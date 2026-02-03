@@ -24,7 +24,7 @@ import {
   Modal,
   WarningIcon,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface DiskSizeConfigurationProps {
   visible: boolean

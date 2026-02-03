@@ -17,12 +17,13 @@ export const PLAN_REQUEST_EMPTY_PLACEHOLDER =
 interface UpgradePlanButtonProps {
   /** Stick to camel case for consistency */
   source: string
-  type?: 'default' | 'primary'
+  variant?: 'default' | 'primary'
   plan?: 'Pro' | 'Team' | 'Enterprise'
   addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
   /** Used in the default message template for request upgrade dialog, e.g: "Upgrade to ..." */
   featureProposition?: string
   disabled?: boolean
+  className?: string
 }
 
 /**
@@ -32,12 +33,13 @@ interface UpgradePlanButtonProps {
  */
 export const UpgradePlanButton = ({
   source,
-  type = 'primary',
+  variant = 'primary',
   plan = 'Pro',
   addon,
   featureProposition,
   disabled,
   children,
+  className,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -55,13 +57,17 @@ export const UpgradePlanButton = ({
   const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
   const message = `Name: ${organization?.name}\nSlug: ${slug}\nRequested plan: ${plan ?? PLAN_REQUEST_EMPTY_PLACEHOLDER}`
 
-  const href = billingAll
-    ? isFreePlan
-      ? `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
-      : addon === 'spendCap'
-        ? `/org/${slug ?? '_'}/billing?panel=costControl&source=${source}`
+  const isRequestingToDisableSpendCap = addon === 'spendCap'
+  const isOnPaidPlanAndRequestingToPurchaseAddon = !isFreePlan && !!addon
+
+  // [Joshen] URL for button based on the "upgrade request" and the org's plan. Falls back to URL for opening subscription plan
+  const href = isRequestingToDisableSpendCap
+    ? `/org/${slug ?? '_'}/billing?panel=costControl&source=${source}`
+    : isOnPaidPlanAndRequestingToPurchaseAddon
+      ? addon === 'computeSize'
+        ? `/project/${ref ?? '_'}/settings/compute-and-disk`
         : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
-    : '/'
+      : `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
 
   const linkChildren = children || (!!addon ? 'Enable add-on' : `Upgrade to ${plan}`)
   const link = billingAll ? (
@@ -78,6 +84,7 @@ export const UpgradePlanButton = ({
         plan={plan}
         addon={addon}
         featureProposition={featureProposition}
+        className={className}
       >
         {children}
       </RequestUpgradeToBillingOwners>
@@ -88,7 +95,8 @@ export const UpgradePlanButton = ({
     return (
       <ButtonTooltip
         disabled
-        type="primary"
+        type={variant}
+        className={className}
         tooltip={{
           content: {
             side: 'bottom',
@@ -102,7 +110,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={type} disabled={disabled}>
+    <Button asChild type={variant} disabled={disabled} className={className}>
       {link}
     </Button>
   )

@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface ErrorCodeDialogProps {
   open: boolean

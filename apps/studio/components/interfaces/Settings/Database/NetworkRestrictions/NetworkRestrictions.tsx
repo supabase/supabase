@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -25,10 +24,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import AddRestrictionModal from './AddRestrictionModal'
-import AllowAllModal from './AllowAllModal'
-import DisallowAllModal from './DisallowAllModal'
-import RemoveRestrictionModal from './RemoveRestrictionModal'
 import {
   PageSection,
   PageSectionAside,
@@ -37,6 +32,11 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import AddRestrictionModal from './AddRestrictionModal'
+import AllowAllModal from './AllowAllModal'
+import DisallowAllModal from './DisallowAllModal'
+import RemoveRestrictionModal from './RemoveRestrictionModal'
 
 interface AccessButtonProps {
   disabled: boolean

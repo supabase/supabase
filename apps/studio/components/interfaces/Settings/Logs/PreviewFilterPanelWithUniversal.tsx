@@ -2,10 +2,10 @@ import dayjs from 'dayjs'
 import { Eye, EyeOff, RefreshCw, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, Calendar, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
@@ -83,31 +83,6 @@ interface PreviewFilterPanelProps {
   setSelectedDatePickerValue: (value: DatePickerValue) => void
 }
 
-function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
-  const timeoutRef = useRef<NodeJS.Timeout>()
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [])
-
-  return useCallback(
-    (...args: Parameters<T>) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        callback(...args)
-      }, delay)
-    },
-    [callback, delay]
-  ) as T
-}
-
 export const PreviewFilterPanelWithUniversal = ({
   isLoading,
   newCount,
@@ -132,8 +107,6 @@ export const PreviewFilterPanelWithUniversal = ({
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
-
-  const logName = router.pathname.split('/').pop()
 
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 

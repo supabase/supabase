@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -49,16 +50,16 @@ export const CreateNewAPIKeysButton = () => {
         <AlertDialogHeader>
           <AlertDialogTitle>Create new API keys</AlertDialogTitle>
           <AlertDialogDescription>
-            This will create a default publishable key and a default secret key named{' '}
+            This will create a default publishable key and a default secret key both named{' '}
             <code className="!break-keep text-code-inline">default</code>. These keys are required
             to connect your application to your Supabase project.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button onClick={handleCreateNewApiKeys} loading={isCreatingKeys}>
+          <AlertDialogAction onClick={handleCreateNewApiKeys} disabled={isCreatingKeys}>
             {isCreatingKeys ? 'Creating...' : 'Create keys'}
-          </Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

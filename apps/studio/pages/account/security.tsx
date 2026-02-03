@@ -59,8 +59,8 @@ const Security: NextPageWithLayout = () => {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="small" className="pt-8">
-        <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
+      <PageContainer size="small">
+        <Collapsible_Shadcn_ className={cn('mt-8', collapsibleClasses)}>
           <CollapsibleTrigger_Shadcn_ asChild>
             <button
               type="button"

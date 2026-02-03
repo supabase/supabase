@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -14,7 +14,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Badge, Card, CardContent, CardHeader } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { PostgrestConfig } from './PostgrestConfig'
 
 export const ServiceList = () => {
@@ -89,7 +89,7 @@ export const ServiceList = () => {
                 </Alert_Shadcn_>
               ) : (
                 <FormLayout
-                  layout="horizontal"
+                  layout="flex-row-reverse"
                   label={
                     isCustomDomainActive ? (
                       <div className="flex items-center space-x-2">
@@ -107,6 +107,7 @@ export const ServiceList = () => {
                         ? 'RESTful endpoint for querying your read replica'
                         : 'RESTful endpoint for querying and managing your database'
                   }
+                  className="[&>div]:xl:w-1/2 [&>div>div]:w-full"
                 >
                   <Input copy readOnly className="font-mono" value={endpoint} />
                 </FormLayout>

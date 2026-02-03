@@ -36,4 +36,11 @@ export const FEATURE_PREVIEWS = [
     isNew: false,
     isPlatformOnly: false,
   },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
+    name: 'Queue table operations',
+    discussionsUrl: undefined,
+    isNew: true,
+    isPlatformOnly: false,
+  },
 ] as const

@@ -227,6 +227,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/cloud-marketplace/buyers/{buyer_id}/contract-linking-eligibility': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Check whether the buyer's latest contract can be linked to an organization
+     * @description Cases where linking is not possible/needed include contracts that stem from an Agreement Based Offer or contracts for the AWS Activate Credits Deal
+     */
+    get: operations['ClazarController_checkContractLinkingEligibility']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/cloud-marketplace/buyers/{buyer_id}/onboarding-info': {
     parameters: {
       query?: never
@@ -415,23 +435,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/database/{ref}/hook-logs': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets hook logs with the given ID */
-    get: operations['HooksController_getHookLogs']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/feedback/conversations/{conversation_id}/custom-fields': {
     parameters: {
       query?: never
@@ -576,40 +579,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/github/branches/{connection_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List GitHub connection branches */
-    get: operations['GitHubBranchesController_listConnectionBranches']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/github/branches/{connection_id}/{branch_name}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get GitHub connection branch */
-    get: operations['GitHubBranchesController_getConnectionBranch']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/integrations/github/connections': {
     parameters: {
       query?: never
@@ -739,23 +708,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/vercel/{organization_integration_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Removes Vercel organization integration with the given id */
-    delete: operations['VercelIntegrationController_removeVercelIntegration']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/integrations/vercel/connections': {
     parameters: {
       query?: never
@@ -802,23 +754,6 @@ export interface paths {
     put?: never
     /** Syncs supabase project envs with given connection id */
     post: operations['VercelConnectionsController_syncVercelConnectionEnvironments']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/vercel/connections/{organization_integration_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets installed vercel project connections for the given organization integration */
-    get: operations['VercelConnectionsController_getVercelConnections']
-    put?: never
-    post?: never
     delete?: never
     options?: never
     head?: never
@@ -1085,6 +1020,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/invoices/{invoice_id}/receipt': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the receipt PDF URL for a paid invoice */
+    get: operations['OrgInvoicesController_getInvoiceReceipt']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     parameters: {
       query?: never
@@ -1292,26 +1244,6 @@ export interface paths {
     trace?: never
   }
   '/platform/organizations/{slug}/entitlements': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get entitlements for an organization
-     * @description Returns the entitlements available to the organization based on their plan and any overrides.
-     */
-    get: operations['OrganizationEntitlementsController_getEntitlements']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/{slug}/entitlements/entitlements': {
     parameters: {
       query?: never
       header?: never
@@ -1641,7 +1573,7 @@ export interface paths {
      * Gets all projects for the given organization
      * @description Returns a paginated list of projects for the specified organization.
      *
-     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     *     This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
     get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
@@ -1992,8 +1924,7 @@ export interface paths {
     put?: never
     /** Creates user's profile */
     post: operations['ProfileController_createProfile']
-    /** Deletes user's profile */
-    delete: operations['ProfileController_deleteProfile']
+    delete?: never
     options?: never
     head?: never
     /** Updates user's profile */
@@ -2134,7 +2065,7 @@ export interface paths {
      * Gets all projects that belong to the authenticated user
      * @description Returns a paginated list of projects across all organizations the user has access to.
      *
-     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     *     This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
     get: operations['ProjectsController_getProjects']
     put?: never
@@ -2658,24 +2589,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}/config/postgres': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project's Postgres config */
-    get: operations['PostgresConfigController_getConfig']
-    /** Updates project's Postgres config */
-    put: operations['PostgresConfigController_updateConfig']
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/projects/{ref}/config/postgrest': {
     parameters: {
       query?: never
@@ -2778,8 +2691,7 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    /** Updates project's supavisor config */
-    patch: operations['SupavisorConfigController_updateSupavisorConfig']
+    patch?: never
     trace?: never
   }
   '/platform/projects/{ref}/content': {
@@ -2793,8 +2705,7 @@ export interface paths {
     get: operations['ContentController_getContent']
     /** Updates project's content */
     put: operations['ContentController_updateWholeContent']
-    /** Creates project's content */
-    post: operations['ContentController_createContent']
+    post?: never
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
     options?: never
@@ -3003,23 +2914,6 @@ export interface paths {
     }
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/projects/{ref}/live': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project health check */
-    get: operations['HealthCheckController_projectHealthCheck']
     put?: never
     post?: never
     delete?: never
@@ -3251,23 +3145,6 @@ export interface paths {
     put?: never
     /** Unpauses project */
     post: operations['UnpauseController_unpauseProject']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/projects/{ref}/restore/cancel': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Cancels a failed restoration */
-    post: operations['UnpauseController_cancelProjectRestoration']
     delete?: never
     options?: never
     head?: never
@@ -3591,6 +3468,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/destinations/validate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Validate destination configuration
+     * @description Validates that the destination is accessible and properly configured. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationDestinationsController_validateDestination']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/pipelines': {
     parameters: {
       query?: never
@@ -3663,7 +3560,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-table-state': {
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-tables': {
     parameters: {
       query?: never
       header?: never
@@ -3673,10 +3570,10 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * Rollback pipeline table state
-     * @description Rollback a table state for the pipeline. Requires bearer auth and an active, healthy project.
+     * Rollback pipeline tables
+     * @description Rollback the replication state of tables in the pipeline. Supports rolling back a single table, all errored tables or all tables. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationPipelinesController_rollbackTableState']
+    post: operations['ReplicationPipelinesController_rollbackTables']
     delete?: never
     options?: never
     head?: never
@@ -3761,6 +3658,26 @@ export interface paths {
      * @description Update the pipeline to a new version. Requires bearer auth and an active, healthy project.
      */
     post: operations['ReplicationPipelinesController_updatePipelineVersion']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/validate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Validate pipeline configuration
+     * @description Validates pipeline prerequisites against the source database. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationPipelinesController_validatePipeline']
     delete?: never
     options?: never
     head?: never
@@ -3973,10 +3890,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets list of namespaces from a bucket */
-    get: operations['StorageAnalyticsBucketNamespacesController_getBuckets']
+    get: operations['StorageAnalyticsBucketNamespacesController_getNamespaces']
     put?: never
     /** Create a namespace within a bucket */
-    post: operations['StorageAnalyticsBucketNamespacesController_createBucket']
+    post: operations['StorageAnalyticsBucketNamespacesController_createNamespace']
     delete?: never
     options?: never
     head?: never
@@ -3994,7 +3911,7 @@ export interface paths {
     put?: never
     post?: never
     /** Drop a namespace within an analytics bucket */
-    delete: operations['StorageAnalyticsBucketNamespaceController_deleteBucket']
+    delete: operations['StorageAnalyticsBucketNamespaceController_deleteNamespace']
     options?: never
     head?: never
     patch?: never
@@ -4008,7 +3925,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets list of tables from a namespace */
-    get: operations['StorageAnalyticsBucketNamespaceTablesController_getBuckets']
+    get: operations['StorageAnalyticsBucketNamespaceTablesController_getTables']
     put?: never
     /** Create a table within a namespace */
     post: operations['StorageAnalyticsBucketNamespaceTablesController_createTable']
@@ -4485,40 +4402,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/telemetry/page': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Send server page event */
-    post: operations['TelemetryPageController_sendServerPageV2']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/telemetry/page-leave': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Send analytics page leave event */
-    post: operations['TelemetryPageLeaveController_trackPageLeave']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/telemetry/reset': {
     parameters: {
       query?: never
@@ -4600,8 +4483,7 @@ export interface paths {
     post?: never
     delete?: never
     options?: never
-    /** Count the number of workflow runs for the given branch */
-    head: operations['WorkflowRunController_countWorkflowRuns']
+    head?: never
     patch?: never
     trace?: never
   }
@@ -4757,7 +4639,6 @@ export interface components {
       }
       pitr_enabled: boolean
       region: string
-      tierKey: string
       walg_enabled: boolean
     }
     BillingCustomerUpdateBody: {
@@ -4796,7 +4677,6 @@ export interface components {
       region: string
       target_compute_size: string
       target_volume_size_gb: number
-      tierKey: string
       walg_enabled: boolean
     }
     CloneProject: {
@@ -4804,6 +4684,17 @@ export interface components {
       newDbPass: string
       newProjectName: string
       recoveryTimeTarget?: number
+    }
+    CloudMarketplaceContractLinkingEligibilityResponse: {
+      eligibility: {
+        aws_agreement_id?: string
+        is_eligible: boolean
+        reasons: (
+          | 'AWS_ACTIVATE_CREDITS_DEAL'
+          | 'AGREEMENT_BASED_OFFER'
+          | 'NO_ACTIVE_CONTRACT_FOUND'
+        )[]
+      }
     }
     CloudMarketplaceOnboardingInfoResponse: {
       aws_contract_auto_renewal: boolean
@@ -4944,23 +4835,6 @@ export interface components {
     CreateCollectionBody: {
       name: string
       retention_days: number
-    }
-    CreateContentBody: {
-      content?: {
-        [key: string]: unknown
-      }
-      description?: string
-      /** @default false */
-      favorite?: boolean
-      /** Format: uuid */
-      folder_id?: (null | (string | null)) | null
-      id?: string
-      name: string
-      owner_id?: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
     }
     CreateContentFolderBody: {
       name: string
@@ -5505,11 +5379,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -5533,11 +5409,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -5582,17 +5460,22 @@ export interface components {
       organization_slugs?: string[]
       permissions: (
         | 'organizations_read'
-        | 'organizations_write'
+        | 'organizations_create'
         | 'projects_read'
-        | 'available_regions_read'
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
         | 'members_read'
         | 'members_write'
+        | 'organization_projects_read'
+        | 'organization_projects_create'
         | 'project_admin_read'
         | 'project_admin_write'
+        | 'action_runs_read'
+        | 'action_runs_write'
         | 'advisors_read'
+        | 'analytics_logs_read'
+        | 'analytics_usage_read'
         | 'api_gateway_keys_read'
         | 'api_gateway_keys_write'
         | 'auth_config_read'
@@ -5613,6 +5496,8 @@ export interface components {
         | 'database_write'
         | 'database_config_read'
         | 'database_config_write'
+        | 'database_jit_read'
+        | 'database_jit_write'
         | 'database_network_bans_read'
         | 'database_network_bans_write'
         | 'database_network_restrictions_read'
@@ -5631,8 +5516,8 @@ export interface components {
         | 'edge_functions_write'
         | 'edge_functions_secrets_read'
         | 'edge_functions_secrets_write'
-        | 'infra_add-ons_read'
-        | 'infra_add-ons_write'
+        | 'infra_add_ons_read'
+        | 'infra_add_ons_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -5641,8 +5526,8 @@ export interface components {
         | 'storage_write'
         | 'storage_config_read'
         | 'storage_config_write'
-        | 'telemetry_logs_read'
-        | 'telemetry_usage_read'
+        | 'vanity_subdomain_read'
+        | 'vanity_subdomain_write'
       )[]
       project_refs?: string[]
     }
@@ -5991,7 +5876,12 @@ export interface components {
         | {
             iops: number
             size_gb: number
-            throughput_mbps: number
+            /**
+             * @deprecated
+             * @description Use throughput_mibps instead. This field incorrectly uses `mbps` but the value is actually MiB/s.
+             */
+            throughput_mbps?: number
+            throughput_mibps?: number
             /** @enum {string} */
             type: 'gp3'
           }
@@ -6007,7 +5897,12 @@ export interface components {
         | {
             iops: number
             size_gb: number
+            /**
+             * @deprecated
+             * @description Use throughput_mibps instead. This field incorrectly uses `mbps` but the value is actually MiB/s.
+             */
             throughput_mbps: number
+            throughput_mibps: number
             /** @enum {string} */
             type: 'gp3'
           }
@@ -6022,7 +5917,12 @@ export interface components {
         | {
             iops: number
             size_gb: number
+            /**
+             * @deprecated
+             * @description Use throughput_mibps instead. This field incorrectly uses `mbps` but the value is actually MiB/s.
+             */
             throughput_mbps: number
+            throughput_mibps: number
             /** @enum {string} */
             type: 'gp3'
           }
@@ -6508,7 +6408,6 @@ export interface components {
       /** @enum {string} */
       billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
-      cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
       customer_balance?: number
@@ -6676,17 +6575,6 @@ export interface components {
       }
       updated_at: string
     }
-    GetVercelConnectionsResponse: {
-      foreign_project_id: string
-      id: string
-      inserted_at: string
-      metadata: {
-        [key: string]: unknown
-      }
-      organization_integration_id: string
-      supabase_project_ref: string
-      updated_at: string
-    }[]
     GetVercelProjectsResponse: {
       pagination: {
         count: number
@@ -6982,6 +6870,10 @@ export interface components {
     InvoicePaymentLinkResponse: {
       redirectUrl: string
     }
+    InvoiceReceiptResponse: {
+      /** Format: uri */
+      receipt_pdf: string
+    }
     LFAccessToken: {
       description: string | null
       id: number
@@ -7123,8 +7015,18 @@ export interface components {
           /** @enum {string} */
           key:
             | 'instances.compute_update_available_sizes'
+            | 'instances.read_replicas'
+            | 'instances.disk_modifications'
+            | 'replication.etl'
             | 'storage.max_file_size'
+            | 'storage.image_transformations'
+            | 'storage.vector_buckets'
+            | 'storage.iceberg_catalog'
             | 'security.audit_logs_days'
+            | 'security.questionnaire'
+            | 'security.soc2_report'
+            | 'security.private_link'
+            | 'security.enforce_mfa'
             | 'log.retention_days'
             | 'custom_domain'
             | 'vanity_subdomain'
@@ -7134,9 +7036,29 @@ export interface components {
             | 'branching_limit'
             | 'branching_persistent'
             | 'auth.mfa_phone'
+            | 'auth.mfa_web_authn'
+            | 'auth.mfa_enhanced_security'
             | 'auth.hooks'
             | 'auth.platform.sso'
+            | 'auth.custom_jwt_template'
+            | 'auth.saml_2'
+            | 'auth.user_sessions'
+            | 'auth.leaked_password_protection'
+            | 'auth.advanced_auth_settings'
             | 'backup.retention_days'
+            | 'function.max_count'
+            | 'function.size_limit_mb'
+            | 'realtime.max_concurrent_users'
+            | 'realtime.max_events_per_second'
+            | 'realtime.max_joins_per_second'
+            | 'realtime.max_channels_per_client'
+            | 'realtime.max_bytes_per_second'
+            | 'realtime.max_presence_events_per_second'
+            | 'realtime.max_payload_size_in_kb'
+            | 'project_scoped_roles'
+            | 'security.member_roles'
+            | 'project_pausing'
+            | 'project_cloning'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -7792,37 +7714,6 @@ export interface components {
       relation_name: string
       relation_schema: string
     }
-    PostgresConfigResponse: {
-      /** @description Default unit: s */
-      checkpoint_timeout?: string
-      effective_cache_size?: string
-      hot_standby_feedback?: boolean
-      logical_decoding_work_mem?: string
-      maintenance_work_mem?: string
-      max_connections?: number
-      max_locks_per_transaction?: number
-      max_parallel_maintenance_workers?: number
-      max_parallel_workers?: number
-      max_parallel_workers_per_gather?: number
-      max_replication_slots?: number
-      max_slot_wal_keep_size?: string
-      max_standby_archive_delay?: string
-      max_standby_streaming_delay?: string
-      max_wal_senders?: number
-      max_wal_size?: string
-      max_worker_processes?: number
-      /** @enum {string} */
-      session_replication_role?: 'origin' | 'replica' | 'local'
-      shared_buffers?: string
-      /** @description Default unit: ms */
-      statement_timeout?: string
-      track_activity_query_size?: string
-      track_commit_timestamp?: boolean
-      wal_keep_size?: string
-      /** @description Default unit: ms */
-      wal_sender_timeout?: string
-      work_mem?: string
-    }
     PostgresExtension: {
       comment: string | null
       default_version: string
@@ -8070,14 +7961,14 @@ export interface components {
         | 'billing:payment_methods'
         | 'realtime:all'
       )[]
-      first_name: string
-      free_project_limit: number
+      first_name: string | null
+      free_project_limit: number | null
       gotrue_id: string
       id: number
       is_alpha_user: boolean
       is_sso_user: boolean
-      last_name: string
-      mobile: string
+      last_name: string | null
+      mobile: string | null
       primary_email: string
       username: string
     }
@@ -8723,11 +8614,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -8783,11 +8676,13 @@ export interface components {
              */
             max_fill_ms?: number
             /**
-             * @description Maximum batch size
+             * @description Maximum size of the batch
              * @example 200
              */
             max_size?: number
           }
+          /** @description Maximum number of table sync workers */
+          max_table_sync_workers?: number
           /**
            * @description Publication name
            * @example pub_orders
@@ -9003,7 +8898,6 @@ export interface components {
         source_notification_id?: string
       }
     }
-    RestoreCancellation: Record<string, never>
     RestoreLogicalBackupBody: {
       id: number
     }
@@ -9018,72 +8912,89 @@ export interface components {
       name: string
       website: string
     }
-    RollbackTableStateBody: {
+    RollbackTablesBody: {
       /**
        * @description Rollback type
        * @example individual
        * @enum {string}
        */
       rollback_type: 'individual' | 'full'
-      /**
-       * @description Table id (Postgres OID)
-       * @example 16408
-       */
-      table_id: number
+      /** @description Rollback target */
+      target:
+        | {
+            /**
+             * @description Table id (Postgres OID)
+             * @example 16408
+             */
+            table_id: number
+            /** @enum {string} */
+            type: 'single_table'
+          }
+        | {
+            /** @enum {string} */
+            type: 'all_errored_tables'
+          }
+        | {
+            /** @enum {string} */
+            type: 'all_tables'
+          }
     }
-    RollbackTableStateResponse: {
-      /** @description Table replication state */
-      new_state:
-        | {
-            /** @enum {string} */
-            name: 'queued'
-          }
-        | {
-            /** @enum {string} */
-            name: 'copying_table'
-          }
-        | {
-            /** @enum {string} */
-            name: 'copied_table'
-          }
-        | {
-            /** @enum {string} */
-            name: 'following_wal'
-          }
-        | {
-            /** @enum {string} */
-            name: 'error'
-            reason: string
-            retry_policy:
-              | {
-                  /** @enum {string} */
-                  policy: 'no_retry'
-                }
-              | {
-                  /** @enum {string} */
-                  policy: 'manual_retry'
-                }
-              | {
-                  /**
-                   * @description Next retry time (RFC 3339 timestamp)
-                   * @example 2025-01-02T03:04:05Z
-                   */
-                  next_retry: string
-                  /** @enum {string} */
-                  policy: 'timed_retry'
-                }
-            solution?: string
-          }
+    RollbackTablesResponse: {
       /**
        * @description Pipeline id
        * @example 1012
        */
       pipeline_id: number
-      /**
-       * @description Table id (Postgres OID)
-       * @example 16408
-       */
-      table_id: number
+      /** @description Rolled back tables */
+      tables: {
+        /** @description Table replication state */
+        new_state:
+          | {
+              /** @enum {string} */
+              name: 'queued'
+            }
+          | {
+              /** @enum {string} */
+              name: 'copying_table'
+            }
+          | {
+              /** @enum {string} */
+              name: 'copied_table'
+            }
+          | {
+              /** @enum {string} */
+              name: 'following_wal'
+            }
+          | {
+              /** @enum {string} */
+              name: 'error'
+              reason: string
+              retry_policy:
+                | {
+                    /** @enum {string} */
+                    policy: 'no_retry'
+                  }
+                | {
+                    /** @enum {string} */
+                    policy: 'manual_retry'
+                  }
+                | {
+                    /**
+                     * @description Next retry time (RFC 3339 timestamp)
+                     * @example 2025-01-02T03:04:05Z
+                     */
+                    next_retry: string
+                    /** @enum {string} */
+                    policy: 'timed_retry'
+                  }
+              solution?: string
+            }
+        /**
+         * @description Table id (Postgres OID)
+         * @example 16408
+         */
+        table_id: number
+      }[]
     }
     RunLintByNameResponse: {
       lints: {
@@ -9165,7 +9076,9 @@ export interface components {
       allowSupportAccess?: boolean
       browserInformation?: string
       category: string
+      dashboardLogs?: string
       dashboardSentryIssueId?: string
+      dashboardStudioVersion?: string
       library?: string
       message: string
       organizationSlug?: string
@@ -9418,37 +9331,10 @@ export interface components {
       reset_project?: boolean
     }
     TelemetryIdentifyBodyV2: {
+      anonymous_id?: string
       organization_slug?: string
       project_ref?: string
       user_id: string
-    }
-    TelemetryPageBodyV2: {
-      feature_flags?: {
-        [key: string]: unknown
-      }
-      groups?: {
-        organization?: string
-        project?: string
-      }
-      page_title: string
-      page_url: string
-      pathname: string
-      ph: {
-        language: string
-        referrer: string
-        search: string
-        user_agent: string
-        viewport_height: number
-        viewport_width: number
-      }
-    }
-    TelemetryPageLeaveBody: {
-      feature_flags?: {
-        [key: string]: unknown
-      }
-      page_title: string
-      page_url: string
-      pathname: string
     }
     TemporaryApiKeyResponse: {
       api_key: string
@@ -9856,6 +9742,10 @@ export interface components {
       EXTERNAL_WORKOS_ENABLED?: boolean | null
       EXTERNAL_WORKOS_SECRET?: string | null
       EXTERNAL_WORKOS_URL?: string | null
+      EXTERNAL_X_CLIENT_ID?: string | null
+      EXTERNAL_X_EMAIL_OPTIONAL?: boolean | null
+      EXTERNAL_X_ENABLED?: boolean | null
+      EXTERNAL_X_SECRET?: string | null
       EXTERNAL_ZOOM_CLIENT_ID?: string | null
       EXTERNAL_ZOOM_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_ZOOM_ENABLED?: boolean | null
@@ -10109,38 +9999,6 @@ export interface components {
       server_idle_timeout?: number
       server_lifetime?: number
     }
-    UpdatePostgresConfigBody: {
-      /** @description Default unit: s */
-      checkpoint_timeout?: string
-      effective_cache_size?: string
-      hot_standby_feedback?: boolean
-      logical_decoding_work_mem?: string
-      maintenance_work_mem?: string
-      max_connections?: number
-      max_locks_per_transaction?: number
-      max_parallel_maintenance_workers?: number
-      max_parallel_workers?: number
-      max_parallel_workers_per_gather?: number
-      max_replication_slots?: number
-      max_slot_wal_keep_size?: string
-      max_standby_archive_delay?: string
-      max_standby_streaming_delay?: string
-      max_wal_senders?: number
-      max_wal_size?: string
-      max_worker_processes?: number
-      restart_database?: boolean
-      /** @enum {string} */
-      session_replication_role?: 'origin' | 'replica' | 'local'
-      shared_buffers?: string
-      /** @description Default unit: ms */
-      statement_timeout?: string
-      track_activity_query_size?: string
-      track_commit_timestamp?: boolean
-      wal_keep_size?: string
-      /** @description Default unit: ms */
-      wal_sender_timeout?: string
-      work_mem?: string
-    }
     UpdatePostgrestConfigBody: {
       db_extra_search_path?: string
       db_pool?: number
@@ -10352,11 +10210,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -10380,11 +10240,13 @@ export interface components {
            */
           max_fill_ms?: number
           /**
-           * @description Maximum batch size
+           * @description Maximum size of the batch
            * @example 200
            */
           max_size?: number
         }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
         /**
          * @description Publication name
          * @example pub_orders
@@ -10547,18 +10409,6 @@ export interface components {
     UpdateSubscriptionResponse: {
       pending_payment_intent_secret: string | null
     }
-    UpdateSupavisorConfigBody: {
-      default_pool_size?: number | null
-      /**
-       * @description Dedicated pooler mode for the project
-       * @enum {string}
-       */
-      pool_mode?: 'transaction' | 'session'
-    }
-    UpdateSupavisorConfigResponse: {
-      default_pool_size: number | null
-      pool_mode: string
-    }
     UpdateUserBody: {
       ban_duration?: string
     }
@@ -10614,11 +10464,14 @@ export interface components {
         [key: string]: unknown
       }
       description?: string
-      /** @description A missing `favorite` value means that the value will remained unchanged for updates. Defaults to `false` for inserts. */
+      /**
+       * @description A missing `favorite` value means that the value will remained unchanged for updates. Defaults to `false` for inserts.
+       * @default false
+       */
       favorite?: boolean
       /** Format: uuid */
       folder_id?: (null | (string | null)) | null
-      id: string
+      id?: string
       name: string
       owner_id?: number
       project_id?: number
@@ -10674,24 +10527,148 @@ export interface components {
       role?: string
       updated_at?: string
     }
-    UserContentObject: {
-      content: {
-        [key: string]: unknown
+    ValidateDestinationResponse: {
+      /** @description List of validation failures */
+      validation_failures: {
+        /**
+         * @description Failure type
+         * @example critical
+         * @enum {string}
+         */
+        failure_type: 'critical' | 'warning'
+        /**
+         * @description Validation failure name
+         * @example Validation Failed
+         */
+        name: string
+        /**
+         * @description Validation failure reason
+         * @example The configuration is invalid
+         */
+        reason: string
+      }[]
+    }
+    ValidatePipelineResponse: {
+      /** @description List of validation failures */
+      validation_failures: {
+        /**
+         * @description Failure type
+         * @example critical
+         * @enum {string}
+         */
+        failure_type: 'critical' | 'warning'
+        /**
+         * @description Validation failure name
+         * @example Validation Failed
+         */
+        name: string
+        /**
+         * @description Validation failure reason
+         * @example The configuration is invalid
+         */
+        reason: string
+      }[]
+    }
+    ValidateReplicationDestinationBody: {
+      /** @description Destination configuration */
+      config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace?: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
+    }
+    ValidateReplicationPipelineBody: {
+      /** @description Pipeline configuration */
+      config: {
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+          /**
+           * @description Maximum size of the batch
+           * @example 200
+           */
+          max_size?: number
+        }
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
       }
-      description?: string
-      favorite: boolean
-      folder_id?: string | null
-      id: string
-      inserted_at: string
-      last_updated_by?: number
-      name: string
-      owner_id: number
-      project_id: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      updated_at: string
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
+      /**
+       * @description Source id
+       * @example 3001
+       */
+      source_id: number
     }
     ValidateSpamBody: {
       content: string
@@ -11456,6 +11433,34 @@ export interface operations {
       }
     }
   }
+  ClazarController_checkContractLinkingEligibility: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        buyer_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CloudMarketplaceContractLinkingEligibilityResponse']
+        }
+      }
+      /** @description Failed to get info about contract linking eligibility */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ClazarController_getCloudMarketplaceOnboardingInfo: {
     parameters: {
       query?: never
@@ -12044,60 +12049,6 @@ export interface operations {
       }
     }
   }
-  HooksController_getHookLogs: {
-    parameters: {
-      query: {
-        id: number
-        limit?: number
-        offset?: number
-      }
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get hook logs with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   LinkConversationController_updateConversationCustomFields: {
     parameters: {
       query?: never
@@ -12402,66 +12353,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to remove GitHub authorization */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  GitHubBranchesController_listConnectionBranches: {
-    parameters: {
-      query?: {
-        page?: number
-        per_page?: number
-      }
-      header?: never
-      path: {
-        connection_id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GitHubBranchResponse'][]
-        }
-      }
-      /** @description Failed to list GitHub connection branches */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  GitHubBranchesController_getConnectionBranch: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        branch_name: string
-        connection_id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GitHubBranchResponse']
-        }
-      }
-      /** @description Failed to get GitHub connection branch */
       500: {
         headers: {
           [name: string]: unknown
@@ -12797,32 +12688,6 @@ export interface operations {
       }
     }
   }
-  VercelIntegrationController_removeVercelIntegration: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        organization_integration_id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to remove Vercel organization integration with the given id */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   VercelConnectionsController_createVercelConnection: {
     parameters: {
       query?: never
@@ -12929,34 +12794,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to sync supabase project envs with given connection id */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelConnectionsController_getVercelConnections: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        organization_integration_id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetVercelConnectionsResponse']
-        }
-      }
-      /** @description Failed to get installed vercel connections for the given organization integration */
       500: {
         headers: {
           [name: string]: unknown
@@ -13746,6 +13583,71 @@ export interface operations {
       }
     }
   }
+  OrgInvoicesController_getInvoiceReceipt: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        invoice_id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['InvoiceReceiptResponse']
+        }
+      }
+      /** @description Receipt not available for this invoice type or status */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Invoice or receipt not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve receipt */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrgInvoicesController_getUpcomingInvoice: {
     parameters: {
       query?: never
@@ -14494,49 +14396,6 @@ export interface operations {
       }
     }
   }
-  OrganizationEntitlementsController_getEntitlements: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ListEntitlementsResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   MembersController_getMembers: {
     parameters: {
       query?: never
@@ -14993,7 +14852,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description MFA enfocement state on organization. */
+      /** @description MFA enforcement state on organization. */
       201: {
         headers: {
           [name: string]: unknown
@@ -15048,7 +14907,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description MFA enfocement state on organization updated successfully. */
+      /** @description MFA enforcement state on organization updated successfully. */
       201: {
         headers: {
           [name: string]: unknown
@@ -17089,36 +16948,6 @@ export interface operations {
         }
       }
       /** @description Failed to create user's profile */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ProfileController_deleteProfile: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete user's profile */
       500: {
         headers: {
           [name: string]: unknown
@@ -19622,110 +19451,6 @@ export interface operations {
       }
     }
   }
-  PostgresConfigController_getConfig: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to retrieve project's Postgres config */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  PostgresConfigController_updateConfig: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdatePostgresConfigBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update project's Postgres config */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   PostgrestConfigController_getPostgRESTConfig: {
     parameters: {
       query?: never
@@ -20177,60 +19902,6 @@ export interface operations {
       }
     }
   }
-  SupavisorConfigController_updateSupavisorConfig: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateSupavisorConfigBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UpdateSupavisorConfigResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update project's supavisor config */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ContentController_getContent: {
     parameters: {
       query?: {
@@ -20335,60 +20006,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update project's content */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ContentController_createContent: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateContentBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UserContentObject']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create project's content */
       500: {
         headers: {
           [name: string]: unknown
@@ -21353,7 +20970,7 @@ export interface operations {
           | 'disk_fs_used'
           | 'disk_fs_used_wal'
           | 'disk_fs_used_system'
-          | 'physical_replication_lag_physical_replica_lag_seconds'
+          | 'physical_replication_lag_physical_replication_lag_seconds'
           | 'pg_stat_database_num_backends'
           | 'max_db_connections'
         attributes?: (
@@ -21409,7 +21026,7 @@ export interface operations {
           | 'disk_fs_used'
           | 'disk_fs_used_wal'
           | 'disk_fs_used_system'
-          | 'physical_replication_lag_physical_replica_lag_seconds'
+          | 'physical_replication_lag_physical_replication_lag_seconds'
           | 'pg_stat_database_num_backends'
           | 'max_db_connections'
         )[]
@@ -21455,54 +21072,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get project's usage metrics */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  HealthCheckController_projectHealthCheck: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project health check */
       500: {
         headers: {
           [name: string]: unknown
@@ -22264,56 +21833,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to unpause project */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  UnpauseController_cancelProjectRestoration: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['RestoreCancellation']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to cancel project restoration */
       500: {
         headers: {
           [name: string]: unknown
@@ -23376,6 +22895,61 @@ export interface operations {
       }
     }
   }
+  ReplicationDestinationsController_validateDestination: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateReplicationDestinationBody']
+      }
+    }
+    responses: {
+      /** @description Validation completed. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ValidateDestinationResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while validating destination. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ReplicationPipelinesController_getPipelines: {
     parameters: {
       query?: never
@@ -23694,7 +23268,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_rollbackTableState: {
+  ReplicationPipelinesController_rollbackTables: {
     parameters: {
       query?: never
       header?: never
@@ -23708,17 +23282,17 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['RollbackTableStateBody']
+        'application/json': components['schemas']['RollbackTablesBody']
       }
     }
     responses: {
-      /** @description New table state after rollback. */
+      /** @description New table states after rollback. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RollbackTableStateResponse']
+          'application/json': components['schemas']['RollbackTablesResponse']
         }
       }
       /** @description Unauthorized */
@@ -23742,7 +23316,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Unexpected error while rolling back table state. */
+      /** @description Unexpected error while rolling back tables. */
       500: {
         headers: {
           [name: string]: unknown
@@ -24006,6 +23580,61 @@ export interface operations {
         content?: never
       }
       /** @description Unexpected error while updating pipeline version. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_validatePipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateReplicationPipelineBody']
+      }
+    }
+    responses: {
+      /** @description Validation completed. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ValidatePipelineResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while validating pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -24671,7 +24300,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespacesController_getBuckets: {
+  StorageAnalyticsBucketNamespacesController_getNamespaces: {
     parameters: {
       query?: never
       header?: never
@@ -24723,7 +24352,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespacesController_createBucket: {
+  StorageAnalyticsBucketNamespacesController_createNamespace: {
     parameters: {
       query?: never
       header?: never
@@ -24777,7 +24406,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespaceController_deleteBucket: {
+  StorageAnalyticsBucketNamespaceController_deleteNamespace: {
     parameters: {
       query?: never
       header?: never
@@ -24828,7 +24457,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespaceTablesController_getBuckets: {
+  StorageAnalyticsBucketNamespaceTablesController_getTables: {
     parameters: {
       query?: never
       header?: never
@@ -26579,63 +26208,6 @@ export interface operations {
       }
     }
   }
-  TelemetryPageController_sendServerPageV2: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TelemetryPageBodyV2']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to send server page event */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TelemetryPageLeaveController_trackPageLeave: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TelemetryPageLeaveBody']
-      }
-    }
-    responses: {
-      /** @description Page leave event sent */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to send analytics page leave event */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   TelemetryResetController_reset: {
     parameters: {
       query?: never
@@ -26754,37 +26326,6 @@ export interface operations {
         }
       }
       /** @description Failed to list workflow runs */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  WorkflowRunController_countWorkflowRuns: {
-    parameters: {
-      query?: {
-        /** @description Branch ID */
-        branch_id?: string
-        /** @description Project ref */
-        project_ref?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          /** @description total count value */
-          'X-Total-Count'?: number
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to count workflow runs */
       500: {
         headers: {
           [name: string]: unknown

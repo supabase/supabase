@@ -2,6 +2,7 @@
 
 import { ChevronRight, Play, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 // End of third-party imports
 
 import { isFeatureEnabled, useBreakpoint } from 'common'
@@ -10,10 +11,11 @@ import { IconPanel } from 'ui-patterns/IconPanel'
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
 
-const { sdkDart: sdkDartEnabled, sdkKotlin: sdkKotlinEnabled } = isFeatureEnabled([
-  'sdk:dart',
-  'sdk:kotlin',
-])
+const {
+  sdkDart: sdkDartEnabled,
+  sdkKotlin: sdkKotlinEnabled,
+  sdkSwift: sdkSwiftEnabled,
+} = isFeatureEnabled(['sdk:dart', 'sdk:kotlin', 'sdk:swift'])
 
 function AiPrompt({ className }: { className?: string }) {
   return (
@@ -38,59 +40,72 @@ const HomePageCover = (props) => {
   const isXs = useBreakpoint(639)
   const iconSize = isXs ? 'sm' : 'lg'
   const { homepageHeading } = getCustomContent(['homepage:heading'])
+  const { resolvedTheme } = useTheme()
+  const isLightMode = resolvedTheme !== 'dark'
 
   const frameworks = [
     {
       tooltip: 'ReactJS',
       icon: '/docs/img/icons/react-icon',
       href: '/guides/getting-started/quickstarts/reactjs',
+      hasLightIcon: false,
     },
     {
       tooltip: 'Next.js',
       icon: '/docs/img/icons/nextjs-icon',
       href: '/guides/getting-started/quickstarts/nextjs',
+      hasLightIcon: false,
     },
     {
-      tooltip: 'RedwoodJS',
-      icon: '/docs/img/icons/redwoodjs-icon',
-      href: '/guides/getting-started/quickstarts/redwoodjs',
+      tooltip: 'TanStack Start',
+      icon: '/docs/img/icons/tanstack-icon',
+      href: '/guides/getting-started/quickstarts/tanstack',
+      hasLightIcon: false,
     },
     {
-      tooltip: 'Flutter',
-      icon: '/docs/img/icons/flutter-icon',
-      href: '/guides/getting-started/quickstarts/flutter',
-      enabled: sdkDartEnabled,
+      tooltip: 'Vue',
+      icon: '/docs/img/icons/vuejs-icon',
+      href: '/guides/getting-started/quickstarts/vue',
+      hasLightIcon: false,
+    },
+    {
+      tooltip: 'Nuxt',
+      icon: '/docs/img/icons/nuxt-icon',
+      href: '/guides/getting-started/quickstarts/nuxtjs',
+      hasLightIcon: false,
+    },
+    {
+      tooltip: 'iOS Swift',
+      icon: '/docs/img/icons/swift-icon-orange',
+      href: '/guides/getting-started/quickstarts/ios-swiftui',
+      enabled: sdkSwiftEnabled,
+      hasLightIcon: false,
     },
     {
       tooltip: 'Android Kotlin',
       icon: '/docs/img/icons/kotlin-icon',
       href: '/guides/getting-started/quickstarts/kotlin',
       enabled: sdkKotlinEnabled,
+      hasLightIcon: false,
     },
     {
-      tooltip: 'SvelteKit',
-      icon: '/docs/img/icons/svelte-icon',
-      href: '/guides/getting-started/quickstarts/sveltekit',
+      tooltip: 'Expo React Native',
+      icon: '/docs/img/icons/expo-icon',
+      href: '/guides/getting-started/quickstarts/expo-react-native',
+      hasLightIcon: true,
     },
     {
-      tooltip: 'SolidJS',
-      icon: '/docs/img/icons/solidjs-icon',
-      href: '/guides/getting-started/quickstarts/solidjs',
+      tooltip: 'Flutter',
+      icon: '/docs/img/icons/flutter-icon',
+      href: '/guides/getting-started/quickstarts/flutter',
+      enabled: sdkDartEnabled,
+      hasLightIcon: false,
     },
     {
-      tooltip: 'Vue',
-      icon: '/docs/img/icons/vuejs-icon',
-      href: '/guides/getting-started/quickstarts/vue',
-    },
-    {
-      tooltip: 'Nuxt',
-      icon: '/docs/img/icons/nuxt-icon',
-      href: '/guides/getting-started/quickstarts/nuxtjs',
-    },
-    {
-      tooltip: 'Refine',
-      icon: '/docs/img/icons/refine-icon',
-      href: '/guides/getting-started/quickstarts/refine',
+      tooltip: 'Python',
+      icon: '/docs/img/icons/python-icon',
+      href: '/guides/getting-started/quickstarts/flask',
+      hasLightIcon: false,
     },
   ]
 
@@ -120,16 +135,21 @@ const HomePageCover = (props) => {
           <div className="flex flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
             {frameworks
               .filter((framework) => framework.enabled !== false)
-              .map((framework, i) => (
-                <Link key={i} href={framework.href} passHref className="no-underline">
-                  <IconPanel
-                    iconSize={iconSize}
-                    hideArrow
-                    tooltip={framework.tooltip}
-                    icon={framework.icon}
-                  />
-                </Link>
-              ))}
+              .map((framework, i) => {
+                const iconToUse =
+                  framework.hasLightIcon && isLightMode ? `${framework.icon}-light` : framework.icon
+
+                return (
+                  <Link key={i} href={framework.href} passHref className="no-underline">
+                    <IconPanel
+                      iconSize={iconSize}
+                      hideArrow
+                      tooltip={framework.tooltip}
+                      icon={iconToUse}
+                    />
+                  </Link>
+                )
+              })}
           </div>
           <AiPrompt className="mt-6" />
         </div>

@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
 import { get, handleError } from 'data/fetchers'
-import { UseCustomQueryOptions } from 'types'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdatingStatusVariables = {
@@ -45,7 +45,7 @@ export async function getJwtSecretUpdatingStatus(
 }
 
 export type JwtSecretUpdatingStatusData = Awaited<ReturnType<typeof getJwtSecretUpdatingStatus>>
-export type JwtSecretUpdatingStatusError = unknown
+export type JwtSecretUpdatingStatusError = ResponseError
 
 export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusData>(
   { projectRef }: JwtSecretUpdatingStatusVariables,

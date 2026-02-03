@@ -7,7 +7,7 @@ import type {
   CommandMenuCommandClickedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
-import { useSendTelemetryEvent } from 'lib/telemetry'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 export function useDocsCommandMenuTelemetry() {
   const sendTelemetryEvent = useSendTelemetryEvent()

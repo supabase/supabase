@@ -26,7 +26,7 @@ const Audit: NextPageWithLayout = () => {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="small" className="pt-8">
+      <PageContainer size="small" className="mt-8">
         <AuditLogs />
       </PageContainer>
     </>

@@ -88,7 +88,7 @@ const OrganizationPicker = ({
           className="p-0 w-full"
           side="bottom"
           align="center"
-          style={{ width: ref.current?.offsetWidth }}
+          sameWidthAsTrigger
         >
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Search organizations..." />

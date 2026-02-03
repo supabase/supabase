@@ -1,5 +1,5 @@
 {
-  "name": "angular-user-management",
+  "name": "supabase-angular",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -8,40 +8,31 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
-  "prettier": {
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      }
-    ]
-  },
   "private": true,
   "dependencies": {
-    "@angular/common": "^20.1.2",
-    "@angular/compiler": "^20.1.2",
-    "@angular/core": "^20.1.2",
-    "@angular/forms": "^20.1.2",
-    "@angular/platform-browser": "^20.1.2",
-    "@angular/router": "^20.1.2",
-    "@supabase/supabase-js": "^2.52.0",
+    "@angular/animations": "^21.1.1",
+    "@angular/common": "^21.1.1",
+    "@angular/compiler": "^21.1.1",
+    "@angular/core": "^21.1.1",
+    "@angular/forms": "^21.1.1",
+    "@angular/platform-browser": "^21.1.1",
+    "@angular/platform-browser-dynamic": "^21.1.1",
+    "@supabase/supabase-js": "^2.93.1",
     "rxjs": "~7.8.2",
     "tslib": "^2.8.1",
-    "zone.js": "~0.15.1"
+    "zone.js": "~0.16.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.1.1",
-    "@angular/cli": "^20.1.1",
-    "@angular/compiler-cli": "^20.1.2",
-    "@types/jasmine": "~5.1.8",
-    "jasmine-core": "~5.9.0",
+    "@angular-devkit/build-angular": "^21.1.1",
+    "@angular/cli": "^21.1.1",
+    "@angular/compiler-cli": "^21.1.1",
+    "@types/jasmine": "~5.1.0",
+    "jasmine-core": "~5.5.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.3"
+    "typescript": "~5.9.3"
   }
 }

@@ -25,7 +25,6 @@ import { Snippet } from 'data/content/sql-folders-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -204,7 +203,6 @@ export const SQLEditorTreeViewItem = ({
     }
 
     const snippetCopy = createSqlSnippetSkeletonV2({
-      id: uuidv4(),
       name: `${snippet.name} (Duplicate)`,
       sql,
       owner_id: profile?.id,
@@ -253,6 +251,8 @@ export const SQLEditorTreeViewItem = ({
             }}
             {...props}
             name={element.name}
+            nameForTitle={props.nameForTitle}
+            description={element.metadata?.description || undefined}
             xPadding={16}
           />
         </ContextMenuTrigger_Shadcn_>

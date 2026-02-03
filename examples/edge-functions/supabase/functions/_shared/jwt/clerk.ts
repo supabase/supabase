@@ -1,6 +1,6 @@
 // Clerk as a third-party provider alongside Supabase Auth.
 // Use this template to validate tokens issued by Clerk integration
-import * as jose from "https://deno.land/x/jose@v4.14.4/index.ts";
+import * as jose from "jsr:@panva/jose@6";
 
 // Obtain from https://clerk.com/setup/supabase
 // Must supply this value from function env

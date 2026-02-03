@@ -12,7 +12,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -32,7 +31,9 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { sanitizeRoute } from './ProjectDropdown'
+import { partition } from 'lodash'
 
 const BranchLink = ({
   branch,
@@ -101,7 +102,7 @@ export const BranchDropdown = () => {
   const mainBranch = branches?.find((branch) => branch.is_default)
   const restOfBranches = branches
     ?.filter((branch) => !branch.is_default)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   const sortedBranches =
     branches && branches.length > 0

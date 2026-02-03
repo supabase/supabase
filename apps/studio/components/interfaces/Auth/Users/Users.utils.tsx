@@ -82,6 +82,7 @@ const providers = {
     { notion: 'notion-icon' },
     { twitch: 'twitch-icon' },
     { twitter: 'twitter-icon' },
+    { x: 'x-icon-light' },
     { slack_oidc: 'slack-icon' },
     { slack: 'slack-icon' },
     { spotify: 'spotify-icon' },
@@ -149,6 +150,7 @@ export function getDisplayName(user: User, fallback = '-'): string {
     last_name,
     firstName,
     first_name,
+    name,
   } = user.raw_user_meta_data ?? {}
 
   const {
@@ -193,7 +195,8 @@ export function getDisplayName(user: User, fallback = '-'): string {
 
   return (
     toPrettyJsonString(
-      displayName ||
+      name ||
+        displayName ||
         display_name ||
         ccDisplayName ||
         cc_display_name ||
@@ -371,7 +374,9 @@ export const formatUserColumns = ({
                           width={16}
                           src={icon}
                           alt={`${provider} auth icon`}
-                          className={cn(provider === 'github' && 'dark:invert')}
+                          className={cn(
+                            (provider === 'github' || provider === 'x') && 'dark:invert'
+                          )}
                         />
                       </div>
                     )

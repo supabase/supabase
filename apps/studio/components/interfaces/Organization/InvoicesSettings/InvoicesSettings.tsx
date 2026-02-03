@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import InvoicePayButton from './InvoicePayButton'
 
 const PAGE_LIMIT = 5

@@ -1,11 +1,8 @@
 import { expect, Page } from '@playwright/test'
 import { waitForApiResponse } from './wait-for-response.js'
-import { dismissToastsIfAny } from './dismiss-toast.js'
 import { toUrl } from './to-url.js'
 
 export const createUserViaUI = async (page: Page, ref: string, email: string, password: string) => {
-  await dismissToastsIfAny(page)
-
   // Open the Add user dropdown
   await page.getByRole('button', { name: 'Add user' }).click()
 
@@ -36,16 +33,15 @@ export const createUserViaUI = async (page: Page, ref: string, email: string, pa
   // Wait for both API calls to complete
   await Promise.all([createUserPromise, usersListPromise])
 
-  // Wait for success toast
+  // Verify the user appears in the table
+  const userRow = page.getByRole('row').filter({ hasText: email })
   await expect(
-    page.getByText(`Successfully created user: ${email}`),
-    'Success toast should be visible after user creation'
+    userRow,
+    `User row with email ${email} should be visible after creation`
   ).toBeVisible({ timeout: 10_000 })
 }
 
 export const deleteUserViaUI = async (page: Page, ref: string, email: string) => {
-  await dismissToastsIfAny(page)
-
   // Find the user row by email and click the checkbox
   const userRow = page.getByRole('row').filter({ hasText: email })
   await expect(userRow, `User row with email ${email} should be visible`).toBeVisible()
@@ -71,11 +67,18 @@ export const deleteUserViaUI = async (page: Page, ref: string, email: string) =>
   // Wait for both API calls to complete
   await Promise.all([deleteUserPromise, usersListPromise])
 
-  // Wait for success toast
-  await expect(
-    page.getByText('Successfully deleted the selected 1 user'),
-    'Success toast should be visible after user deletion'
-  ).toBeVisible({ timeout: 10_000 })
+  // Verify the user is removed from the table
+  await expect
+    .poll(
+      async () => {
+        return await userRow.count()
+      },
+      {
+        message: `User row with email ${email} should be removed after deletion`,
+        timeout: 10_000,
+      }
+    )
+    .toBe(0)
 }
 
 export const navigateToAuthUsers = async (page: Page, ref: string) => {
