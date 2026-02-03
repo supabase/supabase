@@ -34,7 +34,7 @@ export const ExpiresAtOptions: Record<string, { value: string; label: string }> 
   },
 }
 
-type ResourceAction = 'read' | 'write'
+type ResourceAction = 'read' | 'create' | 'write'
 type AccessLevel = 'read' | 'read-write' | 'no access'
 
 interface ResourceConfig {
@@ -50,7 +50,7 @@ const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
     scope: 'user',
     title: 'Access to organization information',
     basePermission: 'organizations',
-    actions: ['read', 'write'],
+    actions: ['read', 'create'],
   },
   'user:projects': {
     scope: 'user',
@@ -348,17 +348,6 @@ export const PERMISSIONS_UI = [
 ]
 
 export const ACCESS_TOKEN_PERMISSIONS = PERMISSIONS_UI
-
-export const PERMISSION_TO_FGA_RELATION_MAP: Record<string, string> = {
-  infra_add_ons_read: 'infra_add-ons_read',
-  infra_add_ons_write: 'infra_add-ons_write',
-}
-
-export const getFGARelationName = (
-  permission: ScopedAccessTokenPermission
-): ScopedAccessTokenPermission => {
-  return (PERMISSION_TO_FGA_RELATION_MAP[permission] || permission) as ScopedAccessTokenPermission
-}
 
 export const mapPermissionToFGA = (
   resource: string,
