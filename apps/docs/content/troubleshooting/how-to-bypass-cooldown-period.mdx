@@ -1,23 +1,23 @@
 ---
-title = "How to bypass modification limits"
+title = "How to bypass cooldown period"
 topics = [
 "platform"
 ]
-keywords = ["modification limits", "disk resize"]
+keywords = ["cooldown", "disk resize"]
 ---
 
-This limit is not a Supabase limitation. It is rooted in how Amazon EBS (the underlying storage for our databases) manages volume modifications. AWS allows up to four modifications per volume within a rolling 24-hour window. While you can start a new modification immediately after a previous one completes, AWS enforces a quota that prevents a fifth modification within that 24-hour period to ensure data integrity and volume stability.
+This cooldown period isn't a Supabase limitation. It's rooted in how Amazon EBS (the underlying storage instance for our databases) manages volume modifications. After modifying a volume (e.g. increasing size, changing type, or IOPS), AWS enforces a mandatory 6-hour cooldown before allowing another modification on the same volume. This is to ensure data integrity and stability of the volume under load.
 
 From the [**AWS docs**](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyVolume.html):
 
-> After you initiate a volume modification, you must wait for that modification to reach the completed state before you can initiate another modification for the same volume. You can modify a volume up to four times within a rolling 24-hour period, as long as the volume is in the in-use or available state, and all previous modifications for that volume are completed. If you exceed this limit, you get an error message that indicates when you can perform your next modification.
+> “After modifying a volume, you must wait at least six hours and ensure that the volume is in the in-use or available state before you can modify the same volume. This is sometimes referred to as a cooldown period.”
 
-There are a few options to work around this limit if you have already used your four modifications and need to make further adjustments:
+There are a few options to work around the cooldown, depending on the state of your database:
 
-1.  **Restore to a new project**: This spins up a new instance with a new disk, bypassing the the 24-hour quota entirely. It’s a great option if you're okay with a new project and project refactoring. [**Docs: restoring to a new project**](/docs/guides/platform/backups#restore-to-a-new-project).
-2.  **pg_upgrade**: Our [**pg_upgrade**](/docs/guides/platform/upgrading) implementation migrates your data to a new disk, which resets the modification count. The main requirement here is that the database must be operational - it can't run it if your DB is in a degraded or inaccessible state.
+1.  **Restore to a new project**: This spins up a new instance with a new disk, bypassing the cooldown entirely. It’s a great option if you're okay with a new project and project refactoring. [**Docs: restoring to a new project**](/docs/guides/platform/backups#restore-to-a-new-project).
+2.  **pg_upgrade**: Our [**pg_upgrade**](/docs/guides/platform/upgrading) implementation migrates your data to a new disk, which skips the cooldown. The main requirement here is that the database must be operational - it can't run it if your DB is in a degraded or inaccessible state.
 3.  **Pause and Restore**: This also migrates to a new disk but is only available for projects on the Free plan. If you're not on the Free plan, you'd need to [**transfer your project to an organization on the Free plan**](/docs/guides/platform/project-transfer) first.
 
-If the database is down or locked in a bad state (e.g corrupted or stuck during resize), and you have hit the modification limit, the only path forward is to wait until the rolling 24-hour window allows for another modification.
+If the database is down or locked in a bad state (e.g corrupted or stuck during resize), the only path forward is to wait until the cooldown expires and the disk resize job completes in the queue.
 
 More on this in our doc here: [**https://supabase.com/docs/guides/platform/database-size#disk-size**](/docs/guides/platform/database-size#disk-size).

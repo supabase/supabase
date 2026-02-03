@@ -1,32 +1,36 @@
-import { forwardRef, memo, Ref, useRef } from 'react'
-import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { ref as valtioRef } from 'valtio'
-
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import type { PostgresColumn } from '@supabase/postgres-meta'
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
+import { Ref, forwardRef, memo, useMemo, useRef } from 'react'
+import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ref as valtioRef } from 'valtio'
+
 import type { GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
+import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
 }
 
 interface IGrid extends GridProps {
-  rows: any[]
-  error: any
+  rows: SupaRow[]
+  error: ResponseError | null
   isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
@@ -65,9 +69,17 @@ export const Grid = memo(
         snap.setSelectedRows(selectedRows)
       }
 
-      const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
+      const selectedCellRef = useRef<{
+        rowIdx: number
+        row: SupaRow
+        column: CalculatedColumn<SupaRow, unknown>
+      } | null>(null)
 
-      function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
+      function onSelectedCellChange(args: {
+        rowIdx: number
+        row: SupaRow
+        column: CalculatedColumn<SupaRow, unknown>
+      }) {
         selectedCellRef.current = args
         snap.setSelectedCellPosition({ idx: args.column.idx, rowIdx: args.rowIdx })
       }
@@ -122,19 +134,59 @@ export const Grid = memo(
         return fk !== undefined ? formatForeignKeys([fk])[0] : undefined
       }
 
-      function onRowDoubleClick(row: any, column: any) {
+      function onRowDoubleClick(row: SupaRow, column: { name: string }) {
         const foreignKey = getColumnForeignKey(column.name)
 
         if (foreignKey) {
           tableEditorSnap.onEditForeignKeyColumnValue({
             foreignKey,
             row,
-            column,
+            column: column as unknown as PostgresColumn,
           })
         }
       }
 
       const removeAllFilters = () => onApplyFilters([])
+
+      // Compute columns with cellClass for dirty cells
+      // This needs to be computed at render time so it reacts to operation queue changes
+      const columnsWithDirtyCellClass = useMemo(() => {
+        const primaryKeys = isTableLike(snap.originalTable) ? snap.originalTable.primary_keys : []
+        const pendingOperations = tableEditorSnap.operationQueue.operations
+
+        // If no pending operations, return columns as-is
+        if (pendingOperations.length === 0) {
+          return snap.gridColumns as CalculatedColumn<SupaRow, unknown>[]
+        }
+
+        return (snap.gridColumns as CalculatedColumn<SupaRow, unknown>[]).map((col) => {
+          // Skip special columns like select column
+          if (col.key === 'select-row' || col.key === 'add-column') {
+            return col
+          }
+
+          return {
+            ...col,
+            cellClass: (row: SupaRow) => {
+              // Build row identifiers from primary keys
+              const rowIdentifiers: Record<string, unknown> = {}
+              for (const pk of primaryKeys) {
+                rowIdentifiers[pk.name] = row[pk.name]
+              }
+
+              // Check if this cell has pending changes
+              // Since we are checking for cell changes, we need to use the EDIT_CELL_CONTENT type
+              const isDirty = tableEditorSnap.hasPendingCellChange(
+                QueuedOperationType.EDIT_CELL_CONTENT,
+                snap.table.id,
+                rowIdentifiers,
+                col.key
+              )
+              return isDirty ? 'rdg-cell--dirty' : undefined
+            },
+          }
+        })
+      }, [snap.gridColumns, snap.originalTable, snap.table.id, tableEditorSnap])
 
       return (
         <div
@@ -145,11 +197,10 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute top-9 p-2 w-full z-[1] pointer-events-none',
+                'absolute top-9 p-2 w-full z-[1]',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
-              style={{ height: `calc(100% - 35px)` }}
               onDragOver={onDragOver}
               onDragLeave={onDragOver}
               onDrop={onFileDrop}
@@ -245,7 +296,7 @@ export const Grid = memo(
             ref={ref}
             className={`${gridClass} flex-grow`}
             rowClass={rowClass}
-            columns={snap.gridColumns as CalculatedColumn<any, any>[]}
+            columns={columnsWithDirtyCellClass}
             rows={rows ?? []}
             renderers={{ renderRow: RowRenderer }}
             rowKeyGetter={rowKeyGetter}
@@ -254,7 +305,11 @@ export const Grid = memo(
             onRowsChange={onRowsChange}
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
-            onCellDoubleClick={(props) => onRowDoubleClick(props.row, props.column)}
+            onCellDoubleClick={(props) => {
+              if (typeof props.column.name === 'string') {
+                onRowDoubleClick(props.row, { name: props.column.name })
+              }
+            }}
             onCellKeyDown={handleCopyCell}
           />
         </div>
