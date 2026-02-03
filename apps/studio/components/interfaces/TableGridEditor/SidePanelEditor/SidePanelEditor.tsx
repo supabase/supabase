@@ -60,6 +60,7 @@ import {
   createColumn,
   createTable,
   duplicateTable,
+  getRowFromSidePanel,
   insertRowsViaSpreadsheet,
   insertTableRows,
   updateColumn,
@@ -319,16 +320,7 @@ export const SidePanelEditor = ({
               return
             }
 
-            const row =
-              snap.sidePanel?.type === 'json'
-                ? snap.sidePanel.jsonValue.row
-                : snap.sidePanel?.type === 'cell'
-                  ? snap.sidePanel.value?.row
-                  : snap.sidePanel?.type === 'row'
-                    ? snap.sidePanel.row
-                    : snap.sidePanel?.type === 'foreign-row-selector'
-                      ? snap.sidePanel.foreignKey.row
-                      : undefined
+            const row = getRowFromSidePanel(snap.sidePanel)
 
             if (!row) {
               saveRowError = new Error('No row found')
