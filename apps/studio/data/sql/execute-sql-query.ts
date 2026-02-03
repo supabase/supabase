@@ -15,7 +15,13 @@ import {
   createNodeTree,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
 
-const COST_THRESHOLD = 100_000 // Arbitrary - need to find a good value
+/**
+ * [Joshen] Done a bit of stress testing and experimentation, tho we should still observe and tweak where necessary
+ * From what I understand a query cost of 100,000 is considered to be "heavy", and 1M is "potentially dangerous"
+ * Reckon we ensure that the dashboard just caps query costs at "heavy", so that it doesn't impact the DB for other queries
+ * (e.g from the user's application)
+ */
+const COST_THRESHOLD = 100_000
 export const COST_THRESHOLD_ERROR = 'Query cost exceeds threshold'
 
 export type ExecuteSqlVariables = {
