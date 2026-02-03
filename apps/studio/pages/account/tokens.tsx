@@ -19,7 +19,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
   const [searchString, setSearchString] = useState('')
 
   return (
-    <AccessTokensLayout description="Create and manage personal access tokens for API authentication.">
+    <AccessTokensLayout>
       <div className="space-y-4">
         {newToken && (
           <AccessTokenNewBanner
