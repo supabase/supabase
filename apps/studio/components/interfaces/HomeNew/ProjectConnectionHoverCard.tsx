@@ -7,7 +7,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { pluckObjectFields } from 'lib/helpers'
 import { Plug } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { type ReactNode, useMemo, useState } from 'react'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -34,8 +34,8 @@ interface ProjectConnectionHoverCardProps {
 }
 
 export const ProjectConnectionHoverCard = ({ projectRef }: ProjectConnectionHoverCardProps) => {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [_, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data: settings, isPending: isLoadingSettings } = useProjectSettingsV2Query(
     { projectRef },
@@ -81,39 +81,28 @@ export const ProjectConnectionHoverCard = ({ projectRef }: ProjectConnectionHove
     }).direct.uri
   }, [primaryDatabase, projectRef])
 
-  const handleOpenConnect = () => {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { ...router.query, showConnect: 'true' },
-      },
-      undefined,
-      { shallow: true }
-    )
-  }
-
   const projectUrlLabel =
     projectUrl ?? (isLoadingSettings ? 'Loading project URL...' : 'Project URL unavailable')
 
   return (
-    <HoverCard openDelay={250} closeDelay={100} onOpenChange={setOpen}>
+    <HoverCard openDelay={250} closeDelay={100} open={open} onOpenChange={setOpen}>
       <HoverCardTrigger asChild>
-        <button onClick={handleOpenConnect} className="flex items-center gap-4 mt-3 group">
-          <div className="w-8 h-8 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
-            <Plug strokeWidth={1.5} size={16} className="text-foreground-light" />
+        <button onClick={() => setShowConnect(true)} className="flex items-center gap-4 mt-3 group">
+          <div className=" transition w-8 h-8 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
+            <Plug strokeWidth={1.5} size={16} className="text-foreground-light rotate-90" />
           </div>
-          <span className="text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4 max-w-[320px] truncate text-left">
+          <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4 max-w-[320px] text-left">
             {projectUrlLabel}
           </span>
         </button>
       </HoverCardTrigger>
       <HoverCardContent side="bottom" align="start" className="w-[420px] p-0">
         <div className="p-4 border-b space-y-4">
-          <h3 className="heading-meta text-foreground-light"> Data API </h3>
+          <h3 className="heading-meta text-foreground-light">Data API</h3>
           <DetailRow label="Project URL">
             <Input
-              readOnly
               copy
+              readOnly
               className="font-mono text-xs"
               value={projectUrl ?? ''}
               placeholder="Project URL unavailable"
@@ -124,8 +113,8 @@ export const ProjectConnectionHoverCard = ({ projectRef }: ProjectConnectionHove
               <div className="text-xs text-foreground-lighter">Loading publishable key...</div>
             ) : canReadAPIKeys ? (
               <Input
-                readOnly
                 copy
+                readOnly
                 className="font-mono text-xs"
                 value={publishableKey?.api_key ?? ''}
                 placeholder="Publishable key unavailable"
@@ -143,20 +132,24 @@ export const ProjectConnectionHoverCard = ({ projectRef }: ProjectConnectionHove
             {isLoadingDatabases ? (
               <div className="text-xs text-foreground-lighter">Loading connection string...</div>
             ) : (
-              <>
-                <Input
-                  readOnly
-                  copy
-                  className="font-mono text-xs"
-                  value={directConnectionString}
-                  placeholder="Connection string unavailable"
-                />
-              </>
+              <Input
+                copy
+                readOnly
+                className="font-mono text-xs"
+                value={directConnectionString}
+                placeholder="Connection string unavailable"
+              />
             )}
           </DetailRow>
         </div>
         <div className="p-4">
-          <Button type="default" size="medium" className="w-full" onClick={handleOpenConnect}>
+          <Button
+            icon={<Plug className="rotate-90" />}
+            type="default"
+            size="medium"
+            className="w-full"
+            onClick={() => setShowConnect(true)}
+          >
             Get connected
           </Button>
         </div>
