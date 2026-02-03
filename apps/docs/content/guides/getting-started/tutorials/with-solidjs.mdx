@@ -271,10 +271,17 @@ const App: Component = () => {
   const [session, setSession] = createSignal<AuthSession | null>(null)
 
   createEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
+    // Use getUser() to verify authentication status
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        // Get session only after verifying user exists
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          setSession(session)
+        })
+      }
     })
 
+    // Listen for auth state changes
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
