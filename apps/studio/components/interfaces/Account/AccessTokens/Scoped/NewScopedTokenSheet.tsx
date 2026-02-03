@@ -9,7 +9,11 @@ import { z } from 'zod'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
-import { useAccessTokenCreateMutation } from 'data/scoped-access-tokens/scoped-access-token-create-mutation'
+import {
+  useAccessTokenCreateMutation,
+  type NewScopedAccessToken,
+  type ScopedAccessTokenCreateVariables,
+} from 'data/scoped-access-tokens/scoped-access-token-create-mutation'
 import {
   Button,
   Form_Shadcn_,
@@ -48,11 +52,13 @@ const TokenSchema = z.object({
   permissionRows: z.array(PermissionRowSchema).optional(),
 })
 
+type TokenFormValues = z.infer<typeof TokenSchema>
+
 export interface NewScopedTokenSheetProps {
   visible: boolean
   onOpenChange: (open: boolean) => void
   tokenScope: 'V0' | undefined
-  onCreateToken: (token: any) => void
+  onCreateToken: (token: NewScopedAccessToken) => void
 }
 
 export const NewScopedTokenSheet = ({
@@ -71,7 +77,7 @@ export const NewScopedTokenSheet = ({
     [projectsData]
   )
 
-  const form = useForm<z.infer<typeof TokenSchema>>({
+  const form = useForm<TokenFormValues>({
     resolver: zodResolver(TokenSchema),
     defaultValues: {
       tokenName: '',
@@ -91,7 +97,7 @@ export const NewScopedTokenSheet = ({
   const expiresAt = form.watch('expiresAt')
   const permissionRows = form.watch('permissionRows') || []
 
-  const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
+  const onSubmit: SubmitHandler<TokenFormValues> = async (values) => {
     if (!permissionRows || permissionRows.length === 0) {
       toast.error('Please configure at least one permission.')
       return
@@ -159,13 +165,7 @@ export const NewScopedTokenSheet = ({
       return
     }
 
-    const finalPayload: {
-      name: string
-      expires_at?: string
-      permissions: any
-      organization_slugs?: string[]
-      project_refs?: string[]
-    } = {
+    const finalPayload: ScopedAccessTokenCreateVariables = {
       name: values.tokenName,
       permissions,
     }

@@ -1,4 +1,4 @@
-import { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form'
+import { Control, UseFormSetValue, UseFormWatch, FieldValues, Path, PathValue } from 'react-hook-form'
 import {
   Button,
   Popover_Shadcn_,
@@ -21,17 +21,43 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Plus, Key, X, RotateCcw } from 'lucide-react'
 import { ACCESS_TOKEN_PERMISSIONS } from '../../AccessToken.constants'
 
-interface PermissionsProps {
-  control: Control<any>
-  setValue: UseFormSetValue<any>
-  watch: UseFormWatch<any>
+export type AccessLevel = 'read' | 'read-write' | 'no access'
+
+export interface PermissionResource {
+  resource: string
+  title: string
+  actions: AccessLevel[]
+}
+
+interface PermissionGroup {
+  name: string
+  resources: PermissionResource[]
+}
+
+export interface PermissionRow {
+  resource: string
+  action: string
+}
+
+interface AllResource extends PermissionResource {
+  group: string
+}
+
+export interface PermissionsFormValues extends FieldValues {
+  permissionRows?: PermissionRow[]
+}
+
+interface PermissionsProps<TFormValues extends PermissionsFormValues = PermissionsFormValues> {
+  control: Control<TFormValues>
+  setValue: UseFormSetValue<TFormValues>
+  watch: UseFormWatch<TFormValues>
   resourceSearchOpen: boolean
   setResourceSearchOpen: (open: boolean) => void
 }
 
-const createAllResources = (ACCESS_TOKEN_PERMISSIONS: any[]) => {
-  return ACCESS_TOKEN_PERMISSIONS.flatMap((group) =>
-    group.resources.map((resource: any) => ({
+const createAllResources = (permissionGroups: PermissionGroup[]): AllResource[] => {
+  return permissionGroups.flatMap((group) =>
+    group.resources.map((resource) => ({
       resource: resource.resource,
       title: resource.title,
       actions: resource.actions,
@@ -40,40 +66,38 @@ const createAllResources = (ACCESS_TOKEN_PERMISSIONS: any[]) => {
   )
 }
 
-interface PermissionResourceSelectorProps {
+interface PermissionResourceSelectorProps<TFormValues extends PermissionsFormValues> {
   open: boolean
   onOpenChange: (open: boolean) => void
-  permissionRows: any[]
-  setValue: UseFormSetValue<any>
-  allResources: any[]
+  permissionRows: PermissionRow[]
+  setValue: UseFormSetValue<TFormValues>
+  allResources: AllResource[]
   align?: 'center' | 'end' | 'start'
-  buttonSize?: 'default' | 'tiny'
   presetLabelPrefix?: string
 }
 
-const PermissionResourceSelector = ({
+const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
   open,
   onOpenChange,
   permissionRows,
   setValue,
   allResources,
   align = 'center',
-  buttonSize = 'default',
   presetLabelPrefix = '',
-}: PermissionResourceSelectorProps) => {
+}: PermissionResourceSelectorProps<TFormValues>) => {
   const handleSelectAll = () => {
-    const allPermissions = allResources.map((resource) => ({
+    const allPermissions: PermissionRow[] = allResources.map((resource) => ({
       resource: resource.resource,
       action: resource.actions.includes('read-write')
         ? 'read-write'
         : resource.actions[0],
     }))
-    setValue('permissionRows', allPermissions)
+    setValue('permissionRows' as Path<TFormValues>, allPermissions as PathValue<TFormValues, Path<TFormValues>>)
     onOpenChange(false)
   }
 
   const handleSelectGroup = (groupName: string) => {
-    const groupPermissions = allResources
+    const groupPermissions: PermissionRow[] = allResources
       .filter((resource) => resource.group === groupName)
       .map((resource) => ({
         resource: resource.resource,
@@ -81,19 +105,19 @@ const PermissionResourceSelector = ({
           ? 'read-write'
           : resource.actions[0],
       }))
-    setValue('permissionRows', groupPermissions)
+    setValue('permissionRows' as Path<TFormValues>, groupPermissions as PathValue<TFormValues, Path<TFormValues>>)
     onOpenChange(false)
   }
 
-  const handleSelectResource = (resource: any) => {
+  const handleSelectResource = (resource: PermissionResource) => {
     const defaultAction = resource.actions.includes('read-write')
       ? 'read-write'
       : resource.actions[0]
-    const newRows = [
+    const newRows: PermissionRow[] = [
       ...permissionRows,
       { resource: resource.resource, action: defaultAction },
     ]
-    setValue('permissionRows', newRows)
+    setValue('permissionRows' as Path<TFormValues>, newRows as PathValue<TFormValues, Path<TFormValues>>)
     onOpenChange(false)
   }
 
@@ -201,14 +225,14 @@ const PermissionResourceSelector = ({
   )
 }
 
-export const Permissions = ({
+export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({
   // control,
   setValue,
   watch,
   resourceSearchOpen,
   setResourceSearchOpen,
-}: PermissionsProps) => {
-  const permissionRows = watch('permissionRows') || []
+}: PermissionsProps<TFormValues>) => {
+  const permissionRows = (watch('permissionRows' as Path<TFormValues>) || []) as PermissionRow[]
   const ALL_RESOURCES = createAllResources(ACCESS_TOKEN_PERMISSIONS)
 
   return (
@@ -225,7 +249,6 @@ export const Permissions = ({
               setValue={setValue}
               allResources={ALL_RESOURCES}
               align="center"
-              buttonSize="default"
             />
           </div>
         </div>
@@ -241,7 +264,6 @@ export const Permissions = ({
                 setValue={setValue}
                 allResources={ALL_RESOURCES}
                 align="end"
-                buttonSize="tiny"
                 presetLabelPrefix="Add "
               />
               <ButtonTooltip
@@ -249,7 +271,7 @@ export const Permissions = ({
                 size="tiny"
                 className="p-1"
                 onClick={() => {
-                  setValue('permissionRows', [])
+                  setValue('permissionRows' as Path<TFormValues>, [] as PathValue<TFormValues, Path<TFormValues>>)
                 }}
                 icon={<RotateCcw size={16} />}
                 tooltip={{
@@ -265,7 +287,7 @@ export const Permissions = ({
           </div>
 
           <div className="border border-border rounded-lg">
-            {permissionRows.map((row: any, index: number) => {
+            {permissionRows.map((row, index) => {
               const selectedResource = ALL_RESOURCES.find((r) => r.resource === row.resource)
               return (
                 <div key={index}>
@@ -287,10 +309,10 @@ export const Permissions = ({
                         <Select_Shadcn_
                           value={row.action}
                           onValueChange={(value) => {
-                            const newRows = permissionRows.map((r: any, i: number) =>
+                            const newRows: PermissionRow[] = permissionRows.map((r, i) =>
                               i === index ? { resource: r.resource, action: value } : r
                             )
-                            setValue('permissionRows', newRows, {
+                            setValue('permissionRows' as Path<TFormValues>, newRows as PathValue<TFormValues, Path<TFormValues>>, {
                               shouldValidate: true,
                               shouldDirty: true,
                             })
@@ -300,7 +322,7 @@ export const Permissions = ({
                             <SelectValue_Shadcn_ placeholder="Set access" />
                           </SelectTrigger_Shadcn_>
                           <SelectContent_Shadcn_>
-                            {selectedResource.actions.map((action: string) => (
+                            {selectedResource.actions.map((action) => (
                               <SelectItem_Shadcn_ key={action} value={action}>
                                 {action.charAt(0).toUpperCase() + action.slice(1)}
                               </SelectItem_Shadcn_>
@@ -313,8 +335,8 @@ export const Permissions = ({
                         size="tiny"
                         className="p-1"
                         onClick={() => {
-                          const newRows = permissionRows.filter((_: any, i: number) => i !== index)
-                          setValue('permissionRows', newRows)
+                          const newRows = permissionRows.filter((_, i) => i !== index)
+                          setValue('permissionRows' as Path<TFormValues>, newRows as PathValue<TFormValues, Path<TFormValues>>)
                         }}
                         icon={<X size={16} />}
                       />

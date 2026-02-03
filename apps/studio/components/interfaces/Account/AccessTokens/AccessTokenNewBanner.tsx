@@ -47,7 +47,7 @@ export const AccessTokenNewBanner = <T,>({
 
       <CardContent className="space-y-4">
         <p className="text-sm text-foreground-light">{description}</p>
-        <div className="w-full border-b border-default pb-6">
+        <div className="w-full pb-2">
           <Input
             copy
             readOnly
@@ -55,13 +55,13 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => {}}
+            onChange={() => { }}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>
 
         {permissions && permissions.length > 0 && (
-          <div className="pt-0">
+          <div className="pt-4 border-t border-default">
             {shouldCollapse ? (
               <Collapsible open={permissionsOpen} onOpenChange={setPermissionsOpen}>
                 <CollapsibleTrigger asChild>
