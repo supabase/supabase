@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useWatch } from '@ui/components/shadcn/ui/form'
+import { useWatch_Shadcn_ } from 'ui'
 import { ChevronDown, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
@@ -52,7 +52,7 @@ const HTTPRequestFields = ({ form }: HTTPRequestFieldsProps) => {
   const { serviceKey, secretKey } = getKeys(apiKeys)
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 
-  const functionType = useWatch({ control: form.control, name: 'function_type' })
+  const functionType = useWatch_Shadcn_({ control: form.control, name: 'function_type' })
 
   const {
     fields: headerFields,
