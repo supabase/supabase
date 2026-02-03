@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
-import { FilterProperty, FilterOptionObject, AsyncOptionsFunction } from './types'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { AsyncOptionsFunction, FilterOptionObject, FilterProperty } from './types'
 import { isAsyncOptionsFunction } from './utils'
 
 export type ActiveInput =
@@ -144,9 +145,12 @@ export function useHighlightNavigation(
         return
       }
       if (e.key === 'Enter') {
-        e.preventDefault()
-        onEnter(highlightedIndex)
-        return
+        // Only select dropdown item if there are items available
+        if (itemsLength > 0) {
+          e.preventDefault()
+          onEnter(highlightedIndex)
+          return
+        }
       }
       if (fallbackKeyDown) fallbackKeyDown(e)
     },

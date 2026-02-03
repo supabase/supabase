@@ -1,7 +1,8 @@
 import { KeyboardEvent, useCallback } from 'react'
+
 import { ActiveInput } from './hooks'
 import { FilterGroup } from './types'
-import { findGroupByPath, findConditionByPath, removeFromGroup } from './utils'
+import { findConditionByPath, findGroupByPath, removeFromGroup } from './utils'
 
 export function useKeyboardNavigation({
   activeInput,
@@ -268,6 +269,15 @@ export function useKeyboardNavigation({
         handleArrowRight(e)
       } else if (e.key === 'Escape') {
         setActiveInput(null)
+      } else if (e.key === 'Enter') {
+        if (activeInput?.type === 'value') {
+          e.preventDefault()
+          setActiveInput({ type: 'group', path: activeInput.path.slice(0, -1) })
+        } else if (activeInput?.type === 'operator') {
+          e.preventDefault()
+          const conditionPath = activeInput.path
+          setActiveInput({ type: 'value', path: conditionPath })
+        }
       }
     },
     [activeInput, handleBackspace, handleArrowLeft, handleArrowRight, setActiveInput]
