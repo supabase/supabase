@@ -1,10 +1,4 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { isEmpty, noop } from 'lodash'
-import { useContext, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
-import { checkDataApiPrivilegesNonEmpty } from '@/lib/data-api-types'
 import type { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -22,10 +16,14 @@ import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { type PlainObject } from 'lib/type-helpers'
+import { isEmpty, noop } from 'lodash'
+import { useContext, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -46,6 +44,8 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { checkDataApiPrivilegesNonEmpty } from '@/lib/data-api-types'
 
 type SaveTableParamsFor<Action extends SaveTableParams['action']> = Extract<
   SaveTableParams,
@@ -361,6 +361,7 @@ export const TableEditor = ({
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
+          visible={visible}
         />
       }
     >
