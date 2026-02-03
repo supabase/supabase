@@ -333,6 +333,7 @@ export function FilterCondition({
         onClick={onRemove}
         className="group hover:text-foreground hover:!bg-surface-600 rounded-none px-1 h-auto py-0"
         aria-label={`Remove ${property.label} filter`}
+        tabIndex={-1}
       />
     </div>
   )
