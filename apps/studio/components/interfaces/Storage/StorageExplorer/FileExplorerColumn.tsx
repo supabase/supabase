@@ -9,7 +9,6 @@ import { toast } from 'sonner'
 import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Checkbox, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -54,6 +53,24 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
       </div>
     </Transition>
   )
+}
+
+// This provides storage-specific formatting with better precision for large files
+const formatStorageSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes'
+  
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  
+  // Storage files benefit from more precision for MB and larger
+  // Show 3 decimal places for MB+, 2 for KB, 0 for Bytes
+  const decimals = i === 0 ? 0 : i === 1 ? 2 : 3
+  
+  const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))
+  
+  return `${formattedSize} ${sizes[i]}`
 }
 
 export interface FileExplorerColumnProps {
@@ -286,7 +303,7 @@ export const FileExplorerColumn = ({
       {snap.view === STORAGE_VIEWS.LIST && (
         <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full">
           <p className="text-sm">
-            {formatBytes(columnItemsSize)} for {columnItems.length} items
+            {formatStorageSize(columnItemsSize)} for {columnItems.length} items
           </p>
         </div>
       )}
