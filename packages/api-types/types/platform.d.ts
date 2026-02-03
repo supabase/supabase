@@ -951,6 +951,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/preview-code': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Previews a code redemption */
+    post: operations['OrgCreditsController_previewCode']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/billing/credits/redeem': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Redeems a credit code */
+    post: operations['OrgCreditsController_redeemCode']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/top-up': {
     parameters: {
       query?: never
@@ -1904,6 +1938,26 @@ export interface paths {
     }
     /** Retrieve database views */
     get: operations['ViewsController_getViews']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/plans/features': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get feature configurations for all plans
+     * @description Returns feature configurations for customer-facing plans (Free, Pro, Team, Enterprise). Use the featureKey query parameter to get a specific feature, or omit it to get all features.
+     */
+    get: operations['PlanFeaturesController_getPlanFeatures']
     put?: never
     post?: never
     delete?: never
@@ -5484,8 +5538,12 @@ export interface components {
         | 'auth_signing_keys_write'
         | 'backups_read'
         | 'backups_write'
+        | 'branching_development_create'
+        | 'branching_development_delete'
         | 'branching_development_read'
         | 'branching_development_write'
+        | 'branching_production_create'
+        | 'branching_production_delete'
         | 'branching_production_read'
         | 'branching_production_write'
         | 'custom_domain_read'
@@ -5518,6 +5576,8 @@ export interface components {
         | 'edge_functions_secrets_write'
         | 'infra_add_ons_read'
         | 'infra_add_ons_write'
+        | 'infra_disk_config_read'
+        | 'infra_disk_config_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -5723,6 +5783,21 @@ export interface components {
       organization_slug: string
       source: string
       teamId?: string
+    }
+    CreditRedemptionPreviewResponse: {
+      amount_cents: number
+      /** Format: date-time */
+      credits_expire_at: string | null
+      credits_expiry_days: number | null
+    }
+    CreditRedemptionRequest: {
+      code: string
+    }
+    CreditRedemptionResponse: {
+      amount_cents: number
+      /** Format: date-time */
+      credits_expire_at: string | null
+      credits_expiry_days: number | null
     }
     CreditsTopUpRequest: {
       address?: {
@@ -7684,6 +7759,28 @@ export interface components {
     }
     PgbouncerStatusResponse: {
       active: boolean
+    }
+    PlanFeaturesResponse: {
+      [key: string]: {
+        [key: string]: {
+          config:
+            | {
+                enabled: boolean
+              }
+            | {
+                enabled: boolean
+                unit: string
+                unlimited: boolean
+                value: number
+              }
+            | {
+                enabled: boolean
+                set: string[]
+              }
+          /** @enum {string} */
+          type: 'boolean' | 'numeric' | 'set'
+        }
+      }
     }
     PlansResponse: {
       plans: {
@@ -13323,6 +13420,116 @@ export interface operations {
       }
     }
   }
+  OrgCreditsController_previewCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreditRedemptionRequest']
+      }
+    }
+    responses: {
+      /** @description Credit code details. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreditRedemptionPreviewResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to preview redemption code */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgCreditsController_redeemCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreditRedemptionRequest']
+      }
+    }
+    responses: {
+      /** @description Credit code redeemed successfully. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreditRedemptionResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to redeem credit code */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrgCreditsController_createTopUp: {
     parameters: {
       query?: never
@@ -16901,6 +17108,72 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  PlanFeaturesController_getPlanFeatures: {
+    parameters: {
+      query?: {
+        featureKey?:
+          | 'instances.compute_update_available_sizes'
+          | 'instances.read_replicas'
+          | 'instances.disk_modifications'
+          | 'replication.etl'
+          | 'storage.max_file_size'
+          | 'storage.image_transformations'
+          | 'storage.vector_buckets'
+          | 'storage.iceberg_catalog'
+          | 'security.audit_logs_days'
+          | 'security.questionnaire'
+          | 'security.soc2_report'
+          | 'security.private_link'
+          | 'security.enforce_mfa'
+          | 'log.retention_days'
+          | 'custom_domain'
+          | 'vanity_subdomain'
+          | 'ipv4'
+          | 'pitr.available_variants'
+          | 'log_drains'
+          | 'branching_limit'
+          | 'branching_persistent'
+          | 'auth.mfa_phone'
+          | 'auth.mfa_web_authn'
+          | 'auth.mfa_enhanced_security'
+          | 'auth.hooks'
+          | 'auth.platform.sso'
+          | 'auth.custom_jwt_template'
+          | 'auth.saml_2'
+          | 'auth.user_sessions'
+          | 'auth.leaked_password_protection'
+          | 'auth.advanced_auth_settings'
+          | 'backup.retention_days'
+          | 'function.max_count'
+          | 'function.size_limit_mb'
+          | 'realtime.max_concurrent_users'
+          | 'realtime.max_events_per_second'
+          | 'realtime.max_joins_per_second'
+          | 'realtime.max_channels_per_client'
+          | 'realtime.max_bytes_per_second'
+          | 'realtime.max_presence_events_per_second'
+          | 'realtime.max_payload_size_in_kb'
+          | 'project_scoped_roles'
+          | 'security.member_roles'
+          | 'project_pausing'
+          | 'project_cloning'
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanFeaturesResponse']
+        }
       }
     }
   }
@@ -26071,7 +26344,10 @@ export interface operations {
   }
   TelemetryFeatureFlagsController_callFeatureFlag: {
     parameters: {
-      query?: never
+      query?: {
+        organization_slug?: string
+        project_ref?: string
+      }
       header?: never
       path?: never
       cookie?: never

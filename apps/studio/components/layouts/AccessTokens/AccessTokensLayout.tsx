@@ -17,7 +17,6 @@ import {
 const AccessTokensLayout = ({ children }: PropsWithChildren) => {
   const router = useRouter()
   const scopedTokensEnabled = useFlag('scopedPAT')
-  const isScopedTokens = router.asPath.split('?')[0] === '/account/tokens/scoped'
 
   const navigationItems = [
     {
@@ -27,12 +26,12 @@ const AccessTokensLayout = ({ children }: PropsWithChildren) => {
     },
     ...(scopedTokensEnabled
       ? [
-          {
-            label: 'Scoped Tokens',
-            href: `/account/tokens/scoped`,
-            id: 'scoped-tokens',
-          },
-        ]
+        {
+          label: 'Scoped Tokens',
+          href: `/account/tokens/scoped`,
+          id: 'scoped-tokens',
+        },
+      ]
       : []),
   ]
 
