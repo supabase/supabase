@@ -179,16 +179,11 @@ export function useKeyboardNavigation({
             path: activeInput.path.slice(0, -1),
           })
         }
-        // For root group with no conditions, do nothing - keep menu open
       } else if (activeInput?.type === 'value' && isEmpty) {
         const condition = findConditionByPath(activeFilters, activeInput.path)
         if (condition && !condition.value) {
           e.preventDefault()
-          removeByPath(activeInput.path)
-          setActiveInput({
-            type: 'group',
-            path: activeInput.path.slice(0, -1),
-          })
+          setActiveInput({ type: 'operator', path: activeInput.path })
         }
       }
     },

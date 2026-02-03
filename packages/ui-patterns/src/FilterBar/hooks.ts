@@ -151,6 +151,12 @@ export function useHighlightNavigation(
           onEnter(highlightedIndex)
           return
         }
+        if (fallbackKeyDown) fallbackKeyDown(e)
+        return
+      }
+      if (e.key === 'Backspace') {
+        if (fallbackKeyDown) fallbackKeyDown(e)
+        return
       }
       if (fallbackKeyDown) fallbackKeyDown(e)
     },
