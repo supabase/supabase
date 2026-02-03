@@ -62,7 +62,7 @@ const AccessTokensLayout = ({ children }: PropsWithChildren) => {
           </PageHeaderNavigationTabs>
         )}
       </PageHeader>
-      <PageContainer size="small" className="pt-8">
+      <PageContainer size="small" className="py-8">
         {children}
       </PageContainer>
     </>
