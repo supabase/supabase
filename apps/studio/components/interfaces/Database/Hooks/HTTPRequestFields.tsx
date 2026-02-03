@@ -1,6 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useWatch } from '@ui/components/shadcn/ui/form'
 import { ChevronDown, Plus, X } from 'lucide-react'
 import Link from 'next/link'
+import { useFieldArray, UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -18,37 +20,24 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
-  Listbox,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   SidePanel,
 } from 'ui'
-import { HTTPArgument } from './EditHookPanel'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { WebhookFormValues } from './EditHookPanel.constants'
 
 interface HTTPRequestFieldsProps {
-  type: 'http_request' | 'supabase_function'
-  errors: any
-  httpHeaders: HTTPArgument[]
-  httpParameters: HTTPArgument[]
-  onAddHeaders: (headers?: any[]) => void
-  onUpdateHeader: (idx: number, property: string, value: string) => void
-  onRemoveHeader: (idx: number) => void
-  onAddParameter: () => void
-  onUpdateParameter: (idx: number, property: string, value: string) => void
-  onRemoveParameter: (idx: number) => void
+  form: UseFormReturn<WebhookFormValues>
 }
 
-const HTTPRequestFields = ({
-  type,
-  errors,
-  httpHeaders = [],
-  httpParameters = [],
-  onAddHeaders,
-  onUpdateHeader,
-  onRemoveHeader,
-  onAddParameter,
-  onUpdateParameter,
-  onRemoveParameter,
-}: HTTPRequestFieldsProps) => {
+const HTTPRequestFields = ({ form }: HTTPRequestFieldsProps) => {
   const { ref } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
@@ -63,37 +52,89 @@ const HTTPRequestFields = ({
   const { serviceKey, secretKey } = getKeys(apiKeys)
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 
+  const functionType = useWatch({ control: form.control, name: 'function_type' })
+
+  const {
+    fields: headerFields,
+    append: appendHeader,
+    remove: removeHeader,
+  } = useFieldArray({
+    control: form.control,
+    name: 'httpHeaders',
+  })
+
+  const {
+    fields: paramFields,
+    append: appendParam,
+    remove: removeParam,
+  } = useFieldArray({
+    control: form.control,
+    name: 'httpParameters',
+  })
+
+  const onAddHeaders = (headers?: { id: string; name: string; value: string }[]) => {
+    if (headers) {
+      headers.forEach((header) => appendHeader(header))
+    } else {
+      appendHeader({ id: uuidv4(), name: '', value: '' })
+    }
+  }
+
   return (
     <>
       <FormSection
         header={
           <FormSectionLabel className="lg:!col-span-4">
-            {type === 'http_request'
+            {functionType === 'http_request'
               ? 'HTTP Request'
-              : type === 'supabase_function'
+              : functionType === 'supabase_function'
                 ? 'Edge Function'
                 : ''}
           </FormSectionLabel>
         }
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
-          <Listbox id="http_method" name="http_method" size="medium" label="Method">
-            <Listbox.Option id="GET" value="GET" label="GET">
-              GET
-            </Listbox.Option>
-            <Listbox.Option id="POST" value="POST" label="POST">
-              POST
-            </Listbox.Option>
-          </Listbox>
-          {type === 'http_request' ? (
-            <Input
-              id="http_url"
+          <FormField_Shadcn_
+            control={form.control}
+            name="http_method"
+            render={({ field }) => (
+              <FormItemLayout label="Method" layout="vertical" className="gap-1">
+                <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                  <FormControl_Shadcn_>
+                    <SelectTrigger_Shadcn_>
+                      <SelectValue_Shadcn_ />
+                    </SelectTrigger_Shadcn_>
+                  </FormControl_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormItemLayout>
+            )}
+          />
+
+          {functionType === 'http_request' ? (
+            <FormField_Shadcn_
+              control={form.control}
               name="http_url"
-              label="URL"
-              placeholder="http://api.com/path/resource"
-              descriptionText="URL of the HTTP request. Must include HTTP/HTTPS"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="URL"
+                  layout="vertical"
+                  className="gap-1"
+                  description="URL of the HTTP request. Must include HTTP/HTTPS"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_
+                      {...field}
+                      placeholder="http://api.com/path/resource"
+                    />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
             />
-          ) : type === 'supabase_function' && edgeFunctions.length === 0 ? (
+          ) : functionType === 'supabase_function' && edgeFunctions.length === 0 ? (
             <div className="space-y-1">
               <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
               <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
@@ -102,30 +143,69 @@ const HTTPRequestFields = ({
                   <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
                 </Button>
               </div>
-              {errors.http_url && <p className="text-sm text-red-900">{errors.http_url}</p>}
             </div>
-          ) : type === 'supabase_function' && edgeFunctions.length > 0 ? (
-            <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
-              {edgeFunctions.map((fn) => {
-                const restUrl = selectedProject?.restUrl
-                const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
-                const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
+          ) : functionType === 'supabase_function' && edgeFunctions.length > 0 ? (
+            <FormField_Shadcn_
+              control={form.control}
+              name="http_url"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Select which edge function to trigger"
+                  layout="vertical"
+                  className="gap-1"
+                >
+                  <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                    <FormControl_Shadcn_>
+                      <SelectTrigger_Shadcn_>
+                        <SelectValue_Shadcn_ placeholder="Select an edge function" />
+                      </SelectTrigger_Shadcn_>
+                    </FormControl_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      {edgeFunctions.map((fn) => {
+                        const restUrl = selectedProject?.restUrl
+                        const restUrlTld = restUrl
+                          ? new URL(restUrl).hostname.split('.').pop()
+                          : 'co'
+                        const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
 
-                return (
-                  <Listbox.Option key={fn.id} id={functionUrl} value={functionUrl} label={fn.name}>
-                    {fn.name}
-                  </Listbox.Option>
-                )
-              })}
-            </Listbox>
+                        return (
+                          <SelectItem_Shadcn_ key={fn.id} value={functionUrl}>
+                            {fn.name}
+                          </SelectItem_Shadcn_>
+                        )
+                      })}
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
           ) : null}
-          <Input
-            id="timeout_ms"
+
+          <FormField_Shadcn_
+            control={form.control}
             name="timeout_ms"
-            label="Timeout"
-            labelOptional="Between 1000ms to 10,000ms"
-            type="number"
-            actions={<p className="text-foreground-light pr-2">ms</p>}
+            render={({ field }) => (
+              <FormItemLayout
+                label="Timeout"
+                labelOptional="Between 1000ms to 10,000ms"
+                layout="vertical"
+                className="gap-1"
+              >
+                <FormControl_Shadcn_>
+                  <div className="relative">
+                    <Input_Shadcn_
+                      {...field}
+                      type="number"
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      className="pr-10"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-light text-sm">
+                      ms
+                    </span>
+                  </div>
+                </FormControl_Shadcn_>
+              </FormItemLayout>
+            )}
           />
         </FormSectionContent>
       </FormSection>
@@ -135,27 +215,39 @@ const HTTPRequestFields = ({
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <div className="space-y-2">
-            {httpHeaders.map((header, idx: number) => (
-              <div key={header.id} className="flex items-center space-x-2">
-                <Input
-                  value={header.name}
-                  size="small"
-                  className="w-full"
-                  placeholder="Header name"
-                  onChange={(event: any) => onUpdateHeader(idx, 'name', event.target.value)}
+            {headerFields.map((field, index) => (
+              <div key={field.id} className="flex items-center space-x-2">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name={`httpHeaders.${index}.name`}
+                  render={({ field }) => (
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        {...field}
+                                                className="w-full"
+                        placeholder="Header name"
+                      />
+                    </FormControl_Shadcn_>
+                  )}
                 />
-                <Input
-                  value={header.value}
-                  size="small"
-                  className="w-full"
-                  placeholder="Header value"
-                  onChange={(event: any) => onUpdateHeader(idx, 'value', event.target.value)}
+                <FormField_Shadcn_
+                  control={form.control}
+                  name={`httpHeaders.${index}.value`}
+                  render={({ field }) => (
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        {...field}
+                                                className="w-full"
+                        placeholder="Header value"
+                      />
+                    </FormControl_Shadcn_>
+                  )}
                 />
                 <ButtonTooltip
                   type="text"
                   icon={<X />}
                   className="py-4"
-                  onClick={() => onRemoveHeader(idx)}
+                  onClick={() => removeHeader(index)}
                   tooltip={{ content: { side: 'bottom', text: 'Remove header' } }}
                 />
               </div>
@@ -165,12 +257,12 @@ const HTTPRequestFields = ({
                 type="default"
                 size="tiny"
                 icon={<Plus />}
-                className={cn(type === 'supabase_function' && 'rounded-r-none px-3')}
+                className={cn(functionType === 'supabase_function' && 'rounded-r-none px-3')}
                 onClick={() => onAddHeaders()}
               >
                 Add a new header
               </Button>
-              {type === 'supabase_function' && (
+              {functionType === 'supabase_function' && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -235,33 +327,50 @@ const HTTPRequestFields = ({
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <div className="space-y-2">
-            {httpParameters.map((parameter, idx: number) => (
-              <div key={parameter.id} className="flex items-center space-x-2">
-                <Input
-                  size="small"
-                  value={parameter.name}
-                  className="w-full"
-                  placeholder="Parameter name"
-                  onChange={(event: any) => onUpdateParameter(idx, 'name', event.target.value)}
+            {paramFields.map((field, index) => (
+              <div key={field.id} className="flex items-center space-x-2">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name={`httpParameters.${index}.name`}
+                  render={({ field }) => (
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        {...field}
+                                                className="w-full"
+                        placeholder="Parameter name"
+                      />
+                    </FormControl_Shadcn_>
+                  )}
                 />
-                <Input
-                  size="small"
-                  value={parameter.value}
-                  className="w-full"
-                  placeholder="Parameter value"
-                  onChange={(event: any) => onUpdateParameter(idx, 'value', event.target.value)}
+                <FormField_Shadcn_
+                  control={form.control}
+                  name={`httpParameters.${index}.value`}
+                  render={({ field }) => (
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        {...field}
+                                                className="w-full"
+                        placeholder="Parameter value"
+                      />
+                    </FormControl_Shadcn_>
+                  )}
                 />
                 <ButtonTooltip
                   type="text"
                   className="py-4"
                   icon={<X />}
-                  onClick={() => onRemoveParameter(idx)}
+                  onClick={() => removeParam(index)}
                   tooltip={{ content: { side: 'bottom', text: 'Remove parameter' } }}
                 />
               </div>
             ))}
             <div>
-              <Button type="default" size="tiny" icon={<Plus />} onClick={onAddParameter}>
+              <Button
+                type="default"
+                size="tiny"
+                icon={<Plus />}
+                onClick={() => appendParam({ id: uuidv4(), name: '', value: '' })}
+              >
                 Add a new parameter
               </Button>
             </div>
