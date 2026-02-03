@@ -1,34 +1,53 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import type { PostgresExtension } from '@supabase/postgres-meta'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  Badge,
   Button,
-  Form,
-  Input,
-  Listbox,
-  Modal,
-  WarningIcon,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectSeparator_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Select_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { extensionsWithRecommendedSchemas } from './Extensions.constants'
+import { useDatabaseExtensionDefaultSchemaQuery } from '@/data/database-extensions/database-extension-schema-query'
 
 const orioleExtCallOuts = ['vector', 'postgis']
 
-// Extensions that have recommended schemas (rather than required schemas)
-const extensionsWithRecommendedSchemas: Record<string, string> = {
-  wrappers: 'extensions',
-}
+const FormSchema = z.object({ name: z.string(), schema: z.string() }).superRefine((val, ctx) => {
+  if (val.schema === 'custom' && val.name.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['name'],
+      message: 'Please provide a name for the schema',
+    })
+  }
+})
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -36,20 +55,44 @@ interface EnableExtensionModalProps {
   onCancel: () => void
 }
 
-const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
-  const { data: project } = useSelectedProjectQuery()
+export const EnableExtensionModal = ({
+  visible,
+  extension,
+  onCancel,
+}: EnableExtensionModalProps) => {
   const isOrioleDb = useIsOrioleDb()
-  const [defaultSchema, setDefaultSchema] = useState()
-  const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
+  const { data: project } = useSelectedProjectQuery()
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
 
-  const { data: schemas, isPending: isSchemasLoading } = useSchemasQuery(
+  const recommendedSchema = extensionsWithRecommendedSchemas[extension.name]
+
+  const { data: schemas = [], isPending: isSchemasLoading } = useSchemasQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
     { enabled: visible }
   )
-  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
+  const availableSchemas = schemas.filter(
+    (schema) =>
+      schema.name === recommendedSchema ||
+      !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
+  )
+
+  const { data: extensionMeta, isPending: fetchingSchemaInfo } =
+    useDatabaseExtensionDefaultSchemaQuery(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        extension: extension.name,
+      },
+      { enabled: visible }
+    )
+  // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
+  const defaultSchema = extension.name === 'pg_cron' ? 'pg_catalog' : extensionMeta?.schema
+
+  const isLoading = fetchingSchemaInfo || isSchemasLoading
+
   const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
       toast.success(`Extension "${extension.name}" is now enabled`)
@@ -60,62 +103,16 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
     },
   })
 
-  // [Joshen] Worth checking in with users - whether having this schema selection
-  // might be confusing, and if we should have a tooltip to explain that schemas
-  // are just concepts of namespace, you can use that extension no matter where it's
-  // installed in
+  const defaultValues = { name: extension.name, schema: recommendedSchema ?? 'extensions' }
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues,
+  })
+  const { schema } = form.watch()
 
-  useEffect(() => {
-    let cancel = false
-
-    if (visible) {
-      const checkExtensionSchema = async () => {
-        if (!cancel) {
-          setFetchingSchemaInfo(true)
-          setDefaultSchema(undefined)
-        }
-        try {
-          const res = await executeSql({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            sql: `select * from pg_available_extension_versions where name = '${extension.name}'`,
-          })
-          if (!cancel) setDefaultSchema(res.result[0].schema)
-        } catch (error) {}
-
-        setFetchingSchemaInfo(false)
-      }
-      checkExtensionSchema()
-    }
-
-    return () => {
-      cancel = true
-    }
-  }, [visible, extension.name])
-
-  const getSchemaDescriptionText = (extensionName: string, schema: string | null | undefined) => {
-    // Prioritize defaultSchema (required/forced) over recommended schema
-    if (schema) {
-      return `Extension must be installed in the “${schema}” schema.`
-    }
-
-    const recommendedSchema = extensionsWithRecommendedSchemas[extensionName]
-    if (recommendedSchema) {
-      return `Use the “${recommendedSchema}” schema for full compatibility with related features.`
-    }
-
-    return undefined
-  }
-
-  const isLoading = fetchingSchemaInfo || isSchemasLoading
-
-  const validate = (values: any) => {
-    const errors: any = {}
-    if (values.schema === 'custom' && !values.name) errors.name = 'Required field'
-    return errors
-  }
-
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (project === undefined) return console.error('Project is required')
 
     const schema =
@@ -137,149 +134,160 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
   }
 
   return (
-    <Modal
-      hideFooter
-      visible={visible}
-      onCancel={onCancel}
-      size="small"
-      header={
-        <div className="flex items-baseline gap-2">
-          <h5 className="text-foreground">Enable</h5>
-          <code className="text-code-inline">{extension.name}</code>
-        </div>
-      }
+    <Dialog
+      open={visible}
+      onOpenChange={(open: boolean) => {
+        if (!open) onCancel()
+      }}
     >
-      <Form
-        initialValues={{
-          name: extension.name, // Name of new schema, if creating new
-          schema: 'extensions',
-        }}
-        validate={validate}
-        onSubmit={onSubmit}
-      >
-        {({ values }: any) => {
-          return (
-            <>
-              <Modal.Content className="flex flex-col gap-y-2">
-                {isOrioleDb && orioleExtCallOuts.includes(extension.name) && (
-                  <Admonition type="default" title="Extension is limited by OrioleDB">
-                    <span className="block">
-                      {extension.name} cannot be accelerated by indexes on tables that are using the
-                      OrioleDB access method
-                    </span>
-                    <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
-                  </Admonition>
-                )}
+      <DialogContent size="small" aria-describedby={undefined}>
+        <DialogHeader>
+          <DialogTitle>Enable {extension.name}</DialogTitle>
+        </DialogHeader>
 
-                {isLoading ? (
-                  <div className="space-y-2">
+        <DialogSectionSeparator />
+
+        {isOrioleDb && orioleExtCallOuts.includes(extension.name) && (
+          <Admonition
+            type="default"
+            title="Extension is limited by OrioleDB"
+            className="border-x-0 border-t-0 rounded-none"
+          >
+            <span className="block">
+              {extension.name} cannot be accelerated by indexes on tables that are using the
+              OrioleDB access method
+            </span>
+            <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
+          </Admonition>
+        )}
+
+        {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
+          <Admonition
+            type="warning"
+            title="The pg_cron extension is not fully supported for Fly projects"
+            className="border-x-0 border-t-0 rounded-none"
+          >
+            <p>
+              You can still enable the extension, but pg_cron jobs may not run due to the behavior
+              of Fly projects.
+            </p>
+            <DocsButton
+              className="mt-2"
+              href={`${DOCS_URL}/guides/platform/fly-postgres#limitations`}
+            />
+          </Admonition>
+        )}
+
+        <DialogSection>
+          <Form_Shadcn_ {...form}>
+            <form id="enable-extensions-form" onSubmit={form.handleSubmit(onSubmit)}>
+              {isLoading ? (
+                <div className="space-y-2">
+                  <ShimmeringLoader />
+                  <div className="w-3/4">
                     <ShimmeringLoader />
-                    <div className="w-3/4">
-                      <ShimmeringLoader />
-                    </div>
                   </div>
-                ) : defaultSchema ? (
-                  <Input
-                    disabled
-                    id="schema"
-                    name="schema"
-                    value={defaultSchema}
+                </div>
+              ) : !!defaultSchema ? (
+                <div className="flex flex-col gap-y-2">
+                  <FormItemLayout
+                    isReactForm={false}
                     label="Select a schema to enable the extension for"
-                    descriptionText={getSchemaDescriptionText(extension.name, defaultSchema)}
-                  />
-                ) : (
-                  <Listbox
-                    size="small"
-                    name="schema"
-                    label="Select a schema to enable the extension for"
-                    descriptionText={getSchemaDescriptionText(extension.name, null)}
                   >
-                    <Listbox.Option
-                      key="custom"
-                      id="custom"
-                      label={`Create a new schema "${extension.name}"`}
-                      value="custom"
-                      addOnBefore={() => <Plus size={16} strokeWidth={1.5} />}
-                    >
-                      Create a new schema "{extension.name}"
-                    </Listbox.Option>
-                    <Modal.Separator />
-                    {schemas
-                      ?.filter(
-                        (schema) =>
-                          !protectedSchemas.some(
-                            (protectedSchema) => protectedSchema.name === schema.name
-                          )
-                      )
-                      .map((schema) => {
-                        return (
-                          <Listbox.Option
-                            key={schema.id}
-                            id={schema.name}
-                            label={schema.name}
-                            value={schema.name}
-                            addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
-                          >
-                            {schema.name}
-                          </Listbox.Option>
-                        )
-                      })}
-                  </Listbox>
-                )}
-              </Modal.Content>
-
-              {values.schema === 'custom' && (
-                <Modal.Content>
-                  <Input id="name" name="name" label="Schema name" />
-                </Modal.Content>
-              )}
-
-              {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
-                <Modal.Content>
-                  <Alert_Shadcn_ variant="warning">
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>
-                      The pg_cron extension is not fully supported for Fly projects
-                    </AlertTitle_Shadcn_>
-
-                    <AlertDescription_Shadcn_>
-                      You can still enable the extension, but pg_cron jobs may not run due to the
-                      behavior of Fly projects.
-                    </AlertDescription_Shadcn_>
-
-                    <AlertDescription_Shadcn_ className="mt-3">
-                      <Button
-                        asChild
-                        type="default"
-                        iconRight={<ExternalLinkIcon width={12} height={12} />}
+                    <Input_Shadcn_ disabled value={defaultSchema} />
+                  </FormItemLayout>
+                  <p className="text-sm text-foreground-light">
+                    Extension must be installed in the “{defaultSchema}” schema.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-y-2">
+                  <FormField_Shadcn_
+                    key="schema"
+                    name="schema"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        name="schema"
+                        label="Select a schema to enable the extension for"
                       >
-                        <a
-                          href="/docs/guides/platform/fly-postgres#limitations"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <span>Learn more</span>
-                        </a>
-                      </Button>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                </Modal.Content>
+                        <FormControl_Shadcn_>
+                          <Select_Shadcn_
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={!!defaultSchema}
+                          >
+                            <SelectTrigger_Shadcn_>
+                              <SelectValue_Shadcn_ placeholder="Select a schema" />
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              <SelectItem_Shadcn_ value="custom">
+                                Create a new schema{' '}
+                                <code className="text-code-inline">{extension.name}</code>
+                              </SelectItem_Shadcn_>
+                              <SelectSeparator_Shadcn_ />
+                              {availableSchemas.map((schema) => {
+                                return (
+                                  <SelectItem_Shadcn_ key={schema.id} value={schema.name}>
+                                    {schema.name}
+                                    {schema.name === recommendedSchema ? (
+                                      <Badge className="ml-2" variant="success">
+                                        Recommended
+                                      </Badge>
+                                    ) : !defaultSchema && schema.name === 'extensions' ? (
+                                      <Badge className="ml-2">Default</Badge>
+                                    ) : null}
+                                  </SelectItem_Shadcn_>
+                                )
+                              })}
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+
+                  {!!recommendedSchema && (
+                    <p className="text-sm text-foreground-light">
+                      Use the "{recommendedSchema}" schema for full compatibility with related
+                      features.
+                    </p>
+                  )}
+
+                  {schema === 'custom' && (
+                    <FormField_Shadcn_
+                      key="name"
+                      name="name"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItemLayout name="name" label="Schema name">
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_ {...field} />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                  )}
+                </div>
               )}
-              <Modal.Separator />
-              <Modal.Content className="flex items-center justify-end space-x-2">
-                <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" disabled={isEnabling || isLoading} loading={isEnabling}>
-                  Enable extension
-                </Button>
-              </Modal.Content>
-            </>
-          )
-        }}
-      </Form>
-    </Modal>
+            </form>
+          </Form_Shadcn_>
+        </DialogSection>
+
+        <DialogFooter>
+          <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
+            Cancel
+          </Button>
+          <Button
+            htmlType="submit"
+            form="enable-extensions-form"
+            loading={isEnabling}
+            disabled={isLoading || isEnabling}
+          >
+            Enable extension
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default EnableExtensionModal

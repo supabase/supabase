@@ -1,22 +1,26 @@
 'use client'
 
-import { useRouter as useLegacyRouter } from 'next/compat/router'
-import { type PropsWithChildren, useEffect, useMemo, useCallback } from 'react'
-
 import { useConstant } from 'common'
+import { useRouter as useLegacyRouter } from 'next/compat/router'
+import { type PropsWithChildren, useCallback, useEffect, useMemo } from 'react'
 
 import { CommandContext } from '../internal/Context'
 import { initCommandsState } from '../internal/state/commandsState'
 import { initPagesState } from '../internal/state/pagesState'
 import { initQueryState } from '../internal/state/queryState'
 import { initViewState } from '../internal/state/viewState'
-import { CrossCompatRouterContext } from './hooks/useCrossCompatRouter'
 import {
-  useCommandMenuTelemetry,
   type CommandMenuTelemetryCallback,
+  useCommandMenuTelemetry,
 } from './hooks/useCommandMenuTelemetry'
 import { CommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
-import { useCommandMenuOpen, useSetCommandMenuOpen, useToggleCommandMenu } from './hooks/viewHooks'
+import { CrossCompatRouterContext } from './hooks/useCrossCompatRouter'
+import {
+  useCommandMenuOpen,
+  useResetCommandMenu,
+  useSetCommandMenuOpen,
+  useToggleCommandMenu,
+} from './hooks/viewHooks'
 
 const CommandProviderInternal = ({ children }: PropsWithChildren) => {
   const combinedState = useConstant(() => ({
@@ -69,13 +73,15 @@ const CommandShortcut = ({
 
 function CloseOnNavigation({ children }: PropsWithChildren) {
   const setIsOpen = useSetCommandMenuOpen()
+  const resetCommandMenu = useResetCommandMenu()
 
   const legacyRouter = useLegacyRouter()
   const isUsingLegacyRouting = !!legacyRouter
 
   const completeNavigation = useCallback(() => {
     setIsOpen(false)
-  }, [setIsOpen])
+    resetCommandMenu()
+  }, [resetCommandMenu, setIsOpen])
 
   const ctx = useMemo(
     () => ({

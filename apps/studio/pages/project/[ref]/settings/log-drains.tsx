@@ -1,8 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM, useParams } from 'common'
+import { useFlag } from 'common'
 import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
@@ -21,7 +19,9 @@ import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import { ChevronDown } from 'lucide-react'
+import { useState } from 'react'
 import { cloneElement } from 'react'
+import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import {
   Alert_Shadcn_,
@@ -51,6 +51,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('log_drains')
 
+  const sentryEnabled = useFlag('SentryLogDrain')
+  const s3Enabled = useFlag('S3logdrain')
+  const axiomEnabled = useFlag('axiomLogDrain')
+
   const { data: logDrains } = useLogDrainsQuery(
     { ref },
     { enabled: !isLoadingEntitlement && hasAccessToLogDrains }
@@ -59,10 +63,12 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const { mutate: createLogDrain, isPending: createLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain destination created')
+      setIsCreateConfirmModalOpen(false)
       setOpen(false)
     },
     onError: () => {
       toast.error('Failed to create log drain')
+      setIsCreateConfirmModalOpen(false)
       setOpen(false)
     },
   })
@@ -155,7 +161,6 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             setPendingLogDrainValues(null)
           }
           setIsCreateConfirmModalOpen(false)
-          setOpen(false)
         }}
         onCancel={() => {
           setIsCreateConfirmModalOpen(false)
@@ -211,7 +216,12 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">
-                    {LOG_DRAIN_TYPES.map((drainType) => (
+                    {LOG_DRAIN_TYPES.filter((t) => {
+                      if (t.value === 'sentry') return sentryEnabled
+                      if (t.value === 's3') return s3Enabled
+                      if (t.value === 'axiom') return axiomEnabled
+                      return true
+                    }).map((drainType) => (
                       <DropdownMenuItem
                         key={drainType.value}
                         onClick={() => handleNewClick(drainType.value)}
