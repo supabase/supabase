@@ -81,7 +81,7 @@ overrides:
   preact: 10.26.10
   refractor>prismjs: ^1.30.0
   shadcn>diff: ^8.0.3
-  tar: ^7.5.4
+  tar: ^7.5.7
   tmp: ^0.2.4
   vinxi>vite: 'catalog:'
   vinxi>h3: ^1.15.5
