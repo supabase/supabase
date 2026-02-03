@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from 'react'
+
 export interface DevTelemetryEvent {
   id: string
   timestamp: number
@@ -28,6 +30,6 @@ export interface DevTelemetryToolbarContextType {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   events: DevTelemetryEvent[]
-  setEvents: React.Dispatch<React.SetStateAction<DevTelemetryEvent[]>>
+  setEvents: Dispatch<SetStateAction<DevTelemetryEvent[]>>
   dismissToolbar: () => void
 }
