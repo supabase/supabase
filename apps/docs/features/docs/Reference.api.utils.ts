@@ -129,7 +129,7 @@ interface IOAuth2Security {
 }
 
 interface IFgaSecurity {
-  fga_permissions: string[];
+  fga_permissions: string[]
 }
 
 export function getTypeDisplayFromSchema(schema: ISchema) {
