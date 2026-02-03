@@ -326,7 +326,9 @@ export const SidePanelEditor = ({
                   ? snap.sidePanel.value?.row
                   : snap.sidePanel?.type === 'row'
                     ? snap.sidePanel.row
-                    : undefined
+                    : snap.sidePanel?.type === 'foreign-row-selector'
+                      ? snap.sidePanel.foreignKey.row
+                      : undefined
 
             if (!row) {
               saveRowError = new Error('No row found')
