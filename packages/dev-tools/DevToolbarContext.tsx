@@ -98,7 +98,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   }, [appendEvent, isEnabled])
 
   useEffect(() => {
-    if (!isEnabled || !isOpen || typeof EventSource === 'undefined') return
+    if (!isEnabled || typeof EventSource === 'undefined') return
 
     let eventSource: EventSource | null = null
     let isMounted = true
@@ -163,7 +163,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
         sseRetryTimeoutRef.current = null
       }
     }
-  }, [apiUrl, appendEvent, isEnabled, isOpen])
+  }, [apiUrl, appendEvent, isEnabled])
 
   if (!IS_LOCAL_DEV) {
     return <>{children}</>
