@@ -480,8 +480,6 @@ Supabase Read Replicas distribute read traffic across multiple databases. Use th
 Deploy your first Read Replica in minutes from Project Settings > Infrastructure. Choose a region—same region for analytics isolation, different region for geo-distribution. Select a compute size to match your workload.
 
 [Read blog post](https://supabase.com/blog/read-replicas-vs-bigger-compute)
-
-[Read documentation](https://supabase.com/docs/guides/platform/read-replicas)
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -1236,7 +1234,7 @@ JWT Signing Keys provide modern, secure JWT management with the flexibility requ
     slug: 'jwt-signing-keys',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
+      availableOnSelfHosted: false,
     },
   },
   {

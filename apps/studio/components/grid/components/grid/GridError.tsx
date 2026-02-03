@@ -9,10 +9,16 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-export const GridError = ({ error }: { error?: any }) => {
+import { HighCostError } from '@/components/ui/HighQueryCost'
+import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
+import { ResponseError } from '@/types'
+
+export const GridError = ({ error }: { error?: ResponseError | null }) => {
   const { filters } = useTableFilter()
   const { sorts } = useTableSort()
   const snap = useTableEditorTableStateSnapshot()
+
+  if (!error) return null
 
   const tableEntityType = snap.originalTable?.entity_type
   const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
@@ -26,7 +32,19 @@ export const GridError = ({ error }: { error?: any }) => {
   const isInvalidOrderingOperatorError =
     sorts.length > 0 && error?.message?.includes('identify an ordering operator')
 
-  if (isForeignTableMissingVaultKeyError) {
+  const isHighCostError = error?.message.includes(COST_THRESHOLD_ERROR)
+
+  if (isHighCostError) {
+    return (
+      <HighCostError
+        error={error}
+        suggestions={[
+          'Remove any sorts or filters on unindexed columns, or',
+          'Create indexes for columns that you want to filter or sort on',
+        ]}
+      />
+    )
+  } else if (isForeignTableMissingVaultKeyError) {
     return <ForeignTableMissingVaultKeyError />
   } else if (isInvalidSyntaxError) {
     return <InvalidSyntaxError error={error} />
@@ -67,7 +85,7 @@ const ForeignTableMissingVaultKeyError = () => {
   )
 }
 
-const InvalidSyntaxError = ({ error }: { error?: any }) => {
+const InvalidSyntaxError = ({ error }: { error: ResponseError }) => {
   const { onApplyFilters } = useTableFilter()
 
   return (
@@ -94,9 +112,9 @@ const InvalidSyntaxError = ({ error }: { error?: any }) => {
   )
 }
 
-const InvalidOrderingOperatorError = ({ error }: { error: any }) => {
+const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
   const { sorts, onApplySorts } = useTableSort()
-  const invalidDataType = (error?.message ?? '').split('type ').pop()
+  const invalidDataType = (error.message ?? '').split('type ').pop() ?? ''
   const formattedInvalidDataType = invalidDataType.includes('json')
     ? invalidDataType.toUpperCase()
     : invalidDataType
@@ -127,13 +145,13 @@ const InvalidOrderingOperatorError = ({ error }: { error: any }) => {
   )
 }
 
-const GeneralError = ({ error }: { error: any }) => {
+const GeneralError = ({ error }: { error: ResponseError }) => {
   const { filters } = useTableFilter()
 
   return (
     <AlertError
-      className="pointer-events-auto"
       error={error}
+      className="pointer-events-auto"
       subject="Failed to retrieve rows from table"
     >
       {filters.length > 0 && (
