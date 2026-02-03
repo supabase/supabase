@@ -3,11 +3,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { SmtpForm } from 'components/interfaces/Auth/SmtpForm/SmtpForm'
 import { AuthEmailsLayout } from 'components/layouts/AuthLayout/AuthEmailsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const SmtpPage: NextPageWithLayout = () => {
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
@@ -20,15 +21,17 @@ const SmtpPage: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer>
+    <PageContainer size="default">
       {!isPermissionsLoaded ? (
-        <ScaffoldSection isFullWidth>
-          <GenericSkeletonLoader />
-        </ScaffoldSection>
+        <PageSection>
+          <PageSectionContent>
+            <GenericSkeletonLoader />
+          </PageSectionContent>
+        </PageSection>
       ) : (
         <SmtpForm />
       )}
-    </ScaffoldContainer>
+    </PageContainer>
   )
 }
 

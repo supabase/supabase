@@ -1,17 +1,19 @@
-import { PropsWithChildren, createContext, useContext, useEffect, useRef } from 'react'
-import { CalculatedColumn } from 'react-data-grid'
-import { proxy, ref, subscribe, useSnapshot } from 'valtio'
-import { proxySet } from 'valtio/utils'
-
+import { useFlag } from 'common'
 import {
   loadTableEditorStateFromLocalStorage,
   parseSupaTable,
   saveTableEditorStateToLocalStorageDebounced,
 } from 'components/grid/SupabaseGrid.utils'
-import { SupaRow } from 'components/grid/types'
+import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
+import { Filter, SupaRow } from 'components/grid/types'
 import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
 import { Entity } from 'data/table-editor/table-editor-types'
+import { PropsWithChildren, createContext, useContext, useEffect, useRef } from 'react'
+import { CalculatedColumn } from 'react-data-grid'
+import { proxy, ref, subscribe, useSnapshot } from 'valtio'
+import { proxySet } from 'valtio/utils'
+
 import { useTableEditorStateSnapshot } from './table-editor'
 
 export const createTableEditorTableState = ({
@@ -32,7 +34,7 @@ export const createTableEditorTableState = ({
 }) => {
   const table = parseSupaTable(originalTable)
 
-  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.id)
   const gridColumns = getInitialGridColumns(
     getGridColumns(table, {
       tableId: table.id,
@@ -156,6 +158,15 @@ export const createTableEditorTableState = ({
         { gridColumns: state.gridColumns }
       )
     },
+
+    /* Filters (NOTE: this is only for the new AI filter bar) */
+    filters: [] as Filter[],
+    setFilters: (filters: Filter[]) => {
+      state.filters = filters
+    },
+    clearFilters: () => {
+      state.filters = []
+    },
   })
 
   return state
@@ -176,6 +187,7 @@ export const TableEditorTableStateContextProvider = ({
   table,
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
+  const showIndexAdvisor = useFlag('ShowIndexAdvisorOnTableEditor')
   const tableEditorSnap = useTableEditorStateSnapshot()
   const state = useRef(
     createTableEditorTableState({
@@ -202,8 +214,7 @@ export const TableEditorTableStateContextProvider = ({
         saveTableEditorStateToLocalStorageDebounced({
           gridColumns: state.gridColumns,
           projectRef,
-          tableName: state.table.name,
-          schema: state.table.schema,
+          tableId: state.table.id,
         })
       })
     }
@@ -226,7 +237,13 @@ export const TableEditorTableStateContextProvider = ({
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
-      {children}
+      {showIndexAdvisor && state.table.schema ? (
+        <TableIndexAdvisorProvider schema={state.table.schema ?? 'public'} table={state.table.name}>
+          {children}
+        </TableIndexAdvisorProvider>
+      ) : (
+        children
+      )}
     </TableEditorTableStateContext.Provider>
   )
 }

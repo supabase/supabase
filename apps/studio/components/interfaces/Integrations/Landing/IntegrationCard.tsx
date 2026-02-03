@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { Badge, Card, CardContent, cn } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { IntegrationDefinition } from './Integrations.constants'
 
 type IntegrationCardProps = IntegrationDefinition & {
@@ -26,9 +26,9 @@ export const IntegrationLoadingCard = () => {
         <ShimmeringLoader className="w-full h-full bg-white border rounded-md" />
       </div>
       <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-y-2">
-        <div className="flex-col justify-start items-start gap-y-1 flex">
-          <ShimmeringLoader className="w-20 py-2.5" />
-          <ShimmeringLoader className="w-56 py-2.5" />
+        <div className="w-full flex-col justify-start items-start gap-y-1 flex">
+          <ShimmeringLoader className="w-3/4 py-2.5" />
+          <ShimmeringLoader className="w-full py-2.5" />
         </div>
       </div>
     </div>
@@ -72,14 +72,8 @@ export const IntegrationCard = ({
               <h3>{name}</h3>
               <p className="text-foreground-light text-sm">{description}</p>
               <div className="flex items-center gap-x-1 mt-4">
-                {status && (
-                  <Badge variant="warning" className="capitalize">
-                    {status}
-                  </Badge>
-                )}
-                <Badge>
-                  <span>Official</span>
-                </Badge>
+                {status && <Badge variant="warning">{status}</Badge>}
+                <Badge>Official</Badge>
               </div>
             </div>
           </CardContent>
@@ -98,8 +92,8 @@ export const IntegrationCard = ({
             </div>
             {isInstalled && (
               <div className="flex items-center gap-x-1">
-                <BadgeCheck size={14} className="text-brand" />
-                <span className=" text-brand text-xs">Installed</span>
+                <BadgeCheck size={14} className="text-brand-link" />
+                <span className="text-brand-link text-xs">Installed</span>
               </div>
             )}
           </div>
@@ -108,14 +102,8 @@ export const IntegrationCard = ({
 
             <p className="text-foreground-light text-xs flex-1">{description}</p>
             <div className="flex items-center gap-x-1 mt-4">
-              {status && (
-                <Badge variant="warning" className="capitalize">
-                  {status}
-                </Badge>
-              )}
-              <Badge>
-                <span>Official</span>
-              </Badge>
+              {status && <Badge variant="warning">{status}</Badge>}
+              <Badge>Official</Badge>
             </div>
           </div>
         </CardContent>

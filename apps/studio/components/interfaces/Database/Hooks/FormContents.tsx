@@ -1,4 +1,5 @@
 import type { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect } from 'react'
 
@@ -6,6 +7,7 @@ import { useParams } from 'common'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { Checkbox, Input, Listbox, Radio, SidePanel } from 'ui'
@@ -50,7 +52,11 @@ export const FormContents = ({
   const restUrl = project?.restUrl
   const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
-  const { data: keys = [] } = useAPIKeysQuery({ projectRef: ref, reveal: true })
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: keys = [] } = useAPIKeysQuery(
+    { projectRef: ref, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { data: functions = [], isSuccess: isSuccessEdgeFunctions } = useEdgeFunctionsQuery({
     projectRef: ref,
   })
@@ -90,23 +96,23 @@ export const FormContents = ({
     if (values.http_url && isEdgeFunctionSelected) {
       const fnSlug = values.http_url.split('/').at(-1)
       const fn = functions.find((x) => x.slug === fnSlug)
+      const authorizationHeader = httpHeaders.find((x) => x.name === 'Authorization')
+      const edgeFunctionAuthHeaderVal = `Bearer ${legacyServiceRole}`
 
-      if (fn?.verify_jwt) {
-        if (!httpHeaders.some((x) => x.name === 'Authorization')) {
-          const authorizationHeader = {
-            id: uuidv4(),
-            name: 'Authorization',
-            value: `Bearer ${legacyServiceRole}`,
-          }
-          setHttpHeaders([...httpHeaders, authorizationHeader])
+      if (fn?.verify_jwt && authorizationHeader == null) {
+        const authorizationHeader = {
+          id: uuidv4(),
+          name: 'Authorization',
+          value: edgeFunctionAuthHeaderVal,
         }
-      } else {
-        const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
+        setHttpHeaders([...httpHeaders, authorizationHeader])
+      } else if (fn?.verify_jwt && authorizationHeader?.value !== edgeFunctionAuthHeaderVal) {
+        const updatedHttpHeaders = httpHeaders.map((x) => {
+          if (x.name === 'Authorization') return { ...x, value: edgeFunctionAuthHeaderVal }
+          else return x
+        })
         setHttpHeaders(updatedHttpHeaders)
       }
-    } else {
-      const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
-      setHttpHeaders(updatedHttpHeaders)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.http_url, isSuccessEdgeFunctions])

@@ -1,13 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-
 import { useWatch } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
+import { EnableExtensionModal } from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getDatabaseCronJob } from 'data/database-cron-jobs/database-cron-job-query'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
@@ -17,11 +12,15 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -33,8 +32,8 @@ import {
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CRONJOB_DEFINITIONS } from '../CronJobs.constants'
 import { buildCronQuery, buildHttpRequestCommand, parseCronJobCommand } from '../CronJobs.utils'
 import { EdgeFunctionSection } from '../EdgeFunctionSection'
@@ -44,18 +43,18 @@ import { HttpRequestSection } from '../HttpRequestSection'
 import { SqlFunctionSection } from '../SqlFunctionSection'
 import { SqlSnippetSection } from '../SqlSnippetSection'
 import {
-  FormSchema,
   type CreateCronJobForm,
   type CronJobType,
+  FormSchema,
 } from './CreateCronJobSheet.constants'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 
 interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
   supportsSeconds: boolean
-  isClosing: boolean
-  setIsClosing: (v: boolean) => void
+  onDirty: (isDirty: boolean) => void
   onClose: () => void
+  onCloseWithConfirmation: () => void
 }
 
 const FORM_ID = 'create-cron-job-sidepanel'
@@ -87,9 +86,9 @@ const buildCommand = (values: CronJobType) => {
 export const CreateCronJobSheet = ({
   selectedCronJob,
   supportsSeconds,
-  isClosing,
-  setIsClosing,
+  onDirty,
   onClose,
+  onCloseWithConfirmation: confirmOnClose,
 }: CreateCronJobSheetProps) => {
   const { childId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -109,7 +108,7 @@ export const CreateCronJobSheet = ({
   const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: upsertCronJob, isLoading: isUpserting } = useDatabaseCronJobCreateMutation()
+  const { mutate: upsertCronJob, isPending: isUpserting } = useDatabaseCronJobCreateMutation()
   const isLoading = isLoadingGetCronJob || isUpserting
 
   const { can: canToggleExtensions } = useAsyncCheckPermissions(
@@ -129,17 +128,14 @@ export const CreateCronJobSheet = ({
     },
   })
 
-  const isEdited = form.formState.isDirty
-  // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
-  if (!isEdited && isClosing) onClose()
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      const isDirty = form.formState.isDirty
+      onDirty(isDirty)
+    })
 
-  const onClosePanel = () => {
-    if (isEdited) {
-      setIsClosing(true)
-    } else {
-      onClose()
-    }
-  }
+    return () => subscription.unsubscribe()
+  }, [form, onDirty])
 
   const [
     cronType,
@@ -370,8 +366,8 @@ export const CreateCronJobSheet = ({
                     // @ts-ignore
                     title={
                       <span>
-                        Enable <code className="text-xs w-min">pg_net</code> for HTTP requests or
-                        Edge Functions
+                        Enable <code className="text-code-inline w-min">pg_net</code> for HTTP
+                        requests or Edge Functions
                       </span>
                     }
                     description={
@@ -430,7 +426,7 @@ export const CreateCronJobSheet = ({
             size="tiny"
             type="default"
             htmlType="button"
-            onClick={onClosePanel}
+            onClick={confirmOnClose}
             disabled={isLoading}
           >
             Cancel
@@ -447,18 +443,6 @@ export const CreateCronJobSheet = ({
           </Button>
         </SheetFooter>
       </div>
-      <ConfirmationModal
-        visible={isClosing}
-        title="Discard changes"
-        confirmLabel="Discard"
-        onCancel={() => setIsClosing(false)}
-        onConfirm={() => onClose()}
-      >
-        <p className="text-sm text-foreground-light">
-          There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-          lost.
-        </p>
-      </ConfirmationModal>
       {pgNetExtension && (
         <EnableExtensionModal
           visible={showEnableExtensionModal}

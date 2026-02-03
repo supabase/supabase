@@ -1,15 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
 import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
-import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
+import { useState } from 'react'
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -17,14 +13,17 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
+  Form_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import z from 'zod'
+
+import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
 
 type SecretPair = {
   name: string
@@ -58,7 +57,7 @@ const removeWrappingQuotes = (str: string): string => {
 
 const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
-  const [showSecretValue, setShowSecretValue] = useState(false)
+  const [visibleSecrets, setVisibleSecrets] = useState<Set<string>>(new Set())
   const [duplicateSecretName, setDuplicateSecretName] = useState<string>('')
   const [pendingSecrets, setPendingSecrets] = useState<z.infer<typeof FormSchema> | null>(null)
 
@@ -90,7 +89,7 @@ const AddNewSecretForm = () => {
           const index = parseInt(indexStr)
           form.setValue(
             `secrets.${index}.${field}` as `secrets.${number}.name` | `secrets.${number}.value`,
-            text
+            text.trim()
           )
           return
         }
@@ -127,11 +126,14 @@ const AddNewSecretForm = () => {
     }
   }
 
-  const { mutate: createSecret, isLoading: isCreating } = useSecretsCreateMutation({
+  const { mutate: createSecret, isPending: isCreating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully created new secret "${variables.secrets[0].name}"`)
       // RHF recommends using setTimeout/useEffect to reset the form
-      setTimeout(() => form.reset(), 0)
+      setTimeout(() => {
+        form.reset()
+        setVisibleSecrets(new Set())
+      }, 0)
     },
   })
 
@@ -162,13 +164,45 @@ const AddNewSecretForm = () => {
     setPendingSecrets(null)
   }
 
+  const handleToggleSecretVisibility = (fieldId: string) => {
+    setVisibleSecrets((prev) => {
+      const visibleSet = new Set(prev)
+      if (visibleSet.has(fieldId)) {
+        visibleSet.delete(fieldId)
+      } else {
+        visibleSet.add(fieldId)
+      }
+      return visibleSet
+    })
+  }
+
+  const handleRemoveSecret = (fieldId: string, index: number) => {
+    if (fields.length > 1) {
+      setVisibleSecrets((prev) => {
+        const visibleSet = new Set(prev)
+        visibleSet.delete(fieldId)
+        return visibleSet
+      })
+      remove(index)
+    } else {
+      form.reset(defaultValues)
+      setVisibleSecrets(new Set())
+    }
+  }
+
+  const handleAddAnotherSecret = () => {
+    append({ name: '', value: '' })
+  }
+
+  const isSecretVisible = (fieldId: string) => visibleSecrets.has(fieldId)
+
   return (
     <>
       <Form_Shadcn_ {...form}>
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
-              <CardTitle>Add new secrets</CardTitle>
+              <CardTitle>Add or replace secrets</CardTitle>
             </CardHeader>
             <CardContent>
               {fields.map((fieldItem, index) => (
@@ -178,7 +212,7 @@ const AddNewSecretForm = () => {
                     name={`secrets.${index}.name`}
                     render={({ field }) => (
                       <FormItem_Shadcn_ className="w-full">
-                        <FormLabel_Shadcn_>Key</FormLabel_Shadcn_>
+                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input
                             {...field}
@@ -199,7 +233,7 @@ const AddNewSecretForm = () => {
                         <FormControl_Shadcn_>
                           <Input
                             {...field}
-                            type={showSecretValue ? 'text' : 'password'}
+                            type={isSecretVisible(fieldItem.id) ? 'text' : 'password'}
                             data-1p-ignore
                             data-lpignore="true"
                             data-form-type="other"
@@ -209,8 +243,8 @@ const AddNewSecretForm = () => {
                                 <Button
                                   type="text"
                                   className="px-1"
-                                  icon={showSecretValue ? <EyeOff /> : <Eye />}
-                                  onClick={() => setShowSecretValue(!showSecretValue)}
+                                  icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
+                                  onClick={() => handleToggleSecretVisibility(fieldItem.id)}
                                 />
                               </div>
                             }
@@ -225,30 +259,23 @@ const AddNewSecretForm = () => {
                     type="default"
                     className="h-[34px] mt-6"
                     icon={<MinusCircle />}
-                    onClick={() => (fields.length > 1 ? remove(index) : form.reset(defaultValues))}
+                    disabled={fields.length <= 1}
+                    onClick={() => handleRemoveSecret(fieldItem.id, index)}
                   />
                 </div>
               ))}
 
-              <Button
-                type="default"
-                onClick={() => {
-                  const formValues = form.getValues('secrets')
-                  const isEmptyForm = formValues.every((field) => !field.name && !field.value)
-                  if (isEmptyForm) {
-                    fields.forEach((_, index) => remove(index))
-                    append({ name: '', value: '' })
-                  } else {
-                    append({ name: '', value: '' })
-                  }
-                }}
-              >
+              <Button type="default" onClick={handleAddAnotherSecret}>
                 Add another
               </Button>
             </CardContent>
-            <CardFooter className="justify-end space-x-2">
+            <CardFooter className="justify-between space-x-2">
+              <p className="text-sm text-foreground-muted">
+                Insert or update multiple secrets at once by pasting key-value pairs
+              </p>
+
               <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
-                {isCreating ? 'Saving...' : 'Save'}
+                {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
               </Button>
             </CardFooter>
           </Card>

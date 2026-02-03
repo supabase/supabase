@@ -1762,6 +1762,322 @@
       ]
     },
     {
+      "name": "password-based-auth-nuxtjs",
+      "type": "registry:block",
+      "title": "Password Based Auth flow for Nuxt.js and Supabase",
+      "description": "Password Based Auth flow for Nuxt.js and Supabase",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/components/login-form.vue",
+          "type": "registry:file",
+          "target": "app/components/login-form.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/components/sign-up-form.vue",
+          "type": "registry:file",
+          "target": "app/components/sign-up-form.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/components/forgot-password-form.vue",
+          "type": "registry:file",
+          "target": "app/components/forgot-password-form.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/components/update-password-form.vue",
+          "type": "registry:file",
+          "target": "app/components/update-password-form.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/login.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/login.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/sign-up.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/sign-up.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/forgot-password.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/forgot-password.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/update-password.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/update-password.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/error.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/error.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/sign-up-success.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/sign-up-success.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/app/pages/protected/index.vue",
+          "type": "registry:file",
+          "target": "app/pages/protected/index.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/nuxtjs/server/routes/auth/confirm.get.ts",
+          "type": "registry:file",
+          "target": "server/routes/auth/confirm.get.ts"
+        }
+      ]
+    },
+    {
+      "name": "password-based-auth-vue",
+      "type": "registry:block",
+      "title": "Password Based Auth flow for Vue and Supabase",
+      "description": "Password Based Auth flow for Vue and Supabase",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "files": [
+        {
+          "path": "registry/default/password-based-auth/vue/components/login-form.vue",
+          "type": "registry:component",
+          "target": "components/login-form.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/vue/components/sign-up-form.vue",
+          "type": "registry:component",
+          "target": "components/sign-up-form.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/vue/components/forgot-password-form.vue",
+          "type": "registry:component",
+          "target": "components/forgot-password-form.vue"
+        },
+        {
+          "path": "registry/default/password-based-auth/vue/components/update-password-form.vue",
+          "type": "registry:component",
+          "target": "components/update-password-form.vue"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "social-auth-vue",
+      "type": "registry:block",
+      "title": "Social Auth flow for Vue and Supabase",
+      "description": "Social Auth flow for Vue and Supabase",
+      "registryDependencies": [
+        "button",
+        "card"
+      ],
+      "files": [
+        {
+          "path": "registry/default/social-auth/vue/components/login-form.vue",
+          "type": "registry:component",
+          "target": "components/login-form.vue"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "social-auth-nuxtjs",
+      "type": "registry:block",
+      "title": "Social Auth flow for Nuxt and Supabase",
+      "description": "Social Auth flow for Nuxt and Supabase",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label"
+      ],
+      "files": [
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/components/login-form.vue",
+          "type": "registry:file",
+          "target": "app/components/login-form.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/components/logout-button.vue",
+          "type": "registry:file",
+          "target": "app/components/logout-button.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/pages/auth/login.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/login.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/pages/auth/error.vue",
+          "type": "registry:file",
+          "target": "app/pages/auth/error.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/app/pages/protected/index.vue",
+          "type": "registry:file",
+          "target": "app/pages/protected/index.vue"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/server/middleware/auth.ts",
+          "type": "registry:file",
+          "target": "server/middleware/auth.ts"
+        },
+        {
+          "path": "registry/default/social-auth/nuxtjs/server/routes/auth/oauth.ts",
+          "type": "registry:file",
+          "target": "server/routes/auth/oauth.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "dropzone-nuxtjs",
+      "type": "registry:block",
+      "title": "Dropzone (File Upload) for Nuxt and Supabase",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/components/dropzone.vue",
+          "type": "registry:component",
+          "target": "app/components/dropzone.vue"
+        },
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/components/dropzone-empty-state.vue",
+          "type": "registry:component",
+          "target": "app/components/dropzone-empty-state.vue"
+        },
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/components/dropzone-content.vue",
+          "type": "registry:component",
+          "target": "app/components/dropzone-content.vue"
+        },
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/composables/useSupabaseUpload.ts",
+          "type": "registry:component",
+          "target": "app/composables/useSupabaseUpload.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "dropzone-vue",
+      "type": "registry:block",
+      "title": "Dropzone (File Upload) for Vue and Supabase",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/default/dropzone/vue/components/dropzone.vue",
+          "type": "registry:component",
+          "target": "components/dropzone.vue"
+        },
+        {
+          "path": "registry/default/dropzone/vue/components/dropzone-empty-state.vue",
+          "type": "registry:component",
+          "target": "components/dropzone-empty-state.vue"
+        },
+        {
+          "path": "registry/default/dropzone/vue/components/dropzone-content.vue",
+          "type": "registry:component",
+          "target": "components/dropzone-content.vue"
+        },
+        {
+          "path": "registry/default/dropzone/vue/composables/useSupabaseUpload.ts",
+          "type": "registry:component",
+          "target": "composables/useSupabaseUpload.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "realtime-cursor-nuxtjs",
+      "type": "registry:component",
+      "title": "Realtime Cursor for Nuxt and Supabase",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "files": [
+        {
+          "path": "registry/default/realtime-cursor/nuxtjs/app/components/cursor.vue",
+          "type": "registry:component",
+          "target": "app/components/cursor.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/nuxtjs/app/components/realtime-cursors.vue",
+          "type": "registry:component",
+          "target": "app/components/realtime-cursors.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/nuxtjs/app/composables/useRealtimeCursors.ts",
+          "type": "registry:component",
+          "target": "app/composables/useRealtimeCursors.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "realtime-cursor-vue",
+      "type": "registry:component",
+      "title": "Realtime Cursor for Vue and Supabase",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "files": [
+        {
+          "path": "registry/default/realtime-cursor/vue/components/cursor.vue",
+          "type": "registry:component",
+          "target": "components/cursor.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/vue/components/realtime-cursors.vue",
+          "type": "registry:component",
+          "target": "components/realtime-cursors.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/vue/composables/useRealtimeCursors.ts",
+          "type": "registry:component",
+          "target": "composables/useRealtimeCursors.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "ai-editor-rules",
       "type": "registry:file",

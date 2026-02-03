@@ -110,7 +110,7 @@ We can now create a foreign table to access the data in our secondary project.
 ```sql
 create foreign table docs (
   id text not null,
-  embedding vector(384),
+  embedding extensions.vector(384),
   metadata jsonb,
   url text
 )

@@ -11,7 +11,7 @@ interface RAMWarningsProps {
   severity?: 'warning' | 'critical' | null
 }
 
-const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => {
+export const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => {
   if (severity === 'warning') {
     return (
       <Alert_Shadcn_ variant="warning">
@@ -62,5 +62,3 @@ const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => 
 
   return null
 }
-
-export default RAMWarnings

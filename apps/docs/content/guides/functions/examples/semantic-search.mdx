@@ -28,7 +28,7 @@ create extension if not exists vector with schema extensions;
 create table embeddings (
   id bigint primary key generated always as identity,
   content text not null,
-  embedding vector (384)
+  embedding extensions.vector (384)
 );
 alter table embeddings enable row level security;
 
@@ -72,7 +72,7 @@ Given the [following Postgres Function](https://github.com/supabase/supabase/blo
 --
 -- Returns a setof embeddings so that we can use PostgREST resource embeddings (joins with other tables)
 -- Additional filtering like limits can be chained to this function call
-create or replace function query_embeddings(embedding vector(384), match_threshold float)
+create or replace function query_embeddings(embedding extensions.vector(384), match_threshold float)
 returns setof embeddings
 language plpgsql
 as $$

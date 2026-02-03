@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
-import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
+import { ComposedChart } from 'components/ui/Charts/ComposedChart'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
 import { Card, CardContent, cn } from 'ui'
+
 import { ReportChartUpsell } from './ReportChartUpsell'
-import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
 
 export interface ReportChartV2Props {
   report: ReportConfig
@@ -20,6 +21,10 @@ export interface ReportChartV2Props {
   endDate: string
   interval: AnalyticsInterval
   updateDateRange: (from: string, to: string) => void
+  /**
+   * Group ID used to invalidate React Query caches
+   */
+  queryGroup?: string
   className?: string
   syncId?: string
   filters?: any
@@ -28,10 +33,13 @@ export interface ReportChartV2Props {
 
 // Compute total across entire period over unique attribute keys.
 // Excludes attributes that are disabled, reference lines, max values, or marked omitFromTotal.
-export function computePeriodTotal(chartData: any[], dynamicAttributes: any[]): number {
+export function computePeriodTotal(
+  chartData: Record<string, unknown>[],
+  dynamicAttributes: MultiAttribute[]
+): number {
   const attributeKeys = Array.from(
     new Set(
-      (dynamicAttributes as any[])
+      dynamicAttributes
         .filter(
           (a) =>
             a?.enabled !== false &&
@@ -39,11 +47,11 @@ export function computePeriodTotal(chartData: any[], dynamicAttributes: any[]): 
             !a?.isMaxValue &&
             !a?.omitFromTotal
         )
-        .map((a: any) => a.attribute)
+        .map((a) => a.attribute)
     )
   )
 
-  return chartData.reduce((sum: number, row: any) => {
+  return chartData.reduce((sum: number, row: Record<string, unknown>) => {
     const rowTotal = attributeKeys.reduce((acc: number, key: string) => {
       const value = row?.[key]
       return acc + (typeof value === 'number' ? value : 0)
@@ -63,13 +71,13 @@ export const ReportChartV2 = ({
   syncId,
   filters,
   highlightActions,
+  queryGroup,
 }: ReportChartV2Props) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
   const orgPlanId = orgPlan?.id
 
-  const isAvailable =
-    report.availableIn === undefined || (orgPlanId && report.availableIn.includes(orgPlanId))
+  const isAvailable = !report?.availableIn || (orgPlanId && report.availableIn?.includes(orgPlanId))
 
   const canFetch = orgPlanId !== undefined && isAvailable
 
@@ -78,27 +86,28 @@ export const ReportChartV2 = ({
     isLoading: isLoadingChart,
     error,
     isFetching,
-  } = useQuery(
-    [
+  } = useQuery({
+    queryKey: [
       'projects',
       projectRef,
       'report-v2',
-      { reportId: report.id, startDate, endDate, interval, filters },
+      { reportId: report.id, queryGroup, startDate, endDate, interval, filters },
     ],
-    async () => {
+    queryFn: async () => {
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
-    {
-      enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
-      refetchOnWindowFocus: false,
-      staleTime: 0,
-    }
-  )
+    enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  })
 
   const chartData = queryResult?.data || []
   const dynamicAttributes = queryResult?.attributes || []
 
-  const headerTotal = computePeriodTotal(chartData, dynamicAttributes)
+  const showSumAsDefaultHighlight = report.showSumAsDefaultHighlight ?? true
+  const headerTotal = showSumAsDefaultHighlight
+    ? computePeriodTotal(chartData, dynamicAttributes)
+    : undefined
 
   /**
    * Depending on the source the timestamp key could be 'timestamp' or 'period_start'
@@ -106,16 +115,16 @@ export const ReportChartV2 = ({
   const firstItem = chartData[0]
   const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
 
-  const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
-    chartData,
+  const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted({
+    data: chartData,
     timestampKey,
-    (dynamicAttributes as any[]).map((attr: any) => attr.attribute),
-    0,
+    valueKey: dynamicAttributes.map((attr) => attr.attribute),
+    defaultValue: 0,
     startDate,
     endDate,
-    undefined,
-    interval
-  )
+    minPointsToFill: undefined,
+    interval,
+  })
 
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
   const chartHighlight = useChartHighlight()
@@ -143,7 +152,7 @@ export const ReportChartV2 = ({
             Error loading chart data
           </p>
         ) : (
-          <div className="w-full">
+          <div className="w-full relative">
             <ComposedChart
               chartId={report.id}
               attributes={dynamicAttributes}
@@ -169,6 +178,7 @@ export const ReportChartV2 = ({
               syncId={syncId}
               sql={queryResult?.query}
               highlightActions={highlightActions}
+              showNewBadge={report.showNewBadge}
             />
           </div>
         )}

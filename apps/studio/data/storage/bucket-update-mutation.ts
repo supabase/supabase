@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 type BucketUpdateVariables = {
@@ -31,7 +31,7 @@ async function updateBucket({
   allowed_mime_types,
 }: BucketUpdateVariables): Promise<BucketUpdateResult> {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const payload: Partial<UpdateStorageBucketBody> = { public: isPublic }
   if (file_size_limit !== undefined) payload.file_size_limit = file_size_limit
@@ -58,33 +58,31 @@ export const useBucketUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketUpdateData, ResponseError, BucketUpdateVariables>,
+  UseCustomMutationOptions<BucketUpdateData, ResponseError, BucketUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketUpdateData, ResponseError, BucketUpdateVariables>(
-    async (vars) => {
+  return useMutation<BucketUpdateData, ResponseError, BucketUpdateVariables>({
+    mutationFn: async (vars) => {
       const result = await updateBucket(vars)
       if (result.error) {
         throw result.error
       }
       return result.data
     },
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update bucket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update bucket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

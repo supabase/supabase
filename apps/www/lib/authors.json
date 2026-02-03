@@ -486,6 +486,14 @@
     "author_image_url": "https://github.com/chrischandler.png"
   },
   {
+    "author_id": "chris_caruso",
+    "author": "Chris Caruso",
+    "position": "Senior Solutions Architect",
+    "company": "Supabase",
+    "author_url": "https://www.linkedin.com/in/carusochristian/",
+    "author_image_url": "https://github.com/carusocv.png"
+  },
+  {
     "author_id": "bdon",
     "author": "Brandon Liu",
     "username": "bdon",
@@ -691,5 +699,130 @@
     "position": "Founder Advocate",
     "author_url": "https://www.linkedin.com/in/gregorykress",
     "author_image_url": "/images/blog/avatars/gregorykress.jpg"
+  },
+  {
+    "author_id": "harry_roper",
+    "author": "Harry Roper",
+    "position": "Founder and CEO",
+    "company": "Imaginary Space",
+    "author_url": "https://www.linkedin.com/in/harry-roper",
+    "author_image_url": "/images/avatars/harry-roper.png"
+  },
+  {
+    "author_id": "shahed_islam",
+    "author": "Shahed Islam",
+    "position": "Co-Founder and CEO",
+    "company": "SJ Innovation LLC",
+    "author_url": "https://www.linkedin.com/in/shahed-islam",
+    "author_image_url": "/images/avatars/shahed-islam.jpeg"
+  },
+  {
+    "author_id": "omar_moulani",
+    "author": "Omar Moulani",
+    "position": "Founder and Managing Director",
+    "company": "WeGetDesign",
+    "author_url": "https://www.linkedin.com/in/omar-moulani",
+    "author_image_url": "/images/avatars/omar-moulani.jpeg"
+  },
+  {
+    "author_id": "dave_wilson",
+    "author": "Dave Wilson",
+    "position": "Partnerships",
+    "company": "Supabase",
+    "author_url": "https://www.linkedin.com/in/david-wilson-285564140",
+    "author_image_url": "/images/avatars/dave-wilson.jpg"
+  },
+  {
+    "author_id": "seth_kramer",
+    "author": "Seth Kramer",
+    "position": "Founder",
+    "company": "No Code MBA",
+    "author_url": "https://www.linkedin.com/in/seth-kramer-62806b63/",
+    "author_image_url": "/images/avatars/seth-kramer.jpeg"
+  },
+  {
+    "author_id": "cemal_kilic",
+    "author": "Cemal Kılıç",
+    "username": "cemalkilic",
+    "position": "Engineering",
+    "author_url": "https://github.com/cemalkilic",
+    "author_image_url": "https://github.com/cemalkilic.png"
+  },
+  {
+    "author_id": "riccardo_busetti",
+    "author": "Riccardo Busetti",
+    "username": "iambriccardo",
+    "position": "Engineering",
+    "author_url": "https://github.com/iambriccardo",
+    "author_image_url": "https://github.com/iambriccardo.png"
+  },
+  {
+    "author_id": "fady",
+    "author": "Fady Abdelmalik",
+    "position": "Engineering",
+    "author_url": "https://github.com/issuedat",
+    "author_image_url": "https://github.com/issuedat.png"
+  },
+  {
+    "author_id": "danny",
+    "author": "Danny White",
+    "position": "Product Design",
+    "author_url": "https://github.com/dnywh",
+    "author_image_url": "https://github.com/dnywh.png"
+  },
+  {
+    "author_id": "matt_rossman",
+    "author": "Matt Rossman",
+    "username": "mattrossman",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/the_ross_man",
+    "author_image_url": "https://github.com/mattrossman.png"
+  },
+  {
+    "author_id": "eduardo_gurgel",
+    "author": "Eduardo Gurgel",
+    "username": "edgurgel",
+    "position": "Engineering",
+    "author_url": "https://github.com/edgurgel",
+    "author_image_url": "https://github.com/edgurgel.png"
+  },
+  {
+    "author_id": "steven_eubank",
+    "author": "Steven Eubank",
+    "username": "smeubank",
+    "position": "Product Manager",
+    "author_url": "https://github.com/smeubank",
+    "author_image_url": "https://github.com/smeubank.png"
+  },
+  {
+    "author_id": "katerina_skroumpelou",
+    "author": "Katerina Skroumpelou",
+    "position": "Engineering",
+    "author_url": "https://github.com/mandarini",
+    "author_image_url": "https://github.com/mandarini.png"
+  },
+  {
+    "author_id": "pedro_rodrigues",
+    "author": "Pedro Rodrigues",
+    "username": "Rodriguespn",
+    "position": "AI Tooling Engineer",
+    "author_url": "https://github.com/Rodriguespn",
+    "author_image_url": "https://github.com/Rodriguespn.png"
+  },
+  {
+    "author_id": "matt_linkous",
+    "author": "Matt Linkous",
+    "username": "matlin",
+    "position": "Head of Integrations",
+    "author_url": "https://github.com/matlin",
+    "author_image_url": "https://github.com/matlin.png"
+  },
+  {
+    "author_id": "miles_thomas",
+    "author": "Miles Thomas",
+    "username": "myruzuu",
+    "position": "Product Manager",
+    "author_url": "https://www.linkedin.com/in/mairuzu",
+    "author_image_url": "https://github.com/myruzuu.png"
   }
 ]

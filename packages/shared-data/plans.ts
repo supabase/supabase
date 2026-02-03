@@ -85,6 +85,7 @@ export const plans: PricingInformation[] = [
       'Priority email support & SLAs',
       'Daily backups stored for 14 days',
       '28-day log retention',
+      ['Add Log Drains', 'additional $60 per drain, per project'],
     ],
     preface: 'Everything in the Pro Plan, plus:',
     cta: 'Get Started',

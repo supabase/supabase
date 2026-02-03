@@ -1,6 +1,7 @@
 import { Children } from 'react'
+import { cn } from 'ui'
 
-const FormSection = ({
+export const FormSection = ({
   children,
   id,
   header,
@@ -15,7 +16,7 @@ const FormSection = ({
   className?: string
 }) => {
   const classes = [
-    'grid grid-cols-12 gap-6 px-4 md:px-8 py-4 md:py-8',
+    'grid grid-cols-12 gap-6 px-[var(--card-padding-x)] py-4 md:py-8',
     `${disabled ? ' opacity-30' : ' opacity-100'}`,
     `${className}`,
   ]
@@ -28,7 +29,7 @@ const FormSection = ({
   )
 }
 
-const FormSectionLabel = ({
+export const FormSectionLabel = ({
   children,
   className = '',
   description,
@@ -39,7 +40,7 @@ const FormSectionLabel = ({
 }) => {
   if (description !== undefined) {
     return (
-      <div className={`flex flex-col space-y-2 col-span-12 lg:col-span-5 ${className}`}>
+      <div className={cn('flex flex-col space-y-2 col-span-12 lg:col-span-5', className)}>
         <label className="text-foreground text-sm">{children}</label>
         {description}
       </div>
@@ -62,7 +63,7 @@ const Shimmer = () => (
   </div>
 )
 
-const FormSectionContent = ({
+export const FormSectionContent = ({
   children,
   loading = true,
   loaders,
@@ -78,7 +79,7 @@ const FormSectionContent = ({
   return (
     <div
       className={`
-        relative col-span-12 flex flex-col gap-6 lg:col-span-7
+        relative col-span-12 flex flex-col gap-6 @lg:col-span-7
         ${fullWidth && '!col-span-12'}
         ${className}
       `}
@@ -91,5 +92,3 @@ const FormSectionContent = ({
     </div>
   )
 }
-
-export { FormSection, FormSectionContent, FormSectionLabel }

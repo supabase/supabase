@@ -5,6 +5,7 @@ import { assertSelfHosted, encryptString, getConnectionString } from './util'
 
 export type QueryOptions = {
   query: string
+  parameters?: unknown[]
   readOnly?: boolean
   headers?: HeadersInit
 }
@@ -16,6 +17,7 @@ export type QueryOptions = {
  */
 export async function executeQuery<T = unknown>({
   query,
+  parameters,
   readOnly = false,
   headers,
 }: QueryOptions): Promise<WrappedResult<T[]>> {
@@ -24,6 +26,11 @@ export async function executeQuery<T = unknown>({
   const connectionString = getConnectionString({ readOnly })
   const connectionStringEncrypted = encryptString(connectionString)
 
+  const requestBody: { query: string; parameters?: unknown[] } = { query }
+  if (parameters !== undefined) {
+    requestBody.parameters = parameters
+  }
+
   const response = await fetch(`${PG_META_URL}/query`, {
     method: 'POST',
     headers: constructHeaders({
@@ -31,7 +38,7 @@ export async function executeQuery<T = unknown>({
       'Content-Type': 'application/json',
       'x-connection-encrypted': connectionStringEncrypted,
     }),
-    body: JSON.stringify({ query }),
+    body: JSON.stringify(requestBody),
   })
 
   try {

@@ -1,7 +1,8 @@
 import { noop } from 'lodash'
-import { Badge, Button, Checkbox, Modal } from 'ui'
+import { Button, Checkbox, cn, Modal } from 'ui'
 
-import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
+import { PolicyName } from 'components/interfaces/Auth/Policies/PolicyEditor/PolicyName'
+import { PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor/PolicyRoles'
 import SqlEditor from 'components/ui/SqlEditor'
 import { DOCS_URL } from 'lib/constants'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
@@ -27,6 +28,9 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
 
 const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = () => {} }: any) => {
   const allowedClientLibraryMethods = deriveAllowedClientLibraryMethods(allowedOperations)
+  const hasUpdateOrDelete =
+    allowedOperations.includes('UPDATE') || allowedOperations.includes('DELETE')
+
   return (
     <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-12">
       <div className="flex md:w-1/3 flex-col space-y-2">
@@ -46,7 +50,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
           .
         </p>
       </div>
-      <div className="md:w-2/3">
+      <div className="md:w-2/3 flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           <Checkbox
             label="SELECT"
@@ -69,13 +73,26 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
             checked={allowedOperations.includes('DELETE')}
           />
         </div>
+        {hasUpdateOrDelete && (
+          <p className="text-sm text-foreground-light mt-3 prose [&>code]:text-xs">
+            <code>SELECT</code> has been auto selected as <code>UPDATE</code> and{' '}
+            <code>DELETE</code> require it
+          </p>
+        )}
         <div className="flex w-5/6 flex-wrap">
           {Object.keys(STORAGE_CLIENT_LIBRARY_MAPPINGS).map((method) => (
-            <div key={method} className="mr-2 mt-2 font-mono">
-              <Badge variant={allowedClientLibraryMethods.includes(method) ? 'brand' : 'default'}>
+            <ul key={method} className="mr-2 mt-2 list-none">
+              <li
+                className={cn(
+                  'text-xs font-mono leading-[1.1] px-2 py-1 rounded-full border font-normal whitespace-nowrap transition-colors duration-200',
+                  allowedClientLibraryMethods.includes(method)
+                    ? 'bg-brand bg-opacity-10 text-brand-600 border-brand-500'
+                    : 'bg-surface-75 text-foreground-lighter border-muted'
+                )}
+              >
                 {method}
-              </Badge>
-            </div>
+              </li>
+            </ul>
           ))}
         </div>
       </div>

@@ -1,6 +1,6 @@
 ---
 title: Switch
-description: A control that allows the user to toggle between checked and not checked.
+description: A control for toggling between unchecked and checked.
 component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/switch
@@ -59,6 +59,26 @@ import { Switch } from '@/components/ui/switch'
 ```tsx
 <Switch />
 ```
+
+### Relative positioning
+
+When using Switch in custom flex layouts (especially with height constraints like `h-full`), you may need to add `relative` positioning to the parent container to ensure proper rendering of focus rings, form validation messages, and overflow.
+
+```tsx
+<div className="relative">
+  <FormField_Shadcn_
+    control={form.control}
+    name="enabled"
+    render={({ field }) => (
+      <FormControl_Shadcn_>
+        <Switch checked={field.value} onCheckedChange={field.onChange} />
+      </FormControl_Shadcn_>
+    )}
+  />
+</div>
+```
+
+You don’t need to add `relative` manually when using FormItemLayout as it provides the necessary positioning context automatically.
 
 ## Examples
 

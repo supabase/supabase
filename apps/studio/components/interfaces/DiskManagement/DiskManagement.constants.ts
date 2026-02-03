@@ -1,5 +1,5 @@
 // [Joshen] These should eventually be in shared-types so that it can be used between infra and dashboard
-// https://github.com/supabase/infrastructure/blob/a466d85ece3179cf7b6da1b15c11f2ed2be49bd6/shared/src/volumes.ts#L5-L24
+// https://github.com/supabase/platform/blob/a466d85ece3179cf7b6da1b15c11f2ed2be49bd6/shared/src/volumes.ts#L5-L24
 // https://docs.aws.amazon.com/ebs/latest/userguide/provisioned-iops.html#io2-bx-considerations
 export const IO2_AVAILABLE_REGIONS = [
   'ap-east-1',

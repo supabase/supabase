@@ -76,3 +76,79 @@ export async function createTestDatabase() {
 export async function cleanupRoot() {
   await rootPool.end()
 }
+
+export async function createDatabaseWithAuthSchema(
+  db: Awaited<ReturnType<typeof createTestDatabase>>,
+  options?: { includeIdentities?: boolean }
+) {
+  const { includeIdentities = false } = options || {}
+
+  await db.executeQuery(`
+    CREATE SCHEMA IF NOT EXISTS auth;
+
+    CREATE TABLE IF NOT EXISTS auth.users (
+      instance_id uuid NULL,
+      id uuid NOT NULL UNIQUE,
+      aud varchar(255) NULL,
+      "role" varchar(255) NULL,
+      email varchar(255) NULL,
+      encrypted_password varchar(255) NULL,
+      email_confirmed_at timestamptz NULL,
+      invited_at timestamptz NULL,
+      confirmation_token varchar(255) NULL,
+      confirmation_sent_at timestamptz NULL,
+      recovery_token varchar(255) NULL,
+      recovery_sent_at timestamptz NULL,
+      email_change_token varchar(255) NULL,
+      email_change varchar(255) NULL,
+      email_change_sent_at timestamptz NULL,
+      last_sign_in_at timestamptz NULL,
+      raw_app_meta_data jsonb NULL,
+      raw_user_meta_data jsonb NULL,
+      is_super_admin bool NULL,
+      created_at timestamptz NULL,
+      updated_at timestamptz NULL,
+      phone text NULL,
+      phone_confirmed_at timestamptz NULL,
+      phone_change text NULL,
+      phone_change_token varchar(255) NULL,
+      phone_change_sent_at timestamptz NULL,
+      confirmed_at timestamptz NULL,
+      email_change_token_current varchar(255) NULL,
+      email_change_confirm_status smallint NULL,
+      banned_until timestamptz NULL,
+      reauthentication_token varchar(255) NULL,
+      reauthentication_sent_at timestamptz NULL,
+      is_sso_user bool NOT NULL DEFAULT false,
+      deleted_at timestamptz NULL,
+      is_anonymous bool NOT NULL DEFAULT false,
+      CONSTRAINT users_pkey PRIMARY KEY (id)
+    );
+
+    CREATE INDEX IF NOT EXISTS users_instance_id_idx ON auth.users USING btree (instance_id);
+    CREATE INDEX IF NOT EXISTS users_instance_id_email_idx ON auth.users USING btree (instance_id, lower(email));
+    CREATE INDEX IF NOT EXISTS confirmation_token_idx ON auth.users USING btree (confirmation_token) WHERE confirmation_token IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS recovery_token_idx ON auth.users USING btree (recovery_token) WHERE recovery_token IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS email_change_token_current_idx ON auth.users USING btree (email_change_token_current) WHERE email_change_token_current IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS email_change_token_new_idx ON auth.users USING btree (email_change_token) WHERE email_change_token IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS reauthentication_token_idx ON auth.users USING btree (reauthentication_token) WHERE reauthentication_token IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS users_is_anonymous_idx ON auth.users USING btree (is_anonymous);
+  `)
+
+  if (includeIdentities) {
+    await db.executeQuery(`
+      CREATE TABLE IF NOT EXISTS auth.identities (
+        id text NOT NULL,
+        user_id uuid NOT NULL,
+        identity_data jsonb NOT NULL,
+        provider text NOT NULL,
+        last_sign_in_at timestamptz NULL,
+        created_at timestamptz NULL,
+        updated_at timestamptz NULL,
+        CONSTRAINT identities_pkey PRIMARY KEY (provider, id)
+      );
+
+      CREATE INDEX IF NOT EXISTS identities_user_id_idx ON auth.identities USING btree (user_id);
+    `)
+  }
+}

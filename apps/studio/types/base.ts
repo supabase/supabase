@@ -1,8 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { OrganizationBase } from 'data/organizations/organizations-query'
-import { PlanId } from 'data/subscriptions/types'
-import jsonLogic from 'json-logic-js'
-import { ManagedBy } from 'lib/constants/infrastructure'
+import type { PermissionAction } from '@supabase/shared-types/out/constants'
+import type { OrganizationBase } from 'data/organizations/organizations-query'
+import type { PlanId } from 'data/subscriptions/types'
+import type jsonLogic from 'json-logic-js'
+import type { ManagedBy } from 'lib/constants/infrastructure'
 
 export interface Organization extends OrganizationBase {
   managed_by: ManagedBy
@@ -85,16 +85,36 @@ export interface ResponseFailure {
 
 export type SupaResponse<T> = T | ResponseFailure
 
+// [Joshen] Trialing returning metadata for the error object. It's meant to be generic
+// but typed properly here, and we can create more types if needed with the | operator
+type CostMetadata = {
+  cost: number
+  sql: string
+}
+
+export type ErrorMetadata = CostMetadata
+
 export class ResponseError extends Error {
   code?: number
   requestId?: string
   retryAfter?: number
+  requestPathname?: string
+  metadata?: CostMetadata
 
-  constructor(message: string | undefined, code?: number, requestId?: string, retryAfter?: number) {
+  constructor(
+    message: string | undefined,
+    code?: number,
+    requestId?: string,
+    retryAfter?: number,
+    requestPathname?: string,
+    metadata?: CostMetadata
+  ) {
     super(message || 'API error happened while trying to communicate with the server.')
     this.code = code
     this.requestId = requestId
     this.retryAfter = retryAfter
+    this.requestPathname = requestPathname
+    this.metadata = metadata
   }
 }
 

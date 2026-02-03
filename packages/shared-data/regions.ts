@@ -7,6 +7,11 @@ export const AWS_REGIONS = {
     displayName: 'West US (North California)',
     location: [37.774929, -122.419418],
   },
+  WEST_US_2: {
+    code: 'us-west-2',
+    displayName: 'West US (Oregon)',
+    location: [45.51, -122.67],
+  },
   EAST_US: {
     code: 'us-east-1',
     displayName: 'East US (North Virginia)',

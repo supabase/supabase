@@ -1,11 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import pgMeta from '@supabase/pg-meta'
 import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { DatabaseFunction } from './database-functions-query'
 
 export type DatabaseFunctionDeleteVariables = {
@@ -38,27 +38,29 @@ export const useDatabaseFunctionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseFunctionDeleteData, ResponseError, DatabaseFunctionDeleteVariables>,
+  UseCustomMutationOptions<
+    DatabaseFunctionDeleteData,
+    ResponseError,
+    DatabaseFunctionDeleteVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionDeleteData, ResponseError, DatabaseFunctionDeleteVariables>(
-    (vars) => deleteDatabaseFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseKeys.databaseFunctions(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete database function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseFunctionDeleteData, ResponseError, DatabaseFunctionDeleteVariables>({
+    mutationFn: (vars) => deleteDatabaseFunction(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.databaseFunctions(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete database function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

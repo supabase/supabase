@@ -1,22 +1,28 @@
-import { debounce, memoize } from 'lodash'
-import { toast } from 'sonner'
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
-import { devtools, proxyMap } from 'valtio/utils'
-
+import type { QueryPlanRow } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
+import { UpsertContentPayload, upsertContent } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { getQueryClient } from 'data/query-client'
+import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
-import { SqlSnippets } from 'types'
+import { toast } from 'sonner'
+import type { SqlSnippets } from 'types'
+import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
+import { devtools, proxyMap } from 'valtio/utils'
 
-export type StateSnippetFolder = {
+type StateSnippetFolder = {
   projectRef: string
   folder: SnippetFolder
   status?: 'editing' | 'saving' | 'idle'
+}
+
+type StateSnippet = {
+  projectRef: string
+  splitSizes: number[]
+  snippet: SnippetWithContent
 }
 
 // [Joshen] API codegen is somehow missing the content property
@@ -25,27 +31,33 @@ export interface SnippetWithContent extends Snippet {
   isNotSavedInDatabaseYet?: boolean
 }
 
-export type StateSnippet = {
-  projectRef: string
-  splitSizes: number[]
-  snippet: SnippetWithContent
-}
-
 const NEW_FOLDER_ID = 'new-folder'
 
 export const sqlEditorState = proxy({
   // ========================================================================
   // ## Data properties within the store
   // ========================================================================
+
+  /**
+   * Currently limitations include supporting up to one level of folders from root, and only private snippets
+   */
   folders: {} as {
     [folderId: string]: StateSnippetFolder
   },
-  // Private and Shared snippets only
+
+  /**
+   * Private and shared snippets only, favorite snippets are derivatives of them by the `favorite` property
+   */
   snippets: {} as {
     [snippetId: string]: StateSnippet
   },
 
-  // Query results, if any, for a snippet
+  /**
+   * Query results, if any, for a snippet. Set as an array per snippetId as we were previously experimenting
+   * with having a Jupyter notebook like UI but it never took off. Nonetheless kept this data structure as
+   * we'd also want to support returning multiple results from a single query (e.g From a query that contains
+   * multiple select statements), and this will allow us to do quite easily.
+   */
   results: {} as {
     [snippetId: string]: {
       rows: any[]
@@ -53,18 +65,41 @@ export const sqlEditorState = proxy({
       autoLimit?: number
     }[]
   },
-  // Synchronous saving of folders and snippets (debounce behavior)
-  // key is the snippet id, value is shouldInvalidate
+
+  /**
+   * Explain results, if any, for a snippet
+   */
+  explainResults: {} as {
+    [snippetId: string]: {
+      rows: QueryPlanRow[]
+      error?: { message: string; formattedError?: string }
+    }
+  },
+  /**
+   * Synchronous saving of folders and snippets (debounce behavior). Key is the snippet id, value is shouldInvalidate
+   */
   needsSaving: proxyMap<string, boolean>([]),
-  // Stores the state of each snippet
+  /**
+   * Stores the state of each snippet
+   */
   savingStates: {} as {
     [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
+  /**
+   * UI-imposed limit for the number of results a query can return (applied to the SQL query being run if applicable).
+   * Acts as a safeguard to prevent accidentally taking down the database from a really large SELECT query.
+   * Related to `autoLimit` in `results`. Refer to `checkIfAppendLimitRequired` and `suffixWithLimit` for usage.
+   */
   limit: 100,
-  // For handling renaming folder failed
+
+  /**
+   * Used for error handling after optimistical rendering from renaming a folder
+   */
   lastUpdatedFolderName: '',
 
-  // For Assistant to render diffing into the editor
+  /**
+   * For Assistant to render diffing into the editor
+   */
   diffContent: undefined as undefined | { sql: string; diffType: DiffType },
 
   get allFolderNames() {
@@ -78,14 +113,21 @@ export const sqlEditorState = proxy({
   setDiffContent: (sql: string, diffType: DiffType) =>
     (sqlEditorState.diffContent = { sql, diffType }),
 
+  /**
+   * Load snippet into SQL Editor Valtio store
+   */
   addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: SnippetWithContent }) => {
     if (sqlEditorState.snippets[snippet.id]) return
 
     sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
     sqlEditorState.results[snippet.id] = []
+    sqlEditorState.explainResults[snippet.id] = { rows: [] }
     sqlEditorState.savingStates[snippet.id] = 'IDLE'
   },
 
+  /**
+   * Update snippet data (e.g name, visibility, chart) and queue for sync saving
+   */
   updateSnippet: ({
     id,
     snippet,
@@ -104,6 +146,11 @@ export const sqlEditorState = proxy({
     }
   },
 
+  /**
+   * Load snippet content into the snippet within the Valtio store.
+   * Snippets fetched from the GET /content or /folders endpoints do not have the content loaded initially
+   * to reduce the response size from the API. Hence content for each snippet has to be loaded on demand
+   */
   setSnippet: (projectRef: string, snippet: SnippetWithContent) => {
     let storedSnippet = sqlEditorState.snippets[snippet.id]
     if (storedSnippet) {
@@ -115,14 +162,31 @@ export const sqlEditorState = proxy({
     }
   },
 
-  setSql: (id: string, sql: string) => {
+  /**
+   * Update the snippet content of a snippet and queue for sync saving
+   * Possibly can consolidate with `updateSnippet` to simplify
+   */
+  setSql: ({
+    id,
+    sql,
+    shouldInvalidate = false,
+  }: {
+    id: string
+    sql: string
+    shouldInvalidate?: boolean
+  }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
       snippet.content.sql = sql
-      sqlEditorState.needsSaving.set(id, false)
+      sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },
 
+  /**
+   * Update snippet in Valtio store after renaming
+   * Renaming a snippet follows an async saving and hence doesnt require queuing for sync saving here
+   * Refer to `RenameQueryModal.tsx` for more details
+   */
   renameSnippet: ({
     id,
     name,
@@ -136,27 +200,36 @@ export const sqlEditorState = proxy({
     if (snippet) {
       snippet.name = name
       snippet.description = description
-
-      sqlEditorState.needsSaving.set(id, true)
     }
   },
 
-  removeSnippet: (id: string) => {
+  /**
+   * Remove snippet from the Valtio store, and optionally remove snippet from the sync saving queue
+   */
+  removeSnippet: (id: string, skipSave: boolean = false) => {
     const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
     sqlEditorState.snippets = otherSnippets
 
     const { [id]: result, ...otherResults } = sqlEditorState.results
     sqlEditorState.results = otherResults
 
-    sqlEditorState.needsSaving.delete(id)
+    const { [id]: explainResult, ...otherExplainResults } = sqlEditorState.explainResults
+    sqlEditorState.explainResults = otherExplainResults
+
+    if (!skipSave) sqlEditorState.needsSaving.delete(id)
   },
 
+  /**
+   * Load folder into SQL Editor Valtio store
+   */
   addFolder: ({ projectRef, folder }: { projectRef: string; folder: SnippetFolder }) => {
     if (sqlEditorState.folders[folder.id]) return
-
     sqlEditorState.folders[folder.id] = { projectRef, folder }
   },
 
+  /**
+   * Adds a new folder placeholder for the UI to render
+   */
   addNewFolder: ({ projectRef }: { projectRef: string }) => {
     // [Joshen] Use this to identify new folders that have yet to be saved
     const id = NEW_FOLDER_ID
@@ -177,6 +250,9 @@ export const sqlEditorState = proxy({
     sqlEditorState.folders[id].status = 'editing'
   },
 
+  /**
+   * For renaming a folder, queue for sync saving if pass all validations
+   */
   saveFolder: ({ id, name }: { id: string; name: string }) => {
     let storeFolder = sqlEditorState.folders[id]
     const isNewFolder = id === 'new-folder'
@@ -202,11 +278,19 @@ export const sqlEditorState = proxy({
     }
   },
 
+  /**
+   * Remove folder from the Valtio store
+   * Deleting a folder follows an async saving and hence doesnt require queuing for sync saving here
+   * Refer to `SQLEditorNav` for more details (ConfirmationModal for deleting a folder)
+   */
   removeFolder: (id: string) => {
     const { [id]: folder, ...otherFolders } = sqlEditorState.folders
     sqlEditorState.folders = otherFolders
   },
 
+  /**
+   * Set the value for the auto limit for SELECT based SQL queries
+   */
   setLimit: (value: number) => (sqlEditorState.limit = value),
 
   addNeedsSaving: (id: string) => sqlEditorState.needsSaving.set(id, true),
@@ -229,13 +313,18 @@ export const sqlEditorState = proxy({
 
   addResult: (id: string, results: any[], autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: results, autoLimit })
+      // Use ref() to prevent Valtio from creating proxies for each row object.
+      // This is critical for large result sets - without ref(), Valtio wraps every
+      // row and nested property in a Proxy, causing massive memory overhead.
+      // Alright to use ref() in this case as the data is meant to be read-only and we
+      // don't need to track changes to the underlying data
+      sqlEditorState.results[id] = [{ rows: ref(results), autoLimit }]
     }
   },
 
   addResultError: (id: string, error: any, autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: [], error, autoLimit })
+      sqlEditorState.results[id] = [{ rows: ref([]), error, autoLimit }]
     }
   },
 
@@ -243,6 +332,24 @@ export const sqlEditorState = proxy({
     if (sqlEditorState.results[id]) {
       sqlEditorState.results[id] = []
     }
+  },
+
+  addExplainResult: (id: string, results: QueryPlanRow[]) => {
+    // Use ref() to prevent Valtio from creating proxies for each row object
+    sqlEditorState.explainResults[id] = { rows: ref(results) }
+  },
+
+  addExplainResultError: (id: string, error: { message: string; formattedError?: string }) => {
+    sqlEditorState.explainResults[id] = { rows: ref([]), error }
+  },
+
+  resetExplainResult: (id: string) => {
+    sqlEditorState.explainResults[id] = { rows: [] }
+  },
+
+  resetResults: (id: string) => {
+    sqlEditorState.resetResult(id)
+    sqlEditorState.resetExplainResult(id)
   },
 })
 
@@ -262,7 +369,9 @@ export const useSnippetFolders = (projectRef: string) => {
     () =>
       Object.values(snapshot.folders)
         .filter((x) => x.projectRef === projectRef)
-        .map((x) => x.folder),
+        .map((x) => x.folder)
+        // folders don't have created_at or inserted_at, so we always sort by name
+        .sort((a, b) => a.name.localeCompare(b.name)),
     [projectRef, snapshot.folders]
   )
 }
@@ -290,7 +399,7 @@ async function upsertSnippet(
   id: string,
   projectRef: string,
   payload: UpsertContentPayload,
-  shouldInvalidate = true
+  shouldInvalidate = false
 ) {
   try {
     sqlEditorState.savingStates[id] = 'UPDATING'
@@ -299,9 +408,9 @@ async function upsertSnippet(
     if (shouldInvalidate) {
       const queryClient = getQueryClient()
       await Promise.all([
-        queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql')),
-        queryClient.invalidateQueries(contentKeys.sqlSnippets(projectRef)),
-        queryClient.invalidateQueries(contentKeys.folders(projectRef)),
+        queryClient.invalidateQueries({ queryKey: contentKeys.count(projectRef, 'sql') }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.sqlSnippets(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) }),
       ])
     }
 
@@ -315,14 +424,14 @@ async function upsertSnippet(
   }
 }
 
-const memoizedUpdateSnippet = memoize((_id: string) => debounce(upsertSnippet, 1000))
+const memoizedUpsertSnippet = memoize((_id: string) => debounce(upsertSnippet, 1000))
 
 const debouncedUpdateSnippet = (
   id: string,
   projectRef: string,
   payload: UpsertContentPayload,
   shouldInvalidate = false
-) => memoizedUpdateSnippet(id)(id, projectRef, payload, shouldInvalidate)
+) => memoizedUpsertSnippet(id)(id, projectRef, payload, shouldInvalidate)
 
 async function upsertFolder(id: string, projectRef: string, name: string) {
   try {
@@ -395,10 +504,10 @@ if (typeof window !== 'undefined') {
               project_id: project_id ?? 0,
               owner_id: owner_id,
               folder_id: folder_id ?? undefined,
+              favorite: favorite ?? false,
               content: {
                 ...content!,
                 content_id: id,
-                favorite: favorite ?? false,
               },
             },
             shouldInvalidate

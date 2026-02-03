@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as Sentry from '@sentry/nextjs'
 import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -7,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { captureCriticalError } from 'lib/error-reporting'
 import { auth, getReturnToPath } from 'lib/gotrue'
 import {
   Button,
@@ -19,11 +19,6 @@ import {
 } from 'ui'
 
 import PasswordConditionsHelper from './PasswordConditionsHelper'
-
-const WHITELIST_ERRORS = [
-  'New password should be different from the old password',
-  'Password is known to be weak and easy to guess, please choose a different one',
-]
 
 // Convert the existing yup passwordSchema to Zod
 const passwordSchema = z.object({
@@ -70,9 +65,7 @@ const ResetPasswordForm = () => {
       await router.push(getReturnToPath('/organizations'))
     } else {
       toast.error(`Failed to save password: ${error.message}`, { id: toastId })
-      if (!WHITELIST_ERRORS.some((e) => error.message.includes(e))) {
-        Sentry.captureMessage('[CRITICAL] Failed to reset password: ' + error.message)
-      }
+      captureCriticalError(error, 'reset password')
     }
   }
 

@@ -10,6 +10,7 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
@@ -34,8 +35,8 @@ const IPv4SidePanel = () => {
   const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'ipv4'
 
-  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
+  const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled IPv4`)
       closePanel()
@@ -44,7 +45,7 @@ const IPv4SidePanel = () => {
       toast.error(`Unable to enable IPv4: ${error.message}`)
     },
   })
-  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled IPv4.`)
       closePanel()
@@ -62,6 +63,8 @@ const IPv4SidePanel = () => {
     (addons?.available_addons ?? []).find((addon) => addon.type === 'ipv4')?.variants ?? []
 
   const isFreePlan = organization?.plan?.id === 'free'
+  const { hasAccess: hasAccessToIPv4, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('ipv4')
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
   const isPgBouncerEnabled = !isFreePlan
@@ -91,10 +94,18 @@ const IPv4SidePanel = () => {
       visible={visible}
       onCancel={closePanel}
       onConfirm={onConfirm}
-      loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4 || !isAws}
+      loading={isLoading || isSubmitting || isLoadingEntitlement}
+      disabled={
+        !hasAccessToIPv4 ||
+        isLoadingEntitlement ||
+        isLoading ||
+        !hasChanges ||
+        isSubmitting ||
+        !canUpdateIPv4 ||
+        !isAws
+      }
       tooltip={
-        isFreePlan
+        !hasAccessToIPv4
           ? 'Unable to enable IPv4 on a Free Plan'
           : !canUpdateIPv4
             ? 'You do not have permission to update IPv4'
@@ -147,7 +158,7 @@ const IPv4SidePanel = () => {
             </p>
           )}
 
-          <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
+          <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
               size="tiny"
@@ -181,7 +192,7 @@ const IPv4SidePanel = () => {
                   className="col-span-4 !p-0"
                   name="ipv4"
                   key={option.identifier}
-                  disabled={isFreePlan || !isAws}
+                  disabled={!hasAccessToIPv4 || !isAws}
                   checked={selectedOption === option.identifier}
                   label={option.name}
                   value={option.identifier}
@@ -239,7 +250,7 @@ const IPv4SidePanel = () => {
             </>
           )}
 
-          {isFreePlan && (
+          {!hasAccessToIPv4 && (
             <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
               <p>Upgrade your plan to enable a IPv4 address for your project</p>
               <Button asChild type="default">

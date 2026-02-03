@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { AlertTriangle, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -13,7 +14,6 @@ import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { AlertTriangle, Info } from 'lucide-react'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout, Organization } from 'types'
 
@@ -43,7 +43,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const {
     data: organizationsData,
-    isLoading: isLoadingOrganizationsQuery,
+    isPending: isLoadingOrganizationsQuery,
     isSuccess: isOrganizationsDataSuccess,
   } = useOrganizationsQuery()
 
@@ -111,7 +111,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     }
   }
 
-  const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
+  const { mutate, isPending: isLoadingVercelIntegrationCreateMutation } =
     useVercelIntegrationCreateMutation({
       onMutate() {
         snapshot.setLoading(true)

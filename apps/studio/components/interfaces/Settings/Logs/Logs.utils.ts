@@ -77,6 +77,7 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
 const genWhereStatement = (table: LogsTableName, filters: Filters) => {
   const keys = Object.keys(filters)
   const filterTemplates = SQL_FILTER_TEMPLATES[table]
+
   const _resolveTemplateToStatement = (dotKey: string): string | null => {
     const template = filterTemplates[dotKey]
     const value = get(filters, dotKey)
@@ -289,6 +290,19 @@ export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?:
     (day > 28 && planId === 'team') ||
     (day > 90 && planId === 'enterprise')
   )
+}
+
+/**
+ * Determine if we should show the user an upgrade prompt while browsing logs
+ * This method should replace maybeShowUpgradePrompt once we have migrated all usage to the Entitlements API.
+ */
+export const maybeShowUpgradePromptIfNotEntitled = (
+  from: string | null | undefined,
+  entitledToDays: number | undefined
+) => {
+  if (!entitledToDays) return false
+  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
+  return day > entitledToDays
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {

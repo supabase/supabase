@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/nextjs'
 import { Github } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -6,6 +5,7 @@ import { toast } from 'sonner'
 import { BASE_PATH } from 'lib/constants'
 
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { captureCriticalError } from 'lib/error-reporting'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
 import { LastSignInWrapper } from './LastSignInWrapper'
@@ -36,7 +36,7 @@ export const SignInWithGitHub = () => {
       else setLastSignInUsed('github')
     } catch (error: any) {
       toast.error(`Failed to sign in via GitHub: ${error.message}`)
-      Sentry.captureMessage('[CRITICAL] Failed to sign in via GH: ' + error.message)
+      captureCriticalError(error, 'sign in via GitHub')
       setLoading(false)
     }
   }

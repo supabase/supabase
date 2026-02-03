@@ -152,6 +152,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
   const { data: org } = useSelectedOrganizationQuery()
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
 
+  const isAwsK8sProject = project?.cloud_provider === 'AWS_K8S'
+
   const { formState, getValues } = form
 
   const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissions(
@@ -214,22 +216,34 @@ export const DiskManagementReviewAndSubmitDialog = ({
   const hasComputeChanges =
     form.formState.defaultValues?.computeSize !== form.getValues('computeSize')
   const hasTotalSizeChanges =
-    !isAwsNimbus && form.formState.defaultValues?.totalSize !== form.getValues('totalSize')
+    !isAwsK8sProject &&
+    !isAwsNimbus &&
+    form.formState.defaultValues?.totalSize !== form.getValues('totalSize')
   const hasStorageTypeChanges =
-    !isAwsNimbus && form.formState.defaultValues?.storageType !== form.getValues('storageType')
+    !isAwsK8sProject &&
+    !isAwsNimbus &&
+    form.formState.defaultValues?.storageType !== form.getValues('storageType')
   const hasThroughputChanges =
-    !isAwsNimbus && form.formState.defaultValues?.throughput !== form.getValues('throughput')
+    !isAwsK8sProject &&
+    !isAwsNimbus &&
+    form.formState.defaultValues?.throughput !== form.getValues('throughput')
   const hasIOPSChanges =
+    !isAwsK8sProject &&
     !isAwsNimbus &&
     form.formState.defaultValues?.provisionedIOPS !== form.getValues('provisionedIOPS')
 
   const hasGrowthPercentChanges =
-    !isAwsNimbus && form.formState.defaultValues?.growthPercent !== form.getValues('growthPercent')
+    !isAwsK8sProject &&
+    !isAwsNimbus &&
+    form.formState.defaultValues?.growthPercent !== form.getValues('growthPercent')
   const hasMinIncrementChanges =
+    !isAwsK8sProject &&
     !isAwsNimbus &&
     form.formState.defaultValues?.minIncrementGb !== form.getValues('minIncrementGb')
   const hasMaxSizeChanges =
-    !isAwsNimbus && form.formState.defaultValues?.maxSizeGb !== form.getValues('maxSizeGb')
+    !isAwsK8sProject &&
+    !isAwsNimbus &&
+    form.formState.defaultValues?.maxSizeGb !== form.getValues('maxSizeGb')
 
   const hasDiskConfigChanges =
     hasIOPSChanges ||

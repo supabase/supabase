@@ -2,20 +2,6 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
   {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS,
-    name: 'Security notification templates',
-    discussionsUrl: undefined,
-    isNew: true,
-    isPlatformOnly: true,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI,
-    name: 'New Storage interface',
-    discussionsUrl: undefined,
-    isNew: true,
-    isPlatformOnly: false,
-  },
-  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
     name: 'New Logs interface',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
@@ -37,13 +23,6 @@ export const FEATURE_PREVIEWS = [
     isPlatformOnly: true,
   },
   {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    name: 'Directly edit database entities',
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
-    isNew: false,
-    isPlatformOnly: false,
-  },
-  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
@@ -55,6 +34,13 @@ export const FEATURE_PREVIEWS = [
     name: 'Column-level privileges',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     isNew: false,
+    isPlatformOnly: false,
+  },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
+    name: 'Queue table operations',
+    discussionsUrl: undefined,
+    isNew: true,
     isPlatformOnly: false,
   },
 ] as const

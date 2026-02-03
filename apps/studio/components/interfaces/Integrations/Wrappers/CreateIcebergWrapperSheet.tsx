@@ -20,7 +20,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { CreateWrapperSheetProps } from './CreateWrapperSheet'
 import InputField from './InputField'
 import { makeValidateRequired } from './Wrappers.utils'
@@ -58,9 +57,9 @@ type Target = 'S3Tables' | 'R2Catalog' | 'IcebergRestCatalog'
 
 export const CreateIcebergWrapperSheet = ({
   wrapperMeta: wrapperMetaOriginal,
-  isClosing,
-  setIsClosing,
+  onDirty,
   onClose,
+  onCloseWithConfirmation,
 }: CreateWrapperSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -70,7 +69,7 @@ export const CreateIcebergWrapperSheet = ({
 
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const { mutateAsync: createFDW, isLoading: isCreatingWrapper } = useFDWCreateMutation({
+  const { mutateAsync: createFDW, isPending: isCreatingWrapper } = useFDWCreateMutation({
     onSuccess: () => {
       toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
       onClose()
@@ -112,7 +111,7 @@ export const CreateIcebergWrapperSheet = ({
     ),
   }
 
-  const { mutateAsync: createSchema, isLoading: isCreatingSchema } = useSchemaCreateMutation()
+  const { mutateAsync: createSchema, isPending: isCreatingSchema } = useSchemaCreateMutation()
 
   const onSubmit = async (values: any) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
@@ -187,21 +186,9 @@ export const CreateIcebergWrapperSheet = ({
           onSubmit={onSubmit}
           className="flex-grow flex flex-col h-full"
         >
-          {({ values, initialValues, setFieldValue }: any) => {
+          {({ values, initialValues }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-
-            const onClosePanel = () => {
-              if (hasChanges) {
-                setIsClosing(true)
-              } else {
-                onClose()
-              }
-            }
-
-            // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
-            if (!hasChanges && isClosing) {
-              onClose()
-            }
+            onDirty(hasChanges)
 
             return (
               <>
@@ -219,7 +206,7 @@ export const CreateIcebergWrapperSheet = ({
                           (values?.wrapper_name ?? '').length > 0 ? (
                             <>
                               Your wrapper's server name will be{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           ) : (
                             ''
@@ -349,7 +336,7 @@ export const CreateIcebergWrapperSheet = ({
                     size="tiny"
                     type="default"
                     htmlType="button"
-                    onClick={onClosePanel}
+                    onClick={onCloseWithConfirmation}
                     disabled={isLoading}
                   >
                     Cancel
@@ -369,18 +356,6 @@ export const CreateIcebergWrapperSheet = ({
           }}
         </Form>
       </div>
-      <ConfirmationModal
-        visible={isClosing}
-        title="Discard changes"
-        confirmLabel="Discard"
-        onCancel={() => setIsClosing(false)}
-        onConfirm={() => onClose()}
-      >
-        <p className="text-sm text-foreground-light">
-          There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-          lost.
-        </p>
-      </ConfirmationModal>
     </>
   )
 }

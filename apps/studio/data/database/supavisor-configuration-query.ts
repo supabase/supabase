@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
 
 type SupavisorConfigurationVariables = {
@@ -31,13 +31,11 @@ export const useSupavisorConfigurationQuery = <TData = SupavisorConfigurationDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<SupavisorConfigurationData, SupavisorConfigurationError, TData> = {}
+  }: UseCustomQueryOptions<SupavisorConfigurationData, SupavisorConfigurationError, TData> = {}
 ) =>
-  useQuery<SupavisorConfigurationData, SupavisorConfigurationError, TData>(
-    databaseKeys.poolingConfiguration(projectRef),
-    ({ signal }) => getSupavisorConfiguration({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
-      ...options,
-    }
-  )
+  useQuery<SupavisorConfigurationData, SupavisorConfigurationError, TData>({
+    queryKey: databaseKeys.poolingConfiguration(projectRef),
+    queryFn: ({ signal }) => getSupavisorConfiguration({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
+    ...options,
+  })

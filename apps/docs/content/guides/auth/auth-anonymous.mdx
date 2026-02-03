@@ -160,10 +160,10 @@ await supabase.auth.updateUser(UserAttributes(email: 'valid.email@supabase.io'))
 <$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
-You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method to link an email or phone identity to the anonymous user.
+You can use the [`update(user:)`](/docs/reference/swift/auth-updateuser) method to link an email or phone identity to the anonymous user.
 
 ```swift
-try await supabase.auth.updateUser(
+try await supabase.auth.update(
   user: UserAttributes(email: "valid.email@supabase.io")
 )
 ```

@@ -1,4 +1,4 @@
-import type { QuoteBlock as QuoteBlockProps } from 'src/payload-types'
+import type { QuoteBlock as QuoteBlockProps } from '@/payload-types'
 
 import React from 'react'
 

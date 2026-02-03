@@ -10,6 +10,7 @@ import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortabl
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
@@ -28,6 +29,7 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
+import { useTabsScroll } from './Tabs.utils'
 
 export const EditorTabs = () => {
   const { ref, id } = useParams()
@@ -116,14 +118,23 @@ export const EditorTabs = () => {
           ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
           : tabs.openTabs.filter((x) => x.startsWith('sql'))
       const tabIdx = openedTabs.indexOf(tabId)
+      const activeTabIdx = openedTabs.indexOf(tabs.activeTab!)
       const tabsToClose = openedTabs.slice(tabIdx + 1)
       tabs.removeTabs(tabsToClose)
+
+      const isActiveTabClosed = tabIdx < activeTabIdx
+      if (isActiveTabClosed) {
+        const id = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
+        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${id}`)
+      }
     }
   }
 
   const handleTabChange = (id: string) => {
     tabs.handleTabNavigation(id, router)
   }
+
+  const { tabsListRef } = useTabsScroll({ activeTab: tabs.activeTab, tabCount: editorTabs.length })
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
@@ -134,6 +145,7 @@ export const EditorTabs = () => {
       >
         <CollapseButton hideTabs={false} />
         <TabsList_Shadcn_
+          ref={tabsListRef}
           className={cn(
             'rounded-b-none gap-0 h-10 flex items-center w-full z-[1]',
             'bg-surface-200 dark:bg-alternative border-none overflow-clip overflow-x-auto'

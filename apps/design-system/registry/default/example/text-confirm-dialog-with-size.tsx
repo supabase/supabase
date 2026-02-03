@@ -25,8 +25,8 @@ const TextConfirmModalWithSize = () => {
 
   return (
     <>
-      <Button type="default" onClick={onVisibleChange}>
-        Open warning text confirm dialog
+      <Button type="danger" onClick={onVisibleChange}>
+        Show Text Confirm Dialog
       </Button>
       <TextConfirmModal
         key="withSize"

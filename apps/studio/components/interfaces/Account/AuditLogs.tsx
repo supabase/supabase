@@ -1,23 +1,24 @@
+import { keepPreviousData } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
-import { useDebounce } from '@uidotdev/usehooks'
-import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
+import { LogDetailsPanel } from 'components/interfaces/AuditLogs/LogDetailsPanel'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { Button } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 
-const AuditLogs = () => {
+export const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
 
   const [search, setSearch] = useState('')
@@ -43,22 +44,29 @@ const AuditLogs = () => {
     fetchNextPage,
   } = useProjectsInfiniteQuery(
     { search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const projects =
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const { data: organizations } = useOrganizationsQuery()
-  const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useProfileAuditLogsQuery(
-      {
-        iso_timestamp_start: dateRange.from,
-        iso_timestamp_end: dateRange.to,
-      },
-      {
-        retry: false,
-      }
-    )
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+    refetch,
+  } = useProfileAuditLogsQuery(
+    {
+      iso_timestamp_start: dateRange.from,
+      iso_timestamp_end: dateRange.to,
+    },
+    {
+      retry: false,
+    }
+  )
 
   const logs = data?.result ?? []
   const sortedLogs = logs
@@ -69,7 +77,9 @@ const AuditLogs = () => {
     )
     ?.filter((log) => {
       if (filters.projects.length > 0) {
-        return filters.projects.includes(log.target.metadata.project_ref || '')
+        return filters.projects.includes(
+          log.target.metadata.project_ref || log.target.metadata.ref || ''
+        )
       } else {
         return log
       }
@@ -220,12 +230,12 @@ const AuditLogs = () => {
                   ]}
                   body={
                     sortedLogs?.map((log) => {
-                      const project = projects?.find(
-                        (project) => project.ref === log.target.metadata.project_ref
-                      )
-                      const organization = organizations?.find(
-                        (org) => org.slug === log.target.metadata.org_slug
-                      )
+                      const logProjectRef =
+                        log.target.metadata.project_ref || log.target.metadata.ref
+                      const logOrgSlug = log.target.metadata.org_slug || log.target.metadata.slug
+
+                      const project = projects?.find((project) => project.ref === logProjectRef)
+                      const organization = organizations?.find((org) => org.slug === logOrgSlug)
 
                       const hasStatusCode = log.action.metadata[0]?.status !== undefined
 
@@ -261,16 +271,10 @@ const AuditLogs = () => {
                             </p>
                             <p
                               className="text-foreground-light text-xs mt-0.5 truncate"
-                              title={
-                                log.target.metadata.project_ref ?? log.target.metadata.org_slug
-                              }
+                              title={logProjectRef ?? logOrgSlug ?? ''}
                             >
-                              {log.target.metadata.project_ref
-                                ? 'Ref: '
-                                : log.target.metadata.org_slug
-                                  ? 'Slug: '
-                                  : null}
-                              {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
+                              {logProjectRef ? 'Ref: ' : logOrgSlug ? 'Slug: ' : null}
+                              {logProjectRef ?? logOrgSlug}
                             </p>
                           </Table.td>
                           <Table.td>
@@ -294,5 +298,3 @@ const AuditLogs = () => {
     </>
   )
 }
-
-export default AuditLogs

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { jwtSigningKeysKeys } from './keys'
 
 interface LegacyJWTSigningKeyCreateVariables {
@@ -29,7 +29,7 @@ export const useLegacyJWTSigningKeyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     LegacyJWTSigningKeyCreateData,
     ResponseError,
     LegacyJWTSigningKeyCreateVariables
@@ -42,13 +42,14 @@ export const useLegacyJWTSigningKeyCreateMutation = ({
     LegacyJWTSigningKeyCreateData,
     ResponseError,
     LegacyJWTSigningKeyCreateVariables
-  >((vars) => createLegacyJWTSigningKey(vars), {
+  >({
+    mutationFn: (vars) => createLegacyJWTSigningKey(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await queryClient.invalidateQueries(jwtSigningKeysKeys.legacy(projectRef))
+      await queryClient.invalidateQueries({ queryKey: jwtSigningKeysKeys.legacy(projectRef) })
       // invalidate the keys as well since migration creates 2 new keys and the UI needs to be refreshed
-      await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: jwtSigningKeysKeys.list(projectRef) })
 
       await onSuccess?.(data, variables, context)
     },

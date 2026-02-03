@@ -15,11 +15,13 @@ export interface ChartMeta {
 
 export interface UsageSectionProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   categoryKey: CategoryMetaKey
   subscription?: OrgSubscription
   chartMeta: ChartMeta
   currentBillingCycleSelected: boolean
+  startDate?: string
+  endDate?: string
 }
 
 const UsageSection = ({
@@ -29,14 +31,21 @@ const UsageSection = ({
   chartMeta,
   subscription,
   currentBillingCycleSelected,
+  startDate,
+  endDate,
 }: UsageSectionProps) => {
   const {
     data: usage,
     error: usageError,
-    isLoading: isLoadingUsage,
+    isPending: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
-  } = useOrgUsageQuery({ orgSlug })
+  } = useOrgUsageQuery({
+    orgSlug,
+    projectRef,
+    start: !currentBillingCycleSelected && startDate ? new Date(startDate) : undefined,
+    end: !currentBillingCycleSelected && endDate ? new Date(endDate) : undefined,
+  })
 
   const categoryMeta = USAGE_CATEGORIES(subscription).find(
     (category) => category.key === categoryKey
@@ -64,7 +73,7 @@ const UsageSection = ({
             currentBillingCycleSelected={currentBillingCycleSelected}
             usage={usage}
           />
-        ) : attribute.key === PricingMetric.DATABASE_SIZE ? (
+        ) : attribute.key === PricingMetric.DATABASE_SIZE && subscription?.plan.id === 'free' ? (
           <DatabaseSizeUsage
             key={attribute.name}
             slug={orgSlug}

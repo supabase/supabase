@@ -24,7 +24,7 @@ import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
-import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
+import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
 import { TableDefinition } from './TableDefinition'
 
 export interface TableGridEditorProps {

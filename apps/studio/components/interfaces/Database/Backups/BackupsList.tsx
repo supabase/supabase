@@ -1,26 +1,30 @@
+import { useParams } from 'common'
+import Panel from 'components/ui/Panel'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
+import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
+import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import dayjs from 'dayjs'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import { Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
-import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { TimestampInfo } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
 import { BackupsStorageAlert } from './BackupsStorageAlert'
 
-const BackupsList = () => {
+export const BackupsList = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()
+  const { hasAccess: hasAccessToBackups } = useCheckEntitlements('backup.retention_days')
 
   const { setProjectStatus } = useSetProjectStatus()
   const { data: selectedProject } = useSelectedProjectQuery()
@@ -29,7 +33,7 @@ const BackupsList = () => {
   const { data: backups } = useBackupsQuery({ projectRef })
   const {
     mutate: restoreFromBackup,
-    isLoading: isRestoring,
+    isPending: isRestoring,
     isSuccess: isSuccessBackup,
   } = useBackupRestoreMutation({
     onSuccess: () => {
@@ -47,20 +51,21 @@ const BackupsList = () => {
     },
   })
 
-  const planKey = backups?.tierKey ?? ''
   const sortedBackups = (backups?.backups ?? []).sort(
     (a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
   )
   const isPitrEnabled = backups?.pitr_enabled
 
-  if (planKey === 'FREE') {
+  if (!hasAccessToBackups) {
     return (
       <UpgradeToPro
         addon="pitr"
+        source="backups"
+        featureProposition="have up to 7 days of scheduled backups"
         icon={<Clock size={20} />}
         primaryText="Free Plan does not include project backups."
         secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
-        source="backups"
+        buttonText="Upgrade"
       />
     )
   }
@@ -70,7 +75,7 @@ const BackupsList = () => {
   return (
     <>
       <div className="space-y-6">
-        {sortedBackups.length === 0 && planKey !== 'FREE' ? (
+        {sortedBackups.length === 0 ? (
           <BackupsEmpty />
         ) : (
           <>
@@ -92,17 +97,12 @@ const BackupsList = () => {
         )}
       </div>
       <ConfirmationModal
-        size="medium"
-        confirmLabel="Confirm restore"
-        confirmLabelLoading="Restoring"
+        size="small"
+        confirmLabel="Restore"
+        confirmLabelLoading="Restoring..."
+        variant="warning"
         visible={selectedBackup !== undefined}
-        title="Confirm to restore from backup"
-        alert={{
-          base: { variant: 'warning' },
-          title: 'Your project will be offline while the restore is in progress',
-          description:
-            'It is advised to upgrade at a time when there will be minimal impact for your application.',
-        }}
+        title="Restore from backup"
         loading={isRestoring || isSuccessBackup}
         onCancel={() => setSelectedBackup(undefined)}
         onConfirm={() => {
@@ -111,14 +111,32 @@ const BackupsList = () => {
           restoreFromBackup({ ref: projectRef, backup: selectedBackup })
         }}
       >
-        <p className="text-sm">
-          Are you sure you want to restore from{' '}
-          {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new data
-          written since this backup was made.
-        </p>
+        <div className="space-y-3">
+          {!!selectedBackup && (
+            <p className="text-sm">
+              This will restore your database to the backup made on{' '}
+              <TimestampInfo
+                displayAs="utc"
+                utcTimestamp={selectedBackup.inserted_at}
+                labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                className="!text-sm"
+              />
+            </p>
+          )}
+
+          <Admonition
+            showIcon={false}
+            type="warning"
+            title="This action cannot be undone"
+            description={
+              <ul className="list-disc list-inside">
+                <li>Your project will be offline during restoration</li>
+                <li>Any new data since this backup will be lost</li>
+              </ul>
+            }
+          />
+        </div>
       </ConfirmationModal>
     </>
   )
 }
-
-export default BackupsList

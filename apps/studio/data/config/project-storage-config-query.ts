@@ -1,9 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectStorageConfigVariables = {
@@ -43,10 +43,23 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectStorageConfigData, ProjectStorageConfigError, TData> = {}
+  }: UseCustomQueryOptions<ProjectStorageConfigData, ProjectStorageConfigError, TData> = {}
 ) =>
-  useQuery<ProjectStorageConfigData, ProjectStorageConfigError, TData>(
-    configKeys.storage(projectRef),
-    ({ signal }) => getProjectStorageConfig({ projectRef }, signal),
-    { enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ProjectStorageConfigData, ProjectStorageConfigError, TData>({
+    queryKey: configKeys.storage(projectRef),
+    queryFn: ({ signal }) => getProjectStorageConfig({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    ...options,
+  })
+
+export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
+  const { data } = useProjectStorageConfigQuery({ projectRef })
+  const isIcebergCatalogEnabled = !!data?.features.icebergCatalog?.enabled
+  return isIcebergCatalogEnabled
+}
+
+export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
+  const { data } = useProjectStorageConfigQuery({ projectRef })
+  const isVectorBucketsEnabled = !!data?.features.vectorBuckets?.enabled
+  return isVectorBucketsEnabled
+}

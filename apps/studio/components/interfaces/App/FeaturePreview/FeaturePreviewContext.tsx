@@ -84,11 +84,6 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
 }
 
-export const useIsInlineEditorEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
-}
-
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
 
@@ -110,14 +105,9 @@ export const useIsAdvisorRulesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
-export const useIsNewStorageUIEnabled = () => {
+export const useIsQueueOperationsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]
-}
-
-export const useIsSecurityNotificationsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
 }
 
 export const useFeaturePreviewModal = () => {
@@ -126,8 +116,6 @@ export const useFeaturePreviewModal = () => {
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const isNewStorageUIAvailable = useFlag('storageAnalyticsVector')
-  const isSecurityNotificationsAvailable = useFlag('securityNotifications')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
@@ -142,21 +130,11 @@ export const useFeaturePreviewModal = () => {
           return advisorRulesEnabled
         case 'supabase-ui-preview-unified-logs':
           return isUnifiedLogsPreviewAvailable
-        case 'new-storage-ui':
-          return isNewStorageUIAvailable
-        case 'security-notifications':
-          return isSecurityNotificationsAvailable
         default:
           return true
       }
     },
-    [
-      gitlessBranchingEnabled,
-      advisorRulesEnabled,
-      isUnifiedLogsPreviewAvailable,
-      isNewStorageUIAvailable,
-      isSecurityNotificationsAvailable,
-    ]
+    [gitlessBranchingEnabled, advisorRulesEnabled, isUnifiedLogsPreviewAvailable]
   )
 
   const selectedFeatureKey = (

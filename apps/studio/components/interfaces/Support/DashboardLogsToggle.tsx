@@ -11,14 +11,15 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { SupportFormValues } from './SupportForm.schema'
-import { DASHBOARD_LOG_CATEGORIES, getSanitizedBreadcrumbs } from './dashboard-logs'
+import { DASHBOARD_LOG_CATEGORIES } from './dashboard-logs'
 
 interface DashboardLogsToggleProps {
   form: UseFormReturn<SupportFormValues>
+  sanitizedLog: unknown[]
 }
 
-export function DashboardLogsToggle({ form }: DashboardLogsToggleProps) {
-  const sanitizedLogJson = useMemo(() => JSON.stringify(getSanitizedBreadcrumbs(), null, 2), [])
+export function DashboardLogsToggle({ form, sanitizedLog }: DashboardLogsToggleProps) {
+  const sanitizedLogJson = useMemo(() => JSON.stringify(sanitizedLog, null, 2), [sanitizedLog])
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 

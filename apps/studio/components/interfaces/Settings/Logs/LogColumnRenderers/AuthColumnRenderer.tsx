@@ -9,6 +9,7 @@ const columns: Column<LogData>[] = [
   {
     name: 'auth-first-column',
     key: 'auth-first-column',
+    renderHeaderCell: () => null,
     renderCell: (props) => {
       if (!props.row.level) {
         return defaultRenderCell(props)

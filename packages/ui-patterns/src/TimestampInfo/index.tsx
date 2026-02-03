@@ -51,8 +51,8 @@ export const TimestampInfo = ({
   utcTimestamp,
   className,
   displayAs = 'local',
-  format = 'DD MMM  HH:mm:ss',
-  labelFormat = 'DD MMM HH:mm:ss',
+  format = 'DD MMM YY HH:mm:ss',
+  labelFormat = 'DD MMM YY HH:mm:ss',
   label,
 }: {
   className?: string

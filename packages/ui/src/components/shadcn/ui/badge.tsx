@@ -4,30 +4,22 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils/cn'
 
 const badgeVariants = cva(
-  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-opacity-10',
+  'inline-flex items-center gap-1 justify-center rounded-full font-normal whitespace-nowrap tracking-[0.07em] uppercase font-medium text-[9px] leading-none px-[5.5px] py-[3px]',
   {
     variants: {
       variant: {
-        default: 'bg-surface-200 text-foreground-light border border-strong',
-        warning: 'bg-warning text-warning border border-warning-500',
-        success: 'bg-brand text-brand-600 border border-brand-500',
-        destructive: 'bg-destructive text-destructive-600 border border-destructive-500',
-        brand: 'bg-brand text-brand-600 border border-brand-500',
+        default: 'bg-surface-75 text-foreground-light border border-strong',
+        warning: 'bg-warning bg-opacity-10 text-warning border border-warning-500',
+        success: 'bg-brand bg-opacity-10 text-brand-600 border border-brand-500',
+        destructive:
+          'bg-destructive bg-opacity-10 text-destructive-600 border border-destructive-500',
+        // Secondary is invisible
         secondary:
-          'bg-secondary hover:bg-secondary/80 border-transparent text-secondary-foreground',
-        outline: 'bg-transparent text border border-foreground-muted',
-      },
-      size: {
-        small: 'px-2.5 py-0.5 text-xs',
-        large: 'px-3 py-0.5 rounded-full text-sm',
-      },
-      dot: {
-        true: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
+          'bg-secondary bg-opacity-50 hover:bg-secondary/80 border-transparent text-secondary-foreground',
       },
     },
     defaultVariants: {
       variant: 'default',
-      size: 'small',
     },
   }
 )
@@ -36,24 +28,16 @@ export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
-function Badge({
-  className,
-  variant = 'default',
-  size,
-  dot = false,
-  children,
-  ...props
-}: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant, size }), className)} {...props}>
-      {dot && (
-        <svg className={badgeVariants({ dot })} fill="currentColor" viewBox="0 0 8 8">
-          <circle cx="4" cy="4" r="3" />
-        </svg>
-      )}
-      {children}
-    </div>
-  )
-}
+// Forward refs in order to allow tooltips to be applied to the badge
+const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
+  ({ className, variant = 'default', children, ...props }, ref) => {
+    return (
+      <div ref={ref} className={cn(badgeVariants({ variant }), className)} {...props}>
+        {children}
+      </div>
+    )
+  }
+)
+Badge.displayName = 'Badge'
 
-export { Badge, badgeVariants }
+export { Badge }

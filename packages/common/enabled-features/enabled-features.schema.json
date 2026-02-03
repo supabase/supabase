@@ -52,9 +52,9 @@
       "type": "boolean",
       "description": "Enable the authentication attack protection page"
     },
-    "authentication:advanced": {
+    "authentication:performance": {
       "type": "boolean",
-      "description": "Enable the authentication advanced page"
+      "description": "Enable the authentication performance page"
     },
 
     "authentication:show_providers": {
@@ -99,7 +99,10 @@
       "type": "boolean",
       "description": "Show larger logo sizes throughout the apps"
     },
-
+    "cli:disable_custom_profiles": {
+      "type": "boolean",
+      "description": "Disable custom CLI profiles feature"
+    },
     "dashboard_auth:sign_up": {
       "type": "boolean",
       "description": "Enable the sign up page in the dashboard"
@@ -178,6 +181,10 @@
       "type": "boolean",
       "description": "Enable footer on docs site"
     },
+    "docs:navigation_dropdown_links_home": {
+      "type": "boolean",
+      "description": "Should the navigation dropdown homepage link go to Supabase.com or the dashboard"
+    },
     "docs:framework_quickstarts": {
       "type": "boolean",
       "description": "Enable framework quickstarts documentation"
@@ -245,6 +252,10 @@
       "type": "boolean",
       "description": "Enable the vercel integration section in the organization and project settings pages"
     },
+    "integrations:aws_private_link": {
+      "type": "boolean",
+      "description": "Enable the AWS PrivateLink integration section in the project settings pages"
+    },
 
     "infrastructure:read_replicas": {
       "type": "boolean",
@@ -298,14 +309,6 @@
       "description": "Shows the account deletion section in account preferences"
     },
 
-    "project_connection:javascript_example": {
-      "type": "boolean",
-      "description": "Show the javascript example in the project connection settings. If off, it'll show up as Typescript example instead (both are the same code example)"
-    },
-    "project_connection:dart_example": {
-      "type": "boolean",
-      "description": "Show the dart example in the project connection settings"
-    },
     "project_connection:show_app_frameworks": {
       "type": "boolean",
       "description": "Show the app frameworks tab in the connect modal"
@@ -402,6 +405,15 @@
       "description": "Enable the Swift SDK"
     },
 
+    "storage:analytics": {
+      "type": "boolean",
+      "description": "Enable Analytics Buckets in Storage"
+    },
+    "storage:vectors": {
+      "type": "boolean",
+      "description": "Enable Vector Buckets in Storage"
+    },
+
     "search:fullIndex": {
       "type": "boolean",
       "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
@@ -418,7 +430,7 @@
     "ai:opt_in_level_schema",
     "ai:opt_in_level_schema_and_log",
     "ai:opt_in_level_schema_and_log_and_data",
-    "authentication:advanced",
+    "authentication:performance",
     "authentication:attack_protection",
     "authentication:emails",
     "authentication:multi_factor",
@@ -466,6 +478,7 @@
     "integrations:partners",
     "integrations:wrappers",
     "integrations:vercel",
+    "integrations:aws_private_link",
     "infrastructure:read_replicas",
     "profile:show_email",
     "profile:show_information",
@@ -489,8 +502,6 @@
     "project_settings:log_drains",
     "project_settings:restart_project",
     "project_settings:database_upgrades",
-    "project_connection:javascript_example",
-    "project_connection:dart_example",
     "project_connection:show_app_frameworks",
     "project_connection:show_mobile_frameworks",
     "project_connection:show_orms",
@@ -502,6 +513,8 @@
     "sdk:kotlin",
     "sdk:python",
     "sdk:swift",
+    "storage:analytics",
+    "storage:vectors",
     "search:fullIndex"
   ],
   "additionalProperties": false

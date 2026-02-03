@@ -29,7 +29,7 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
 
   const [open, setOpen] = useState(false)
 
-  const { mutate: createRule, isLoading: isCreating } = useLintRuleCreateMutation({
+  const { mutate: createRule, isPending: isCreating } = useLintRuleCreateMutation({
     onSuccess: (_, vars) => {
       const ruleLint = vars.exception.lint_name
       const ruleLintMeta = lintInfoMap.find((x) => x.name === ruleLint)

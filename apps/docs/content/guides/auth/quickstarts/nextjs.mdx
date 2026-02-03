@@ -31,11 +31,11 @@ hideToc: true
     <StepHikeCompact.Details title="Create a Next.js app">
 
     Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with:
-    - [Cookie-based Auth](docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server)
+    - [Cookie-based Auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server)
     - [TypeScript](https://www.typescriptlang.org/)
     - [Tailwind CSS](https://tailwindcss.com/)
 
-    [See GitHub repo](https://github.com/vercel/next.js/tree/canary/examples/with-supabase)
+    <$Partial path="uiLibCta.mdx" />
 
     </StepHikeCompact.Details>
 
@@ -52,9 +52,11 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    Rename `.env.example` to `.env.local` and populate with [your project's URL and Key](/dashboard/project/_/settings/api).
+        Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
 
-    <$Partial path="api_settings_steps.mdx" />
+        <ProjectConfigVariables variable="url" />
+        <ProjectConfigVariables variable="publishable" />
+        <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
@@ -65,6 +67,8 @@ hideToc: true
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon key
       ```
 
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
+
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
@@ -74,7 +78,7 @@ hideToc: true
 
     Start the development server, go to http://localhost:3000 in a browser, and you should see the contents of `app/page.tsx`.
 
-    To sign up a new user, navigate to http://localhost:3000/sign-up, and click `Sign up`. *NOTE: .env.example must be renamed to .env.local before this route becomes available*
+    To sign up a new user, navigate to http://localhost:3000/auth/sign-up, and click `Sign up`.
 
     </StepHikeCompact.Details>
 

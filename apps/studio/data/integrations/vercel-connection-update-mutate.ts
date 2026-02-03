@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { EnvironmentTargets } from './integrations.types'
 import { integrationKeys } from './keys'
 
@@ -40,27 +40,25 @@ export const useVercelConnectionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>,
+  UseCustomMutationOptions<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>(
-    (vars) => updateVercelConnection(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(
-          integrationKeys.vercelConnectionsList(variables.organizationIntegrationId)
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update Vercel connection: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>({
+    mutationFn: (vars) => updateVercelConnection(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: integrationKeys.vercelConnectionsList(variables.organizationIntegrationId),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update Vercel connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }
