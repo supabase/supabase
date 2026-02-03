@@ -77,6 +77,10 @@ export const DatabaseInfrastructureSection = ({
     attributes: [
       'avg_cpu_usage',
       'ram_usage',
+      'disk_fs_used_system',
+      'disk_fs_used_wal',
+      'pg_database_size',
+      'disk_fs_size',
       'disk_io_consumption',
       'pg_stat_database_num_backends',
     ],
@@ -200,8 +204,8 @@ export const DatabaseInfrastructureSection = ({
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
             <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-              <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
-                Disk
+              <MetricCardLabel tooltip="Disk usage percentage of total disk space used">
+                Disk Usage
               </MetricCardLabel>
             </MetricCardHeader>
             <MetricCardContent>
@@ -209,6 +213,25 @@ export const DatabaseInfrastructureSection = ({
                 <div className="text-xs text-destructive break-words">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
+              ) : (
+                <MetricCardValue>--</MetricCardValue>
+              )}
+            </MetricCardContent>
+          </MetricCard>
+        </Link>
+
+        <Link href={databaseReportUrl} className="block group">
+          <MetricCard isLoading={infraLoading}>
+            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+              <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
+                Disk IO
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              {infraError ? (
+                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+              ) : metrics ? (
+                <MetricCardValue>{metrics.diskIo.current.toFixed(0)}%</MetricCardValue>
               ) : (
                 <MetricCardValue>--</MetricCardValue>
               )}
