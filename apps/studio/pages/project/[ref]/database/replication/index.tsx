@@ -34,8 +34,9 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
                   <h3 className="text-foreground text-xl prose">Replication</h3>
                 </div>
                 <p className="prose text-sm max-w-full">
-                  Automatically replicate your database changes to external data warehouses and
-                  analytics platforms in real-time
+                  {unifiedReplication
+                    ? 'Deploy read replicas across multiple regions, or replicate database changes to external data warehouses and analytics platforms'
+                    : 'Automatically replicate your database changes to external data warehouses and analytics platforms in real-time'}
                 </p>
               </div>
             </ScaffoldSection>
@@ -60,7 +61,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
               />
             </ScaffoldSection>
           </ScaffoldContainer>
-          <ReplicationComingSoon projectRef={ref || '_'} />
+          <ReplicationComingSoon />
         </>
       )}
     </>
