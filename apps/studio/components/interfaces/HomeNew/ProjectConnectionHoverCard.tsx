@@ -74,7 +74,7 @@ export const ProjectConnectionHoverCard = ({ projectRef }: ProjectConnectionHove
     ) {
       return ''
     }
-    const connectionInfo = pluckObjectFields(primaryDatabase, DB_FIELDS)
+    const connectionInfo = pluckObjectFields(primaryDatabase, [...DB_FIELDS])
     return getConnectionStrings({
       connectionInfo: { ...EMPTY_CONNECTION_INFO, ...connectionInfo },
       metadata: { projectRef },
