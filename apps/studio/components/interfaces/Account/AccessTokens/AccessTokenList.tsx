@@ -146,8 +146,8 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
     const filtered = !searchString
       ? tokens
       : tokens?.filter((token) => {
-        return token.name.toLowerCase().includes(searchString.toLowerCase())
-      })
+          return token.name.toLowerCase().includes(searchString.toLowerCase())
+        })
 
     if (!filtered) return filtered
 

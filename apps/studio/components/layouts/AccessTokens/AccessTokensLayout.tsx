@@ -26,12 +26,12 @@ const AccessTokensLayout = ({ children }: PropsWithChildren) => {
     },
     ...(scopedTokensEnabled
       ? [
-        {
-          label: 'Scoped Tokens',
-          href: `/account/tokens/scoped`,
-          id: 'scoped-tokens',
-        },
-      ]
+          {
+            label: 'Scoped Tokens',
+            href: `/account/tokens/scoped`,
+            id: 'scoped-tokens',
+          },
+        ]
       : []),
   ]
 

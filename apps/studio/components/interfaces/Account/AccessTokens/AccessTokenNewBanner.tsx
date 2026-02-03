@@ -55,7 +55,7 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => { }}
+            onChange={() => {}}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>
@@ -71,14 +71,8 @@ export const AccessTokenNewBanner = <T,>({
                     className="w-full justify-start px-0.5 h-auto text-sm font-medium text-foreground-light hover:text-foreground"
                   >
                     <div className="flex items-center gap-1.5">
-                      {permissionsOpen ? (
-                        <ChevronDown size={14} />
-                      ) : (
-                        <ChevronRight size={14} />
-                      )}
-                      <span>
-                        Permissions assigned to this token ({permissions.length})
-                      </span>
+                      {permissionsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      <span>Permissions assigned to this token ({permissions.length})</span>
                     </div>
                   </Button>
                 </CollapsibleTrigger>

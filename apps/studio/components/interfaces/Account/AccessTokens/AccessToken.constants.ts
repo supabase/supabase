@@ -254,7 +254,7 @@ function getPermissions(
     const permissionString = `${basePermission}_create` as ScopedAccessTokenPermission
     return [permissionString]
   }
-  
+
   const permissionString = `${basePermission}_${action}` as ScopedAccessTokenPermission
   return [permissionString]
 }
