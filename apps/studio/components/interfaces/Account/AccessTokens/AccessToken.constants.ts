@@ -58,12 +58,6 @@ const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
     basePermission: 'projects',
     actions: ['read'],
   },
-  'user:available_regions': {
-    scope: 'user',
-    title: 'Access to available regions information',
-    basePermission: 'available_regions',
-    actions: ['read'],
-  },
   'user:snippets': {
     scope: 'user',
     title: 'Access to user snippets',
@@ -241,13 +235,13 @@ const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
   'project:telemetry:logs': {
     scope: 'project',
     title: 'View project log analytics',
-    basePermission: 'telemetry_logs',
+    basePermission: 'analytics_logs',
     actions: ['read'],
   },
   'project:telemetry:usage': {
     scope: 'project',
     title: 'Access usage analytics data',
-    basePermission: 'telemetry_usage',
+    basePermission: 'analytics_usage',
     actions: ['read'],
   },
 }
@@ -256,6 +250,11 @@ function getPermissions(
   basePermission: string,
   action: ResourceAction
 ): ScopedAccessTokenPermission[] {
+  if (basePermission === 'organizations' && action === 'write') {
+    const permissionString = `${basePermission}_create` as ScopedAccessTokenPermission
+    return [permissionString]
+  }
+  
   const permissionString = `${basePermission}_${action}` as ScopedAccessTokenPermission
   return [permissionString]
 }

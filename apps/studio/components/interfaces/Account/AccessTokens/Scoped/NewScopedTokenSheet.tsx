@@ -29,7 +29,6 @@ import { ResourceAccess } from './Form/ResourceAccess'
 import {
   mapPermissionToFGA,
   ExpiresAtOptions,
-  getFGARelationName,
   type ScopedAccessTokenPermission,
 } from '../AccessToken.constants'
 
@@ -151,7 +150,7 @@ export const NewScopedTokenSheet = ({
     const permissions = permissionRows
       .flatMap((row) => {
         const { resource, action } = row
-        return mapPermissionToFGA(resource, action).map(getFGARelationName)
+        return mapPermissionToFGA(resource, action)
       })
       .filter(Boolean) as ScopedAccessTokenPermission[]
 
