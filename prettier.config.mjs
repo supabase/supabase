@@ -21,7 +21,7 @@ if (process.env.SORT_IMPORTS !== 'false') {
   options = {
     ...options,
     plugins: [...options.plugins, '@ianvs/prettier-plugin-sort-imports'],
-    importOrder: ['<THIRD_PARTY_MODULES>', '', '^(@|.{1,2})/(.*)$'],
+    importOrder: ['<THIRD_PARTY_MODULES>', '', '^(@|\\.{1,2})/(.*)$'],
   }
 }
 
