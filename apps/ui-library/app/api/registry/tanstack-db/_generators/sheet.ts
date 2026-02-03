@@ -22,7 +22,9 @@ export function generateSheetContent(tableName: string, definition: OpenAPIDefin
     return !isSystemField
   })
   const readOnlyFields = allFields.filter(([name]) => {
-    return name === primaryKey || name === 'created_at' || name === 'updated_at' || name.endsWith('_at')
+    return (
+      name === primaryKey || name === 'created_at' || name === 'updated_at' || name.endsWith('_at')
+    )
   })
 
   // Generate state declarations
@@ -169,17 +171,17 @@ ${options}
       .map(() => `        created_at: new Date().toISOString(),`),
   ].join('\n')
 
-  // Generate update data
+  // Generate update data (direct mutations on draft)
   const updateData = editableFields
     .map(([name, prop]) => {
       const stateName = toCamelCase(name)
       if (prop.type === 'boolean') {
-        return `          ${name}: ${stateName},`
+        return `        draft.${name} = ${stateName}`
       }
       if (prop.type === 'integer' || prop.type === 'number') {
-        return `          ${name}: ${stateName} || 0,`
+        return `        draft.${name} = ${stateName} || 0`
       }
-      return `          ${name}: ${stateName},`
+      return `        draft.${name} = ${stateName}`
     })
     .join('\n')
 
@@ -262,10 +264,9 @@ ${validationCheck ? `    if (${validationCheck}) return\n` : ''}
 ${insertData}
       })
     } else if (item) {
-      ${collectionName}.update([item.${primaryKey}], (prev) => ({
-        ...prev,
+      ${collectionName}.update(item.${primaryKey}, (draft) => {
 ${updateData}
-      }))
+      })
     }
 
     handleClose()
