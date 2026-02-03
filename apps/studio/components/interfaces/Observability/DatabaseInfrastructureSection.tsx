@@ -148,19 +148,6 @@ export const DatabaseInfrastructureSection = ({
       <h2 className="mb-4">Database</h2>
       {/* First row: Metrics */}
       <div className="grid grid-cols-3 gap-2">
-        <Link href={databaseReportUrl} className="block group">
-          <MetricCard isLoading={dbLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-              <MetricCardLabel tooltip="Percentage of database operations resulting in errors or warnings">
-                Error Rate
-              </MetricCardLabel>
-            </MetricCardHeader>
-            <MetricCardContent>
-              <MetricCardValue>{dbErrorRate.toFixed(2)}%</MetricCardValue>
-            </MetricCardContent>
-          </MetricCard>
-        </Link>
-
         <Link
           href={`/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(JSON.stringify({ operator: '>', value: 1000 }))}`}
           className="block group"
