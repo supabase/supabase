@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.823.0",
-    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "prettier": "3.2.4",
