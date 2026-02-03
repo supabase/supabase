@@ -270,14 +270,18 @@ export const Destinations = () => {
               className={cn(
                 'w-full',
                 'border border-dashed bg-surface-100 border-overlay',
-                'flex flex-col px-10 rounded-lg justify-center items-center py-8 mt-4'
+                'flex flex-col px-16 rounded-lg justify-center items-center py-8 mt-4'
               )}
             >
-              <h4>Create your first destination</h4>
-              <p className="prose text-sm text-center mt-1 max-w-[70ch]">
-                Destinations are external platforms where your database changes are automatically
-                sent. Connect to various data warehouses and analytics platforms to enable real-time
-                data pipelines.
+              <h4>
+                {unifiedReplication
+                  ? 'Replication keeps your data in sync across systems'
+                  : 'Create your first destination'}
+              </h4>
+              <p className="text-foreground-light text-sm text-balance text-center mt-1">
+                {unifiedReplication
+                  ? 'Deploy read replicas for lower latency and better resource management, or capture database changes to external platforms for real-time data pipelines.'
+                  : 'Destinations are external platforms where your database changes are automatically sent. Connect to various data warehouses and analytics platforms to enable real-time data pipelines.'}
               </p>
               <Button
                 icon={<Plus />}
