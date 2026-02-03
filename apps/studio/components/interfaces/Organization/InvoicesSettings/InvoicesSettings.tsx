@@ -1,8 +1,3 @@
-import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, Download, FileText, Receipt } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
 import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
 import AlertError from 'components/ui/AlertError'
@@ -12,23 +7,28 @@ import { getInvoice } from 'data/invoices/invoice-query'
 import { getInvoiceReceipt } from 'data/invoices/invoice-receipt-query'
 import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
+import dayjs from 'dayjs'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { formatCurrency } from 'lib/helpers'
+import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Organization } from 'types/base'
 import {
   Button,
   Card,
   CardFooter,
-  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import InvoicePayButton from './InvoicePayButton'
 
 const PAGE_LIMIT = 5
@@ -199,7 +199,15 @@ export const InvoicesSettings = () => {
                             <InvoicePayButton slug={slug} invoiceId={x.id} />
                           )}
 
-                        {x.status === InvoiceStatus.PAID && (
+                        <ButtonTooltip
+                          type="outline"
+                          className="w-7"
+                          icon={<ScrollText size={16} strokeWidth={1.5} />}
+                          onClick={() => fetchInvoice(x.id)}
+                          tooltip={{ content: { side: 'bottom', text: 'Download invoice' } }}
+                        />
+
+                        {x.status === InvoiceStatus.PAID && x.amount_due > 0 && (
                           <ButtonTooltip
                             type="outline"
                             className="w-7"
@@ -208,14 +216,6 @@ export const InvoicesSettings = () => {
                             tooltip={{ content: { side: 'bottom', text: 'Download receipt' } }}
                           />
                         )}
-
-                        <ButtonTooltip
-                          type="outline"
-                          className="w-7"
-                          icon={<Download size={16} strokeWidth={1.5} />}
-                          onClick={() => fetchInvoice(x.id)}
-                          tooltip={{ content: { side: 'bottom', text: 'Download invoice' } }}
-                        />
                       </div>
                     </TableCell>
                   </TableRow>
