@@ -14,7 +14,7 @@ message = "PKCE flow interrupted by email client or token consumed by link scann
 
 When setting up authentication with magic links and mobile deep linking, you might encounter specific errors like `#ZgotmplZ` in your email templates or a 'cannot parse response' error during the login flow. This guide explains the underlying causes and provides a robust solution.
 
-### **What is PKCE Flow?**
+### **What is PKCE flow?**
 
 PKCE (Proof Key for Code Exchange) is a security extension to the OAuth 2.0 Authorization Code Flow, specifically designed for public clients like mobile apps. It prevents interception attacks by requiring the client to generate a secret (a "code verifier") which is hashed and sent to the authorization server during the initial authorization request. This hash (the "code challenge") is later compared to the actual code verifier when the client exchanges the authorization code for an access token. It acts as a secure "handshake" between your mobile application and the authentication service.
 
