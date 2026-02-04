@@ -1,19 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import { ChevronDownIcon } from '@heroicons/react/outline'
+import Link from 'next/link'
+import React, { useEffect, useRef, useState } from 'react'
 import { useWindowSize } from 'react-use'
-
+import { plans as allPlans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import Panel from '../Panel'
+import ComputePricingCalculator from './ComputePricingCalculator'
 import ComputePricingTable from './ComputePricingTable'
 import PricingComputeAnimation from './PricingComputeAnimation'
-import ComputePricingCalculator from './ComputePricingCalculator'
+import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
+
+const plans = allPlans
+  .filter((plan) => plan.planId === 'pro' || plan.planId === 'team')
+  .map((plan) => ({
+    name: plan.name,
+    price: plan.priceMonthly as number,
+  }))
 
 const PricingComputeSection = () => {
   const ref = useRef<HTMLDivElement>(null)
   const [showTable, setShowTable] = useState(false)
   const { width } = useWindowSize()
   const [height, setHeight] = useState(ref?.current?.clientHeight)
+  const [activePlan, setActivePlan] = useState(plans[0])
 
   useEffect(() => {
     setHeight(ref?.current?.clientHeight)
@@ -22,39 +33,108 @@ const PricingComputeSection = () => {
   return (
     <Panel outerClassName="w-full mx-auto max-w-6xl" innerClassName="flex flex-col">
       <div className="flex flex-col xl:grid xl:grid-cols-3 xl:gap-4">
-        <div className="p-4 pb-0 lg:p-8 gap-4">
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-1">
-                <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full">
-                  Starts from <span translate="no">$10</span>/month
-                </span>
-              </div>
-              <h3 className="text-foreground text-2xl">
-                Scale compute up to
-                <br className="hidden sm:block" /> 64 cores and 256 GB RAM
-              </h3>
-            </div>
-            <p className="text-foreground-lighter text-[13px]">
-              Paid Plans include <span translate="no">$10</span>/month in compute credits.
-              Additional compute power is available if you need extra performance when scaling up
-              Supabase.
-            </p>
+        <div className="p-4 pb-0 lg:p-8 gap-4 flex flex-col">
+          <div className="mb-4 grid gap-1">
+            <h3 className="text-foreground-light text-lg">1. Choose your plan</h3>
           </div>
-          <div className="flex items-center gap-4 mt-4">
-            <Button asChild size="tiny" type="default">
-              <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
-                Learn about Compute add-ons
-              </Link>
-            </Button>
+          <ToggleGroup
+            type="single"
+            value={activePlan.name}
+            onValueChange={(value) => {
+              const selectedPlan = plans.find((p) => p.name === value)
+              if (selectedPlan) setActivePlan(selectedPlan)
+            }}
+            className="grid grid-cols-2 gap-2 w-full bg-surface-200 rounded-md"
+          >
+            {plans.map((plan) => (
+              <ToggleGroupItem
+                key={plan.name}
+                value={plan.name}
+                className={cn(
+                  'w-full h-6 ',
+                  activePlan.name === plan.name
+                    ? 'bg-surface-200 text-foreground data-[state=on]:bg-surface-400 data-[state=on]:text-foreground'
+                    : 'hover:bg-surface-200'
+                )}
+              >
+                {plan.name}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+
+          <div className="grid gap-3">
+            <h3 className="text-foreground text-2xl font-medium">{activePlan.name}</h3>
+            <div className="grid gap-1">
+              <p className="text-foreground text-lg">
+                <span className="font-mono font-bold">${activePlan.price}</span>
+                <span className="text-foreground-light text-sm">/month </span>
+              </p>
+            </div>
+            <div className="grid gap-2 text-sm">
+              {activePlan.name === 'Pro' && (
+                <>
+                  <p className="text-foreground-light font-medium">
+                    Everything in the Free Plan, plus:
+                  </p>
+                  <p className="text-foreground-light">100K monthly active users</p>
+                  <p className="text-foreground-light">8 GB disk size per project</p>
+                  <p className="text-foreground-light">250 GB bandwidth</p>
+                  <p className="text-foreground-light">Daily backups (7 day retention)</p>
+                  <p className="text-foreground-light">Email support</p>
+                </>
+              )}
+              {activePlan.name === 'Team' && (
+                <>
+                  <p className="text-foreground-light font-medium">
+                    Everything in the Pro Plan, plus:
+                  </p>
+                  <p className="text-foreground-light">SOC2</p>
+                  <p className="text-foreground-light">Project-scoped and read-only access</p>
+                  <p className="text-foreground-light">HIPAA available as paid add-on</p>
+                  <p className="text-foreground-light">SSO for Supabase Dashboard</p>
+                  <p className="text-foreground-light">Priority email support & SLAs</p>
+                  <p className="text-foreground-light">Daily backups (14 day retention)</p>
+                </>
+              )}
+              <p className="text-foreground-lighter text-xs mt-2">
+                Paid plans include $10/mo in compute credits, enough to cover one Micro instance.
+              </p>
+            </div>
           </div>
         </div>
         <div className="relative col-span-2 h-full w-full p-4 lg:p-8">
-          <ComputePricingCalculator />
+          <h3 className="text-foreground-light text-lg mb-2">
+            2. Configure compute for your projects
+          </h3>
+          <p className="text-foreground-lighter text-xs mb-6">
+            Paid plans can have unlimited projects. Pay only for compute usage (from{' '}
+            <span translate="no">$10</span>/month for Micro).
+          </p>
+
+          <ComputePricingCalculator activePlan={activePlan} />
         </div>
       </div>
       <hr className="border-0 border-t" />
       <div className="flex flex-col">
+        <div className="flex gap-2 p-6 justify-between items-center mt-2">
+          <div className="grid gap-2">
+            <p>
+              <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full">
+                Starts from <span translate="no">$10</span>/month
+              </span>
+            </p>
+            <h3 className="text-foreground text-2xl">
+              Scale compute up to
+              <br className="hidden sm:block" /> 64 cores and 256 GB RAM
+            </h3>
+          </div>
+
+          <Button asChild size="tiny" type="default">
+            <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
+              Learn about Compute add-ons
+            </Link>
+          </Button>
+        </div>
         <div
           className="relative w-full overflow-hidden transition-all !ease-[cubic-bezier(.76,0,.23,1)] duration-300"
           style={{ height: showTable ? `${height}px` : '200px' }}

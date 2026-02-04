@@ -93,7 +93,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
 
                   <div
                     className={cn(
-                      'text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default lg:min-h-[175px]',
+                      'text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default lg:min-h-[155px]',
                       plan.priceLabel ? 'py-6 lg:pb-0 pt-6' : 'py-8 lg:pb-0 lg:pt-10'
                     )}
                   >

@@ -34,5 +34,18 @@
   {
     "question": "Can I pause a free project?",
     "answer": "Yes, you can pause a project at any time. Our Free Plan gives you 2 free projects, but you can have as many paused projects as you want. Just pause and unpause them as needed."
+  },
+  {
+    "question": "Do Pro Plan projects cost $25 each?",
+    "answer": "No, the Pro Plan is a $25 per month subscription and includes unlimited projects. You pay only for compute usage (from $10/month for Micro). Use the calculator in [How compute pricing works](/pricing#how-compute-pricing-works) to estimate the monthly cost for your projects."
+  },
+  {
+    "question": "If I upgrade my organization to the Pro Plan, will all my projects be on the Pro Plan?",
+    "answer": "Yes, if you upgrade your organization to the Pro Plan, all your projects will be on the Pro Plan. You can add unlimited projects to your Pro Plan organization. You can still have projects on the Free Plan, but they must be in a separate organization."
+  },
+
+  {
+    "question": "Can I still have Free projects on the Pro Plan?",
+    "answer": "Yes, you can still have Free projects on the Pro Plan. You just need to have them in a separate organization. Free projects need to be in a separate organization to keep billing separate."
   }
 ]

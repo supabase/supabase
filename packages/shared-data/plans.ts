@@ -50,10 +50,10 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
-    warning: '$10 in compute credits included',
     priceMonthly: 25,
     description: 'For production applications with the power to scale.',
     features: [
+      ['Micro compute instance', 'via $10/mo in compute credits'],
       ['100,000 monthly active users', 'then $0.00325 per MAU'],
       ['8 GB disk size per project', 'then $0.125 per GB'],
       ['250 GB egress', 'then $0.09 per GB'],
@@ -62,9 +62,11 @@ export const plans: PricingInformation[] = [
       'Email support',
       'Daily backups stored for 7 days',
       '7-day log retention',
+
     ],
     preface: 'Everything in the Free Plan, plus:',
     cta: 'Get Started',
+    footer: 'Unlimited projects, no pausing. Pay only for project compute usage (Micro ≈ $10/month). Keep your 2 free projects.',
   },
   {
     id: 'tier_team',
@@ -74,7 +76,6 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
-    warning: '$10 in compute credits included',
     priceMonthly: 599,
     description: 'Add features such as SSO, control over backups, and industry certifications.',
     features: [
