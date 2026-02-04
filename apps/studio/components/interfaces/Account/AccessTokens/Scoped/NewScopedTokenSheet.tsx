@@ -47,8 +47,6 @@ const TokenSchema = z.object({
   resourceAccess: z.enum(['all-orgs', 'selected-orgs', 'selected-projects']),
   selectedOrganizations: z.array(z.string()).optional(),
   selectedProjects: z.array(z.string()).optional(),
-  organizationPermissions: z.record(z.string(), z.string()).optional(),
-  projectPermissions: z.record(z.string(), z.string()).optional(),
   permissionRows: z.array(PermissionRowSchema).optional(),
 })
 
@@ -87,8 +85,6 @@ export const NewScopedTokenSheet = ({
       resourceAccess: 'all-orgs',
       selectedOrganizations: [],
       selectedProjects: [],
-      organizationPermissions: {},
-      projectPermissions: {},
       permissionRows: [],
     },
     mode: 'onChange',
@@ -225,8 +221,6 @@ export const NewScopedTokenSheet = ({
       resourceAccess: 'all-orgs',
       selectedOrganizations: [],
       selectedProjects: [],
-      organizationPermissions: {},
-      projectPermissions: {},
       permissionRows: [],
     })
     setCustomExpiryDate(undefined)
@@ -241,7 +235,6 @@ export const NewScopedTokenSheet = ({
   const handleCustomExpiryChange = (isCustom: boolean) => {
     setIsCustomExpiry(isCustom)
     if (isCustom && !customExpiryDate) {
-      // Set a default custom date (today at 23:59:59)
       const defaultCustomDate = {
         date: dayjs().endOf('day').toISOString(),
       }

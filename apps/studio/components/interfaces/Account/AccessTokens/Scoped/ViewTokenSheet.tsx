@@ -18,7 +18,6 @@ import { ACCESS_TOKEN_PERMISSIONS, getResourcePermissions } from '../AccessToken
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useMemo } from 'react'
-import { PermissionResource } from './Form/Permissions'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -50,15 +49,13 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
   const getRealAccess = (resource: string, tokenPermissions: string[]) => {
     const hasPermission = (permission: string) => tokenPermissions.includes(permission)
-
-    // Get the permissions for this resource from PERMISSION_MAP
     const resourcePermissions = getResourcePermissions(resource)
+
     if (!resourcePermissions) {
       console.warn(`Unknown resource: ${resource}`)
       return 'no access'
     }
 
-    // Check what permissions the token has for this resource
     const hasRead = resourcePermissions['read']?.some((p) => hasPermission(p)) || false
     const hasWrite = resourcePermissions['write']?.some((p) => hasPermission(p)) || false
     const hasCreate = resourcePermissions['create']?.some((p) => hasPermission(p)) || false
@@ -203,10 +200,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.created_at
                                     ? new Date(token.created_at).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                      })
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
                                     : 'Unknown'}
                                 </span>
                               </TableCell>
@@ -219,10 +216,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.last_used_at
                                     ? new Date(token.last_used_at).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                      })
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
                                     : 'Never'}
                                 </span>
                               </TableCell>
@@ -235,10 +232,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.expires_at
                                     ? new Date(token.expires_at).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                      })
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
                                     : 'Never'}
                                 </span>
                               </TableCell>
@@ -281,7 +278,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <TableCell colSpan={2}>
                                   <p className="text-foreground-light text-center py-4">
                                     {token?.organization_slugs &&
-                                    token.organization_slugs.length > 0
+                                      token.organization_slugs.length > 0
                                       ? 'This token has access to specific organizations and projects.'
                                       : 'This token has access to all resources.'}
                                   </p>

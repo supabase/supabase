@@ -60,16 +60,16 @@ interface PermissionResourceSelectorProps<TFormValues extends PermissionsFormVal
   onOpenChange: (open: boolean) => void
   permissionRows: PermissionRow[]
   setValue: UseFormSetValue<TFormValues>
-  allResources: PermissionResource[]
   align?: 'center' | 'end' | 'start'
 }
 
 const getBestAction = (actions: string[]): string => {
   const availableActions = actions.filter((a) => a !== 'no access')
+
   if (availableActions.length === 0) return 'no access'
 
-  // Priority order: read first, then write, then create, then delete, then others
   const priority = ['read', 'write', 'create', 'delete', 'read-write']
+
   for (const priorityAction of priority) {
     if (availableActions.includes(priorityAction)) {
       return priorityAction
@@ -82,11 +82,8 @@ const getBestAction = (actions: string[]): string => {
 const sortActions = (actions: string[]): string[] => {
   const sorted: string[] = []
   const remaining = [...actions]
-
-  // Priority order: read first, then write, then create, then others, then no access
   const priority = ['read', 'write', 'create']
 
-  // Add priority actions in order if available
   for (const action of priority) {
     const index = remaining.indexOf(action)
     if (index !== -1) {
@@ -95,27 +92,22 @@ const sortActions = (actions: string[]): string[] => {
     }
   }
 
-  // Handle read-write separately (should come after read and write if both exist)
   const readWriteIndex = remaining.indexOf('read-write')
   if (readWriteIndex !== -1) {
-    // Only add read-write if we don't already have both read and write
     if (!sorted.includes('read') || !sorted.includes('write')) {
       sorted.push('read-write')
       remaining.splice(readWriteIndex, 1)
     } else {
-      // If we have both read and write, skip read-write
       remaining.splice(readWriteIndex, 1)
     }
   }
 
-  // Add remaining actions (excluding no access)
   const noAccessIndex = remaining.indexOf('no access')
   if (noAccessIndex !== -1) {
     remaining.splice(noAccessIndex, 1)
   }
   sorted.push(...remaining)
 
-  // Add no access at the end if it exists
   if (actions.includes('no access')) {
     sorted.push('no access')
   }
@@ -241,7 +233,6 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
               onOpenChange={setResourceSearchOpen}
               permissionRows={permissionRows}
               setValue={setValue}
-              allResources={ALL_RESOURCES}
               align="end"
             />
           </div>
@@ -264,7 +255,6 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                           <span className="text-sm font-medium truncate max-w-[36ch]">
                             {selectedResource?.title}
                           </span>
-                          {/* Removed group display */}
                         </div>
                       </div>
                     </div>

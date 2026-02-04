@@ -22,8 +22,6 @@ interface ResourceAccessProps {
     selectedOrganizations?: string[]
     selectedProjects?: string[]
     expiresAt?: string
-    organizationPermissions?: Record<string, string>
-    projectPermissions?: Record<string, string>
     permissionRows?: { resource: string; action: string }[]
   }>
   resourceAccess: string
@@ -181,7 +179,6 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
   )
 }
 
-// Extracted component for radio options
 const ResourceOption = ({
   value,
   label,
