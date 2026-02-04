@@ -30,19 +30,19 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
+  cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
-  cn,
-  copyToClipboard,
 } from 'ui'
 
 import { useInitializeFiltersFromUrl, useSyncFiltersToUrl } from '../../hooks/useFilterLifeCycle'
 import { ExportDialog } from './ExportDialog'
-import { formatRowsForCSV } from './Header.utils'
 import { FilterPopoverNew } from './filter/FilterPopoverNew'
+import { formatRowsForCSV } from './Header.utils'
 import { SortPopover } from './sort/SortPopover'
 
 export type HeaderProps = {
@@ -71,7 +71,7 @@ export const HeaderNew = ({
         ) : snap.selectedRows.size > 0 ? (
           <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
         ) : (
-          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} />
+          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} isRefetching={isRefetching} />
         )}
         <div className="flex items-center gap-2">
           <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
@@ -84,11 +84,12 @@ export const HeaderNew = ({
 
 const DefaultHeader = ({
   tableQueriesEnabled = true,
-}: Pick<HeaderProps, 'tableQueriesEnabled'>) => {
+  isRefetching,
+}: Pick<HeaderProps, 'tableQueriesEnabled' | 'isRefetching'>) => {
   return (
     <>
-      <div className="flex-1 min-w-0">
-        <FilterPopoverNew />
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        <FilterPopoverNew isRefetching={isRefetching} />
       </div>
       <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
     </>
