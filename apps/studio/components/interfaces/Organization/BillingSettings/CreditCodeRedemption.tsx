@@ -98,7 +98,7 @@ export const CreditCodeRedemption = ({
     isPending: redeemingCode,
     error: errorRedeemingCode,
     data: codeRedemptionResult,
-    reset: resetCodeRedemption
+    reset: resetCodeRedemption,
   } = useOrganizationCreditCodeRedemptionMutation()
 
   const resetCaptcha = () => {
@@ -160,7 +160,8 @@ export const CreditCodeRedemption = ({
     return null
   }
 
-const codeRedemptionDisabled = !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isCustomerProfileLoading 
+  const codeRedemptionDisabled =
+    !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isCustomerProfileLoading
 
   return (
     <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>
@@ -169,9 +170,7 @@ const codeRedemptionDisabled = !canRedeemCode || !isPermissionsLoaded || isOrgLo
           <ButtonTooltip
             type="default"
             className="pointer-events-auto"
-            disabled={
-             codeRedemptionDisabled
-            }
+            disabled={codeRedemptionDisabled}
             tooltip={{
               content: {
                 side: 'bottom',
@@ -208,131 +207,136 @@ const codeRedemptionDisabled = !canRedeemCode || !isPermissionsLoaded || isOrgLo
           }}
         />
 
+        {codeRedemptionResult ? (
+          <div className="p-8">
+            <div className="text-center flex items-center justify-center">
+              <PartyPopper className="h-20 w-20" />
+            </div>
 
-   {codeRedemptionResult ? <div className='p-8'>
-     <div className='text-center flex items-center justify-center '>
-     <PartyPopper className='h-20 w-20' />
-     </div>
-
-<div className='text-center'>
-
-     <p className='font-bold text-lg mt-2'>Credits Redeemed!</p>
-</div>
-<Separator className='my-4'/>
-  <div className="flex w-full justify-center items-center">
-                    <div className="flex items-center space-x-1">
-                      <h4 className="opacity-50">$</h4>
-                      <h1 className="relative text-2xl">{codeRedemptionResult.amount_cents / 100}</h1>
-                      <h4 className="opacity-50"> credits applied</h4>
-</div>
-</div>
-                     
-
-{codeRedemptionResult.credits_expire_at && 
-     <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-4 rounded-lg">
-            <Calendar className="h-4 w-4" />
-            <span>
-              {'Expires on '}
-              {new Date(codeRedemptionResult.credits_expire_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </span>
-          </div>
-}
-
-          {org?.plan.id === 'free' && <div className='mt-4 space-y-4'>
-            <Separator />
- <Button className='w-full' size={'medium'} type="primary" asChild>
-                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>
-                  Upgrade Your Organization  
-                </Link>
-              </Button>
-            </div>}                 
-
-        </div> : <>
-
-        <DialogHeader>
-          <DialogTitle>Redeem Code</DialogTitle>
-          <DialogDescription className="space-y-2">
-            <p className="prose text-sm">
-              Redeem your credit code to add credits to your organization
-            </p>
-          </DialogDescription>
-        </DialogHeader>
-
-        <DialogSectionSeparator />
-
-     
-
-        <Form_Shadcn_ {...form}>
-          {isOrgLoading || isCustomerProfileLoading ? (
-            <div className="p-6 space-y-4">
-              <ShimmeringLoader />
-              <div className="flex space-x-4">
-                <ShimmeringLoader className="w-1/2" />
-                <ShimmeringLoader className="w-1/2" />
+            <div className="text-center">
+              <p className="font-bold text-lg mt-2">Credits Redeemed!</p>
+            </div>
+            <Separator className="my-4" />
+            <div className="flex w-full justify-center items-center">
+              <div className="flex items-center space-x-1">
+                <h4 className="opacity-50">$</h4>
+                <h1 className="relative text-2xl">{codeRedemptionResult.amount_cents / 100}</h1>
+                <h4 className="opacity-50"> credits applied</h4>
               </div>
             </div>
-          ) : (
-            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-              <DialogSection className="flex flex-col gap-2">
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItemLayout label="Code" className="gap-1">
-                      <Input_Shadcn_ {...field} className="uppercase" placeholder='ABCD-1234-EFGH-5678' />
-                    </FormItemLayout>
-                  )}
-                />
 
-                     {(customerProfile && customerProfile.balance < 0) && (
-<div className="flex w-full justify-between items-center">
-                    <span>Current Balance</span>
-                    <div className="flex items-center space-x-1">
-                      <h4 className="opacity-50">$</h4>
-                      <h1 className="relative">{customerProfile.balance / -100}</h1>
-                      <h4 className="opacity-50">/credits</h4>
-                    </div>
-                  </div>)}
+            {codeRedemptionResult.credits_expire_at && (
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-4 rounded-lg">
+                <Calendar className="h-4 w-4" />
+                <span>
+                  {'Expires on '}
+                  {new Date(codeRedemptionResult.credits_expire_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </span>
+              </div>
+            )}
 
-
-                <Alert variant={'default'} className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Potential future charges</AlertTitle>
-                  <AlertDescription>
-                      Credits are applied to <strong>{org?.name}</strong> only and can't be shared or transferred to other organizations. Credits are automatically used toward invoices. When credits run out on a paid plan, your default payment method will be charged—your plan won't be downgraded automatically.
-                  </AlertDescription>
-                </Alert>
-
-                {(errorRedeemingCode) && (
-                  <Alert_Shadcn_ variant="destructive">
-                    <AlertCircle className="h-4 w-4 text-foreground-light" />
-                    <AlertTitle_Shadcn_>Code cannot be redeemed</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      {errorRedeemingCode?.message}
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-              </DialogSection>
-
-              <DialogFooter>
-                <Button
-                  htmlType="submit"
-                  type="primary"
-                  loading={redeemingCode}
-                  disabled={codeRedemptionDisabled}
-                >
-                  Redeem
+            {org?.plan.id === 'free' && (
+              <div className="mt-4 space-y-4">
+                <Separator />
+                <Button className="w-full" size={'medium'} type="primary" asChild>
+                  <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>
+                    Upgrade Your Organization
+                  </Link>
                 </Button>
-              </DialogFooter>
-            </form>
-          )}
-        </Form_Shadcn_>
-        </>
-}
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle>Redeem Code</DialogTitle>
+              <DialogDescription className="space-y-2">
+                <p className="prose text-sm">
+                  Redeem your credit code to add credits to your organization
+                </p>
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogSectionSeparator />
+
+            <Form_Shadcn_ {...form}>
+              {isOrgLoading || isCustomerProfileLoading ? (
+                <div className="p-6 space-y-4">
+                  <ShimmeringLoader />
+                  <div className="flex space-x-4">
+                    <ShimmeringLoader className="w-1/2" />
+                    <ShimmeringLoader className="w-1/2" />
+                  </div>
+                </div>
+              ) : (
+                <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+                  <DialogSection className="flex flex-col gap-2">
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="code"
+                      render={({ field }) => (
+                        <FormItemLayout label="Code" className="gap-1">
+                          <Input_Shadcn_
+                            {...field}
+                            className="uppercase"
+                            placeholder="ABCD-1234-EFGH-5678"
+                          />
+                        </FormItemLayout>
+                      )}
+                    />
+
+                    {customerProfile && customerProfile.balance < 0 && (
+                      <div className="flex w-full justify-between items-center">
+                        <span>Current Balance</span>
+                        <div className="flex items-center space-x-1">
+                          <h4 className="opacity-50">$</h4>
+                          <h1 className="relative">{customerProfile.balance / -100}</h1>
+                          <h4 className="opacity-50">/credits</h4>
+                        </div>
+                      </div>
+                    )}
+
+                    <Alert variant={'default'} className="mt-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Potential future charges</AlertTitle>
+                      <AlertDescription>
+                        Credits are applied to <strong>{org?.name}</strong> only and can't be shared
+                        or transferred to other organizations. Credits are automatically used toward
+                        invoices. When credits run out on a paid plan, your default payment method
+                        will be charged—your plan won't be downgraded automatically.
+                      </AlertDescription>
+                    </Alert>
+
+                    {errorRedeemingCode && (
+                      <Alert_Shadcn_ variant="destructive">
+                        <AlertCircle className="h-4 w-4 text-foreground-light" />
+                        <AlertTitle_Shadcn_>Code cannot be redeemed</AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          {errorRedeemingCode?.message}
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    )}
+                  </DialogSection>
+
+                  <DialogFooter>
+                    <Button
+                      htmlType="submit"
+                      type="primary"
+                      loading={redeemingCode}
+                      disabled={codeRedemptionDisabled}
+                    >
+                      Redeem
+                    </Button>
+                  </DialogFooter>
+                </form>
+              )}
+            </Form_Shadcn_>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )
