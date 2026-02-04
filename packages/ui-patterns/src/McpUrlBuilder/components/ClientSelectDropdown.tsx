@@ -15,6 +15,7 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+
 import type { McpClient } from '../types'
 import { ConnectionIcon } from './ConnectionIcon'
 
@@ -77,7 +78,7 @@ export const ClientSelectDropdown = ({
           </Button>
         </PopoverTrigger_Shadcn_>
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start" portal>
+      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search..." />
           <CommandList_Shadcn_>

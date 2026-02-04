@@ -23,7 +23,7 @@ import {
   DropdownMenuSubTrigger,
   SQL_ICON,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DEPRECATED_REPORTS } from './Reports.constants'
 
 interface MetricOptionsProps {

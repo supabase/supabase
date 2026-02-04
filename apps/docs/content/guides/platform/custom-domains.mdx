@@ -90,7 +90,7 @@ Use the [`domains reverify`](/docs/reference/cli/supabase-domains-reverify) comm
 supabase domains reverify --project-ref abcdefghijklmnopqrst
 ```
 
-In the background, Supabase will check your DNS records and use [Let's Encrypt](https://letsencrypt.org) to issue a SSL certificate for your domain. This process can take up to 30 minutes.
+In the background, Supabase will check your DNS records and issue an SSL certificate. Supabase uses multiple Certificate Authorities (including Let's Encrypt, Google Trust Services and SSL.com) to ensure high availability. The specific issuer is chosen based on availability and this process can take up to 30 minutes.
 
 ### Prepare to activate your domain
 

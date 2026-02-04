@@ -88,7 +88,6 @@ const OrganizationPicker = ({
           className="p-0 w-full"
           side="bottom"
           align="center"
-          portal
           sameWidthAsTrigger
         >
           <Command_Shadcn_>

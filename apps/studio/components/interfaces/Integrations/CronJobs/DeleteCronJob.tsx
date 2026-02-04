@@ -26,7 +26,7 @@ export const DeleteCronJob = ({ cronJob, visible, onClose, onDeleteStart }: Dele
   const { mutate: deleteDatabaseCronJob, isPending } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
       sendEvent({
-        action: 'cron_job_deleted',
+        action: 'cron_job_removed',
         groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
       toast.success(`Successfully removed cron job ${cronJob.jobname}`)

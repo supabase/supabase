@@ -140,7 +140,7 @@ export function DiskManagementForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
-    computeSize,
+    computeSize: computeSize ?? 'ci_micro',
     growthPercent: growth_percent,
     minIncrementGb: min_increment_gb,
     maxSizeGb: max_size_gb,
@@ -167,6 +167,7 @@ export function DiskManagementForm() {
       provisionedIOPS: iops,
       throughput: throughput_mbps,
       totalSize: size_gb,
+      computeSize: form.getValues('computeSize'),
     }
 
     if (!('requested_modification' in data)) {
@@ -212,7 +213,9 @@ export function DiskManagementForm() {
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    !isSpendCapEnabled && RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
+    modifiedComputeSize &&
+    !isSpendCapEnabled &&
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -331,8 +334,8 @@ export function DiskManagementForm() {
         {isEntitlementsLoaded && isPlanUpgradeRequired && (
           <UpgradeToPro
             featureProposition="configure compute and disk"
-            primaryText="Compute and Disk configuration is not available on the Free Plan"
-            secondaryText="You will need to upgrade to at least the Pro Plan to configure compute and disk"
+            primaryText="Only available on Pro Plan and above"
+            secondaryText="Upgrade to the Pro Plan to configure compute and disk settings."
           />
         )}
 
@@ -469,7 +472,7 @@ export function DiskManagementForm() {
                       <div className="px-[var(--card-padding-x)] flex flex-col gap-y-8">
                         <NoticeBar
                           type="default"
-                          visible={disableIopsThroughputConfig}
+                          visible={!!disableIopsThroughputConfig}
                           title="Adjusting disk configuration requires LARGE Compute size or above"
                           description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
                           actions={

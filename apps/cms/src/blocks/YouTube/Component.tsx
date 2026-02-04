@@ -1,4 +1,4 @@
-import type { YouTubeBlock as YouTubeBlockProps } from 'src/payload-types'
+import type { YouTubeBlock as YouTubeBlockProps } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
 import React from 'react'

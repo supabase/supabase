@@ -21,7 +21,7 @@ import {
   TableRow,
   cn,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
 

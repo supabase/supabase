@@ -116,13 +116,13 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
             <li key={link.href}>
               <DayLink
                 {...link}
-                className="transition-all duration-300 !ease-[.25,.25,0,1] lg:-translate-y-full lg:opacity-0 group-hover/main:translate-y-0 group-hover/main:opacity-100"
+                className="transition-all duration-300 !ease-[cubic-bezier(.25,.25,0,1)] lg:-translate-y-full lg:opacity-0 group-hover/main:translate-y-0 group-hover/main:opacity-100"
               />
             </li>
           ))}
         </ul>
         <div
-          className="flex flex-col p-4 pt-0 gap-2 relative group-hover/main:!bottom-0 !ease-[.25,.25,0,1] duration-300"
+          className="flex flex-col p-4 pt-0 gap-2 relative group-hover/main:!bottom-0 !ease-[cubic-bezier(.25,.25,0,1)] duration-300"
           style={{
             bottom: isTablet ? 0 : -hiddenHeight + 'px',
           }}
@@ -153,7 +153,7 @@ const CardBG = ({ day }: { day: WeekDayProps }) => (
               key={`${day.title}-image-${i}?v=3`}
               className={cn(
                 'absolute inset-0 w-full h-full -z-10',
-                'transition-all duration-300 !ease-[.24,0,.22,.99]',
+                'transition-all duration-300 !ease-[cubic-bezier(.24,0,.22,.99)]',
                 'dark:opacity-50 scale-100',
                 'group-hover/main:dark:opacity-100'
               )}

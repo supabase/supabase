@@ -101,9 +101,10 @@ const groupPoliciesByBucket = (policies: (PostgresPolicy & { bucket: string | Sy
     }
     policiesByBucket.get(policy.bucket)?.push(policy)
   })
-  return [
-    ...policiesByBucket.entries().map(([bucketName, policies]) => ({ name: bucketName, policies })),
-  ]
+  return Array.from(policiesByBucket).map(([bucketName, policies]) => ({
+    name: bucketName,
+    policies,
+  }))
 }
 
 export const createPayloadsForAddPolicy = (

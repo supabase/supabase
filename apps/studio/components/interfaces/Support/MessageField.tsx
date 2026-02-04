@@ -34,7 +34,7 @@ export function MessageField({ form, originalError }: MessageFieldProps) {
               {...field}
               rows={4}
               maxLength={5000}
-              placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
+              placeholder="Describe the issue you’re facing, along with any relevant information. Please be as detailed and specific as possible."
             />
           </FormControl_Shadcn_>
           {originalError && (

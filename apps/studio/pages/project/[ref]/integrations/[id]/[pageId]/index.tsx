@@ -2,13 +2,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useCronJobsEstimatePrefetch } from 'hooks/misc/useCronJobsEstimatePrefetch'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -34,6 +34,7 @@ import {
   PageSection,
   PageSectionContent,
 } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 type NavigationItem = { label: string; href: string; active?: boolean }
 
@@ -41,6 +42,9 @@ const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+  const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
+
+  useCronJobsEstimatePrefetch(id)
 
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()
@@ -133,6 +137,10 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   if (!router?.isReady) {
     return null
+  }
+
+  if (id === 'stripe_sync_engine' && !stripeSyncEnabled) {
+    return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
   }
 
   if (!integrationsWrappers && id?.endsWith('_wrapper')) {

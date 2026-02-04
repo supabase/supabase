@@ -1,8 +1,6 @@
-import { Book, Maximize2, X } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import {
   createSqlSnippetSkeletonV2,
   suffixWithLimit,
@@ -16,34 +14,37 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
+import { Book, Maximize2, X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
-  cn,
   CodeBlock,
-  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  HoverCard_Shadcn_,
+  Command_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
+  HoverCard_Shadcn_,
   KeyboardShortcut,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   SQL_ICON,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
-import AIEditor from '../AIEditor'
+import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
-import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 
 export const EditorPanel = () => {
   const {
@@ -123,12 +124,16 @@ export const EditorPanel = () => {
       sql: suffixWithLimit(currentValue, 100),
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      isStatementTimeoutDisabled: true,
       handleError: (executeError) => {
         throw executeError
       },
       contextualInvalidation: true,
     })
   }
+
+  // Check if this is an EXPLAIN query result
+  const isValidExplainQuery = isExplainQuery(results ?? [])
 
   const handleChange = (value: string) => {
     setValue(value)
@@ -337,9 +342,15 @@ export const EditorPanel = () => {
         )}
 
         {results !== undefined && results.length > 0 && (
-          <div className={cn(`max-h-72 shrink-0 flex flex-col`, showResults && 'h-full')}>
+          <div
+            className={cn(
+              `shrink-0 flex flex-col`,
+              isValidExplainQuery ? 'max-h-[600px]' : 'max-h-72',
+              showResults && 'h-full'
+            )}
+          >
             {showResults && (
-              <div className="border-t flex-1 overflow-auto">
+              <div className="border-t flex-1 overflow-hidden">
                 <Results rows={results} />
               </div>
             )}

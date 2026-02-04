@@ -22,11 +22,13 @@ const policies = [
   },
 ]
 
+// Studio: See also createNavigationHandler in apps/studio/lib/navigation.ts
+// It handles all of the below, plus modifier clicks and middle mouse button clicks.
 const handlePolicyNavigation = (
-  bucketId: string,
+  policyId: string,
   event: React.MouseEvent | React.KeyboardEvent
 ) => {
-  const url = `/${bucketId}`
+  const url = `/${policyId}`
   if (event.metaKey || event.ctrlKey) {
     // window.open(`${url}`, '_blank') Disabled for demo purposes
   } else {

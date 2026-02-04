@@ -1,7 +1,7 @@
 import { HomepageSvgHandler } from '@/components/homepage-svg-handler'
-import Link from 'next/link'
+import { Auth, Database, Realtime } from 'icons/src/icons'
 import { Paintbrush } from 'lucide-react'
-import { Realtime, Database, Auth } from 'icons/src/icons'
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -15,41 +15,6 @@ export default function Home() {
         </div>
 
         <div className="grid md:grid-cols-2 grid-cols-1 gap-4 w-full">
-          <Link href="/docs/components/atom-components" className="h-full flex">
-            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <div className="flex items-center justify-start min-h-[24px]">
-                <HomepageSvgHandler name="atoms" className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">Atom components</h3>
-                <p className="text-sm text-foreground-light">Building blocks of User interfaces</p>
-              </div>
-            </div>
-          </Link>
-          <Link href="/docs/fragments/fragment-components" className="h-full flex">
-            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <div className="flex items-center justify-start min-h-[24px]">
-                <HomepageSvgHandler name="fragments" className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">Fragment components</h3>
-                <p className="text-sm text-foreground-light">Components assembled from Atoms</p>
-              </div>
-            </div>
-          </Link>
-          <Link href="/docs/components/ui-patterns" className="h-full flex">
-            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <div className="flex items-center justify-start min-h-[24px]">
-                <HomepageSvgHandler name="ui-patterns" className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">UI Patterns components</h3>
-                <p className="text-sm text-foreground-light">
-                  Components assembled from Atoms &amp; Fragments
-                </p>
-              </div>
-            </div>
-          </Link>
           <Link href="/docs/color-usage" className="h-full flex">
             <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <div className="flex flex-col gap-2 min-h-[24px]">
@@ -57,7 +22,21 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="font-medium text-foreground">Colors</h3>
-                <p className="text-sm text-foreground-light">Building blocks of User interfaces</p>
+                <p className="text-sm text-foreground-light">Custom color palette for Supabase</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/docs/icons" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+              <div className="flex items-center justify-start min-h-[24px] gap-3 text-brand">
+                <Realtime className="w-5 h-5" strokeWidth={1.5} stroke="currentColor" />
+                <Database className="w-5 h-5 opacity-60" strokeWidth={1.5} stroke="currentColor" />
+                <Auth className="w-5 h-5 opacity-30" strokeWidth={1.5} stroke="currentColor" />
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground">Icons</h3>
+                <p className="text-sm text-foreground-light">Custom icons for Supabase</p>
               </div>
             </div>
           </Link>
@@ -73,17 +52,40 @@ export default function Home() {
               </div>
             </div>
           </Link>
-
-          <Link href="/docs/icons" className="h-full flex">
+          <Link href="/docs/ui-patterns/introduction" className="h-full flex">
             <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <div className="flex items-center justify-start min-h-[24px] gap-3 text-brand">
-                <Realtime className="w-5 h-5" strokeWidth={1.5} stroke="currentColor" />
-                <Database className="w-5 h-5 opacity-60" strokeWidth={1.5} stroke="currentColor" />
-                <Auth className="w-5 h-5 opacity-30" strokeWidth={1.5} stroke="currentColor" />
+              <div className="flex items-center justify-start min-h-[24px]">
+                <HomepageSvgHandler name="ui-patterns" className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-medium text-foreground">Icons</h3>
-                <p className="text-sm text-foreground-light">Custom icons for Supabase</p>
+                <h3 className="font-medium text-foreground">UI patterns</h3>
+                <p className="text-sm text-foreground-light">
+                  Design guidelines for common interface patterns
+                </p>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/docs/fragments/introduction" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+              <div className="flex items-center justify-start min-h-[24px]">
+                <HomepageSvgHandler name="fragments" className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground">Fragment components</h3>
+                <p className="text-sm text-foreground-light">Components assembled from atoms</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/docs/components/introduction" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+              <div className="flex items-center justify-start min-h-[24px]">
+                <HomepageSvgHandler name="atoms" className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground">Atom components</h3>
+                <p className="text-sm text-foreground-light">Building blocks of user interfaces</p>
               </div>
             </div>
           </Link>

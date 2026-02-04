@@ -1,34 +1,26 @@
 ---
 title: 'Self-Hosting'
 description: 'Host Supabase on your own infrastructure.'
-subtitle: 'Install and run your own Supabase.'
+subtitle: 'Install and run your own Supabase on your computer, server, or cloud infrastructure.'
 hideToc: true
 ---
 
-Self-hosted Supabase lets you run the entire Supabase stack on your own computer, server, or cloud infrastructure.
+## Get started
 
-This is different from:
-
-- **Supabase CLI / Local Development**: A lightweight [local environment](/docs/guides/local-development) for development and testing only.
-- **Managed Supabase** platform: If you want to try managed Supabase for free, visit [supabase.com/dashboard](/dashboard).
-
-Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent using managed services, or want to run Supabase in an isolated environment.
-
-## No telemetry
-
-Self-hosted Supabase does not phone home or collect any telemetry.
-
-## Enterprise
-
-If you're an enterprise using self-hosted Supabase, we'd love to hear from you. Reach out to our [Growth Team](https://forms.supabase.com/enterprise) to discuss your use case, share feedback, or explore design partnership opportunities.
-
-## Officially supported
+The fastest and recommended way to self-host Supabase is using Docker.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  <div className="md:col-span-6 xl:col-span-3 relative" key="/guides/self-hosting/docker">
+  <div className="md:col-span-6 xl:col-span-4 relative" key="/guides/self-hosting/docker">
     <Link href="/guides/self-hosting/docker" passHref>
-      <GlassPanel title="Docker">
-
+      <GlassPanel icon={'/docs/img/icons/docker'} hasLightIcon={true}
+        title={
+            <span className="flex items-center gap-2">
+              Docker
+              <Badge variant="success">Official</Badge>
+            </span>
+          }
+        showIconBg={true}
+      >
       Deploy Supabase within your own infrastructure using Docker Compose.
       </GlassPanel>
     </Link>
@@ -36,10 +28,10 @@ If you're an enterprise using self-hosted Supabase, we'd love to hear from you. 
   </div>
 </div>
 
-## Community supported
+## Other deployment options
 
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
-There are several community-driven projects to help you deploy Supabase. These projects may be outdated and are seeking active maintainers. If you're interested in maintaining one of these projects, [contact the community team](/open-source/contributing/supasquad).
+There are several other ways to deploy Supabase with the help of community-driven projects. These projects may be outdated and are seeking active maintainers. If you're interested in maintaining one of these projects, [contact the Community team](/open-source/contributing/supasquad).
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {community.map((x) => (
@@ -49,9 +41,7 @@ There are several community-driven projects to help you deploy Supabase. These p
           title={
             <span className="flex items-center gap-2">
               {x.name}
-              <span className="uppercase text-xs whitespace-nowrap text-foreground-lighter font-mono border rounded-full px-2 py-0.5">
-                Maintainer needed
-              </span>
+                  <Badge>Maintainer needed</Badge>
             </span>
           }
         >
@@ -59,7 +49,9 @@ There are several community-driven projects to help you deploy Supabase. These p
         </GlassPanel>
       </Link>
     </div>
-  ))}
+
+))}
+
 </div>
 
 export const community = [
@@ -75,7 +67,22 @@ export const community = [
   },
 ]
 
-## Responsibility model
+## About self-hosting
+
+Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent using managed services, or want to run Supabase in an isolated environment.
+
+### How self-hosted Supabase differs
+
+Self-hosted Supabase is different from:
+
+- **Supabase CLI** (local development), which is intended for development and testing only.
+- **Managed Supabase** platform, which is fully hosted and operated by Supabase.
+
+### Telemetry
+
+Self-hosted Supabase does not phone home or collect any telemetry.
+
+### Your responsibilities when self-hosting
 
 When you self-host, **you are responsible for**:
 
@@ -85,14 +92,16 @@ When you self-host, **you are responsible for**:
 - Backups and disaster recovery
 - Monitoring and uptime
 
-## Support and troubleshooting
+## Support and community
 
-For resolving common issues, see:
+Self-hosted Supabase is community-supported.
+
+For resolving common issues:
 
 - [GitHub Discussions](https://github.com/orgs/supabase/discussions?discussions_q=is%3Aopen+label%3Aself-hosted) - Questions, feature requests, and workarounds
 - [GitHub Issues](https://github.com/supabase/supabase/issues?q=is%3Aissue%20state%3Aopen%20label%3Aself-hosted) - Known issues
 
-Self-hosted Supabase is community-supported. Get help and connect with other users:
+Get help and connect with other users:
 
 - [Discord](https://discord.supabase.com) - Real-time chat and community support
   {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
@@ -101,3 +110,7 @@ Self-hosted Supabase is community-supported. Get help and connect with other use
 Share your self-hosting experience:
 
 - [GitHub Discussions](https://github.com/orgs/supabase/discussions/39820) - "Self-hosting: What's working (and what's not)?"
+
+### Enterprise self-hosting
+
+If you're an enterprise using self-hosted Supabase, we'd love to hear from you. Reach out to our [Growth Team](https://forms.supabase.com/enterprise) to discuss your use case, share feedback, or explore design partnership opportunities.

@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test'
 import path from 'path'
+import { env } from '../env.config.js'
 import { test } from '../utils/test.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
 import {
@@ -208,6 +209,71 @@ test.describe.serial('Storage', () => {
     await renameItem(page, folderName, newFolderName)
   })
 
+  test('resets folder name when renaming with empty string', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_rename_folder_empty`
+    const folderName = 'folder_to_rename'
+
+    // Create a bucket, navigate to it, and create a folder
+    await createBucket(page, ref, bucketName, false)
+    await navigateToBucket(page, ref, bucketName)
+    await createFolder(page, folderName)
+
+    // Right-click on the folder to open context menu
+    const folder = page.getByTitle(folderName)
+    await expect(folder, `Folder ${folderName} should be visible`).toBeVisible()
+    await folder.click({ button: 'right' })
+
+    // Click rename option from context menu
+    await page.getByRole('menuitem', { name: 'Rename' }).click()
+
+    // Clear the input and press Enter with empty name
+    const nameInput = page.getByRole('textbox')
+    await expect(nameInput, 'Rename input should be visible').toBeVisible()
+    await nameInput.clear()
+    await nameInput.press('Enter')
+
+    // Verify the input disappears (edit mode exits)
+    await expect(nameInput, 'Input should disappear after pressing Enter').not.toBeVisible()
+
+    // Verify the folder name is reset to original
+    await expect(
+      page.getByTitle(folderName),
+      'Folder should retain its original name'
+    ).toBeVisible()
+  })
+
+  test('resets folder name when clicking outside with empty string', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_rename_folder_blur`
+    const folderName = 'folder_to_blur'
+
+    // Create a bucket, navigate to it, and create a folder
+    await createBucket(page, ref, bucketName, false)
+    await navigateToBucket(page, ref, bucketName)
+    await createFolder(page, folderName)
+
+    // Right-click on the folder to open context menu
+    const folder = page.getByTitle(folderName)
+    await expect(folder, `Folder ${folderName} should be visible`).toBeVisible()
+    await folder.click({ button: 'right' })
+
+    // Click rename option from context menu
+    await page.getByRole('menuitem', { name: 'Rename' }).click()
+
+    // Clear the input and click outside to blur
+    const nameInput = page.getByRole('textbox')
+    await expect(nameInput, 'Rename input should be visible').toBeVisible()
+    await nameInput.clear()
+
+    // Click outside the input to trigger blur
+    await page.getByRole('button', { name: 'Edit bucket' }).click()
+
+    // Verify the folder name is reset to original
+    await expect(
+      page.getByTitle(folderName),
+      'Folder should retain its original name after blur'
+    ).toBeVisible()
+  })
+
   test('can delete a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_delete_file`
     const fileName = 'test-file.txt'
@@ -249,5 +315,46 @@ test.describe.serial('Storage', () => {
 
     // Download the file
     await downloadFile(page, fileName)
+  })
+})
+
+test.describe('Storage Settings - Self Hosted', () => {
+  test.skip(env.IS_PLATFORM, 'Storage settings are only disabled on self-hosted')
+
+  test('settings tab should not be visible in navigation', async ({ page, ref }) => {
+    // Navigate to storage files page
+    await page.goto(`/project/${ref}/storage/files`)
+
+    // Wait for the page to load
+    await expect(
+      page.getByRole('button', { name: 'New bucket' }),
+      'New bucket button should be visible'
+    ).toBeVisible()
+
+    // Verify Buckets and Policies tabs are visible but Settings is not
+    // Use href patterns to avoid matching other "Settings" links in the sidebar
+    await expect(
+      page.getByRole('link', { name: 'Buckets' }).filter({ hasText: /^Buckets$/ }),
+      'Buckets tab should be visible'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'Policies' }).filter({ hasText: /^Policies$/ }),
+      'Policies tab should be visible'
+    ).toBeVisible()
+    await expect(
+      page.locator(`a[href="/project/${ref}/storage/files/settings"]`),
+      'Settings tab should NOT be visible for self-hosted'
+    ).not.toBeVisible()
+  })
+
+  test('direct navigation to settings page should show error', async ({ page, ref }) => {
+    // Navigate directly to the settings page
+    await page.goto(`/project/${ref}/storage/files/settings`)
+
+    // Should show an error message indicating settings are not available
+    await expect(
+      page.getByText('Storage settings are not available for self-hosted projects'),
+      'Error message should be visible'
+    ).toBeVisible()
   })
 })

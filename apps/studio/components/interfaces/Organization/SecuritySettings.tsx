@@ -10,7 +10,6 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
@@ -33,6 +32,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const schema = z.object({
   enforceMfa: z.boolean(),
@@ -110,7 +110,7 @@ export const SecuritySettings = () => {
         {!isPaidPlan ? (
           <UpgradeToPro
             source="organizationMfa"
-            primaryText="Organization MFA enforcement is not available on Free plan"
+            primaryText="Organization MFA enforcement is not available on Free Plan"
             secondaryText="Upgrade to Pro or above to enforce MFA requirements for your organization."
             featureProposition="enforce MFA requirements"
           />

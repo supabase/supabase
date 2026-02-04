@@ -1,6 +1,6 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Image } from 'ui'
+import { Badge, Button, Image } from 'ui'
 import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
@@ -19,6 +19,7 @@ import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
+import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
@@ -45,10 +46,12 @@ const components = {
   AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
+  Badge,
   Button,
   ButtonCard,
   CodeSampleDummy,
   CodeSampleWrapper,
+  ComputeDiskLimitsTable,
   CostWarning,
   ErrorCodes,
   Extensions,
