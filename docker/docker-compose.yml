@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2026.01.27-sha-6aa59ff
+    image: supabase/studio:2026.01.27-sha-2a37755
     restart: unless-stopped
     healthcheck:
       test:
@@ -95,7 +95,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.185.0
+    image: supabase/gotrue:v2.186.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -202,7 +202,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.72.0
+    image: supabase/realtime:v2.73.2
     restart: unless-stopped
     depends_on:
       db:
@@ -242,7 +242,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.33.5
+    image: supabase/storage-api:v1.35.3
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -286,7 +286,7 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.30.1
+    image: darthsim/imgproxy:v3.8.0
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -352,7 +352,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.30.3
+    image: supabase/logflare:1.30.5
     restart: unless-stopped
     ports:
       - 4000:4000
