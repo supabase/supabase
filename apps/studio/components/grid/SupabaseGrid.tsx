@@ -98,13 +98,16 @@ export const SupabaseGrid = ({
 
   // Re-apply optimistic updates when table data is loaded/refetched
   // This ensures pending changes remain visible when switching tabs or after data refresh
+  // Skip re-applying during save to avoid race condition where refetch completes before queue clears
+  const isSaving = tableEditorSnap.operationQueue.status === 'saving'
   useEffect(() => {
     if (
       isSuccess &&
       project?.ref &&
       tableId &&
       isQueueOperationsEnabled &&
-      tableEditorSnap.hasPendingOperations
+      tableEditorSnap.hasPendingOperations &&
+      !isSaving
     ) {
       reapplyOptimisticUpdates({
         queryClient,
@@ -122,6 +125,7 @@ export const SupabaseGrid = ({
     tableEditorSnap.hasPendingOperations,
     tableEditorSnap.operationQueue.operations,
     queryClient,
+    isSaving,
   ])
 
   const rows = data?.rows ?? EMPTY_ARR

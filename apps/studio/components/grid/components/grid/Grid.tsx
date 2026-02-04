@@ -20,10 +20,10 @@ import { ref as valtioRef } from 'valtio'
 
 import { useTableFilter } from '../../hooks/useTableFilter'
 import type { GridProps, SupaRow } from '../../types'
+import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
-import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
 import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
@@ -194,9 +194,7 @@ export const Grid = memo(
               }
 
               // Check if this cell has pending changes
-              // Since we are checking for cell changes, we need to use the EDIT_CELL_CONTENT type
               const isDirty = tableEditorSnap.hasPendingCellChange(
-                QueuedOperationType.EDIT_CELL_CONTENT,
                 snap.table.id,
                 rowIdentifiers,
                 col.key
@@ -206,6 +204,29 @@ export const Grid = memo(
           }
         })
       }, [snap.gridColumns, snap.originalTable, snap.table.id, tableEditorSnap])
+
+      // Compute rowClass function to style pending add/delete rows
+      const computedRowClass = useMemo(() => {
+        return (row: SupaRow) => {
+          const classes: string[] = []
+
+          // Call the original rowClass if provided
+          if (rowClass) {
+            const originalClass = rowClass(row)
+            if (originalClass) {
+              classes.push(originalClass)
+            }
+          }
+          if (isPendingAddRow(row)) {
+            classes.push('rdg-row--added')
+          }
+          if (isPendingDeleteRow(row)) {
+            classes.push('rdg-row--deleted')
+          }
+
+          return classes.length > 0 ? classes.join(' ') : undefined
+        }
+      }, [rowClass])
 
       return (
         <div
@@ -314,7 +335,7 @@ export const Grid = memo(
           <DataGrid
             ref={ref}
             className={`${gridClass} flex-grow`}
-            rowClass={rowClass}
+            rowClass={computedRowClass}
             columns={columnsWithDirtyCellClass}
             rows={rows ?? []}
             renderers={{ renderRow: RowRenderer }}
