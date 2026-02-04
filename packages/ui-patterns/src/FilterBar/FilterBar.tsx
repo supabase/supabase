@@ -40,7 +40,6 @@ function FilterBarContent({ className }: { className?: string }) {
             variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r'
           )}
         >
-          {/* Search icon - fades out when loading */}
           <div
             className={cn(
               'transition-opacity duration-300 ease-in-out',
@@ -49,7 +48,6 @@ function FilterBarContent({ className }: { className?: string }) {
           >
             <Search className="text-foreground-muted w-4 h-4 sticky" />
           </div>
-          {/* Loading icon - fades in when provided */}
           {loadingIcon && (
             <div className="absolute inset-0 flex items-center justify-center">{loadingIcon}</div>
           )}
