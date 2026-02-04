@@ -51,7 +51,7 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
     title: doc.title,
     description: doc.description,
     openGraph: {
-      ...mainMetadata.openGraph,
+      ...(mainMetadata.openGraph || {}),
       title: doc.title,
       description: doc.description,
       type: 'article',

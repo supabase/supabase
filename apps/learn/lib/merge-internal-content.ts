@@ -23,7 +23,7 @@ function getNavHrefsInSection(items?: SidebarNavItem[]): Set<string> {
  */
 export function mergeInternalContentIntoSections(
   navItems: SidebarNavItem[],
-  internalPaths: Set<string>
+  internalPaths: string[]
 ): SidebarNavItem[] {
   return navItems.map((parentItem) => {
     // If this item doesn't have children, return as is

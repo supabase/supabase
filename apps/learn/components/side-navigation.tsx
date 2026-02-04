@@ -14,7 +14,7 @@ import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
 interface SideNavigationProps {
-  internalPaths: Set<string>
+  internalPaths: string[]
 }
 
 function SideNavigation({ internalPaths }: SideNavigationProps) {

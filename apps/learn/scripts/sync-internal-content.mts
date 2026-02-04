@@ -26,14 +26,34 @@ if (!repo) {
 }
 
 const repoUrl = `https://${token}@github.com/${repo}.git`
-const run = (cmd: string) => execSync(cmd, { stdio: 'inherit' })
+const safeRepo = `https://github.com/${repo}.git`
+
+// Run command with output captured to prevent token leakage
+const run = (cmd: string) => {
+  try {
+    const output = execSync(cmd, { stdio: 'pipe', encoding: 'utf-8' })
+    return output
+  } catch (error: any) {
+    // Sanitize error messages by replacing token with [REDACTED]
+    const sanitizedMessage = error.message?.replace(new RegExp(token, 'g'), '[REDACTED]') ?? 'Unknown error'
+    const sanitizedStderr = error.stderr?.toString().replace(new RegExp(token, 'g'), '[REDACTED]') ?? ''
+    const sanitizedStdout = error.stdout?.toString().replace(new RegExp(token, 'g'), '[REDACTED]') ?? ''
+
+    const sanitizedError = new Error(sanitizedMessage)
+    ;(sanitizedError as any).stderr = sanitizedStderr
+    ;(sanitizedError as any).stdout = sanitizedStdout
+    ;(sanitizedError as any).status = error.status
+    throw sanitizedError
+  }
+}
 
 try {
   // Clean up any existing content
   rmSync(targetDir, { recursive: true, force: true })
   rmSync(tmpDir, { recursive: true, force: true })
 
-  // Clone to temp directory
+  // Clone to temp directory (using token URL but errors will be sanitized)
+  console.log(`Cloning ${safeRepo} branch ${branch}...`)
   run(`git clone --depth 1 --branch ${branch} ${repoUrl} ${tmpDir}`)
 
   // Remove git folder so targetDir is not a git repo
@@ -47,7 +67,12 @@ try {
 
   console.log('Internal content synced successfully')
 } catch (e: any) {
-  console.error('Failed to sync internal content:', e?.message ?? e)
+  // Sanitize error message to prevent token leakage
+  const sanitizedMessage = (e?.message ?? String(e)).replace(new RegExp(token, 'g'), '[REDACTED]')
+  console.error('Failed to sync internal content:', sanitizedMessage)
+  if (e?.stderr) {
+    console.error('Error details:', e.stderr)
+  }
   rmSync(tmpDir, { recursive: true, force: true })
   process.exit(1)
 }

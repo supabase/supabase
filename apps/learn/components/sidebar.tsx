@@ -8,7 +8,7 @@ import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
 export function Sidebar() {
   // Get internal content paths on server side
-  const internalPaths = getInternalContentPaths()
+  const internalPaths = Array.from(getInternalContentPaths())
 
   return (
     <>

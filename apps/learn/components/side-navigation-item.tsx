@@ -19,7 +19,7 @@ interface NavigationItemProps
   item: SidebarNavItem
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
   level?: number
-  internalPaths?: Set<string>
+  internalPaths?: string[]
   isLoggedIn?: boolean
 }
 
@@ -41,7 +41,7 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
   const hasChildren = item.items && item.items.length > 0
 
   // Check if internal content exists for this item and user is logged in
-  const hasInternal = item.href && internalPaths?.has(item.href) && isLoggedIn
+  const hasInternal = item.href && internalPaths?.includes(item.href) && isLoggedIn
 
   // Auto-expand if any child is active
   useEffect(() => {

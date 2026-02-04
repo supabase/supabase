@@ -36,7 +36,7 @@ export function CourseHero({ title, subtitle, description, instructors }: Course
       </p>
 
       <p className="text-sm sm:text-base text-center text-muted-foreground/80 text-pretty max-w-2xl mx-auto">
-        In this short course, you'll explore how Supabase brings together Database, Auth, Storage,
+        In this short course, you&apos;ll explore how Supabase brings together Database, Auth, Storage,
         Edge Functions, and Realtime into a unified developer platform.
       </p>
 

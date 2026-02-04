@@ -61,7 +61,7 @@ export function WhatWillILearn() {
         <h3 className="text-2xl font-bold mb-4">What will I learn?</h3>
 
         <p className="text-base text-foreground-light">
-          In the fundamental courses, you'll learn all the basics:
+          In the fundamental courses, you&apos;ll learn all the basics:
         </p>
       </div>
 
@@ -86,7 +86,7 @@ export function WhatWillILearn() {
       <div className="mt-8">
         <h4 className="text-lg font-bold mb-2">Smart Office project</h4>
         <p className="text-base text-foreground-light">
-          In the Smart Office project, you'll learn how to build a full-featured Dashboard:
+          In the Smart Office project, you&apos;ll learn how to build a full-featured Dashboard:
         </p>
         <div className="grid grid-cols-12 gap-12 mt-6">
           <div className="col-span-6">

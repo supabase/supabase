@@ -126,7 +126,7 @@ export function ChapterCompletion({ chapterNumber, completionMessage }: ChapterC
                 : 'text-foreground-muted opacity-60 translate-y-2'
             }`}
           >
-            You've completed Chapter {chapterNumber}
+            You&apos;ve completed Chapter {chapterNumber}
           </h3>
 
           {completionMessage && (
