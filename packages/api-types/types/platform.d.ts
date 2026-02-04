@@ -5788,7 +5788,7 @@ export interface components {
       amount_cents: number
       /** Format: date-time */
       credits_expire_at: string | null
-      credits_expiry_days: number | null
+      validity_days: number | null
     }
     CreditRedemptionRequest: {
       code: string
@@ -5797,7 +5797,7 @@ export interface components {
       amount_cents: number
       /** Format: date-time */
       credits_expire_at: string | null
-      credits_expiry_days: number | null
+      validity_days: number | null
     }
     CreditsTopUpRequest: {
       address?: {
@@ -13492,7 +13492,7 @@ export interface operations {
     }
     responses: {
       /** @description Credit code redeemed successfully. */
-      201: {
+      200: {
         headers: {
           [name: string]: unknown
         }
