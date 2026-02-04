@@ -1,7 +1,8 @@
 import { KeyboardEvent, useCallback } from 'react'
+
 import { ActiveInput } from './hooks'
 import { FilterGroup } from './types'
-import { findGroupByPath, findConditionByPath, removeFromGroup } from './utils'
+import { findConditionByPath, findGroupByPath, removeFromGroup } from './utils'
 
 export function useKeyboardNavigation({
   activeInput,
@@ -178,16 +179,11 @@ export function useKeyboardNavigation({
             path: activeInput.path.slice(0, -1),
           })
         }
-        // For root group with no conditions, do nothing - keep menu open
       } else if (activeInput?.type === 'value' && isEmpty) {
         const condition = findConditionByPath(activeFilters, activeInput.path)
         if (condition && !condition.value) {
           e.preventDefault()
-          removeByPath(activeInput.path)
-          setActiveInput({
-            type: 'group',
-            path: activeInput.path.slice(0, -1),
-          })
+          setActiveInput({ type: 'operator', path: activeInput.path })
         }
       }
     },
@@ -267,7 +263,19 @@ export function useKeyboardNavigation({
       } else if (e.key === 'ArrowRight') {
         handleArrowRight(e)
       } else if (e.key === 'Escape') {
-        setActiveInput(null)
+        const activeElement = document.activeElement as HTMLElement | null
+        if (activeElement && activeElement.blur) {
+          activeElement.blur()
+        }
+      } else if (e.key === 'Enter') {
+        if (activeInput?.type === 'value') {
+          e.preventDefault()
+          setActiveInput({ type: 'group', path: activeInput.path.slice(0, -1) })
+        } else if (activeInput?.type === 'operator') {
+          e.preventDefault()
+          const conditionPath = activeInput.path
+          setActiveInput({ type: 'value', path: conditionPath })
+        }
       }
     },
     [activeInput, handleBackspace, handleArrowLeft, handleArrowRight, setActiveInput]

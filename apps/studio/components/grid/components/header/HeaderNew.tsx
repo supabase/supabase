@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
 import { queueRowDeletesWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -40,6 +39,7 @@ import {
   copyToClipboard,
 } from 'ui'
 
+import { useInitializeFiltersFromUrl, useSyncFiltersToUrl } from '../../hooks/useFilterLifeCycle'
 import { ExportDialog } from './ExportDialog'
 import { formatRowsForCSV } from './Header.utils'
 import { FilterPopoverNew } from './filter/FilterPopoverNew'
@@ -56,6 +56,10 @@ export const HeaderNew = ({
   isRefetching,
   tableQueriesEnabled = true,
 }: HeaderProps) => {
+  useInitializeFiltersFromUrl()
+
+  useSyncFiltersToUrl()
+
   const snap = useTableEditorTableStateSnapshot()
   const showInsertButton = snap.selectedRows.size === 0
 
@@ -227,7 +231,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
 
-  const { filters } = useTableFilter()
+  const filters = snap.filters
   const { sorts } = useTableSort()
 
   const [isExporting, setIsExporting] = useState(false)
