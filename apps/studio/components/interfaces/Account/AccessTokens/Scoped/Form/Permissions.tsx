@@ -261,7 +261,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                                 {action === 'no access'
                                   ? 'No access'
                                   : action.charAt(0).toUpperCase() +
-                                  action.slice(1).replace(/-/g, ' ')}
+                                    action.slice(1).replace(/-/g, ' ')}
                               </SelectItem_Shadcn_>
                             ))}
                           </SelectContent_Shadcn_>
