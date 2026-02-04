@@ -14,7 +14,7 @@ An 'Invalid payload sent to hook' error (500) occurs in Auth hooks when the payl
 
 This error arises because anonymous users do not have an existing phone number to modify. Client application logic attempting a `phone_change` for such users results in an invalid operation. The `new_phone` field should only be present during a `phone_change` flow initiated by an _authenticated_ user.
 
-### How to Avoid This Issue:
+### How to avoid This Issue:
 
 Refine your client application logic to prevent this incorrect payload structure:
 
