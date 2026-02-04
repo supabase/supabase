@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { isValidHttpUrl } from 'lib/helpers'
+import { isValidHttpUrl } from '@/lib/helpers'
 
 const httpRequestSchema = z.object({
   function_type: z.literal('http_request'),

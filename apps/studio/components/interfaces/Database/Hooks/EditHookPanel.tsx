@@ -1,22 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import type { PostgresTrigger } from '@supabase/postgres-meta'
-import { useEffect, useMemo } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
-import { getTableEditor } from 'data/table-editor/table-editor-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
-import { uuidv4 } from 'lib/helpers'
 import { Button, Form_Shadcn_, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
+import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
+import { getTableEditor, tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from '@/hooks/ui/useConfirmOnClose'
+import { uuidv4 } from '@/lib/helpers'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -83,13 +84,10 @@ const parseParameters = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
 export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data } = useTablesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const [isLoadingTable, setIsLoadingTable] = useState(false)
 
-  const { mutate: createDatabaseTrigger, isPending: isCreating } =
-    useDatabaseTriggerCreateMutation({
+  const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
+    {
       onSuccess: (res) => {
         toast.success(`Successfully created new webhook "${res.name}"`)
         onClose()
@@ -97,10 +95,11 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       onError: (error) => {
         toast.error(`Failed to create webhook: ${error.message}`)
       },
-    })
+    }
+  )
 
-  const { mutate: updateDatabaseTrigger, isPending: isUpdating } =
-    useDatabaseTriggerUpdateMutation({
+  const { mutate: updateDatabaseTrigger, isPending: isUpdating } = useDatabaseTriggerUpdateMutation(
+    {
       onSuccess: (res) => {
         toast.success(`Successfully updated webhook "${res.name}"`)
         onClose()
@@ -108,14 +107,11 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       onError: (error) => {
         toast.error(`Failed to update webhook: ${error.message}`)
       },
-    })
-
-  const isSubmitting = isCreating || isUpdating
-
-  const tables = useMemo(
-    () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
-    [data]
+    }
   )
+
+  const isSubmitting = isCreating || isUpdating || isLoadingTable
+
   const restUrl = project?.restUrl
   const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
@@ -126,7 +122,11 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       table_id: selectedHook?.table_id?.toString() ?? '',
       http_url: selectedHook?.function_args?.[0] ?? '',
       http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
-      function_type: isEdgeFunction({ ref, restUrlTld, url: selectedHook?.function_args?.[0] ?? '' })
+      function_type: isEdgeFunction({
+        ref,
+        restUrlTld,
+        url: selectedHook?.function_args?.[0] ?? '',
+      })
         ? 'supabase_function'
         : 'http_request',
       timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
@@ -159,79 +159,90 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
     }
   }, [visible, selectedHook, ref, restUrlTld, form])
 
+  const queryClient = useQueryClient()
   const onSubmit: SubmitHandler<WebhookFormValues> = async (values) => {
     if (!project?.ref) {
       return console.error('Project ref is required')
     }
 
-    const selectedTable = await getTableEditor({
-      id: Number(values.table_id),
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    })
-    if (!selectedTable) {
-      return toast.error('Unable to find selected table')
-    }
-
-    const headers = values.httpHeaders
-      .filter((header) => header.name && header.value)
-      .reduce(
-        (a, b) => {
-          a[b.name] = b.value
-          return a
-        },
-        {} as Record<string, string>
+    try {
+      setIsLoadingTable(true)
+      const selectedTable = await queryClient.fetchQuery(
+        tableEditorQueryOptions({
+          id: Number(values.table_id),
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+        })
       )
-    const parameters = values.httpParameters
-      .filter((param) => param.name && param.value)
-      .reduce(
-        (a, b) => {
-          a[b.name] = b.value
-          return a
-        },
-        {} as Record<string, string>
-      )
-
-    // replacer function with JSON.stringify to handle quotes properly
-    const stringifiedParameters = JSON.stringify(parameters, (key, value) => {
-      if (typeof value === 'string') {
-        // Return the raw string without any additional escaping
-        return value
+      if (!selectedTable) {
+        return toast.error('Unable to find selected table')
       }
-      return value
-    })
 
-    const payload: PGTriggerCreate = {
-      events: values.events,
-      activation: 'AFTER',
-      orientation: 'ROW',
-      name: values.name,
-      table: selectedTable.name,
-      schema: selectedTable.schema,
-      function_name: 'http_request',
-      function_schema: 'supabase_functions',
-      function_args: [
-        values.http_url,
-        values.http_method,
-        JSON.stringify(headers),
-        stringifiedParameters,
-        values.timeout_ms.toString(),
-      ],
-    }
+      const headers = values.httpHeaders
+        .filter((header) => header.name && header.value)
+        .reduce(
+          (a, b) => {
+            a[b.name] = b.value
+            return a
+          },
+          {} as Record<string, string>
+        )
+      const parameters = values.httpParameters
+        .filter((param) => param.name && param.value)
+        .reduce(
+          (a, b) => {
+            a[b.name] = b.value
+            return a
+          },
+          {} as Record<string, string>
+        )
 
-    if (selectedHook === undefined) {
-      createDatabaseTrigger({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        payload,
+      // replacer function with JSON.stringify to handle quotes properly
+      const stringifiedParameters = JSON.stringify(parameters, (key, value) => {
+        if (typeof value === 'string') {
+          // Return the raw string without any additional escaping
+          return value
+        }
+        return value
       })
-    } else {
-      updateDatabaseTrigger({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        originalTrigger: selectedHook,
-        updatedTrigger: { ...payload, enabled_mode: 'ORIGIN' },
-      })
+
+      const payload: PGTriggerCreate = {
+        events: values.events,
+        activation: 'AFTER',
+        orientation: 'ROW',
+        name: values.name,
+        table: selectedTable.name,
+        schema: selectedTable.schema,
+        function_name: 'http_request',
+        function_schema: 'supabase_functions',
+        function_args: [
+          values.http_url,
+          values.http_method,
+          JSON.stringify(headers),
+          stringifiedParameters,
+          values.timeout_ms.toString(),
+        ],
+      }
+
+      if (selectedHook === undefined) {
+        createDatabaseTrigger({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          payload,
+        })
+      } else {
+        updateDatabaseTrigger({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          originalTrigger: selectedHook,
+          updatedTrigger: { ...payload, enabled_mode: 'ORIGIN' },
+        })
+      }
+    } catch (error) {
+      console.error('Failed to get table editor:', error)
+      toast.error('Failed to get table editor')
+    } finally {
+      setIsLoadingTable(false)
     }
   }
 
@@ -283,7 +294,7 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       >
         <Form_Shadcn_ {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-            <FormContents form={form} tables={tables} selectedHook={selectedHook} />
+            <FormContents form={form} selectedHook={selectedHook} />
           </form>
         </Form_Shadcn_>
       </SidePanel>

@@ -1,17 +1,9 @@
-import type { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
+import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useWatch } from '@ui/components/shadcn/ui/form'
-import Image from 'next/legacy/image'
-import { useEffect } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-
 import { useParams } from 'common'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
+import Image from 'next/legacy/image'
+import { useEffect, useMemo } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 import {
   Checkbox_Shadcn_,
   FormControl_Shadcn_,
@@ -27,20 +19,34 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   SidePanel,
+  useWatch_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { WebhookFormValues } from './EditHookPanel.constants'
+
 import { isEdgeFunction } from './EditHookPanel'
-import HTTPRequestFields from './HTTPRequestFields'
+import { WebhookFormValues } from './EditHookPanel.constants'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
+import { HTTPHeaders } from './HTTPHeaders'
+import { HTTPParameters } from './HTTPParameters'
+import { HTTPRequestConfig } from './HTTPRequestConfig'
+import {
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from '@/components/ui/Forms/FormSection'
+import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { uuidv4 } from '@/lib/helpers'
 
 export interface FormContentsProps {
   form: UseFormReturn<WebhookFormValues>
-  tables: PostgresTable[]
   selectedHook?: PostgresTrigger
 }
 
-export const FormContents = ({ form, tables, selectedHook }: FormContentsProps) => {
+export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -58,30 +64,19 @@ export const FormContents = ({ form, tables, selectedHook }: FormContentsProps) 
 
   const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
 
-  const functionType = useWatch({ control: form.control, name: 'function_type' })
-  const httpUrl = useWatch({ control: form.control, name: 'http_url' })
-  const httpHeaders = useWatch({ control: form.control, name: 'httpHeaders' })
+  const functionType = useWatch_Shadcn_({ control: form.control, name: 'function_type' })
+  const httpUrl = useWatch_Shadcn_({ control: form.control, name: 'http_url' })
+  const httpHeaders = useWatch_Shadcn_({ control: form.control, name: 'httpHeaders' })
 
-  // Handle function_type changes
-  useEffect(() => {
-    if (functionType === 'http_request') {
-      if (selectedHook !== undefined) {
-        const [url] = selectedHook.function_args
-        form.setValue('http_url', url, { shouldDirty: false })
-      } else {
-        form.setValue('http_url', '', { shouldDirty: false })
-      }
-    } else if (functionType === 'supabase_function') {
-      // Default to first edge function in the list
-      const fnSlug = functions[0]?.slug
-      const defaultFunctionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fnSlug}`
-      const currentUrl = form.getValues('http_url')
-      if (!isEdgeFunction({ ref, restUrlTld, url: currentUrl })) {
-        form.setValue('http_url', defaultFunctionUrl, { shouldDirty: false })
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [functionType])
+  const { data } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const tables = useMemo(
+    () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
+    [data]
+  )
 
   // Handle auth header auto-add for edge functions
   useEffect(() => {
@@ -235,8 +230,25 @@ export const FormContents = ({ form, tables, selectedHook }: FormContentsProps) 
                 <FormControl_Shadcn_>
                   <RadioGroupStacked
                     value={field.value}
-                    onValueChange={field.onChange}
-                    className="gap-3"
+                    onValueChange={(functionType) => {
+                      if (functionType === 'http_request') {
+                        if (selectedHook !== undefined) {
+                          const [url] = selectedHook.function_args
+                          form.setValue('http_url', url, { shouldDirty: false })
+                        } else {
+                          form.setValue('http_url', '', { shouldDirty: false })
+                        }
+                      } else if (functionType === 'supabase_function') {
+                        // Default to first edge function in the list
+                        const fnSlug = functions[0]?.slug
+                        const defaultFunctionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fnSlug}`
+                        const currentUrl = form.getValues('http_url')
+                        if (!isEdgeFunction({ ref, restUrlTld, url: currentUrl })) {
+                          form.setValue('http_url', defaultFunctionUrl, { shouldDirty: false })
+                        }
+                      }
+                      field.onChange(functionType)
+                    }}
                   >
                     {AVAILABLE_WEBHOOK_TYPES.map((webhook) => (
                       <RadioGroupStackedItem
@@ -271,8 +283,11 @@ export const FormContents = ({ form, tables, selectedHook }: FormContentsProps) 
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
-
-      <HTTPRequestFields form={form} />
+      <HTTPRequestConfig form={form} />
+      <SidePanel.Separator />
+      <HTTPHeaders form={form} />
+      <SidePanel.Separator />
+      <HTTPParameters form={form} />
     </div>
   )
 }
