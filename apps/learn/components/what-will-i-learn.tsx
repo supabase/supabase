@@ -8,9 +8,8 @@ import {
   Rocket,
   Timer,
 } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
 import Image from 'next/image'
-import smartOfficeImage from '@/public/img/smart-office.png'
+import { Card, CardDescription, CardHeader, CardTitle } from 'ui'
 
 const learningTracks = [
   {
@@ -92,10 +91,11 @@ export function WhatWillILearn() {
         <div className="grid grid-cols-12 gap-12 mt-6">
           <div className="col-span-6">
             <Image
-              src={smartOfficeImage}
+              src={'/img/smart-office.png'}
               alt="Smart Office project dashboard screenshot"
               className="w-full h-auto"
-              placeholder="blur"
+              width={1000}
+              height={875}
             />
           </div>
           <div className="col-span-6">
