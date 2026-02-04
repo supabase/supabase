@@ -29,15 +29,32 @@ await supabase.auth.signInWithOAuth({
 
 <TabPanel id="server" label="Server">
 
-In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
+In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to. You must use a server client with cookie handlers that write to a `Headers` object, and pass those headers to your framework's redirect so that cookies are set in the browser.
 
 ```js
-import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
-const provider = 'provider' as Provider
-const redirect = (url: string) => {}
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+const provider = 'provider'
+const request = new Request('https://example.com') // your framework's request object
+const redirect = (url, init) => {} // your framework's redirect (e.g. Remix: redirect from '@remix-run/node')
 
 // ---cut---
+const headers = new Headers()
+const supabase = createServerClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!,
+  {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+      },
+      setAll(cookiesToSet) {
+        for (const { name, value, options } of cookiesToSet) {
+          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+        }
+      },
+    },
+  }
+)
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider,
   options: {
@@ -46,7 +63,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 
 if (data.url) {
-  redirect(data.url) // use the redirect API for your server framework
+  redirect(data.url, { headers }) // use the redirect API for your server framework
 }
 ```
 
@@ -113,12 +130,12 @@ Create a new file at `src/routes/auth/callback/+server.js` and populate with the
 import { redirect } from '@sveltejs/kit';
 
 export const GET = async (event) => {
-	const {
-		url,
-		locals: { supabase }
-	} = event;
-	const code = url.searchParams.get('code') as string;
-	const next = url.searchParams.get('next') ?? '/';
+  const {
+    url,
+    locals: { supabase }
+  } = event;
+  const code = url.searchParams.get('code') as string;
+  const next = url.searchParams.get('next') ?? '/';
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
@@ -246,7 +263,7 @@ app.get("/auth/callback", async function (req, res) {
         cookiesToSet.forEach(({ name, value, options }) =>
           context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
         )
-      },
+      }
     },
   })
     await supabase.auth.exchangeCodeForSession(code)
