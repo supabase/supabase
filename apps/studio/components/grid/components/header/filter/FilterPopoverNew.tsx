@@ -1,10 +1,8 @@
-import { format } from 'date-fns'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-
-import { useDebounce } from '@uidotdev/usehooks'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
 import type { Filter } from 'components/grid/types'
 import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
+import { format } from 'date-fns'
+import { useCallback, useMemo, useState } from 'react'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Calendar } from 'ui'
 import {
@@ -13,10 +11,11 @@ import {
   FilterGroup,
   FilterOption,
   FilterProperty,
-  isGroup,
   SerializableFilterProperty,
+  isGroup,
   updateGroupAtPath,
 } from 'ui-patterns'
+
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
 
 export interface FilterPopoverProps {
@@ -116,22 +115,14 @@ function serializeFilterProperties(
 }
 
 export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
-  const { filters: urlFilters, onApplyFilters } = useTableFilter()
+  const { filters, setFilters } = useTableFilterNew()
   const snap = useTableEditorTableStateSnapshot()
-
-  // Local state for immediate UI updates
-  const [localFilters, setLocalFilters] = useState<Filter[]>(urlFilters)
-  const debouncedLocalFilters = useDebounce(localFilters, 500)
-
-  useEffect(() => {
-    onApplyFilters(debouncedLocalFilters)
-  }, [debouncedLocalFilters, onApplyFilters])
 
   const [freeformText, setFreeformText] = useState('')
   const { mutateAsync: generateFilters, isPending: isGenerating } = useSqlFilterGenerateMutation()
 
   // Convert filters to FilterGroup for the FilterBar
-  const filterGroup = useMemo(() => filtersToFilterGroup(localFilters), [localFilters])
+  const filterGroup = useMemo(() => filtersToFilterGroup(filters), [filters])
 
   const columns = useMemo(() => snap.table?.columns ?? [], [snap.table?.columns])
 
@@ -162,11 +153,13 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
   )
 
   // Handle filter changes from FilterBar
-  const handleFilterChange = useCallback((newFilterGroup: FilterGroup) => {
-    const newFilters = filterGroupToFilters(newFilterGroup)
-    // Update local state immediately for responsive UI
-    setLocalFilters(newFilters)
-  }, [])
+  const handleFilterChange = useCallback(
+    (newFilterGroup: FilterGroup) => {
+      const newFilters = filterGroupToFilters(newFilterGroup)
+      setFilters(newFilters)
+    },
+    [setFilters]
+  )
 
   const actions = useMemo(
     () => [

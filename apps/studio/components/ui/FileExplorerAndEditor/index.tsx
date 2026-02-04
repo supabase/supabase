@@ -1,25 +1,25 @@
+import { AIEditor } from 'components/ui/AIEditor'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Edit, File, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { AIEditor } from 'components/ui/AIEditor'
 import {
   Button,
-  cn,
-  ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
-  flattenTree,
+  ContextMenu_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   TreeView,
   TreeViewItem,
+  cn,
+  flattenTree,
 } from 'ui'
-import { FileAction, TreeChildData, type FileData } from './FileExplorerAndEditor.types'
+
+import { FileAction, type FileData, TreeChildData } from './FileExplorerAndEditor.types'
 import {
   extractZipFile,
   getFileAction,
