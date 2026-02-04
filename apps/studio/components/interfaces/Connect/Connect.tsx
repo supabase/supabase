@@ -1,21 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { ExternalLink, Plug } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
-
 import { ApiKeysTabContent } from 'components/interfaces/Connect/ApiKeysTabContent'
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -26,24 +24,21 @@ import {
   DialogHeader,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
   cn,
 } from 'ui'
+
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
-import Link from 'next/link'
 
 export const Connect = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { data: selectedProject } = useSelectedProjectQuery()
-  const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const {
     projectConnectionShowAppFrameworks: showAppFrameworks,
@@ -68,11 +63,6 @@ export const Connect = () => {
     return true
   })
 
-  const [showConnect, setShowConnect] = useQueryState(
-    'showConnect',
-    parseAsBoolean.withDefault(false)
-  )
-
   // helper to get the connection type object
   function getConnectionObjectForTab(tab: string | null) {
     switch (tab) {
@@ -87,6 +77,7 @@ export const Connect = () => {
     }
   }
 
+  const [open, setOpen] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
   const [tab, setTab] = useQueryState('connectTab', parseAsString.withDefault('direct'))
   const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
   const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
@@ -106,7 +97,7 @@ export const Connect = () => {
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: open })
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
@@ -258,18 +249,16 @@ export const Connect = () => {
     setQueryMethod(null)
   }
 
-  const handleDialogChange = (open: boolean) => {
-    if (!open) {
-      setShowConnect(null)
+  const handleDialogChange = (dialogOpen: boolean) => {
+    if (!dialogOpen) {
       setTab(null)
       resetQueryStates()
-    } else {
-      setShowConnect(open)
     }
+    setOpen(dialogOpen)
   }
 
   useEffect(() => {
-    if (!showConnect) return
+    if (!open) return
     const noConnectTabInUrl = typeof router.query.connectTab === 'undefined'
     const hasQuery = queryFramework || queryUsing || queryWith
     const inferred = inferConnectTabFromParentKey(queryFramework)
@@ -280,10 +269,10 @@ export const Connect = () => {
       if (inferred === 'mobiles') setConnectionObject(MOBILES)
       if (inferred === 'orms') setConnectionObject(ORMS)
     }
-  }, [showConnect, router.query.connectTab, queryFramework, queryUsing, queryWith, setTab])
+  }, [open, router.query.connectTab, queryFramework, queryUsing, queryWith, setTab])
 
   useEffect(() => {
-    if (!showConnect) return
+    if (!open) return
 
     const newConnectionObject = getConnectionObjectForTab(tab)
     setConnectionObject(newConnectionObject)
@@ -312,7 +301,7 @@ export const Connect = () => {
       if (grandchild?.key !== queryWith) setQueryWith(grandchild?.key ?? null)
     }
   }, [
-    showConnect,
+    open,
     tab,
     queryFramework,
     setQueryFramework,
@@ -322,32 +311,8 @@ export const Connect = () => {
     setQueryWith,
   ])
 
-  if (!isActiveHealthy) {
-    return (
-      <ButtonTooltip
-        disabled
-        type="default"
-        className="rounded-full"
-        icon={<Plug className="rotate-90" />}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: 'Project is currently not active and cannot be connected',
-          },
-        }}
-      >
-        Connect
-      </ButtonTooltip>
-    )
-  }
-
   return (
-    <Dialog open={showConnect} onOpenChange={handleDialogChange}>
-      <DialogTrigger asChild>
-        <Button type="default" className="rounded-full" icon={<Plug className="rotate-90" />}>
-          <span>Connect</span>
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogContent className={cn('sm:max-w-5xl p-0 rounded-lg')} centered={false}>
         <DialogHeader className={cn('text-left', DIALOG_PADDING_X)}>
           <DialogTitle>
