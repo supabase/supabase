@@ -1,10 +1,4 @@
-import {
-  UseFormSetValue,
-  UseFormWatch,
-  FieldValues,
-  Path,
-  PathValue,
-} from 'react-hook-form'
+import { UseFormSetValue, UseFormWatch, FieldValues, Path, PathValue } from 'react-hook-form'
 import {
   Button,
   Popover_Shadcn_,
@@ -51,7 +45,10 @@ interface PermissionsProps<TFormValues extends PermissionsFormValues = Permissio
   setResourceSearchOpen: (open: boolean) => void
 }
 
-const createAllResources = (permissionGroup: { name: string; resources: PermissionResource[] }): PermissionResource[] => {
+const createAllResources = (permissionGroup: {
+  name: string
+  resources: PermissionResource[]
+}): PermissionResource[] => {
   return permissionGroup.resources.map((resource) => ({
     resource: resource.resource,
     title: resource.title,
@@ -138,9 +135,7 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
             <ScrollArea className="max-h-[200px] overflow-y-scroll">
               <CommandGroup_Shadcn_ className="[&>div]:text-left">
                 {ACCESS_TOKEN_PERMISSIONS.resources.map((resource) => {
-                  const isChecked = permissionRows.some(
-                    (row) => row.resource === resource.resource
-                  )
+                  const isChecked = permissionRows.some((row) => row.resource === resource.resource)
                   return (
                     <CommandItem_Shadcn_
                       key={resource.resource}
@@ -216,7 +211,6 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
               allResources={ALL_RESOURCES}
               align="end"
             />
-
           </div>
         </div>
 
@@ -267,7 +261,8 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                               <SelectItem_Shadcn_ key={action} value={action}>
                                 {action === 'no access'
                                   ? 'No access'
-                                  : action.charAt(0).toUpperCase() + action.slice(1).replace(/-/g, ' ')}
+                                  : action.charAt(0).toUpperCase() +
+                                    action.slice(1).replace(/-/g, ' ')}
                               </SelectItem_Shadcn_>
                             ))}
                           </SelectContent_Shadcn_>

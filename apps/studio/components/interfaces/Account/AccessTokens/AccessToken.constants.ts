@@ -34,11 +34,10 @@ export const EXPIRES_AT_OPTIONS = {
   },
 } as const
 
-
 interface PermissionOption {
   id: string // e.g., 'user:organizations:read'
   title: string
-  permissions: ScopedAccessTokenPermission[] 
+  permissions: ScopedAccessTokenPermission[]
 }
 
 export const PERMISSION_OPTIONS: PermissionOption[] = [
@@ -420,10 +419,7 @@ export const PERMISSION_OPTIONS: PermissionOption[] = [
 ].sort((a, b) => a.title.localeCompare(b.title)) as PermissionOption[]
 
 export const PERMISSIONS_UI = (() => {
-  const resourceMap = new Map<
-    string,
-    { resource: string; title: string; actions: string[] }
-  >()
+  const resourceMap = new Map<string, { resource: string; title: string; actions: string[] }>()
 
   PERMISSION_OPTIONS.forEach((option) => {
     const parts = option.id.split(':')
