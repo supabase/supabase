@@ -590,7 +590,7 @@ export const pricing: Pricing = {
         title: 'Log Drain',
         plans: {
           free: false,
-          pro: false,
+          pro: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           team: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           enterprise: 'Custom',
         },
