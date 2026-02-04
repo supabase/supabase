@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import PricingClient from './PricingClient'
+import PricingContent from './PricingContent'
 
 export const metadata: Metadata = {
   title: 'Pricing & Fees | Supabase',
@@ -19,5 +19,5 @@ export const metadata: Metadata = {
 }
 
 export default function PricingPage() {
-  return <PricingClient />
+  return <PricingContent />
 }

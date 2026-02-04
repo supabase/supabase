@@ -18,7 +18,7 @@ const PricingFAQs = dynamic(() => import('~/components/Pricing/PricingFAQs'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 const PricingDiskSection = dynamic(() => import('~/components/Pricing/PricingDiskSection'))
 
-export default function PricingClient() {
+export default function PricingContent() {
   const pathname = usePathname()
 
   // Ability to scroll into pricing sections like storage
