@@ -7,7 +7,7 @@ const httpRequestSchema = z.object({
   http_url: z
     .string()
     .min(1, 'Please provide a URL')
-    .refine((val) => val.startsWith('http'), 'Please include HTTP/HTTPs to your URL')
+    .refine((val) => val.startsWith('http'), 'Please prefix your URL with http or https')
     .refine((val) => isValidHttpUrl(val), 'Please provide a valid URL'),
 })
 

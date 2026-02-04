@@ -13,8 +13,7 @@ import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
-import { getTableEditor, tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
-import { useTablesQuery } from '@/data/tables/tables-query'
+import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from '@/hooks/ui/useConfirmOnClose'
 import { uuidv4 } from '@/lib/helpers'
@@ -246,8 +245,10 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
     }
   }
 
+  // This is intentionally kept outside of the useConfirmOnClose hook to force RHF to update the isDirty state.
+  const isDirty = form.formState.isDirty
   const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
-    checkIsDirty: () => form.formState.isDirty,
+    checkIsDirty: () => isDirty,
     onClose: () => onClose(),
   })
 

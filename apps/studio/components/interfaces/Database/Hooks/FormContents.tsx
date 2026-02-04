@@ -8,7 +8,6 @@ import {
   Checkbox_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormMessage_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
   RadioGroupStacked,
@@ -64,7 +63,6 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
 
   const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
 
-  const functionType = useWatch_Shadcn_({ control: form.control, name: 'function_type' })
   const httpUrl = useWatch_Shadcn_({ control: form.control, name: 'http_url' })
   const httpHeaders = useWatch_Shadcn_({ control: form.control, name: 'httpHeaders' })
 
@@ -209,7 +207,6 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                     </div>
                   ))}
                 </div>
-                <FormMessage_Shadcn_ />
               </FormItemLayout>
             )}
           />

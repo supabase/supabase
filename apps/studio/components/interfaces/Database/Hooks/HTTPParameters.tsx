@@ -1,4 +1,4 @@
-import { Plus, X } from 'lucide-react'
+import { Plus, Trash } from 'lucide-react'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
 import { Button, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, SidePanel } from 'ui'
 
@@ -54,7 +54,7 @@ export const HTTPParameters = ({ form }: HTTPParametersProps) => {
               <ButtonTooltip
                 type="text"
                 className="py-4"
-                icon={<X />}
+                icon={<Trash />}
                 onClick={() => removeParam(index)}
                 tooltip={{ content: { side: 'bottom', text: 'Remove parameter' } }}
               />

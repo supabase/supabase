@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ChevronDown, Plus, X } from 'lucide-react'
+import { ChevronDown, Plus, Trash } from 'lucide-react'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
 import {
   Button,
@@ -90,7 +90,7 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
               />
               <ButtonTooltip
                 type="text"
-                icon={<X />}
+                icon={<Trash />}
                 className="py-4"
                 onClick={() => removeHeader(index)}
                 tooltip={{ content: { side: 'bottom', text: 'Remove header' } }}
