@@ -1,10 +1,7 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { forwardRef, memo, Ref, useMemo, useRef } from 'react'
-import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { ref as valtioRef } from 'valtio'
-
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useFlag } from 'common'
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
+import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -13,15 +10,21 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
+import { Ref, forwardRef, memo, useCallback, useMemo, useRef } from 'react'
+import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ref as valtioRef } from 'valtio'
+
+import { useTableFilter } from '../../hooks/useTableFilter'
 import type { GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
 import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -29,7 +32,7 @@ const rowKeyGetter = (row: SupaRow) => {
 
 interface IGrid extends GridProps {
   rows: SupaRow[]
-  error: Error | null
+  error: ResponseError | null
   isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
@@ -55,9 +58,12 @@ export const Grid = memo(
       },
       ref: Ref<DataGridHandle> | undefined
     ) => {
+      const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
+
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
-      const { filters, onApplyFilters } = useTableFilter()
+      const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
+      const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
 
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
@@ -145,7 +151,21 @@ export const Grid = memo(
         }
       }
 
-      const removeAllFilters = () => onApplyFilters([])
+      const removeAllFilters = useCallback(() => {
+        if (newFilterBarEnabled) {
+          clearNewFilters()
+        } else {
+          clearOldFilters()
+        }
+      }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
+
+      const filters = useMemo(() => {
+        if (newFilterBarEnabled) {
+          return newFilters
+        } else {
+          return oldFilters
+        }
+      }, [newFilters, oldFilters, newFilterBarEnabled])
 
       // Compute columns with cellClass for dirty cells
       // This needs to be computed at render time so it reacts to operation queue changes
@@ -196,11 +216,10 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute top-9 p-2 w-full z-[1] pointer-events-none',
+                'absolute top-9 p-2 w-full z-[1]',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
-              style={{ height: `calc(100% - 35px)` }}
               onDragOver={onDragOver}
               onDragLeave={onDragOver}
               onDrop={onFileDrop}

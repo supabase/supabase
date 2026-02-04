@@ -53,7 +53,7 @@
     "prism-react-renderer": "^2.3.1",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "~0.34.0",
+    "sharp": "~0.34.5",
     "tailwind-merge": "^1.13.2",
     "tsx": "catalog:",
     "typescript": "catalog:"

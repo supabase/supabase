@@ -52,6 +52,7 @@ Danny White
 Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
+David Birdsong
 David Weitzman
 Deepthi Sigireddi
 Deji I
@@ -73,6 +74,8 @@ Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
 Felipe Stival
+Ferhat Elmas
+Firas El Rachidi
 Francesco Sansalvadore
 Garrett Crowell
 Gerardo Estaba
@@ -175,6 +178,7 @@ Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Sara Read
 Sean Oliver
 Sean Thompson
 Sergio Cioban Filho
