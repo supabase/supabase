@@ -5,15 +5,15 @@ import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/al
 import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AlertCircle, ArrowRight, Calendar, Gift, PartyPopper, PartyPopperIcon } from 'lucide-react'
+import { AlertCircle, Calendar, PartyPopper} from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -24,8 +24,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  FormField_Shadcn_,
   Form_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Separator,
 } from 'ui'
@@ -33,12 +33,10 @@ import { ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { useOrganizationPreviewCreditCodeQuery } from '@/data/organizations/organization-credit-code-preview-query'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import Link from 'next/link'
 
 const FORM_ID = 'credit-code-redemption'
 
