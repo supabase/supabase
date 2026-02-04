@@ -6,10 +6,10 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.93.2
-  '@supabase/postgrest-js': 2.93.2
-  '@supabase/realtime-js': 2.93.2
-  '@supabase/supabase-js': 2.93.2
+  '@supabase/auth-js': 2.94.1
+  '@supabase/postgrest-js': 2.94.1
+  '@supabase/realtime-js': 2.94.1
+  '@supabase/supabase-js': 2.94.1
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
@@ -25,7 +25,7 @@ catalog:
   valtio: ^1.12.0
   vite: ^7.1.11
   vitest: ^3.2.0
-  zod: ^3.25.76
+  zod: 3.25.76
 
 ignoredBuiltDependencies:
   - '@parcel/watcher'
@@ -81,7 +81,7 @@ overrides:
   preact: 10.26.10
   refractor>prismjs: ^1.30.0
   shadcn>diff: ^8.0.3
-  tar: ^7.5.4
+  tar: ^7.5.7
   tmp: ^0.2.4
   vinxi>vite: 'catalog:'
   vinxi>h3: ^1.15.5

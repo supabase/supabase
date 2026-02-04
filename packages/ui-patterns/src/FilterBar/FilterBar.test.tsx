@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { FilterBar } from './FilterBar'
-import { FilterProperty, FilterGroup } from './types'
+import { FilterGroup, FilterProperty } from './types'
 
 const mockFilterProperties: FilterProperty[] = [
   {
@@ -50,7 +51,11 @@ describe('FilterBar', () => {
       />
     )
 
-    expect(screen.getByPlaceholderText('Search or filter...')).toBeInTheDocument()
+    expect(
+      screen.getByPlaceholderText(
+        'Ask AI for help (e.g. Find all users with name John) or filter...'
+      )
+    ).toBeInTheDocument()
   })
 
   it('renders with search input', () => {
@@ -64,7 +69,9 @@ describe('FilterBar', () => {
       />
     )
 
-    const input = screen.getByPlaceholderText('Search or filter...')
+    const input = screen.getByPlaceholderText(
+      'Ask AI for help (e.g. Find all users with name John) or filter...'
+    )
     expect(input).toBeInTheDocument()
   })
 
@@ -85,7 +92,9 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText('Search or filter...')
+    const freeform = screen.getByPlaceholderText(
+      'Ask AI for help (e.g. Find all users with name John) or filter...'
+    )
     freeform.focus()
     await user.click(freeform)
 
@@ -135,7 +144,9 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText('Search or filter...')
+    const freeform = screen.getByPlaceholderText(
+      'Ask AI for help (e.g. Find all users with name John) or filter...'
+    )
     await user.click(freeform)
     await user.click(screen.getByText('Status'))
 
@@ -225,7 +236,9 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText('Search or filter...')
+    const freeform = screen.getByPlaceholderText(
+      'Ask AI for help (e.g. Find all users with name John) or filter...'
+    )
     await user.click(freeform)
     await user.click(screen.getByText('Tag'))
 
@@ -287,7 +300,9 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText('Search or filter...')
+    const freeform = screen.getByPlaceholderText(
+      'Ask AI for help (e.g. Find all users with name John) or filter...'
+    )
     await user.click(freeform)
     expect(await screen.findByText('Name')).toBeInTheDocument()
 

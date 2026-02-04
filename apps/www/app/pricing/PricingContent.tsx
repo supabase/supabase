@@ -1,8 +1,9 @@
+'use client'
+
 import { ArrowDownIcon } from '@heroicons/react/outline'
 import { ArrowUpRight } from 'lucide-react'
-import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { Button } from 'ui'
 
@@ -17,13 +18,8 @@ const PricingFAQs = dynamic(() => import('~/components/Pricing/PricingFAQs'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 const PricingDiskSection = dynamic(() => import('~/components/Pricing/PricingDiskSection'))
 
-export default function IndexPage() {
-  const router = useRouter()
-  const { asPath } = useRouter()
-
-  const meta_title = 'Pricing & Fees | Supabase'
-  const meta_description =
-    'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.'
+export default function PricingContent() {
+  const pathname = usePathname()
 
   // Ability to scroll into pricing sections like storage
   useEffect(() => {
@@ -32,7 +28,7 @@ export default function IndexPage() {
      * on both mobile and desktop. To handle both cases, we actually need to check screen size
      */
 
-    const hash = asPath.split('#')[1]
+    const hash = window.location.hash.slice(1)
     if (!hash) return
 
     let device = 'desktop'
@@ -44,28 +40,13 @@ export default function IndexPage() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [asPath])
+  }, [pathname])
 
   const { isLoading, organizations } = useOrganizations()
   const hasExistingOrganizations = !isLoading && organizations.length > 0
 
   return (
     <DefaultLayout>
-      <NextSeo
-        title={meta_title}
-        description={meta_description}
-        openGraph={{
-          title: meta_title,
-          description: meta_description,
-          url: `https://supabase.com/${router.pathname}`,
-          images: [
-            {
-              url: `https://supabase.com/images/og/supabase-og.png`,
-            },
-          ],
-        }}
-      />
-
       <div className="relative z-10 pt-8 pb-4 xl:py-16">
         <div className="mx-auto max-w-7xl px-8 text-center sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
