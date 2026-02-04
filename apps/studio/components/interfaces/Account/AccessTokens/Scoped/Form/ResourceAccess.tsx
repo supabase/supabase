@@ -61,6 +61,16 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
     [projectsData]
   )
 
+  const orgSlugToName = useMemo(
+    () => new Map(organizations.map((org) => [org.slug, org.name])),
+    [organizations]
+  )
+
+  const projectRefToName = useMemo(
+    () => new Map(projects.map((project) => [project.ref, project.name])),
+    [projects]
+  )
+
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
       <FormField_Shadcn_
@@ -97,40 +107,56 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
           key="selectedOrganizations"
           name="selectedOrganizations"
           control={control}
-          render={({ field }) => (
-            <FormItemLayout name="selectedOrganizations" label="Select organizations">
-              <FormControl_Shadcn_ className="overflow-visible">
-                <MultiSelector values={field.value || []} onValuesChange={field.onChange}>
-                  <MultiSelectorTrigger
-                    deletableBadge
-                    showIcon={false}
-                    mode="inline-combobox"
-                    label="Select organizations"
-                    badgeLimit="wrap"
-                  />
-                  <MultiSelectorContent className="z-50">
-                    {isLoadingOrgs ? (
-                      <div className="px-3 py-2 text-sm text-foreground-light">
-                        Loading organizations...
-                      </div>
-                    ) : organizations.length === 0 ? (
-                      <div className="px-3 py-2 text-sm text-foreground-light">
-                        No organizations available
-                      </div>
-                    ) : (
-                      <MultiSelectorList>
-                        {organizations.map((org) => (
-                          <MultiSelectorItem key={org.slug} value={org.slug}>
-                            {org.name}
-                          </MultiSelectorItem>
-                        ))}
-                      </MultiSelectorList>
-                    )}
-                  </MultiSelectorContent>
-                </MultiSelector>
-              </FormControl_Shadcn_>
-            </FormItemLayout>
-          )}
+          render={({ field }) => {
+            const displayValues = (field.value || []).map((slug) => orgSlugToName.get(slug) || slug)
+
+            const handleValuesChange = (names: string[]) => {
+              const slugs = names
+                .map((name) => {
+                  for (const [slug, orgName] of orgSlugToName.entries()) {
+                    if (orgName === name) return slug
+                  }
+                  return name
+                })
+                .filter(Boolean)
+              field.onChange(slugs)
+            }
+
+            return (
+              <FormItemLayout name="selectedOrganizations" label="Select organizations">
+                <FormControl_Shadcn_ className="overflow-visible">
+                  <MultiSelector values={displayValues} onValuesChange={handleValuesChange}>
+                    <MultiSelectorTrigger
+                      deletableBadge
+                      showIcon={false}
+                      mode="inline-combobox"
+                      label="Select organizations"
+                      badgeLimit="wrap"
+                    />
+                    <MultiSelectorContent className="z-50">
+                      {isLoadingOrgs ? (
+                        <div className="px-3 py-2 text-sm text-foreground-light">
+                          Loading organizations...
+                        </div>
+                      ) : organizations.length === 0 ? (
+                        <div className="px-3 py-2 text-sm text-foreground-light">
+                          No organizations available
+                        </div>
+                      ) : (
+                        <MultiSelectorList>
+                          {organizations.map((org) => (
+                            <MultiSelectorItem key={org.slug} value={org.name}>
+                              {org.name}
+                            </MultiSelectorItem>
+                          ))}
+                        </MultiSelectorList>
+                      )}
+                    </MultiSelectorContent>
+                  </MultiSelector>
+                </FormControl_Shadcn_>
+              </FormItemLayout>
+            )
+          }}
         />
       )}
 
@@ -139,40 +165,56 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
           key="selectedProjects"
           name="selectedProjects"
           control={control}
-          render={({ field }) => (
-            <FormItemLayout name="selectedProjects" label="Select projects">
-              <FormControl_Shadcn_ className="overflow-visible">
-                <MultiSelector values={field.value || []} onValuesChange={field.onChange}>
-                  <MultiSelectorTrigger
-                    deletableBadge
-                    showIcon={false}
-                    mode="inline-combobox"
-                    label="Select projects"
-                    badgeLimit="wrap"
-                  />
-                  <MultiSelectorContent className="z-50">
-                    {isLoadingProjects ? (
-                      <div className="px-3 py-2 text-sm text-foreground-light">
-                        Loading projects...
-                      </div>
-                    ) : projects.length === 0 ? (
-                      <div className="px-3 py-2 text-sm text-foreground-light">
-                        No projects available
-                      </div>
-                    ) : (
-                      <MultiSelectorList>
-                        {projects.map((project) => (
-                          <MultiSelectorItem key={project.ref} value={project.ref}>
-                            {project.name}
-                          </MultiSelectorItem>
-                        ))}
-                      </MultiSelectorList>
-                    )}
-                  </MultiSelectorContent>
-                </MultiSelector>
-              </FormControl_Shadcn_>
-            </FormItemLayout>
-          )}
+          render={({ field }) => {
+            const displayValues = (field.value || []).map((ref) => projectRefToName.get(ref) || ref)
+
+            const handleValuesChange = (names: string[]) => {
+              const refs = names
+                .map((name) => {
+                  for (const [ref, projectName] of projectRefToName.entries()) {
+                    if (projectName === name) return ref
+                  }
+                  return name
+                })
+                .filter(Boolean)
+              field.onChange(refs)
+            }
+
+            return (
+              <FormItemLayout name="selectedProjects" label="Select projects">
+                <FormControl_Shadcn_ className="overflow-visible">
+                  <MultiSelector values={displayValues} onValuesChange={handleValuesChange}>
+                    <MultiSelectorTrigger
+                      deletableBadge
+                      showIcon={false}
+                      mode="inline-combobox"
+                      label="Select projects"
+                      badgeLimit="wrap"
+                    />
+                    <MultiSelectorContent className="z-50">
+                      {isLoadingProjects ? (
+                        <div className="px-3 py-2 text-sm text-foreground-light">
+                          Loading projects...
+                        </div>
+                      ) : projects.length === 0 ? (
+                        <div className="px-3 py-2 text-sm text-foreground-light">
+                          No projects available
+                        </div>
+                      ) : (
+                        <MultiSelectorList>
+                          {projects.map((project) => (
+                            <MultiSelectorItem key={project.ref} value={project.name}>
+                              {project.name}
+                            </MultiSelectorItem>
+                          ))}
+                        </MultiSelectorList>
+                      )}
+                    </MultiSelectorContent>
+                  </MultiSelector>
+                </FormControl_Shadcn_>
+              </FormItemLayout>
+            )
+          }}
         />
       )}
     </div>
