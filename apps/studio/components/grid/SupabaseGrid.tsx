@@ -15,8 +15,10 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { QueuedOperation } from 'state/table-editor-operation-queue.types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
-import { useIsQueueOperationsEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { validateMsSqlSorting } from './MsSqlValidation'
+import {
+  useIsQueueOperationsEnabled,
+  useIsTableFilterBarEnabled,
+} from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
@@ -25,6 +27,7 @@ import { HeaderNew } from './components/header/HeaderNew'
 import { RowContextMenu } from './components/menu/RowContextMenu'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
+import { validateMsSqlSorting } from './MsSqlValidation'
 import { GridProps } from './types'
 import { reapplyOptimisticUpdates } from './utils/queueOperationUtils'
 
@@ -50,7 +53,7 @@ export const SupabaseGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
+  const newFilterBarEnabled = useIsTableFilterBarEnabled()
 
   const { filters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
