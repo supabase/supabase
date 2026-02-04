@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/al
 import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AlertCircle, Calendar, PartyPopper} from 'lucide-react'
+import { AlertCircle, Calendar, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
