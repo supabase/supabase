@@ -46,7 +46,6 @@ const schema = object({
   EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
   SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
   MAILER_AUTOCONFIRM: boolean().required(),
-  SITE_URL: string().required('Must have a Site URL'),
 })
 
 export const BasicAuthSettingsForm = () => {
@@ -78,7 +77,6 @@ export const BasicAuthSettingsForm = () => {
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
       SECURITY_MANUAL_LINKING_ENABLED: false,
       MAILER_AUTOCONFIRM: true,
-      SITE_URL: '',
     },
   })
 
@@ -90,7 +88,6 @@ export const BasicAuthSettingsForm = () => {
         SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED,
         // The backend uses false to represent that email confirmation is required
         MAILER_AUTOCONFIRM: !authConfig.MAILER_AUTOCONFIRM,
-        SITE_URL: authConfig.SITE_URL,
       })
     }
   }, [authConfig])
