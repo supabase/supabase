@@ -93,11 +93,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
-    const blogImage = blogPost.imgThumb || blogPost.imgSocial
-    const metaImageUrl = blogImage
-      ? blogImage.startsWith('http')
-        ? blogImage
-        : `${CMS_SITE_ORIGIN.replace('/api-v2', '')}${blogImage}`
+    const metaImageUrl = blogPost.imgSocial
+      ? blogPost.imgSocial.startsWith('http')
+        ? blogPost.imgSocial
+        : `${CMS_SITE_ORIGIN.replace('/api-v2', '')}${blogPost.imgSocial}`
       : undefined
 
     return {
@@ -152,9 +151,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     }
   }
 
-  // Fallback to imgThumb or imgSocial if no meta image
+  // Only use imgSocial for OG image, no fallback to imgThumb
   if (!metaImageUrl) {
-    metaImageUrl = cmsPost.imgThumb || cmsPost.imgSocial
+    metaImageUrl = cmsPost.imgSocial
   }
 
   // Ensure image URLs are absolute

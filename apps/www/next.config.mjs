@@ -1,16 +1,14 @@
+import { remarkCodeHike } from '@code-hike/mdx'
 import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 import { withSentryConfig } from '@sentry/nextjs'
-
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import redirects from './lib/redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
-
-import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -76,6 +74,7 @@ const nextConfig = {
   images: {
     dangerouslyAllowSVG: false,
     remotePatterns,
+    qualities: [25, 50, 75, 100],
   },
   async headers() {
     return [

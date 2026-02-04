@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+
 import { CMS_SITE_ORIGIN } from '~/lib/constants'
 import { generateReadingTime } from '~/lib/helpers'
 
@@ -713,7 +714,7 @@ export async function GET(request: NextRequest) {
           formattedDate,
           readingTime,
           authors,
-          imgThumb: imgThumbUrl || imgSocialUrl || '',
+          imgThumb: imgThumbUrl || '',
           imgSocial: imgSocialUrl || undefined,
           meta: p.meta || null,
           url: `/blog/${p.slug}`,

@@ -30,10 +30,8 @@ const BlogGridItem = ({ post }: Props) => {
   }
 
   const imageUrl = post.isCMS
-    ? post.imgThumb || post.imgSocial || '/images/blog/blog-placeholder.png'
-    : resolveImagePath(post.imgThumb) ||
-      resolveImagePath(post.imgSocial) ||
-      '/images/blog/blog-placeholder.png'
+    ? post.imgThumb || '/images/blog/blog-placeholder.png'
+    : resolveImagePath(post.imgThumb) || '/images/blog/blog-placeholder.png'
 
   return (
     <Link
