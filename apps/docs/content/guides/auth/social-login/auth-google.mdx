@@ -202,7 +202,7 @@ To use the Google provider in local development:
    enabled = true
    client_id = "<client-id>"
    secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
-   skip_nonce_check = false
+   skip_nonce_check = true
    ```
 
 If you have multiple client IDs, such as one for Web, iOS and Android, concatenate all of the client IDs with a comma but make sure the web's client ID is first in the list.
