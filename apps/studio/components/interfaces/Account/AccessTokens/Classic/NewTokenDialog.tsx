@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { DatePicker } from 'components/ui/DatePicker'
-import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
+import { useAccessTokenCreateMutation, type NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Button,
   Dialog,
@@ -50,7 +50,7 @@ export interface NewAccessTokenDialogProps {
   open: boolean
   tokenScope: 'V0' | undefined
   onOpenChange: (open: boolean) => void
-  onCreateToken: (token: any) => void
+  onCreateToken: (token: NewAccessToken) => void
 }
 
 export const NewTokenDialog = ({
