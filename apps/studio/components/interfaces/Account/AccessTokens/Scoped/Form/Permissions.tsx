@@ -1,5 +1,4 @@
 import {
-  Control,
   UseFormSetValue,
   UseFormWatch,
   FieldValues,
@@ -23,17 +22,17 @@ import {
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   WarningIcon,
+  Checkbox_Shadcn_,
+  ScrollArea,
 } from 'ui'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Plus, Key, X, RotateCcw } from 'lucide-react'
 import { ACCESS_TOKEN_PERMISSIONS } from '../../AccessToken.constants'
 
-export type AccessLevel = 'read' | 'read-write' | 'no access'
-
 export interface PermissionResource {
   resource: string
   title: string
-  actions: AccessLevel[]
+  actions: string[]
 }
 
 interface PermissionGroup {
@@ -55,7 +54,6 @@ export interface PermissionsFormValues extends FieldValues {
 }
 
 interface PermissionsProps<TFormValues extends PermissionsFormValues = PermissionsFormValues> {
-  control: Control<TFormValues>
   setValue: UseFormSetValue<TFormValues>
   watch: UseFormWatch<TFormValues>
   resourceSearchOpen: boolean
@@ -80,7 +78,32 @@ interface PermissionResourceSelectorProps<TFormValues extends PermissionsFormVal
   setValue: UseFormSetValue<TFormValues>
   allResources: AllResource[]
   align?: 'center' | 'end' | 'start'
-  presetLabelPrefix?: string
+}
+
+const getBestAction = (actions: string[]): string => {
+  const availableActions = actions.filter((a) => a !== 'no access')
+  if (availableActions.length === 0) return 'no access'
+
+  // Priority order: read-write > write > read > create > delete > others
+  const priority = ['read-write', 'write', 'read', 'create', 'delete']
+  for (const priorityAction of priority) {
+    if (availableActions.includes(priorityAction)) {
+      return priorityAction
+    }
+  }
+
+  // If no priority action found, return the first available (excluding 'no access')
+  return availableActions[0]
+}
+
+const sortActions = (actions: string[]): string[] => {
+  const sorted = [...actions]
+  const noAccessIndex = sorted.indexOf('no access')
+  if (noAccessIndex !== -1) {
+    sorted.splice(noAccessIndex, 1)
+    sorted.push('no access')
+  }
+  return sorted
 }
 
 const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
@@ -90,140 +113,79 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
   setValue,
   allResources,
   align = 'center',
-  presetLabelPrefix = '',
 }: PermissionResourceSelectorProps<TFormValues>) => {
-  const handleSelectAll = () => {
-    const allPermissions: PermissionRow[] = allResources.map((resource) => ({
-      resource: resource.resource,
-      action: resource.actions.includes('read-write') ? 'read-write' : resource.actions[0],
-    }))
-    setValue(
-      'permissionRows' as Path<TFormValues>,
-      allPermissions as PathValue<TFormValues, Path<TFormValues>>
-    )
-    onOpenChange(false)
-  }
+  const handleToggleResource = (resource: PermissionResource) => {
+    const isAlreadyAdded = permissionRows.some((row) => row.resource === resource.resource)
 
-  const handleSelectGroup = (groupName: string) => {
-    const groupPermissions: PermissionRow[] = allResources
-      .filter((resource) => resource.group === groupName)
-      .map((resource) => ({
-        resource: resource.resource,
-        action: resource.actions.includes('read-write') ? 'read-write' : resource.actions[0],
-      }))
-    setValue(
-      'permissionRows' as Path<TFormValues>,
-      groupPermissions as PathValue<TFormValues, Path<TFormValues>>
-    )
-    onOpenChange(false)
-  }
-
-  const handleSelectResource = (resource: PermissionResource) => {
-    const defaultAction = resource.actions.includes('read-write')
-      ? 'read-write'
-      : resource.actions[0]
-    const newRows: PermissionRow[] = [
-      ...permissionRows,
-      { resource: resource.resource, action: defaultAction },
-    ]
-    setValue(
-      'permissionRows' as Path<TFormValues>,
-      newRows as PathValue<TFormValues, Path<TFormValues>>
-    )
-    onOpenChange(false)
+    if (isAlreadyAdded) {
+      // Remove the resource
+      const newRows = permissionRows.filter((row) => row.resource !== resource.resource)
+      setValue(
+        'permissionRows' as Path<TFormValues>,
+        newRows as PathValue<TFormValues, Path<TFormValues>>
+      )
+    } else {
+      // Add the resource with default action
+      const defaultAction = getBestAction(resource.actions)
+      const newRows: PermissionRow[] = [
+        ...permissionRows,
+        { resource: resource.resource, action: defaultAction },
+      ]
+      setValue(
+        'permissionRows' as Path<TFormValues>,
+        newRows as PathValue<TFormValues, Path<TFormValues>>
+      )
+    }
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={onOpenChange}>
+    <Popover_Shadcn_ open={open} onOpenChange={onOpenChange} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button type="default" size="tiny" icon={<Plus className="h-4 w-4" />}>
           Add permission
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[400px] max-h-[300px] p-0" align={align}>
+      <PopoverContent_Shadcn_ className="w-[400px] p-0" align={align}>
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search resources..." />
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
 
-            <CommandGroup_Shadcn_ heading="Preset options" className="[&>div]:text-left">
-              <CommandItem_Shadcn_ value="add-all-permissions" onSelect={handleSelectAll}>
-                <div className="flex items-center gap-3">
-                  <Key size={12} />
-                  <div className="flex flex-col text-left">
-                    <span className="font-medium text-foreground">
-                      {presetLabelPrefix}All permissions
-                    </span>
-                  </div>
-                </div>
-              </CommandItem_Shadcn_>
-
-              <CommandItem_Shadcn_
-                value="add-all-user-permissions"
-                onSelect={() => handleSelectGroup('User permissions')}
-              >
-                <div className="flex items-center gap-3">
-                  <Key size={12} />
-                  <div className="flex flex-col text-left">
-                    <span className="font-medium text-foreground">
-                      {presetLabelPrefix}All user permissions
-                    </span>
-                  </div>
-                </div>
-              </CommandItem_Shadcn_>
-
-              <CommandItem_Shadcn_
-                value="add-all-project-permissions"
-                onSelect={() => handleSelectGroup('Project permissions')}
-              >
-                <div className="flex items-center gap-3">
-                  <Key size={12} />
-                  <div className="flex flex-col text-left">
-                    <span className="font-medium text-foreground">
-                      {presetLabelPrefix}All project permissions
-                    </span>
-                  </div>
-                </div>
-              </CommandItem_Shadcn_>
-
-              <CommandItem_Shadcn_
-                value="add-all-organization-permissions"
-                onSelect={() => handleSelectGroup('Organization permissions')}
-              >
-                <div className="flex items-center gap-3">
-                  <Key size={12} />
-                  <div className="flex flex-col text-left">
-                    <span className="font-medium text-foreground">
-                      {presetLabelPrefix}All organization permissions
-                    </span>
-                  </div>
-                </div>
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
-
-            {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => (
-              <CommandGroup_Shadcn_
-                key={permissionGroup.name}
-                heading={permissionGroup.name}
-                className="[&>div]:text-left"
-              >
-                {permissionGroup.resources.map((resource) => (
-                  <CommandItem_Shadcn_
-                    key={resource.resource}
-                    value={`${resource.resource} ${resource.title} ${permissionGroup.name}`}
-                    onSelect={() => handleSelectResource(resource)}
-                    className="text-white"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Key size={12} />
-                      <div className="flex flex-col text-left">
-                        <span className="font-medium text-foreground">{resource.title}</span>
-                      </div>
-                    </div>
-                  </CommandItem_Shadcn_>
-                ))}
-              </CommandGroup_Shadcn_>
-            ))}
+            <ScrollArea className="max-h-[200px] overflow-y-scroll">
+              {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => (
+                <CommandGroup_Shadcn_
+                  key={permissionGroup.name}
+                  heading={permissionGroup.name}
+                  className="[&>div]:text-left"
+                >
+                  {permissionGroup.resources.map((resource) => {
+                    const isChecked = permissionRows.some(
+                      (row) => row.resource === resource.resource
+                    )
+                    return (
+                      <CommandItem_Shadcn_
+                        key={resource.resource}
+                        value={`${resource.resource} ${resource.title} ${permissionGroup.name}`}
+                        onSelect={() => handleToggleResource(resource)}
+                        className="text-white"
+                      >
+                        <div className="flex items-center gap-3 w-full">
+                          <Checkbox_Shadcn_
+                            checked={isChecked}
+                            onCheckedChange={() => handleToggleResource(resource)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <Key size={12} className="text-foreground-lighter" />
+                          <div className="flex flex-col text-left flex-1">
+                            <span className="font-medium text-foreground">{resource.title}</span>
+                          </div>
+                        </div>
+                      </CommandItem_Shadcn_>
+                    )
+                  })}
+                </CommandGroup_Shadcn_>
+              ))}
+            </ScrollArea>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
       </PopoverContent_Shadcn_>
@@ -232,7 +194,6 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
 }
 
 export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({
-  // control,
   setValue,
   watch,
   resourceSearchOpen,
@@ -243,35 +204,11 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
-      {permissionRows.length === 0 ? (
-        <div className="space-y-3">
+      <div className="space-y-3">
+        <div className="flex justify-between items-center">
           <span className="text-sm">Configure permissions</span>
-          <div className="text-center py-8 border border-dashed border-border rounded-lg">
-            <p className="text-sm text-foreground-light mb-4">No permissions configured yet.</p>
-            <PermissionResourceSelector
-              open={resourceSearchOpen}
-              onOpenChange={setResourceSearchOpen}
-              permissionRows={permissionRows}
-              setValue={setValue}
-              allResources={ALL_RESOURCES}
-              align="center"
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-sm">Configure permissions</span>
-            <div className="flex items-center gap-2">
-              <PermissionResourceSelector
-                open={resourceSearchOpen}
-                onOpenChange={setResourceSearchOpen}
-                permissionRows={permissionRows}
-                setValue={setValue}
-                allResources={ALL_RESOURCES}
-                align="end"
-                presetLabelPrefix="Add "
-              />
+          <div className="flex items-center gap-2">
+            {permissionRows.length > 0 && (
               <ButtonTooltip
                 type="default"
                 size="tiny"
@@ -286,15 +223,30 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                 tooltip={{
                   content: {
                     side: 'top',
-                    align: 'end',
+                    align: 'center',
                     alignOffset: -10,
                     text: 'Reset all permissions',
                   },
                 }}
               />
-            </div>
-          </div>
+            )}
+            <PermissionResourceSelector
+              open={resourceSearchOpen}
+              onOpenChange={setResourceSearchOpen}
+              permissionRows={permissionRows}
+              setValue={setValue}
+              allResources={ALL_RESOURCES}
+              align="end"
+            />
 
+          </div>
+        </div>
+
+        {permissionRows.length === 0 ? (
+          <div className="text-center py-8 border border-dashed border-border rounded-lg">
+            <p className="text-sm text-foreground-light">No permissions configured yet.</p>
+          </div>
+        ) : (
           <div className="border border-border rounded-lg">
             {permissionRows.map((row, index) => {
               const selectedResource = ALL_RESOURCES.find((r) => r.resource === row.resource)
@@ -335,9 +287,11 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                             <SelectValue_Shadcn_ placeholder="Set access" />
                           </SelectTrigger_Shadcn_>
                           <SelectContent_Shadcn_>
-                            {selectedResource.actions.map((action) => (
+                            {sortActions(selectedResource.actions).map((action) => (
                               <SelectItem_Shadcn_ key={action} value={action}>
-                                {action.charAt(0).toUpperCase() + action.slice(1)}
+                                {action === 'no access'
+                                  ? 'No access'
+                                  : action.charAt(0).toUpperCase() + action.slice(1).replace(/-/g, ' ')}
                               </SelectItem_Shadcn_>
                             ))}
                           </SelectContent_Shadcn_>
@@ -363,8 +317,8 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
               )
             })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="w-full flex gap-x-2 items-center">
         <WarningIcon />

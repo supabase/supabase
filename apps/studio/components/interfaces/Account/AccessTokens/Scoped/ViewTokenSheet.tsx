@@ -14,10 +14,11 @@ import {
 import { useScopedAccessTokenQuery } from 'data/scoped-access-tokens/scoped-access-token-query'
 import { DocsButton } from 'components/ui/DocsButton'
 import { Card, CardContent } from 'ui'
-import { ACCESS_TOKEN_PERMISSIONS, PERMISSION_MAP } from '../AccessToken.constants'
+import { ACCESS_TOKEN_PERMISSIONS, getResourcePermissions } from '../AccessToken.constants'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useMemo } from 'react'
+import { PermissionResource } from './Form/Permissions'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -51,7 +52,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     const hasPermission = (permission: string) => tokenPermissions.includes(permission)
 
     // Get the permissions for this resource from PERMISSION_MAP
-    const resourcePermissions = PERMISSION_MAP[resource]
+    const resourcePermissions = getResourcePermissions(resource)
     if (!resourcePermissions) {
       console.warn(`Unknown resource: ${resource}`)
       return 'no access'
@@ -59,14 +60,24 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
     // Check what permissions the token has for this resource
     const hasRead = resourcePermissions['read']?.some((p) => hasPermission(p)) || false
-    const hasWrite = resourcePermissions['read-write']?.some((p) => hasPermission(p)) || false
+    const hasWrite = resourcePermissions['write']?.some((p) => hasPermission(p)) || false
+    const hasCreate = resourcePermissions['create']?.some((p) => hasPermission(p)) || false
+    const hasDelete = resourcePermissions['delete']?.some((p) => hasPermission(p)) || false
 
-    if (hasRead && hasWrite) {
-      return 'read-write'
-    } else if (hasRead) {
-      return 'read only'
-    } else {
+    const actions: string[] = []
+    if (hasRead) actions.push('read')
+    if (hasWrite) actions.push('write')
+    if (hasCreate) actions.push('create')
+    if (hasDelete) actions.push('delete')
+
+    if (actions.length === 0) {
       return 'no access'
+    } else if (actions.length === 1) {
+      return actions[0]
+    } else if (hasRead && hasWrite && actions.length === 2) {
+      return 'read-write'
+    } else {
+      return actions.join('-')
     }
   }
 
@@ -83,7 +94,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     }
   }
 
-  const groupResourcesByAccess = (resources: any[]) => {
+  const groupResourcesByAccess = (resources: PermissionResource[]) => {
     const grouped = {
       'Read only': [] as string[],
       'Read-write': [] as string[],
@@ -191,10 +202,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.created_at
                                     ? new Date(token.created_at).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                      })
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
                                     : 'Unknown'}
                                 </span>
                               </TableCell>
@@ -207,10 +218,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.last_used_at
                                     ? new Date(token.last_used_at).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                      })
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
                                     : 'Never'}
                                 </span>
                               </TableCell>
@@ -223,10 +234,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.expires_at
                                     ? new Date(token.expires_at).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                      })
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
                                     : 'Never'}
                                 </span>
                               </TableCell>
@@ -269,7 +280,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <TableCell colSpan={2}>
                                   <p className="text-foreground-light text-center py-4">
                                     {token?.organization_slugs &&
-                                    token.organization_slugs.length > 0
+                                      token.organization_slugs.length > 0
                                       ? 'This token has access to specific organizations and projects.'
                                       : 'This token has access to all resources.'}
                                   </p>

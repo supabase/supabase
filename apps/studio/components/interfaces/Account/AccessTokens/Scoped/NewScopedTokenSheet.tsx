@@ -315,7 +315,6 @@ export const NewScopedTokenSheet = ({
                 <ResourceAccess control={form.control} resourceAccess={resourceAccess} />
                 <Separator />
                 <Permissions
-                  control={form.control}
                   setValue={form.setValue}
                   watch={form.watch}
                   resourceSearchOpen={resourceSearchOpen}

@@ -34,324 +34,545 @@ export const EXPIRES_AT_OPTIONS = {
   },
 } as const
 
-type ResourceAction = 'read' | 'create' | 'write'
-type AccessLevel = 'read' | 'read-write' | 'no access'
-
-interface ResourceConfig {
-  scope: 'user' | 'organization' | 'project'
+// Direct definition: each option maps to exact API permissions
+interface PermissionOption {
+  id: string // e.g., 'user:organizations:read'
   title: string
-  basePermission: string
-  actions: ResourceAction[]
+  group: 'User permissions' | 'Organization permissions' | 'Project permissions'
+  permissions: ScopedAccessTokenPermission[] // Exact API permissions this grants
 }
 
-// [kemal]: I don't necessarily like this approach, happy to hear a better one.
-const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
-  'user:organizations': {
-    scope: 'user',
-    title: 'Access to organization information',
-    basePermission: 'organizations',
-    actions: ['read', 'create'],
+export const PERMISSION_OPTIONS: PermissionOption[] = [
+  // User permissions
+  {
+    id: 'user:organizations:read',
+    title: 'Read organization information',
+    group: 'User permissions',
+    permissions: ['organizations_read'],
   },
-  'user:projects': {
-    scope: 'user',
+  {
+    id: 'user:organizations:create',
+    title: 'Create organizations',
+    group: 'User permissions',
+    permissions: ['organizations_create'],
+  },
+  {
+    id: 'user:projects:read',
     title: 'Access to project information',
-    basePermission: 'projects',
-    actions: ['read'],
+    group: 'User permissions',
+    permissions: ['projects_read'],
   },
-  'user:snippets': {
-    scope: 'user',
+  {
+    id: 'user:snippets:read',
     title: 'Access to user snippets',
-    basePermission: 'snippets',
-    actions: ['read'],
+    group: 'User permissions',
+    permissions: ['snippets_read'],
   },
-  'organization:admin': {
-    scope: 'organization',
-    title: 'Manage organization admin settings',
-    basePermission: 'organization_admin',
-    actions: ['read', 'write'],
+
+  // Organization permissions
+  {
+    id: 'organization:admin:read',
+    title: 'Read organization admin settings',
+    group: 'Organization permissions',
+    permissions: ['organization_admin_read'],
   },
-  'organization:members': {
-    scope: 'organization',
+  {
+    id: 'organization:admin:write',
+    title: 'Write organization admin settings (transfer projects)',
+    group: 'Organization permissions',
+    permissions: ['organization_admin_write'],
+  },
+  {
+    id: 'organization:members:read',
+    title: 'Read organization members',
+    group: 'Organization permissions',
+    permissions: ['members_read'],
+  },
+  {
+    id: 'organization:members:write',
     title: 'Manage organization members',
-    basePermission: 'members',
-    actions: ['read', 'write'],
+    group: 'Organization permissions',
+    permissions: ['members_write'],
   },
-  'project:admin': {
-    scope: 'project',
-    title: 'Full access to project admin settings',
-    basePermission: 'project_admin',
-    actions: ['read', 'write'],
+  {
+    id: 'organization:projects:read',
+    title: 'Read organization projects',
+    group: 'Organization permissions',
+    permissions: ['organization_projects_read'],
   },
-  'project:advisors': {
-    scope: 'project',
+  {
+    id: 'organization:projects:create',
+    title: 'Create organization projects',
+    group: 'Organization permissions',
+    permissions: ['organization_projects_create'],
+  },
+
+  // Project permissions
+  {
+    id: 'project:admin:read',
+    title: 'Read project admin settings',
+    group: 'Project permissions',
+    permissions: ['project_admin_read'],
+  },
+  {
+    id: 'project:admin:write',
+    title: 'Write project admin settings',
+    group: 'Project permissions',
+    permissions: ['project_admin_write'],
+  },
+  {
+    id: 'project:action_runs:read',
+    title: 'Read action runs',
+    group: 'Project permissions',
+    permissions: ['action_runs_read'],
+  },
+  {
+    id: 'project:action_runs:write',
+    title: 'Write action runs',
+    group: 'Project permissions',
+    permissions: ['action_runs_write'],
+  },
+  {
+    id: 'project:advisors:read',
     title: 'View project advisor recommendations',
-    basePermission: 'advisors',
-    actions: ['read'],
+    group: 'Project permissions',
+    permissions: ['advisors_read'],
   },
-  'project:api_gateway:keys': {
-    scope: 'project',
-    title: 'Manage API keys for the API gateway',
-    basePermission: 'api_gateway_keys',
-    actions: ['read', 'write'],
-  },
-  'project:auth:config': {
-    scope: 'project',
-    title: 'View or modify authentication settings',
-    basePermission: 'auth_config',
-    actions: ['read', 'write'],
-  },
-  'project:auth:signing_keys': {
-    scope: 'project',
-    title: 'Access or rotate signing keys',
-    basePermission: 'auth_signing_keys',
-    actions: ['read', 'write'],
-  },
-  'project:backups': {
-    scope: 'project',
-    title: 'View or trigger project backups',
-    basePermission: 'backups',
-    actions: ['read', 'write'],
-  },
-  'project:branching:development': {
-    scope: 'project',
-    title: 'Manage development branches',
-    basePermission: 'branching_development',
-    actions: ['read', 'write'],
-  },
-  'project:branching:production': {
-    scope: 'project',
-    title: 'Manage production branches',
-    basePermission: 'branching_production',
-    actions: ['read', 'write'],
-  },
-  'project:custom_domain': {
-    scope: 'project',
-    title: 'Manage custom domains',
-    basePermission: 'custom_domain',
-    actions: ['read', 'write'],
-  },
-  'project:data_api:config': {
-    scope: 'project',
-    title: 'Modify PostgREST behavior and settings',
-    basePermission: 'data_api_config',
-    actions: ['read', 'write'],
-  },
-  'project:database': {
-    scope: 'project',
-    title: 'Read and write access to database data',
-    basePermission: 'database',
-    actions: ['read', 'write'],
-  },
-  'project:database:config': {
-    scope: 'project',
-    title: 'Manage core database configuration',
-    basePermission: 'database_config',
-    actions: ['read', 'write'],
-  },
-  'project:database:network_bans': {
-    scope: 'project',
-    title: 'Manage banned IPs',
-    basePermission: 'database_network_bans',
-    actions: ['read', 'write'],
-  },
-  'project:database:network_restrictions': {
-    scope: 'project',
-    title: 'Set or modify network restrictions',
-    basePermission: 'database_network_restrictions',
-    actions: ['read', 'write'],
-  },
-  'project:database:migrations': {
-    scope: 'project',
-    title: 'Manage database migrations',
-    basePermission: 'database_migrations',
-    actions: ['read', 'write'],
-  },
-  'project:database:pooling_config': {
-    scope: 'project',
-    title: 'Configure database connection pooling',
-    basePermission: 'database_pooling_config',
-    actions: ['read', 'write'],
-  },
-  'project:database:readonly_config': {
-    scope: 'project',
-    title: 'Manage database read only mode',
-    basePermission: 'database_readonly_config',
-    actions: ['read', 'write'],
-  },
-  'project:database:ssl_config': {
-    scope: 'project',
-    title: 'Configure SSL for the database',
-    basePermission: 'database_ssl_config',
-    actions: ['read', 'write'],
-  },
-  'project:database:webhooks_config': {
-    scope: 'project',
-    title: 'Manage webhooks triggered from the database',
-    basePermission: 'database_webhooks_config',
-    actions: ['read', 'write'],
-  },
-  'project:edge_functions': {
-    scope: 'project',
-    title: 'Create and manage edge functions',
-    basePermission: 'edge_functions',
-    actions: ['read', 'write'],
-  },
-  'project:edge_functions:secrets': {
-    scope: 'project',
-    title: 'Manage secrets for edge functions',
-    basePermission: 'edge_functions_secrets',
-    actions: ['read', 'write'],
-  },
-  'project:infra:add_ons': {
-    scope: 'project',
-    title: 'Manage project infrastructure add-ons',
-    basePermission: 'infra_add_ons',
-    actions: ['read', 'write'],
-  },
-  'project:infra:read_replicas': {
-    scope: 'project',
-    title: 'Configure read replicas',
-    basePermission: 'infra_read_replicas',
-    actions: ['read', 'write'],
-  },
-  'project:snippets': {
-    scope: 'project',
-    title: 'Manage project code snippets',
-    basePermission: 'project_snippets',
-    actions: ['read', 'write'],
-  },
-  'project:storage': {
-    scope: 'project',
-    title: 'Read and write access to file storage',
-    basePermission: 'storage',
-    actions: ['read', 'write'],
-  },
-  'project:storage:config': {
-    scope: 'project',
-    title: 'Manage storage bucket configuration',
-    basePermission: 'storage_config',
-    actions: ['read', 'write'],
-  },
-  'project:telemetry:logs': {
-    scope: 'project',
+  {
+    id: 'project:telemetry:logs:read',
     title: 'View project log analytics',
-    basePermission: 'analytics_logs',
-    actions: ['read'],
+    group: 'Project permissions',
+    permissions: ['analytics_logs_read'],
   },
-  'project:telemetry:usage': {
-    scope: 'project',
+  {
+    id: 'project:telemetry:usage:read',
     title: 'Access usage analytics data',
-    basePermission: 'analytics_usage',
-    actions: ['read'],
-  },
-}
-
-function getPermissions(
-  basePermission: string,
-  action: ResourceAction
-): ScopedAccessTokenPermission[] {
-  if (basePermission === 'organizations' && action === 'write') {
-    const permissionString = `${basePermission}_create` as ScopedAccessTokenPermission
-    return [permissionString]
-  }
-
-  const permissionString = `${basePermission}_${action}` as ScopedAccessTokenPermission
-  return [permissionString]
-}
-
-export const PERMISSION_MAP: Record<
-  string,
-  Record<string, ScopedAccessTokenPermission[]>
-> = Object.entries(RESOURCE_CONFIGS).reduce(
-  (acc, [resourceKey, config]) => {
-    const hasRead = config.actions.includes('read')
-    const hasWrite = config.actions.includes('write')
-
-    acc[resourceKey] = {
-      'no access': [],
-    }
-
-    if (hasRead) {
-      acc[resourceKey].read = getPermissions(config.basePermission, 'read')
-    }
-
-    if (hasRead && hasWrite) {
-      acc[resourceKey]['read-write'] = [
-        ...getPermissions(config.basePermission, 'read'),
-        ...getPermissions(config.basePermission, 'write'),
-      ]
-    }
-
-    return acc
-  },
-  {} as Record<string, Record<string, ScopedAccessTokenPermission[]>>
-)
-
-export const PERMISSIONS_UI = [
-  {
-    name: 'User permissions',
-    resources: Object.entries(RESOURCE_CONFIGS)
-      .filter(([_, config]) => config.scope === 'user')
-      .map(([resource, config]) => {
-        const actions: AccessLevel[] = ['no access']
-        if (config.actions.includes('read')) {
-          actions.unshift('read')
-        }
-        if (config.actions.includes('read') && config.actions.includes('write')) {
-          actions.unshift('read-write')
-        }
-        return {
-          resource,
-          title: config.title,
-          actions,
-        }
-      }),
+    group: 'Project permissions',
+    permissions: ['analytics_usage_read'],
   },
   {
-    name: 'Organization permissions',
-    resources: Object.entries(RESOURCE_CONFIGS)
-      .filter(([_, config]) => config.scope === 'organization')
-      .map(([resource, config]) => {
-        const actions: AccessLevel[] = ['no access']
-        if (config.actions.includes('read')) {
-          actions.unshift('read')
-        }
-        if (config.actions.includes('read') && config.actions.includes('write')) {
-          actions.unshift('read-write')
-        }
-        return {
-          resource,
-          title: config.title,
-          actions,
-        }
-      }),
+    id: 'project:api_gateway:keys:read',
+    title: 'Read API keys for the API gateway',
+    group: 'Project permissions',
+    permissions: ['api_gateway_keys_read'],
   },
   {
-    name: 'Project permissions',
-    resources: Object.entries(RESOURCE_CONFIGS)
-      .filter(([_, config]) => config.scope === 'project')
-      .map(([resource, config]) => {
-        const actions: AccessLevel[] = ['no access']
-        if (config.actions.includes('read')) {
-          actions.unshift('read')
-        }
-        if (config.actions.includes('read') && config.actions.includes('write')) {
-          actions.unshift('read-write')
-        }
-        return {
-          resource,
-          title: config.title,
-          actions,
-        }
-      }),
+    id: 'project:api_gateway:keys:write',
+    title: 'Manage API keys for the API gateway',
+    group: 'Project permissions',
+    permissions: ['api_gateway_keys_write'],
+  },
+  {
+    id: 'project:auth:config:read',
+    title: 'Read authentication settings',
+    group: 'Project permissions',
+    permissions: ['auth_config_read'],
+  },
+  {
+    id: 'project:auth:config:write',
+    title: 'Modify authentication settings',
+    group: 'Project permissions',
+    permissions: ['auth_config_write'],
+  },
+  {
+    id: 'project:auth:signing_keys:read',
+    title: 'Read signing keys',
+    group: 'Project permissions',
+    permissions: ['auth_signing_keys_read'],
+  },
+  {
+    id: 'project:auth:signing_keys:write',
+    title: 'Access or rotate signing keys',
+    group: 'Project permissions',
+    permissions: ['auth_signing_keys_write'],
+  },
+  {
+    id: 'project:backups:read',
+    title: 'View project backups',
+    group: 'Project permissions',
+    permissions: ['backups_read'],
+  },
+  {
+    id: 'project:backups:write',
+    title: 'Trigger project backups',
+    group: 'Project permissions',
+    permissions: ['backups_write'],
+  },
+  {
+    id: 'project:branching:development:read',
+    title: 'Read development branches',
+    group: 'Project permissions',
+    permissions: ['branching_development_read'],
+  },
+  {
+    id: 'project:branching:development:write',
+    title: 'Write development branches',
+    group: 'Project permissions',
+    permissions: ['branching_development_write'],
+  },
+  {
+    id: 'project:branching:development:create',
+    title: 'Create development branches',
+    group: 'Project permissions',
+    permissions: ['branching_development_create'],
+  },
+  {
+    id: 'project:branching:development:delete',
+    title: 'Delete development branches',
+    group: 'Project permissions',
+    permissions: ['branching_development_delete'],
+  },
+  {
+    id: 'project:branching:production:read',
+    title: 'Read production branches',
+    group: 'Project permissions',
+    permissions: ['branching_production_read'],
+  },
+  {
+    id: 'project:branching:production:write',
+    title: 'Write production branches',
+    group: 'Project permissions',
+    permissions: ['branching_production_write'],
+  },
+  {
+    id: 'project:branching:production:create',
+    title: 'Create production branches',
+    group: 'Project permissions',
+    permissions: ['branching_production_create'],
+  },
+  {
+    id: 'project:branching:production:delete',
+    title: 'Delete production branches',
+    group: 'Project permissions',
+    permissions: ['branching_production_delete'],
+  },
+  {
+    id: 'project:custom_domain:read',
+    title: 'Read custom domains',
+    group: 'Project permissions',
+    permissions: ['custom_domain_read'],
+  },
+  {
+    id: 'project:custom_domain:write',
+    title: 'Manage custom domains',
+    group: 'Project permissions',
+    permissions: ['custom_domain_write'],
+  },
+  {
+    id: 'project:data_api:config:read',
+    title: 'Read PostgREST behavior and settings',
+    group: 'Project permissions',
+    permissions: ['data_api_config_read'],
+  },
+  {
+    id: 'project:data_api:config:write',
+    title: 'Modify PostgREST behavior and settings',
+    group: 'Project permissions',
+    permissions: ['data_api_config_write'],
+  },
+  {
+    id: 'project:database:read',
+    title: 'Read database data',
+    group: 'Project permissions',
+    permissions: ['database_read'],
+  },
+  {
+    id: 'project:database:write',
+    title: 'Write database data',
+    group: 'Project permissions',
+    permissions: ['database_write'],
+  },
+  {
+    id: 'project:database:config:read',
+    title: 'Read core database configuration',
+    group: 'Project permissions',
+    permissions: ['database_config_read'],
+  },
+  {
+    id: 'project:database:config:write',
+    title: 'Manage core database configuration',
+    group: 'Project permissions',
+    permissions: ['database_config_write'],
+  },
+  {
+    id: 'project:database:jit:read',
+    title: 'Read database JIT settings',
+    group: 'Project permissions',
+    permissions: ['database_jit_read'],
+  },
+  {
+    id: 'project:database:jit:write',
+    title: 'Write database JIT settings',
+    group: 'Project permissions',
+    permissions: ['database_jit_write'],
+  },
+  {
+    id: 'project:database:network_bans:read',
+    title: 'Read banned IPs',
+    group: 'Project permissions',
+    permissions: ['database_network_bans_read'],
+  },
+  {
+    id: 'project:database:network_bans:write',
+    title: 'Manage banned IPs',
+    group: 'Project permissions',
+    permissions: ['database_network_bans_write'],
+  },
+  {
+    id: 'project:database:network_restrictions:read',
+    title: 'Read network restrictions',
+    group: 'Project permissions',
+    permissions: ['database_network_restrictions_read'],
+  },
+  {
+    id: 'project:database:network_restrictions:write',
+    title: 'Set or modify network restrictions',
+    group: 'Project permissions',
+    permissions: ['database_network_restrictions_write'],
+  },
+  {
+    id: 'project:database:migrations:read',
+    title: 'Read database migrations',
+    group: 'Project permissions',
+    permissions: ['database_migrations_read'],
+  },
+  {
+    id: 'project:database:migrations:write',
+    title: 'Manage database migrations',
+    group: 'Project permissions',
+    permissions: ['database_migrations_write'],
+  },
+  {
+    id: 'project:database:pooling_config:read',
+    title: 'Read database connection pooling',
+    group: 'Project permissions',
+    permissions: ['database_pooling_config_read'],
+  },
+  {
+    id: 'project:database:pooling_config:write',
+    title: 'Configure database connection pooling',
+    group: 'Project permissions',
+    permissions: ['database_pooling_config_write'],
+  },
+  {
+    id: 'project:database:readonly_config:read',
+    title: 'Read database read only mode',
+    group: 'Project permissions',
+    permissions: ['database_readonly_config_read'],
+  },
+  {
+    id: 'project:database:readonly_config:write',
+    title: 'Manage database read only mode',
+    group: 'Project permissions',
+    permissions: ['database_readonly_config_write'],
+  },
+  {
+    id: 'project:database:ssl_config:read',
+    title: 'Read SSL configuration',
+    group: 'Project permissions',
+    permissions: ['database_ssl_config_read'],
+  },
+  {
+    id: 'project:database:ssl_config:write',
+    title: 'Configure SSL for the database',
+    group: 'Project permissions',
+    permissions: ['database_ssl_config_write'],
+  },
+  {
+    id: 'project:database:webhooks_config:read',
+    title: 'Read webhooks triggered from the database',
+    group: 'Project permissions',
+    permissions: ['database_webhooks_config_read'],
+  },
+  {
+    id: 'project:database:webhooks_config:write',
+    title: 'Manage webhooks triggered from the database',
+    group: 'Project permissions',
+    permissions: ['database_webhooks_config_write'],
+  },
+  {
+    id: 'project:edge_functions:read',
+    title: 'Read edge functions',
+    group: 'Project permissions',
+    permissions: ['edge_functions_read'],
+  },
+  {
+    id: 'project:edge_functions:write',
+    title: 'Create and manage edge functions',
+    group: 'Project permissions',
+    permissions: ['edge_functions_write'],
+  },
+  {
+    id: 'project:edge_functions:secrets:read',
+    title: 'Read secrets for edge functions',
+    group: 'Project permissions',
+    permissions: ['edge_functions_secrets_read'],
+  },
+  {
+    id: 'project:edge_functions:secrets:write',
+    title: 'Manage secrets for edge functions',
+    group: 'Project permissions',
+    permissions: ['edge_functions_secrets_write'],
+  },
+  {
+    id: 'project:infra:add_ons:read',
+    title: 'Read project infrastructure add-ons',
+    group: 'Project permissions',
+    permissions: ['infra_add_ons_read'],
+  },
+  {
+    id: 'project:infra:add_ons:write',
+    title: 'Manage project infrastructure add-ons',
+    group: 'Project permissions',
+    permissions: ['infra_add_ons_write'],
+  },
+  {
+    id: 'project:infra:disk_config:read',
+    title: 'Read disk configuration',
+    group: 'Project permissions',
+    permissions: ['infra_disk_config_read'],
+  },
+  {
+    id: 'project:infra:disk_config:write',
+    title: 'Write disk configuration',
+    group: 'Project permissions',
+    permissions: ['infra_disk_config_write'],
+  },
+  {
+    id: 'project:infra:read_replicas:read',
+    title: 'Read read replicas configuration',
+    group: 'Project permissions',
+    permissions: ['infra_read_replicas_read'],
+  },
+  {
+    id: 'project:infra:read_replicas:write',
+    title: 'Configure read replicas',
+    group: 'Project permissions',
+    permissions: ['infra_read_replicas_write'],
+  },
+  {
+    id: 'project:snippets:read',
+    title: 'Read project code snippets',
+    group: 'Project permissions',
+    permissions: ['project_snippets_read'],
+  },
+  {
+    id: 'project:snippets:write',
+    title: 'Manage project code snippets',
+    group: 'Project permissions',
+    permissions: ['project_snippets_write'],
+  },
+  {
+    id: 'project:storage:read',
+    title: 'Read file storage',
+    group: 'Project permissions',
+    permissions: ['storage_read'],
+  },
+  {
+    id: 'project:storage:write',
+    title: 'Write file storage',
+    group: 'Project permissions',
+    permissions: ['storage_write'],
+  },
+  {
+    id: 'project:storage:config:read',
+    title: 'Read storage bucket configuration',
+    group: 'Project permissions',
+    permissions: ['storage_config_read'],
+  },
+  {
+    id: 'project:storage:config:write',
+    title: 'Manage storage bucket configuration',
+    group: 'Project permissions',
+    permissions: ['storage_config_write'],
+  },
+  {
+    id: 'project:vanity_subdomain:read',
+    title: 'Read vanity subdomain',
+    group: 'Project permissions',
+    permissions: ['vanity_subdomain_read'],
+  },
+  {
+    id: 'project:vanity_subdomain:write',
+    title: 'Write vanity subdomain',
+    group: 'Project permissions',
+    permissions: ['vanity_subdomain_write'],
   },
 ]
 
-export const ACCESS_TOKEN_PERMISSIONS = PERMISSIONS_UI
+export const PERMISSIONS_UI = (() => {
+  const groups = ['User permissions', 'Organization permissions', 'Project permissions'] as const
+
+  return groups.map((groupName) => {
+    const resourceMap = new Map<
+      string,
+      { resource: string; title: string; actions: string[] }
+    >()
+
+    PERMISSION_OPTIONS.filter((p) => p.group === groupName).forEach((option) => {
+      const parts = option.id.split(':')
+      const scope = parts[0]
+      const resourceParts = parts.slice(1, -1)
+      const action = parts[parts.length - 1]
+
+      const resourceKey = [scope, ...resourceParts].join(':')
+
+      if (!resourceMap.has(resourceKey)) {
+        
+
+        resourceMap.set(resourceKey, {
+          resource: resourceKey,
+          title: option.title,
+          actions: ['no access'],
+        })
+      }
+
+      const resource = resourceMap.get(resourceKey)!
+      if (!resource.actions.includes(action)) {
+        resource.actions.push(action)
+      }
+    })
+
+    return {
+      name: groupName,
+      resources: Array.from(resourceMap.values()),
+    }
+  })
+})()
 
 export const mapPermissionToFGA = (
   resource: string,
   action: string
 ): ScopedAccessTokenPermission[] => {
-  return PERMISSION_MAP[resource]?.[action] || []
+  const optionId = `${resource}:${action}`
+  const option = PERMISSION_OPTIONS.find((o) => o.id === optionId)
+  return option?.permissions || []
+}
+
+export const ACCESS_TOKEN_PERMISSIONS = PERMISSIONS_UI
+
+export const getResourcePermissions = (
+  resource: string
+): Record<string, ScopedAccessTokenPermission[]> => {
+  const result: Record<string, ScopedAccessTokenPermission[]> = {
+    'no access': [],
+  }
+
+  PERMISSION_OPTIONS.filter((option) => {
+    const parts = option.id.split(':')
+    const optionResource = parts.slice(0, -1).join(':')
+    return optionResource === resource
+  }).forEach((option) => {
+    const action = option.id.split(':').pop()!
+    if (!result[action]) {
+      result[action] = []
+    }
+    result[action].push(...option.permissions)
+  })
+
+  if (result['read'] && result['write']) {
+    result['read-write'] = [...result['read'], ...result['write']]
+  }
+
+  return result
 }
