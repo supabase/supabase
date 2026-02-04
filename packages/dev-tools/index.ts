@@ -21,7 +21,7 @@ const noopContext: DevTelemetryToolbarContextType = {
 
 export const DevToolbarProvider =
   process.env.NODE_ENV !== 'development'
-    ? ({ children }: { children: ReactNode }) => children
+    ? ({ children }: { children: ReactNode; apiUrl?: string }) => children
     : DevToolbarContextModule.DevToolbarProvider
 
 export const useDevToolbar =
