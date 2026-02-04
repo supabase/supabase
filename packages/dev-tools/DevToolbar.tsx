@@ -5,7 +5,6 @@ import { Activity, ChevronDown, ChevronUp, Flag } from 'lucide-react'
 import {
   type ChangeEvent,
   type Dispatch,
-  type KeyboardEvent,
   type SetStateAction,
   useCallback,
   useEffect,
@@ -50,23 +49,14 @@ function EventCard({ event }: { event: DevTelemetryEvent }) {
 
   const handleToggle = () => setIsExpanded((prev) => !prev)
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleToggle()
-    }
-  }
-
   return (
     <div className="border rounded-md p-3 bg-surface-100">
-      <div
-        role="button"
-        tabIndex={0}
+      <button
+        type="button"
         aria-expanded={isExpanded}
         aria-label={`${event.eventName} event details`}
-        className="flex items-start justify-between cursor-pointer gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
+        className="flex items-start justify-between cursor-pointer gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm w-full text-left"
         onClick={handleToggle}
-        onKeyDown={handleKeyDown}
       >
         <div className="flex flex-col gap-1 min-w-0 flex-1">
           <div className="flex items-start gap-2 flex-wrap">
@@ -93,7 +83,7 @@ function EventCard({ event }: { event: DevTelemetryEvent }) {
           </span>
           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </div>
-      </div>
+      </button>
 
       {isExpanded && (
         <pre className="mt-3 p-2 bg-surface-200 rounded text-xs overflow-x-auto max-h-[300px] overflow-y-auto">
@@ -331,113 +321,107 @@ export function DevToolbar() {
             </TabsTrigger>
           </TabsList>
 
-          {activeTab === 'events' && (
-            <div className="flex-1 min-h-0 flex flex-col">
-              <div className="flex items-center gap-4 pb-4 shrink-0">
-                <Input
-                  placeholder="Filter events..."
-                  value={eventFilter}
-                  onChange={(e) => setEventFilter(e.target.value)}
-                  className="flex-1"
-                />
-                <Button type="outline" onClick={() => setEvents([])}>
-                  Clear
+          <TabsContent value="events" className="flex-1 min-h-0 flex flex-col mt-0">
+            <div className="flex items-center gap-4 pb-4 shrink-0">
+              <Input
+                placeholder="Filter events..."
+                value={eventFilter}
+                onChange={(e) => setEventFilter(e.target.value)}
+                className="flex-1"
+              />
+              <Button type="outline" onClick={() => setEvents([])}>
+                Clear
+              </Button>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pb-6">
+              {filteredEvents.length === 0 ? (
+                <div className="text-center text-foreground-muted py-8">
+                  No events yet. Interact with the app to see telemetry events.
+                </div>
+              ) : (
+                filteredEvents.map((event) => (
+                  <EventCard key={`${event.source}-${event.id}`} event={event} />
+                ))
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="flags" className="flex-1 min-h-0 flex flex-col mt-0">
+            {totalOverrideCount > 0 && (
+              <div className="flex items-center justify-between p-3 bg-warning/10 rounded-md mb-4 shrink-0">
+                <span className="text-sm text-warning">
+                  {totalOverrideCount} flag(s) overridden
+                  {phOverrideCount > 0 && ccOverrideCount > 0
+                    ? ` (${phOverrideCount} PostHog, ${ccOverrideCount} ConfigCat)`
+                    : ''}
+                </span>
+                <Button type="outline" onClick={clearAllOverrides}>
+                  Clear & Reload
                 </Button>
               </div>
+            )}
 
-              <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pb-6">
-                {filteredEvents.length === 0 ? (
-                  <div className="text-center text-foreground-muted py-8">
-                    No events yet. Interact with the app to see telemetry events.
-                  </div>
-                ) : (
-                  filteredEvents.map((event) => (
-                    <EventCard key={`${event.source}-${event.id}`} event={event} />
-                  ))
-                )}
-              </div>
-            </div>
-          )}
+            <Tabs
+              value={flagsSubTab}
+              onValueChange={(v) => setFlagsSubTab(v as 'posthog' | 'configcat')}
+              className="flex-1 flex flex-col min-h-0"
+            >
+              <TabsList className="shrink-0 mb-4">
+                <TabsTrigger value="posthog" className="px-4">
+                  PostHog {phOverrideCount > 0 && `(${phOverrideCount})`}
+                </TabsTrigger>
+                <TabsTrigger value="configcat" className="px-4">
+                  ConfigCat {ccOverrideCount > 0 && `(${ccOverrideCount})`}
+                </TabsTrigger>
+              </TabsList>
 
-          {activeTab === 'flags' && (
-            <div className="flex-1 min-h-0 flex flex-col">
-              {totalOverrideCount > 0 && (
-                <div className="flex items-center justify-between p-3 bg-warning/10 rounded-md mb-4 shrink-0">
-                  <span className="text-sm text-warning">
-                    {totalOverrideCount} flag(s) overridden
-                    {phOverrideCount > 0 && ccOverrideCount > 0
-                      ? ` (${phOverrideCount} PostHog, ${ccOverrideCount} ConfigCat)`
-                      : ''}
-                  </span>
-                  <Button type="outline" onClick={clearAllOverrides}>
-                    Clear & Reload
-                  </Button>
-                </div>
-              )}
-
-              <Tabs
-                value={flagsSubTab}
-                onValueChange={(v) => setFlagsSubTab(v as 'posthog' | 'configcat')}
-                className="flex-1 flex flex-col min-h-0"
-              >
-                <TabsList className="shrink-0 mb-4">
-                  <TabsTrigger value="posthog" className="px-4">
-                    PostHog {phOverrideCount > 0 && `(${phOverrideCount})`}
-                  </TabsTrigger>
-                  <TabsTrigger value="configcat" className="px-4">
-                    ConfigCat {ccOverrideCount > 0 && `(${ccOverrideCount})`}
-                  </TabsTrigger>
-                </TabsList>
-
-                <div className="flex-1 min-h-0 overflow-y-auto pb-6">
-                  {flagsSubTab === 'posthog' && (
-                    <div className="space-y-4">
-                      {Object.keys(posthogFlags).length === 0 ? (
-                        <div className="text-center text-foreground-muted py-8">
-                          No PostHog feature flags loaded yet.
-                        </div>
-                      ) : (
-                        Object.entries(posthogFlags).map(([flagName, flagValue]) => (
-                          <FlagCard
-                            key={flagName}
-                            flagName={flagName}
-                            currentValue={
-                              phFlagOverrides[flagName] ?? phFlagOriginals[flagName] ?? flagValue
-                            }
-                            originalValue={phFlagOriginals[flagName] ?? flagValue}
-                            isOverridden={flagName in phFlagOverrides}
-                            onToggle={(value) => togglePhFlagOverride(flagName, value)}
-                          />
-                        ))
-                      )}
+              <TabsContent value="posthog" className="flex-1 min-h-0 overflow-y-auto pb-6 mt-0">
+                <div className="space-y-4">
+                  {Object.keys(posthogFlags).length === 0 ? (
+                    <div className="text-center text-foreground-muted py-8">
+                      No PostHog feature flags loaded yet.
                     </div>
-                  )}
-                  {flagsSubTab === 'configcat' && (
-                    <div className="space-y-4">
-                      {Object.keys(configcatFlags).length === 0 ? (
-                        <div className="text-center text-foreground-muted py-8">
-                          No ConfigCat feature flags loaded yet.
-                        </div>
-                      ) : (
-                        Object.entries(configcatFlags).map(([flagName, flagValue]) => (
-                          <FlagCard
-                            key={flagName}
-                            flagName={flagName}
-                            currentValue={
-                              ccFlagOverrides[flagName] ?? ccFlagOriginals[flagName] ?? flagValue
-                            }
-                            originalValue={ccFlagOriginals[flagName] ?? flagValue}
-                            isOverridden={flagName in ccFlagOverrides}
-                            onToggle={(value) => toggleCcFlagOverride(flagName, value)}
-                          />
-                        ))
-                      )}
-                    </div>
+                  ) : (
+                    Object.entries(posthogFlags).map(([flagName, flagValue]) => (
+                      <FlagCard
+                        key={flagName}
+                        flagName={flagName}
+                        currentValue={
+                          phFlagOverrides[flagName] ?? phFlagOriginals[flagName] ?? flagValue
+                        }
+                        originalValue={phFlagOriginals[flagName] ?? flagValue}
+                        isOverridden={flagName in phFlagOverrides}
+                        onToggle={(value) => togglePhFlagOverride(flagName, value)}
+                      />
+                    ))
                   )}
                 </div>
-              </Tabs>
-            </div>
-          )}
+              </TabsContent>
+              <TabsContent value="configcat" className="flex-1 min-h-0 overflow-y-auto pb-6 mt-0">
+                <div className="space-y-4">
+                  {Object.keys(configcatFlags).length === 0 ? (
+                    <div className="text-center text-foreground-muted py-8">
+                      No ConfigCat feature flags loaded yet.
+                    </div>
+                  ) : (
+                    Object.entries(configcatFlags).map(([flagName, flagValue]) => (
+                      <FlagCard
+                        key={flagName}
+                        flagName={flagName}
+                        currentValue={
+                          ccFlagOverrides[flagName] ?? ccFlagOriginals[flagName] ?? flagValue
+                        }
+                        originalValue={ccFlagOriginals[flagName] ?? flagValue}
+                        isOverridden={flagName in ccFlagOverrides}
+                        onToggle={(value) => toggleCcFlagOverride(flagName, value)}
+                      />
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
         </Tabs>
       </SheetContent>
     </Sheet>

@@ -197,17 +197,6 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
 }
 
 export function useDevToolbar() {
-  if (!IS_LOCAL_DEV) {
-    return {
-      isEnabled: false,
-      isOpen: false,
-      setIsOpen: () => {},
-      events: [],
-      setEvents: () => {},
-      dismissToolbar: () => {},
-    }
-  }
-
   const context = useContext(DevToolbarContext)
   if (!context) {
     return {

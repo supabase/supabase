@@ -18,7 +18,7 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-vi.mock('next/navigation', () => require('next-router-mock'))
+vi.mock('next/navigation', () => require('next-router-mock/navigation'))
 
 afterEach(() => {
   cleanup()
