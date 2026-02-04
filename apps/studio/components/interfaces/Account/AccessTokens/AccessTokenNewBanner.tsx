@@ -1,5 +1,5 @@
 import { X, ChevronDown, ChevronRight } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { Button, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
@@ -9,6 +9,7 @@ import {
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { ACCESS_TOKEN_PERMISSIONS, getResourcePermissions } from './AccessToken.constants'
 
 interface AccessTokenNewBannerProps<T> {
   token: T
@@ -33,6 +34,77 @@ export const AccessTokenNewBanner = <T,>({
   const [permissionsOpen, setPermissionsOpen] = useState(false)
   const shouldCollapse = permissions && permissions.length > PERMISSIONS_COLLAPSE_THRESHOLD
 
+  const getRealAccess = (resource: string, tokenPermissions: string[]) => {
+    const hasPermission = (permission: string) => tokenPermissions.includes(permission)
+
+    // Get the permissions for this resource from PERMISSION_MAP
+    const resourcePermissions = getResourcePermissions(resource)
+    if (!resourcePermissions) {
+      return 'no access'
+    }
+
+    // Check what permissions the token has for this resource
+    const hasRead = resourcePermissions['read']?.some((p) => hasPermission(p)) || false
+    const hasWrite = resourcePermissions['write']?.some((p) => hasPermission(p)) || false
+    const hasCreate = resourcePermissions['create']?.some((p) => hasPermission(p)) || false
+    const hasDelete = resourcePermissions['delete']?.some((p) => hasPermission(p)) || false
+
+    const actions: string[] = []
+    if (hasRead) actions.push('read')
+    if (hasWrite) actions.push('write')
+    if (hasCreate) actions.push('create')
+    if (hasDelete) actions.push('delete')
+
+    if (actions.length === 0) {
+      return 'no access'
+    } else if (actions.length === 1) {
+      return actions[0]
+    } else if (hasRead && hasWrite && actions.length === 2) {
+      return 'read-write'
+    } else {
+      return actions.join('-')
+    }
+  }
+
+  const formatAccessText = (access: string) => {
+    switch (access) {
+      case 'read-write':
+        return 'Read-write'
+      case 'read only':
+        return 'Read only'
+      case 'no access':
+        return 'No access'
+      default:
+        return access.charAt(0).toUpperCase() + access.slice(1)
+    }
+  }
+
+  const groupedPermissionsByAccess = useMemo(() => {
+    const grouped: Record<string, string[]> = {}
+
+    if (!permissions || permissions.length === 0) {
+      return grouped
+    }
+
+    ACCESS_TOKEN_PERMISSIONS.resources.forEach((resource) => {
+      const access = getRealAccess(resource.resource, permissions)
+      if (access !== 'no access') {
+        const formattedAccess = formatAccessText(access)
+        if (!grouped[formattedAccess]) {
+          grouped[formattedAccess] = []
+        }
+        grouped[formattedAccess].push(resource.title)
+      }
+    })
+
+    return grouped
+  }, [permissions])
+
+  const totalGroupedPermissions = Object.values(groupedPermissionsByAccess).reduce(
+    (sum, resources) => sum + resources.length,
+    0
+  )
+
   return (
     <Card className="mb-6">
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 relative">
@@ -55,7 +127,7 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => {}}
+            onChange={() => { }}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>
@@ -72,14 +144,25 @@ export const AccessTokenNewBanner = <T,>({
                   >
                     <div className="flex items-center gap-1.5">
                       {permissionsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                      <span>Permissions assigned to this token ({permissions.length})</span>
+                      <span>
+                        Permissions assigned to this token ({totalGroupedPermissions})
+                      </span>
                     </div>
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-3 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                  <div className="flex flex-wrap gap-2">
-                    {permissions.map((permission) => (
-                      <Badge key={permission}>{permission}</Badge>
+                  <div className="space-y-4">
+                    {Object.entries(groupedPermissionsByAccess).map(([accessLevel, resources]) => (
+                      <div key={accessLevel} className="space-y-2">
+                        <h4 className="text-xs text-foreground-light font-mono uppercase tracking-wide">
+                          {accessLevel}
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {resources.map((resource) => (
+                            <Badge key={`${accessLevel}-${resource}`}>{resource}</Badge>
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </CollapsibleContent>
@@ -87,9 +170,18 @@ export const AccessTokenNewBanner = <T,>({
             ) : (
               <>
                 <h3 className="text-sm font-medium mb-3">Permissions assigned to this token:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {permissions.map((permission) => (
-                    <Badge key={permission}>{permission}</Badge>
+                <div className="space-y-4">
+                  {Object.entries(groupedPermissionsByAccess).map(([accessLevel, resources]) => (
+                    <div key={accessLevel} className="space-y-2">
+                      <h4 className="text-xs text-foreground-light font-mono uppercase tracking-wide">
+                        {accessLevel}
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {resources.map((resource) => (
+                          <Badge key={`${accessLevel}-${resource}`}>{resource}</Badge>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </>
