@@ -4,7 +4,9 @@ import { normalizeSlug } from './get-next-page'
 /**
  * Gets the current chapter number from a doc
  */
-export function getCurrentChapter(slug: string): { chapterNumber?: number; completionMessage?: string } | null {
+export function getCurrentChapter(
+  slug: string
+): { chapterNumber?: number; completionMessage?: string } | null {
   const normalizedSlug = normalizeSlug(slug)
   const doc = allDocs.find((doc) => normalizeSlug(doc.slugAsParams) === normalizedSlug)
 
@@ -32,4 +34,3 @@ export function getCurrentChapter(slug: string): { chapterNumber?: number; compl
     completionMessage,
   }
 }
-

@@ -16,7 +16,12 @@ export function FrameworkProvider({ children }: { children: React.ReactNode }) {
   // Initialize from localStorage on mount (client-side only)
   useEffect(() => {
     const storedCourse = localStorage.getItem('preferredCourse')
-    const validCourses: Course[] = ['foundations', 'smart-office', 'performance-scaling', 'debugging-operations']
+    const validCourses: Course[] = [
+      'foundations',
+      'smart-office',
+      'performance-scaling',
+      'debugging-operations',
+    ]
     if (storedCourse && validCourses.includes(storedCourse as Course)) {
       setCourseState(storedCourse as Course)
     }

@@ -36,4 +36,3 @@ export function NextUp({ title, description, href, chapterNumber }: NextUpProps)
     </div>
   )
 }
-

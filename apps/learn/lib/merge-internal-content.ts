@@ -76,14 +76,10 @@ export function mergeInternalContentIntoSections(
 
       return {
         ...parentItem,
-        items: [
-          ...parentItem.items,
-          internalResourcesHeading,
-        ],
+        items: [...parentItem.items, internalResourcesHeading],
       }
     }
 
     return parentItem
   })
 }
-

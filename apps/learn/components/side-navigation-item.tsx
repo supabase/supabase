@@ -23,7 +23,14 @@ interface NavigationItemProps
   isLoggedIn?: boolean
 }
 
-const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 0, internalPaths, isLoggedIn = true, ...props }) => {
+const NavigationItem: React.FC<NavigationItemProps> = ({
+  item,
+  onClick,
+  level = 0,
+  internalPaths,
+  isLoggedIn = true,
+  ...props
+}) => {
   const { setOpen } = useMobileMenu()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
@@ -78,8 +85,8 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
     isActive
       ? 'bg-surface-200 text-foreground'
       : hasChildren && isOpen
-      ? 'bg-surface-100 text-foreground'
-      : 'text-foreground-lighter hover:bg-surface-100 hover:text-foreground'
+        ? 'bg-surface-100 text-foreground'
+        : 'text-foreground-lighter hover:bg-surface-100 hover:text-foreground'
   )
 
   return (
@@ -88,10 +95,7 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
         <>
           <button
             onClick={handleButtonClick}
-            className={cn(
-              'w-full flex items-center justify-between gap-2 zans',
-              itemClasses
-            )}
+            className={cn('w-full flex items-center justify-between gap-2 zans', itemClasses)}
           >
             <span className="flex items-center gap-2 flex-1 min-w-0">
               {item.title}
@@ -125,12 +129,7 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 
         </>
       ) : (
         <>
-          <Link
-            href={href || '#'}
-            {...props}
-            onClick={handleLinkClick}
-            className={itemClasses}
-          >
+          <Link href={href || '#'} {...props} onClick={handleLinkClick} className={itemClasses}>
             <span className="flex items-center gap-2">
               <span className="truncate">{item.title}</span>
               {item.new && (
