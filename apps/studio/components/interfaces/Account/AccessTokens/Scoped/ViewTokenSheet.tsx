@@ -94,25 +94,26 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     }
   }
 
-  const groupResourcesByAccess = (resources: PermissionResource[]) => {
-    const grouped = {
-      'Read only': [] as string[],
-      'Read-write': [] as string[],
-      'No access': [] as string[],
-    }
+  const groupedResourcesByAccess = useMemo(() => {
+    const grouped: Record<string, string[]> = {}
 
     if (!token?.permissions) {
       return grouped
     }
 
-    resources.forEach((resource) => {
+    ACCESS_TOKEN_PERMISSIONS.resources.forEach((resource) => {
       const access = getRealAccess(resource.resource, token.permissions)
-      const formattedAccess = formatAccessText(access)
-      grouped[formattedAccess as keyof typeof grouped].push(resource.title)
+      if (access !== 'no access') {
+        const formattedAccess = formatAccessText(access)
+        if (!grouped[formattedAccess]) {
+          grouped[formattedAccess] = []
+        }
+        grouped[formattedAccess].push(resource.title)
+      }
     })
 
     return grouped
-  }
+  }, [token?.permissions])
 
   const getResourceAccessInfo = () => {
     const resources: Array<{ name: string; type: string; identifier: string }> = []
@@ -293,53 +294,53 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                     </Card>
                   </div>
 
-                  {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => {
-                    const groupedResources = groupResourcesByAccess(permissionGroup.resources)
-
-                    return (
-                      <div key={permissionGroup.name} className="space-y-3">
-                        <h3 className="text-sm font-medium text-foreground">
-                          {permissionGroup.name}
-                        </h3>
-                        <Card className="w-full overflow-hidden bg-surface-100">
-                          <CardContent className="p-0">
-                            <Table className="p-5 table-auto">
-                              <TableHeader>
-                                <TableRow className="bg-200">
-                                  <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[60%]">
-                                    Permission
-                                  </TableHead>
-                                  <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                                    Access
-                                  </TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {Object.entries(groupedResources).map(
-                                  ([accessLevel, resources]) => {
-                                    if (resources.length === 0) return null
-
-                                    return resources.map((resource) => (
-                                      <TableRow key={`${accessLevel}-${resource}`}>
-                                        <TableCell>
-                                          <p className="truncate text-foreground">{resource}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                          <span className="text-foreground-light">
-                                            {accessLevel}
-                                          </span>
-                                        </TableCell>
-                                      </TableRow>
-                                    ))
-                                  }
-                                )}
-                              </TableBody>
-                            </Table>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    )
-                  })}
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-foreground">Permissions</h3>
+                    <Card className="w-full overflow-hidden bg-surface-100">
+                      <CardContent className="p-0">
+                        <Table className="p-5 table-auto">
+                          <TableHeader>
+                            <TableRow className="bg-200">
+                              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[60%]">
+                                Permission
+                              </TableHead>
+                              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                                Access
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {Object.keys(groupedResourcesByAccess).length === 0 ? (
+                              <TableRow>
+                                <TableCell colSpan={2}>
+                                  <p className="text-foreground-light text-center py-4">
+                                    No permissions configured for this token.
+                                  </p>
+                                </TableCell>
+                              </TableRow>
+                            ) : (
+                              Object.entries(groupedResourcesByAccess).map(
+                                ([accessLevel, resources]) => {
+                                  return resources.map((resource) => (
+                                    <TableRow key={`${accessLevel}-${resource}`}>
+                                      <TableCell>
+                                        <p className="truncate text-foreground">{resource}</p>
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className="text-foreground-light">
+                                          {accessLevel}
+                                        </span>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))
+                                }
+                              )
+                            )}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </>
               )}
             </div>

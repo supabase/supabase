@@ -35,18 +35,9 @@ export interface PermissionResource {
   actions: string[]
 }
 
-interface PermissionGroup {
-  name: string
-  resources: PermissionResource[]
-}
-
 export interface PermissionRow {
   resource: string
   action: string
-}
-
-interface AllResource extends PermissionResource {
-  group: string
 }
 
 export interface PermissionsFormValues extends FieldValues {
@@ -60,15 +51,12 @@ interface PermissionsProps<TFormValues extends PermissionsFormValues = Permissio
   setResourceSearchOpen: (open: boolean) => void
 }
 
-const createAllResources = (permissionGroups: PermissionGroup[]): AllResource[] => {
-  return permissionGroups.flatMap((group) =>
-    group.resources.map((resource) => ({
-      resource: resource.resource,
-      title: resource.title,
-      actions: resource.actions,
-      group: group.name,
-    }))
-  )
+const createAllResources = (permissionGroup: { name: string; resources: PermissionResource[] }): PermissionResource[] => {
+  return permissionGroup.resources.map((resource) => ({
+    resource: resource.resource,
+    title: resource.title,
+    actions: resource.actions,
+  }))
 }
 
 interface PermissionResourceSelectorProps<TFormValues extends PermissionsFormValues> {
@@ -76,7 +64,7 @@ interface PermissionResourceSelectorProps<TFormValues extends PermissionsFormVal
   onOpenChange: (open: boolean) => void
   permissionRows: PermissionRow[]
   setValue: UseFormSetValue<TFormValues>
-  allResources: AllResource[]
+  allResources: PermissionResource[]
   align?: 'center' | 'end' | 'start'
 }
 
@@ -92,7 +80,6 @@ const getBestAction = (actions: string[]): string => {
     }
   }
 
-  // If no priority action found, return the first available (excluding 'no access')
   return availableActions[0]
 }
 
@@ -111,21 +98,18 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
   onOpenChange,
   permissionRows,
   setValue,
-  allResources,
   align = 'center',
 }: PermissionResourceSelectorProps<TFormValues>) => {
   const handleToggleResource = (resource: PermissionResource) => {
     const isAlreadyAdded = permissionRows.some((row) => row.resource === resource.resource)
 
     if (isAlreadyAdded) {
-      // Remove the resource
       const newRows = permissionRows.filter((row) => row.resource !== resource.resource)
       setValue(
         'permissionRows' as Path<TFormValues>,
         newRows as PathValue<TFormValues, Path<TFormValues>>
       )
     } else {
-      // Add the resource with default action
       const defaultAction = getBestAction(resource.actions)
       const newRows: PermissionRow[] = [
         ...permissionRows,
@@ -152,39 +136,33 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
             <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
 
             <ScrollArea className="max-h-[200px] overflow-y-scroll">
-              {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => (
-                <CommandGroup_Shadcn_
-                  key={permissionGroup.name}
-                  heading={permissionGroup.name}
-                  className="[&>div]:text-left"
-                >
-                  {permissionGroup.resources.map((resource) => {
-                    const isChecked = permissionRows.some(
-                      (row) => row.resource === resource.resource
-                    )
-                    return (
-                      <CommandItem_Shadcn_
-                        key={resource.resource}
-                        value={`${resource.resource} ${resource.title} ${permissionGroup.name}`}
-                        onSelect={() => handleToggleResource(resource)}
-                        className="text-white"
-                      >
-                        <div className="flex items-center gap-3 w-full">
-                          <Checkbox_Shadcn_
-                            checked={isChecked}
-                            onCheckedChange={() => handleToggleResource(resource)}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <Key size={12} className="text-foreground-lighter" />
-                          <div className="flex flex-col text-left flex-1">
-                            <span className="font-medium text-foreground">{resource.title}</span>
-                          </div>
+              <CommandGroup_Shadcn_ className="[&>div]:text-left">
+                {ACCESS_TOKEN_PERMISSIONS.resources.map((resource) => {
+                  const isChecked = permissionRows.some(
+                    (row) => row.resource === resource.resource
+                  )
+                  return (
+                    <CommandItem_Shadcn_
+                      key={resource.resource}
+                      value={`${resource.resource} ${resource.title}`}
+                      onSelect={() => handleToggleResource(resource)}
+                      className="text-white"
+                    >
+                      <div className="flex items-center gap-3 w-full">
+                        <Checkbox_Shadcn_
+                          checked={isChecked}
+                          onCheckedChange={() => handleToggleResource(resource)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <Key size={12} className="text-foreground-lighter" />
+                        <div className="flex flex-col text-left flex-1">
+                          <span className="font-medium text-foreground">{resource.title}</span>
                         </div>
-                      </CommandItem_Shadcn_>
-                    )
-                  })}
-                </CommandGroup_Shadcn_>
-              ))}
+                      </div>
+                    </CommandItem_Shadcn_>
+                  )
+                })}
+              </CommandGroup_Shadcn_>
             </ScrollArea>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
@@ -259,9 +237,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                           <span className="text-sm font-medium truncate max-w-[36ch]">
                             {selectedResource?.title}
                           </span>
-                          <span className="text-xs text-foreground-light">
-                            {selectedResource?.group}
-                          </span>
+                          {/* Removed group display */}
                         </div>
                       </div>
                     </div>
