@@ -41,20 +41,26 @@ Use `queryOptions` from `@tanstack/react-query` to define reusable query configu
 
 Guidelines:
 
-- Export `Variables`, `Data`, and `Error` types from the file.
+- Export `XVariables`, `XData`, and `XError` types from the file (prefixed with the domain name).
 - Implement a private `getX(variables, signal?)` function that:
   - throws if required variables are missing
   - passes the `signal` through to the fetcher for cancellation
-  - calls `handleError(error)` and returns `data`
+  - calls `handleError(error)` on failure (which throws) — the function returns `data` on success
   - this function should NOT be exported. For imperative fetching, use `queryClient.fetchQuery(xQueryOptions(...))`
 - Export `xQueryOptions()` using `queryOptions` from `@tanstack/react-query`.
-- Gate with `enabled` so the query doesn't run until required variables exist (and platform-only queries should include `IS_PLATFORM`).
-- When migrating away from exporting `useQuery`, move all options into the `xQueryOptions` as params and default values.
+- Gate with `enabled` so the query doesn't run until required variables exist (and platform-only queries should include `IS_PLATFORM` from `lib/constants`).
+- When migrating away from exporting `useQuery`, move all options into the `xQueryOptions` as default values.
+- No extra options should be added as params, if the user wants to overwrite the options, they can do by destructuring the query options. For example, `{ ...xQueryOptions(vars), enabled: true }`.
 
 Template:
 
 ```ts
 import { queryOptions } from '@tanstack/react-query'
+
+import { xKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import { ResponseError } from '@/types'
 
 export type XVariables = { projectRef?: string }
 export type XError = ResponseError
@@ -71,14 +77,11 @@ async function getX({ projectRef }: XVariables, signal?: AbortSignal) {
 
 export type XData = Awaited<ReturnType<typeof getX>>
 
-export const xQueryOptions = (
-  { projectRef }: XVariables,
-  { enabled = true }: { enabled?: boolean } = { enabled: true }
-) => {
+export const xQueryOptions = ({ projectRef }: XVariables) => {
   return queryOptions({
     queryKey: xKeys.list(projectRef),
     queryFn: ({ signal }) => getX({ projectRef }, signal),
-    enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined',
+    enabled: IS_PLATFORM && typeof projectRef !== 'undefined',
   })
 }
 ```
@@ -140,7 +143,19 @@ const handleClick = useCallback(
 Template:
 
 ```ts
-export const useXUpdateMutation = ({ onSuccess, onError, ...options } = {}) => {
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+
+import { xKeys } from './keys'
+import type { UseCustomMutationOptions } from '@/data/custom-mutation'
+
+type XUpdateVariables = { projectRef: string; slug: string; payload: XPayload }
+
+export const useXUpdateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: UseMutationOptions<XData, XError, XUpdateVariables> = {}) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: updateX,
