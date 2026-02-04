@@ -288,7 +288,7 @@ export const CreditCodeRedemption = ({
                     />
 
                     {customerProfile && customerProfile.balance < 0 && (
-                      <div className="flex w-full justify-between items-center">
+                      <div className="mt-2 flex w-full justify-between items-center">
                         <span>Current Balance</span>
                         <div className="flex items-center space-x-1">
                           <h4 className="opacity-50">$</h4>
