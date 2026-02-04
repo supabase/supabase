@@ -54,7 +54,7 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
 >
   <TabPanel id="async-storage" label="AsyncStorage">
     <$CodeSample
-      path="/auth/quickstarts/expo-react-native-social-auth/lib/supabase.web.ts"
+      path="/auth/expo-social-auth/lib/supabase.web.ts"
       lines={[[1, -1]]}
       meta="name=lib/supabase.web.ts"
 />
@@ -72,7 +72,7 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
     Implement a `ExpoSecureStoreAdapter` to pass in as Auth storage adapter for the `supabase-js` client:
 
     <$CodeSample
-      path="/auth/quickstarts/expo-react-native-social-auth/lib/supabase.ts"
+      path="/auth/expo-social-auth/lib/supabase.ts"
       lines={[[1, -1]]}
       meta="name=lib/supabase.ts"
 />
@@ -88,7 +88,7 @@ These variables are safe to expose in your Expo app since Supabase has [Row Leve
 Create a `.env` file containing these variables:
 
 <$CodeSample
-  path="/auth/quickstarts/expo-react-native-social-auth/.env"
+  path="/auth/expo-social-auth/.env"
   lines={[[1, -1]]}
   meta="name=.env"
 />
@@ -102,7 +102,7 @@ Next, you need to protect app navigation to prevent unauthenticated users from a
 Create [a React context](https://react.dev/learn/passing-data-deeply-with-context) to manage the authentication session, making it accessible from any component:
 
 <$CodeSample
-  path="/auth/quickstarts/expo-react-native-social-auth/hooks/use-auth-context.tsx"
+  path="/auth/expo-social-auth/hooks/use-auth-context.tsx"
   lines={[[1, -1]]}
   meta="name=hooks/use-auth-context.tsx"
 />
@@ -112,7 +112,7 @@ Create [a React context](https://react.dev/learn/passing-data-deeply-with-contex
 Next, create a provider component to manage the authentication session throughout the app:
 
 <$CodeSample
-  path="/auth/quickstarts/expo-react-native-social-auth/providers/auth-provider.tsx"
+  path="/auth/expo-social-auth/providers/auth-provider.tsx"
   lines={[[1, -1]]}
   meta="name=providers/auth-provider.tsx"
 />
@@ -122,7 +122,7 @@ Next, create a provider component to manage the authentication session throughou
 Create a `SplashScreenController` component to display the [Expo `SplashScreen`](https://docs.expo.dev/versions/latest/sdk/splash-screen/) while the authentication session is loading:
 
 <$CodeSample
-path="/auth/quickstarts/expo-react-native-social-auth/components/splash-screen-controller.tsx"
+path="/auth/expo-social-auth/components/splash-screen-controller.tsx"
 lines={[[1, -1]]}
 meta="name=components/splash-screen-controller.tsx"
 />
@@ -132,7 +132,7 @@ meta="name=components/splash-screen-controller.tsx"
 Create a logout button component to handle user sign-out:
 
 <$CodeSample
-path="/auth/quickstarts/expo-react-native-social-auth/components/social-auth-buttons/sign-out-button.tsx"
+path="/auth/expo-social-auth/components/social-auth-buttons/sign-out-button.tsx"
 lines={[[1, -1]]}
 meta="name=components/social-auth-buttons/sign-out-button.tsx"
 />
@@ -140,7 +140,7 @@ meta="name=components/social-auth-buttons/sign-out-button.tsx"
 And add it to the `app/(tabs)/index.tsx` file used to display the user profile data and the logout button:
 
 <$CodeSample
-path="/auth/quickstarts/expo-react-native-social-auth/app/(tabs)/index.tsx"
+path="/auth/expo-social-auth/app/(tabs)/index.tsx"
 lines={[[1, -1]]}
 meta="name=app/(tabs)/index.tsx"
 />
@@ -150,7 +150,7 @@ meta="name=app/(tabs)/index.tsx"
 Next, create a basic login screen component:
 
 <$CodeSample
-path="/auth/quickstarts/expo-react-native-social-auth/app/login.tsx"
+path="/auth/expo-social-auth/app/login.tsx"
 lines={[[1, -1]]}
 meta="name=app/login.tsx"
 />
@@ -162,7 +162,7 @@ Wrap the navigation with the `AuthProvider` and `SplashScreenController`.
 Using [Expo Router's protected routes](https://docs.expo.dev/router/advanced/authentication/#using-protected-routes), you can secure navigation:
 
 <$CodeSample
-path="/auth/quickstarts/expo-react-native-social-auth/app/_layout.tsx"
+path="/auth/expo-social-auth/app/_layout.tsx"
 lines={[[1, -1]]}
 meta="name=app/_layout.tsx"
 />
@@ -268,7 +268,7 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Then create the iOS specific button component `AppleSignInButton`:
 
-    <$CodeSample path="/auth/quickstarts/expo-react-native-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx"
+    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx"
 />
 
 
@@ -356,7 +356,7 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Next, create the Android-specific `AppleSignInButton` component:
 
-    <$CodeSample path="/auth/quickstarts/expo-react-native-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.android.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.android.tsx"
+    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.android.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.android.tsx"
 />
 
     You should now be able to test the authentication by running it on a physical device or simulator:
@@ -390,7 +390,7 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Next, create the Web-specific `AppleSignInButton` component:
 
-    <$CodeSample path="/auth/quickstarts/expo-react-native-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.web.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.web.tsx"
+    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.web.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.web.tsx"
 />
 
     Test the authentication in your browser using the tunneled HTTPS URL:
@@ -438,7 +438,7 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Then create the iOS specific button component `AppleSignInButton`:
 
-    <$CodeSample path="/auth/quickstarts/expo-react-native-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.tsx"
+    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.tsx"
 />
 
 
@@ -511,7 +511,7 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
 
     Create the mobile generic button component `GoogleSignInButton`:
 
-    <$CodeSample path="/auth/quickstarts/expo-react-native-social-auth/components/social-auth-buttons/google/google-sign-in-button.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/google/google-sign-in-button.tsx"
+    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/google/google-sign-in-button.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/google/google-sign-in-button.tsx"
 />
 
 
@@ -567,7 +567,7 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
 
     Then create the iOS specific button component `GoogleSignInButton`:
 
-    <$CodeSample path="/auth/quickstarts/expo-react-native-social-auth/components/social-auth-buttons/google/google-sign-in-button.web.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/google/google-sign-in-button.web.tsx"
+    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/google/google-sign-in-button.web.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/google/google-sign-in-button.web.tsx"
 />
 
 
