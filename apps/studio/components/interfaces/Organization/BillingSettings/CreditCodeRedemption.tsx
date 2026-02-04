@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/al
 import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, ArrowRight, Calendar, Gift, PartyPopper, PartyPopperIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -27,6 +27,7 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  Separator,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -37,6 +38,7 @@ import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organization
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import Link from 'next/link'
 
 const FORM_ID = 'credit-code-redemption'
 
@@ -74,26 +76,6 @@ export const CreditCodeRedemption = ({
   const { data: customerProfile, isLoading: isCustomerProfileLoading } =
     useOrganizationCustomerProfileQuery({ slug })
 
-  const watchedCode = form.watch('code')
-  const [debouncedCode, setDebouncedCode] = useState(watchedCode)
-
-  useEffect(() => {
-    const handle = setTimeout(() => setDebouncedCode(watchedCode), 400)
-    return () => clearTimeout(handle)
-  }, [watchedCode])
-
-  const { data: codePreview, error: errorCodePreview } = useOrganizationPreviewCreditCodeQuery(
-    {
-      slug,
-      code: debouncedCode,
-    },
-    {
-      // Avoid firing on initial mount and only when code is present
-      enabled: !!debouncedCode && debouncedCode.trim().length > 2,
-      refetchOnWindowFocus: false,
-    }
-  )
-
   useEffect(() => {
     if (!router.isReady) return
 
@@ -115,12 +97,9 @@ export const CreditCodeRedemption = ({
     mutateAsync: redeemCode,
     isPending: redeemingCode,
     error: errorRedeemingCode,
-  } = useOrganizationCreditCodeRedemptionMutation({
-    onSuccess: () => {
-      setCodeRedemptionModalVisible(false)
-      toast.success('Code redeemed successfully!')
-    },
-  })
+    data: codeRedemptionResult,
+    reset: resetCodeRedemption
+  } = useOrganizationCreditCodeRedemptionMutation()
 
   const resetCaptcha = () => {
     captchaTokenRef.current = null
@@ -157,11 +136,12 @@ export const CreditCodeRedemption = ({
     await redeemCode(
       {
         slug,
-        code: form.getValues('code'),
+        code,
         hcaptchaToken: token,
       },
       {
         onSuccess: (data) => {
+          form.setValue('code', '')
           resetCaptcha()
         },
       }
@@ -171,6 +151,7 @@ export const CreditCodeRedemption = ({
   const onCodeRedemptionDialogVisibilityChange = (visible: boolean) => {
     setCodeRedemptionModalVisible(visible)
     if (!visible) {
+      resetCodeRedemption()
       resetCaptcha()
     }
   }
@@ -178,6 +159,8 @@ export const CreditCodeRedemption = ({
   if (!redeemCodeEnabled) {
     return null
   }
+
+const codeRedemptionDisabled = !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isCustomerProfileLoading 
 
   return (
     <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>
@@ -187,7 +170,7 @@ export const CreditCodeRedemption = ({
             type="default"
             className="pointer-events-auto"
             disabled={
-              !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isCustomerProfileLoading
+             codeRedemptionDisabled
             }
             tooltip={{
               content: {
@@ -224,6 +207,52 @@ export const CreditCodeRedemption = ({
             captchaTokenRef.current = null
           }}
         />
+
+
+   {codeRedemptionResult ? <div className='p-8'>
+     <div className='text-center flex items-center justify-center '>
+     <PartyPopper className='h-20 w-20' />
+     </div>
+
+<div className='text-center'>
+
+     <p className='font-bold text-lg mt-2'>Credits Redeemed!</p>
+</div>
+<Separator className='my-4'/>
+  <div className="flex w-full justify-center items-center">
+                    <div className="flex items-center space-x-1">
+                      <h4 className="opacity-50">$</h4>
+                      <h1 className="relative text-2xl">{codeRedemptionResult.amount_cents / 100}</h1>
+                      <h4 className="opacity-50"> credits applied</h4>
+</div>
+</div>
+                     
+
+{codeRedemptionResult.credits_expire_at && 
+     <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-4 rounded-lg">
+            <Calendar className="h-4 w-4" />
+            <span>
+              {'Expires on '}
+              {new Date(codeRedemptionResult.credits_expire_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </span>
+          </div>
+}
+
+          {org?.plan.id === 'free' && <div className='mt-4 space-y-4'>
+            <Separator />
+ <Button className='w-full' size={'medium'} type="primary" asChild>
+                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>
+                  Upgrade Your Organization  
+                </Link>
+              </Button>
+            </div>}                 
+
+        </div> : <>
+
         <DialogHeader>
           <DialogTitle>Redeem Code</DialogTitle>
           <DialogDescription className="space-y-2">
@@ -234,6 +263,8 @@ export const CreditCodeRedemption = ({
         </DialogHeader>
 
         <DialogSectionSeparator />
+
+     
 
         <Form_Shadcn_ {...form}>
           {isOrgLoading || isCustomerProfileLoading ? (
@@ -252,56 +283,36 @@ export const CreditCodeRedemption = ({
                   name="code"
                   render={({ field }) => (
                     <FormItemLayout label="Code" className="gap-1">
-                      <Input_Shadcn_ {...field} className="uppercase" />
+                      <Input_Shadcn_ {...field} className="uppercase" placeholder='ABCD-1234-EFGH-5678' />
                     </FormItemLayout>
                   )}
                 />
 
-                <div className="grid grid-cols-2 gap-4 border-t pt-2">
-                  <div className="space-y-1">
-                    <span className="text-sm font-medium text-foreground-lighter">
-                      Current Balance
-                    </span>
-                    {customerProfile ? (
-                      <p className="text-2xl font-medium">${customerProfile?.balance / -100}</p>
-                    ) : (
-                      <p>-</p>
-                    )}
-                  </div>
-                  <div>
-                    <span className="text-sm font-medium text-foreground-lighter">New Balance</span>
+                     {(customerProfile && customerProfile.balance < 0) && (
+<div className="flex w-full justify-between items-center">
+                    <span>Current Balance</span>
+                    <div className="flex items-center space-x-1">
+                      <h4 className="opacity-50">$</h4>
+                      <h1 className="relative">{customerProfile.balance / -100}</h1>
+                      <h4 className="opacity-50">/credits</h4>
+                    </div>
+                  </div>)}
 
-                    <p className="text-2xl font-medium">
-                      {' '}
-                      {codePreview && customerProfile
-                        ? '$' + (customerProfile?.balance / -100 + codePreview.amount_cents / 100)
-                        : '-'}
-                    </p>
-                  </div>
-                </div>
 
                 <Alert variant={'default'} className="mt-4">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Potential charges</AlertTitle>
+                  <AlertTitle>Potential future charges</AlertTitle>
                   <AlertDescription>
-                    <p>
-                      The credits will be applied to your organization "{org?.name}" and cannot be
-                      used across other organizations you may have.
-                    </p>
-                    <p className="mt-1">
-                      Credits are used whenever invoices are issued. Once you run out of credits,
-                      your default payment method will be charged for future invoices. You will not
-                      be downgraded automatically.
-                    </p>
+                      Credits are applied to <strong>{org?.name}</strong> only and can't be shared or transferred to other organizations. Credits are automatically used toward invoices. When credits run out on a paid plan, your default payment method will be charged—your plan won't be downgraded automatically.
                   </AlertDescription>
                 </Alert>
 
-                {(errorRedeemingCode || errorCodePreview) && (
+                {(errorRedeemingCode) && (
                   <Alert_Shadcn_ variant="destructive">
                     <AlertCircle className="h-4 w-4 text-foreground-light" />
                     <AlertTitle_Shadcn_>Code cannot be redeemed</AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
-                      {errorRedeemingCode?.message || errorCodePreview?.message}
+                      {errorRedeemingCode?.message}
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
@@ -312,7 +323,7 @@ export const CreditCodeRedemption = ({
                   htmlType="submit"
                   type="primary"
                   loading={redeemingCode}
-                  disabled={!codePreview}
+                  disabled={codeRedemptionDisabled}
                 >
                   Redeem
                 </Button>
@@ -320,6 +331,8 @@ export const CreditCodeRedemption = ({
             </form>
           )}
         </Form_Shadcn_>
+        </>
+}
       </DialogContent>
     </Dialog>
   )
