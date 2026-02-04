@@ -146,8 +146,8 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
     const filtered = !searchString
       ? tokens
       : tokens?.filter((token) => {
-          return token.name.toLowerCase().includes(searchString.toLowerCase())
-        })
+        return token.name.toLowerCase().includes(searchString.toLowerCase())
+      })
 
     if (!filtered) return filtered
 
@@ -277,7 +277,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                       <Button
                         type="default"
                         title="More options"
-                        className="px-1"
+                        className="w-7"
                         disabled={isLoading}
                         loading={isLoading}
                         icon={<MoreVertical />}
