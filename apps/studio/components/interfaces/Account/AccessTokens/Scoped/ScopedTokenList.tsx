@@ -155,8 +155,8 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
     const filtered = !searchString
       ? tokens
       : tokens?.filter((token) => {
-        return token.name.toLowerCase().includes(searchString.toLowerCase())
-      })
+          return token.name.toLowerCase().includes(searchString.toLowerCase())
+        })
 
     if (!filtered) return filtered
 
