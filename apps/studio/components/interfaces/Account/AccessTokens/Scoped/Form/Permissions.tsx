@@ -17,7 +17,6 @@ import {
   SelectItem_Shadcn_,
   WarningIcon,
   Checkbox_Shadcn_,
-  ScrollArea,
 } from 'ui'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Plus, Key, X, RotateCcw } from 'lucide-react'
@@ -120,7 +119,7 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={onOpenChange} modal={false}>
+    <Popover_Shadcn_ open={open} onOpenChange={onOpenChange} modal={true}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button type="default" size="tiny" icon={<Plus className="h-4 w-4" />}>
           Add permission
@@ -132,8 +131,8 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
 
-            <ScrollArea className="max-h-[200px] overflow-y-scroll">
-              <CommandGroup_Shadcn_ className="[&>div]:text-left">
+            <CommandGroup_Shadcn_ className="[&>div]:text-left">
+              <div className="max-h-[210px] overflow-y-auto">
                 {ACCESS_TOKEN_PERMISSIONS.resources.map((resource) => {
                   const isChecked = permissionRows.some((row) => row.resource === resource.resource)
                   return (
@@ -157,8 +156,8 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
                     </CommandItem_Shadcn_>
                   )
                 })}
-              </CommandGroup_Shadcn_>
-            </ScrollArea>
+              </div>
+            </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
       </PopoverContent_Shadcn_>
@@ -262,7 +261,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                                 {action === 'no access'
                                   ? 'No access'
                                   : action.charAt(0).toUpperCase() +
-                                    action.slice(1).replace(/-/g, ' ')}
+                                  action.slice(1).replace(/-/g, ' ')}
                               </SelectItem_Shadcn_>
                             ))}
                           </SelectContent_Shadcn_>
