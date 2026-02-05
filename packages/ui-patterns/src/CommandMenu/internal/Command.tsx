@@ -4,6 +4,7 @@ import { forwardRef, type PropsWithChildren } from 'react'
 import { cn, CommandItem_Shadcn_ } from 'ui'
 
 import { useCommandMenuTelemetryContext } from '../api/hooks/useCommandMenuTelemetryContext'
+import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
 import { useResetCommandMenu, useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 import type { IActionCommand, ICommand, IRouteCommand } from './types'
 
