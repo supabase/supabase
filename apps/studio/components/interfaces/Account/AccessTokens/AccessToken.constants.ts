@@ -28,9 +28,7 @@ const getAction = (key: string): string => {
 }
 
 const getResource = (key: string): string => {
-  return key
-    .replace(/_(READ|WRITE|CREATE|DELETE)$/, '')
-    .toLowerCase()
+  return key.replace(/_(READ|WRITE|CREATE|DELETE)$/, '').toLowerCase()
 }
 
 const buildPermissionList = () => {
@@ -95,11 +93,9 @@ export const getResourcePermissions = (
   const [scope, resource] = resourceKey.split(':')
   const result: Record<string, ScopedAccessTokenPermission[]> = { 'no access': [] }
 
-  PERMISSION_LIST
-    .filter((p) => p.scope === scope && p.resource === resource)
-    .forEach((p) => {
-      result[p.action] = [p.id as ScopedAccessTokenPermission]
-    })
+  PERMISSION_LIST.filter((p) => p.scope === scope && p.resource === resource).forEach((p) => {
+    result[p.action] = [p.id as ScopedAccessTokenPermission]
+  })
 
   if (result['read'] && result['write']) {
     result['read-write'] = [...result['read'], ...result['write']]

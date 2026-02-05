@@ -233,7 +233,9 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
         ) : (
           <div className="border border-border rounded-lg">
             {permissionRows.map((row, index) => {
-              const selectedResource = ACCESS_TOKEN_RESOURCES.find((r) => r.resource === row.resource)
+              const selectedResource = ACCESS_TOKEN_RESOURCES.find(
+                (r) => r.resource === row.resource
+              )
               return (
                 <div key={index}>
                   <div className="flex items-center gap-3 p-3">
@@ -273,7 +275,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                                 {action === 'no access'
                                   ? 'No access'
                                   : action.charAt(0).toUpperCase() +
-                                  action.slice(1).replace(/-/g, ' ')}
+                                    action.slice(1).replace(/-/g, ' ')}
                               </SelectItem_Shadcn_>
                             ))}
                           </SelectContent_Shadcn_>

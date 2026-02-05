@@ -32,7 +32,8 @@ export const AccessTokenNewBanner = <T,>({
 }: AccessTokenNewBannerProps<T>) => {
   const tokenPermissions = getTokenPermissions?.(token)
   const [permissionsOpen, setPermissionsOpen] = useState(false)
-  const shouldCollapse = tokenPermissions && tokenPermissions.length > PERMISSIONS_COLLAPSE_THRESHOLD
+  const shouldCollapse =
+    tokenPermissions && tokenPermissions.length > PERMISSIONS_COLLAPSE_THRESHOLD
 
   const getRealAccess = (resource: string, tokenPermissions: string[]) => {
     const hasPermission = (permission: string) => tokenPermissions.includes(permission)
@@ -125,7 +126,7 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => { }}
+            onChange={() => {}}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>
