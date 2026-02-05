@@ -28,7 +28,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { BasicInfo } from './Form/BasicInfo'
-import { Permissions } from './Form/Permissions'
+import { Permissions } from './Form/Permissions/Permissions'
 import { ResourceAccess } from './Form/ResourceAccess'
 import {
   mapPermissionToFGA,
