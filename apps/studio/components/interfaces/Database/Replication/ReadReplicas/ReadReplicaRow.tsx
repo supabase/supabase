@@ -14,6 +14,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
@@ -51,7 +54,7 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
   const [showConfirmRestart, setShowConfirmRestart] = useState(false)
   const [showConfirmDrop, setShowConfirmDrop] = useState(false)
 
-  const regionLabel = Object.values(AWS_REGIONS).find((x) => x.code === region)?.displayName
+  const regionMeta = Object.values(AWS_REGIONS).find((x) => x.code === region)
 
   const isInTransition = useMemo(() => getIsInTransition({ status }), [status])
   const statusLabel = useMemo(() => getStatusLabel({ status }), [status])
@@ -66,7 +69,12 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
         <TableCell>
           <div>
             <p>Read Replica (ID: {formattedId})</p>
-            <p className="text-foreground-lighter">{regionLabel}</p>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="text-foreground-lighter w-fit">{regionMeta?.displayName}</p>
+              </TooltipTrigger>
+              <TooltipContent side="right">{regionMeta?.code}</TooltipContent>
+            </Tooltip>
           </div>
         </TableCell>
 
