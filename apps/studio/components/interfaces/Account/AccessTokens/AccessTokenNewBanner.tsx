@@ -126,7 +126,7 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => {}}
+            onChange={() => { }}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>
@@ -148,44 +148,47 @@ export const AccessTokenNewBanner = <T,>({
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-3 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                  <div className="space-y-4">
-                    {Object.entries(groupedPermissionsByAccess).map(([accessLevel, resources]) => (
-                      <div key={accessLevel} className="space-y-2">
-                        <h4 className="text-xs text-foreground-light font-mono uppercase tracking-wide">
-                          {accessLevel}
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {resources.map((resource) => (
-                            <Badge key={`${accessLevel}-${resource}`}>{resource}</Badge>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <PermissionsList groupedPermissions={groupedPermissionsByAccess} />
                 </CollapsibleContent>
               </Collapsible>
             ) : (
               <>
                 <h3 className="text-sm font-medium mb-3">Permissions assigned to this token:</h3>
-                <div className="space-y-4">
-                  {Object.entries(groupedPermissionsByAccess).map(([accessLevel, resources]) => (
-                    <div key={accessLevel} className="space-y-2">
-                      <h4 className="text-xs text-foreground-light font-mono uppercase tracking-wide">
-                        {accessLevel}
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {resources.map((resource) => (
-                          <Badge key={`${accessLevel}-${resource}`}>{resource}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <PermissionsList groupedPermissions={groupedPermissionsByAccess} />
               </>
             )}
           </div>
         )}
       </CardContent>
     </Card>
+  )
+}
+
+interface PermissionsListProps {
+  groupedPermissions: Record<string, string[]>
+}
+
+const PermissionsList = ({ groupedPermissions }: PermissionsListProps) => {
+  return (
+    <div className="gap-2 flex flex-col">
+      {Object.entries(groupedPermissions).map(([accessLevel, resources]) => (
+        <div key={accessLevel} className="flex flex-wrap gap-1.5">
+          <span className="text-xs text-foreground-lighter font-mono uppercase tracking-wide">
+            {accessLevel}:
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            {resources.map((resource, index) => (
+              <span
+                key={`${accessLevel}-${resource}`}
+                className="text-xs text-foreground capitalize"
+              >
+                {resource}
+                {index < resources.length - 1 ? ',' : '.'}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
