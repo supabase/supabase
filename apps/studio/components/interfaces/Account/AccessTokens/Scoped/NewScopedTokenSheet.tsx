@@ -28,10 +28,7 @@ import { Admonition } from 'ui-patterns'
 import { BasicInfo } from './Form/BasicInfo'
 import { Permissions } from './Form/Permissions/Permissions'
 import { ResourceAccess } from './Form/ResourceAccess/ResourceAccess'
-import {
-  EXPIRES_AT_OPTIONS,
-  type ScopedAccessTokenPermission,
-} from '../AccessToken.constants'
+import { EXPIRES_AT_OPTIONS, type ScopedAccessTokenPermission } from '../AccessToken.constants'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { mapPermissionToFGA, getExpirationDate } from '../AccessToken.utils'
 import { TokenSchema, type TokenFormValues } from '../AccessToken.schemas'
@@ -73,7 +70,6 @@ export const NewScopedTokenSheet = ({
   const permissionRows = form.watch('permissionRows') || []
 
   const onSubmit: SubmitHandler<TokenFormValues> = async (values) => {
-
     if (!permissionRows || permissionRows.length === 0) {
       toast.error('Please configure at least one permission.')
       return

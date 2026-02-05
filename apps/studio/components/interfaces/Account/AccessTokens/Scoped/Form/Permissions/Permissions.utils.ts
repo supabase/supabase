@@ -1,4 +1,4 @@
-import { PermissionResource, PermissionRow } from "./Permissions.types"
+import { PermissionResource, PermissionRow } from './Permissions.types'
 
 const getBestAction = (actions: string[]): string => {
   const availableActions = actions.filter((a) => a !== 'no access')

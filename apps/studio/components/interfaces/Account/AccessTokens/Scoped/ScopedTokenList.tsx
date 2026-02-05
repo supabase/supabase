@@ -7,12 +7,22 @@ import {
 import { MoreVertical, Trash, Key } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TableCell, TableRow } from 'ui/src/components/shadcn/ui/table'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 
-import { ACCESS_TOKEN_SORT_VALUES, AccessTokenSort, AccessTokenSortColumn } from '../AccessToken.types'
+import {
+  ACCESS_TOKEN_SORT_VALUES,
+  AccessTokenSort,
+  AccessTokenSortColumn,
+} from '../AccessToken.types'
 import { handleSortChange, filterAndSortTokens } from '../AccessToken.utils'
 import { TableContainer } from '../AccessTokenTable/TableContainer'
 import { RowLoading } from '../AccessTokenTable/RowLoading'
@@ -65,7 +75,11 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
       <TableContainer sort={sort} onSortChange={onSortChange}>
         <TableRow>
           <TableCell colSpan={4} className="p-0">
-            <AlertError error={error} subject="Failed to retrieve access tokens" className="rounded-none border-0" />
+            <AlertError
+              error={error}
+              subject="Failed to retrieve access tokens"
+              className="rounded-none border-0"
+            />
           </TableCell>
         </TableRow>
       </TableContainer>
@@ -108,7 +122,12 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
               <div className="flex items-center justify-end gap-x-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button type="default" title="More options" className="w-7" icon={<MoreVertical />} />
+                    <Button
+                      type="default"
+                      title="More options"
+                      className="w-7"
+                      icon={<MoreVertical />}
+                    />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-40">
                     <DropdownMenuItem

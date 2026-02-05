@@ -1,14 +1,9 @@
-import { cn } from "ui"
-import { Box } from "lucide-react"
-import { Check } from "lucide-react"
-import { ResourceOptionProps } from "./ResourceAccess.types"
+import { cn } from 'ui'
+import { Box } from 'lucide-react'
+import { Check } from 'lucide-react'
+import { ResourceOptionProps } from './ResourceAccess.types'
 
-export const ResourceOption = ({
-  value,
-  label,
-  isSelected,
-  onChange,
-}: ResourceOptionProps) => (
+export const ResourceOption = ({ value, label, isSelected, onChange }: ResourceOptionProps) => (
   <label
     className={cn(
       'border border-default rounded-md bg-surface-200 hover:bg-overlay-hover hover:border-control px-4 py-3 cursor-pointer transition-colors flex-1 flex flex-col',

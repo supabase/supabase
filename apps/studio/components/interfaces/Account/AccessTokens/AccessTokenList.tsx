@@ -4,12 +4,22 @@ import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tok
 import { MoreVertical, Trash } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TableCell, TableRow } from 'ui/src/components/shadcn/ui/table'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 
-import { ACCESS_TOKEN_SORT_VALUES, AccessTokenSort, AccessTokenSortColumn } from './AccessToken.types'
+import {
+  ACCESS_TOKEN_SORT_VALUES,
+  AccessTokenSort,
+  AccessTokenSortColumn,
+} from './AccessToken.types'
 import { handleSortChange, filterAndSortTokens } from './AccessToken.utils'
 import { TableContainer } from './AccessTokenTable/TableContainer'
 import { RowLoading } from './AccessTokenTable/RowLoading'
@@ -57,7 +67,11 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
       <TableContainer sort={sort} onSortChange={onSortChange}>
         <TableRow>
           <TableCell colSpan={4} className="p-0">
-            <AlertError error={error} subject="Failed to retrieve access tokens" className="rounded-none border-0" />
+            <AlertError
+              error={error}
+              subject="Failed to retrieve access tokens"
+              className="rounded-none border-0"
+            />
           </TableCell>
         </TableRow>
       </TableContainer>
@@ -79,7 +93,9 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
         <TableRow>
           <TableCell colSpan={4} className="py-12">
             <p className="text-sm text-center text-foreground">No access tokens found</p>
-            <p className="text-sm text-center text-foreground-light">You do not have any tokens created yet</p>
+            <p className="text-sm text-center text-foreground-light">
+              You do not have any tokens created yet
+            </p>
           </TableCell>
         </TableRow>
       </TableContainer>
@@ -98,10 +114,21 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
               <div className="flex items-center justify-end gap-x-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button type="default" title="More options" className="w-7" icon={<MoreVertical />} />
+                    <Button
+                      type="default"
+                      title="More options"
+                      className="w-7"
+                      icon={<MoreVertical />}
+                    />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-40">
-                    <DropdownMenuItem className="gap-x-2" onClick={() => { setToken(x); setIsOpen(true) }}>
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      onClick={() => {
+                        setToken(x)
+                        setIsOpen(true)
+                      }}
+                    >
                       <Trash size={12} />
                       <p>Delete token</p>
                     </DropdownMenuItem>
@@ -120,7 +147,9 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
         onCancel={() => setIsOpen(false)}
-        onConfirm={() => { if (token) deleteToken({ id: token.id }) }}
+        onConfirm={() => {
+          if (token) deleteToken({ id: token.id })
+        }}
       >
         <p className="py-4 text-sm text-foreground-light">
           This action cannot be undone. Are you sure you want to delete "{token?.name}" token?

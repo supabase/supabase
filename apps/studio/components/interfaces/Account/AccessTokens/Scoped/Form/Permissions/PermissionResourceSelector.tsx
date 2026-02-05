@@ -53,7 +53,9 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
             <CommandGroup_Shadcn_ className="[&>div]:text-left">
               <div className="max-h-[210px] overflow-y-auto">
                 {ACCESS_TOKEN_RESOURCES.map((resource) => {
-                  const isChecked = permissionRows.some((row: PermissionRow) => row.resource === resource.resource)
+                  const isChecked = permissionRows.some(
+                    (row: PermissionRow) => row.resource === resource.resource
+                  )
                   return (
                     <CommandItem_Shadcn_
                       key={resource.resource}

@@ -8,8 +8,12 @@ export const ACCESS_TOKEN_SORT_VALUES = [
 ] as const
 
 export type AccessTokenSort = (typeof ACCESS_TOKEN_SORT_VALUES)[number]
-export type AccessTokenSortColumn = AccessTokenSort extends `${infer Column}:${string}` ? Column : never
-export type AccessTokenSortOrder = AccessTokenSort extends `${string}:${infer Order}` ? Order : never
+export type AccessTokenSortColumn = AccessTokenSort extends `${infer Column}:${string}`
+  ? Column
+  : never
+export type AccessTokenSortOrder = AccessTokenSort extends `${string}:${infer Order}`
+  ? Order
+  : never
 
 export interface BaseToken {
   id: string | number

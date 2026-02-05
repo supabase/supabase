@@ -1,5 +1,10 @@
 import dayjs from 'dayjs'
-import { AccessTokenSort, AccessTokenSortColumn, AccessTokenSortOrder, BaseToken } from './AccessToken.types'
+import {
+  AccessTokenSort,
+  AccessTokenSortColumn,
+  AccessTokenSortOrder,
+  BaseToken,
+} from './AccessToken.types'
 import { PERMISSION_LIST, ScopedAccessTokenPermission } from './AccessToken.constants'
 
 export const handleSortChange = (
@@ -130,11 +135,17 @@ export const formatActionText = (action: string): string => {
 
 export const getExpirationDate = (key: string): string | undefined => {
   switch (key) {
-    case 'hour': return dayjs().add(60, 'minutes').toISOString()
-    case 'day': return dayjs().add(1, 'day').toISOString()
-    case 'week': return dayjs().add(7, 'days').toISOString()
-    case 'month': return dayjs().add(30, 'days').toISOString()
-    case 'never': return undefined
-    default: return undefined
+    case 'hour':
+      return dayjs().add(1, 'hours').toISOString()
+    case 'day':
+      return dayjs().add(1, 'day').toISOString()
+    case 'week':
+      return dayjs().add(7, 'days').toISOString()
+    case 'month':
+      return dayjs().add(30, 'days').toISOString()
+    case 'never':
+      return undefined
+    default:
+      return undefined
   }
 }

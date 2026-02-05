@@ -37,8 +37,6 @@ export const AccessTokenNewBanner = <T,>({
   const shouldCollapse =
     tokenPermissions && tokenPermissions.length > PERMISSIONS_COLLAPSE_THRESHOLD
 
-
-
   const formatAccessText = (access: string) => {
     switch (access) {
       case 'read-write':
@@ -102,7 +100,7 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => { }}
+            onChange={() => {}}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>

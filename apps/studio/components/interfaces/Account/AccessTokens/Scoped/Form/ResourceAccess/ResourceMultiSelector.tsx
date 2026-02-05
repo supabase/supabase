@@ -19,10 +19,7 @@ export const ResourceMultiSelector = ({
   loadingMessage,
   emptyMessage,
 }: ResourceMultiSelectorProps) => {
-  const idToName = useMemo(
-    () => new Map(items.map((item) => [item.id, item.name])),
-    [items]
-  )
+  const idToName = useMemo(() => new Map(items.map((item) => [item.id, item.name])), [items])
 
   const displayValues = (field.value || []).map((id: string) => idToName.get(id) || id)
 

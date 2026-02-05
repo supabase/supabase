@@ -1,4 +1,4 @@
-import { FieldValues, UseFormSetValue, UseFormWatch } from "react-hook-form"
+import { FieldValues, UseFormSetValue, UseFormWatch } from 'react-hook-form'
 
 export interface PermissionResource {
   resource: string
@@ -15,7 +15,9 @@ export interface PermissionsFormValues extends FieldValues {
   permissionRows?: PermissionRow[]
 }
 
-export interface PermissionsProps<TFormValues extends PermissionsFormValues = PermissionsFormValues> {
+export interface PermissionsProps<
+  TFormValues extends PermissionsFormValues = PermissionsFormValues,
+> {
   setValue: UseFormSetValue<TFormValues>
   watch: UseFormWatch<TFormValues>
   resourceSearchOpen: boolean
