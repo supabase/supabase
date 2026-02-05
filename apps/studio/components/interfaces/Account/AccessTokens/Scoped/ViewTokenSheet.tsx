@@ -18,6 +18,7 @@ import { getResourcePermissions, ACCESS_TOKEN_RESOURCES } from '../AccessToken.c
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useMemo } from 'react'
+import { formatActionText } from './Form/Permissions/Permissions.utils'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -78,19 +79,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     }
   }
 
-  const formatAccessText = (access: string) => {
-    switch (access) {
-      case 'read-write':
-        return 'Read-write'
-      case 'read only':
-        return 'Read only'
-      case 'no access':
-        return 'No access'
-      default:
-        return access.charAt(0).toUpperCase() + access.slice(1)
-    }
-  }
-
   const groupedResourcesByAccess = useMemo(() => {
     const grouped: Record<string, string[]> = {}
 
@@ -101,7 +89,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     ACCESS_TOKEN_RESOURCES.forEach((resource) => {
       const access = getRealAccess(resource.resource, token.permissions)
       if (access !== 'no access') {
-        const formattedAccess = formatAccessText(access)
+        const formattedAccess = formatActionText(access)
         if (!grouped[formattedAccess]) {
           grouped[formattedAccess] = []
         }
@@ -200,10 +188,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.created_at
                                     ? new Date(token.created_at).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                      })
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
                                     : 'Unknown'}
                                 </span>
                               </TableCell>
@@ -216,10 +204,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.last_used_at
                                     ? new Date(token.last_used_at).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                      })
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
                                     : 'Never'}
                                 </span>
                               </TableCell>
@@ -232,10 +220,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.expires_at
                                     ? new Date(token.expires_at).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'short',
-                                        year: 'numeric',
-                                      })
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
                                     : 'Never'}
                                 </span>
                               </TableCell>
@@ -278,7 +266,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <TableCell colSpan={2}>
                                   <p className="text-foreground-light text-center py-4">
                                     {token?.organization_slugs &&
-                                    token.organization_slugs.length > 0
+                                      token.organization_slugs.length > 0
                                       ? 'This token has access to specific organizations and projects.'
                                       : 'This token has access to all resources.'}
                                   </p>
@@ -324,7 +312,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                         <p className="truncate text-foreground">{resource}</p>
                                       </TableCell>
                                       <TableCell>
-                                        <span className="text-foreground-light">{accessLevel}</span>
+                                        <span className="text-foreground-light">{formatActionText(accessLevel)}</span>
                                       </TableCell>
                                     </TableRow>
                                   ))

@@ -12,7 +12,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { X, RotateCcw } from 'lucide-react'
 import { ACCESS_TOKEN_RESOURCES } from '../../../AccessToken.constants'
 import { PermissionRow, PermissionsFormValues, PermissionsProps } from './Permissions.types'
-import { sortActions } from './Permissions.utils'
+import { sortActions, formatActionText } from './Permissions.utils'
 import { PermissionResourceSelector } from './PermissionResourceSelector'
 
 export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({
@@ -107,10 +107,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                           <SelectContent_Shadcn_>
                             {sortActions(selectedResource.actions).map((action) => (
                               <SelectItem_Shadcn_ key={action} value={action}>
-                                {action === 'no access'
-                                  ? 'No access'
-                                  : action.charAt(0).toUpperCase() +
-                                  action.slice(1).replace(/-/g, ' ')}
+                                {formatActionText(action)}
                               </SelectItem_Shadcn_>
                             ))}
                           </SelectContent_Shadcn_>
