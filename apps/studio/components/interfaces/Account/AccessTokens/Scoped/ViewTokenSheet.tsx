@@ -16,7 +16,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { Card, CardContent } from 'ui'
 import { ACCESS_TOKEN_RESOURCES } from '../AccessToken.constants'
 import { useMemo } from 'react'
-import { formatActionText, getRealAccess } from '../AccessToken.utils'
+import { formatAccessText, getRealAccess } from '../AccessToken.utils'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 
 interface ViewTokenSheetProps {
@@ -51,7 +51,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     ACCESS_TOKEN_RESOURCES.forEach((resource) => {
       const access = getRealAccess(resource.resource, token.permissions)
       if (access !== 'no access') {
-        const formattedAccess = formatActionText(access)
+        const formattedAccess = formatAccessText(access)
         if (!grouped[formattedAccess]) {
           grouped[formattedAccess] = []
         }
@@ -275,7 +275,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                       </TableCell>
                                       <TableCell>
                                         <span className="text-foreground-light">
-                                          {formatActionText(accessLevel)}
+                                          {formatAccessText(accessLevel)}
                                         </span>
                                       </TableCell>
                                     </TableRow>

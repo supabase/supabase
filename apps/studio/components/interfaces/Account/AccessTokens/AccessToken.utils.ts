@@ -122,7 +122,7 @@ export const getRealAccess = (resource: string, tokenPermissions: string[]) => {
   }
 }
 
-export const formatActionText = (action: string): string => {
+export const formatAccessText = (action: string): string => {
   switch (action) {
     case 'no access':
       return 'No access'

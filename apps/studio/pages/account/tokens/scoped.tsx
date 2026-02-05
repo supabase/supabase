@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import AccessTokensLayout from 'components/layouts/AccessTokens/AccessTokensLayout'
 import { NewScopedTokenButton } from 'components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenButton'
-import { AccessTokenNewBanner } from 'components/interfaces/Account/AccessTokens/AccessTokenNewBanner'
+import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
 
 import { ScopedTokenList } from 'components/interfaces/Account/AccessTokens/Scoped/ScopedTokenList'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'

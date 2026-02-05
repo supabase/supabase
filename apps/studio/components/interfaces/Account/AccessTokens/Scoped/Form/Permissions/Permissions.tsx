@@ -13,7 +13,7 @@ import { X, RotateCcw } from 'lucide-react'
 import { ACCESS_TOKEN_RESOURCES } from '../../../AccessToken.constants'
 import { PermissionRow, PermissionsFormValues, PermissionsProps } from './Permissions.types'
 import { sortActions } from './Permissions.utils'
-import { formatActionText } from '../../../AccessToken.utils'
+import { formatAccessText } from '../../../AccessToken.utils'
 import { PermissionResourceSelector } from './PermissionResourceSelector'
 
 export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({
@@ -108,7 +108,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                           <SelectContent_Shadcn_>
                             {sortActions(selectedResource.actions).map((action) => (
                               <SelectItem_Shadcn_ key={action} value={action}>
-                                {formatActionText(action)}
+                                {formatAccessText(action)}
                               </SelectItem_Shadcn_>
                             ))}
                           </SelectContent_Shadcn_>
