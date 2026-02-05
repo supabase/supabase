@@ -6,15 +6,15 @@ keywords = []
 
 When trying to establish secure connections from Supabase Edge Functions to external services, you might encounter difficulties with traditional IP whitelisting. This guide explains why this problem occurs and provides various solutions to address it.
 
-### What are Egress IP Addresses?
+## What are egress IP addresses?
 
 An **Egress IP address** is the public IP address from which network traffic originates when leaving a network or service. When an application or a serverless function connects to an external third-party service, the third-party service sees the connection coming from this Egress IP.
 
-### What is CIDR?
+## What is CIDR?
 
 **CIDR (Classless Inter-Domain Routing)** is a method for efficiently allocating IP addresses and routing IP packets. It allows IP addresses to be grouped into blocks using a notation like `[IP]/prefix_length` (e.g., `192.168.1.0/24`). Whitelisting based on CIDR ranges typically grants access to all IP addresses within a specified block.
 
-### Understanding Supabase Edge Functions and the Problem:
+## Understanding Supabase Edge Functions and the problem
 
 **Supabase Edge Functions** are serverless functions that run globally, close to your users, powered by Deno Deploy. They are designed for low-latency execution and adhere to "serverless" and "edge-first" principles:
 
@@ -23,15 +23,15 @@ An **Egress IP address** is the public IP address from which network traffic ori
 
 Due to their serverless and globally distributed nature, Supabase Edge Functions do not originate from a single static IP address or a small, stable range of IPs. This prevents the assignment of fixed egress IP addresses necessary for traditional network-level whitelisting.
 
-### Problem Summary:
+## Problem summary
 
 Because Supabase Edge Functions lack static or stable egress IP addresses, standard outbound calls from an Edge Function to a service that requires IP whitelisting (e.g., specifying an IPv4 CIDR range like `[IP]/24`) will likely be blocked.
 
-### Solutions for Whitelisting External Services:
+## Solutions for whitelisting external services
 
 This section details the approaches to enable secure connections from your Edge Functions.
 
-#### Solution 1: Use an Outbound Proxy (Recommended)
+### Solution 1: Use an outbound proxy (recommended)
 
 This is the standard and recommended solution for connecting to third-party services that you do not control but which require a static IP address for whitelisting.
 
@@ -42,7 +42,7 @@ This is the standard and recommended solution for connecting to third-party serv
   3.  Whitelist the static IP address of your proxy server on the external third-party service.
 - **Benefit:** All traffic from your Edge Function will appear to originate from the proxy's static IP, satisfying the whitelisting requirement of the external service.
 
-#### Solution 2: Header-Based Authentication (Best for Servers You Control)
+### Solution 2: Header-based authentication (best for servers you control)
 
 If you own or control the destination server, you can shift your security strategy from the network layer to the application layer. Instead of relying on IP addresses for authentication, you use a shared secret.
 
@@ -71,7 +71,7 @@ If you own or control the destination server, you can shift your security strate
       - Reject any request that does not carry the correct secret token.
 - **Benefit:** This creates a "virtual whitelist" at the application level, effectively controlling access without relying on static IP addresses.
 
-#### Solution 3: Self-Hosting the Edge Runtime
+### Solution 3: Self-hosting the Edge Runtime
 
 This solution is for scenarios with extremely strict security policies (e.g., government or health data regulations) that might forbid the use of proxies or secret-based whitelisting for compliance reasons.
 

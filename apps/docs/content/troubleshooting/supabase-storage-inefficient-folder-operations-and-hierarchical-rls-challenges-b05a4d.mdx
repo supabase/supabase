@@ -6,10 +6,10 @@ keywords = []
 
 Supabase Storage lacks native folder concepts or APIs for batch folder operations, which can lead to inefficient folder operations (move, rename, delete) and difficulties in implementing hierarchical access controls for objects.
 
-**Why Does This Happen?**
+## Why does this happen?
 Storage buckets treat "folders" purely as key prefixes. This means file system-like folder behavior and inherited permissions are not built-in features of Supabase Storage.
 
-**How to Address These Challenges:**
+## How to address these challenges
 To overcome these limitations and implement robust folder management with hierarchical RLS, consider the following approach:
 
 - **Model your folder hierarchy in a custom PostgreSQL table.** This table should manage folder metadata such as folder IDs, parent IDs, paths, and permissions.

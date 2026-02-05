@@ -6,11 +6,11 @@ keywords = []
 
 If your App Store submission is rejected with a 'TLS error' when tested in an IPv6-only environment, often citing a lack of AAAA records, it typically indicates application-level issues rather than a Supabase configuration problem.
 
-**Why Does This Happen?**
+## Why does this happen?
 
 Supabase projects are designed for compatibility with IPv6-only NAT64/DNS64 environments through automatic IPv4-to-IPv6 translation. This means explicit AAAA records are not required for your `*.supabase.co` domain. The 'TLS error' usually points to how the application handles networking requests, which can interfere with this automatic translation.
 
-**How to Resolve This Issue:**
+## How to resolve this issue
 
 - Ensure you're using hostnames, not IP addresses - Use project-ref.supabase.co everywhere in your code. See [Supporting IPv6 DNS64/NAT64 Networks](https://developer.apple.com/documentation/network/supporting_ipv6_dns64_nat64_networks)
 - Use high-level networking APIs like URLSession that handle IPv6 automatically. See [URLSession Documentation](https://developer.apple.com/documentation/foundation/urlsession)
