@@ -64,6 +64,17 @@ interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:!px-6 [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-6 [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
 
+export type ChartTableRowStatus = 'default' | 'warning' | 'destructive' 
+
+export const getStatusRowClass = (status: ChartTableRowStatus = 'default') => {
+  const variants: Record<ChartTableRowStatus, string> = {
+    default: '',
+    warning: '[&>td]:bg-warning-200 [&>td]:hover:bg-warning-300 [&>td]:text-warning',
+    destructive: '[&>td]:bg-destructive-200 [&>td]:hover:bg-destructive-300 [&>td]:text-destructive',
+  }
+  return variants[status]
+}
+
 const Chart = React.forwardRef<HTMLDivElement, ChartProps>(
   ({ children, isLoading = false, isDisabled = false, className, ...props }, ref) => {
     return (
