@@ -95,11 +95,11 @@ test.describe('Queue Table Operations', () => {
   })
 
   test.beforeEach(async ({ page, ref }) => {
-    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await enableQueueOperations(page)
     const loadPromise = waitForTableToLoad(page, ref)
-    await page.reload()
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await loadPromise
+    await enableQueueOperations(page)
+    await page.reload({ waitUntil: 'networkidle' })
   })
 
   test.afterAll(async () => {
