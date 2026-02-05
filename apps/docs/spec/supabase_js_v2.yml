@@ -7194,7 +7194,6 @@ functions:
           ```
 
   - id: cors-headers
-    title: corsHeaders
     $ref: '@supabase/supabase-js.cors.corsHeaders'
 
   - id: functions-setauth
