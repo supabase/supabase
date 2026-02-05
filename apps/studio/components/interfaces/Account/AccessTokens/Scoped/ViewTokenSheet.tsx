@@ -16,9 +16,8 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { Card, CardContent } from 'ui'
 import { ACCESS_TOKEN_RESOURCES } from '../AccessToken.constants'
 import { useMemo } from 'react'
-import { formatActionText } from './Form/Permissions/Permissions.utils'
+import { formatActionText, getRealAccess } from '../AccessToken.utils'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
-import { getRealAccess } from '../AccessToken.utils'
 
 interface ViewTokenSheetProps {
   visible: boolean

@@ -12,7 +12,8 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { X, RotateCcw } from 'lucide-react'
 import { ACCESS_TOKEN_RESOURCES } from '../../../AccessToken.constants'
 import { PermissionRow, PermissionsFormValues, PermissionsProps } from './Permissions.types'
-import { sortActions, formatActionText } from './Permissions.utils'
+import { sortActions } from './Permissions.utils'
+import { formatActionText } from '../../../AccessToken.utils'
 import { PermissionResourceSelector } from './PermissionResourceSelector'
 
 export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({

@@ -115,3 +115,14 @@ export const getRealAccess = (resource: string, tokenPermissions: string[]) => {
     return actions.join('-')
   }
 }
+
+export const formatActionText = (action: string): string => {
+  switch (action) {
+    case 'no access':
+      return 'No access'
+    case 'read-write':
+      return 'Read write'
+    default:
+      return action.charAt(0).toUpperCase() + action.slice(1).replace(/-/g, ' ')
+  }
+}
