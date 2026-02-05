@@ -39,14 +39,14 @@ export const FEATURE_PREVIEWS = [
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
     name: 'Queue table operations',
-    discussionsUrl: undefined,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/42460',
     isNew: true,
     isPlatformOnly: false,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
     name: 'New Table Filter Bar',
-    discussionsUrl: undefined,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/42461',
     isNew: true,
     isPlatformOnly: false,
   },
