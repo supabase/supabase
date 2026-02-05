@@ -13,6 +13,20 @@ Check updates for each service to learn more.
 
 ## Unreleased
 
+### Studio
+- Added functions management UI (requires `docker-compose.yml` update) - PR [#40690](https://github.com/supabase/supabase/pull/40690), PR [#42322](https://github.com/supabase/supabase/pull/42322), PR [#42349](https://github.com/supabase/supabase/pull/42349), PR [#42350](https://github.com/supabase/supabase/pull/42350)
+
+### MCP Server
+- Updated to `v0.6.3` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.6.3)
+
+---
+
+## [2026-02-05]
+
+### Storage
+- Updated to `v1.37.1` - [Changelog](https://github.com/supabase/storage/releases/tag/v1.37.1)
+- Fixed an issue with Storage not starting because of an issue with migrations - PR [storage#845](https://github.com/supabase/storage/pull/845)
+
 ---
 
 ## [2026-01-27]
@@ -33,7 +47,7 @@ Check updates for each service to learn more.
 ### Realtime
 - Updated to `v2.72.0` - [Release](https://github.com/supabase/realtime/releases/tag/v2.72.0)
 - Changed healthchecks logging to off by default (requires `docker-compose.yml` update) - PR [realtime#1677](https://github.com/supabase/realtime/pull/1677), PR [#42156](https://github.com/supabase/supabase/pull/42156)
-- Changed logging configuration and healthcheck frequency to reduce log volume - PR [#42112](https://github.com/supabase/supabase/pull/42112)
+- Changed logging configuration and healthcheck frequency to reduce log volume (requires `docker-compose.yml` update) - PR [#42112](https://github.com/supabase/supabase/pull/42112)
 
 ### Storage
 - Updated to `v1.33.5` - [Changelog](https://github.com/supabase/storage/releases/tag/v1.33.5)
