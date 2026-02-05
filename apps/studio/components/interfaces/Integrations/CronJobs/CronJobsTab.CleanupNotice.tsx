@@ -40,7 +40,7 @@ export const CronJobRunDetailsOverflowNoticeV2 = (
       layout="horizontal"
       actions={<CronJobRunDetailsOverflowDialog {...props} />}
     >
-      <p className="text-xs">Last and next run for each cron job omitted due to high query cost</p>
+      <p className="text-xs">Last run for each cron job omitted due to high query cost</p>
     </Admonition>
   )
 }
@@ -77,7 +77,7 @@ const CronJobRunDetailsOverflowDialog = ({
       </DialogTrigger>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Last and next run for cron jobs omitted for overview</DialogTitle>
+          <DialogTitle>Last run for cron jobs omitted for overview</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-2">
