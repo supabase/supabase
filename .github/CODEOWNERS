@@ -3,6 +3,7 @@
 /packages/shared-data/plans.ts @supabase/billing
 /packages/common/telemetry-constants.ts @supabase/growth-eng
 /packages/pg-meta @supabase/postgres @avallete
+/packages/ui-patterns @supabase/design
 
 /apps/studio/ @supabase/Dashboard
 
