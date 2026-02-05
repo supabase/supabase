@@ -931,6 +931,13 @@
         "slug": "functions-cors-headers",
         "product": "functions",
         "type": "function"
+      },
+      {
+        "id": "functions-setauth",
+        "title": "Update authorization token",
+        "slug": "functions-setauth",
+        "product": "functions",
+        "type": "function"
       }
     ]
   },
@@ -1004,6 +1011,13 @@
         "id": "broadcast-message",
         "title": "Broadcast a message",
         "slug": "broadcastmessage",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-setauth",
+        "title": "Set authentication token",
+        "slug": "realtime-setauth",
         "product": "realtime",
         "type": "function"
       }
