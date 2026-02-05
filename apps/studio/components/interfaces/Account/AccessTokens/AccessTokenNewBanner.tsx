@@ -9,7 +9,7 @@ import {
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { ACCESS_TOKEN_PERMISSIONS, getResourcePermissions } from './AccessToken.constants'
+import { getResourcePermissions, ACCESS_TOKEN_RESOURCES } from './AccessToken.constants'
 
 interface AccessTokenNewBannerProps<T> {
   token: T
@@ -20,7 +20,7 @@ interface AccessTokenNewBannerProps<T> {
   description?: string
 }
 
-const PERMISSIONS_COLLAPSE_THRESHOLD = 5 // Show inline if 5 or fewer, collapse if more
+const PERMISSIONS_COLLAPSE_THRESHOLD = 5
 
 export const AccessTokenNewBanner = <T,>({
   token,
@@ -30,20 +30,18 @@ export const AccessTokenNewBanner = <T,>({
   title = 'Successfully generated a new token!',
   description = 'Do copy this access token and store it in a secure place - you will not be able to see it again.',
 }: AccessTokenNewBannerProps<T>) => {
-  const permissions = getTokenPermissions?.(token)
+  const tokenPermissions = getTokenPermissions?.(token)
   const [permissionsOpen, setPermissionsOpen] = useState(false)
-  const shouldCollapse = permissions && permissions.length > PERMISSIONS_COLLAPSE_THRESHOLD
+  const shouldCollapse = tokenPermissions && tokenPermissions.length > PERMISSIONS_COLLAPSE_THRESHOLD
 
   const getRealAccess = (resource: string, tokenPermissions: string[]) => {
     const hasPermission = (permission: string) => tokenPermissions.includes(permission)
 
-    // Get the permissions for this resource from PERMISSION_MAP
     const resourcePermissions = getResourcePermissions(resource)
     if (!resourcePermissions) {
       return 'no access'
     }
 
-    // Check what permissions the token has for this resource
     const hasRead = resourcePermissions['read']?.some((p) => hasPermission(p)) || false
     const hasWrite = resourcePermissions['write']?.some((p) => hasPermission(p)) || false
     const hasCreate = resourcePermissions['create']?.some((p) => hasPermission(p)) || false
@@ -82,12 +80,12 @@ export const AccessTokenNewBanner = <T,>({
   const groupedPermissionsByAccess = useMemo(() => {
     const grouped: Record<string, string[]> = {}
 
-    if (!permissions || permissions.length === 0) {
+    if (!tokenPermissions || tokenPermissions.length === 0) {
       return grouped
     }
 
-    ACCESS_TOKEN_PERMISSIONS.resources.forEach((resource) => {
-      const access = getRealAccess(resource.resource, permissions)
+    ACCESS_TOKEN_RESOURCES.forEach((resource) => {
+      const access = getRealAccess(resource.resource, tokenPermissions)
       if (access !== 'no access') {
         const formattedAccess = formatAccessText(access)
         if (!grouped[formattedAccess]) {
@@ -98,7 +96,7 @@ export const AccessTokenNewBanner = <T,>({
     })
 
     return grouped
-  }, [permissions])
+  }, [tokenPermissions])
 
   const totalGroupedPermissions = Object.values(groupedPermissionsByAccess).reduce(
     (sum, resources) => sum + resources.length,
@@ -127,12 +125,12 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => {}}
+            onChange={() => { }}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>
 
-        {permissions && permissions.length > 0 && (
+        {tokenPermissions && tokenPermissions.length > 0 && (
           <div className="pt-4 border-t border-default">
             {shouldCollapse ? (
               <Collapsible open={permissionsOpen} onOpenChange={setPermissionsOpen}>

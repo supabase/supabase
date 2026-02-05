@@ -20,11 +20,7 @@ import {
 } from 'ui'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Plus, Key, X, RotateCcw } from 'lucide-react'
-import { ACCESS_TOKEN_PERMISSIONS } from '../../AccessToken.constants'
-
-import { permissions } from '@supabase/shared-types'
-
-console.log(permissions)
+import { ACCESS_TOKEN_RESOURCES } from '../../AccessToken.constants'
 
 export interface PermissionResource {
   resource: string
@@ -46,17 +42,6 @@ interface PermissionsProps<TFormValues extends PermissionsFormValues = Permissio
   watch: UseFormWatch<TFormValues>
   resourceSearchOpen: boolean
   setResourceSearchOpen: (open: boolean) => void
-}
-
-const createAllResources = (permissionGroup: {
-  name: string
-  resources: PermissionResource[]
-}): PermissionResource[] => {
-  return permissionGroup.resources.map((resource) => ({
-    resource: resource.resource,
-    title: resource.title,
-    actions: resource.actions,
-  }))
 }
 
 interface PermissionResourceSelectorProps<TFormValues extends PermissionsFormValues> {
@@ -163,7 +148,7 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
 
             <CommandGroup_Shadcn_ className="[&>div]:text-left">
               <div className="max-h-[210px] overflow-y-auto">
-                {ACCESS_TOKEN_PERMISSIONS.resources.map((resource) => {
+                {ACCESS_TOKEN_RESOURCES.map((resource) => {
                   const isChecked = permissionRows.some((row) => row.resource === resource.resource)
                   return (
                     <CommandItem_Shadcn_
@@ -202,7 +187,6 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
   setResourceSearchOpen,
 }: PermissionsProps<TFormValues>) => {
   const permissionRows = (watch('permissionRows' as Path<TFormValues>) || []) as PermissionRow[]
-  const ALL_RESOURCES = createAllResources(ACCESS_TOKEN_PERMISSIONS)
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
@@ -249,7 +233,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
         ) : (
           <div className="border border-border rounded-lg">
             {permissionRows.map((row, index) => {
-              const selectedResource = ALL_RESOURCES.find((r) => r.resource === row.resource)
+              const selectedResource = ACCESS_TOKEN_RESOURCES.find((r) => r.resource === row.resource)
               return (
                 <div key={index}>
                   <div className="flex items-center gap-3 p-3">
