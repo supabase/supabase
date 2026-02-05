@@ -457,7 +457,7 @@ services:
 
   vector:
     container_name: supabase-vector
-    image: timberio/vector:0.53.1-alpine
+    image: timberio/vector:0.53.0-alpine
     restart: unless-stopped
     volumes:
       - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
