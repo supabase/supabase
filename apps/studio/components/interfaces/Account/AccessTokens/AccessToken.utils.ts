@@ -1,5 +1,5 @@
 import { AccessTokenSort, AccessTokenSortColumn, AccessTokenSortOrder, BaseToken } from './AccessToken.types'
-import { z } from 'zod'
+import { PERMISSION_LIST, ScopedAccessTokenPermission } from './AccessToken.constants'
 
 export const handleSortChange = (
   currentSort: AccessTokenSort,
@@ -57,18 +57,61 @@ export const filterAndSortTokens = <T extends BaseToken>(
   })
 }
 
-export const PermissionRowSchema = z.object({
-  resource: z.string().min(1, 'Please select a resource'),
-  action: z.string().min(1, 'Please select an action'),
-})
+export const mapPermissionToFGA = (
+  resourceKey: string,
+  action: string
+): ScopedAccessTokenPermission[] => {
+  const [scope, resource] = resourceKey.split(':')
+  const match = PERMISSION_LIST.find(
+    (p) => p.scope === scope && p.resource === resource && p.action === action
+  )
+  return match ? [match.id as ScopedAccessTokenPermission] : []
+}
 
-export const TokenSchema = z.object({
-  tokenName: z.string().min(1, 'Please enter a name for the token'),
-  expiresAt: z.preprocess((val) => (val === 'never' ? undefined : val), z.string().optional()),
-  resourceAccess: z.enum(['all-orgs', 'selected-orgs', 'selected-projects']),
-  selectedOrganizations: z.array(z.string()).optional(),
-  selectedProjects: z.array(z.string()).optional(),
-  permissionRows: z.array(PermissionRowSchema).min(1, 'Please configure at least one permission'),
-})
+// [kemal]: Not sure how efficient this will be, but it should get permissions from shared types and transform them whenever @supabase/shared-types updates.
+export const getResourcePermissions = (
+  resourceKey: string
+): Record<string, ScopedAccessTokenPermission[]> => {
+  const [scope, resource] = resourceKey.split(':')
+  const result: Record<string, ScopedAccessTokenPermission[]> = { 'no access': [] }
 
-export type TokenFormValues = z.infer<typeof TokenSchema>
+  PERMISSION_LIST.filter((p) => p.scope === scope && p.resource === resource).forEach((p) => {
+    result[p.action] = [p.id as ScopedAccessTokenPermission]
+  })
+
+  if (result['read'] && result['write']) {
+    result['read-write'] = [...result['read'], ...result['write']]
+  }
+
+  return result
+}
+
+export const getRealAccess = (resource: string, tokenPermissions: string[]) => {
+  const hasPermission = (permission: string) => tokenPermissions.includes(permission)
+  const resourcePermissions = getResourcePermissions(resource)
+
+  if (!resourcePermissions) {
+    return 'no access'
+  }
+
+  const hasRead = resourcePermissions['read']?.some((p: string) => hasPermission(p)) || false
+  const hasWrite = resourcePermissions['write']?.some((p: string) => hasPermission(p)) || false
+  const hasCreate = resourcePermissions['create']?.some((p: string) => hasPermission(p)) || false
+  const hasDelete = resourcePermissions['delete']?.some((p: string) => hasPermission(p)) || false
+
+  const actions: string[] = []
+  if (hasRead) actions.push('read')
+  if (hasWrite) actions.push('write')
+  if (hasCreate) actions.push('create')
+  if (hasDelete) actions.push('delete')
+
+  if (actions.length === 0) {
+    return 'no access'
+  } else if (actions.length === 1) {
+    return actions[0]
+  } else if (hasRead && hasWrite && actions.length === 2) {
+    return 'read-write'
+  } else {
+    return actions.join('-')
+  }
+}

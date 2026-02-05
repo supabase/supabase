@@ -20,7 +20,7 @@ import {
   EXPIRES_AT_OPTIONS,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../../AccessToken.constants'
-import { type TokenFormValues } from '../../AccessToken.utils'
+import { type TokenFormValues } from '../../AccessToken.schemas'
 
 interface BasicInfoProps {
   control: Control<TokenFormValues>

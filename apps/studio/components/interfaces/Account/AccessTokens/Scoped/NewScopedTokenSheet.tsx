@@ -29,12 +29,12 @@ import { BasicInfo } from './Form/BasicInfo'
 import { Permissions } from './Form/Permissions/Permissions'
 import { ResourceAccess } from './Form/ResourceAccess/ResourceAccess'
 import {
-  mapPermissionToFGA,
   EXPIRES_AT_OPTIONS,
   type ScopedAccessTokenPermission,
 } from '../AccessToken.constants'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
-import { TokenSchema, type TokenFormValues } from '../AccessToken.utils'
+import { mapPermissionToFGA } from '../AccessToken.utils'
+import { TokenSchema, type TokenFormValues } from '../AccessToken.schemas'
 
 export interface NewScopedTokenSheetProps {
   visible: boolean

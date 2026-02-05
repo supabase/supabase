@@ -55,7 +55,7 @@ const buildPermissionList = () => {
   return list
 }
 
-const PERMISSION_LIST = buildPermissionList()
+export const PERMISSION_LIST = buildPermissionList()
 
 export const ACCESS_TOKEN_RESOURCES = (() => {
   const resourceMap = new Map<string, { resource: string; title: string; actions: string[] }>()
@@ -74,32 +74,3 @@ export const ACCESS_TOKEN_RESOURCES = (() => {
 
   return Array.from(resourceMap.values())
 })()
-
-export const mapPermissionToFGA = (
-  resourceKey: string,
-  action: string
-): ScopedAccessTokenPermission[] => {
-  const [scope, resource] = resourceKey.split(':')
-  const match = PERMISSION_LIST.find(
-    (p) => p.scope === scope && p.resource === resource && p.action === action
-  )
-  return match ? [match.id as ScopedAccessTokenPermission] : []
-}
-
-// [kemal]: Not sure how efficient this will be, but it should get permissions from shared types and transform them whenever @supabase/shared-types updates.
-export const getResourcePermissions = (
-  resourceKey: string
-): Record<string, ScopedAccessTokenPermission[]> => {
-  const [scope, resource] = resourceKey.split(':')
-  const result: Record<string, ScopedAccessTokenPermission[]> = { 'no access': [] }
-
-  PERMISSION_LIST.filter((p) => p.scope === scope && p.resource === resource).forEach((p) => {
-    result[p.action] = [p.id as ScopedAccessTokenPermission]
-  })
-
-  if (result['read'] && result['write']) {
-    result['read-write'] = [...result['read'], ...result['write']]
-  }
-
-  return result
-}

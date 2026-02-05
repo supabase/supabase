@@ -10,7 +10,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { getResourcePermissions, ACCESS_TOKEN_RESOURCES } from './AccessToken.constants'
+import { ACCESS_TOKEN_RESOURCES } from './AccessToken.constants'
+import { getRealAccess } from './AccessToken.utils'
 
 interface AccessTokenNewBannerProps<T> {
   token: T
@@ -36,35 +37,7 @@ export const AccessTokenNewBanner = <T,>({
   const shouldCollapse =
     tokenPermissions && tokenPermissions.length > PERMISSIONS_COLLAPSE_THRESHOLD
 
-  const getRealAccess = (resource: string, tokenPermissions: string[]) => {
-    const hasPermission = (permission: string) => tokenPermissions.includes(permission)
 
-    const resourcePermissions = getResourcePermissions(resource)
-    if (!resourcePermissions) {
-      return 'no access'
-    }
-
-    const hasRead = resourcePermissions['read']?.some((p) => hasPermission(p)) || false
-    const hasWrite = resourcePermissions['write']?.some((p) => hasPermission(p)) || false
-    const hasCreate = resourcePermissions['create']?.some((p) => hasPermission(p)) || false
-    const hasDelete = resourcePermissions['delete']?.some((p) => hasPermission(p)) || false
-
-    const actions: string[] = []
-    if (hasRead) actions.push('read')
-    if (hasWrite) actions.push('write')
-    if (hasCreate) actions.push('create')
-    if (hasDelete) actions.push('delete')
-
-    if (actions.length === 0) {
-      return 'no access'
-    } else if (actions.length === 1) {
-      return actions[0]
-    } else if (hasRead && hasWrite && actions.length === 2) {
-      return 'read-write'
-    } else {
-      return actions.join('-')
-    }
-  }
 
   const formatAccessText = (access: string) => {
     switch (access) {
@@ -129,7 +102,7 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => {}}
+            onChange={() => { }}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>

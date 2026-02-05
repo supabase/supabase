@@ -14,10 +14,11 @@ import {
 import { useScopedAccessTokenQuery } from 'data/scoped-access-tokens/scoped-access-token-query'
 import { DocsButton } from 'components/ui/DocsButton'
 import { Card, CardContent } from 'ui'
-import { getResourcePermissions, ACCESS_TOKEN_RESOURCES } from '../AccessToken.constants'
+import { ACCESS_TOKEN_RESOURCES } from '../AccessToken.constants'
 import { useMemo } from 'react'
 import { formatActionText } from './Form/Permissions/Permissions.utils'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
+import { getRealAccess } from '../AccessToken.utils'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -40,37 +41,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
       retryDelay: 1000,
     }
   )
-
-  const getRealAccess = (resource: string, tokenPermissions: string[]) => {
-    const hasPermission = (permission: string) => tokenPermissions.includes(permission)
-    const resourcePermissions = getResourcePermissions(resource)
-
-    if (!resourcePermissions) {
-      console.warn(`Unknown resource: ${resource}`)
-      return 'no access'
-    }
-
-    const hasRead = resourcePermissions['read']?.some((p) => hasPermission(p)) || false
-    const hasWrite = resourcePermissions['write']?.some((p) => hasPermission(p)) || false
-    const hasCreate = resourcePermissions['create']?.some((p) => hasPermission(p)) || false
-    const hasDelete = resourcePermissions['delete']?.some((p) => hasPermission(p)) || false
-
-    const actions: string[] = []
-    if (hasRead) actions.push('read')
-    if (hasWrite) actions.push('write')
-    if (hasCreate) actions.push('create')
-    if (hasDelete) actions.push('delete')
-
-    if (actions.length === 0) {
-      return 'no access'
-    } else if (actions.length === 1) {
-      return actions[0]
-    } else if (hasRead && hasWrite && actions.length === 2) {
-      return 'read-write'
-    } else {
-      return actions.join('-')
-    }
-  }
 
   const groupedResourcesByAccess = useMemo(() => {
     const grouped: Record<string, string[]> = {}
