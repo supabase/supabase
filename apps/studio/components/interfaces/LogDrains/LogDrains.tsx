@@ -5,11 +5,12 @@ import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-quer
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useTrack } from 'lib/telemetry/track'
 import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
-import React, { cloneElement, useState } from 'react'
+import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
   Card,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -20,7 +21,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'

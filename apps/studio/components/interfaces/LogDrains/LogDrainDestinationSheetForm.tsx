@@ -123,6 +123,9 @@ const formUnion = z.discriminatedUnion('type', [
     username: z.string().min(1, { message: 'Username is required' }),
     password: z.string().min(1, { message: 'Password is required' }),
   }),
+  z.object({
+    type: z.literal('otlp'),
+  }),
 ])
 
 const formSchema = z
@@ -227,7 +230,6 @@ export function LogDrainDestinationSheetForm({
       batch_timeout: defaultConfig?.batch_timeout ?? 3000,
       dataset_name: defaultConfig?.dataset_name || '',
       api_token: defaultConfig?.api_token || '',
-      region: defaultConfig?.region || '',
     },
   })
 
@@ -341,9 +343,7 @@ export function LogDrainDestinationSheetForm({
                     <Select_Shadcn_
                       defaultValue={defaultType}
                       value={form.getValues('type')}
-                      onValueChange={(v: Exclude<LogDrainType, 'axiom'>) =>
-                        form.setValue('type', v)
-                      }
+                      onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                     >
                       <SelectTrigger_Shadcn_>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}

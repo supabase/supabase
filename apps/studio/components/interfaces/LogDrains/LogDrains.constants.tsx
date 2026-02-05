@@ -1,6 +1,5 @@
 import { components } from 'api-types'
-import { Datadog, Grafana, Sentry, Last9 } from 'icons'
-import { Axiom } from 'icons'
+import { Axiom, Datadog, Grafana, Last9, Sentry } from 'icons'
 import { BracesIcon, Cloud } from 'lucide-react'
 
 const iconProps = {

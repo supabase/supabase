@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
-import { useFlag } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
@@ -19,8 +18,7 @@ import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import { ChevronDown } from 'lucide-react'
-import { useState } from 'react'
-import { cloneElement } from 'react'
+import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -112,8 +110,8 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             setOpen(v)
           }}
           defaultValues={{
-            type: selectedLogDrain?.type || 'webhook',
             ...selectedLogDrain,
+            type: selectedLogDrain?.type ? selectedLogDrain.type : 'webhook',
           }}
           isLoading={isLoading}
           onSubmit={({ name, description, type, ...values }) => {
