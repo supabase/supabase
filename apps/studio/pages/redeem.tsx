@@ -14,11 +14,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, Loading } from 'ui'
 
-const RedeemCredistPage: NextPageWithLayout = () => {
-  const {
-    query: { code },
-  } = useRouter()
-
+const RedeemCreditsPage: NextPageWithLayout = () => {
   const {
     data: organizations,
     isLoading: areOrganizationsLoading,
@@ -53,15 +49,7 @@ const RedeemCredistPage: NextPageWithLayout = () => {
             new organization first. You will have to revisit this link after creating the
             organization to redeem the code.
           </p>
-          <Button
-            className="mt-4"
-            size="tiny"
-            htmlType="submit"
-            type="primary"
-            onClick={async (e) => {
-              e.preventDefault()
-            }}
-          >
+          <Button asChild className="mt-4" size="tiny" type="primary">
             <Link href={`/new`}>Create organization</Link>
           </Button>
         </div>
@@ -96,6 +84,6 @@ const RedeemCredistPage: NextPageWithLayout = () => {
   )
 }
 
-RedeemCredistPage.getLayout = (page) => <RedeemCreditsLayout>{page}</RedeemCreditsLayout>
+RedeemCreditsPage.getLayout = (page) => <RedeemCreditsLayout>{page}</RedeemCreditsLayout>
 
-export default RedeemCredistPage
+export default RedeemCreditsPage
