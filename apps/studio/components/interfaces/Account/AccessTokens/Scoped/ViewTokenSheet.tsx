@@ -15,10 +15,9 @@ import { useScopedAccessTokenQuery } from 'data/scoped-access-tokens/scoped-acce
 import { DocsButton } from 'components/ui/DocsButton'
 import { Card, CardContent } from 'ui'
 import { getResourcePermissions, ACCESS_TOKEN_RESOURCES } from '../AccessToken.constants'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useMemo } from 'react'
 import { formatActionText } from './Form/Permissions/Permissions.utils'
+import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -27,13 +26,7 @@ interface ViewTokenSheetProps {
 }
 
 export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProps) {
-  const { data: organizations = [] } = useOrganizationsQuery()
-  const { data: projectsData } = useProjectsInfiniteQuery({
-    limit: 100,
-  })
-
-  const projects =
-    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData]) ?? []
+  const { organizations, projects } = useOrgAndProjectData()
 
   const {
     data: token,

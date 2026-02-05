@@ -7,8 +7,6 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import {
   useAccessTokenCreateMutation,
   type NewScopedAccessToken,
@@ -35,6 +33,7 @@ import {
   EXPIRES_AT_OPTIONS,
   type ScopedAccessTokenPermission,
 } from '../AccessToken.constants'
+import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 
 const PermissionRowSchema = z.object({
   resource: z.string().min(1, 'Please select a resource'),
@@ -70,12 +69,7 @@ export const NewScopedTokenSheet = ({
   const [resourceSearchOpen, setResourceSearchOpen] = useState(false)
   const [customExpiryDate, setCustomExpiryDate] = useState<{ date: string } | undefined>(undefined)
   const [isCustomExpiry, setIsCustomExpiry] = useState(false)
-  const { data: organizations = [] } = useOrganizationsQuery()
-  const { data: projectsData } = useProjectsInfiniteQuery({ limit: 100 })
-  const projects = useMemo(
-    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
-    [projectsData]
-  )
+  const { organizations, projects } = useOrgAndProjectData()
 
   const form = useForm<TokenFormValues>({
     resolver: zodResolver(TokenSchema),

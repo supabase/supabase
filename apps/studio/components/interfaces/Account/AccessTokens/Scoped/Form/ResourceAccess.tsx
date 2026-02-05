@@ -14,6 +14,7 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 
 interface ResourceAccessProps {
   control: Control<{
@@ -48,18 +49,9 @@ const RESOURCE_OPTIONS = [
 export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps) => {
   const { profile } = useProfile()
 
-  const { data: organizations = [], isLoading: isLoadingOrgs } = useOrganizationsQuery({
+  const { organizations, projects, isLoadingOrgs, isLoadingProjects } = useOrgAndProjectData({
     enabled: !!profile,
   })
-
-  const { data: projectsData, isLoading: isLoadingProjects } = useProjectsInfiniteQuery({
-    limit: 100,
-  })
-
-  const projects = useMemo(
-    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
-    [projectsData]
-  )
 
   const orgSlugToName = useMemo(
     () => new Map(organizations.map((org) => [org.slug, org.name])),
