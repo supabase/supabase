@@ -29,7 +29,7 @@ The core of this behavior stems from the distinction between how PostgreSQL mana
 
 - **PostgreSQL's Flexibility:** As a standard PostgreSQL cluster, your Supabase backend is inherently capable of hosting multiple databases. You can connect to your project and manually create additional databases, such as `example_database` or `another_database`, alongside the default `postgres` database. These manually created databases are fully functional PostgreSQL databases, accessible via external tools like TablePlus, `psql`, or any other PostgreSQL client, provided you use the correct connection parameters (e.g., `user=postgres.[your_project_slug] host=... port=... dbname=example_database`).
 
-- **Supabase's Integrated Design:** While PostgreSQL itself supports multiple databases per cluster, the Supabase platform, its Dashboard, and most of its integrated features (such as PostgREST for APIs, Supabase Auth, and Supabase Storage) are specifically engineered to operate exclusively with the project's **default `postgres` database**.
+- **Supabase's Integrated Design:** While Postgres itself supports multiple databases per cluster, the Supabase platform, its Dashboard, and most of its integrated features (such as PostgREST for APIs, Supabase Auth, and Supabase Storage) are specifically engineered to operate exclusively with the project's **default `postgres` database**.
 
 - **The Disconnect Explained:**
   - **Dashboard Visibility:** The Supabase Dashboard is designed to manage and display information related solely to the `postgres` database within your project. Manually created databases (like `example_database`) will therefore not appear in the Dashboard's interface, as it's not configured to interact with them.
