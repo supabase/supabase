@@ -2,6 +2,7 @@ import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
 import type { Filter } from 'components/grid/types'
 import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
 import { format } from 'date-fns'
+import { Loader2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Calendar } from 'ui'
@@ -20,6 +21,7 @@ import { columnToFilterProperty } from './FilterPopoverNew.utils'
 
 export interface FilterPopoverProps {
   portal?: boolean
+  isRefetching?: boolean
 }
 
 // Convert Filter[] to FilterGroup
@@ -114,7 +116,7 @@ function serializeFilterProperties(
   }))
 }
 
-export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
+export const FilterPopoverNew = ({ isRefetching = false }: FilterPopoverProps) => {
   const { filters, setFilters } = useTableFilterNew()
   const snap = useTableEditorTableStateSnapshot()
 
@@ -188,17 +190,24 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
     [generateFilters, serializableFilterProperties, handleFilterChange, setFreeformText]
   )
 
+  const icon = isRefetching ? (
+    <Loader2 className="animate-spin text-brand h-4 w-4 shrink-0" aria-label="Loading table data" />
+  ) : null
+
   return (
-    <FilterBar
-      filterProperties={filterProperties}
-      filters={filterGroup}
-      onFilterChange={handleFilterChange}
-      freeformText={freeformText}
-      onFreeformTextChange={setFreeformText}
-      actions={actions}
-      isLoading={isGenerating}
-      variant="pill"
-      className="bg-transparent border-0"
-    />
+    <div className="flex-1 min-w-0">
+      <FilterBar
+        filterProperties={filterProperties}
+        filters={filterGroup}
+        onFilterChange={handleFilterChange}
+        freeformText={freeformText}
+        onFreeformTextChange={setFreeformText}
+        actions={actions}
+        isLoading={isGenerating}
+        variant="pill"
+        className="bg-transparent border-0"
+        icon={icon}
+      />
+    </div>
   )
 }

@@ -84,6 +84,10 @@ export const createTableEditorTableState = ({
       state.allRowsSelected = selectAll ?? false
       state.selectedRows = proxySet(rows)
     },
+    resetSelectedRows: () => {
+      state.allRowsSelected = false
+      state.selectedRows = proxySet(new Set())
+    },
 
     /* Columns */
     gridColumns,
