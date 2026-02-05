@@ -65,6 +65,7 @@
       ],
       "env": [
         "ANALYZE",
+        "CI",
         "NEXT_PUBLIC_SUPPORT_API_URL",
         "NEXT_PUBLIC_CONTENT_API_URL",
         "NEXT_PUBLIC_BASE_PATH",

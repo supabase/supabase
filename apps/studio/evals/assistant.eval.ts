@@ -23,6 +23,7 @@ assert(process.env.OPENAI_API_KEY, 'OPENAI_API_KEY is not set')
 Eval('Assistant', {
   projectId: process.env.BRAINTRUST_PROJECT_ID,
   data: () => dataset,
+  trialCount: process.env.CI ? 3 : 1,
   task: async (input) => {
     const result = await generateAssistantResponse({
       model: openai('gpt-5-mini'),
