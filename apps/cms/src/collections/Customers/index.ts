@@ -1,5 +1,10 @@
-import type { CollectionConfig } from 'payload'
-
+import {
+  MetaDescriptionField,
+  MetaImageField,
+  MetaTitleField,
+  OverviewField,
+  PreviewField,
+} from '@payloadcms/plugin-seo/fields'
 import {
   BlocksFeature,
   FixedToolbarFeature,
@@ -8,26 +13,18 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
+import type { CollectionConfig } from 'payload'
 
 import { isAnyone } from '../../access/isAnyone.ts'
 import { isAuthenticated } from '../../access/isAuthenticated.ts'
-
 import { Banner } from '../../blocks/Banner/config.ts'
 import { Code } from '../../blocks/Code/config.ts'
 import { MediaBlock } from '../../blocks/MediaBlock/config.ts'
 import { Quote } from '../../blocks/Quote/config.ts'
 import { YouTube } from '../../blocks/YouTube/config.ts'
-import { revalidateDelete, revalidateCustomer } from './hooks/revalidateCustomer.ts'
-
-import {
-  MetaDescriptionField,
-  MetaImageField,
-  MetaTitleField,
-  OverviewField,
-  PreviewField,
-} from '@payloadcms/plugin-seo/fields'
 import { slugField } from '../../fields/slug/index.ts'
 import { WWW_SITE_ORIGIN } from '../../utilities/constants.ts'
+import { revalidateCustomer, revalidateDelete } from './hooks/revalidateCustomer.ts'
 
 const industryOptions = [
   { label: 'Healthcare', value: 'healthcare' },

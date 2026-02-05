@@ -8,6 +8,7 @@ import {
   PopoverAnchor_Shadcn_,
   PopoverContent_Shadcn_,
 } from 'ui'
+
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
 import { FilterCondition } from './FilterCondition'
@@ -173,7 +174,9 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onKeyDown={handleFreeformKeyDown}
                 className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-0"
                 placeholder={
-                  group.conditions.length === 0 ? 'Search or filter...' : '+ Search or filter...'
+                  group.conditions.length === 0
+                    ? 'Ask AI for help (e.g. Find all users with name John) or filter...'
+                    : 'Add more filters...'
                 }
                 disabled={isLoading}
               />
