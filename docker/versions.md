@@ -1,5 +1,8 @@
 # Docker Image Versions
 
+## 2026-02-05
+- supabase/storage-api:v1.37.1 (prev supabase/storage-api:v1.33.5)
+
 ## 2026-01-27
 - supabase/studio:2026.01.27-sha-6aa59ff (prev supabase/studio:2025.12.17-sha-43f4f7f)
 - supabase/gotrue:v2.185.0 (prev supabase/gotrue:v2.184.0)
