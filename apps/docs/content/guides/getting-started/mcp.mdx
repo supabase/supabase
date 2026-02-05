@@ -191,13 +191,7 @@ We recommend the following best practices to mitigate security risks when using 
 - **Read-only mode**: If you must connect to real data, set the server to [read-only](https://github.com/supabase-community/supabase-mcp#read-only-mode) mode, which executes all queries as a read-only Postgres user.
 - **Project scoping**: Scope your MCP server to a [specific project](https://github.com/supabase-community/supabase-mcp#project-scoped-mode), limiting access to only that project's resources. This prevents LLMs from accessing data from other projects in your Supabase account.
 - **Branching**: Use Supabase's [branching feature](/docs/guides/deployment/branching) to create a development branch for your database. This allows you to test changes in a safe environment before merging them to production.
-- **Feature groups**: Control which tool groups are available by adding the `features` parameter to your MCP server URL:
-
-  ```
-  https://mcp.supabase.com/mcp?features=database,docs,debugging
-  ```
-
-  Available groups: `account`, `database`, `debugging`, `development`, `docs`, `functions`, `branching`, `storage`. All except `storage` are enabled by default. This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.
+- **Feature groups**: Restrict which [tool groups](#available-tools) are available using the `features` [configuration option](#configuration-options). This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.
 
 ## On GitHub
 
