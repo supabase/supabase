@@ -22,7 +22,7 @@ PKCE (Proof Key for Code Exchange) is a security extension to the OAuth 2.0 Auth
 
 Magic links are a passwordless authentication method where users receive a unique, time-sensitive link via email. Clicking this link directly logs them into the application without needing a password.
 
-## What is Go template security and `{{ .SiteURL }}`?
+## What is go template security and `{{ .SiteURL }}`?
 
 The email templating system often uses a language like Go, which has built-in security features to prevent cross-site scripting (XSS) and other vulnerabilities. When a variable like `{{ .SiteURL }}` (intended to represent your application's primary URL) is used in an email template, Go's security model automatically sanitizes the output. If the URL provided in `{{ .SiteURL }}` does not start with a recognized safe scheme like `http://` or `https://` (e.g., `your-app-scheme://`), Go considers it potentially malicious. To protect users, it replaces the unsafe link with a placeholder, typically `#ZgotmplZ`.
 
