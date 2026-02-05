@@ -150,10 +150,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.created_at
                                     ? new Date(token.created_at).toLocaleDateString('en-GB', {
-                                      day: 'numeric',
-                                      month: 'short',
-                                      year: 'numeric',
-                                    })
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: 'numeric',
+                                      })
                                     : 'Unknown'}
                                 </span>
                               </TableCell>
@@ -166,10 +166,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.last_used_at
                                     ? new Date(token.last_used_at).toLocaleDateString('en-GB', {
-                                      day: 'numeric',
-                                      month: 'short',
-                                      year: 'numeric',
-                                    })
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: 'numeric',
+                                      })
                                     : 'Never'}
                                 </span>
                               </TableCell>
@@ -182,10 +182,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <span className="text-foreground">
                                   {token?.expires_at
                                     ? new Date(token.expires_at).toLocaleDateString('en-GB', {
-                                      day: 'numeric',
-                                      month: 'short',
-                                      year: 'numeric',
-                                    })
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: 'numeric',
+                                      })
                                     : 'Never'}
                                 </span>
                               </TableCell>
@@ -228,7 +228,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <TableCell colSpan={2}>
                                   <p className="text-foreground-light text-center py-4">
                                     {token?.organization_slugs &&
-                                      token.organization_slugs.length > 0
+                                    token.organization_slugs.length > 0
                                       ? 'This token has access to specific organizations and projects.'
                                       : 'This token has access to all resources.'}
                                   </p>
@@ -271,7 +271,9 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                   return resources.map((resource) => (
                                     <TableRow key={`${accessLevel}-${resource}`}>
                                       <TableCell>
-                                        <p className="truncate text-foreground capitalize">{resource}</p>
+                                        <p className="truncate text-foreground capitalize">
+                                          {resource}
+                                        </p>
                                       </TableCell>
                                       <TableCell>
                                         <span className="text-foreground-light">

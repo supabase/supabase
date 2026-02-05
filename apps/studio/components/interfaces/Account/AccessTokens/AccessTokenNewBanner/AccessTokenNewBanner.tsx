@@ -50,7 +50,7 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => { }}
+            onChange={() => {}}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>
