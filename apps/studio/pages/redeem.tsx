@@ -42,15 +42,19 @@ const RedeemCredistPage: NextPageWithLayout = () => {
     }
 
     return (
-      <div className='grid md:grid-cols-2 pt-10 gap-8'>
+      <div className="grid md:grid-cols-2 pt-10 gap-8">
         <div>
-          <p>To redeem your credits, select one of your organizations. The credits will be applied to that organization only and cannot be transferred or shared between organizations.</p>
-          <p className='mt-8'>
-            <span className="font-bold text-foreground-light">Want to start fresh?</span> Create
-            a new organization first. You will have to revisit this link after creating the organization to redeem the code.
+          <p>
+            To redeem your credits, select one of your organizations. The credits will be applied to
+            that organization only and cannot be transferred or shared between organizations.
+          </p>
+          <p className="mt-8">
+            <span className="font-bold text-foreground-light">Want to start fresh?</span> Create a
+            new organization first. You will have to revisit this link after creating the
+            organization to redeem the code.
           </p>
           <Button
-            className='mt-4'
+            className="mt-4"
             size="tiny"
             htmlType="submit"
             type="primary"
@@ -58,13 +62,11 @@ const RedeemCredistPage: NextPageWithLayout = () => {
               e.preventDefault()
             }}
           >
-            <Link href={`/new`}>
-              Create organization
-            </Link>
+            <Link href={`/new`}>Create organization</Link>
           </Button>
         </div>
 
-        <div className='space-y-2'>
+        <div className="space-y-2">
           {organizations.map((org) => (
             <div key={org.id} onClickCapture={() => setSelectedOrg(org.slug)}>
               <OrganizationCard key={org.id} isLink={false} organization={org} />
@@ -72,7 +74,13 @@ const RedeemCredistPage: NextPageWithLayout = () => {
           ))}
         </div>
 
-        {selectedOrg && <CreditCodeRedemption slug={selectedOrg} modalVisible={true} onClose={() => setSelectedOrg(null)} />}
+        {selectedOrg && (
+          <CreditCodeRedemption
+            slug={selectedOrg}
+            modalVisible={true}
+            onClose={() => setSelectedOrg(null)}
+          />
+        )}
       </div>
     )
   }

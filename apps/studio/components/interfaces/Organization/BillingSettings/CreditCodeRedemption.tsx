@@ -50,7 +50,7 @@ type CreditCodeRedemptionForm = z.infer<typeof FormSchema>
 export const CreditCodeRedemption = ({
   slug,
   modalVisible = false,
-  onClose
+  onClose,
 }: {
   slug: string | undefined
   modalVisible?: boolean
