@@ -1,19 +1,13 @@
 import { expect, Page } from '@playwright/test'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
+import { deleteTable } from '../utils/table-helpers.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { waitForApiResponse, waitForTableToLoad } from '../utils/wait-for-response.js'
+import { waitForTableToLoad } from '../utils/wait-for-response.js'
 
 const QUEUE_OPERATIONS_KEY = 'supabase-ui-queue-operations'
 const tableNamePrefix = 'pw_queue_table'
-
-const dismissToastsIfAny = async (page: Page) => {
-  const closeButtons = page.getByRole('button', { name: 'Close toast' })
-  const count = await closeButtons.count()
-  for (let i = 0; i < count; i++) {
-    await closeButtons.nth(i).click()
-  }
-}
 
 const enableQueueOperations = async (page: Page) => {
   await page.evaluate((key) => {
@@ -21,39 +15,27 @@ const enableQueueOperations = async (page: Page) => {
   }, QUEUE_OPERATIONS_KEY)
 }
 
-/**
- * Helper function to run SQL in the SQL editor
- */
 const runSQL = async (page: Page, ref: string, sql: string) => {
   await page.goto(toUrl(`/project/${ref}/sql/new`))
-
-  // Wait for SQL editor to be ready
   await expect(page.getByText('Loading...')).not.toBeVisible({ timeout: 10000 })
 
-  // Click into the editor and paste SQL (avoids autocomplete issues)
   await page.locator('.view-lines').click()
   await page.keyboard.press('ControlOrMeta+KeyA')
   await page.evaluate((text) => navigator.clipboard.writeText(text), sql)
   await page.keyboard.press('ControlOrMeta+KeyV')
 
-  // Run the query
   await page.getByTestId('sql-run-button').click()
 
-  // Handle destructive query confirmation dialog if it appears
   const confirmButton = page.getByRole('button', { name: 'Run this query' })
   if (await confirmButton.isVisible({ timeout: 1000 }).catch(() => false)) {
     await confirmButton.click()
   }
 
-  // Wait for the query to complete - look for success indicator in the results
   await expect(
     page.getByText('Success. No rows returned').or(page.getByText(/^\d+ rows?$/)).first()
   ).toBeVisible({ timeout: 10000 })
 }
 
-/**
- * Helper function to create a table using SQL
- */
 const createTableSQL = async (
   page: Page,
   ref: string,
@@ -76,9 +58,6 @@ const createTableSQL = async (
   await runSQL(page, ref, sql)
 }
 
-/**
- * Helper function to drop a table using SQL
- */
 const dropTableSQL = async (page: Page, ref: string, tableName: string) => {
   await runSQL(page, ref, `DROP TABLE IF EXISTS ${tableName} CASCADE;`)
 }
@@ -95,43 +74,18 @@ const createTable = async (page: Page, ref: string, tableName: string, columnNam
   await nameInput.fill(tableName)
   await expect(nameInput).toHaveValue(tableName)
 
-  // Make created_at nullable
   await page.getByTestId('created_at-extra-options').click()
   await page.getByRole('checkbox', { name: 'Is Nullable' }).click()
   await page.getByTestId('created_at-extra-options').click({ force: true })
 
-  // Add custom column
   await page.getByRole('button', { name: 'Add column' }).click()
   await page.getByRole('textbox', { name: 'column_name' }).fill(columnName)
   await page.getByText('Choose a column type...').click()
   await page.getByRole('option', { name: 'text Variable-length' }).click()
 
   await page.getByRole('button', { name: 'Save' }).click()
-  await expect(
-    page.getByText(`Table ${tableName} is good to go!`),
-    'Success toast should be visible after table creation'
-  ).toBeVisible({ timeout: 50000 })
-
-  await expect(
-    page.getByRole('button', { name: `View ${tableName}`, exact: true }),
-    'Table should be visible after creation'
-  ).toBeVisible()
-}
-
-const deleteTable = async (page: Page, ref: string, tableName: string) => {
-  const viewLocator = page.getByLabel(`View ${tableName}`)
-  if ((await viewLocator.count()) === 0) return
-  await viewLocator.nth(0).click()
-  await viewLocator.locator('button[aria-haspopup="menu"]').click({ force: true })
-  await page.getByText('Delete table').click()
-  await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).click()
-  const apiPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete-', {
-    method: 'POST',
-  })
-  const revalidatePromise = waitForApiResponse(page, 'pg-meta', ref, `query?key=entity-types-`)
-  await page.getByRole('button', { name: 'Delete' }).click()
-  await Promise.all([apiPromise, revalidatePromise])
-  await expect(page.getByTestId('confirm-delete-table-modal')).not.toBeVisible()
+  await expect(page.getByText(`Table ${tableName} is good to go!`)).toBeVisible({ timeout: 50000 })
+  await expect(page.getByRole('button', { name: `View ${tableName}`, exact: true })).toBeVisible()
 }
 
 test.describe('Queue Table Operations', () => {
@@ -144,7 +98,6 @@ test.describe('Queue Table Operations', () => {
       await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
       await loadPromise
 
-      // Clean up any existing test tables
       const viewButtons = page.getByRole('button', { name: /^View / })
       const names = await Promise.all(
         (await viewButtons.all()).map(async (btn) => {
@@ -169,10 +122,8 @@ test.describe('Queue Table Operations', () => {
   })
 
   test.beforeEach(async ({ page, ref }) => {
-    // Enable queue operations feature preview
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
-    // Reload to apply the feature preview
     await page.reload()
     await waitForTableToLoad(page, ref)
   })
@@ -185,54 +136,42 @@ test.describe('Queue Table Operations', () => {
     const tableName = `${tableNamePrefix}_cell_edit`
     const columnName = 'name'
 
-    // Create table with initial data using SQL
     await createTableSQL(page, ref, tableName, columnName, [{ name: 'original value' }])
 
-    // Navigate to the table editor
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
     await page.reload()
     await waitForTableToLoad(page, ref)
 
-    // Navigate to the table
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Verify the row exists
     await expect(page.getByRole('gridcell', { name: 'original value' })).toBeVisible()
 
-    // Now edit the cell by double-clicking
     const cell = page.getByRole('gridcell', { name: 'original value' })
     await cell.dblclick()
 
-    // Edit the value in the inline editor
     const editor = page.getByRole('textbox', { name: /Editor content/ })
     await expect(editor).toBeVisible()
     await editor.fill('edited value')
     await page.keyboard.press('Enter')
 
-    // Verify pending changes bar appears
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    // Click View Details to open the side panel
     await page.getByRole('button', { name: 'View Details' }).click()
 
-    // Verify the pending changes panel shows the edit
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
     await expect(sidePanel.getByText('Cell Edits (1)')).toBeVisible()
     await expect(sidePanel.getByTitle('original value')).toBeVisible()
     await expect(sidePanel.getByTitle('edited value')).toBeVisible()
 
-    // Save all changes
     await sidePanel.getByRole('button', { name: /Save All/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Verify the cell now shows the edited value
     await expect(page.getByRole('gridcell', { name: 'edited value' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'original value' })).not.toBeVisible()
 
-    // Cleanup
     await dropTableSQL(page, ref, tableName)
   })
 
@@ -240,44 +179,34 @@ test.describe('Queue Table Operations', () => {
     const tableName = `${tableNamePrefix}_cell_cancel`
     const columnName = 'name'
 
-    // Create table with initial data using SQL
     await createTableSQL(page, ref, tableName, columnName, [{ name: 'keep this value' }])
 
-    // Navigate to the table editor
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
     await page.reload()
     await waitForTableToLoad(page, ref)
 
-    // Navigate to the table
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Verify the row exists
     await expect(page.getByRole('gridcell', { name: 'keep this value' })).toBeVisible()
 
-    // Edit the cell
     const cell = page.getByRole('gridcell', { name: 'keep this value' })
     await cell.dblclick()
     const editor = page.getByRole('textbox', { name: /Editor content/ })
     await editor.fill('should be cancelled')
     await page.keyboard.press('Enter')
 
-    // Open pending changes panel
     await expect(page.getByText('1 pending change')).toBeVisible()
     await page.getByRole('button', { name: 'View Details' }).click()
 
-    // Cancel all changes
     await page.getByRole('button', { name: 'Cancel All' }).click()
 
-    // Verify the original value is still there
     await expect(page.getByRole('gridcell', { name: 'keep this value' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'should be cancelled' })).not.toBeVisible()
 
-    // Verify pending changes bar is gone
     await expect(page.getByText('pending change')).not.toBeVisible()
 
-    // Cleanup
     await dropTableSQL(page, ref, tableName)
   })
 
@@ -285,48 +214,37 @@ test.describe('Queue Table Operations', () => {
     const tableName = `${tableNamePrefix}_row_insert`
     const columnName = 'name'
 
-    // Create empty table using SQL
     await createTableSQL(page, ref, tableName, columnName)
 
-    // Navigate to the table editor
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
     await page.reload()
     await waitForTableToLoad(page, ref)
 
-    // Navigate to the table
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Insert a row via side panel
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('new row value')
     await page.getByTestId('action-bar-save-row').click()
 
-    // Verify pending changes bar appears
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    // The row should appear in the grid (but not yet saved to database)
     await expect(page.getByRole('gridcell', { name: 'new row value' })).toBeVisible()
 
-    // Open pending changes panel
     await page.getByRole('button', { name: 'View Details' }).click()
 
-    // Verify the pending changes panel shows the insert
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
     await expect(sidePanel.getByText('Rows to Add (1)')).toBeVisible()
     await expect(sidePanel.getByText('New row', { exact: true })).toBeVisible()
 
-    // Save all changes
     await sidePanel.getByRole('button', { name: /Save All/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Verify the row is still visible (now saved)
     await expect(page.getByRole('gridcell', { name: 'new row value' })).toBeVisible()
 
-    // Cleanup
     await dropTableSQL(page, ref, tableName)
   })
 
@@ -334,51 +252,40 @@ test.describe('Queue Table Operations', () => {
     const tableName = `${tableNamePrefix}_batch_ops`
     const columnName = 'name'
 
-    // Create empty table using SQL
     await createTableSQL(page, ref, tableName, columnName)
 
-    // Navigate to the table editor
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
     await page.reload()
     await waitForTableToLoad(page, ref)
 
-    // Navigate to the table
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Insert first row
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('row one')
     await page.getByTestId('action-bar-save-row').click()
 
-    // Insert second row
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('row two')
     await page.getByTestId('action-bar-save-row').click()
 
-    // Verify 2 pending changes
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    // Open pending changes panel
     await page.getByRole('button', { name: 'View Details' }).click()
 
-    // Verify the panel shows both operations
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('2 operations')).toBeVisible()
     await expect(sidePanel.getByText('Rows to Add (2)')).toBeVisible()
 
-    // Save all
     await sidePanel.getByRole('button', { name: /Save All/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Verify both rows exist
     await expect(page.getByRole('gridcell', { name: 'row one' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'row two' })).toBeVisible()
 
-    // Cleanup
     await dropTableSQL(page, ref, tableName)
   })
 
@@ -386,55 +293,42 @@ test.describe('Queue Table Operations', () => {
     const tableName = `${tableNamePrefix}_remove_op`
     const columnName = 'name'
 
-    // Create empty table using SQL
     await createTableSQL(page, ref, tableName, columnName)
 
-    // Navigate to the table editor
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
     await page.reload()
     await waitForTableToLoad(page, ref)
 
-    // Navigate to the table
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Insert first row
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('keep this row')
     await page.getByTestId('action-bar-save-row').click()
 
-    // Insert second row
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('remove this row')
     await page.getByTestId('action-bar-save-row').click()
 
-    // Verify 2 pending changes
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    // Open pending changes panel
     await page.getByRole('button', { name: 'View Details' }).click()
 
-    // Remove the second operation (the one we want to discard)
-    // Find the remove button for "remove this row"
     const sidePanel = page.getByRole('dialog')
     const removeButtons = sidePanel.getByRole('button', { name: 'Remove operation' })
     await removeButtons.last().click()
 
-    // Verify only 1 pending change now
     await expect(sidePanel.getByText('1 operation')).toBeVisible()
 
-    // Save the remaining change
     await sidePanel.getByRole('button', { name: /Save All/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Verify only the first row was saved
     await expect(page.getByRole('gridcell', { name: 'keep this row' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'remove this row' })).not.toBeVisible()
 
-    // Cleanup
     await dropTableSQL(page, ref, tableName)
   })
 
@@ -442,44 +336,34 @@ test.describe('Queue Table Operations', () => {
     const tableName = `${tableNamePrefix}_shortcuts`
     const columnName = 'name'
 
-    // Create empty table using SQL
     await createTableSQL(page, ref, tableName, columnName)
 
-    // Navigate to the table editor
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
     await page.reload()
     await waitForTableToLoad(page, ref)
 
-    // Navigate to the table
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Insert a row
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('shortcut test')
     await page.getByTestId('action-bar-save-row').click()
 
-    // Verify pending changes bar appears
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    // Use Cmd+. (or Ctrl+.) to open the details panel
     await page.keyboard.press('Meta+.')
     await expect(page.getByRole('dialog').getByText('Pending changes')).toBeVisible()
 
-    // Close with the same shortcut
     await page.keyboard.press('Meta+.')
     await expect(page.getByRole('button', { name: 'View Details' })).toBeVisible()
 
-    // Use Cmd+S (or Ctrl+S) to save
     await page.keyboard.press('Meta+s')
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Verify the row was saved
     await expect(page.getByRole('gridcell', { name: 'shortcut test' })).toBeVisible()
 
-    // Cleanup
     await dropTableSQL(page, ref, tableName)
   })
 
@@ -487,50 +371,38 @@ test.describe('Queue Table Operations', () => {
     const tableName = `${tableNamePrefix}_row_delete`
     const columnName = 'name'
 
-    // Create table with initial data using SQL
     await createTableSQL(page, ref, tableName, columnName, [{ name: 'row to delete' }])
 
-    // Navigate to the table editor
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
     await page.reload()
     await waitForTableToLoad(page, ref)
 
-    // Navigate to the table
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Verify the row exists
     await expect(page.getByRole('gridcell', { name: 'row to delete' })).toBeVisible()
 
-    // Right-click on the row to open context menu
     const cell = page.getByRole('gridcell', { name: 'row to delete' })
     await cell.click({ button: 'right' })
 
-    // Click "Delete row" from context menu
     await page.getByRole('menuitem', { name: 'Delete row' }).click()
 
-    // Verify pending changes bar appears with delete
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    // Open pending changes panel to verify it shows delete operation
     await page.getByRole('button', { name: 'View Details' }).click()
 
-    // Verify the pending changes panel shows the delete
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
     await expect(sidePanel.getByText('Rows to Delete (1)')).toBeVisible()
     await expect(sidePanel.getByText('Delete row', { exact: true })).toBeVisible()
 
-    // Save all changes
     await sidePanel.getByRole('button', { name: /Save All/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Verify the row is deleted
     await expect(page.getByRole('gridcell', { name: 'row to delete' })).not.toBeVisible()
     await expect(page.getByText('0 records')).toBeVisible()
 
-    // Cleanup
     await deleteTable(page, ref, tableName)
   })
 
@@ -540,11 +412,9 @@ test.describe('Queue Table Operations', () => {
 
     await createTable(page, ref, tableName, columnName)
 
-    // Navigate to the table
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Insert a row and save it
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('should not be deleted')
@@ -553,23 +423,18 @@ test.describe('Queue Table Operations', () => {
     await page.getByRole('button', { name: 'Save⌘S' }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Right-click and delete
     const cell = page.getByRole('gridcell', { name: 'should not be deleted' })
     await cell.click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Delete row' }).click()
 
-    // Verify pending delete
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    // Open panel and cancel
     await page.getByRole('button', { name: 'View Details' }).click()
     await page.getByRole('button', { name: 'Cancel All' }).click()
 
-    // Verify the row still exists
     await expect(page.getByRole('gridcell', { name: 'should not be deleted' })).toBeVisible()
     await expect(page.getByText('pending change')).not.toBeVisible()
 
-    // Cleanup
     await deleteTable(page, ref, tableName)
   })
 
@@ -579,11 +444,9 @@ test.describe('Queue Table Operations', () => {
 
     await createTable(page, ref, tableName, columnName)
 
-    // Navigate to the table
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Insert two rows and save them first
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('row to edit')
@@ -598,29 +461,23 @@ test.describe('Queue Table Operations', () => {
     await page.getByRole('button', { name: 'Save⌘S' }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Now create a batch of mixed operations:
-    // 1. Edit the first row
     const cellToEdit = page.getByRole('gridcell', { name: 'row to edit' })
     await cellToEdit.dblclick()
     const editor = page.getByRole('textbox', { name: /Editor content/ })
     await editor.fill('edited row')
     await page.keyboard.press('Enter')
 
-    // 2. Delete the second row
     const cellToDelete = page.getByRole('gridcell', { name: 'row to delete' })
     await cellToDelete.click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Delete row' }).click()
 
-    // 3. Add a new row
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('new row')
     await page.getByTestId('action-bar-save-row').click()
 
-    // Verify 3 pending changes
     await expect(page.getByText('3 pending changes')).toBeVisible()
 
-    // Open panel to verify all three types
     await page.getByRole('button', { name: 'View Details' }).click()
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('3 operations')).toBeVisible()
@@ -628,17 +485,14 @@ test.describe('Queue Table Operations', () => {
     await expect(sidePanel.getByText('Rows to Add (1)')).toBeVisible()
     await expect(sidePanel.getByText('Cell Edits (1)')).toBeVisible()
 
-    // Save all
     await sidePanel.getByRole('button', { name: /Save All/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Verify final state
     await expect(page.getByRole('gridcell', { name: 'edited row' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'new row' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'row to delete' })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'row to edit' })).not.toBeVisible()
 
-    // Cleanup
     await deleteTable(page, ref, tableName)
   })
 
@@ -647,11 +501,9 @@ test.describe('Queue Table Operations', () => {
     const tableName2 = `${tableNamePrefix}_persist2`
     const columnName = 'name'
 
-    // Create two tables
     await createTable(page, ref, tableName1, columnName)
     await createTable(page, ref, tableName2, columnName)
 
-    // Navigate to first table and add a pending change
     await page.getByRole('button', { name: `View ${tableName1}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
@@ -662,35 +514,28 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    // Switch to second table
     await page.getByRole('button', { name: `View ${tableName2}`, exact: true }).click()
 
-    // Add a pending change in second table
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('pending in table 2')
     await page.getByTestId('action-bar-save-row').click()
 
-    // Should have 2 pending changes total (from both tables)
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    // Open panel and verify both are there
     await page.getByRole('button', { name: 'View Details' }).click()
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('2 operations')).toBeVisible()
 
-    // Save all
     await sidePanel.getByRole('button', { name: /Save All/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
-    // Verify both rows exist in their respective tables
     await page.getByRole('button', { name: `View ${tableName1}`, exact: true }).click()
     await expect(page.getByRole('gridcell', { name: 'pending in table 1' })).toBeVisible()
 
     await page.getByRole('button', { name: `View ${tableName2}`, exact: true }).click()
     await expect(page.getByRole('gridcell', { name: 'pending in table 2' })).toBeVisible()
 
-    // Cleanup
     await deleteTable(page, ref, tableName1)
     await deleteTable(page, ref, tableName2)
   })
