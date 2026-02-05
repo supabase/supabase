@@ -1,0 +1,71 @@
+---
+title = "PKCE Flow errors: 'cannot parse response' or '#ZgotmplZ' in magic link emails"
+topics = [ "auth", "cli" ]
+keywords = []
+[[errors]]
+code = "#ZgotmplZ"
+message = "Go template sanitization of unsafe URL scheme"
+
+[[errors]]
+code = "cannot parse response"
+message = "PKCE flow interrupted by email client or token consumed by link scanner"
+
+---
+
+When setting up authentication with magic links and mobile deep linking, you might encounter specific errors like `#ZgotmplZ` in your email templates or a 'cannot parse response' error during the login flow. This guide explains the underlying causes and provides a robust solution.
+
+## What is PKCE flow?
+
+PKCE (Proof Key for Code Exchange) is a security extension to the OAuth 2.0 Authorization Code Flow, specifically designed for public clients like mobile apps. It prevents interception attacks by requiring the client to generate a secret (a "code verifier") which is hashed and sent to the authorization server during the initial authorization request. This hash (the "code challenge") is later compared to the actual code verifier when the client exchanges the authorization code for an access token. It acts as a secure "handshake" between your mobile application and the authentication service.
+
+## What are magic links?
+
+Magic links are a passwordless authentication method where users receive a unique, time-sensitive link via email. Clicking this link directly logs them into the application without needing a password.
+
+## What is go template security and `{{ .SiteURL }}`?
+
+The email templating system often uses a language like Go, which has built-in security features to prevent cross-site scripting (XSS) and other vulnerabilities. When a variable like `{{ .SiteURL }}` (intended to represent your application's primary URL) is used in an email template, Go's security model automatically sanitizes the output. If the URL provided in `{{ .SiteURL }}` does not start with a recognized safe scheme like `http://` or `https://` (e.g., `your-app-scheme://`), Go considers it potentially malicious. To protect users, it replaces the unsafe link with a placeholder, typically `#ZgotmplZ`.
+
+## Understanding the problem
+
+You may observe two distinct issues:
+
+1.  **The `#ZgotmplZ` Error**:
+
+    - **Cause**: This error occurs when you attempt to use a non-standard URL scheme (like `your-app-scheme://` for a mobile app deep link) directly within a template variable like `{{ .SiteURL }}` in your email templates. Go's security features sanitize this perceived "unsafe" URL, replacing it with the `#ZgotmplZ` placeholder. This prevents the link from being rendered correctly and thus from working.
+
+2.  **The 'Cannot Parse Response' Error**:
+    - **Cause 1: Broken PKCE Handshake**: This error typically arises when the authentication flow, especially PKCE, is interrupted. If an email client attempts to open the magic link in its own internal browser, this can disrupt the "handshake" process between your mobile application and the authentication service. The mobile app expects to receive specific parameters to complete the PKCE flow, and if these are not delivered correctly due to the intermediary email browser, the app reports a 'cannot parse response' error.
+    - **Cause 2: Email Link Scanners**: Many email providers and security tools automatically scan or "pre-click" links in emails to check for malicious content. For one-time magic links, this automated scanning can inadvertently consume the authentication token before the legitimate user even clicks the link. When the user then clicks the (now consumed) link, the authentication attempt fails, resulting in a 'cannot parse response' error. This can lead to occasional failures, even if the general flow appears to work most of the time.
+
+## Resolving the problem: The recommended flow (email → website → mobile app)
+
+To achieve a reliable and secure authentication experience that accommodates both Go's security model and the complexities of mobile deep linking and PKCE, the recommended approach is a multi-step redirection: **Email → Website → Mobile App**.
+
+Here’s how to implement this solution:
+
+### Step 1: Configure your authentication project
+
+Ensure your authentication service (e.g., Supabase) is correctly configured to use your website as the primary callback destination.
+
+- **Set Your Project's `SITE_URL`**: Update this setting to your website's primary domain. This should be a standard web URL (e.g., `https://example.com`). This ensures that `{{ .SiteURL }}` and `{{ .ConfirmationURL }}` will generate safe, web-standard links.
+- **Add Your Mobile Deep Link Scheme to `Additional Redirect URLs`**: Include your mobile app's deep link scheme with a wildcard (e.g., `your-app-scheme://*`) in the list of authorized redirect URLs. This tells the authentication service that your app's scheme is a valid destination _after_ the initial web redirect.
+
+### Step 2: Update your email template
+
+Now that your `SITE_URL` is correctly set to a web domain, you can safely use the built-in variables.
+
+- **Use `{{ .ConfirmationURL }}` for Magic Links**: In your email template, use `{{ .ConfirmationURL }}`. This variable will generate a secure web link pointing to your configured `SITE_URL`, typically `https://example.com/auth/callback` or a similar path. This link is safe from Go's sanitization as it uses a standard `https://` scheme.
+
+### Step 3: Implement an intermediary web page with user action
+
+This is the most crucial step to resolve both the broken PKCE handshake and the email link scanner issues.
+
+- **Create a Web Callback Page**: Develop a simple web page on your `SITE_URL` (e.g., `https://example.com/auth/callback`). This page will be the initial destination when the user clicks the magic link in the email.
+- **Add a User-Initiated Button**: On this callback page, include a button or explicit action that the user _must_ click to proceed. For example, a button labeled "Verify & Open App."
+  - **Why this is essential**:
+    - It prevents email link scanners from automatically triggering the final deep link, ensuring the one-time token is not consumed prematurely.
+    - It ensures the user is in a standard web browser (like Chrome or Safari), which can correctly handle the deep link redirection, rather than an email client's internal browser that might break the PKCE flow.
+- **Implement Deep Link Redirection**: When the user clicks the "Verify & Open App." button, execute a script that redirects them to your mobile application using its deep link scheme. For example, `window.location.href = "your-app-scheme://login-callback?code=..."` where `code` would contain any necessary authentication parameters received by the web callback page.
+
+By following this Email → Website → Mobile App flow with a user-initiated action on the web page, you establish a robust and secure authentication process that sidesteps common pitfalls associated with email clients and link scanners, ensuring a consistent user experience.

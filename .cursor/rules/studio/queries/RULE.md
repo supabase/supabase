@@ -9,12 +9,12 @@ alwaysApply: false
 
 # Studio queries & mutations (React Query)
 
-Follow the `apps/studio/data/` patterns used by edge functions:
+Follow the `apps/studio/data/` patterns:
 
-- Query hook: `apps/studio/data/edge-functions/edge-functions-query.ts`
+- Query options: `apps/studio/data/table-editor/table-editor-query.ts`
 - Mutation hook: `apps/studio/data/edge-functions/edge-functions-update-mutation.ts`
 - Keys: `apps/studio/data/edge-functions/keys.ts`
-- Page usage: `apps/studio/pages/project/[ref]/functions/index.tsx`
+- Page usage: `apps/studio/pages/project/[ref]/database/tables/[id].tsx`
 
 ## Organize query keys
 
@@ -31,23 +31,41 @@ export const edgeFunctionsKeys = {
 }
 ```
 
-## Write a query hook
+## Write query options (preferred pattern)
 
-- Export `Variables`, `Data`, and `Error` types from the file.
-- Implement a `getX(variables, signal?)` function that:
+Use `queryOptions` from `@tanstack/react-query` to define reusable query configurations. This pattern:
+
+- Provides type safety for query keys and data
+- Can be used with `useQuery()` in components
+- Can be used with `queryClient.fetchQuery()` for imperative fetching
+
+Guidelines:
+
+- Export `XVariables`, `XData`, and `XError` types from the file (prefixed with the domain name).
+- Implement a private `getX(variables, signal?)` function that:
   - throws if required variables are missing
   - passes the `signal` through to the fetcher for cancellation
-  - calls `handleError(error)` and returns `data`
-- Wrap it in `useXQuery()` using `useQuery`, `UseCustomQueryOptions`, and a domain key helper.
-- Gate with `enabled` so the query doesn’t run until required variables exist (and platform-only queries should include `IS_PLATFORM`).
+  - calls `handleError(error)` on failure (which throws) — the function returns `data` on success
+  - this function should NOT be exported. For imperative fetching, use `queryClient.fetchQuery(xQueryOptions(...))`
+- Export `xQueryOptions()` using `queryOptions` from `@tanstack/react-query`.
+- Gate with `enabled` so the query doesn't run until required variables exist (and platform-only queries should include `IS_PLATFORM` from `lib/constants`).
+- When migrating away from exporting `useQuery`, move all options into the `xQueryOptions` as default values.
+- No extra options should be added as params, if the user wants to overwrite the options, they can do by destructuring the query options. For example, `{ ...xQueryOptions(vars), enabled: true }`.
 
 Template:
 
 ```ts
+import { queryOptions } from '@tanstack/react-query'
+
+import { xKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import { ResponseError } from '@/types'
+
 export type XVariables = { projectRef?: string }
 export type XError = ResponseError
 
-export async function getX({ projectRef }: XVariables, signal?: AbortSignal) {
+async function getX({ projectRef }: XVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
   const { data, error } = await get('/v1/projects/{ref}/x', {
     params: { path: { ref: projectRef } },
@@ -59,16 +77,58 @@ export async function getX({ projectRef }: XVariables, signal?: AbortSignal) {
 
 export type XData = Awaited<ReturnType<typeof getX>>
 
-export const useXQuery = <TData = XData>(
-  { projectRef }: XVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions<XData, XError, TData> = {}
-) =>
-  useQuery<XData, XError, TData>({
+export const xQueryOptions = ({ projectRef }: XVariables) => {
+  return queryOptions({
     queryKey: xKeys.list(projectRef),
     queryFn: ({ signal }) => getX({ projectRef }, signal),
-    enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined',
-    ...options,
+    enabled: IS_PLATFORM && typeof projectRef !== 'undefined',
   })
+}
+```
+
+## Using query options in components
+
+Use `useQuery` directly with the query options:
+
+```ts
+import { useQuery } from '@tanstack/react-query'
+
+import { xQueryOptions } from '@/data/x/x-query'
+
+// In component:
+const { data, isPending, isError } = useQuery(
+  xQueryOptions({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+)
+```
+
+## Imperative fetching (outside React or in callbacks)
+
+Use `queryClient.fetchQuery()` with the query options:
+
+```ts
+import { useQueryClient } from '@tanstack/react-query'
+
+import { xQueryOptions } from '@/data/x/x-query'
+
+// In component:
+const queryClient = useQueryClient()
+
+const handleClick = useCallback(
+  async (id: number) => {
+    const data = await queryClient.fetchQuery(
+      xQueryOptions({
+        id,
+        projectRef,
+        connectionString: project?.connectionString,
+      })
+    )
+    // use data...
+  },
+  [project?.connectionString, projectRef, queryClient]
+)
 ```
 
 ## Write a mutation hook
@@ -78,12 +138,24 @@ export const useXQuery = <TData = XData>(
 - Prefer a `useXMutation()` wrapper that:
   - accepts `UseCustomMutationOptions` (omit `mutationFn`)
   - invalidates the relevant `list()` + `detail()` keys in `onSuccess` and `await`s them via `Promise.all`
-  - defaults to a `toast.error(...)` when `onError` isn’t provided
+  - defaults to a `toast.error(...)` when `onError` isn't provided
 
 Template:
 
 ```ts
-export const useXUpdateMutation = ({ onSuccess, onError, ...options } = {}) => {
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+
+import { xKeys } from './keys'
+import type { UseCustomMutationOptions } from '@/data/custom-mutation'
+
+type XUpdateVariables = { projectRef: string; slug: string; payload: XPayload }
+
+export const useXUpdateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: UseMutationOptions<XData, XError, XUpdateVariables> = {}) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: updateX,
@@ -107,7 +179,7 @@ export const useXUpdateMutation = ({ onSuccess, onError, ...options } = {}) => {
 
 ## Component usage
 
-- Prefer React Query’s v5 flags:
+- Prefer React Query's v5 flags:
   - `isPending` for initial load (often aliased to `isLoading`)
   - `isFetching` for background refetches
-- Render states explicitly (pending → error → success), like `apps/studio/pages/project/[ref]/functions/index.tsx`.
+- Render states explicitly (pending → error → success), like `apps/studio/pages/project/[ref]/database/tables/[id].tsx`.

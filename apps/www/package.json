@@ -90,6 +90,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.4",
     "@hookform/resolvers": "^3.1.1",
     "@types/animejs": "^3.1.12",
     "@types/classnames": "^2.3.1",

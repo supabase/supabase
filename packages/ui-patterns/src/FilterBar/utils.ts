@@ -1,11 +1,11 @@
 import {
-  FilterGroup,
-  FilterCondition,
-  FilterProperty,
-  CustomOptionObject,
-  FilterOptionObject,
-  FilterOperatorObject,
   AsyncOptionsFunction,
+  CustomOptionObject,
+  FilterCondition,
+  FilterGroup,
+  FilterOperatorObject,
+  FilterOptionObject,
+  FilterProperty,
   SyncOptionsFunction,
   isGroup,
 } from './types'
@@ -133,17 +133,9 @@ export function addFilterToGroup(
   property: FilterProperty
 ): FilterGroup {
   if (path.length === 0) {
-    const firstOperator = property.operators?.[0] || '='
-    const operatorValue = isFilterOperatorObject(firstOperator)
-      ? firstOperator.value
-      : firstOperator
-
     return {
       ...group,
-      conditions: [
-        ...group.conditions,
-        { propertyName: property.name, value: '', operator: operatorValue },
-      ],
+      conditions: [...group.conditions, { propertyName: property.name, value: '', operator: '' }],
     }
   }
 

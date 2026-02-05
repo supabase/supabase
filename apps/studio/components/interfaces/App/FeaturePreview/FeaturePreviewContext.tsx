@@ -1,8 +1,10 @@
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { EMPTY_OBJ } from 'lib/void'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
-  PropsWithChildren,
   createContext,
+  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
@@ -10,8 +12,6 @@ import {
   useState,
 } from 'react'
 
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { EMPTY_OBJ } from 'lib/void'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 
 type FeaturePreviewContextType = {
@@ -108,6 +108,11 @@ export const useIsAdvisorRulesEnabled = () => {
 export const useIsQueueOperationsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
+}
+
+export const useIsTableFilterBarEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
 }
 
 export const useFeaturePreviewModal = () => {

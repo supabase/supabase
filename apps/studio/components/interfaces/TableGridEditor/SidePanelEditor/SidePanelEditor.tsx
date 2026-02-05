@@ -4,7 +4,10 @@ import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { queueCellEditWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
+import {
+  queueCellEditWithOptimisticUpdate,
+  queueRowAddWithOptimisticUpdate,
+} from 'components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
@@ -57,6 +60,7 @@ import {
   createColumn,
   createTable,
   duplicateTable,
+  getRowFromSidePanel,
   insertRowsViaSpreadsheet,
   insertTableRows,
   updateColumn,
@@ -271,6 +275,25 @@ export const SidePanelEditor = ({
 
     let saveRowError: Error | undefined
     if (isNewRecord) {
+      // Queue the ADD_ROW operation if queue operations feature is enabled
+      if (isQueueOperationsEnabled && selectedTable.primary_keys.length > 0) {
+        queueRowAddWithOptimisticUpdate({
+          queryClient,
+          queueOperation: snap.queueOperation,
+          projectRef: project.ref,
+          tableId: selectedTable.id,
+          table: selectedTable as unknown as Entity,
+          rowData: payload,
+          enumArrayColumns,
+        })
+
+        // Close panel immediately without error
+        onComplete()
+        setIsEdited(false)
+        snap.closeSidePanel()
+        return
+      }
+
       try {
         await createTableRows({
           projectRef: project.ref,
@@ -297,13 +320,16 @@ export const SidePanelEditor = ({
               return
             }
 
-            const row =
-              snap.sidePanel?.type === 'json'
-                ? snap.sidePanel.jsonValue.row
-                : snap.sidePanel?.type === 'cell'
-                  ? snap.sidePanel.value?.row
-                  : undefined
-            const oldValue = row?.[changedColumn]
+            const row = getRowFromSidePanel(snap.sidePanel)
+
+            if (!row) {
+              saveRowError = new Error('No row found')
+              toast.error('No row found')
+              onComplete(saveRowError)
+              return
+            }
+
+            const oldValue = row[changedColumn]
 
             queueCellEditWithOptimisticUpdate({
               queryClient,
@@ -312,6 +338,7 @@ export const SidePanelEditor = ({
               tableId: selectedTable.id,
               // Cast to Entity - the queue save mutation only uses id, name, schema
               table: selectedTable as unknown as Entity,
+              row,
               rowIdentifiers: configuration.identifiers,
               columnName: changedColumn,
               oldValue: oldValue,

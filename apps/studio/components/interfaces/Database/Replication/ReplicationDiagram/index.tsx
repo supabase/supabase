@@ -1,18 +1,18 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
 import ReactFlow, { Background, ReactFlowProvider, useReactFlow } from 'reactflow'
 
+import { getStatusName } from '../Pipeline.utils'
+import { PrimaryDatabaseNode, ReadReplicaNode, ReplicationNode } from './Nodes'
+import { getDagreGraphLayout } from './ReplicationDiagram.utils'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { ReplicationPipelineStatusResponse } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { timeout } from '@/lib/helpers'
-import { useParams } from 'common'
-import { getStatusName } from '../Pipeline.utils'
-import { PrimaryDatabaseNode, ReadReplicaNode, ReplicationNode } from './Nodes'
-import { getDagreGraphLayout } from './ReplicationDiagram.utils'
 
 export const ReplicationDiagram = () => {
   return (

@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.72.7
+  version: 2.75.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -349,35 +349,6 @@ commands:
   - id: supabase-storage-cp
     title: supabase storage cp
     summary: Copy objects from src to dst path
-    description: |
-      Relies on standard uploads to move files between local and remote storage. [Not suitable for moving files over 6MB in size](https://supabase.com/docs/guides/storage/uploads/standard-uploads?queryGroups=language&language=js#uploading).
-    examples:
-      - id: upload-file-to-bucket
-        name: Upload file to bucket
-        code: supabase storage cp -r path/to/file ss:///bucket_name --experimental
-        response: |
-          Uploading: /path/to/file/example.txt => /bucket_name/example.txt
-      - id: Upload-file-to-folder
-        name: Upload file to folder
-        code: supabase storage cp -r path/to/local/file ss:///bucket_name/path/to/folder --experimental
-        response: |
-          Uploading: /path/to/file/example.txt => /bucket_name/path/to/folder/example.txt
-      - id: upload-entire-folder-to-bucket
-        name: Upload folder to bucket
-        code: supabase storage cp -r path/to/local/folder ss:///bucket_name --experimental
-        response: |
-          Uploading: /path/to/folder/example1.txt => /bucket_name/folder/example1.txt
-          Uploading: /path/to/folder/example2.txt => /bucket_name/folder/example2.txt
-          Uploading: /path/to/folder/example3.txt => /bucket_name/folder/example3.txt
-          ...
-      - id: download-entire-bucket
-        name: Download bucket
-        code: supabase storage cp -r ss://bucket_name path/to/local/folder --experimental
-        response: |
-          Downloading: bucket_name/example1.txt => path/to/local/folder/bucket_name/example1.txt
-          Downloading: bucket_name/example2.txt => path/to/local/folder/bucket_name/example2.txt
-          Downloading: bucket_name/example3.txt => path/to/local/folder/bucket_name/example3.txt
-          ...
     tags: []
     links: []
     usage: supabase storage cp <src> <dst> [flags]
@@ -1640,7 +1611,7 @@ commands:
 
       Creates a new migration file locally.
 
-      A `supabase/migrations` directory will be created if it does not already exist in your current `workdir`. All schema migration files must be created in this directory following the pattern `<timestamp>_<name>.sql`.
+      A `supabase/migrations` directory will be created if it does not already exists in your current `workdir`. All schema migration files must be created in this directory following the pattern `<timestamp>_<name>.sql`.
 
       Outputs from other commands like `db diff` may be piped to `migration new <name>` via stdin.
     examples:
@@ -1917,9 +1888,9 @@ commands:
     summary: Show statistics related to vacuum operations per table
     description: |2
 
-      This shows you stats about the vacuum activities for each table. Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovacuum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will asynchronously clean the dead tuples.
+      This shows you stats about the vacuum activities for each table. Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovaccum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will aysnchronously clean the dead tuples.
 
-      The command lists when the last vacuum and last auto vacuum took place, the row count on the table as well as the count of dead rows and whether autovacuum is expected to run or not. If the number of dead rows is much higher than the row count, or if an autovacuum is expected but has not been performed for some time, this can indicate that autovacuum is not able to keep up and that your vacuum settings need to be tweaked or that you require more compute or disk IOPS to allow autovacuum to complete.
+      The command lists when the last vacuum and last auto vacuum took place, the row count on the table as well as the count of dead rows and whether autovacuum is expected to run or not. If the number of dead rows is much higher than the row count, or if an autovacuum is expected but has not been performed for some time, this can indicate that autovacuum is not able to keep up and that your vacuum settings need to be tweaked or that you require more compute or disk IOPS to allow autovaccum to complete.
 
 
       ```
@@ -2296,9 +2267,9 @@ commands:
       Estimates space allocated to a relation that is full of dead tuples
     description: |2
 
-      This command displays an estimation of table "bloat" - Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovacuum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will asynchronously clean the dead tuples. Sometimes the autovacuum is unable to work fast enough to reduce or prevent tables from becoming bloated. High bloat can slow down queries, cause excessive IOPS and waste space in your database.
+      This command displays an estimation of table "bloat" - Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovaccum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will asynchronously clean the dead tuples. Sometimes the autovaccum is unable to work fast enough to reduce or prevent tables from becoming bloated. High bloat can slow down queries, cause excessive IOPS and waste space in your database.
 
-      Tables with a high bloat ratio should be investigated to see if vacuuming is not quick enough or if there are other issues.
+      Tables with a high bloat ratio should be investigated to see if there are vacuuming is not quick enough or there are other issues.
 
       ```
           TYPE  │ SCHEMA NAME │        OBJECT NAME         │ BLOAT │ WASTE
@@ -2633,10 +2604,10 @@ commands:
     title: supabase functions download
     summary: Download a Function from Supabase
     description: |
-      Download the source code for a Function from the linked Supabase project.
+      Download the source code for a Function from the linked Supabase project. If no function name is provided, downloads all functions.
     tags: []
     links: []
-    usage: supabase functions download <Function name> [flags]
+    usage: supabase functions download [Function name] [flags]
     subcommands: []
     flags:
       - id: project-ref
@@ -3258,7 +3229,7 @@ commands:
 
       By default, all schemas in the target database are diffed. Use the `--schema public,extensions` flag to restrict diffing to a subset of schemas.
 
-      While the diff command is able to capture most schema changes, there are cases where it is known to fail. Currently, this could happen if your schema contains:
+      While the diff command is able to capture most schema changes, there are cases where it is known to fail. Currently, this could happen if you schema contains:
 
       - Changes to publication
       - Changes to storage buckets

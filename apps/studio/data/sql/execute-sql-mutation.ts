@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { sqlEventParser } from 'lib/sql-event-parser'
+import { toast } from 'sonner'
 import { UseCustomMutationOptions } from 'types'
-import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
+
+import { ExecuteSqlData, ExecuteSqlVariables, executeSql } from './execute-sql-query'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
 // So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better
@@ -25,19 +25,24 @@ export type QueryResponseError = {
   severity: string
 }
 
+type ExecuteSqlMutationVariables = ExecuteSqlVariables & {
+  autoLimit?: number
+  contextualInvalidation?: boolean
+}
+
 export const useExecuteSqlMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>,
+  UseCustomMutationOptions<ExecuteSqlData, QueryResponseError, ExecuteSqlMutationVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
 
-  return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>({
+  return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlMutationVariables>({
     mutationFn: (args) => executeSql(args),
     async onSuccess(data, variables, context) {
       const { contextualInvalidation, sql, projectRef } = variables
