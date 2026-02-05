@@ -1,6 +1,7 @@
+import { z } from 'zod'
+
 import { ident, literal } from './pg-format'
 import { ROLES_SQL } from './sql/roles'
-import { z } from 'zod'
 
 const pgRoleZod = z.object({
   id: z.number(),

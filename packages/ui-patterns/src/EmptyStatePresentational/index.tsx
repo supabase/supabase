@@ -1,7 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import { SquarePlus } from 'lucide-react'
 import { createElement, isValidElement, ReactNode } from 'react'
-
 import { cn } from 'ui'
 
 export interface EmptyStatePresentationalProps {

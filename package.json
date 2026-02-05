@@ -22,7 +22,7 @@
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
-    "test:prettier": "SORT_IMPORTS=false prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "test:prettier": "SORT_IMPORTS=false prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,json}'",
     "format": "SORT_IMPORTS=false prettier --cache --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",

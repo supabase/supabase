@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import Script from 'next/script'
 import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
+
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
 import { IS_PLATFORM, IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
@@ -13,13 +14,13 @@ import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useParams, useTelemetryCookie } from './hooks'
+import { posthogClient } from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
 import {
   clearTelemetryDataCookie,
   getSharedTelemetryData,
   getTelemetryCookieOptions,
 } from './telemetry-utils'
-import { posthogClient } from './posthog-client'
 
 export { posthogClient }
 

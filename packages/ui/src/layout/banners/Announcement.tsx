@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
-import { usePathname } from 'next/navigation'
-import { PropsWithChildren } from 'react'
-import { cn } from '../../lib/utils/cn'
 import { X } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { PropsWithChildren, useEffect, useState } from 'react'
+
+import { cn } from '../../lib/utils/cn'
 
 export interface AnnouncementProps {
   show: boolean
