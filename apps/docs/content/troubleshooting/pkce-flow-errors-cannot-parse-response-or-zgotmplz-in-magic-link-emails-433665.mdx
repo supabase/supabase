@@ -38,7 +38,7 @@ You may observe two distinct issues:
     - **Cause 1: Broken PKCE Handshake**: This error typically arises when the authentication flow, especially PKCE, is interrupted. If an email client attempts to open the magic link in its own internal browser, this can disrupt the "handshake" process between your mobile application and the authentication service. The mobile app expects to receive specific parameters to complete the PKCE flow, and if these are not delivered correctly due to the intermediary email browser, the app reports a 'cannot parse response' error.
     - **Cause 2: Email Link Scanners**: Many email providers and security tools automatically scan or "pre-click" links in emails to check for malicious content. For one-time magic links, this automated scanning can inadvertently consume the authentication token before the legitimate user even clicks the link. When the user then clicks the (now consumed) link, the authentication attempt fails, resulting in a 'cannot parse response' error. This can lead to occasional failures, even if the general flow appears to work most of the time.
 
-## Resolving the problem: The recommended flow (email → website → Mobile App)
+## Resolving the problem: The recommended flow (email → website → mobile App)
 
 To achieve a reliable and secure authentication experience that accommodates both Go's security model and the complexities of mobile deep linking and PKCE, the recommended approach is a multi-step redirection: **Email → Website → Mobile App**.
 
