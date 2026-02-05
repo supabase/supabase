@@ -13,13 +13,15 @@ If PostgREST is returning errors by not recognizing new database columns, tables
 Then this indicates that there's a stale PostgREST schema cache.
 
 ## Why this happens
-This can occur when an [underlying PostgreSQL notification queue issue](https://www.postgresql.org/message-id/CAK98qZ3wZLE-RZJN_Y%2BTFjiTRPPFPBwNBpBi5K5CU8hUHkzDpw%40mail.gmail.com) prevents PostgREST from receiving cache reload signals after schema changes.
+
+This can occur when an [underlying Postgres notification queue issue](https://www.postgresql.org/message-id/CAK98qZ3wZLE-RZJN_Y%2BTFjiTRPPFPBwNBpBi5K5CU8hUHkzDpw%40mail.gmail.com) prevents PostgREST from receiving cache reload signals after schema changes.
 
 ## How to fix this
+
 Execute the following SQL command via the [SQL Editor](/dashboard/project/_/sql/new) or a direct client:
 
 ```sql
 select pg_notification_queue_usage();
 ```
 
-This command directly refreshes the PostgreSQL notification queue, prompting PostgREST to update its schema cache with the latest database schema. This process is non-disruptive and does not require a database instance or PostgREST service restart.
+This command directly refreshes the Postgres notification queue, prompting PostgREST to update its schema cache with the latest database schema. This process is non-disruptive and does not require a database instance or PostgREST service restart.
