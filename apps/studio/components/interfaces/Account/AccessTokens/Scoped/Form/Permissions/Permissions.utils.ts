@@ -1,4 +1,6 @@
-export const getBestAction = (actions: string[]): string => {
+import { PermissionResource, PermissionRow } from "./Permissions.types"
+
+const getBestAction = (actions: string[]): string => {
   const availableActions = actions.filter((a) => a !== 'no access')
 
   if (availableActions.length === 0) return 'no access'
@@ -59,4 +61,18 @@ export const formatActionText = (action: string): string => {
     default:
       return action.charAt(0).toUpperCase() + action.slice(1).replace(/-/g, ' ')
   }
+}
+
+export const togglePermissionResource = (
+  permissionRows: PermissionRow[],
+  resource: PermissionResource
+): PermissionRow[] => {
+  const isAlreadyAdded = permissionRows.some((row) => row.resource === resource.resource)
+
+  if (isAlreadyAdded) {
+    return permissionRows.filter((row) => row.resource !== resource.resource)
+  }
+
+  const defaultAction = getBestAction(resource.actions)
+  return [...permissionRows, { resource: resource.resource, action: defaultAction }]
 }

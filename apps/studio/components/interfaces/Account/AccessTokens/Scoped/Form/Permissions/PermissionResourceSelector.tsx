@@ -20,7 +20,7 @@ import {
   PermissionsFormValues,
   PermissionResourceSelectorProps,
 } from './Permissions.types'
-import { getBestAction } from './Permissions.utils'
+import { togglePermissionResource } from './Permissions.utils'
 
 export const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
   open,
@@ -30,25 +30,11 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
   align = 'center',
 }: PermissionResourceSelectorProps<TFormValues>) => {
   const handleToggleResource = (resource: PermissionResource) => {
-    const isAlreadyAdded = permissionRows.some((row) => row.resource === resource.resource)
-
-    if (isAlreadyAdded) {
-      const newRows = permissionRows.filter((row) => row.resource !== resource.resource)
-      setValue(
-        'permissionRows' as Path<TFormValues>,
-        newRows as PathValue<TFormValues, Path<TFormValues>>
-      )
-    } else {
-      const defaultAction = getBestAction(resource.actions)
-      const newRows: PermissionRow[] = [
-        ...permissionRows,
-        { resource: resource.resource, action: defaultAction },
-      ]
-      setValue(
-        'permissionRows' as Path<TFormValues>,
-        newRows as PathValue<TFormValues, Path<TFormValues>>
-      )
-    }
+    const newRows = togglePermissionResource(permissionRows, resource)
+    setValue(
+      'permissionRows' as Path<TFormValues>,
+      newRows as PathValue<TFormValues, Path<TFormValues>>
+    )
   }
 
   return (
@@ -67,12 +53,12 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
             <CommandGroup_Shadcn_ className="[&>div]:text-left">
               <div className="max-h-[210px] overflow-y-auto">
                 {ACCESS_TOKEN_RESOURCES.map((resource) => {
-                  const isChecked = permissionRows.some((row) => row.resource === resource.resource)
+                  const isChecked = permissionRows.some((row: PermissionRow) => row.resource === resource.resource)
                   return (
                     <CommandItem_Shadcn_
                       key={resource.resource}
                       value={`${resource.resource} ${resource.title}`}
-                      onSelect={() => handleToggleResource(resource)}
+                      onSelect={() => togglePermissionResource(permissionRows, resource)}
                       className="text-foreground"
                     >
                       <div className="flex items-center gap-3 w-full">
