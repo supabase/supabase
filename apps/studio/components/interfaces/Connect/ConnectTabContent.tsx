@@ -2,18 +2,20 @@ import dynamic from 'next/dynamic'
 import { forwardRef, HTMLAttributes, useMemo } from 'react'
 
 import { useParams } from 'common'
+import { useDeploymentModeQuery } from 'data/config/deployment-mode-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { useTrack } from 'lib/telemetry/track'
 import { cn, CopyCallbackContext } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { getAddons } from '../Billing/Subscription/Subscription.utils'
 import type { projectKeys } from './Connect.types'
-import { getConnectionStrings } from './DatabaseSettings.utils'
+import { getConnectionStrings, getSelfHostedPoolerStrings } from './DatabaseSettings.utils'
 
 interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
   projectKeys: projectKeys
@@ -28,6 +30,8 @@ interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
     ipv4SupportedForDedicatedPooler: boolean
     direct?: string
   }
+  /** True when running via Supabase CLI (local development) */
+  isCliMode?: boolean
 }
 
 export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
@@ -36,6 +40,11 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
     const track = useTrack()
     const { data: selectedOrg } = useSelectedOrganizationQuery()
     const allowPgBouncerSelection = useMemo(() => selectedOrg?.plan.id !== 'free', [selectedOrg])
+
+    // Detect deployment mode for non-platform environments
+    const { data: deploymentMode } = useDeploymentModeQuery()
+    const isCliMode = deploymentMode?.is_cli_mode ?? false
+    const isSelfHosted = !IS_PLATFORM && !isCliMode
 
     const handleCopy = () => {
       const trackingProperties: {
@@ -106,6 +115,35 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
       })
     }, [filePath])
 
+    // For self-hosted, generate pooler strings with Supavisor placeholders
+    // Session pooler uses POSTGRES_PORT (via connectionInfo.db_port), transaction pooler uses 6543
+    const selfHostedPoolerTransaction = getSelfHostedPoolerStrings(connectionInfo.db_host, 6543)
+    const selfHostedPoolerSession = getSelfHostedPoolerStrings(
+      connectionInfo.db_host,
+      connectionInfo.db_port || 5432
+    )
+
+    // Build connectionStringPooler based on environment
+    const connectionStringPooler = isSelfHosted
+      ? {
+          // Self-hosted uses Supavisor with placeholder credentials
+          transactionShared: selfHostedPoolerTransaction.uri,
+          sessionShared: selfHostedPoolerSession.uri,
+          transactionDedicated: undefined,
+          sessionDedicated: undefined,
+          ipv4SupportedForDedicatedPooler: false,
+          direct: connectionStringsShared.direct.uri,
+        }
+      : {
+          // Platform uses actual pooler configuration
+          transactionShared: connectionStringsShared.pooler.uri,
+          sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
+          transactionDedicated: connectionStringsDedicated?.pooler.uri,
+          sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
+          ipv4SupportedForDedicatedPooler: !!ipv4Addon,
+          direct: connectionStringsShared.direct.uri,
+        }
+
     return (
       <div ref={ref} {...props} className={cn('border rounded-lg', props.className)}>
         <CopyCallbackContext.Provider value={handleCopy}>
@@ -114,14 +152,8 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
             filePath={filePath}
             connectionTab={connectionTab}
             selectedFrameworkOrTool={selectedFrameworkOrTool}
-            connectionStringPooler={{
-              transactionShared: connectionStringsShared.pooler.uri,
-              sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
-              transactionDedicated: connectionStringsDedicated?.pooler.uri,
-              sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
-              ipv4SupportedForDedicatedPooler: !!ipv4Addon,
-              direct: connectionStringsShared.direct.uri,
-            }}
+            connectionStringPooler={connectionStringPooler}
+            isCliMode={isCliMode}
             onCopy={handleCopy}
           />
         </CopyCallbackContext.Provider>

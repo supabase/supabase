@@ -19,5 +19,7 @@ export interface ContentFileProps {
     direct?: string
   }
   connectionTab: 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
+  /** True when running via Supabase CLI (local development) */
+  isCliMode?: boolean
   onCopy?: () => void
 }
