@@ -2,12 +2,13 @@ import { X, ChevronDown, ChevronRight } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { Button, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
+import { Button } from 'ui'
 import {
   Collapsible_Shadcn_ as Collapsible,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { getResourcePermissions, ACCESS_TOKEN_RESOURCES } from './AccessToken.constants'
 
@@ -28,7 +29,7 @@ export const AccessTokenNewBanner = <T,>({
   getTokenValue,
   getTokenPermissions,
   title = 'Successfully generated a new token!',
-  description = 'Do copy this access token and store it in a secure place - you will not be able to see it again.',
+  description = 'Copy this access token and store it in a secure place. You will not be able to see it again.',
 }: AccessTokenNewBannerProps<T>) => {
   const tokenPermissions = getTokenPermissions?.(token)
   const [permissionsOpen, setPermissionsOpen] = useState(false)
@@ -105,18 +106,20 @@ export const AccessTokenNewBanner = <T,>({
   )
 
   return (
-    <Card className="mb-6">
-      <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 relative">
-        <CardTitle>{title}</CardTitle>
+    <Admonition
+      type="tip"
+      title={title}
+      className="mb-6 relative"
+      actions={
         <Button
           type="text"
           icon={<X />}
           className="w-7 h-7 absolute top-2.5 right-2.5"
           onClick={onClose}
         />
-      </CardHeader>
-
-      <CardContent className="space-y-4">
+      }
+    >
+      <div className="space-y-4">
         <p className="text-sm text-foreground-light">{description}</p>
         <div className="w-full pb-2">
           <Input
@@ -126,7 +129,7 @@ export const AccessTokenNewBanner = <T,>({
             className="w-full input-mono"
             id="access-token-value"
             value={getTokenValue(token)}
-            onChange={() => { }}
+            onChange={() => {}}
             onCopy={() => toast.success('Token copied to clipboard')}
           />
         </div>
@@ -159,8 +162,8 @@ export const AccessTokenNewBanner = <T,>({
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </Admonition>
   )
 }
 

@@ -28,8 +28,6 @@ const ScopedTokens: NextPageWithLayout = () => {
             onClose={() => setNewToken(undefined)}
             getTokenValue={(token) => token.token}
             getTokenPermissions={(token) => token.permissions}
-            title="Successfully generated a new scoped token!"
-            description="Do copy this scoped access token and store it in a secure place - you will not be able to see it again."
           />
         )}
         <div className="flex items-center justify-between gap-x-2 mb-3">

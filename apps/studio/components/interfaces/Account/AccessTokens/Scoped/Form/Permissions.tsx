@@ -155,7 +155,7 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
                       key={resource.resource}
                       value={`${resource.resource} ${resource.title}`}
                       onSelect={() => handleToggleResource(resource)}
-                      className="text-white"
+                      className="text-foreground"
                     >
                       <div className="flex items-center gap-3 w-full">
                         <Checkbox_Shadcn_
@@ -165,7 +165,9 @@ const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
                         />
                         <Key size={12} className="text-foreground-lighter" />
                         <div className="flex flex-col text-left flex-1">
-                          <span className="font-medium text-foreground">{resource.title}</span>
+                          <span className="font-medium text-foreground capitalize">
+                            {resource.title}
+                          </span>
                         </div>
                       </div>
                     </CommandItem_Shadcn_>
@@ -242,7 +244,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium truncate max-w-[36ch]">
+                          <span className="text-sm font-medium truncate max-w-[36ch] capitalize">
                             {selectedResource?.title}
                           </span>
                         </div>
