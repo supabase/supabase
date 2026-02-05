@@ -163,33 +163,45 @@ export const FeatureFlagProvider = ({
           : Promise.resolve([]),
       ])
 
+      const isLocalDev = process.env.NODE_ENV === 'development'
+
+      const safeParse = (
+        value: string | undefined
+      ): Record<string, boolean | number | string> => {
+        if (!value) return {}
+        try {
+          return JSON.parse(value)
+        } catch {
+          return {}
+        }
+      }
+
       // Process PostHog flags if loaded
       if (Object.keys(flags).length > 0) {
-        flagStore.posthog = flags
+        // Apply local dev overrides for PostHog flags
+        if (isLocalDev) {
+          try {
+            const cookies = getCookies()
+            const phOverrides = safeParse(cookies['x-ph-flag-overrides'])
+            flagStore.posthog = { ...flags, ...phOverrides }
+          } catch {
+            flagStore.posthog = flags
+          }
+        } else {
+          flagStore.posthog = flags
+        }
       }
 
       // Process ConfigCat flags if loaded
       if (flagValues.length > 0) {
-        const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
         let overridesCookieValue: Record<string, boolean | number | string> = {}
-
-        const safeParse = (
-          value: string | undefined
-        ): Record<string, boolean | number | string> => {
-          if (!value) return {}
-          try {
-            return JSON.parse(value)
-          } catch {
-            return {}
-          }
-        }
 
         try {
           const cookies = getCookies()
           // Merge overrides: vercel-flag-overrides first, then x-cc-flag-overrides (local only)
           // x-cc-flag-overrides takes precedence in local dev
           const vercelOverrides = safeParse(cookies['vercel-flag-overrides'])
-          const ccOverrides = isLocal ? safeParse(cookies['x-cc-flag-overrides']) : {}
+          const ccOverrides = isLocalDev ? safeParse(cookies['x-cc-flag-overrides']) : {}
 
           overridesCookieValue = {
             ...vercelOverrides,
