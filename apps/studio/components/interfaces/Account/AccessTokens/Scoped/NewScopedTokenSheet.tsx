@@ -33,7 +33,7 @@ import {
   type ScopedAccessTokenPermission,
 } from '../AccessToken.constants'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
-import { mapPermissionToFGA } from '../AccessToken.utils'
+import { mapPermissionToFGA, getExpirationDate } from '../AccessToken.utils'
 import { TokenSchema, type TokenFormValues } from '../AccessToken.schemas'
 
 export interface NewScopedTokenSheetProps {
@@ -73,6 +73,7 @@ export const NewScopedTokenSheet = ({
   const permissionRows = form.watch('permissionRows') || []
 
   const onSubmit: SubmitHandler<TokenFormValues> = async (values) => {
+
     if (!permissionRows || permissionRows.length === 0) {
       toast.error('Please configure at least one permission.')
       return
@@ -122,10 +123,12 @@ export const NewScopedTokenSheet = ({
       }
     }
 
-    let finalExpiresAt = values.expiresAt
+    let finalExpiresAt: string | undefined
 
     if (isCustomExpiry && customExpiryDate) {
       finalExpiresAt = customExpiryDate.date
+    } else {
+      finalExpiresAt = getExpirationDate(values.expiresAt || '')
     }
 
     const permissions = permissionRows
