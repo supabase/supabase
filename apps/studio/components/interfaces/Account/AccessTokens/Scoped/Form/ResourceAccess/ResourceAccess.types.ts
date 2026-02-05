@@ -1,14 +1,8 @@
 import { Control, ControllerRenderProps } from "react-hook-form"
+import { TokenFormValues } from "../../../AccessToken.utils"
 
 export interface ResourceAccessProps {
-  control: Control<{
-    resourceAccess: 'selected-orgs' | 'selected-projects' | 'all-orgs'
-    tokenName: string
-    selectedOrganizations?: string[]
-    selectedProjects?: string[]
-    expiresAt?: string
-    permissionRows?: { resource: string; action: string }[]
-  }>
+  control: Control<TokenFormValues>
   resourceAccess: string
 }
 
