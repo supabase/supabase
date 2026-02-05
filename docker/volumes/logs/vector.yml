@@ -104,7 +104,7 @@ transforms:
       parsed, err = parse_regex(.event_message, r'^(?P<time>.*): (?P<msg>.*)$')
       if err == null {
           .event_message = parsed.msg
-          .timestamp = parse_timestamp!(value: parsed.time,format: "%Y-%m-%dT%H:%M:%S.%fZ")
+          .timestamp = parse_timestamp!(value: parsed.time,format: "%d/%b/%Y:%H:%M:%S %z")
           .metadata.host = .project
       }
   # Filter out healthcheck logs from Realtime
