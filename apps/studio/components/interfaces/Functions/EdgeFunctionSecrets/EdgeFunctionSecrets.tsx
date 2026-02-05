@@ -64,7 +64,7 @@ export const EdgeFunctionSecrets = () => {
   const secrets =
     searchString.length > 0
       ? data?.filter((secret) => secret.name.toLowerCase().includes(searchString.toLowerCase())) ??
-      []
+        []
       : data ?? []
 
   const headers = [
@@ -161,8 +161,10 @@ export const EdgeFunctionSecrets = () => {
                             <TableCell colSpan={headers.length}>
                               <p className="text-sm text-foreground">No secrets created</p>
                               <p className="text-sm text-foreground-lighter">
-                                This project has no custom secrets yet. <code className="text-code-inline !text-foreground-lighter whitespace-nowrap">SUPABASE_*</code>
-                                {' '}
+                                This project has no custom secrets yet.{' '}
+                                <code className="text-code-inline !text-foreground-lighter whitespace-nowrap">
+                                  SUPABASE_*
+                                </code>{' '}
                                 <InlineLink
                                   href={`${DOCS_URL}/guides/functions/secrets#default-secrets`}
                                 >
