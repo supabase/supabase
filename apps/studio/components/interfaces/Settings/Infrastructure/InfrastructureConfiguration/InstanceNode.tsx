@@ -1,10 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { Handle, NodeProps, Position } from 'reactflow'
-
 import { useParams } from 'common'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import SparkBar from 'components/ui/SparkBar'
@@ -14,14 +8,20 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import dayjs from 'dayjs'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
+import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { Handle, NodeProps, Position } from 'reactflow'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -30,15 +30,15 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
+
 import {
   ERROR_STATES,
   INIT_PROGRESS,
   NODE_SEP,
   NODE_WIDTH,
-  REPLICA_STATUS,
   Region,
+  REPLICA_STATUS,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
 
@@ -140,7 +140,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
                 <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-sm text-foreground-light">{providerLabel}</span>
+                <span className="text-sm text-foreground-light">{region.region}</span>
                 {projectHomepageShowInstanceSize && (
                   <>
                     <span className="text-sm text-foreground-light">•</span>
@@ -303,7 +303,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <div className="my-0.5">
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
-                <span>{providerLabel}</span>
+                <span>{region.region}</span>
                 {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span>•</span>
