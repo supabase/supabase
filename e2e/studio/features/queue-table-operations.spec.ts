@@ -327,13 +327,13 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    await page.keyboard.press('Meta+.')
+    await page.keyboard.press('ControlOrMeta+.')
     await expect(page.getByRole('dialog').getByText('Pending changes')).toBeVisible()
 
-    await page.keyboard.press('Meta+.')
+    await page.keyboard.press('ControlOrMeta+.')
     await expect(page.getByRole('button', { name: 'View Details' })).toBeVisible()
 
-    await page.keyboard.press('Meta+s')
+    await page.keyboard.press('ControlOrMeta+s')
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
     await expect(page.getByRole('gridcell', { name: 'shortcut test' })).toBeVisible()
