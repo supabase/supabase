@@ -1,9 +1,13 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { getCronJobsMinimalSql } from '../sql/queries/get-cron-jobs'
-import { CRON_JOBS_PAGE_LIMIT, CronJob, DatabaseCronJobRunsVariables } from './database-cron-jobs-infinite-query'
+import {
+  CRON_JOBS_PAGE_LIMIT,
+  CronJob,
+  DatabaseCronJobRunsVariables,
+} from './database-cron-jobs-infinite-query'
 import { databaseCronJobsKeys } from './keys'
 
 export async function getDatabaseCronJobsMinimal({
@@ -18,7 +22,7 @@ export async function getDatabaseCronJobsMinimal({
     projectRef,
     connectionString,
     sql: getCronJobsMinimalSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
-    queryKey: ['cron-jobs-minimal']    
+    queryKey: ['cron-jobs-minimal'],
   })
 
   return result

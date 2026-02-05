@@ -1,7 +1,7 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-
 import { COST_THRESHOLD_ERROR, executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { getCronJobsSql } from '../sql/queries/get-cron-jobs'
 import { databaseCronJobsKeys } from './keys'
 
@@ -36,7 +36,7 @@ export async function getDatabaseCronJobs({
     connectionString,
     sql: getCronJobsSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
     queryKey: ['cron-jobs'],
-    preflightCheck: true
+    preflightCheck: true,
   })
 
   return result

@@ -1,5 +1,13 @@
 // [Joshen] Just omits the LEFT JOIN as that's the heavy part
-export const getCronJobsMinimalSql = ({ searchTerm, page, limit }: { searchTerm?: string; page: number, limit: number }) =>
+export const getCronJobsMinimalSql = ({
+  searchTerm,
+  page,
+  limit,
+}: {
+  searchTerm?: string
+  page: number
+  limit: number
+}) =>
   `
 SELECT 
   job.jobid,
@@ -15,7 +23,15 @@ LIMIT ${limit}
 OFFSET ${page * limit};
 `.trim()
 
-export const getCronJobsSql = ({ searchTerm, page, limit }: { searchTerm?: string; page: number, limit: number }) =>
+export const getCronJobsSql = ({
+  searchTerm,
+  page,
+  limit,
+}: {
+  searchTerm?: string
+  page: number
+  limit: number
+}) =>
   `
 WITH latest_runs AS (
   SELECT 
