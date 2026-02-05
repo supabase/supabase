@@ -43,4 +43,11 @@ export const FEATURE_PREVIEWS = [
     isNew: true,
     isPlatformOnly: false,
   },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
+    name: 'New Table Filter Bar',
+    discussionsUrl: undefined,
+    isNew: true,
+    isPlatformOnly: false,
+  },
 ] as const

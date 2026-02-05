@@ -320,6 +320,7 @@ allow_list = [
     "SwiftUI",
     "Supabase",
     "Remapper",
+    "TablePlus",
     "TextLocal",
     "Thanos",
     "TimescaleDB",

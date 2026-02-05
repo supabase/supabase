@@ -1,47 +1,15 @@
 import { describe, test, expect } from 'vitest'
+import { generateTableChangeKey, rowMatchesIdentifiers, applyCellEdit } from './queueOperationUtils'
 import {
-  generateTableChangeKey,
-  generateTableChangeKeyFromOperation,
-  rowMatchesIdentifiers,
-  applyCellEdit,
-} from './queueOperationUtils'
-import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+  type NewEditCellContentOperation,
+  type NewAddRowOperation,
+  type NewDeleteRowOperation,
+  QueuedOperationType,
+} from '@/state/table-editor-operation-queue.types'
 
 describe('generateTableChangeKey', () => {
-  test('should generate key with row identifiers', () => {
-    const key = generateTableChangeKey({
-      type: QueuedOperationType.EDIT_CELL_CONTENT,
-      tableId: 1,
-      columnName: 'name',
-      rowIdentifiers: { id: 1 },
-    })
-    expect(key).toBe('edit_cell_content:1:name:id:1')
-  })
-
-  test('should generate key with empty row identifiers', () => {
-    const key = generateTableChangeKey({
-      type: QueuedOperationType.EDIT_CELL_CONTENT,
-      tableId: 1,
-      columnName: 'name',
-      rowIdentifiers: {},
-    })
-    expect(key).toBe('edit_cell_content:1:name:')
-  })
-
-  test('should generate key with multiple row identifiers sorted alphabetically', () => {
-    const key = generateTableChangeKey({
-      type: QueuedOperationType.EDIT_CELL_CONTENT,
-      tableId: 1,
-      columnName: 'name',
-      rowIdentifiers: { z_id: 3, a_id: 1 },
-    })
-    expect(key).toBe('edit_cell_content:1:name:a_id:1|z_id:3')
-  })
-})
-
-describe('generateTableChangeKeyFromOperation', () => {
-  test('should generate key from EDIT_CELL_CONTENT operation', () => {
-    const operation = {
+  test('should generate key for EDIT_CELL_CONTENT with row identifiers', () => {
+    const operation: NewEditCellContentOperation = {
       type: QueuedOperationType.EDIT_CELL_CONTENT,
       tableId: 1,
       payload: {
@@ -52,8 +20,68 @@ describe('generateTableChangeKeyFromOperation', () => {
         table: {} as any,
       },
     }
-    const key = generateTableChangeKeyFromOperation(operation)
+    const key = generateTableChangeKey(operation)
     expect(key).toBe('edit_cell_content:1:name:id:1')
+  })
+
+  test('should generate key for EDIT_CELL_CONTENT with empty row identifiers', () => {
+    const operation: NewEditCellContentOperation = {
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      payload: {
+        rowIdentifiers: {},
+        columnName: 'name',
+        oldValue: 'old',
+        newValue: 'new',
+        table: {} as any,
+      },
+    }
+    const key = generateTableChangeKey(operation)
+    expect(key).toBe('edit_cell_content:1:name:')
+  })
+
+  test('should generate key with multiple row identifiers sorted alphabetically', () => {
+    const operation: NewEditCellContentOperation = {
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      payload: {
+        rowIdentifiers: { z_id: 3, a_id: 1 },
+        columnName: 'name',
+        oldValue: 'old',
+        newValue: 'new',
+        table: {} as any,
+      },
+    }
+    const key = generateTableChangeKey(operation)
+    expect(key).toBe('edit_cell_content:1:name:a_id:1|z_id:3')
+  })
+
+  test('should generate key for ADD_ROW operation', () => {
+    const operation: NewAddRowOperation = {
+      type: QueuedOperationType.ADD_ROW,
+      tableId: 1,
+      payload: {
+        tempId: 'temp-123',
+        rowData: { idx: -1, __tempId: 'temp-123' },
+        table: {} as any,
+      },
+    }
+    const key = generateTableChangeKey(operation)
+    expect(key).toBe('add_row:1:temp-123')
+  })
+
+  test('should generate key for DELETE_ROW operation', () => {
+    const operation: NewDeleteRowOperation = {
+      type: QueuedOperationType.DELETE_ROW,
+      tableId: 1,
+      payload: {
+        rowIdentifiers: { id: 1 },
+        originalRow: { idx: 0, id: 1 },
+        table: {} as any,
+      },
+    }
+    const key = generateTableChangeKey(operation)
+    expect(key).toBe('delete_row:1:id:1')
   })
 
   test('should throw error for unknown operation type', () => {
@@ -68,7 +96,7 @@ describe('generateTableChangeKeyFromOperation', () => {
         table: {} as any,
       },
     }
-    expect(() => generateTableChangeKeyFromOperation(operation)).toThrow('Unknown operation type')
+    expect(() => generateTableChangeKey(operation)).toThrow('Unknown operation type')
   })
 })
 

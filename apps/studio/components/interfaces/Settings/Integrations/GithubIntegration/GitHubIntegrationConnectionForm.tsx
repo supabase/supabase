@@ -552,8 +552,8 @@ const GitHubIntegrationConnectionForm = ({
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex-row-reverse"
-                    label="Supabase directory"
-                    description="Relative path to your supabase folder"
+                    label="Working directory"
+                    description="Path to working directory with your supabase folder"
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_

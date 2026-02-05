@@ -1,34 +1,35 @@
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
+import { useFlag, useParams } from 'common'
+import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
+import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from 'lib/role-impersonation'
+import { EMPTY_ARR } from 'lib/void'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
-
-import { useFlag, useParams } from 'common'
-import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { RoleImpersonationState } from 'lib/role-impersonation'
-import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { QueuedOperation } from 'state/table-editor-operation-queue.types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
+import {
+  useIsQueueOperationsEnabled,
+  useIsTableFilterBarEnabled,
+} from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import { Header, HeaderProps } from './components/header/Header'
 import { HeaderNew } from './components/header/HeaderNew'
 import { RowContextMenu } from './components/menu/RowContextMenu'
-import { GridProps } from './types'
-import { reapplyOptimisticUpdates } from './utils/queueOperationUtils'
-
-import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 import { validateMsSqlSorting } from './MsSqlValidation'
-import { useIsQueueOperationsEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { GridProps } from './types'
+import { reapplyOptimisticUpdates } from './utils/queueOperationUtils'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -52,7 +53,7 @@ export const SupabaseGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
+  const newFilterBarEnabled = useIsTableFilterBarEnabled()
 
   const { filters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
@@ -100,13 +101,16 @@ export const SupabaseGrid = ({
 
   // Re-apply optimistic updates when table data is loaded/refetched
   // This ensures pending changes remain visible when switching tabs or after data refresh
+  // Skip re-applying during save to avoid race condition where refetch completes before queue clears
+  const isSaving = tableEditorSnap.operationQueue.status === 'saving'
   useEffect(() => {
     if (
       isSuccess &&
       project?.ref &&
       tableId &&
       isQueueOperationsEnabled &&
-      tableEditorSnap.hasPendingOperations
+      tableEditorSnap.hasPendingOperations &&
+      !isSaving
     ) {
       reapplyOptimisticUpdates({
         queryClient,
@@ -124,6 +128,7 @@ export const SupabaseGrid = ({
     tableEditorSnap.hasPendingOperations,
     tableEditorSnap.operationQueue.operations,
     queryClient,
+    isSaving,
   ])
 
   const rows = data?.rows ?? EMPTY_ARR

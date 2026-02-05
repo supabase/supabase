@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+
 import { ActiveInput } from './hooks'
 import { MenuItem } from './menuItems'
 import { FilterGroup, FilterProperty } from './types'
@@ -64,7 +65,7 @@ export function useCommandHandling({
 
       const path = activeInput.path
       handleOperatorChange(path, selectedValue)
-      setActiveInput(null)
+      setActiveInput({ type: 'value', path })
     },
     [activeInput, handleOperatorChange, setActiveInput]
   )
@@ -76,7 +77,7 @@ export function useCommandHandling({
       const newPath = [...currentPath, group.conditions.length]
 
       setTimeout(() => {
-        setActiveInput({ type: 'value', path: newPath })
+        setActiveInput({ type: 'operator', path: newPath })
       }, 0)
     },
     [activeFilters, onFilterChange, setActiveInput]
