@@ -21,3 +21,5 @@
 /apps/studio/pages/new/index.tsx                                    @supabase/security
 
 /apps/studio/data/sql/queries/                                      @supabase/postgres @avallete
+
+/packages/shared-data/compute-disk-limits.ts @supabase/infra
