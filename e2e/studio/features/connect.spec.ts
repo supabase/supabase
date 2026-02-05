@@ -18,7 +18,7 @@ test.describe('Connect', async () => {
     // The ConnectSheet component renders a Sheet with title "Connect to your project"
     await expect(
       page.getByRole('heading', { name: 'Connect to your project' })
-    ).toBeVisible({ timeout: 30000 }, 'Connect dialog/sheet should be visible when showConnect=true')
+    ).toBeVisible({ timeout: 30000 })
   })
 
   test('Connect dialog closes when dismissed', async ({ page, ref }) => {
@@ -58,7 +58,7 @@ test.describe('Connect', async () => {
     // Verify the Connect dialog/sheet opens
     await expect(
       page.getByRole('heading', { name: 'Connect to your project' })
-    ).toBeVisible({ timeout: 30000 }, 'Connect dialog/sheet should open after clicking Connect button')
+    ).toBeVisible({ timeout: 30000 })
 
     // Verify the URL has the showConnect query param
     await expect(page).toHaveURL(/showConnect=true/)
