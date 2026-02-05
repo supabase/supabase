@@ -36,10 +36,7 @@ export const HooksListing = () => {
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
-  const [hook, setHook] = useQueryState(
-    'hook',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [hook, setHook] = useQueryState('hook', parseAsString)
 
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
 

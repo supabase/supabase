@@ -54,10 +54,7 @@ export const PublishableAPIKeys = () => {
     [apiKeysData]
   )
 
-  const [deleteId, setDeleteId] = useQueryState(
-    'deletePublishableKey',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [deleteId, setDeleteId] = useQueryState('deletePublishableKey', parseAsString)
   const apiKeyToDelete = publishableApiKeys?.find((key) => key.id === deleteId)
 
   const {

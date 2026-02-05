@@ -98,10 +98,7 @@ export const SecretAPIKeys = () => {
 
   const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
-  const [deleteId, setDeleteId] = useQueryState(
-    'deleteSecretKey',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [deleteId, setDeleteId] = useQueryState('deleteSecretKey', parseAsString)
   const apiKeyToDelete = secretApiKeys?.find((key) => key.id === deleteId)
 
   const {
