@@ -10,22 +10,23 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   RadioGroupCard,
   RadioGroupCardItem,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectLabel_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -33,7 +34,6 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -617,8 +617,8 @@ export function LogDrainDestinationSheetForm({
                           label={'Region'}
                           description={
                             <p>
-                              The Last9 region to send logs to. Credentials can be obtained from
-                              the Last9 OTEL integration panel.
+                              The Last9 region to send logs to. Credentials can be obtained from the
+                              Last9 OTEL integration panel.
                             </p>
                           }
                         >
