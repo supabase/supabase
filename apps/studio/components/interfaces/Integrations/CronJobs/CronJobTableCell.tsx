@@ -1,6 +1,6 @@
 import parser from 'cron-parser'
 import dayjs from 'dayjs'
-import { Copy, Edit, MoreVertical, Play, Trash } from 'lucide-react'
+import { Copy, Edit, Minus, MoreVertical, Play, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -90,6 +90,7 @@ export const CronJobTableCell = ({
   const [showToggleModal, setShowToggleModal] = useState(false)
 
   const value = row?.[col.id]
+  const hasValue = col.id in row
   const { jobid, schedule, latest_run, status, active, jobname } = row
 
   const formattedValue =
@@ -241,7 +242,9 @@ export const CronJobTableCell = ({
       <ContextMenuTrigger_Shadcn_ asChild>
         <div className={cn('w-full flex items-center text-xs')}>
           {['latest_run', 'next_run'].includes(col.id) ? (
-            col.id === 'latest_run' && formattedValue === null ? (
+            !hasValue ? (
+              <Minus size={14} className="text-foreground-lighter" />
+            ) : col.id === 'latest_run' && formattedValue === null ? (
               <p className="text-foreground-lighter">Job has not been run yet</p>
             ) : col.id === 'next_run' && !formattedValue ? (
               <p className="text-foreground-lighter">Unable to parse next run for job</p>
