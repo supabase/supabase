@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+
 import { runQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
 
 // GET User Counts by day

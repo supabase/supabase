@@ -12,10 +12,12 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { data: allStatusPageEvents } = useIncidentStatusQuery()
   const { maintenanceEvents = [], incidents = [] } = allStatusPageEvents ?? {}
 
+  // Only show incident banner for incidents with real impact (not "none")
+  const hasBannerWorthyIncidents = incidents.some((incident) => incident.impact !== 'none')
   const ongoingIncident =
     useFlag('ongoingIncident') ||
     process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true' ||
-    incidents.length > 0
+    hasBannerWorthyIncidents
   const ongoingMaintenance = maintenanceEvents.length > 0
 
   const showNoticeBanner = useFlag('showNoticeBanner')
