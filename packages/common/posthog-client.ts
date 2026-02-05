@@ -203,12 +203,19 @@ class PostHogClient {
     if (typeof document === 'undefined') return undefined
 
     try {
-      const phCookie = document.cookie
-        .split(';')
-        .find((cookie) => cookie.trim().startsWith('ph_'))
+      const cookieName = `ph_${this.config.apiKey}_posthog`
+      const cookies = document.cookie.split(';')
 
-      if (phCookie) {
-        const cookieValue = decodeURIComponent(phCookie.split('=')[1])
+      for (const cookie of cookies) {
+        const trimmed = cookie.trim()
+        const eqIndex = trimmed.indexOf('=')
+        if (eqIndex === -1) continue
+
+        const name = trimmed.substring(0, eqIndex)
+        if (name !== cookieName) continue
+
+        // Use substring instead of split to handle '=' chars in the value
+        const cookieValue = decodeURIComponent(trimmed.substring(eqIndex + 1))
         const phData = JSON.parse(cookieValue)
 
         if (phData.distinct_id && typeof phData.distinct_id === 'string') {
