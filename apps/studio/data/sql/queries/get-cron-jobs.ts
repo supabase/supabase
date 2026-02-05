@@ -1,3 +1,5 @@
+import { literal } from '@supabase/pg-meta/src/pg-format'
+
 // [Joshen] Just omits the LEFT JOIN as that's the heavy part
 export const getCronJobsMinimalSql = ({
   searchTerm,
@@ -17,7 +19,7 @@ SELECT
   job.active
 FROM 
   cron.job job
-${!!searchTerm ? `WHERE job.jobname ILIKE '%${searchTerm}%'` : ''}
+${!!searchTerm ? `WHERE job.jobname ILIKE ${literal(`%${searchTerm}%`)}` : ''}
 ORDER BY job.jobid
 LIMIT ${limit}
 OFFSET ${page * limit};
@@ -63,7 +65,7 @@ SELECT
 FROM 
   cron.job job
 LEFT JOIN most_recent_runs mr ON job.jobid = mr.jobid
-${!!searchTerm ? `WHERE job.jobname ILIKE '%${searchTerm}%'` : ''}
+${!!searchTerm ? `WHERE job.jobname ILIKE ${literal(`%${searchTerm}%`)}` : ''}
 ORDER BY job.jobid
 LIMIT ${limit}
 OFFSET ${page * limit};

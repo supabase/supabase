@@ -79,7 +79,7 @@ export const useCronJobsInfiniteQuery = <TData = DatabaseCronJobsInfiniteData>(
     },
     retry: (failureCount, error) => {
       if (error.message === COST_THRESHOLD_ERROR) return false
-      return failureCount <= 3
+      return failureCount < 3
     },
     ...options,
   })
