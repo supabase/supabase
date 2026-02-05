@@ -36,17 +36,19 @@ const runSQL = async (page: Page, ref: string, sql: string) => {
   await page.evaluate((text) => navigator.clipboard.writeText(text), sql)
   await page.keyboard.press('ControlOrMeta+KeyV')
 
-  // Run the query and wait for response
-  const sqlMutationPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
-    method: 'POST',
-  })
+  // Run the query
   await page.getByTestId('sql-run-button').click()
 
-  try {
-    await sqlMutationPromise
-  } catch (e) {
-    console.warn('SQL execution API timeout:', (e as Error).message)
+  // Handle destructive query confirmation dialog if it appears
+  const confirmButton = page.getByRole('button', { name: 'Run this query' })
+  if (await confirmButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await confirmButton.click()
   }
+
+  // Wait for the query to complete - look for success indicator in the results
+  await expect(
+    page.getByText('Success. No rows returned').or(page.getByText(/^\d+ rows?$/)).first()
+  ).toBeVisible({ timeout: 10000 })
 }
 
 /**
