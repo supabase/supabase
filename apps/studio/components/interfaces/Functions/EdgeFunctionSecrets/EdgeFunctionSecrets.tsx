@@ -161,7 +161,8 @@ export const EdgeFunctionSecrets = () => {
                             <TableCell colSpan={headers.length}>
                               <p className="text-sm text-foreground">No secrets created</p>
                               <p className="text-sm text-foreground-light prose">
-                                This project has no custom secrets yet. <code>SUPABASE_*</code>
+                                This project has no custom secrets yet. <br />
+                                <code>SUPABASE_*</code>
                                 {''}
                                 <InlineLink
                                   href={`${DOCS_URL}/guides/functions/secrets#default-secrets`}
