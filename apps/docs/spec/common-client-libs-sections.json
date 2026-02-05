@@ -924,6 +924,13 @@
         "slug": "functions-invoke",
         "product": "functions",
         "type": "function"
+      },
+      {
+        "id": "cors-headers",
+        "title": "CORS headers for Edge Functions",
+        "slug": "functions-cors-headers",
+        "product": "functions",
+        "type": "function"
       }
     ]
   },

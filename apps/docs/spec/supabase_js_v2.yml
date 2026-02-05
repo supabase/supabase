@@ -7193,6 +7193,10 @@ functions:
           })
           ```
 
+  - id: cors-headers
+    title: corsHeaders
+    $ref: '@supabase/supabase-js.cors.corsHeaders'
+
   - id: subscribe
     title: on().subscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
