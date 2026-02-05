@@ -24,7 +24,7 @@ Check updates for each service to learn more.
 ## [2026-02-05]
 
 ### Storage
-- Updated to `v1.37.1` - [Changelog](https://github.com/supabase/storage/releases/tag/v1.37.1)
+- Updated to `v1.37.1` - [Release](https://github.com/supabase/storage/releases/tag/v1.37.1)
 - Fixed an issue with Storage not starting because of an issue with migrations - PR [storage#845](https://github.com/supabase/storage/pull/845)
 
 ---
@@ -50,19 +50,19 @@ Check updates for each service to learn more.
 - Changed logging configuration and healthcheck frequency to reduce log volume (requires `docker-compose.yml` update) - PR [#42112](https://github.com/supabase/supabase/pull/42112)
 
 ### Storage
-- Updated to `v1.33.5` - [Changelog](https://github.com/supabase/storage/releases/tag/v1.33.5)
+- Updated to `v1.33.5` - [Release](https://github.com/supabase/storage/releases/tag/v1.33.5)
 
 ### imgproxy
 - Updated to `v3.30.1` - [Changelog](https://github.com/imgproxy/imgproxy/blob/master/CHANGELOG.md) | [Release](https://github.com/imgproxy/imgproxy/releases/tag/v3.30.1)
 
 ### Postgres Meta
-- Updated to `v0.95.2` - [Changelog](https://github.com/supabase/postgres-meta/releases/tag/v0.95.2)
+- Updated to `v0.95.2` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.95.2)
 
 ### Edge Runtime
 - Updated to `v1.70.0` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.70.0)
 
 ### Analytics (Logflare)
-- Updated to `v1.30.3` - [Changelog](https://github.com/Logflare/logflare/releases/tag/v1.30.3)
+- Updated to `v1.30.3` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.30.3)
 
 ### Postgres
 - No image update
