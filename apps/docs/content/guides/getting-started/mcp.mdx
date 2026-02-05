@@ -59,7 +59,7 @@ The Supabase MCP server provides tools organized into feature groups. All groups
 - `get_edge_function` - Get a specific Edge Function
 - `deploy_edge_function` - Deploy an Edge Function
 
-### Account Management
+### Account management
 
 <Admonition type="note">
 
@@ -76,7 +76,7 @@ Disabled when using project-scoped mode (`project_ref` parameter).
 
 - `search_docs` - Search Supabase documentation
 
-### Branching (Experimental)
+### Branching (experimental)
 
 <Admonition type="note">
 
@@ -87,7 +87,7 @@ Requires a paid plan.
 - `create_branch` / `list_branches` / `delete_branch` - Branch management
 - `merge_branch` / `reset_branch` / `rebase_branch` - Branch operations
 
-### Storage (Disabled by default)
+### Storage (disabled by default)
 
 - `list_storage_buckets` - List storage buckets
 - `get_storage_config` / `update_storage_config` - Storage configuration
@@ -96,11 +96,11 @@ Requires a paid plan.
 
 The [configuration panel above](#step-2-configure-your-ai-tool) can set these options for you. If you prefer to configure manually, the following URL query parameters are available:
 
-| Parameter | Description | Example |
-|-----------|-------------|---------|
-| `read_only=true` | Execute all queries as a read-only Postgres user | `?read_only=true` |
-| `project_ref=<id>` | Scope to a specific project (disables account tools) | `?project_ref=abc123` |
-| `features=<groups>` | Enable only specific tool groups (comma-separated) | `?features=database,docs` |
+| Parameter           | Description                                          | Example                   |
+| ------------------- | ---------------------------------------------------- | ------------------------- |
+| `read_only=true`    | Execute all queries as a read-only Postgres user     | `?read_only=true`         |
+| `project_ref=<id>`  | Scope to a specific project (disables account tools) | `?project_ref=abc123`     |
+| `features=<groups>` | Enable only specific tool groups (comma-separated)   | `?features=database,docs` |
 
 Parameters can be combined: `https://mcp.supabase.com/mcp?project_ref=abc123&read_only=true`
 
