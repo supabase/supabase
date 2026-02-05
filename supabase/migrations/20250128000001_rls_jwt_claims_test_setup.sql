@@ -97,7 +97,9 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.cleanup_rls_jwt_test_tables() TO authenticated;
+REVOKE ALL ON FUNCTION public.cleanup_rls_jwt_test_tables() FROM public, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.cleanup_rls_jwt_test_tables() TO service_role;
 
 COMMENT ON FUNCTION public.cleanup_rls_jwt_test_tables() IS 
-'Cleanup function for test tables. Use this to remove test tables after testing.';
+'Cleanup function for test tables. Use this to remove test tables after testing.
+Only accessible to service_role for security reasons.';

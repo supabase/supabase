@@ -135,11 +135,11 @@ export function generateRLSPolicySQL(options: {
   policySQL += `FOR ${operation}\n`
   policySQL += `TO ${role}\n`
 
-  if (operation === 'SELECT' || operation === 'DELETE' || operation === 'UPDATE') {
+  if (operation === 'SELECT' || operation === 'DELETE' || operation === 'UPDATE' || operation === 'ALL') {
     policySQL += `USING (${usingClause || defaultUsing})\n`
   }
 
-  if (operation === 'INSERT' || operation === 'UPDATE') {
+  if (operation === 'INSERT' || operation === 'UPDATE' || operation === 'ALL') {
     policySQL += `WITH CHECK (${withCheckClause || defaultWithCheck})\n`
   }
 
@@ -173,7 +173,10 @@ export function generateCompleteRLSSetupSQL(options: {
 
   // Create workaround function if requested
   if (createFunction) {
-    sql += generateRLSWorkaroundFunctionSQL(workaroundFunction) + '\n\n'
+    sql +=
+      (workaroundFunction === 'get_current_user_id_enhanced'
+        ? generateEnhancedRLSWorkaroundFunctionSQL(workaroundFunction)
+        : generateRLSWorkaroundFunctionSQL(workaroundFunction)) + '\n\n'
   }
 
   // Enable RLS
@@ -232,6 +235,6 @@ export function isRLSWorkaroundFunction(functionName: string): boolean {
  */
 export function getRecommendedRLSFunction(): string {
   // In a real implementation, this would check if the function exists
-  // For now, return the workaround function name
-  return 'get_current_user_id_rls()'
+  // For now, return the workaround function name (without parentheses)
+  return 'get_current_user_id_rls'
 }
