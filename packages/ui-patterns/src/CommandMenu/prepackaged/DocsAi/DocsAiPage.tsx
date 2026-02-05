@@ -1,18 +1,17 @@
 'use client'
 
+import { useBreakpoint } from 'common'
 import { User } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-
-import { useBreakpoint } from 'common'
 import {
   AiIconAnimation,
   Button,
+  cn,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  cn,
   markdownComponents,
 } from 'ui'
 import { StatusIcon } from 'ui/src/components/StatusIcon'

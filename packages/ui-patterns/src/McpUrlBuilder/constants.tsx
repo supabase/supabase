@@ -1,4 +1,5 @@
 import { CodeBlock } from 'ui/src/components/CodeBlock'
+
 import type {
   ClaudeCodeMcpConfig,
   CodexMcpConfig,

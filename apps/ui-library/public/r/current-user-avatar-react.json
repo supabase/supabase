@@ -18,12 +18,12 @@
     },
     {
       "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
-      "content": "import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\nimport { useEffect, useState } from 'react'\n\nexport const useCurrentUserName = () => {\n  const [name, setName] = useState<string | null>(null)\n\n  useEffect(() => {\n    const fetchProfileName = async () => {\n      const { data, error } = await createClient().auth.getSession()\n      if (error) {\n        console.error(error)\n      }\n\n      setName(data.session?.user.user_metadata.full_name ?? '?')\n    }\n\n    fetchProfileName()\n  }, [])\n\n  return name || '?'\n}\n",
+      "content": "import { useEffect, useState } from 'react'\n\nimport { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\n\nexport const useCurrentUserName = () => {\n  const [name, setName] = useState<string | null>(null)\n\n  useEffect(() => {\n    const fetchProfileName = async () => {\n      const { data, error } = await createClient().auth.getSession()\n      if (error) {\n        console.error(error)\n      }\n\n      setName(data.session?.user.user_metadata.full_name ?? '?')\n    }\n\n    fetchProfileName()\n  }, [])\n\n  return name || '?'\n}\n",
       "type": "registry:hook"
     },
     {
       "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
-      "content": "import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\nimport { useEffect, useState } from 'react'\n\nexport const useCurrentUserImage = () => {\n  const [image, setImage] = useState<string | null>(null)\n\n  useEffect(() => {\n    const fetchUserImage = async () => {\n      const { data, error } = await createClient().auth.getSession()\n      if (error) {\n        console.error(error)\n      }\n\n      setImage(data.session?.user.user_metadata.avatar_url ?? null)\n    }\n    fetchUserImage()\n  }, [])\n\n  return image\n}\n",
+      "content": "import { useEffect, useState } from 'react'\n\nimport { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\n\nexport const useCurrentUserImage = () => {\n  const [image, setImage] = useState<string | null>(null)\n\n  useEffect(() => {\n    const fetchUserImage = async () => {\n      const { data, error } = await createClient().auth.getSession()\n      if (error) {\n        console.error(error)\n      }\n\n      setImage(data.session?.user.user_metadata.avatar_url ?? null)\n    }\n    fetchUserImage()\n  }, [])\n\n  return image\n}\n",
       "type": "registry:hook"
     },
     {
