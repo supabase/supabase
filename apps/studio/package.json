@@ -63,7 +63,7 @@
     "@supabase/mcp-utils": "^0.3.2",
     "@supabase/pg-meta": "workspace:*",
     "@supabase/realtime-js": "catalog:",
-    "@supabase/shared-types": "0.1.83",
+    "@supabase/shared-types": "0.1.84",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-query": "^5.0.0",
