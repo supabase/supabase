@@ -28,7 +28,9 @@ export async function getIncidentStatus(
     data ?? [],
     (event) => event.impact === 'maintenance'
   )
-  return { maintenanceEvents, incidents }
+  // Don't show incident banner for incidents with impact "none"
+  const incidentsToShow = incidents.filter((event) => event.impact !== 'none')
+  return { maintenanceEvents, incidents: incidentsToShow }
 }
 
 export type IncidentStatusData = Awaited<ReturnType<typeof getIncidentStatus>>
