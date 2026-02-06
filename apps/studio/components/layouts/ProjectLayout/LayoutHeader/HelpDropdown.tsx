@@ -55,6 +55,7 @@ export const HelpDropdown = () => {
             isOpen && 'bg-foreground text-background'
           )}
           onClick={() => {
+            if (isOpen) return // Don't send telemetry event if dropdown is already open
             sendEvent({
               action: 'help_button_clicked',
               groups: { project: project?.ref, organization: org?.slug },
