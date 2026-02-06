@@ -38,9 +38,9 @@ export async function createTable(
   )
 
   if (initialData && initialData.length > 0) {
-    for (const row of initialData) {
-      await query(`INSERT INTO ${tableName} (${columnName}) VALUES ($1)`, [row[columnName]])
-    }
+    const placeholders = initialData.map((_, i) => `($${i + 1})`).join(', ')
+    const values = initialData.map((row) => row[columnName])
+    await query(`INSERT INTO ${tableName} (${columnName}) VALUES ${placeholders}`, values)
   }
 }
 
