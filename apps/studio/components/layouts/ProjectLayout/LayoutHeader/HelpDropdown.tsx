@@ -36,12 +36,11 @@ export const HelpDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
-  let supportLinkQueryParams: Partial<SupportFormUrlKeys> | undefined = undefined
-  if (projectRef) {
-    supportLinkQueryParams = { projectRef }
-  } else if (org?.slug) {
-    supportLinkQueryParams = { orgSlug: org.slug }
-  }
+  const supportLinkQueryParams = getSupportLinkQueryParams(
+    project,
+    org,
+    router.query.ref as string | undefined
+  )
 
   return (
     <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
@@ -80,6 +79,7 @@ export const HelpDropdown = () => {
           projectRef={projectRef}
           supportLinkQueryParams={supportLinkQueryParams}
           onAssistantClick={() => {
+            setIsOpen(false)
             openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
             snap.newChat(ASSISTANT_SUGGESTIONS)
           }}
