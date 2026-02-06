@@ -1,13 +1,12 @@
 'use client'
 
-import { Index } from '@/__registry__'
-import * as React from 'react'
-
-import { useConfig } from '@/hooks/use-config'
-import { CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_, Collapsible_Shadcn_, cn } from 'ui'
-
-import { styles } from '@/registry/styles'
 import { ChevronRight } from 'lucide-react'
+import * as React from 'react'
+import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
+
+import { Index } from '@/__registry__'
+import { useConfig } from '@/hooks/use-config'
+import { styles } from '@/registry/styles'
 
 interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   name: keyof (typeof Index)['default']

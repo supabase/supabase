@@ -1,113 +1,19 @@
 import { expect, Page } from '@playwright/test'
 
+import { query } from '../utils/db/index.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import {
-  createApiResponseWaiter,
-  waitForApiResponse,
-  waitForTableToLoad,
-} from '../utils/wait-for-response.js'
+import { createApiResponseWaiter, waitForTableToLoad } from '../utils/wait-for-response.js'
 import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { openTableContextMenu, deleteTable } from '../utils/table-helpers.js'
 
 const TABLE_NAME_PREFIX = 'pw_api_access'
 
 /**
- * The API privilege types we care about for Data API access.
- * Filters out other PostgreSQL privileges like REFERENCES, TRIGGER, TRUNCATE.
+ * Verifies that the table has the expected API privileges for anon and authenticated roles.
+ * Uses the database utility to query privileges directly.
  */
-const API_PRIVILEGE_TYPES = ['SELECT', 'INSERT', 'UPDATE', 'DELETE']
-
-/**
- * Executes a SQL query via the SQL Editor and returns the result.
- * This is used to verify database state directly.
- */
-async function executeSql(
-  page: Page,
-  ref: string,
-  sql: string
-): Promise<Array<Record<string, unknown>>> {
-  // Create API response waiter for content/count which indicates project is loaded
-  const contentCountWaiter = createApiResponseWaiter(
-    page,
-    'platform/projects',
-    ref,
-    'content/count'
-  )
-
-  // Navigate to SQL editor
-  await page.goto(toUrl(`/project/${ref}/sql/new?skip=true`))
-
-  // Wait for content/count API response to ensure project is fully loaded
-  await contentCountWaiter
-
-  await expect(page.getByText('Loading...')).not.toBeVisible({ timeout: 10000 })
-
-  // Clear and type the SQL
-  await page.locator('.view-lines').click()
-  await page.keyboard.press('ControlOrMeta+KeyA')
-  await page.keyboard.type(sql)
-
-  // Run the query
-  const sqlMutationPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
-    method: 'POST',
-  })
-  await page.getByTestId('sql-run-button').click()
-  await sqlMutationPromise
-
-  // Wait for either results grid or "Success. No rows returned" message
-  const grid = page.getByRole('grid')
-  const noRowsMessage = page.getByText('Success. No rows returned')
-
-  // Wait for either element to appear
-  await expect(grid.or(noRowsMessage)).toBeVisible({ timeout: 10000 })
-
-  // If no rows returned, return empty array
-  if (await noRowsMessage.isVisible().catch(() => false)) {
-    return []
-  }
-
-  // If grid is not visible (shouldn't happen if we get here, but just in case)
-  if ((await grid.count()) === 0) {
-    return []
-  }
-
-  // Extract column headers
-  const headers: Array<string> = []
-  const headerCells = grid.getByRole('columnheader')
-  const headerCount = await headerCells.count()
-  for (let i = 0; i < headerCount; i++) {
-    const text = await headerCells.nth(i).textContent()
-    if (text) headers.push(text.trim())
-  }
-
-  // Extract row data
-  const results: Array<Record<string, unknown>> = []
-  const rows = grid.getByRole('row')
-  const rowCount = await rows.count()
-
-  // Skip first row (header row)
-  for (let i = 1; i < rowCount; i++) {
-    const cells = rows.nth(i).getByRole('gridcell')
-    const cellCount = await cells.count()
-    const row: Record<string, unknown> = {}
-
-    for (let j = 0; j < Math.min(cellCount, headers.length); j++) {
-      const cellText = await cells.nth(j).textContent()
-      row[headers[j]] = cellText?.trim() ?? null
-    }
-
-    if (Object.keys(row).length > 0) {
-      results.push(row)
-    }
-  }
-
-  return results
-}
-
 async function verifyTablePrivileges(
-  page: Page,
-  ref: string,
   schemaName: string,
   tableName: string,
   expectedPrivileges: {
@@ -115,17 +21,16 @@ async function verifyTablePrivileges(
     authenticated: Array<string>
   }
 ) {
-  const sql = `
-    SELECT grantee, privilege_type
-    FROM information_schema.role_table_grants
-    WHERE table_schema = '${schemaName}'
-      AND table_name = '${tableName}'
-      AND grantee IN ('anon', 'authenticated')
-      AND privilege_type IN ('SELECT', 'INSERT', 'UPDATE', 'DELETE')
-    ORDER BY grantee, privilege_type;
-  `
-
-  const results = await executeSql(page, ref, sql)
+  const results = await query<{ grantee: string; privilege_type: string }>(
+    `SELECT grantee, privilege_type
+     FROM information_schema.role_table_grants
+     WHERE table_schema = $1
+       AND table_name = $2
+       AND grantee IN ('anon', 'authenticated')
+       AND privilege_type IN ('SELECT', 'INSERT', 'UPDATE', 'DELETE')
+     ORDER BY grantee, privilege_type`,
+    [schemaName, tableName]
+  )
 
   // Group privileges by grantee
   const actualPrivileges: Record<string, Array<string>> = {
@@ -134,15 +39,8 @@ async function verifyTablePrivileges(
   }
 
   for (const row of results) {
-    const grantee = row['grantee'] as string
-    const privilegeType = row['privilege_type'] as string
-    if (
-      grantee &&
-      privilegeType &&
-      (grantee === 'anon' || grantee === 'authenticated') &&
-      API_PRIVILEGE_TYPES.includes(privilegeType)
-    ) {
-      actualPrivileges[grantee].push(privilegeType)
+    if (row.grantee === 'anon' || row.grantee === 'authenticated') {
+      actualPrivileges[row.grantee].push(row.privilege_type)
     }
   }
 
@@ -241,7 +139,7 @@ test.describe('API Access Toggle', () => {
     ).toBeVisible()
 
     // Verify all API access privileges were granted
-    await verifyTablePrivileges(page, ref, 'public', tableName, {
+    await verifyTablePrivileges('public', tableName, {
       anon: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
       authenticated: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
     })
@@ -291,7 +189,7 @@ test.describe('API Access Toggle', () => {
     ).toBeVisible()
 
     // Verify no API access privileges were granted
-    await verifyTablePrivileges(page, ref, 'public', tableName, {
+    await verifyTablePrivileges('public', tableName, {
       anon: [],
       authenticated: [],
     })
@@ -327,7 +225,7 @@ test.describe('API Access Toggle', () => {
     ).toBeVisible()
 
     // Verify default full privileges were granted
-    await verifyTablePrivileges(page, ref, 'public', tableName, {
+    await verifyTablePrivileges('public', tableName, {
       anon: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
       authenticated: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
     })
@@ -437,7 +335,7 @@ test.describe('API Access Toggle', () => {
     ).toBeVisible()
 
     // Verify partial grants - anon: SELECT; authenticated: SELECT, INSERT
-    await verifyTablePrivileges(page, ref, 'public', tableName, {
+    await verifyTablePrivileges('public', tableName, {
       anon: ['SELECT'],
       authenticated: ['SELECT', 'INSERT'],
     })
@@ -490,7 +388,7 @@ test.describe('API Access Toggle', () => {
     ).toBeVisible()
 
     // Verify initial privileges before edit
-    await verifyTablePrivileges(page, ref, 'public', tableName, {
+    await verifyTablePrivileges('public', tableName, {
       anon: ['SELECT', 'INSERT'],
       authenticated: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
     })
@@ -529,7 +427,7 @@ test.describe('API Access Toggle', () => {
     await page.waitForSelector('[data-testid="table-editor-side-panel"]', { state: 'detached' })
 
     // Step 3: Verify the privileges remain unchanged after edit
-    await verifyTablePrivileges(page, ref, 'public', tableName, {
+    await verifyTablePrivileges('public', tableName, {
       anon: ['SELECT', 'INSERT'],
       authenticated: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
     })

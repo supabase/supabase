@@ -2,18 +2,18 @@
 
 import Editor, { useMonaco } from '@monaco-editor/react'
 import {
+  formatCurl,
+  formatHttp,
   HttpRequest,
   ParsingError,
+  processSql,
   RenderError,
+  renderHttp,
+  renderSupabaseJs,
   Statement,
   SupabaseJsQuery,
   UnimplementedError,
   UnsupportedError,
-  formatCurl,
-  formatHttp,
-  processSql,
-  renderHttp,
-  renderSupabaseJs,
 } from '@supabase/sql-to-rest'
 import { ChevronUp, GitPullRequest } from 'lucide-react'
 import type { editor } from 'monaco-editor'
@@ -28,8 +28,9 @@ import {
 } from 'react'
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
+import { cn, CodeBlock, Collapsible, Tabs } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
+
 import { assumptions } from './assumptions'
 import { BaseUrlDialog } from './base-url-dialog'
 import { faqs } from './faqs'

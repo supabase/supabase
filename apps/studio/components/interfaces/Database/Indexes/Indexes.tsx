@@ -52,19 +52,13 @@ const Indexes = () => {
 
   const [showCreateIndex, setShowCreateIndex] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false)
   )
 
-  const [editIndexId, setEditIndexId] = useQueryState(
-    'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [editIndexId, setEditIndexId] = useQueryState('edit', parseAsString)
   const selectedIndex = allIndexes?.find((idx) => idx.name === editIndexId)
 
-  const [deleteIndexId, setDeleteIndexId] = useQueryState(
-    'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [deleteIndexId, setDeleteIndexId] = useQueryState('delete', parseAsString)
   const selectedIndexToDelete = allIndexes?.find((idx) => idx.name === deleteIndexId)
 
   const {

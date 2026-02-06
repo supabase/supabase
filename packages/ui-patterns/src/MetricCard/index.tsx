@@ -17,11 +17,11 @@ import {
   Card,
   CardContent,
   CardTitle,
+  cn,
   Skeleton,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 
 interface MetricCardContextValue {
