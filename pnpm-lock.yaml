@@ -359,7 +359,7 @@ importers:
         version: 1.6.0
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
-        version: 0.1.1(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))
+        version: 0.1.1(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2)))
       '@types/lodash.template':
         specifier: 4.5.0
         version: 4.5.0
@@ -389,7 +389,7 @@ importers:
         version: 1.6.0
       tailwindcss:
         specifier: 'catalog:'
-        version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
+        version: 3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2))
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -924,7 +924,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^5.9.0
-        version: 5.9.0(ws@8.18.3)(zod@3.25.76)
+        version: 5.9.0(ws@8.19.0)(zod@3.25.76)
       openapi-fetch:
         specifier: 0.12.4
         version: 0.12.4
@@ -1306,7 +1306,7 @@ importers:
         version: 2.7.1(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@16.0.11(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.75.1
-        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
+        version: 4.104.0(encoding@0.1.13)(ws@8.19.0)(zod@3.25.76)
       openapi-fetch:
         specifier: 0.12.4
         version: 0.12.4
@@ -1535,7 +1535,7 @@ importers:
         version: link:../../packages/api-types
       autoevals:
         specifier: ^0.0.131
-        version: 0.0.131(encoding@0.1.13)(ws@8.18.3)
+        version: 0.0.131(encoding@0.1.13)(ws@8.19.0)
       braintrust:
         specifier: ^1.0.2
         version: 1.0.2(@aws-sdk/credential-provider-web-identity@3.830.0)(supports-color@8.1.1)(zod@3.25.76)
@@ -1748,7 +1748,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^5.9.0
-        version: 5.9.0(ws@8.18.3)(zod@3.25.76)
+        version: 5.9.0(ws@8.19.0)(zod@3.25.76)
       openapi-fetch:
         specifier: 0.12.4
         version: 0.12.4
@@ -2031,7 +2031,7 @@ importers:
         version: 2.8.1(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@15.5.10(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.75.1
-        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
+        version: 4.104.0(encoding@0.1.13)(ws@8.19.0)(zod@3.25.76)
       parse-numeric-range:
         specifier: ^1.3.0
         version: 1.3.0
@@ -2152,7 +2152,7 @@ importers:
         version: 7.47.0(react@18.3.1)
       tailwindcss:
         specifier: ^3.4.1
-        version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
+        version: 3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2))
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -2265,7 +2265,7 @@ importers:
         version: 3.5.0
       openai:
         specifier: ^4.75.1
-        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
+        version: 4.104.0(encoding@0.1.13)(ws@8.19.0)(zod@3.25.76)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -2429,10 +2429,10 @@ importers:
         version: 0.1.9
       '@tailwindcss/forms':
         specifier: ^0.5.0
-        version: 0.5.6(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))
+        version: 0.5.6(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2)))
       '@tailwindcss/typography':
         specifier: ^0.5.9
-        version: 0.5.10(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))
+        version: 0.5.10(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2)))
       deepmerge:
         specifier: ^4.2.2
         version: 4.3.1
@@ -2445,10 +2445,10 @@ importers:
     devDependencies:
       tailwindcss:
         specifier: 'catalog:'
-        version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
+        version: 3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2))
       tailwindcss-animate:
         specifier: ^1.0.6
-        version: 1.0.7(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))
+        version: 1.0.7(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2)))
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
@@ -2497,7 +2497,7 @@ importers:
         version: 5.9.2
       vitest:
         specifier: 'catalog:'
-        version: 3.2.4(@types/node@22.13.14)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@5.9.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1)
+        version: 3.2.4(@types/node@25.1.0)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.11.3(@types/node@25.1.0)(typescript@5.9.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.46.0)(tsx@4.20.3)(yaml@2.8.1)
 
   packages/eslint-config-supabase:
     devDependencies:
@@ -2929,7 +2929,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.75.1
-        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
+        version: 4.104.0(encoding@0.1.13)(ws@8.19.0)(zod@3.25.76)
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -28549,10 +28549,19 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
 
+  '@tailwindcss/container-queries@0.1.1(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2)))':
+    dependencies:
+      tailwindcss: 3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2))
+
   '@tailwindcss/forms@0.5.6(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))':
     dependencies:
       mini-svg-data-uri: 1.4.4
       tailwindcss: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
+
+  '@tailwindcss/forms@0.5.6(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2)))':
+    dependencies:
+      mini-svg-data-uri: 1.4.4
+      tailwindcss: 3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2))
 
   '@tailwindcss/typography@0.5.10(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))':
     dependencies:
@@ -28561,6 +28570,14 @@ snapshots:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
+
+  '@tailwindcss/typography@0.5.10(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2)))':
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2))
 
   '@tanstack/directive-functions-plugin@1.114.12(@types/node@25.1.0)(babel-plugin-macros@3.1.0)(jiti@2.5.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.46.0)(tsx@4.20.3)(yaml@2.8.1)':
     dependencies:
@@ -29969,7 +29986,7 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@25.1.0)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.11.3(@types/node@25.1.0)(typescript@5.9.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.46.0)(tsx@4.20.3)(yaml@2.8.1)
+      vitest: 3.2.4(@types/node@22.13.14)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@5.9.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.46.0)(tsx@4.20.3)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -30028,7 +30045,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@25.1.0)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.11.3(@types/node@25.1.0)(typescript@5.9.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.46.0)(tsx@4.20.3)(yaml@2.8.1)
+      vitest: 3.2.4(@types/node@22.13.14)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@5.9.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.46.0)(tsx@4.20.3)(yaml@2.8.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -30659,7 +30676,7 @@ snapshots:
 
   auto-bind@4.0.0: {}
 
-  autoevals@0.0.131(encoding@0.1.13)(ws@8.18.3):
+  autoevals@0.0.131(encoding@0.1.13)(ws@8.19.0):
     dependencies:
       ajv: 8.17.1
       compute-cosine-similarity: 1.1.0
@@ -30667,7 +30684,7 @@ snapshots:
       js-yaml: 4.1.1
       linear-sum-assignment: 1.0.9
       mustache: 4.2.0
-      openai: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
+      openai: 4.104.0(encoding@0.1.13)(ws@8.19.0)(zod@3.25.76)
       zod: 3.25.76
       zod-to-json-schema: 3.25.0(zod@3.25.76)
     transitivePeerDependencies:
@@ -37627,9 +37644,24 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  openai@5.9.0(ws@8.18.3)(zod@3.25.76):
+  openai@4.104.0(encoding@0.1.13)(ws@8.19.0)(zod@3.25.76):
+    dependencies:
+      '@types/node': 18.18.13
+      '@types/node-fetch': 2.6.6
+      abort-controller: 3.0.0
+      agentkeepalive: 4.5.0
+      form-data-encoder: 1.7.2
+      formdata-node: 4.4.1
+      node-fetch: 2.7.0(encoding@0.1.13)
     optionalDependencies:
-      ws: 8.18.3
+      ws: 8.19.0
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - encoding
+
+  openai@5.9.0(ws@8.19.0)(zod@3.25.76):
+    optionalDependencies:
+      ws: 8.19.0
       zod: 3.25.76
 
   openapi-fetch@0.12.4:
@@ -38019,7 +38051,7 @@ snapshots:
 
   periscopic@4.0.2:
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.5
       is-reference: 3.0.3
       zimmerframe: 1.1.4
     optional: true
@@ -40790,9 +40822,9 @@ snapshots:
 
   tailwind-merge@3.3.1: {}
 
-  tailwindcss-animate@1.0.7(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))):
+  tailwindcss-animate@1.0.7(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2))):
     dependencies:
-      tailwindcss: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
+      tailwindcss: 3.4.1(ts-node@10.9.2(@types/node@25.1.0)(typescript@5.9.2))
 
   tailwindcss-radix@2.8.0: {}
 
