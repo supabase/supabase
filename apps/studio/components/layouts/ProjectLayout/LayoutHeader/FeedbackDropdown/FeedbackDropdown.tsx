@@ -6,6 +6,7 @@ import { IS_PLATFORM } from 'common'
 import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
 import {
   ASSISTANT_SUGGESTIONS,
+  getSupportLinkQueryParams,
   HelpSection,
 } from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
