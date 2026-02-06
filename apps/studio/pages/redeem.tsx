@@ -10,9 +10,9 @@ import {
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import type { NextPageWithLayout } from '@/types'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, Loading } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 
 const RedeemCreditsPage: NextPageWithLayout = () => {
   const {
@@ -28,7 +28,14 @@ const RedeemCreditsPage: NextPageWithLayout = () => {
     if (!isOrganizationsFetched) {
       return (
         <Loading active={areOrganizationsLoading}>
-          <span>loading</span>
+          <div className="grid md:grid-cols-2 pt-10 gap-8">
+            <ShimmeringLoader className='w-full' />
+
+            <div className='space-y-4'>
+              <ShimmeringLoader className='w-full h-14' />
+              <ShimmeringLoader className='w-full h-14' />
+            </div>
+          </div>
         </Loading>
       )
     }

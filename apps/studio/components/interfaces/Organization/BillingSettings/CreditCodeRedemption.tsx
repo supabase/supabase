@@ -36,7 +36,6 @@ import { z } from 'zod'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import useLatest from '@/hooks/misc/useLatest'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
 
 const FORM_ID = 'credit-code-redemption'
@@ -58,8 +57,9 @@ export const CreditCodeRedemption = ({
 }) => {
   const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
-  )
+    'stripe.subscriptions', undefined, {
+    organizationSlug: slug,
+  })
 
   const redeemCodeEnabled = useFlag('redeemCodeEnabled')
 
@@ -141,7 +141,7 @@ export const CreditCodeRedemption = ({
         hcaptchaToken: token,
       },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           form.setValue('code', '')
           resetCaptcha()
         },
@@ -257,16 +257,14 @@ export const CreditCodeRedemption = ({
             <DialogHeader>
               <DialogTitle>Redeem Code</DialogTitle>
               <DialogDescription className="space-y-2">
-                <p className="prose text-sm">
-                  Redeem your credit code to add credits to your organization
-                </p>
+                Redeem your credit code to add credits to your organization
               </DialogDescription>
             </DialogHeader>
 
             <DialogSectionSeparator />
 
             <Form_Shadcn_ {...form}>
-              {isOrgLoading || isCustomerProfileLoading ? (
+              {isOrgLoading || isCustomerProfileLoading || !isPermissionsLoaded ? (
                 <div className="p-6 space-y-4">
                   <ShimmeringLoader />
                   <div className="flex space-x-4">
@@ -325,14 +323,22 @@ export const CreditCodeRedemption = ({
                   </DialogSection>
 
                   <DialogFooter>
-                    <Button
-                      htmlType="submit"
+                    <ButtonTooltip
                       type="primary"
-                      loading={redeemingCode}
+                      className="pointer-events-auto"
                       disabled={codeRedemptionDisabled}
-                    >
-                      Redeem
-                    </Button>
+                      htmlType='submit'
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text:
+                            isPermissionsLoaded && !canRedeemCode
+                              ? 'You need additional permissions to redeem codes'
+                              : undefined,
+                        },
+                      }}
+                    >Redeem</ButtonTooltip>
+
                   </DialogFooter>
                 </form>
               )}
