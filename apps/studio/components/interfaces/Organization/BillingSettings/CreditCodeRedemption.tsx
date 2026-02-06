@@ -11,9 +11,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -24,8 +24,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   Separator,
 } from 'ui'
@@ -35,8 +35,8 @@ import { z } from 'zod'
 
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import useLatest from '@/hooks/misc/useLatest'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'credit-code-redemption'
 
@@ -49,18 +49,24 @@ type CreditCodeRedemptionForm = z.infer<typeof FormSchema>
 export const CreditCodeRedemption = ({
   slug,
   modalVisible = false,
+  onClose,
 }: {
   slug: string | undefined
   modalVisible?: boolean
+  onClose?: () => void
 }) => {
   const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+    'stripe.subscriptions',
+    undefined,
+    {
+      organizationSlug: slug,
+    }
   )
 
   const redeemCodeEnabled = useFlag('redeemCodeEnabled')
 
-  const { data: org, isLoading: isOrgLoading } = useSelectedOrganizationQuery({})
+  const { data: org, isLoading: isOrgLoading } = useOrganizationQuery({ slug })
 
   const router = useRouter()
 
@@ -138,7 +144,7 @@ export const CreditCodeRedemption = ({
         hcaptchaToken: token,
       },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           form.setValue('code', '')
           resetCaptcha()
         },
@@ -151,6 +157,7 @@ export const CreditCodeRedemption = ({
     if (!visible) {
       resetCodeRedemption()
       resetCaptcha()
+      onClose?.()
     }
   }
 
@@ -253,16 +260,14 @@ export const CreditCodeRedemption = ({
             <DialogHeader>
               <DialogTitle>Redeem Code</DialogTitle>
               <DialogDescription className="space-y-2">
-                <p className="prose text-sm">
-                  Redeem your credit code to add credits to your organization
-                </p>
+                Redeem your credit code to add credits to your organization
               </DialogDescription>
             </DialogHeader>
 
             <DialogSectionSeparator />
 
             <Form_Shadcn_ {...form}>
-              {isOrgLoading || isCustomerProfileLoading ? (
+              {isOrgLoading || isCustomerProfileLoading || !isPermissionsLoaded ? (
                 <div className="p-6 space-y-4">
                   <ShimmeringLoader />
                   <div className="flex space-x-4">
@@ -321,14 +326,24 @@ export const CreditCodeRedemption = ({
                   </DialogSection>
 
                   <DialogFooter>
-                    <Button
-                      htmlType="submit"
+                    <ButtonTooltip
                       type="primary"
+                      className="pointer-events-auto"
                       loading={redeemingCode}
                       disabled={codeRedemptionDisabled}
+                      htmlType="submit"
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text:
+                            isPermissionsLoaded && !canRedeemCode
+                              ? 'You need additional permissions to redeem codes'
+                              : undefined,
+                        },
+                      }}
                     >
                       Redeem
-                    </Button>
+                    </ButtonTooltip>
                   </DialogFooter>
                 </form>
               )}
