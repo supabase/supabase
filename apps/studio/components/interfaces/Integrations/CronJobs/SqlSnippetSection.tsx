@@ -16,7 +16,10 @@ export const SqlSnippetSection = ({ form }: SqlSnippetSectionProps) => {
         control={form.control}
         name="values.snippet"
         render={({ field }) => (
-          <FormItemLayout label="SQL Snippet" className="[&>div>label]:px-content">
+          <FormItemLayout
+            label="SQL Snippet"
+            className="[&>div>label]:px-content [&_[data-formlayout-id='message']]:px-content"
+          >
             <CodeEditor
               id="create-cron-job-editor"
               language="pgsql"

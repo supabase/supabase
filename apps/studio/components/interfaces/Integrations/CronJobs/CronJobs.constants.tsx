@@ -1,8 +1,16 @@
 import { EdgeFunctions, RESTApi, SqlEditor } from 'icons'
 import { ScrollText } from 'lucide-react'
 
-export const cronPattern =
-  /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
+// Standard cron field pattern (no $)
+const cronFieldPattern = '(\\*|(\\d+|\\*\\/\\d+)|\\d+\\/\\d+|\\d+-\\d+|\\d+(,\\d+)*)'
+// Day-of-month field pattern (allows $ for pg_cron's "last day of month")
+const dayOfMonthPattern = '(\\*|\\$|(\\d+|\\*\\/\\d+)|\\d+\\/\\d+|\\d+-\\d+|\\d+(,\\d+)*)'
+
+// Cron pattern: minute hour day-of-month month day-of-week
+// Only day-of-month (3rd field) supports $ for pg_cron's "last day of month" syntax
+export const cronPattern = new RegExp(
+  `^${cronFieldPattern}\\s+${cronFieldPattern}\\s+${dayOfMonthPattern}\\s+${cronFieldPattern}\\s+${cronFieldPattern}$`
+)
 
 // detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
 export const secondsPattern = /^\d+\s+seconds*$/
