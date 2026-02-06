@@ -15,20 +15,26 @@ export async function storageRequest<T>(
   path: string,
   options?: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; body?: Record<string, unknown> }
 ): Promise<T> {
+  const headers: Record<string, string> = {
+    apikey: SERVICE_ROLE_KEY,
+    Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+  }
+
+  if (options?.body) {
+    headers['Content-Type'] = 'application/json'
+  }
+
   const response = await fetch(`${STORAGE_URL}${path}`, {
     method: options?.method ?? 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: SERVICE_ROLE_KEY,
-      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
-    },
+    headers,
     body: options?.body ? JSON.stringify(options.body) : undefined,
   })
 
   if (!response.ok) {
-    const error = await response.json()
-    throw new Error(`Storage request failed: ${error.message || JSON.stringify(error)}`)
+    const text = await response.text()
+    throw new Error(`Storage request failed (${response.status}): ${text}`)
   }
 
-  return response.json()
+  const text = await response.text()
+  return text ? JSON.parse(text) : ({} as T)
 }

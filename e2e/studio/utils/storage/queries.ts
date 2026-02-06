@@ -39,7 +39,7 @@ export async function deleteBucket(name: string): Promise<void> {
   const buckets = await listBuckets()
   if (!buckets.some((b) => b.id === name)) return
 
-  await storageRequest(`/bucket/${name}/empty`, { method: 'POST', body: {} })
+  await storageRequest(`/bucket/${name}/empty`, { method: 'POST' })
   await storageRequest(`/bucket/${name}`, { method: 'DELETE' })
 }
 
