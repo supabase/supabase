@@ -19,6 +19,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
+  UI_PREVIEW_TABLE_FILTER_BAR: 'supabase-ui-table-filter-bar',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
@@ -118,10 +119,6 @@ export const LOCAL_STORAGE_KEYS = {
    * WWW
    */
   BLOG_VIEW: 'supabase-blog-view',
-
-  // Used to track if user has been exposed to table quickstart experiment (prevents duplicate exposure events)
-  TABLE_QUICKSTART_EXPOSURE_TRACKED: (userId: string) =>
-    `table-quickstart-exposure-tracked-${userId}`,
 } as const
 
 export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
@@ -138,6 +135,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,

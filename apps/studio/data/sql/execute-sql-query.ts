@@ -1,6 +1,5 @@
-import { QueryKey, useQuery } from '@tanstack/react-query'
-
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import { QueryKey, useQuery } from '@tanstack/react-query'
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { MB, PROJECT_STATUS } from 'lib/constants'
@@ -9,7 +8,21 @@ import {
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { sqlKeys } from './keys'
+import {
+  calculateSummary,
+  createNodeTree,
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
+
+/**
+ * [Joshen] Done a bit of stress testing and experimentation, tho we should still observe and tweak where necessary
+ * From what I understand a query cost of 100,000 is considered to be "heavy", and 1M is "potentially dangerous"
+ * Reckon we ensure that the dashboard just caps query costs at "heavy", so that it doesn't impact the DB for other queries
+ * (e.g from the user's application)
+ */
+const COST_THRESHOLD = 100_000
+export const COST_THRESHOLD_ERROR = 'Query cost exceeds threshold'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
@@ -18,9 +31,15 @@ export type ExecuteSqlVariables = {
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
+  /**
+   * Disables transaction mode - should be used only for manual queries ran via the SQL Editor
+   * */
   isStatementTimeoutDisabled?: boolean
-  autoLimit?: number
-  contextualInvalidation?: boolean
+  /**
+   * Runs an EXPLAIN before actually running the query, rejects the query if cost exceeds a threshold.
+   * Intended to be used for interfaces that heavily rely on queries on the DB
+   * */
+  preflightCheck?: boolean
 }
 
 /**
@@ -37,16 +56,8 @@ export async function executeSql<T = any>(
     handleError,
     isRoleImpersonationEnabled = false,
     isStatementTimeoutDisabled = false,
-  }: Pick<
-    ExecuteSqlVariables,
-    | 'projectRef'
-    | 'connectionString'
-    | 'sql'
-    | 'queryKey'
-    | 'handleError'
-    | 'isRoleImpersonationEnabled'
-    | 'isStatementTimeoutDisabled'
-  >,
+    preflightCheck = false,
+  }: ExecuteSqlVariables,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
   fetcherOverride?: (options: {
@@ -76,26 +87,56 @@ export async function executeSql<T = any>(
       error = result.error
     }
   } else {
-    const result = await post('/platform/pg-meta/{ref}/query', {
+    const options = {
       signal,
+      headers,
       params: {
+        path: { ref: projectRef },
         header: {
           'x-connection-encrypted': connectionString ?? '',
           'x-pg-application-name': isStatementTimeoutDisabled
             ? 'supabase/dashboard-query-editor'
             : DEFAULT_PLATFORM_APPLICATION_NAME,
         },
-        path: { ref: projectRef },
-        // @ts-expect-error: This is just a client side thing to identify queries better
-        query: {
-          key:
-            queryKey
-              ?.filter((seg) => typeof seg === 'string' || typeof seg === 'number')
-              .join('-') ?? '',
-        },
       },
+    }
+
+    if (preflightCheck) {
+      /**
+       * [Joshen] Note that I've intentionally omitted error handling here as I'm opting
+       * to NOT block the UI if the preflight check fails for any reason.
+       */
+
+      const { data: costCheck } = await post('/platform/pg-meta/{ref}/query', {
+        ...options,
+        body: {
+          query: `explain ${sql}`,
+          disable_statement_timeout: isStatementTimeoutDisabled,
+        },
+      })
+      const parsedTree = !!costCheck ? createNodeTree(costCheck) : undefined
+      const summary = !!parsedTree ? calculateSummary(parsedTree) : undefined
+      const cost = summary?.totalCost ?? 0
+
+      if (cost >= COST_THRESHOLD) {
+        return handleErrorFetchers({
+          message: COST_THRESHOLD_ERROR,
+          code: cost,
+          metadata: { cost, sql },
+        })
+      }
+    }
+
+    const key =
+      queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ?? ''
+    const result = await post('/platform/pg-meta/{ref}/query', {
+      ...options,
       body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
-      headers,
+      params: {
+        ...options.params,
+        // @ts-expect-error: This is just a client side thing to identify queries better
+        query: { key },
+      },
     })
 
     data = result.data

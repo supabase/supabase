@@ -1,9 +1,9 @@
 'use client'
 
+import { components } from 'api-types'
 import { FlagValues } from 'flags/react'
 import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
 
-import { components } from 'api-types'
 import { useAuth } from './auth'
 import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'

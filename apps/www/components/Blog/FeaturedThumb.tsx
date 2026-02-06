@@ -51,17 +51,16 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
 }
 
 function renderFeaturedThumb(blog: PostTypes, author: any[]) {
+  const resolveImagePath = (img: string | undefined): string | null => {
+    if (!img) return null
+    return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
+  }
+
   const imageUrl = blog.isCMS
-    ? blog.imgThumb
-      ? blog.imgThumb
-      : blog.imgSocial
-        ? blog.imgSocial
-        : '/images/blog/blog-placeholder.png'
-    : blog.imgThumb
-      ? `/images/blog/${blog.imgThumb}`
-      : blog.imgSocial
-        ? `/images/blog/${blog.imgSocial}`
-        : '/images/blog/blog-placeholder.png'
+    ? blog.imgThumb || blog.imgSocial || '/images/blog/blog-placeholder.png'
+    : resolveImagePath(blog.imgThumb) ||
+      resolveImagePath(blog.imgSocial) ||
+      '/images/blog/blog-placeholder.png'
 
   return (
     <div key={blog.slug} className="w-full">
