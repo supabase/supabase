@@ -5,12 +5,7 @@ import SVG from 'react-inlinesvg'
 import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DOCS_URL } from 'lib/constants'
-import {
-  AiIconAnimation,
-  Button,
-  ButtonGroup,
-  ButtonGroupItem,
-} from 'ui'
+import { AiIconAnimation, ButtonGroup, ButtonGroupItem } from 'ui'
 
 import type { HelpOptionId } from './helpOptionsConfig'
 import { HELP_OPTION_IDS } from './helpOptionsConfig'
@@ -20,7 +15,6 @@ const STATUS_URL = 'https://status.supabase.com'
 
 type HelpOptionsListProps = {
   excludeIds?: HelpOptionId[]
-  variant: 'button-group' | 'stack'
   isPlatform: boolean
   projectRef: string | undefined
   supportLinkQueryParams: Partial<SupportFormUrlKeys> | undefined
@@ -31,7 +25,6 @@ type HelpOptionsListProps = {
 
 export const HelpOptionsList = ({
   excludeIds = [],
-  variant,
   isPlatform,
   projectRef,
   supportLinkQueryParams,
@@ -52,138 +45,68 @@ export const HelpOptionsList = ({
 
   const filteredIds = ids.filter(include)
 
-  if (variant === 'button-group') {
-    return (
-      <ButtonGroup className="w-full">
-        {filteredIds.map((id) => {
-          if (id === 'assistant') {
-            return (
-              <ButtonGroupItem
-                key={id}
-                size={size}
-                icon={<AiIconAnimation allowHoverEffect size={14} />}
-                onClick={onAssistantClick}
-              >
-                Supabase Assistant
-              </ButtonGroupItem>
-            )
-          }
-          if (id === 'docs') {
-            return (
-              <ButtonGroupItem key={id} size={size} icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
-                <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
-                  Docs
-                </a>
-              </ButtonGroupItem>
-            )
-          }
-          if (id === 'troubleshooting') {
-            return (
-              <ButtonGroupItem key={id} size={size} icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
-                <a href={`${DOCS_URL}/guides/troubleshooting?products=platform`} target="_blank" rel="noreferrer">
-                  Troubleshooting
-                </a>
-              </ButtonGroupItem>
-            )
-          }
-          if (id === 'discord') {
-            return (
-              <ButtonGroupItem key={id} size={size} icon={<SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />} asChild>
-                <a href={DISCORD_URL} target="_blank" rel="noreferrer">
-                  Ask on Discord
-                </a>
-              </ButtonGroupItem>
-            )
-          }
-          if (id === 'status') {
-            return (
-              <ButtonGroupItem key={id} size={size} icon={<Activity strokeWidth={1.5} size={14} />} asChild>
-                <a href={STATUS_URL} target="_blank" rel="noreferrer">
-                  Supabase status
-                </a>
-              </ButtonGroupItem>
-            )
-          }
-          if (id === 'support') {
-            return (
-              <ButtonGroupItem key={id} size={size} icon={<Mail strokeWidth={1.5} size={14} />} asChild>
-                <SupportLink queryParams={supportLinkQueryParams} onClick={onSupportClick}>
-                  Contact support
-                </SupportLink>
-              </ButtonGroupItem>
-            )
-          }
-          return null
-        })}
-      </ButtonGroup>
-    )
-  }
-
-  // variant === 'stack'
   return (
-    <div className="flex flex-col gap-1.5">
+    <ButtonGroup className="w-full">
       {filteredIds.map((id) => {
         if (id === 'assistant') {
           return (
-            <Button
+            <ButtonGroupItem
               key={id}
-              type="secondary"
               size={size}
-              className="justify-start"
               icon={<AiIconAnimation allowHoverEffect size={14} />}
               onClick={onAssistantClick}
             >
               Supabase Assistant
-            </Button>
+            </ButtonGroupItem>
           )
         }
         if (id === 'docs') {
           return (
-            <Button key={id} type="secondary" size={size} className="justify-start" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
+            <ButtonGroupItem key={id} size={size} icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
               <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
                 Docs
               </a>
-            </Button>
+            </ButtonGroupItem>
           )
         }
         if (id === 'troubleshooting') {
           return (
-            <Button key={id} type="secondary" size={size} className="justify-start" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
+            <ButtonGroupItem key={id} size={size} icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
               <a href={`${DOCS_URL}/guides/troubleshooting?products=platform`} target="_blank" rel="noreferrer">
                 Troubleshooting
               </a>
-            </Button>
+            </ButtonGroupItem>
           )
         }
         if (id === 'discord') {
           return (
-            <Button key={id} type="secondary" size={size} className="justify-start" icon={<SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />} asChild>
+            <ButtonGroupItem key={id} size={size} icon={<SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />} asChild>
               <a href={DISCORD_URL} target="_blank" rel="noreferrer">
                 Ask on Discord
               </a>
-            </Button>
+            </ButtonGroupItem>
           )
         }
         if (id === 'status') {
           return (
-            <Button key={id} type="secondary" size={size} className="justify-start" icon={<Activity strokeWidth={1.5} size={14} />} asChild>
+            <ButtonGroupItem key={id} size={size} icon={<Activity strokeWidth={1.5} size={14} />} asChild>
               <a href={STATUS_URL} target="_blank" rel="noreferrer">
                 Supabase status
               </a>
-            </Button>
+            </ButtonGroupItem>
           )
         }
         if (id === 'support') {
           return (
-            <SupportLink key={id} queryParams={supportLinkQueryParams} onClick={onSupportClick}>
-              <Button type="default" size={size}>
+            <ButtonGroupItem key={id} size={size} icon={<Mail strokeWidth={1.5} size={14} />} asChild>
+              <SupportLink queryParams={supportLinkQueryParams} onClick={onSupportClick}>
                 Contact support
-              </Button>
-            </SupportLink>
+              </SupportLink>
+            </ButtonGroupItem>
           )
         }
         return null
       })}
-    </div>
+    </ButtonGroup>
   )
 }

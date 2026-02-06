@@ -91,13 +91,10 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
           <>
             <div className="flex flex-col gap-4 p-4">
               <HelpSection
-                title="Need help with your project?"
-                description={`Start with our ${projectRef ? 'Assistant, docs,' : 'docs'} or community.`}
                 excludeIds={[]}
                 isPlatform={IS_PLATFORM}
                 projectRef={projectRef}
                 supportLinkQueryParams={supportLinkQueryParams}
-                padding="default"
                 onAssistantClick={() => {
                   openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                   snap.newChat(ASSISTANT_SUGGESTIONS)

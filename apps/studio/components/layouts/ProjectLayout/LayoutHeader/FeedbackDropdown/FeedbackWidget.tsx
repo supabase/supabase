@@ -212,7 +212,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
       <div className="px-4 pt-4 pb-4 flex flex-row justify-between items-center">
         {onSwitchToIssueOptions ? (
           <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
-            Get help
+            Get help instead
           </Button>
         ) : null}
         <div className="flex items-center gap-2 flex-row">

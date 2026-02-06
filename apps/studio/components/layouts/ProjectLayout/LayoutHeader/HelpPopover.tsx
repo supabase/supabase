@@ -64,8 +64,7 @@ export const HelpPopover = () => {
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-5 p-0 py-5" align="end" side="bottom">
         <HelpSection
-          title="Need help with your project?"
-          description={`Start with our ${projectRef ? 'Assistant, docs,' : 'docs'} or community.`}
+          className="px-5"
           excludeIds={['discord']}
           isPlatform={IS_PLATFORM}
           projectRef={projectRef}
@@ -78,9 +77,9 @@ export const HelpPopover = () => {
         />
         <Popover.Separator />
         <div className="flex flex-col gap-4">
-          <div className="px-5 flex flex-col gap-1">
+          <div className="px-5 flex flex-col gap-0.5">
             <h5 className="text-foreground">Community support</h5>
-            <p className="text-sm text-foreground-lighter text-balance">
+            <p className="text-xs text-foreground-lighter text-balance">
               Our Discord community can help with code-related issues. Many questions are answered
               in minutes.
             </p>
