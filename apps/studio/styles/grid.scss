@@ -42,7 +42,7 @@
   color: hsl(var(--warning-default));
 }
 
-// Row pending addition - green background
+// Row pending addition - green background, green text
 .rdg-row.rdg-row--added {
   background-color: hsl(var(--brand-200) / 0.3);
 
@@ -52,15 +52,16 @@
 
   .rdg-cell {
     border-left-color: hsl(var(--brand-default));
+    color: hsl(var(--brand-link));
   }
 
   // First cell gets a stronger left border to indicate new row
   .rdg-cell:first-child {
-    box-shadow: inset 3px 0 0 0 hsl(var(--brand-default));
+    box-shadow: inset 2px 0 0 0 hsl(var(--brand-default));
   }
 }
 
-// Row pending deletion - red background with strikethrough effect
+// Row pending deletion - red background with strikethrough effect, red text
 .rdg-row.rdg-row--deleted {
   background-color: hsl(var(--destructive-200) / 0.3);
   opacity: 0.6;
@@ -73,11 +74,12 @@
     text-decoration: line-through;
     text-decoration-color: hsl(var(--destructive-default));
     border-left-color: hsl(var(--destructive-default));
+    color: hsl(var(--destructive-default));
   }
 
   // First cell gets a stronger left border to indicate deleted row
   .rdg-cell:first-child {
-    box-shadow: inset 3px 0 0 0 hsl(var(--destructive-default));
+    box-shadow: inset 2px 0 0 0 hsl(var(--destructive-default));
   }
 }
 
