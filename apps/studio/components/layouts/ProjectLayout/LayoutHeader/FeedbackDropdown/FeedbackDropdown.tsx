@@ -111,7 +111,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             <PopoverSeparator_Shadcn_ />
             <div className="px-4 pt-4 pb-4">
               <Button type="default" size="tiny" onClick={() => setStage('widget')}>
-                Leave feedback
+                Leave feedback instead
               </Button>
             </div>
           </>

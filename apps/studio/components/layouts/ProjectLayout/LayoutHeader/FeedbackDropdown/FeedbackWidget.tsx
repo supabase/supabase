@@ -164,7 +164,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   }, [debouncedFeedback])
 
   return isFeedbackSent ? (
-    <ThanksMessage onClose={onClose} />
+    <ThanksMessage onClose={onClose} onSwitchToIssueOptions={onSwitchToIssueOptions} />
   ) : (
     <>
       <div className="p-4">
@@ -304,28 +304,38 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   )
 }
 
-const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
+const ThanksMessage = ({
+  onClose,
+  onSwitchToIssueOptions,
+}: {
+  onClose: () => void
+  onSwitchToIssueOptions?: () => void
+}) => {
   return (
-    <div>
-      <div className="grid gap-3 py-3">
-        <div className="px-6 grid gap-4 text-center text-foreground-light">
-          <CircleCheck className="mx-auto text-brand-500" size={24} />
-          <div className="text-center flex flex-col">
-            <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
-            <p className="text-sm text-balance">
-              We don’t always respond to feedback. If you require assistance, please contact support
-              via the <HelpCircle className="inline-block" size={12} aria-label="Help" /> menu
-              instead.
-            </p>
-          </div>
-        </div>
-        <PopoverSeparator_Shadcn_ />
-        <div className="flex items-center justify-end px-4 pb-4">
-          <Button type="default" onClick={onClose}>
-            Close
-          </Button>
+    <>
+      <div className="py-6 px-4 grid gap-4 text-center text-foreground-light">
+        <CircleCheck className="mx-auto text-brand-500" size={24} />
+        <div className="flex flex-col gap-1">
+          <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
+          <p className="text-sm text-balance">
+            We don’t always respond to feedback. If you need help with your project, use the button
+            below.
+          </p>
         </div>
       </div>
-    </div>
+      <PopoverSeparator_Shadcn_ />
+      <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
+        {onSwitchToIssueOptions ? (
+          <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+            Get help
+          </Button>
+        ) : (
+          <span />
+        )}
+        <Button type="default" size="tiny" onClick={onClose}>
+          Close
+        </Button>
+      </div>
+    </>
   )
 }
