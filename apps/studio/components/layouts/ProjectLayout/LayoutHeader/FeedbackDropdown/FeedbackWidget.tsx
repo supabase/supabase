@@ -208,7 +208,7 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
 
       <PopoverSeparator_Shadcn_ />
 
-      <div className="px-4 pt-4 flex flex-row justify-end items-start">
+      <div className="px-4 pt-4 pb-4 flex flex-row justify-end items-start">
         <div className="flex items-center gap-2 flex-row">
           {!!screenshot ? (
             <div
@@ -309,7 +309,7 @@ const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
           </div>
         </div>
         <PopoverSeparator_Shadcn_ />
-        <div className="flex items-center justify-end px-4">
+        <div className="flex items-center justify-end px-4 pb-4">
           <Button type="default" onClick={onClose}>
             Close
           </Button>

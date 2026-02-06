@@ -34,29 +34,32 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
       <PopoverContent_Shadcn_
         side="bottom"
         align="end"
-        className="px-0 pt-1 w-96 flex flex-col"
-
+        className="p-0 flex flex-col w-96"
         id="feedback-widget"
       >
         {stage === 'select' && (
-          <div className="flex flex-col gap-4 pt-4 pb-1 px-4">
+          <div className="flex flex-col gap-4 p-4">
             <div className="font-medium text-sm">What would you like to share?</div>
             <div className="grid grid-cols-2 gap-3">
               <Button type="default" className="h-32" onClick={() => setIsOpen(false)} asChild>
                 <SupportLink>
-                  <span className="grid gap-1 text-center">
+                  <div className="grid gap-1.5 text-center">
                     <TriangleAlert size="28" className="mx-auto text-destructive-600" />
-                    <span className="text-base">Issue</span>
-                    <span className="text-xm text-foreground-lighter">with my project</span>
-                  </span>
+                    <div className="flex flex-col items-center">
+                      <span className="text-base">Issue</span>
+                      <span className="text-xm text-foreground-lighter">with my project</span>
+                    </div>
+                  </div>
                 </SupportLink>
               </Button>
               <Button type="default" className="h-32" onClick={() => setStage('widget')}>
-                <span className="grid gap-1 text-center">
+                <div className="grid gap-1.5 text-center">
                   <Lightbulb size="28" className="mx-auto text-warning" />
-                  <span className="text-base">Idea</span>
-                  <span className="text-xm text-foreground-lighter">to improve Supabase</span>
-                </span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-base">Idea</span>
+                    <span className="text-xm text-foreground-lighter">to improve Supabase</span>
+                  </div>
+                </div>
               </Button>
             </div>
           </div>
