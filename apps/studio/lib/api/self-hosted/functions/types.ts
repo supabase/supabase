@@ -5,7 +5,10 @@ export type FunctionArtifact = {
   updated_at: number
 }
 
-export type FunctionBlobArtifact = {
-  filename: string
-  data: Blob
+export type FunctionFileEntry = {
+  /** Absolute path on disk */
+  absolutePath: string
+  /** Path relative to the function folder, used as the multipart filename */
+  relativePath: string
+  size: number
 }

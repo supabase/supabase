@@ -1,9 +1,9 @@
 import type { Dirent } from 'node:fs'
-import { readdir, readFile, stat } from 'node:fs/promises'
+import { readdir, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-import { FunctionArtifact, FunctionBlobArtifact } from './types'
+import { FunctionArtifact, FunctionFileEntry } from './types'
 
 export class FileSystemFunctionsArtifactStore {
   constructor(private folderPath: string) {}
@@ -30,24 +30,32 @@ export class FileSystemFunctionsArtifactStore {
     return parseFolderToFunctionArtifact(functionFolder)
   }
 
-  async getBlobArtifactsBySlug(slug: string): Promise<FunctionBlobArtifact[]> {
+  async getFileEntriesBySlug(slug: string): Promise<Array<FunctionFileEntry>> {
     if (slug === 'main') return []
 
     const functionFolderPath = path.resolve(this.folderPath, slug)
     if (!functionFolderPath.startsWith(path.resolve(this.folderPath) + path.sep)) return []
 
-    const functionFolder = await readdir(functionFolderPath, {
+    const entries = await readdir(functionFolderPath, {
       recursive: true,
       withFileTypes: true,
     })
 
-    const blobArtifacts = await Promise.all(
-      functionFolder
-        .filter((i) => i.isFile())
-        .map(async (file) => await parseFileToFunctionBlobArtifact(file, functionFolderPath))
+    const fileEntries = await Promise.all(
+      entries
+        .filter((entry) => entry.isFile())
+        .map(async (entry) => {
+          const absolutePath = path.join(entry.parentPath, entry.name)
+          const fileStat = await stat(absolutePath)
+          return {
+            absolutePath,
+            relativePath: path.relative(functionFolderPath, absolutePath),
+            size: fileStat.size,
+          }
+        })
     )
 
-    return blobArtifacts.filter((f) => f !== undefined)
+    return fileEntries
   }
 }
 
@@ -68,21 +76,5 @@ async function parseFolderToFunctionArtifact(
     entrypoint_path: pathToFileURL(entrypointPath).href,
     created_at: entrypointStat.birthtimeMs,
     updated_at: entrypointStat.mtimeMs,
-  }
-}
-
-async function parseFileToFunctionBlobArtifact(
-  file: Dirent,
-  originalFolderPath: string
-): Promise<FunctionBlobArtifact | undefined> {
-  if (!file.isFile()) return
-
-  const buffer = await readFile(path.join(file.parentPath, file.name))
-  /* @ts-ignore: Buffer<ArrayBufferLike> to ArrayBuffer */
-  const blob = new Blob([buffer], { type: 'text/plain' })
-
-  return {
-    data: blob,
-    filename: path.join(file.parentPath, file.name),
   }
 }

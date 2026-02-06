@@ -1,5 +1,6 @@
+import { createReadStream } from 'node:fs'
+import { pipeline } from 'node:stream/promises'
 import { type NextApiRequest, type NextApiResponse } from 'next'
-import { Readable } from 'stream'
 
 import apiWrapper from '@/lib/api/apiWrapper'
 import { getFunctionsArtifactStore } from '@/lib/api/self-hosted/functions'
@@ -24,37 +25,57 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const slugParam = req.query.slug
   const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam
-  if (!slug)
-    return res.status(404).json({ error: { message: `Missing function 'slug' parameter` } })
+  if (!slug) {
+    res.status(404).json({ error: { message: `Missing function 'slug' parameter` } })
+    return
+  }
 
   const store = getFunctionsArtifactStore()
+  const fileEntries = await store.getFileEntriesBySlug(slug)
 
-  const blobArtifacts = await store.getBlobArtifactsBySlug(slug)
+  const boundary = `----FormBoundary${uuidv4().replace(/-/g, '')}`
+  const totalSize = fileEntries.reduce((sum, entry) => sum + entry.size, 0)
 
-  const form = new FormData()
-
-  const totalSize = blobArtifacts.reduce((sum, item) => sum + item.data.size, 0)
   const metadata = {
     // mock id, should be "<project_id>_<function_id>_<version>"
     deployment_id: uuidv4(),
     original_size: totalSize,
     compressed_size: totalSize,
-    module_count: blobArtifacts.length,
+    module_count: fileEntries.length,
   }
-  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }), '')
 
-  blobArtifacts.forEach((item) => {
-    form.append('file', item.data, item.filename)
-  })
+  res.setHeader('Content-Type', `multipart/form-data; boundary=${boundary}`)
+  res.status(200)
 
-  const multipartResponse = new Response(form)
-
-  res.setHeader(
-    'Content-Type',
-    multipartResponse.headers.get('content-type') ?? 'multipart/form-data'
+  // Write metadata part
+  const metadataJson = JSON.stringify(metadata)
+  res.write(
+    `--${boundary}\r\n` +
+      `Content-Disposition: form-data; name="metadata"\r\n` +
+      `Content-Type: application/json\r\n` +
+      `\r\n` +
+      metadataJson +
+      `\r\n`
   )
 
-  res.status(200)
-  const readable = Readable.fromWeb(multipartResponse.body!)
-  return readable.pipe(res)
+  // Stream each file part
+  for (const entry of fileEntries) {
+    const safeName = entry.relativePath
+      .replace(/[\r\n]/g, '')
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+    const encodedName = encodeURIComponent(entry.relativePath)
+    res.write(
+      `--${boundary}\r\n` +
+        `Content-Disposition: form-data; name="file"; filename="${safeName}"; filename*=UTF-8''${encodedName}\r\n` +
+        `Content-Type: text/plain\r\n` +
+        `\r\n`
+    )
+    await pipeline(createReadStream(entry.absolutePath), res, { end: false })
+    res.write(`\r\n`)
+  }
+
+  // Write closing boundary
+  res.write(`--${boundary}--\r\n`)
+  res.end()
 }
