@@ -6,7 +6,7 @@ import SVG from 'react-inlinesvg'
 
 import { IS_PLATFORM } from 'common'
 import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import { ASSISTANT_SUGGESTIONS, HelpOptionsList } from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
+import { ASSISTANT_SUGGESTIONS, HelpSection } from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -63,29 +63,19 @@ export const HelpPopover = () => {
         </ButtonTooltip>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-5 p-0 py-5" align="end" side="bottom">
-        <div className="flex flex-col gap-4">
-          <div className="px-5 flex flex-col gap-1">
-            <h5 className="text-foreground">Need help with your project?</h5>
-            <p className="text-sm text-foreground-lighter text-balance">
-              Start with our {projectRef ? 'Assistant, docs,' : 'docs'} or community.
-            </p>
-          </div>
-
-          <div className="px-5">
-            <HelpOptionsList
-              excludeIds={['discord']}
-              variant="button-group"
-              isPlatform={IS_PLATFORM}
-              projectRef={projectRef}
-              supportLinkQueryParams={supportLinkQueryParams}
-              onAssistantClick={() => {
-                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                snap.newChat(ASSISTANT_SUGGESTIONS)
-              }}
-              onSupportClick={() => setIsOpen(false)}
-            />
-          </div>
-        </div>
+        <HelpSection
+          title="Need help with your project?"
+          description={`Start with our ${projectRef ? 'Assistant, docs,' : 'docs'} or community.`}
+          excludeIds={['discord']}
+          isPlatform={IS_PLATFORM}
+          projectRef={projectRef}
+          supportLinkQueryParams={supportLinkQueryParams}
+          onAssistantClick={() => {
+            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+            snap.newChat(ASSISTANT_SUGGESTIONS)
+          }}
+          onSupportClick={() => setIsOpen(false)}
+        />
         <Popover.Separator />
         <div className="flex flex-col gap-4">
           <div className="px-5 flex flex-col gap-1">

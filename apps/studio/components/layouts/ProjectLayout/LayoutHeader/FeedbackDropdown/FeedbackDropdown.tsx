@@ -1,17 +1,16 @@
-import { ChevronLeft, Lightbulb, TriangleAlert } from 'lucide-react'
+import { Lightbulb, TriangleAlert } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { IS_PLATFORM } from 'common'
 import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import { ASSISTANT_SUGGESTIONS, HelpOptionsList } from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
+import { ASSISTANT_SUGGESTIONS, HelpSection } from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
-
+import { Button, PopoverContent_Shadcn_, PopoverSeparator_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 import { FeedbackWidget } from './FeedbackWidget'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
@@ -89,46 +88,35 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
           </div>
         )}
         {stage === 'issue-options' && (
-          <div className="flex flex-col gap-4 p-4">
-            <Button
-              type="text"
-              size="tiny"
-              className="w-fit -ml-1 text-foreground-lighter hover:text-foreground"
-              icon={<ChevronLeft size={14} />}
-              onClick={() => setStage('select')}
-            >
-              Back
-            </Button>
-            <div className="flex flex-col gap-1">
-              <div className="font-medium text-sm text-foreground">Need help with your project?</div>
-              <p className="text-xs text-foreground-lighter text-balance">
-                Start with our docs or community.
-              </p>
+          <>
+            <div className="flex flex-col gap-4 p-4">
+              <HelpSection
+                title="Need help with your project?"
+                description={`Start with our ${projectRef ? 'Assistant, docs,' : 'docs'} or community.`}
+                excludeIds={[]}
+                isPlatform={IS_PLATFORM}
+                projectRef={projectRef}
+                supportLinkQueryParams={supportLinkQueryParams}
+                padding="default"
+                onAssistantClick={() => {
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                  snap.newChat(ASSISTANT_SUGGESTIONS)
+                  setIsOpen(false)
+                }}
+                onSupportClick={() => setIsOpen(false)}
+              />
             </div>
-            <HelpOptionsList
-              variant="stack"
-              isPlatform={IS_PLATFORM}
-              projectRef={projectRef}
-              supportLinkQueryParams={supportLinkQueryParams}
-              size="small"
-              onAssistantClick={() => {
-                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                snap.newChat(ASSISTANT_SUGGESTIONS)
-                setIsOpen(false)
-              }}
-              onSupportClick={() => setIsOpen(false)}
-            />
-            <div className="pt-2 border-t border-border">
+            <PopoverSeparator_Shadcn_ />
+            <div className="px-4 pt-4 pb-4">
               <Button
                 type="default"
                 size="tiny"
-                className="w-full justify-center"
                 onClick={() => setStage('widget')}
               >
                 Leave feedback
               </Button>
             </div>
-          </div>
+          </>
         )}
         {stage === 'widget' && (
           <FeedbackWidget
