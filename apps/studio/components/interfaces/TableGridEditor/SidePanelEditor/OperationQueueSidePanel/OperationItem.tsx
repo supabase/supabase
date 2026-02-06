@@ -75,14 +75,14 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
       </CardHeader>
 
       <CardContent className="font-mono text-xs">
-        <div className="flex gap-2 py-0.5 bg-red-400/20">
+        <div className="flex gap-2 py-0.5">
           <span className="text-destructive select-none font-medium">-</span>
           <span className="text-destructive truncate max-w-full" title={formattedOldValue}>
             {formattedOldValue}
           </span>
         </div>
 
-        <div className="flex gap-2 py-0.5 bg-green-400/20">
+        <div className="flex gap-2 py-0.5">
           <span className="text-brand-link select-none font-medium">+</span>
           <span className="text-brand-link truncate max-w-full" title={formattedNewValue}>
             {formattedNewValue}

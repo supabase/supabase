@@ -17,7 +17,7 @@ export const OperationList = ({ operations }: OperationListProps) => {
   if (operations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
-        <p className="text-md text-foreground-muted">No pending changes</p>
+        <p className="text-base text-foreground-muted">No pending changes</p>
       </div>
     )
   }
@@ -31,8 +31,7 @@ export const OperationList = ({ operations }: OperationListProps) => {
       {deleteOperations.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-xs text-foreground-lighter">
-            <span>{deleteOperations.length}</span> row deletion
-            {deleteOperations.length !== 1 ? 's' : ''}
+            {deleteOperations.length} row deletion{deleteOperations.length !== 1 ? 's' : ''}
           </h3>
 
           <div className="space-y-3">
@@ -51,7 +50,7 @@ export const OperationList = ({ operations }: OperationListProps) => {
       {addOperations.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-xs text-foreground-lighter">
-            <span>{addOperations.length}</span> row addition{addOperations.length !== 1 ? 's' : ''}
+            {addOperations.length} row addition{addOperations.length !== 1 ? 's' : ''}
           </h3>
           <div className="space-y-3">
             {addOperations.map((op) => (

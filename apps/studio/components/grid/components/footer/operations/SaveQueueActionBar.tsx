@@ -14,7 +14,6 @@ export const SaveQueueActionBar = () => {
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { handleSave } = useOperationQueueActions()
   const [leftPosition, setLeftPosition] = useState<string>('50%')
-  const barRef = useRef<HTMLDivElement>(null)
 
   useOperationQueueShortcuts()
 
@@ -29,8 +28,8 @@ export const SaveQueueActionBar = () => {
   useEffect(() => {
     if (!isVisible) return
 
+    const gridContainer = document.querySelector('.sb-grid')
     const updatePosition = () => {
-      const gridContainer = document.querySelector('.sb-grid')
       if (!gridContainer) {
         setLeftPosition('50%')
         return
@@ -43,7 +42,6 @@ export const SaveQueueActionBar = () => {
 
     updatePosition()
 
-    const gridContainer = document.querySelector('.sb-grid')
     if (!gridContainer) return
 
     const resizeObserver = new ResizeObserver(updatePosition)
@@ -63,7 +61,6 @@ export const SaveQueueActionBar = () => {
     <AnimatePresence>
       {isVisible && (
         <div
-          ref={barRef}
           className="fixed bottom-12 z-50 transform-gpu will-change-transform"
           style={{ left: leftPosition, transform: 'translateX(-50%)' }}
         >

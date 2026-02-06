@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Trash2, Undo2 } from 'lucide-react'
+import { Undo2 } from 'lucide-react'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from 'state/table-editor'

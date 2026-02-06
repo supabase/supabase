@@ -58,7 +58,7 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
               loading={isSaving}
             >
               Save{operations.length > 1 && ' all'}
-              <span className="text-foreground/40 text-text-[10px] ml-1.5">{modKey}S</span>
+              <span className="text-foreground/40 text-[10px] ml-1.5">{modKey}S</span>
             </Button>
           </div>
         </div>
