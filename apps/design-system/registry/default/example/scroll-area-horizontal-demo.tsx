@@ -1,6 +1,5 @@
-import * as React from 'react'
 import Image from 'next/image'
-
+import * as React from 'react'
 import { ScrollArea, ScrollBar } from 'ui'
 
 export interface Artwork {

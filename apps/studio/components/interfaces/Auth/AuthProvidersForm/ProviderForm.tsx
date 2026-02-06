@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-import { useTheme } from 'next-themes'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -214,6 +214,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                               : description,
                         }
                         const isDisabledDueToPlan = properties.isPaid && isFreePlan
+                        const shouldDisable =
+                          properties.type === 'boolean'
+                            ? isDisabledDueToPlan && !values[x]
+                            : isDisabledDueToPlan
 
                         return (
                           <FormField
@@ -222,9 +226,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                             setFieldValue={setFieldValue}
                             properties={properties}
                             formValues={values}
-                            disabled={
-                              shouldDisableField(x) || !canUpdateConfig || isDisabledDueToPlan
-                            }
+                            disabled={shouldDisableField(x) || !canUpdateConfig || shouldDisable}
                           />
                         )
                       })}

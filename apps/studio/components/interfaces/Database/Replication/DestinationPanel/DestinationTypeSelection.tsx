@@ -1,19 +1,15 @@
 import { useFlag } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
+import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
+import { Badge, RadioGroupStacked, RadioGroupStackedItem, cn } from 'ui'
+
+import { useDestinationInformation } from '../useDestinationInformation'
+import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
+import { InlineLink } from '@/components/ui/InlineLink'
 
-type DestinationTypeSelectionProps = {
-  editMode: boolean
-  selectedType: DestinationType
-  setSelectedType: (value: DestinationType) => void
-}
-
-export const DestinationTypeSelection = ({
-  editMode,
-  selectedType,
-  setSelectedType,
-}: DestinationTypeSelectionProps) => {
+export const DestinationTypeSelection = () => {
+  const enablePgReplicate = useIsETLPrivateAlpha()
   const unifiedReplication = useFlag('unifiedReplication')
   const etlEnableBigQuery = useFlag('etlEnableBigQuery')
   const etlEnableIceberg = useFlag('etlEnableIceberg')
@@ -21,6 +17,27 @@ export const DestinationTypeSelection = ({
   const numberOfTypes = [unifiedReplication, etlEnableBigQuery, etlEnableIceberg].filter(
     Boolean
   ).length
+
+  const [urlDestinationType, setDestinationType] = useQueryState(
+    'type',
+    parseAsStringEnum<DestinationType>([
+      'Read Replica',
+      'BigQuery',
+      'Analytics Bucket',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
+
+  const [edit] = useQueryState(
+    'edit',
+    parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const editMode = edit !== null
+
+  const { type: existingDestinationType } = useDestinationInformation({ id: edit })
+  const destinationType = existingDestinationType ?? urlDestinationType
 
   return (
     <div className="px-5 py-5">
@@ -32,8 +49,8 @@ export const DestinationTypeSelection = ({
       </div>
       <RadioGroupStacked
         disabled={editMode}
-        value={selectedType}
-        onValueChange={(value) => setSelectedType(value as DestinationType)}
+        value={destinationType}
+        onValueChange={(value) => setDestinationType(value as DestinationType)}
         className={cn(
           'grid [&>button>div]:py-4',
           numberOfTypes === 3 ? 'grid-cols-3' : numberOfTypes === 2 ? 'grid-cols-2' : 'grid-cols-1',
@@ -41,7 +58,8 @@ export const DestinationTypeSelection = ({
           '[&>button:first-of-type]:!rounded-l-lg [&>button:last-of-type]:!rounded-r-lg'
         )}
       >
-        {((!editMode && unifiedReplication) || (editMode && selectedType === 'Read Replica')) && (
+        {((!editMode && unifiedReplication) ||
+          (editMode && destinationType === 'Read Replica')) && (
           <RadioGroupStackedItem
             label=""
             showIndicator={false}
@@ -61,12 +79,15 @@ export const DestinationTypeSelection = ({
           </RadioGroupStackedItem>
         )}
 
-        {((!editMode && etlEnableBigQuery) || (editMode && selectedType === 'BigQuery')) && (
+        {((!editMode && etlEnableBigQuery) || (editMode && destinationType === 'BigQuery')) && (
           <RadioGroupStackedItem label="" showIndicator={false} id="BigQuery" value="BigQuery">
             <div className="flex flex-col gap-y-2">
               <BigQuery size={20} />
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <p>BigQuery</p>
+                <div className="flex items-center gap-x-2">
+                  <p>BigQuery</p>
+                  {unifiedReplication && <Badge>Alpha</Badge>}
+                </div>
                 <p className="text-foreground-lighter">
                   Send data to Google Cloud's data warehouse for analytics and business intelligence
                 </p>
@@ -75,7 +96,8 @@ export const DestinationTypeSelection = ({
           </RadioGroupStackedItem>
         )}
 
-        {((!editMode && etlEnableIceberg) || (editMode && selectedType === 'Analytics Bucket')) && (
+        {((!editMode && etlEnableIceberg) ||
+          (editMode && destinationType === 'Analytics Bucket')) && (
           <RadioGroupStackedItem
             label=""
             showIndicator={false}
@@ -85,7 +107,10 @@ export const DestinationTypeSelection = ({
             <div className="flex flex-col gap-y-2">
               <AnalyticsBucket size={20} />
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <p>Analytics Bucket</p>
+                <div className="flex items-center gap-x-2">
+                  <p>Analytics Bucket</p>
+                  {unifiedReplication && <Badge>Alpha</Badge>}
+                </div>
                 <p className="text-foreground-lighter">
                   Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics
                   workflows
@@ -95,6 +120,15 @@ export const DestinationTypeSelection = ({
           </RadioGroupStackedItem>
         )}
       </RadioGroupStacked>
+
+      {destinationType !== 'Read Replica' && enablePgReplicate && (
+        <p className="mt-3 text-sm text-foreground-light">
+          Replication is in alpha. Expect rapid changes and possible breaking updates.{' '}
+          <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+            Leave feedback
+          </InlineLink>
+        </p>
+      )}
     </div>
   )
 }

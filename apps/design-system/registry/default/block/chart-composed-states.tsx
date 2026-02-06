@@ -1,18 +1,18 @@
 'use client'
 
 import { BarChart2, ExternalLink } from 'lucide-react'
+import { Badge } from 'ui'
 import {
   Chart,
-  ChartCard,
-  ChartHeader,
-  ChartTitle,
   ChartActions,
+  ChartCard,
   ChartContent,
-  ChartEmptyState,
-  ChartLoadingState,
   ChartDisabledState,
+  ChartEmptyState,
+  ChartHeader,
+  ChartLoadingState,
+  ChartTitle,
 } from 'ui-patterns/Chart'
-import { Badge } from 'ui'
 
 export default function ChartComposedStates() {
   const actions = [

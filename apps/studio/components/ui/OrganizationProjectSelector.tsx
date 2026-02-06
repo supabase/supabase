@@ -4,7 +4,6 @@ import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-proje
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-
 import {
   Button,
   cn,
@@ -44,6 +43,7 @@ interface OrganizationProjectSelectorSelectorProps {
   onInitialLoad?: (projects: OrgProject[]) => void
   isOptionDisabled?: (project: OrgProject) => boolean
   fetchOnMount?: boolean
+  modal?: boolean
 }
 
 export const OrganizationProjectSelector = ({
@@ -61,6 +61,7 @@ export const OrganizationProjectSelector = ({
   onInitialLoad,
   isOptionDisabled,
   fetchOnMount = false,
+  modal = false,
 }: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = _slug ?? organization?.slug
@@ -126,7 +127,7 @@ export const OrganizationProjectSelector = ({
   }, [isLoadingProjects, isSuccessProjects])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={modal}>
       <PopoverTrigger_Shadcn_ asChild>
         {renderTrigger ? (
           renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })
@@ -148,7 +149,6 @@ export const OrganizationProjectSelector = ({
         )}
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
-        portal
         sameWidthAsTrigger={sameWidthAsTrigger}
         className="p-0"
         side="bottom"

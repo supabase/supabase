@@ -316,6 +316,22 @@ export const StripeSyncInstallationPage = () => {
               </SheetHeader>
               <SheetSection className="flex-1">
                 <StripeSyncChangesCard />
+                <Admonition type="warning" className="mt-6">
+                  <p>
+                    This integration currently requires{' '}
+                    <Link
+                      href="https://supabase.com/docs/guides/platform/ssl-enforcement"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      SSL Enforcement
+                    </Link>{' '}
+                    to be disabled during initial setup. Support for SSL Enforcement will be added
+                    in a future update. Once installed, all webhook and sync operations use
+                    HTTPS/SSL.
+                  </p>
+                </Admonition>
                 <h3 className="heading-default mb-4 mt-6">Configuration</h3>
                 {installError && (
                   <Admonition type="destructive" className="mb-4">
@@ -336,7 +352,7 @@ export const StripeSyncInstallationPage = () => {
                     <FormItemLayout
                       layout="flex-row-reverse"
                       label="Stripe API key"
-                      description="Used to fetch your Stripe configuration and set up syncing."
+                      description="Your Stripe secret key. Requires write access to Webhook Endpoints and read-only access to all other categories."
                     >
                       <FormControl_Shadcn_ className="col-span-8">
                         <Input

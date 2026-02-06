@@ -1,0 +1,21 @@
+---
+title = "'Supabase Storage: Inefficient folder operations and hierarchical RLS challenges'"
+topics = [ "functions", "storage" ]
+keywords = []
+---
+
+Supabase Storage lacks native folder concepts or APIs for batch folder operations, which can lead to inefficient folder operations (move, rename, delete) and difficulties in implementing hierarchical access controls for objects.
+
+## Why does this happen?
+
+Storage buckets treat "folders" purely as key prefixes. This means file system-like folder behavior and inherited permissions are not built-in features of Supabase Storage.
+
+## How to address these challenges
+
+To overcome these limitations and implement robust folder management with hierarchical RLS, consider the following approach:
+
+- **Model your folder hierarchy in a custom Postgres table.** This table should manage folder metadata such as folder IDs, parent IDs, paths, and permissions.
+- **Reference `storage.objects` within your custom metadata.** Store a reference to `storage.objects.id` in your custom table to link files to their respective folders.
+- **Implement RLS policies on `storage.objects`.** These policies must `JOIN` with your custom metadata table to enforce hierarchical access permissions based on your defined folder structure.
+- **Handle batch folder operations via your metadata table.** For operations like moving or renaming folders, update the relevant entries in your custom metadata table. Note that actual file paths in Storage are not directly altered by these operations.
+- **Optimize RLS policies for performance.** `JOIN`s in RLS policies can lead to performance degradation, especially with large datasets. Ensure proper indexing on your custom metadata table and consider using `SECURITY DEFINER` functions to optimize policy execution.

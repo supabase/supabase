@@ -1,12 +1,12 @@
-import BlogPostClient from './BlogPostClient'
-import { draftMode } from 'next/headers'
 import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
-import { CMS_SITE_ORIGIN, SITE_ORIGIN } from '~/lib/constants'
-import { processCMSContent } from '~/lib/cms/processCMSContent'
-
-import type { Blog, BlogData, PostReturnType } from 'types/post'
 import type { Metadata } from 'next'
+import { draftMode } from 'next/headers'
+import type { Blog, BlogData, PostReturnType } from 'types/post'
+
+import BlogPostClient from './BlogPostClient'
+import { processCMSContent } from '~/lib/cms/processCMSContent'
+import { CMS_SITE_ORIGIN, SITE_ORIGIN } from '~/lib/constants'
 
 export const revalidate = 30
 
@@ -93,7 +93,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
-    const metaImageUrl = `/images/blog/${blogPost.image ? blogPost.image : blogPost.thumb}`
+    const blogImage = blogPost.imgThumb || blogPost.imgSocial
+    const metaImageUrl = blogImage
+      ? blogImage.startsWith('http')
+        ? blogImage
+        : `${CMS_SITE_ORIGIN.replace('/api-v2', '')}${blogImage}`
+      : undefined
 
     return {
       title: blogPost.title,
@@ -147,9 +152,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     }
   }
 
-  // Fallback to thumb or image if no meta image
+  // Fallback to imgThumb or imgSocial if no meta image
   if (!metaImageUrl) {
-    metaImageUrl = cmsPost.thumb || cmsPost.image
+    metaImageUrl = cmsPost.imgThumb || cmsPost.imgSocial
   }
 
   // Ensure image URLs are absolute
@@ -276,12 +281,12 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
           isCMS: true,
           content: mdxSource,
           toc: tocResult,
-          image: publishedPost.image ?? undefined,
-          thumb: publishedPost.thumb ?? undefined,
+          imgSocial: publishedPost.imgSocial ?? undefined,
+          imgThumb: publishedPost.imgThumb ?? undefined,
           // Extract meta fields from CMS
           meta_title: publishedPost.meta?.title ?? undefined,
           meta_description: publishedPost.meta?.description ?? undefined,
-          meta_image: publishedPost.meta?.image ?? publishedPost.thumb ?? undefined,
+          meta_image: publishedPost.meta?.image ?? publishedPost.imgThumb ?? undefined,
         } as any,
         isDraftMode: isDraft,
       }
@@ -322,12 +327,12 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       content: processedContent.content,
       toc: processedContent.toc,
       toc_depth: cmsPost.toc_depth || 3,
-      image: cmsPost.image ?? undefined,
-      thumb: cmsPost.thumb ?? undefined,
+      imgSocial: cmsPost.imgSocial ?? undefined,
+      imgThumb: cmsPost.imgThumb ?? undefined,
       // Extract meta fields from CMS
       meta_title: cmsPost.meta?.title ?? undefined,
       meta_description: cmsPost.meta?.description ?? undefined,
-      meta_image: cmsPost.meta?.image ?? cmsPost.thumb ?? undefined,
+      meta_image: cmsPost.meta?.image ?? cmsPost.imgThumb ?? undefined,
     } as any,
     isDraftMode: isDraft,
   }

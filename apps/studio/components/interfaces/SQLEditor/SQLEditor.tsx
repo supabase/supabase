@@ -20,6 +20,7 @@ import { constructHeaders, isValidConnString } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { wrapWithRollback } from 'data/sql/utils/transaction'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -77,7 +78,7 @@ import UtilityPanel from './UtilityPanel/UtilityPanel'
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
 const DiffEditor = dynamic(
-  () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
+  () => import('../../ui/DiffEditor').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
 
@@ -230,7 +231,8 @@ export const SQLEditor = () => {
     async (id: string, sql: string) => {
       try {
         const { title: name } = await generateSqlTitle({ sql })
-        snapV2.renameSnippet({ id, name })
+        snapV2.updateSnippet({ id, snippet: { name } })
+        snapV2.addNeedsSaving(id)
         const tabId = createTabId('sql', { id })
         tabs.updateTab(tabId, { label: name })
       } catch (error) {
@@ -409,10 +411,16 @@ export const SQLEditor = () => {
       // Wrap the query with EXPLAIN ANALYZE only if it's not already an EXPLAIN query
       const explainSql = isExplainSql(sql) ? sql : `EXPLAIN ANALYZE ${sql}`
 
+      // Wrap EXPLAIN queries in a transaction with rollback to prevent data modifications
+      // This ensures EXPLAIN ANALYZE INSERT/UPDATE/DELETE queries don't actually modify data
+      const explainSqlWithTransaction = wrapWithRollback(
+        wrapWithRoleImpersonation(explainSql, impersonatedRoleState)
+      )
+
       executeExplain({
         projectRef: project.ref,
         connectionString: connectionString,
-        sql: wrapWithRoleImpersonation(explainSql, impersonatedRoleState),
+        sql: explainSqlWithTransaction,
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
         handleError: (error) => {
           throw error
@@ -780,7 +788,6 @@ export const SQLEditor = () => {
                   {isDiffOpen && (
                     <div className="w-full h-full">
                       <DiffEditor
-                        theme="supabase"
                         language="pgsql"
                         original={defaultSqlDiff.original}
                         modified={defaultSqlDiff.modified}
@@ -788,21 +795,6 @@ export const SQLEditor = () => {
                           diffEditorRef.current = editor
                           setIsDiffEditorMounted(true)
                         }}
-                        options={{
-                          fontSize: 13,
-                          renderSideBySide: false,
-                          minimap: { enabled: false },
-                          wordWrap: 'on',
-                          lineNumbers: 'on',
-                          folding: false,
-                          padding: { top: 4 },
-                          lineNumbersMinChars: 3,
-                        }}
-                        // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
-                        // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
-                        // Error: TextModel got disposed before DiffEditorWidget model got reset
-                        keepCurrentModifiedModel={true}
-                        keepCurrentOriginalModel={true}
                       />
                       {showWidget && (
                         <ResizableAIWidget

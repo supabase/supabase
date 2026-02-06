@@ -2176,7 +2176,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/realtime/rate-limits',
-    destination: '/docs/guides/realtime/quotas',
+    destination: '/docs/guides/realtime/limits',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/quotas',
+    destination: '/docs/guides/realtime/limits',
   },
   {
     permanent: true,
@@ -2206,7 +2211,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/realtime/guides/client-side-throttling',
-    destination: '/docs/guides/realtime/quotas',
+    destination: '/docs/guides/realtime/limits',
   },
   {
     permanent: true,
@@ -2638,8 +2643,13 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/replication/etl-destinations',
+    destination: '/docs/guides/database/replication/replication-setup',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
-    destination: '/docs/guides/auth/server-side',
+    destination: '/docs/guides/auth/server-side/advanced-guide',
   },
   {
     permanent: true,
@@ -2654,7 +2664,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
-    destination: '/docs/guides/auth/passwords',
+    destination: '/docs/guides/auth/social-login',
   },
   {
     permanent: true,
@@ -3052,5 +3062,34 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/platform/fly-postgres',
     destination: '/docs/guides/database/overview',
+  },
+
+  // design
+  {
+    permanent: true,
+    source: '/:path*',
+    has: [
+      {
+        type: 'host',
+        value: 'supabase.design',
+      },
+    ],
+    destination: 'https://supabase.com/design-system/:path*',
+  },
+  {
+    permanent: true,
+    source: '/design',
+    destination: '/design-system',
+  },
+  {
+    source: '/redeem',
+    has: [
+      {
+        type: 'query',
+        key: 'code',
+      },
+    ],
+    destination: '/dashboard/redeem?code=:code',
+    permanent: false,
   },
 ]

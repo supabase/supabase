@@ -1,8 +1,3 @@
-import { Monitor, MonitorDot, Moon, Sun } from 'lucide-react'
-import { useTheme } from 'next-themes'
-
-import { themes } from 'ui/src/components/ThemeProvider/themes'
-
 import {
   PageType,
   useRegisterCommands,
@@ -11,6 +6,9 @@ import {
   useSetPage,
   type CommandOptions,
 } from '..'
+import { Monitor, MonitorDot, Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { themes } from 'ui/src/components/ThemeProvider/themes'
 
 const THEME_SWITCHER_PAGE_NAME = 'Switch theme'
 
