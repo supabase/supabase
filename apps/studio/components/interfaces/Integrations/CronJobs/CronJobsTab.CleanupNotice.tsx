@@ -103,7 +103,7 @@ const CronJobRunDetailsOverflowDialog = ({
           </p>
 
           <p className="text-sm">
-            We recommend removing the old run history now, then schedule a cron job that keeps
+            We recommend removing the old run history now, then scheduling a cron job that keeps
             trimming the <code className="text-code-inline">cron.job_run_details</code> table
             automatically. This also prevents unnecessary bloat on the database.
           </p>
