@@ -1,5 +1,4 @@
-import posthog from 'posthog-js'
-import { PostHogConfig } from 'posthog-js'
+import posthog, { PostHogConfig } from 'posthog-js'
 
 // Limit the max number of queued events
 // (e.g. if a user navigates around a lot before accepting consent)

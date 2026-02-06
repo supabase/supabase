@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react'
+
 import { ActiveInput, useFilterBarState, useOptionsCache } from './hooks'
 import { MenuItem } from './menuItems'
 import { FilterBarAction, FilterGroup, FilterOptionObject, FilterProperty } from './types'
@@ -54,6 +55,7 @@ export type FilterBarContextValue = {
   supportsOperators: boolean
   variant: FilterBarVariant
   actions?: FilterBarAction[]
+  icon?: React.ReactNode
 
   // Refs
   rootRef: React.RefObject<HTMLDivElement>
@@ -80,6 +82,7 @@ export type FilterBarRootProps = {
   isLoading?: boolean
   supportsOperators?: boolean
   variant?: FilterBarVariant
+  icon?: React.ReactNode
 }
 
 export type FilterBarVariant = 'default' | 'pill'
@@ -95,6 +98,7 @@ export function FilterBarRoot({
   isLoading: externalLoading,
   supportsOperators = false,
   variant = 'default',
+  icon,
 }: FilterBarRootProps) {
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -306,6 +310,7 @@ export function FilterBarRoot({
     supportsOperators,
     variant,
     actions,
+    icon,
 
     // Refs
     rootRef,

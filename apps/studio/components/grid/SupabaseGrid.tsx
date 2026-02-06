@@ -15,8 +15,10 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { QueuedOperation } from 'state/table-editor-operation-queue.types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
-import { useIsQueueOperationsEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { validateMsSqlSorting } from './MsSqlValidation'
+import {
+  useIsQueueOperationsEnabled,
+  useIsTableFilterBarEnabled,
+} from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
@@ -25,6 +27,7 @@ import { HeaderNew } from './components/header/HeaderNew'
 import { RowContextMenu } from './components/menu/RowContextMenu'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
+import { validateMsSqlSorting } from './MsSqlValidation'
 import { GridProps } from './types'
 import { reapplyOptimisticUpdates } from './utils/queueOperationUtils'
 
@@ -50,7 +53,7 @@ export const SupabaseGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
+  const newFilterBarEnabled = useIsTableFilterBarEnabled()
 
   const { filters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
@@ -98,13 +101,16 @@ export const SupabaseGrid = ({
 
   // Re-apply optimistic updates when table data is loaded/refetched
   // This ensures pending changes remain visible when switching tabs or after data refresh
+  // Skip re-applying during save to avoid race condition where refetch completes before queue clears
+  const isSaving = tableEditorSnap.operationQueue.status === 'saving'
   useEffect(() => {
     if (
       isSuccess &&
       project?.ref &&
       tableId &&
       isQueueOperationsEnabled &&
-      tableEditorSnap.hasPendingOperations
+      tableEditorSnap.hasPendingOperations &&
+      !isSaving
     ) {
       reapplyOptimisticUpdates({
         queryClient,
@@ -122,6 +128,7 @@ export const SupabaseGrid = ({
     tableEditorSnap.hasPendingOperations,
     tableEditorSnap.operationQueue.operations,
     queryClient,
+    isSaving,
   ])
 
   const rows = data?.rows ?? EMPTY_ARR
