@@ -38,7 +38,7 @@
 
 // Cell with unsaved changes - warning (amber) background/text color
 .rdg-cell.rdg-cell--dirty {
-  background-color: hsl(var(--warning-300));
+  background-color: hsl(var(--warning-300) / 0.75);
   color: hsl(var(--warning-default));
 }
 
@@ -63,11 +63,10 @@
 
 // Row pending deletion - red background with strikethrough effect, red text
 .rdg-row.rdg-row--deleted {
-  background-color: hsl(var(--destructive-200) / 0.3);
-  opacity: 0.6;
+  background-color: hsl(var(--destructive-300) / 0.3);
 
   &:hover {
-    background-color: hsl(var(--destructive-200) / 0.5);
+    background-color: hsl(var(--destructive-300) / 0.5);
   }
 
   .rdg-cell {
@@ -88,6 +87,7 @@
   @apply border-t border-r-0 border-l-0;
   contain: strict;
   -webkit-user-select: none;
+  user-select: none;
   font-size: 14px;
 }
 
