@@ -73,7 +73,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                 (r) => r.resource === row.resource
               )
               return (
-                <div key={index}>
+                <div key={row.resource ?? `resource-${index}`}>
                   <div className="flex items-center gap-3 p-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
