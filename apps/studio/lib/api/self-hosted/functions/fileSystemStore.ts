@@ -33,7 +33,9 @@ export class FileSystemFunctionsArtifactStore {
   async getBlobArtifactsBySlug(slug: string): Promise<FunctionBlobArtifact[]> {
     if (slug === 'main') return []
 
-    const functionFolderPath = path.join(this.folderPath, slug)
+    const functionFolderPath = path.resolve(this.folderPath, slug)
+    if (!functionFolderPath.startsWith(path.resolve(this.folderPath) + path.sep)) return []
+
     const functionFolder = await readdir(functionFolderPath, {
       recursive: true,
       withFileTypes: true,

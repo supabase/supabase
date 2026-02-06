@@ -1,8 +1,9 @@
 import { type NextApiRequest, type NextApiResponse } from 'next'
+import { Readable } from 'stream'
 
-import { uuidv4 } from 'lib/helpers'
-import apiWrapper from 'lib/api/apiWrapper'
-import { getFunctionsArtifactStore } from 'lib/api/self-hosted/functions'
+import apiWrapper from '@/lib/api/apiWrapper'
+import { getFunctionsArtifactStore } from '@/lib/api/self-hosted/functions'
+import { uuidv4 } from '@/lib/helpers'
 
 export default function handlerWithErrorCatching(req: NextApiRequest, res: NextApiResponse) {
   return apiWrapper(req, res, handler, { withAuth: true })
@@ -53,5 +54,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     multipartResponse.headers.get('content-type') ?? 'multipart/form-data'
   )
 
-  return res.status(200).send(await multipartResponse.text())
+  res.status(200)
+  const readable = Readable.fromWeb(multipartResponse.body!)
+  return readable.pipe(res)
 }
