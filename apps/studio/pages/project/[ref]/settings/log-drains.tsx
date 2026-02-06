@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
-import { useFlag } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
@@ -19,8 +18,7 @@ import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import { ChevronDown } from 'lucide-react'
-import { useState } from 'react'
-import { cloneElement } from 'react'
+import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -54,6 +52,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
   const axiomEnabled = useFlag('axiomLogDrain')
+  const last9Enabled = useFlag('Last9LogDrain')
 
   const { data: logDrains } = useLogDrainsQuery(
     { ref },
@@ -111,8 +110,8 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             setOpen(v)
           }}
           defaultValues={{
-            type: selectedLogDrain?.type || 'webhook',
             ...selectedLogDrain,
+            type: selectedLogDrain?.type ? selectedLogDrain.type : 'webhook',
           }}
           isLoading={isLoading}
           onSubmit={({ name, description, type, ...values }) => {
@@ -220,6 +219,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                       if (t.value === 'sentry') return sentryEnabled
                       if (t.value === 's3') return s3Enabled
                       if (t.value === 'axiom') return axiomEnabled
+                      if (t.value === 'last9') return last9Enabled
                       return true
                     }).map((drainType) => (
                       <DropdownMenuItem
