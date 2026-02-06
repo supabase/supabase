@@ -50,8 +50,8 @@ transforms:
           .metadata.request.headers.user_agent = req.agent
           .metadata.request.headers.cf_connecting_ip = req.client
           .metadata.response.status_code = req.status
-          url, err = split(req.request, " ")
-          if err == null {
+          url, split_err = split(req.request, " ")
+          if split_err == null {
               .metadata.request.method = url[0]
               .metadata.request.path = url[1]
               .metadata.request.protocol = url[2]
