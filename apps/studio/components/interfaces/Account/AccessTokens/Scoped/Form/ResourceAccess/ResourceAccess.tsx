@@ -1,5 +1,3 @@
-import { Box, Check } from 'lucide-react'
-
 import { useProfile } from 'lib/profile'
 import { FormControl_Shadcn_, FormField_Shadcn_, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'

@@ -229,8 +229,9 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                               <TableRow>
                                 <TableCell colSpan={2}>
                                   <p className="text-foreground-light text-center py-4">
-                                    {(token?.organization_slugs && token.organization_slugs.length > 0) ||
-                                      (token?.project_refs && token.project_refs.length > 0)
+                                    {(token?.organization_slugs &&
+                                      token.organization_slugs.length > 0) ||
+                                    (token?.project_refs && token.project_refs.length > 0)
                                       ? 'This token has access to specific organizations and projects.'
                                       : 'This token has access to all resources.'}
                                   </p>
