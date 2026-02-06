@@ -787,6 +787,15 @@
     "author_image_url": "https://github.com/edgurgel.png"
   },
   {
+    "author_id": "eric_simons",
+    "author": "Eric Simons",
+    "username": "ericsimons",
+    "position": "CEO",
+    "company": "Bolt.new",
+    "author_url": "https://github.com/ericsimons",
+    "author_image_url": "https://github.com/ericsimons.png"
+  },
+  {
     "author_id": "steven_eubank",
     "author": "Steven Eubank",
     "username": "smeubank",
