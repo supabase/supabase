@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import {
   Sheet,
   SheetContent,
@@ -18,6 +19,7 @@ import { ACCESS_TOKEN_RESOURCES } from '../AccessToken.constants'
 import { useMemo } from 'react'
 import { formatAccessText, getRealAccess } from '../AccessToken.utils'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -147,15 +149,15 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <p className="truncate text-foreground-light">Created</p>
                               </TableCell>
                               <TableCell>
-                                <span className="text-foreground">
-                                  {token?.created_at
-                                    ? new Date(token.created_at).toLocaleDateString('en-GB', {
-                                      day: 'numeric',
-                                      month: 'short',
-                                      year: 'numeric',
-                                    })
-                                    : 'Unknown'}
-                                </span>
+                                {token?.created_at ? (
+                                  <TimestampInfo
+                                    utcTimestamp={token.created_at}
+                                    label={dayjs(token.created_at).format('DD MMM YYYY')}
+                                    className="text-sm"
+                                  />
+                                ) : (
+                                  <span className="text-foreground">Unknown</span>
+                                )}
                               </TableCell>
                             </TableRow>
                             <TableRow>
@@ -163,15 +165,15 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <p className="truncate text-foreground-light">Last used</p>
                               </TableCell>
                               <TableCell>
-                                <span className="text-foreground">
-                                  {token?.last_used_at
-                                    ? new Date(token.last_used_at).toLocaleDateString('en-GB', {
-                                      day: 'numeric',
-                                      month: 'short',
-                                      year: 'numeric',
-                                    })
-                                    : 'Never'}
-                                </span>
+                                {token?.last_used_at ? (
+                                  <TimestampInfo
+                                    utcTimestamp={token.last_used_at}
+                                    label={dayjs(token.last_used_at).fromNow()}
+                                    className="text-sm"
+                                  />
+                                ) : (
+                                  <span className="text-foreground">Never</span>
+                                )}
                               </TableCell>
                             </TableRow>
                             <TableRow>
@@ -179,15 +181,15 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                                 <p className="truncate text-foreground-light">Expires</p>
                               </TableCell>
                               <TableCell>
-                                <span className="text-foreground">
-                                  {token?.expires_at
-                                    ? new Date(token.expires_at).toLocaleDateString('en-GB', {
-                                      day: 'numeric',
-                                      month: 'short',
-                                      year: 'numeric',
-                                    })
-                                    : 'Never'}
-                                </span>
+                                {token?.expires_at ? (
+                                  <TimestampInfo
+                                    utcTimestamp={token.expires_at}
+                                    label={dayjs(token.expires_at).format('DD MMM YYYY')}
+                                    className="text-sm"
+                                  />
+                                ) : (
+                                  <span className="text-foreground">Never</span>
+                                )}
                               </TableCell>
                             </TableRow>
                           </TableBody>
