@@ -48,93 +48,92 @@ export const HelpOptionsList = ({
   return (
     <ButtonGroup className="w-full">
       {filteredIds.map((id) => {
-        if (id === 'assistant') {
-          return (
-            <ButtonGroupItem
-              key={id}
-              size={size}
-              icon={<AiIconAnimation allowHoverEffect size={14} />}
-              onClick={onAssistantClick}
-            >
-              Supabase Assistant
-            </ButtonGroupItem>
-          )
-        }
-        if (id === 'docs') {
-          return (
-            <ButtonGroupItem
-              key={id}
-              size={size}
-              icon={<BookOpen strokeWidth={1.5} size={14} />}
-              asChild
-            >
-              <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
-                Docs
-              </a>
-            </ButtonGroupItem>
-          )
-        }
-        if (id === 'troubleshooting') {
-          return (
-            <ButtonGroupItem
-              key={id}
-              size={size}
-              icon={<Wrench strokeWidth={1.5} size={14} />}
-              asChild
-            >
-              <a
-                href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
-                target="_blank"
-                rel="noreferrer"
+        switch (id) {
+          case 'assistant':
+            return (
+              <ButtonGroupItem
+                key={id}
+                size={size}
+                icon={<AiIconAnimation allowHoverEffect size={14} />}
+                onClick={onAssistantClick}
               >
-                Troubleshooting
-              </a>
-            </ButtonGroupItem>
-          )
+                Supabase Assistant
+              </ButtonGroupItem>
+            )
+          case 'docs':
+            return (
+              <ButtonGroupItem
+                key={id}
+                size={size}
+                icon={<BookOpen strokeWidth={1.5} size={14} />}
+                asChild
+              >
+                <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
+                  Docs
+                </a>
+              </ButtonGroupItem>
+            )
+          case 'troubleshooting':
+            return (
+              <ButtonGroupItem
+                key={id}
+                size={size}
+                icon={<Wrench strokeWidth={1.5} size={14} />}
+                asChild
+              >
+                <a
+                  href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Troubleshooting
+                </a>
+              </ButtonGroupItem>
+            )
+          case 'discord':
+            return (
+              <ButtonGroupItem
+                key={id}
+                size={size}
+                icon={<SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />}
+                asChild
+              >
+                <a href={DISCORD_URL} target="_blank" rel="noreferrer">
+                  Ask on Discord
+                </a>
+              </ButtonGroupItem>
+            )
+          case 'status':
+            return (
+              <ButtonGroupItem
+                key={id}
+                size={size}
+                icon={<Activity strokeWidth={1.5} size={14} />}
+                asChild
+              >
+                <a href={STATUS_URL} target="_blank" rel="noreferrer">
+                  Supabase status
+                </a>
+              </ButtonGroupItem>
+            )
+          case 'support':
+            return (
+              <ButtonGroupItem
+                key={id}
+                size={size}
+                icon={<Mail strokeWidth={1.5} size={14} />}
+                asChild
+              >
+                <SupportLink queryParams={supportLinkQueryParams} onClick={onSupportClick}>
+                  Contact support
+                </SupportLink>
+              </ButtonGroupItem>
+            )
+          default: {
+            const _exhaustive: never = id
+            return null
+          }
         }
-        if (id === 'discord') {
-          return (
-            <ButtonGroupItem
-              key={id}
-              size={size}
-              icon={<SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />}
-              asChild
-            >
-              <a href={DISCORD_URL} target="_blank" rel="noreferrer">
-                Ask on Discord
-              </a>
-            </ButtonGroupItem>
-          )
-        }
-        if (id === 'status') {
-          return (
-            <ButtonGroupItem
-              key={id}
-              size={size}
-              icon={<Activity strokeWidth={1.5} size={14} />}
-              asChild
-            >
-              <a href={STATUS_URL} target="_blank" rel="noreferrer">
-                Supabase status
-              </a>
-            </ButtonGroupItem>
-          )
-        }
-        if (id === 'support') {
-          return (
-            <ButtonGroupItem
-              key={id}
-              size={size}
-              icon={<Mail strokeWidth={1.5} size={14} />}
-              asChild
-            >
-              <SupportLink queryParams={supportLinkQueryParams} onClick={onSupportClick}>
-                Contact support
-              </SupportLink>
-            </ButtonGroupItem>
-          )
-        }
-        return null
       })}
     </ButtonGroup>
   )
