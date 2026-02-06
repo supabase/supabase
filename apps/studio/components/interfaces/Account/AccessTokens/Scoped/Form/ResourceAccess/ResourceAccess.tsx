@@ -51,7 +51,7 @@ export const ResourceAccess = ({ control, resourceAccess, setValue }: ResourceAc
             <FormControl_Shadcn_>
               <div className="space-y-3">
                 <fieldset className="flex gap-3">
-                  <legend className="sr-only">Resource access lavel</legend>
+                  <legend className="sr-only">Resource access level</legend>
                   {RESOURCE_OPTIONS.map((option) => (
                     <ResourceOption
                       key={option.value}
