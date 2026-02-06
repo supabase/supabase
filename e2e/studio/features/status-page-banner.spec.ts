@@ -1,9 +1,7 @@
 import { expect } from '@playwright/test'
+
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-
-// Test-specific localStorage key used by StatusPageBanner for E2E testing
-const TEST_INCIDENT_OVERRIDE_KEY = 'e2e-incident-banner-override'
 
 // Mock incident data - impact is "major" (not "none" or "maintenance")
 const mockIncident = {
@@ -49,35 +47,6 @@ test.describe('StatusPageBanner', () => {
         }
       }
     })
-  })
-
-  test('incident banner shows when override is enabled and is not dismissible', async ({
-    page,
-    ref,
-  }) => {
-    // Set the test override flag before navigation
-    await page.addInitScript((key) => {
-      localStorage.setItem(key, 'true')
-    }, TEST_INCIDENT_OVERRIDE_KEY)
-
-    // Mock the incident status API to return empty data (no real incidents)
-    await page.route('**/api/incident-status', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([]),
-      })
-    })
-
-    await page.goto(toUrl(`/project/${ref}`))
-
-    // Wait for the incident banner to be visible (triggered by override, not real incident)
-    const incidentBanner = page.getByText('We are investigating a technical issue')
-    await expect(incidentBanner).toBeVisible({ timeout: 15000 })
-
-    // Verify the dismiss button is NOT present (override incident banner is not dismissible)
-    const dismissButton = page.getByRole('button', { name: 'Dismiss banner' })
-    await expect(dismissButton).not.toBeVisible()
   })
 
   test('incident banner shows for incidents with impact not equal to "none"', async ({

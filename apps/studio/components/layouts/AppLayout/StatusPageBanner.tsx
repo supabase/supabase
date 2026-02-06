@@ -1,12 +1,9 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from 'components/ui/InlineLink'
-import { IS_TEST_ENV } from 'lib/constants'
 
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-
-const TEST_INCIDENT_OVERRIDE_KEY = 'e2e-incident-banner-override'
 
 const BANNER_DESCRIPTION = (
   <>
@@ -24,14 +21,9 @@ export const StatusPageBanner = () => {
   // Only show incident banner for incidents with real impact (not "none")
   const highImpactIncident = incidents.find((incident) => incident.impact !== 'none')
   const incidentEventId = highImpactIncident?.id ?? ''
-  // In test environments, allow simulating the override via localStorage
-  const testOverride =
-    IS_TEST_ENV && typeof window !== 'undefined'
-      ? localStorage.getItem(TEST_INCIDENT_OVERRIDE_KEY) === 'true'
-      : false
 
   const showIncidentBannerOverride =
-    useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true' || testOverride
+    useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true'
 
   const ongoingMaintenance = maintenanceEvents.length > 0
   const maintenanceEventId = maintenanceEvents[0]?.id ?? ''
