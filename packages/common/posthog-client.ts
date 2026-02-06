@@ -178,17 +178,55 @@ class PostHogClient {
 
   /**
    * Returns PostHog's distinct_id, which holds first-touch attribution data.
-   * Returns undefined until PostHog's `loaded` callback fires.
+   * Falls back to reading from PostHog cookie if SDK isn't initialized yet
+   * (e.g., immediately after OAuth redirect before PostHog loads).
    */
   getDistinctId(): string | undefined {
-    if (!this.initialized) return undefined
+    if (this.initialized) {
+      try {
+        return posthog.get_distinct_id()
+      } catch (error) {
+        console.error('PostHog getDistinctId failed:', error)
+      }
+    }
+
+    // Fallback: parse distinct_id from PostHog cookie
+    return this.getDistinctIdFromCookie()
+  }
+
+  /**
+   * Parse distinct_id from PostHog cookie.
+   * PostHog stores data in a cookie named `ph_<api_key>_posthog` with format:
+   * { distinct_id: "...", ... }
+   */
+  private getDistinctIdFromCookie(): string | undefined {
+    if (typeof document === 'undefined') return undefined
 
     try {
-      return posthog.get_distinct_id()
-    } catch (error) {
-      console.error('PostHog getDistinctId failed:', error)
-      return undefined
+      const cookieName = `ph_${this.config.apiKey}_posthog`
+      const cookies = document.cookie.split(';')
+
+      for (const cookie of cookies) {
+        const trimmed = cookie.trim()
+        const eqIndex = trimmed.indexOf('=')
+        if (eqIndex === -1) continue
+
+        const name = trimmed.substring(0, eqIndex)
+        if (name !== cookieName) continue
+
+        // Use substring instead of split to handle '=' chars in the value
+        const cookieValue = decodeURIComponent(trimmed.substring(eqIndex + 1))
+        const phData = JSON.parse(cookieValue)
+
+        if (phData.distinct_id && typeof phData.distinct_id === 'string') {
+          return phData.distinct_id
+        }
+      }
+    } catch {
+      // No op, cookie may not exist (first visit) or be malformed
     }
+
+    return undefined
   }
 
   /**
