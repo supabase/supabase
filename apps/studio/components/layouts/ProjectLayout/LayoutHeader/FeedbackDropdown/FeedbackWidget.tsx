@@ -137,9 +137,9 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
       const attachmentUrl =
         screenshot && profile?.gotrue_id
           ? await uploadAttachment({
-              image: screenshot,
-              userId: profile.gotrue_id,
-            })
+            image: screenshot,
+            userId: profile.gotrue_id,
+          })
           : undefined
       const formattedFeedback =
         attachmentUrl !== undefined ? `${feedback}\n\nAttachments:\n${attachmentUrl}` : feedback
@@ -208,7 +208,7 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
 
       <PopoverSeparator_Shadcn_ />
 
-      <div className="p-4 flex flex-row justify-end items-start">
+      <div className="px-4 pt-4 flex flex-row justify-end items-start">
         <div className="flex items-center gap-2 flex-row">
           {!!screenshot ? (
             <div
