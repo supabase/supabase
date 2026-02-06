@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const PermissionRowSchema = z.object({
   resource: z.string().min(1, 'Please select a resource'),
-  action: z.string().min(1, 'Please select an action'),
+  actions: z.array(z.string()).min(1, 'Please select at least one action'),
 })
 
 export const TokenSchema = z.object({

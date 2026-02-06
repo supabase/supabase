@@ -75,7 +75,9 @@ export const NewScopedTokenSheet = ({
       return
     }
 
-    const hasValidPermissions = permissionRows.every((row) => row.resource && row.action)
+    const hasValidPermissions = permissionRows.every(
+      (row) => row.resource && row.actions && row.actions.length > 0
+    )
     if (!hasValidPermissions) {
       toast.error('Please ensure all permissions have both resource and action selected.')
       return
@@ -129,8 +131,8 @@ export const NewScopedTokenSheet = ({
 
     const permissions = permissionRows
       .flatMap((row) => {
-        const { resource, action } = row
-        return mapPermissionToFGA(resource, action)
+        const { resource, actions } = row
+        return actions.flatMap((action) => mapPermissionToFGA(resource, action))
       })
       .filter(Boolean) as ScopedAccessTokenPermission[]
 
@@ -281,7 +283,11 @@ export const NewScopedTokenSheet = ({
                   onCustomExpiryChange={handleCustomExpiryChange}
                 />
                 <Separator />
-                <ResourceAccess control={form.control} resourceAccess={resourceAccess} setValue={form.setValue} />
+                <ResourceAccess
+                  control={form.control}
+                  resourceAccess={resourceAccess}
+                  setValue={form.setValue}
+                />
                 <Separator />
                 <Permissions
                   setValue={form.setValue}

@@ -1,11 +1,11 @@
 import { Path, PathValue } from 'react-hook-form'
+import { ChevronDown } from 'lucide-react'
 import {
   Button,
-  Select_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Checkbox_Shadcn_,
   WarningIcon,
 } from 'ui'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -86,33 +86,56 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                     </div>
                     <div className="flex items-center gap-2">
                       {selectedResource && (
-                        <Select_Shadcn_
-                          value={row.action}
-                          onValueChange={(value) => {
-                            const newRows: PermissionRow[] = permissionRows.map((r, i) =>
-                              i === index ? { resource: r.resource, action: value } : r
-                            )
-                            setValue(
-                              'permissionRows' as Path<TFormValues>,
-                              newRows as PathValue<TFormValues, Path<TFormValues>>,
-                              {
-                                shouldValidate: true,
-                                shouldDirty: true,
+                        <Popover_Shadcn_>
+                          <PopoverTrigger_Shadcn_ asChild>
+                            <Button
+                              type="default"
+                              size="tiny"
+                              className="w-[150px] flex text-sm justify-between h-7 "
+                              iconRight={
+                                <ChevronDown size={14} className="text-foreground-muted" />
                               }
-                            )
-                          }}
-                        >
-                          <SelectTrigger_Shadcn_ className="w-[150px] h-7">
-                            <SelectValue_Shadcn_ placeholder="Set access" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            {sortActions(selectedResource.actions).map((action) => (
-                              <SelectItem_Shadcn_ key={action} value={action}>
-                                {formatAccessText(action)}
-                              </SelectItem_Shadcn_>
-                            ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                            >
+                              {row.actions.length === 0 ? (
+                                <span className="text-foreground-lighter">Select access</span>
+                              ) : row.actions.length === 1 ? (
+                                formatAccessText(row.actions[0])
+                              ) : (
+                                `${row.actions.length} selected`
+                              )}
+                            </Button>
+                          </PopoverTrigger_Shadcn_>
+                          <PopoverContent_Shadcn_ className="w-[180px] p-2" align="end">
+                            <div className="space-y-2">
+                              {sortActions(selectedResource.actions).map((action) => (
+                                <label
+                                  key={action}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Checkbox_Shadcn_
+                                    checked={row.actions.includes(action)}
+                                    onCheckedChange={(checked) => {
+                                      const newActions = checked
+                                        ? [...row.actions, action]
+                                        : row.actions.filter((a) => a !== action)
+                                      const newRows: PermissionRow[] = permissionRows.map((r, i) =>
+                                        i === index
+                                          ? { resource: r.resource, actions: newActions }
+                                          : r
+                                      )
+                                      setValue(
+                                        'permissionRows' as Path<TFormValues>,
+                                        newRows as PathValue<TFormValues, Path<TFormValues>>,
+                                        { shouldValidate: true, shouldDirty: true }
+                                      )
+                                    }}
+                                  />
+                                  <span className="text-sm">{formatAccessText(action)}</span>
+                                </label>
+                              ))}
+                            </div>
+                          </PopoverContent_Shadcn_>
+                        </Popover_Shadcn_>
                       )}
                       <Button
                         type="text"

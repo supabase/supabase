@@ -95,22 +95,26 @@ export const getResourcePermissions = (
 export const getRealAccess = (resource: string, tokenPermissions: string[]) => {
   const resourcePermissions = getResourcePermissions(resource)
   const actionTypes = ['read', 'write', 'create', 'delete'] as const
-  const grantedActions = actionTypes.filter(action => 
-    resourcePermissions[action]?.some(p => tokenPermissions.includes(p))
+  const grantedActions = actionTypes.filter((action) =>
+    resourcePermissions[action]?.some((p) => tokenPermissions.includes(p))
   )
 
   if (grantedActions.length === 0) {
     return 'no access'
   }
-  
+
   if (grantedActions.length === 1) {
     return grantedActions[0]
   }
-  
-  if (grantedActions.length === 2 && grantedActions[0] === 'read' && grantedActions[1] === 'write') {
+
+  if (
+    grantedActions.length === 2 &&
+    grantedActions[0] === 'read' &&
+    grantedActions[1] === 'write'
+  ) {
     return 'read-write'
   }
-  
+
   return grantedActions.join('-')
 }
 
@@ -118,10 +122,11 @@ export const formatAccessText = (action: string): string => {
   switch (action) {
     case 'no access':
       return 'No access'
-    case 'read-write':
-      return 'Read write'
     default:
-      return action.charAt(0).toUpperCase() + action.slice(1).replace(/-/g, ' ')
+      return action
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join('-')
   }
 }
 

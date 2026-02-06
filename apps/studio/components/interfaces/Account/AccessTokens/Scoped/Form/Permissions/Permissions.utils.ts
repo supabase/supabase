@@ -19,7 +19,7 @@ const getBestAction = (actions: string[]): string => {
 export const sortActions = (actions: string[]): string[] => {
   const sorted: string[] = []
   const remaining = [...actions]
-  const priority = ['read', 'write', 'create']
+  const priority = ['read', 'write', 'create', 'delete']
 
   for (const action of priority) {
     const index = remaining.indexOf(action)
@@ -29,26 +29,7 @@ export const sortActions = (actions: string[]): string[] => {
     }
   }
 
-  const readWriteIndex = remaining.indexOf('read-write')
-  if (readWriteIndex !== -1) {
-    if (!sorted.includes('read') || !sorted.includes('write')) {
-      sorted.push('read-write')
-      remaining.splice(readWriteIndex, 1)
-    } else {
-      remaining.splice(readWriteIndex, 1)
-    }
-  }
-
-  const noAccessIndex = remaining.indexOf('no access')
-  if (noAccessIndex !== -1) {
-    remaining.splice(noAccessIndex, 1)
-  }
   sorted.push(...remaining)
-
-  if (actions.includes('no access')) {
-    sorted.push('no access')
-  }
-
   return sorted
 }
 
@@ -62,6 +43,6 @@ export const togglePermissionResource = (
     return permissionRows.filter((row) => row.resource !== resource.resource)
   }
 
-  const defaultAction = getBestAction(resource.actions)
-  return [...permissionRows, { resource: resource.resource, action: defaultAction }]
+  const defaultActions = resource.actions.includes('read') ? ['read'] : [resource.actions[0]]
+  return [...permissionRows, { resource: resource.resource, actions: defaultActions }]
 }

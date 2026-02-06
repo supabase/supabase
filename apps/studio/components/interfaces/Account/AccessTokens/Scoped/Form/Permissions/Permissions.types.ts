@@ -8,7 +8,7 @@ export interface PermissionResource {
 
 export interface PermissionRow {
   resource: string
-  action: string
+  actions: string[]
 }
 
 export interface PermissionsFormValues extends FieldValues {
