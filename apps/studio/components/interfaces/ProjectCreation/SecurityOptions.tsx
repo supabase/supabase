@@ -93,7 +93,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
           )}
 
           {!dataApi && (
-            <Admonition type="warning" title="Data API is used by Supabase client libraries">
+            <Admonition type="warning" title="Supabase SDKs query data via the Data API">
               You will not be able to query or mutate data via Supabase client libraries like
               supabase-js.
             </Admonition>
