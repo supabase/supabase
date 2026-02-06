@@ -3081,4 +3081,15 @@ module.exports = [
     source: '/design',
     destination: '/design-system',
   },
+  {
+    source: '/redeem',
+    has: [
+      {
+        type: 'query',
+        key: 'code',
+      },
+    ],
+    destination: '/dashboard/redeem?code=:code',
+    permanent: false,
+  },
 ]

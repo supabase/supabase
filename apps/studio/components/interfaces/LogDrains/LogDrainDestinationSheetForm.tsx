@@ -10,22 +10,23 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   RadioGroupCard,
   RadioGroupCardItem,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectLabel_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -33,14 +34,18 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { z } from 'zod'
 
 import { urlRegex } from '../Auth/Auth.constants'
-import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import {
+  DATADOG_REGIONS,
+  LAST9_REGIONS,
+  LOG_DRAIN_TYPES,
+  LogDrainType,
+} from './LogDrains.constants'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -111,6 +116,15 @@ const formUnion = z.discriminatedUnion('type', [
     type: z.literal('axiom'),
     api_token: z.string().min(1, { message: 'API token is required' }),
     dataset_name: z.string().min(1, { message: 'Dataset name is required' }),
+  }),
+  z.object({
+    type: z.literal('last9'),
+    region: z.string().min(1, { message: 'Region is required' }),
+    username: z.string().min(1, { message: 'Username is required' }),
+    password: z.string().min(1, { message: 'Password is required' }),
+  }),
+  z.object({
+    type: z.literal('otlp'),
   }),
 ])
 
@@ -183,6 +197,7 @@ export function LogDrainDestinationSheetForm({
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
   const axiomEnabled = useFlag('axiomLogDrain')
+  const last9Enabled = useFlag('Last9LogDrain')
 
   const { ref } = useParams()
   const { data: logDrains } = useLogDrainsQuery({
@@ -328,9 +343,7 @@ export function LogDrainDestinationSheetForm({
                     <Select_Shadcn_
                       defaultValue={defaultType}
                       value={form.getValues('type')}
-                      onValueChange={(v: Exclude<LogDrainType, 'axiom'>) =>
-                        form.setValue('type', v)
-                      }
+                      onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                     >
                       <SelectTrigger_Shadcn_>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
@@ -340,6 +353,7 @@ export function LogDrainDestinationSheetForm({
                           if (t.value === 'sentry') return sentryEnabled
                           if (t.value === 's3') return s3Enabled
                           if (t.value === 'axiom') return axiomEnabled
+                          if (t.value === 'last9') return last9Enabled
                           return true
                         }).map((type) => (
                           <SelectItem_Shadcn_
@@ -589,6 +603,60 @@ export function LogDrainDestinationSheetForm({
                       placeholder="xaat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                       formControl={form.control}
                       description="Token allowing ingest access to the specified dataset"
+                    />
+                  </div>
+                )}
+                {type === 'last9' && (
+                  <div className="grid gap-4 px-content">
+                    <FormField_Shadcn_
+                      name="region"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="horizontal"
+                          label={'Region'}
+                          description={
+                            <p>
+                              The Last9 region to send logs to. Credentials can be obtained from the
+                              Last9 OTEL integration panel.
+                            </p>
+                          }
+                        >
+                          <FormControl_Shadcn_>
+                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger_Shadcn_ className="col-span-3">
+                                <SelectValue_Shadcn_ placeholder="Select a region" />
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                <SelectGroup_Shadcn_>
+                                  <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
+                                  {LAST9_REGIONS.map((reg) => (
+                                    <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
+                                      {reg.label}
+                                    </SelectItem_Shadcn_>
+                                  ))}
+                                </SelectGroup_Shadcn_>
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                    <LogDrainFormItem
+                      type="text"
+                      value="username"
+                      label="Username"
+                      placeholder="username"
+                      formControl={form.control}
+                      description="Username for authentication from Last9 OTEL integration."
+                    />
+                    <LogDrainFormItem
+                      type="password"
+                      value="password"
+                      label="Password"
+                      placeholder="••••••••••••••••"
+                      formControl={form.control}
+                      description="Password for authentication from Last9 OTEL integration."
                     />
                   </div>
                 )}
