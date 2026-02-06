@@ -1,7 +1,4 @@
-// Default Supabase CLI constants (hardcoded for local development)
-const SERVICE_ROLE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-const API_URL = 'http://127.0.0.1:54321'
+import { env } from "../../env.config.js"
 
 /**
  * Execute a SQL query against the local Supabase database via pg-meta.
@@ -15,11 +12,11 @@ const API_URL = 'http://127.0.0.1:54321'
  * @throws Error if the query fails
  */
 export async function query<T>(sql: string, params?: Array<unknown>): Promise<Array<T>> {
-  const response = await fetch(`${API_URL}/pg/query`, {
+  const response = await fetch(`${env.API_URL}/pg/query`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      apikey: SERVICE_ROLE_KEY,
+      apikey: env.SERVICE_ROLE_KEY,
     },
     body: JSON.stringify({ query: sql, parameters: params }),
   })
