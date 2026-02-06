@@ -78,9 +78,7 @@ export const DeleteRowOperationItem = ({
       </CardHeader>
 
       <CardContent className="font-mono text-xs bg-destructive-100/30">
-        <div className="text-destructive py-0.5">
-          Row will be deleted
-        </div>
+        <div className="text-destructive py-0.5">Row will be deleted</div>
       </CardContent>
     </Card>
   )

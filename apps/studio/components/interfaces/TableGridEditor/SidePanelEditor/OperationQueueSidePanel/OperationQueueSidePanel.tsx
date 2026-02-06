@@ -45,7 +45,11 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
             <span className="text-foreground/40 text-[10px] ml-1.5">{modKey}.</span>
           </Button>
           <div className="flex space-x-3">
-            <Button type="default" onClick={handleCancel} disabled={isSaving || operations.length === 0}>
+            <Button
+              type="default"
+              onClick={handleCancel}
+              disabled={isSaving || operations.length === 0}
+            >
               Revert{operations.length > 1 && ' all'}
             </Button>
             <Button

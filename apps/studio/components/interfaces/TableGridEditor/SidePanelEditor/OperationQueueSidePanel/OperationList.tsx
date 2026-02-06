@@ -30,10 +30,9 @@ export const OperationList = ({ operations }: OperationListProps) => {
     <div className="space-y-8">
       {deleteOperations.length > 0 && (
         <div className="space-y-3">
-
           <h3 className="text-xs text-foreground-lighter">
-            <span>{deleteOperations.length}</span>{' '}
-            row deletion{deleteOperations.length !== 1 ? 's' : ''}
+            <span>{deleteOperations.length}</span> row deletion
+            {deleteOperations.length !== 1 ? 's' : ''}
           </h3>
 
           <div className="space-y-3">
@@ -52,8 +51,7 @@ export const OperationList = ({ operations }: OperationListProps) => {
       {addOperations.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-xs text-foreground-lighter">
-            <span>{addOperations.length}</span>{' '}
-            row addition{addOperations.length !== 1 ? 's' : ''}
+            <span>{addOperations.length}</span> row addition{addOperations.length !== 1 ? 's' : ''}
           </h3>
           <div className="space-y-3">
             {addOperations.map((op) => (
@@ -70,11 +68,9 @@ export const OperationList = ({ operations }: OperationListProps) => {
 
       {editOperations.length > 0 && (
         <div className="space-y-3">
-
           <h3 className="text-xs text-foreground-lighter">
             {editOperations.length} cell edit{editOperations.length !== 1 ? 's' : ''}
           </h3>
-
 
           <div className="space-y-3">
             {editOperations.map((op) => (
@@ -87,8 +83,7 @@ export const OperationList = ({ operations }: OperationListProps) => {
             ))}
           </div>
         </div>
-      )
-      }
-    </div >
+      )}
+    </div>
   )
 }

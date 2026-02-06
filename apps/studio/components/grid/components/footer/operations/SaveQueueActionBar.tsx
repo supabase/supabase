@@ -84,7 +84,8 @@ export const SaveQueueActionBar = () => {
               </span>
               <div className="flex items-center gap-2">
                 <Button type="default" size="tiny" onClick={() => snap.toggleViewOperationQueue()}>
-                  Review <span className="text-[10px] text-foreground/40 ml-1.5">{`${modKey}.`}</span>
+                  Review{' '}
+                  <span className="text-[10px] text-foreground/40 ml-1.5">{`${modKey}.`}</span>
                 </Button>
                 <Button
                   size="tiny"
