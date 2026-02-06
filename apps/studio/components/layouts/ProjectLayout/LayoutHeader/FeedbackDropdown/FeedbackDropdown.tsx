@@ -1,13 +1,35 @@
-import { Lightbulb, TriangleAlert } from 'lucide-react'
+import { ChevronLeft, Lightbulb, TriangleAlert } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { IS_PLATFORM } from 'common'
+import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
+import { ASSISTANT_SUGGESTIONS, HelpOptionsList } from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+
 import { FeedbackWidget } from './FeedbackWidget'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+  const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const [isOpen, setIsOpen] = useState(false)
-  const [stage, setStage] = useState<'select' | 'widget'>('select')
+  const [stage, setStage] = useState<'select' | 'issue-options' | 'widget'>('select')
+
+  const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
+  let supportLinkQueryParams: Partial<SupportFormUrlKeys> | undefined = undefined
+  if (projectRef) {
+    supportLinkQueryParams = { projectRef }
+  } else if (org?.slug) {
+    supportLinkQueryParams = { orgSlug: org.slug }
+  }
 
   return (
     <Popover_Shadcn_
@@ -41,16 +63,18 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
           <div className="flex flex-col gap-4 p-4">
             <div className="font-medium text-sm">What would you like to share?</div>
             <div className="grid grid-cols-2 gap-3">
-              <Button type="default" className="h-32" onClick={() => setIsOpen(false)} asChild>
-                <SupportLink>
-                  <div className="grid gap-1.5 text-center">
-                    <TriangleAlert size="28" className="mx-auto text-destructive-600" />
-                    <div className="flex flex-col items-center">
-                      <span className="text-base">Issue</span>
-                      <span className="text-xm text-foreground-lighter">with my project</span>
-                    </div>
+              <Button
+                type="default"
+                className="h-32"
+                onClick={() => setStage('issue-options')}
+              >
+                <div className="grid gap-1.5 text-center">
+                  <TriangleAlert size="28" className="mx-auto text-destructive-600" />
+                  <div className="flex flex-col items-center">
+                    <span className="text-base">Issue</span>
+                    <span className="text-xm text-foreground-lighter">with my project</span>
                   </div>
-                </SupportLink>
+                </div>
               </Button>
               <Button type="default" className="h-32" onClick={() => setStage('widget')}>
                 <div className="grid gap-1.5 text-center">
@@ -64,7 +88,54 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             </div>
           </div>
         )}
-        {stage === 'widget' && <FeedbackWidget onClose={() => setIsOpen(false)} />}
+        {stage === 'issue-options' && (
+          <div className="flex flex-col gap-4 p-4">
+            <Button
+              type="text"
+              size="tiny"
+              className="w-fit -ml-1 text-foreground-lighter hover:text-foreground"
+              icon={<ChevronLeft size={14} />}
+              onClick={() => setStage('select')}
+            >
+              Back
+            </Button>
+            <div className="flex flex-col gap-1">
+              <div className="font-medium text-sm text-foreground">Need help with your project?</div>
+              <p className="text-xs text-foreground-lighter text-balance">
+                Start with our docs or community.
+              </p>
+            </div>
+            <HelpOptionsList
+              variant="stack"
+              isPlatform={IS_PLATFORM}
+              projectRef={projectRef}
+              supportLinkQueryParams={supportLinkQueryParams}
+              size="small"
+              onAssistantClick={() => {
+                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                snap.newChat(ASSISTANT_SUGGESTIONS)
+                setIsOpen(false)
+              }}
+              onSupportClick={() => setIsOpen(false)}
+            />
+            <div className="pt-2 border-t border-border">
+              <Button
+                type="default"
+                size="tiny"
+                className="w-full justify-center"
+                onClick={() => setStage('widget')}
+              >
+                Leave feedback
+              </Button>
+            </div>
+          </div>
+        )}
+        {stage === 'widget' && (
+          <FeedbackWidget
+            onClose={() => setIsOpen(false)}
+            onSwitchToIssueOptions={() => setStage('issue-options')}
+          />
+        )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )

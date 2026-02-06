@@ -1,4 +1,4 @@
-import { Activity, BookOpen, HelpCircle, Mail, Wrench } from 'lucide-react'
+import { HelpCircle } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -6,26 +6,15 @@ import SVG from 'react-inlinesvg'
 
 import { IS_PLATFORM } from 'common'
 import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { ASSISTANT_SUGGESTIONS, HelpOptionsList } from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import {
-  AiIconAnimation,
-  Button,
-  ButtonGroup,
-  ButtonGroupItem,
-  cn,
-  Popover,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, Popover, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 
 export const HelpPopover = () => {
   const router = useRouter()
@@ -83,77 +72,18 @@ export const HelpPopover = () => {
           </div>
 
           <div className="px-5">
-            <ButtonGroup className="w-full">
-              {projectRef && (
-                <ButtonGroupItem
-                  size="tiny"
-                  icon={<AiIconAnimation allowHoverEffect size={14} />}
-                  onClick={() => {
-                    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                    snap.newChat({
-                      name: 'Support',
-                      initialInput: `I need help with my project`,
-                      suggestions: {
-                        title:
-                          'I can help you with your project, here are some example prompts to get you started:',
-                        prompts: [
-                          {
-                            label: 'Database Health',
-                            description: 'Summarise my database health and performance',
-                          },
-                          {
-                            label: 'Debug Logs',
-                            description: 'View and debug my edge function logs',
-                          },
-                          {
-                            label: 'RLS Setup',
-                            description: 'Implement row level security for my tables',
-                          },
-                        ],
-                      },
-                    })
-                  }}
-                >
-                  Supabase Assistant
-                </ButtonGroupItem>
-              )}
-              <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
-                <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
-                  Docs
-                </a>
-              </ButtonGroupItem>
-              <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
-                <a
-                  href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Troubleshooting
-                </a>
-              </ButtonGroupItem>
-              {IS_PLATFORM && (
-                <>
-                  <ButtonGroupItem
-                    asChild
-                    size="tiny"
-                    icon={<Activity strokeWidth={1.5} size={14} />}
-                  >
-                    <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
-                      Supabase status
-                    </a>
-                  </ButtonGroupItem>
-
-                  <ButtonGroupItem asChild size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
-                    <SupportLink
-                      queryParams={supportLinkQueryParams}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Contact support
-                    </SupportLink>
-                  </ButtonGroupItem>
-                </>
-              )}
-            </ButtonGroup>
+            <HelpOptionsList
+              excludeIds={['discord']}
+              variant="button-group"
+              isPlatform={IS_PLATFORM}
+              projectRef={projectRef}
+              supportLinkQueryParams={supportLinkQueryParams}
+              onAssistantClick={() => {
+                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                snap.newChat(ASSISTANT_SUGGESTIONS)
+              }}
+              onSupportClick={() => setIsOpen(false)}
+            />
           </div>
         </div>
         <Popover.Separator />

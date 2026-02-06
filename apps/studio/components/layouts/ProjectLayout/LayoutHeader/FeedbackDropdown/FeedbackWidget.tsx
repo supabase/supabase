@@ -7,8 +7,8 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { InlineLinkClassName } from 'components/ui/InlineLink'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -36,9 +36,10 @@ import {
 
 interface FeedbackWidgetProps {
   onClose: () => void
+  onSwitchToIssueOptions?: () => void
 }
 
-export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
+export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidgetProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, slug } = useParams()
@@ -208,7 +209,12 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
 
       <PopoverSeparator_Shadcn_ />
 
-      <div className="px-4 pt-4 pb-4 flex flex-row justify-end items-start">
+      <div className="px-4 pt-4 pb-4 flex flex-row justify-between items-center">
+        {onSwitchToIssueOptions ? (
+          <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+            Get help
+          </Button>
+        ) : null}
         <div className="flex items-center gap-2 flex-row">
           {!!screenshot ? (
             <div
