@@ -15,6 +15,8 @@ import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { getColumnFormat } from '../../utils/column'
+import { isArrayColumn } from 'components/grid/utils/types'
 
 interface ReferenceRecordPeekProps {
   table: PostgresTable
@@ -77,12 +79,19 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
             </Tooltip>
           )}
           <span className="text-xs truncate">{column.name}</span>
-          <span className="text-xs text-foreground-light font-normal">{column.format}</span>
+          <span className="text-xs text-foreground-light font-normal">
+            {getColumnFormat(column.data_type, column.format)}
+          </span>
         </div>
       ),
       renderCell: ({ column: col, row }) => {
         const value = row[col.name as any]
-        const formattedValue = column.format === 'bytea' ? convertByteaToHex(value) : value
+        const formattedValue =
+          column.format === 'bytea'
+            ? convertByteaToHex(value)
+            : isArrayColumn(column.data_type)
+              ? JSON.stringify(value)
+              : value
         return (
           <div
             className={cn(
