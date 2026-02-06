@@ -47,14 +47,10 @@ export const PrimaryDatabaseNode = () => {
 
   return (
     <NodeContainer>
-      <div className="flex flex-col gap-y-0.5">
-        <p className="text-sm">Primary Database</p>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <p className="text-sm text-foreground-light">{region?.displayName}</p>
-          </TooltipTrigger>
-          <TooltipContent side="right">{region?.code}</TooltipContent>
-        </Tooltip>
+      <div className="text-sm flex flex-col gap-y-0.5">
+        <p>Primary Database</p>
+        <p className="text-foreground-light">{region?.displayName}</p>
+        <p className="text-foreground-light">{region?.code}</p>
       </div>
       {!!project && (
         <img
@@ -95,11 +91,9 @@ export const ReplicationNode = ({ id }: { id: string }) => {
       ) : type === 'Analytics Bucket' ? (
         <AnalyticsBucket size={20} className="text-foreground-light" />
       ) : null}
-      <div className="flex flex-col gap-y-0.5">
+      <div className="text-sm flex flex-col gap-y-0.5">
         <div className="flex items-center">
-          <p className="text-sm">
-            {type} (ID: {destination?.id})
-          </p>
+          <p>{type}</p>
           <Tooltip>
             <TooltipTrigger>
               <div className="w-6 h-full flex items-center justify-center">
@@ -120,7 +114,8 @@ export const ReplicationNode = ({ id }: { id: string }) => {
             </TooltipContent>
           </Tooltip>
         </div>
-        <p className="text-sm text-foreground-light">{destination?.name}</p>
+        <p className="text-foreground-light">{destination?.name}</p>
+        <p className="text-foreground-light">ID: {destination?.id}</p>
       </div>
       <Handle type="target" position={Position.Left} className="opacity-25" />
     </NodeContainer>
@@ -144,7 +139,7 @@ export const ReadReplicaNode = ({ id }: { id: string }) => {
       <Database size={20} className="text-foreground-light" />
       <div className="flex flex-col gap-y-0.5">
         <div className="flex items-center">
-          <p className="text-sm">Read Replica (ID: {formattedId})</p>
+          <p className="text-sm">Read Replica</p>
           <Tooltip>
             <TooltipTrigger>
               <div className="w-6 h-full flex items-center justify-center">
@@ -159,12 +154,12 @@ export const ReadReplicaNode = ({ id }: { id: string }) => {
             <TooltipContent side="bottom">{statusLabel}</TooltipContent>
           </Tooltip>
         </div>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <p className="text-sm text-foreground-light">{region?.displayName}</p>
-          </TooltipTrigger>
-          <TooltipContent side="right">{region?.code}</TooltipContent>
-        </Tooltip>
+        <p className="text-sm text-foreground-light">{region?.displayName}</p>
+        <div className="flex gap-x-2 items-center text-sm text-foreground-light">
+          <span>ID: {formattedId}</span>
+          <span>•</span>
+          <span>{region?.code}</span>
+        </div>
       </div>
       <Handle type="target" position={Position.Left} className="opacity-25" />
     </NodeContainer>
