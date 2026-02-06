@@ -27,12 +27,15 @@ export const OperationList = ({ operations }: OperationListProps) => {
   const editOperations = operations.filter(isEditCellContentOperation)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {deleteOperations.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-foreground-light">
-            Rows to Delete ({deleteOperations.length})
+
+          <h3 className="text-xs text-foreground-light">
+            <span>{deleteOperations.length}</span>{' '}
+            row deletion{deleteOperations.length !== 1 ? 's' : ''}
           </h3>
+
           <div className="space-y-3">
             {deleteOperations.map((op) => (
               <DeleteRowOperationItem
@@ -48,8 +51,9 @@ export const OperationList = ({ operations }: OperationListProps) => {
 
       {addOperations.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-foreground-light">
-            Rows to Add ({addOperations.length})
+          <h3 className="text-xs text-foreground-light">
+            <span>{addOperations.length}</span>{' '}
+            row addition{addOperations.length !== 1 ? 's' : ''}
           </h3>
           <div className="space-y-3">
             {addOperations.map((op) => (
@@ -66,9 +70,12 @@ export const OperationList = ({ operations }: OperationListProps) => {
 
       {editOperations.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-foreground-light">
-            Cell Edits ({editOperations.length})
+
+          <h3 className="text-xs text-foreground-light">
+            {editOperations.length} cell edit{editOperations.length !== 1 ? 's' : ''}
           </h3>
+
+
           <div className="space-y-3">
             {editOperations.map((op) => (
               <OperationItem
@@ -80,7 +87,8 @@ export const OperationList = ({ operations }: OperationListProps) => {
             ))}
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   )
 }
