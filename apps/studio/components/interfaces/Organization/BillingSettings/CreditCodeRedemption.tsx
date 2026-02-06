@@ -57,9 +57,12 @@ export const CreditCodeRedemption = ({
 }) => {
   const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions', undefined, {
-    organizationSlug: slug,
-  })
+    'stripe.subscriptions',
+    undefined,
+    {
+      organizationSlug: slug,
+    }
+  )
 
   const redeemCodeEnabled = useFlag('redeemCodeEnabled')
 
@@ -327,7 +330,7 @@ export const CreditCodeRedemption = ({
                       type="primary"
                       className="pointer-events-auto"
                       disabled={codeRedemptionDisabled}
-                      htmlType='submit'
+                      htmlType="submit"
                       tooltip={{
                         content: {
                           side: 'bottom',
@@ -337,8 +340,9 @@ export const CreditCodeRedemption = ({
                               : undefined,
                         },
                       }}
-                    >Redeem</ButtonTooltip>
-
+                    >
+                      Redeem
+                    </ButtonTooltip>
                   </DialogFooter>
                 </form>
               )}

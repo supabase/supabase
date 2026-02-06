@@ -7,11 +7,9 @@ import type { PropsWithChildren } from 'react'
 import { Separator } from 'ui'
 import { withAuth } from '../../hooks/misc/withAuth'
 
-export interface RedeemCreditsLayoutProps { }
+export interface RedeemCreditsLayoutProps {}
 
-const RedeemCreditsLayout = ({
-  children,
-}: PropsWithChildren<RedeemCreditsLayoutProps>) => {
+const RedeemCreditsLayout = ({ children }: PropsWithChildren<RedeemCreditsLayoutProps>) => {
   const { resolvedTheme } = useTheme()
   const { appTitle } = useCustomContent(['app:title'])
 
