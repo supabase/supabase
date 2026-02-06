@@ -41,7 +41,9 @@ export const DeployEdgeFunctionButton = () => {
           tooltip={{
             content: {
               side: 'bottom',
-              text: !isProjectActive ? 'Unable to deploy function as project is inactive' : '',
+              text: !isProjectActive
+                ? 'Unable to deploy function as project is inactive'
+                : undefined,
             },
           }}
         >
