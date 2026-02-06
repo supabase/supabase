@@ -209,7 +209,12 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
 
       <PopoverSeparator_Shadcn_ />
 
-      <div className="px-4 pt-4 pb-4 flex flex-row justify-between items-center">
+      <div
+        className={cn(
+          'px-4 pt-4 pb-4 flex flex-row items-center',
+          onSwitchToIssueOptions ? 'justify-between' : 'justify-end'
+        )}
+      >
         {onSwitchToIssueOptions ? (
           <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
             Get help instead

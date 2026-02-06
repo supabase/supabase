@@ -76,7 +76,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
                   <TriangleAlert size="28" className="mx-auto text-destructive-600" />
                   <div className="flex flex-col items-center">
                     <span className="text-base">Issue</span>
-                    <span className="text-xm text-foreground-lighter">with my project</span>
+                    <span className="text-xs text-foreground-lighter">with my project</span>
                   </div>
                 </div>
               </Button>
@@ -85,7 +85,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
                   <Lightbulb size="28" className="mx-auto text-warning" />
                   <div className="flex flex-col items-center">
                     <span className="text-base">Idea</span>
-                    <span className="text-xm text-foreground-lighter">to improve Supabase</span>
+                    <span className="text-xs text-foreground-lighter">to improve Supabase</span>
                   </div>
                 </div>
               </Button>
