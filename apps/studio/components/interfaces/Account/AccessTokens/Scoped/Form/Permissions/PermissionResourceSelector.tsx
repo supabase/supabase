@@ -60,7 +60,7 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
                     <CommandItem_Shadcn_
                       key={resource.resource}
                       value={`${resource.resource} ${resource.title}`}
-                      onSelect={() => togglePermissionResource(permissionRows, resource)}
+                      onSelect={() => handleToggleResource(resource)}
                       className="text-foreground"
                     >
                       <div className="flex items-center gap-3 w-full">
