@@ -1,7 +1,3 @@
-import { useCallback, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
-import type { ConnectionVars } from '@/data/common.types'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import {
   CTID_BATCH_PAGE_SIZE,
@@ -12,7 +8,11 @@ import {
   getScheduleDeleteCronJobRunDetailsKey,
   getScheduleDeleteCronJobRunDetailsSql,
 } from 'data/sql/queries/delete-cron-job-run-details'
+import { useCallback, useRef, useState } from 'react'
+import { toast } from 'sonner'
+
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
+import type { ConnectionVars } from '@/data/common.types'
 
 // Delay between batches to allow other queries to proceed (in milliseconds)
 const BATCH_DELAY_MS = 100
@@ -157,7 +157,7 @@ export const useCronJobsCleanupActions = ({
    * This should only be called after a successful initial deletion.
    */
   const scheduleCleanup = useCallback(
-    async (interval: string) => {
+    async ({ interval, onSuccess }: { interval: string; onSuccess?: () => void }) => {
       if (!projectRef) {
         console.error('[CronJobsTab > schedule cleanup] Project reference is required')
         toast.error('There was an error scheduling the cleanup. Please try again.')
@@ -176,11 +176,11 @@ export const useCronJobsCleanupActions = ({
 
         setCleanupState({ status: 'schedule-success' })
         toast.success('Scheduled daily cleanup job.')
+        onSuccess?.()
       } catch (error) {
         console.error('[CronJobs] Failed to schedule cleanup with error: %O', error)
         const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-        setCleanupState({ status: 'schedule-error', error: errorMessage })
-        toast.error('Scheduling the cleanup job failed. Please try again.')
+        toast.error(`Failed to schedule cleanup job: ${errorMessage}`)
       }
     },
     [projectRef, connectionString, executeSql]

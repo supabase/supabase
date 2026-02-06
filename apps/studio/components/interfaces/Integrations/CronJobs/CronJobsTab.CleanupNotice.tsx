@@ -175,8 +175,10 @@ const CronJobRunDetailsOverflowDialog = ({
                   loading={isScheduling}
                   disabled={isScheduling}
                   onClick={async () => {
-                    await scheduleCleanup(cleanupInterval)
-                    refetchJobs()
+                    await scheduleCleanup({
+                      interval: cleanupInterval,
+                      onSuccess: () => refetchJobs(),
+                    })
                   }}
                 >
                   Schedule cleanup job
