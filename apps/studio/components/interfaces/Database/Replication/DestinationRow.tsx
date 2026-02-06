@@ -148,12 +148,10 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
               <ShimmeringLoader />
             ) : (
               <div>
-                <p className="truncate">
+                <p>
                   {type} (ID: {pipeline?.id})
                 </p>
-                <p title={destinationName} className="text-foreground-lighter">
-                  {destinationName}
-                </p>
+                <p className="text-foreground-lighter">{destinationName}</p>
               </div>
             )}
           </TableCell>

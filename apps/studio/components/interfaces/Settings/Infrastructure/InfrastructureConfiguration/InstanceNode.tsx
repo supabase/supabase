@@ -183,13 +183,11 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
 export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
   const {
     id,
-    provider,
     region,
     computeSize,
     status,
     inserted_at,
     onSelectRestartReplica,
-    onSelectResizeReplica,
     onSelectDropReplica,
   } = data
   const { ref } = useParams()
@@ -233,9 +231,6 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
         REPLICA_STATUS.INIT_READ_REPLICA,
       ] as string[]
     ).includes(status) || initStatus === ReplicaInitializationStatus.InProgress
-
-  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
-  const providerLabel = provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : provider
 
   return (
     <>
