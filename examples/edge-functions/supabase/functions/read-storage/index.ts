@@ -3,13 +3,11 @@
 // This enables autocomplete, go to definition, etc.
 
 import { createClient } from 'npm:supabase-js@2'
-// New approach (v2.95.0+)
-import { corsHeaders } from 'jsr:@supabase/supabase-js@2/cors'
-// For older versions, use hardcoded headers:
-// const corsHeaders = {
-//   'Access-Control-Allow-Origin': '*',
-//   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-// }
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey',
+}
 
 Deno.serve(async (req) => {
   // read a text file from storage and print its contents
