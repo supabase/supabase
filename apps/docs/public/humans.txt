@@ -5,6 +5,7 @@ Supabase is 100% remote.
 Aaron Byrne
 Ada Wong
 Adam Mokan
+AJ Matias
 Akash Manimaran
 Alaister Young
 Alan De Los Santos
@@ -51,6 +52,7 @@ Danny White
 Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
+David Birdsong
 David Weitzman
 Deepthi Sigireddi
 Deji I
@@ -66,11 +68,14 @@ Eliot Whalan
 Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
+Eyal Ehrlich
 Fabrizio Cataldo
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
 Felipe Stival
+Ferhat Elmas
+Firas El Rachidi
 Francesco Sansalvadore
 Garrett Crowell
 Gerardo Estaba
@@ -84,6 +89,7 @@ Hardik Maheshwari
 Haritabh Gupta
 Haydn Maley
 Hieu Pham
+Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
 Inian P
@@ -106,6 +112,7 @@ Jordi Enric
 José Luis Ledesma
 Joshen Lim
 Julien Goux
+Kalleby Santos
 Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
@@ -172,10 +179,12 @@ Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Sara Read
 Sean Oliver
 Sean Thompson
 Sergio Cioban Filho
 Shane E
+Shreekar Shetty
 Sreyas Udayavarman
 Stanislav M
 Stephen Morgan

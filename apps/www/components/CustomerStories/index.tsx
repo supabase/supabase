@@ -1,19 +1,19 @@
 'use client'
 
-import { PropsWithChildren } from 'react'
-import dynamic from 'next/dynamic'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useTheme } from 'next-themes'
 import { ArrowRight } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
+import Link from 'next/link'
+import { PropsWithChildren } from 'react'
 
+import SectionHeader from 'components/UI/SectionHeader'
 import { Button, cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import SectionHeader from 'components/UI/SectionHeader'
 import Panel from '~/components/Panel'
 
-import customerStories from '~/data/CustomerStories'
 import type { CustomerStoryType } from '~/data/CustomerStories'
+import customerStories from '~/data/CustomerStories'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 const CustomersSliderMobile = dynamic(() => import('./CustomersSliderMobile'))
@@ -34,7 +34,7 @@ const CustomerStories = () => (
           <Link href="/customers">View all stories</Link>
         </Button>
         <Button asChild type="default">
-          <Link href="/events">View Events</Link>
+          <Link href="/events">View events</Link>
         </Button>
       </div>
     </SectionContainer>

@@ -12,8 +12,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Theme,
   singleThemes,
+  Theme,
 } from 'ui'
 
 const ThemeSwitcherDropdown = () => {

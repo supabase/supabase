@@ -31,7 +31,7 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { ErrorInfo, useCallback } from 'react'
+import { type ComponentProps, ErrorInfo, useCallback } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
@@ -53,6 +53,7 @@ import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErro
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
@@ -66,6 +67,19 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
+
+const FeatureFlagProviderWithOrgContext = ({
+  children,
+  ...props
+}: ComponentProps<typeof FeatureFlagProvider>) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+
+  return (
+    <FeatureFlagProvider {...props} organizationSlug={selectedOrganization?.slug ?? undefined}>
+      {children}
+    </FeatureFlagProvider>
+  )
+}
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -124,7 +138,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         <NuqsAdapter>
           <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
-              <FeatureFlagProvider
+              <FeatureFlagProviderWithOrgContext
                 API_URL={API_URL}
                 enabled={IS_PLATFORM}
                 getConfigCatFlags={getConfigCatFlags}
@@ -180,7 +194,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
                   )}
                 </ProfileProvider>
-              </FeatureFlagProvider>
+              </FeatureFlagProviderWithOrgContext>
             </AuthProvider>
           </HydrationBoundary>
         </NuqsAdapter>

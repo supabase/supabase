@@ -2,11 +2,11 @@ import { cva } from 'class-variance-authority'
 import { motion } from 'framer-motion'
 import React from 'react'
 import {
+  cn,
   FormDescription_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Label_Shadcn_,
-  cn,
 } from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
 
@@ -299,23 +299,16 @@ export const FormLayout = React.forwardRef<
   ) => {
     const flex = layout === 'flex' || layout === 'flex-row-reverse'
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
-    const renderError = isReactForm && !hideMessage && (
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className={cn(layout === 'flex-row-reverse' ? 'mt-0' : 'mt-2')}
-      >
+    const renderError =
+      isReactForm && !hideMessage ? (
         <FormMessage_Shadcn_
           className={cn(
-            'mt-2 transition-opacity duration-300 ease-in-out',
+            'mt-2 transition-all duration-300 ease-in-out',
             layout === 'flex-row-reverse' && 'mt-0'
           )}
-          data-formlayout-id={'message'}
+          data-formlayout-id="message"
         />
-      </motion.div>
-    )
+      ) : null
 
     const renderDescription =
       description && isReactForm ? (

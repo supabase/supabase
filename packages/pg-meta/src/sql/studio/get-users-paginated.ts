@@ -1,3 +1,4 @@
+import { ident, literal } from '../../pg-format'
 import { prefixToUUID, stringRange } from './get-users-common'
 import { OptimizedSearchColumns } from './get-users-types'
 
@@ -61,10 +62,9 @@ export const getPaginatedUsersSQL = ({
   const conditions: string[] = []
 
   if (hasValidKeywords) {
-    // [Joshen] Escape single quotes properly
-    const formattedKeywords = keywords.replaceAll("'", "''")
+    const pattern = `%${keywords}%`
     conditions.push(
-      `id::text like '%${formattedKeywords}%' or email like '%${formattedKeywords}%' or phone like '%${formattedKeywords}%' or raw_user_meta_data->>'full_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'first_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'last_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'display_name' ilike '%${formattedKeywords}%'`
+      `id::text like ${literal(pattern)} or email like ${literal(pattern)} or phone like ${literal(pattern)} or raw_user_meta_data->>'full_name' ilike ${literal(pattern)} or raw_user_meta_data->>'first_name' ilike ${literal(pattern)} or raw_user_meta_data->>'last_name' ilike ${literal(pattern)} or raw_user_meta_data->>'display_name' ilike ${literal(pattern)}`
     )
   }
 
@@ -81,11 +81,11 @@ export const getPaginatedUsersSQL = ({
     // JFYI in case we do eventually run into performance issues here when filtering for SAML provider
     if (providers.includes('saml 2.0')) {
       conditions.push(
-        `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => (p === 'saml 2.0' ? `'sso'` : `'${p}'`)).join(', ')}]`.trim()
+        `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => literal(p === 'saml 2.0' ? 'sso' : p)).join(', ')}]`.trim()
       )
     } else {
       conditions.push(
-        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => `'${p}'`).join(', ')}]`
+        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => literal(p)).join(', ')}]`
       )
     }
   }
@@ -96,7 +96,7 @@ export const getPaginatedUsersSQL = ({
 
   let whereStatement = `${conditions.length > 0 ? ` where ${combinedConditions}` : ''}
     order by
-      "${sortOn}" ${sortOrder} nulls last
+      ${ident(sortOn)} ${sortOrder} nulls last
     limit
       ${limit}
     offset
@@ -109,16 +109,16 @@ export const getPaginatedUsersSQL = ({
   if (column === 'email') {
     const range = stringRange(keywords ?? '')
 
-    whereStatement = `where lower(email) ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and lower(email) < '${range[1]}'` : ''} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid order by instance_id, lower(email) asc limit ${limit}`
+    whereStatement = `where lower(email) ${firstOperator} ${literal(startAt ? startAt : range[0])} ${range[1] ? `and lower(email) < ${literal(range[1])}` : ''} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid order by instance_id, lower(email) asc limit ${limit}`
   } else if (column === 'phone') {
     const range = stringRange(keywords ?? '')
-    whereStatement = `where phone ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and phone < '${range[1]}'` : ''} order by phone asc limit ${limit}`
+    whereStatement = `where phone ${firstOperator} ${literal(startAt ? startAt : range[0])} ${range[1] ? `and phone < ${literal(range[1])}` : ''} order by phone asc limit ${limit}`
   } else if (column === 'id') {
     const isMatchingUUIDValue = prefixToUUID(keywords ?? '', false) === keywords
     if (isMatchingUUIDValue) {
-      whereStatement = `where id = '${keywords}' order by id asc limit ${limit}`
+      whereStatement = `where id = ${literal(keywords)} order by id asc limit ${limit}`
     } else {
-      whereStatement = `where id ${firstOperator} '${startAt ? startAt : prefixToUUID(keywords ?? '', false)}' and id < '${prefixToUUID(keywords ?? '', true)}' order by id asc limit ${limit}`
+      whereStatement = `where id ${firstOperator} ${literal(startAt ? startAt : prefixToUUID(keywords ?? '', false))} and id < ${literal(prefixToUUID(keywords ?? '', true))} order by id asc limit ${limit}`
     }
   }
 
@@ -187,7 +187,6 @@ export const getImprovedPaginatedUsersSQL = ({
   limit = DEFAULT_LIMIT,
 }: getPaginatedUsersSQLProps) => {
   const hasValidKeywords = keywords && keywords !== ''
-  const formattedKeywords = hasValidKeywords ? keywords.replaceAll("'", "''") : ''
 
   const conditions: string[] = []
 
@@ -195,32 +194,32 @@ export const getImprovedPaginatedUsersSQL = ({
   if (hasValidKeywords) {
     if (column === 'email') {
       // Use btree index with prefix matching
-      const range = stringRange(formattedKeywords)
+      const range = stringRange(keywords)
       if (range[1]) {
-        conditions.push(`email >= '${range[0]}' AND email < '${range[1]}'`)
+        conditions.push(`email >= ${literal(range[0])} AND email < ${literal(range[1])}`)
       } else {
-        conditions.push(`email >= '${range[0]}'`)
+        conditions.push(`email >= ${literal(range[0])}`)
       }
     } else if (column === 'phone') {
       // Use btree index with prefix matching
-      const range = stringRange(formattedKeywords)
+      const range = stringRange(keywords)
       if (range[1]) {
-        conditions.push(`phone >= '${range[0]}' AND phone < '${range[1]}'`)
+        conditions.push(`phone >= ${literal(range[0])} AND phone < ${literal(range[1])}`)
       } else {
-        conditions.push(`phone >= '${range[0]}'`)
+        conditions.push(`phone >= ${literal(range[0])}`)
       }
     } else if (column === 'id') {
       // Exact match on UUID
-      conditions.push(`id = '${formattedKeywords}'`)
+      conditions.push(`id = ${literal(keywords)}`)
     } else if (column === 'name') {
       // Use btree index with prefix matching on raw_user_meta_data->>'name'
-      const range = stringRange(formattedKeywords)
+      const range = stringRange(keywords)
       if (range[1]) {
         conditions.push(
-          `raw_user_meta_data->>'name' >= '${range[0]}' AND raw_user_meta_data->>'name' < '${range[1]}'`
+          `raw_user_meta_data->>'name' >= ${literal(range[0])} AND raw_user_meta_data->>'name' < ${literal(range[1])}`
         )
       } else {
-        conditions.push(`raw_user_meta_data->>'name' >= '${range[0]}'`)
+        conditions.push(`raw_user_meta_data->>'name' >= ${literal(range[0])}`)
       }
     }
   }
@@ -238,11 +237,11 @@ export const getImprovedPaginatedUsersSQL = ({
   if (providers && providers.length > 0) {
     if (providers.includes('saml 2.0')) {
       conditions.push(
-        `(SELECT jsonb_agg(CASE WHEN value ~ '^sso' THEN 'sso' ELSE value END) FROM jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => (p === 'saml 2.0' ? `'sso'` : `'${p}'`)).join(', ')}]`
+        `(SELECT jsonb_agg(CASE WHEN value ~ '^sso' THEN 'sso' ELSE value END) FROM jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => literal(p === 'saml 2.0' ? 'sso' : p)).join(', ')}]`
       )
     } else {
       conditions.push(
-        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => `'${p}'`).join(', ')}]`
+        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => literal(p)).join(', ')}]`
       )
     }
   }
@@ -255,9 +254,11 @@ export const getImprovedPaginatedUsersSQL = ({
     const operator = sortOrder === 'desc' ? '<' : '>'
     // When sorting by id, no need for a composite cursor since id is already unique
     if (sortOn === 'id') {
-      conditions.push(`id ${operator} '${cursor.id}'::uuid`)
+      conditions.push(`id ${operator} ${literal(cursor.id)}::uuid`)
     } else {
-      conditions.push(`("${sortOn}", id) ${operator} ('${cursor.sort}', '${cursor.id}'::uuid)`)
+      conditions.push(
+        `(${ident(sortOn)}, id) ${operator} (${literal(cursor.sort)}, ${literal(cursor.id)}::uuid)`
+      )
     }
   }
 
@@ -266,7 +267,9 @@ export const getImprovedPaginatedUsersSQL = ({
 
   // Order by sort column, with id as tie breaker (unless already sorting by id)
   const orderByClause =
-    sortOn === 'id' ? `"${sortOn}" ${sortOrder}` : `"${sortOn}" ${sortOrder}, id ${sortOrder}`
+    sortOn === 'id'
+      ? `${ident(sortOn)} ${sortOrder}`
+      : `${ident(sortOn)} ${sortOrder}, id ${sortOrder}`
 
   const usersData = `
     SELECT

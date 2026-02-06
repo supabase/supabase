@@ -14,7 +14,6 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import {
   Entity,
@@ -26,7 +25,6 @@ import {
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
@@ -112,11 +110,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const realtimeEnabledTables = realtimePublication?.tables ?? []
   const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === table?.id)
 
-  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    isTable,
-    isRealtimeEnabled,
-  })
-
   const { mutate: updatePublications, isPending: isTogglingRealtime } =
     useDatabasePublicationUpdateMutation({
       onSuccess: () => {
@@ -132,21 +125,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
         toast.error(`Failed to toggle realtime for ${table.name}: ${error.message}`)
       },
     })
-
-  const { data: triggersData } = useDatabaseTriggersQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      enabled: isTable,
-    }
-  )
-  const tableTriggers = (triggersData ?? []).filter(
-    (trigger) => trigger.schema === table.schema && trigger.table === table.name
-  )
-
-  const tableTriggersCount = tableTriggers.length
 
   const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -184,8 +162,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       lints,
       table.schema
     )
-
-  const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
   const toggleRealtime = async () => {
     if (!project || !realtimePublication) return
@@ -369,54 +345,29 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             </Popover_Shadcn_>
           )}
 
-          {isTable && activeRealtimeVariant === RealtimeButtonVariant.TRIGGERS ? (
-            <Button
-              asChild
-              type={'default'}
+          {realtimeEnabled && (
+            <ButtonTooltip
+              type="default"
               size="tiny"
               icon={
-                <div
-                  className={cn(
-                    'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
-                    tableTriggersCount > 9 ? 'px-1' : 'w-[16px]'
-                  )}
-                >
-                  <span className="text-[11px] text-foreground font-mono text-center">
-                    {tableTriggersCount}
-                  </span>
-                </div>
+                <MousePointer2
+                  strokeWidth={1.5}
+                  className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
+                />
               }
+              onClick={() => setShowEnableRealtime(true)}
+              className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: isRealtimeEnabled
+                    ? 'Click to disable realtime for this table'
+                    : 'Click to enable realtime for this table',
+                },
+              }}
             >
-              <Link href={manageTriggersHref}>
-                {tableTriggersCount === 1 ? 'Trigger' : 'Triggers'}
-              </Link>
-            </Button>
-          ) : (
-            activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON &&
-            realtimeEnabled && (
-              <ButtonTooltip
-                type="default"
-                size="tiny"
-                icon={
-                  <MousePointer2
-                    strokeWidth={1.5}
-                    className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
-                  />
-                }
-                onClick={() => setShowEnableRealtime(true)}
-                className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: isRealtimeEnabled
-                      ? 'Click to disable realtime for this table'
-                      : 'Click to enable realtime for this table',
-                  },
-                }}
-              >
-                {!isRealtimeEnabled && 'Enable Realtime'}
-              </ButtonTooltip>
-            )
+              {!isRealtimeEnabled && 'Enable Realtime'}
+            </ButtonTooltip>
           )}
 
           {isView && viewHasLints && (

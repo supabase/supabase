@@ -1,4 +1,5 @@
 import type { CollectionAfterReadHook } from 'payload'
+
 import type { Author } from '../../../payload-types'
 
 export const populateAuthors: CollectionAfterReadHook = async ({ doc, req: { payload } }) => {

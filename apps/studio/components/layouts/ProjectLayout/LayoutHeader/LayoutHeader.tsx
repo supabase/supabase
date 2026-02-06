@@ -1,11 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode, useMemo } from 'react'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
@@ -16,20 +10,29 @@ import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationD
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
+import { ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { ReactNode, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns'
+
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
+import { Connect } from '@/components/interfaces/Connect/Connect'
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
+import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
+import { usePHFlag } from '@/hooks/ui/useFlag'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -64,12 +67,16 @@ export const LayoutHeader = ({
   showProductMenu,
   backToDashboardURL,
 }: LayoutHeaderProps) => {
-  const { ref: projectRef, slug } = useParams()
   const router = useRouter()
+  const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
+
+  const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
+  const isFlagResolved = connectSheetFlag !== undefined
+  const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
 
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
@@ -198,7 +205,7 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
-                  <Connect />
+                  <ConnectButton />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -265,6 +272,8 @@ export const LayoutHeader = ({
           </div>
         </div>
       </header>
+
+      {isFlagResolved && isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
     </>
   )
 }
