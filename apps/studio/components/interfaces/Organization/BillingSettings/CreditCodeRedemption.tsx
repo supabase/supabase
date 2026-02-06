@@ -11,9 +11,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -24,8 +24,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   Separator,
 } from 'ui'
@@ -35,8 +35,8 @@ import { z } from 'zod'
 
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
-import useLatest from '@/hooks/misc/useLatest'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
+import useLatest from '@/hooks/misc/useLatest'
 
 const FORM_ID = 'credit-code-redemption'
 
@@ -329,6 +329,7 @@ export const CreditCodeRedemption = ({
                     <ButtonTooltip
                       type="primary"
                       className="pointer-events-auto"
+                      loading={redeemingCode}
                       disabled={codeRedemptionDisabled}
                       htmlType="submit"
                       tooltip={{
