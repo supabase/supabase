@@ -1,2 +1,2 @@
 export { query } from './client.js'
-export { tableExists } from './queries.js'
+export { createTable, dropTable, tableExists } from './queries.js'
