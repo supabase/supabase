@@ -94,7 +94,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
 
           {!dataApi && (
             <Admonition type="warning" title="Client libraries need Data API to query your database">
-              Disabling it means supabase-js and similar libraries can’t query or mutate data.
+              Disabling it means supabase-js and similar libraries can't query or mutate data.
             </Admonition>
           )}
         </div>
