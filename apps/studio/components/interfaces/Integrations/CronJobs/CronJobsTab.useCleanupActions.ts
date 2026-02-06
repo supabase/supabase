@@ -5,14 +5,13 @@ import {
   getDeleteOldCronJobRunDetailsByCtidSql,
   getJobRunDetailsPageCountKey,
   getJobRunDetailsPageCountSql,
-  getScheduleDeleteCronJobRunDetailsKey,
-  getScheduleDeleteCronJobRunDetailsSql,
 } from 'data/sql/queries/delete-cron-job-run-details'
 import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
 import type { ConnectionVars } from '@/data/common.types'
+import { useScheduleCronJobRunDetailsCleanupMutation } from '@/data/database-cron-jobs/schedule-clean-up-mutation'
 
 // Delay between batches to allow other queries to proceed (in milliseconds)
 const BATCH_DELAY_MS = 100
@@ -30,9 +29,6 @@ export type CleanupState =
   | { status: 'deleting'; progress: BatchDeletionProgress }
   | { status: 'delete-success'; totalRowsDeleted: number }
   | { status: 'delete-error'; error: string }
-  | { status: 'scheduling' }
-  | { status: 'schedule-success' }
-  | { status: 'schedule-error'; error: string }
 
 export const useCronJobsCleanupActions = ({
   projectRef,
@@ -47,6 +43,12 @@ export const useCronJobsCleanupActions = ({
   const { mutateAsync: executeSql } = useExecuteSqlMutation({
     onError: () => {}, // Error handled inline
   })
+
+  const {
+    mutate: scheduleCronJobCleanup,
+    isPending: isScheduling,
+    isSuccess: isScheduleSuccess,
+  } = useScheduleCronJobRunDetailsCleanupMutation()
 
   /**
    * Run batched deletion using ctid ranges.
@@ -164,26 +166,17 @@ export const useCronJobsCleanupActions = ({
         return
       }
 
-      try {
-        setCleanupState({ status: 'scheduling' })
-
-        await executeSql({
-          projectRef,
-          connectionString,
-          sql: getScheduleDeleteCronJobRunDetailsSql(interval),
-          queryKey: getScheduleDeleteCronJobRunDetailsKey(projectRef, interval),
-        })
-
-        setCleanupState({ status: 'schedule-success' })
-        toast.success('Scheduled daily cleanup job.')
-        onSuccess?.()
-      } catch (error) {
-        console.error('[CronJobs] Failed to schedule cleanup with error: %O', error)
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-        toast.error(`Failed to schedule cleanup job: ${errorMessage}`)
-      }
+      scheduleCronJobCleanup(
+        { projectRef, connectionString, interval },
+        {
+          onSuccess: () => {
+            toast.success('Scheduled daily cleanup job.')
+            onSuccess?.()
+          },
+        }
+      )
     },
-    [projectRef, connectionString, executeSql]
+    [connectionString, projectRef, scheduleCronJobCleanup]
   )
 
   /**
@@ -196,8 +189,10 @@ export const useCronJobsCleanupActions = ({
 
   return {
     cleanupInterval,
-    setCleanupInterval,
     cleanupState,
+    isScheduling,
+    isScheduleSuccess,
+    setCleanupInterval,
     runBatchedDeletion,
     scheduleCleanup,
     cancelDeletion,

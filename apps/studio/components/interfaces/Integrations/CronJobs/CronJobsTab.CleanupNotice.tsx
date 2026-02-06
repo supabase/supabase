@@ -52,8 +52,10 @@ const CronJobRunDetailsOverflowDialog = ({
 
   const {
     cleanupInterval,
-    setCleanupInterval,
     cleanupState,
+    isScheduling,
+    isScheduleSuccess,
+    setCleanupInterval,
     runBatchedDeletion,
     scheduleCleanup,
     cancelDeletion,
@@ -63,10 +65,8 @@ const CronJobRunDetailsOverflowDialog = ({
   })
 
   const isDeleting = cleanupState.status === 'deleting'
-  const isScheduling = cleanupState.status === 'scheduling'
   const isDeleteSuccess = cleanupState.status === 'delete-success'
   const isDeleteError = cleanupState.status === 'delete-error'
-  const isScheduleSuccess = cleanupState.status === 'schedule-success'
   const isBusy = isDeleting || isScheduling
   const canSchedule = isDeleteSuccess || isScheduleSuccess
 
@@ -170,6 +170,8 @@ const CronJobRunDetailsOverflowDialog = ({
                   wrapperClassName="max-w-full"
                 />
                 <Button
+                  block
+                  size="small"
                   type="default"
                   className="mt-1"
                   loading={isScheduling}
