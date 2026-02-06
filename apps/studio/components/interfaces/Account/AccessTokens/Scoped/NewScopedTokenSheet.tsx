@@ -281,7 +281,7 @@ export const NewScopedTokenSheet = ({
                   onCustomExpiryChange={handleCustomExpiryChange}
                 />
                 <Separator />
-                <ResourceAccess control={form.control} resourceAccess={resourceAccess} />
+                <ResourceAccess control={form.control} resourceAccess={resourceAccess} setValue={form.setValue} />
                 <Separator />
                 <Permissions
                   setValue={form.setValue}

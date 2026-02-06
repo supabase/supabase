@@ -25,12 +25,19 @@ const RESOURCE_OPTIONS = [
   },
 ]
 
-export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps) => {
+export const ResourceAccess = ({ control, resourceAccess, setValue }: ResourceAccessProps) => {
   const { profile } = useProfile()
 
   const { organizations, projects, isLoadingOrgs, isLoadingProjects } = useOrgAndProjectData({
     enabled: !!profile,
   })
+
+  const handleResourceAccessChange = (newValue: string, currentValue: string) => {
+    if (newValue !== currentValue) {
+      setValue('selectedOrganizations', [])
+      setValue('selectedProjects', [])
+    }
+  }
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
@@ -49,7 +56,10 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
                       value={option.value}
                       label={option.label}
                       isSelected={field.value === option.value}
-                      onChange={() => field.onChange(option.value)}
+                      onChange={() => {
+                        handleResourceAccessChange(option.value, field.value)
+                        field.onChange(option.value)
+                      }}
                     />
                   ))}
                 </fieldset>

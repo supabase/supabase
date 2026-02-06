@@ -1,9 +1,10 @@
-import { Control, ControllerRenderProps } from 'react-hook-form'
+import { Control, ControllerRenderProps, UseFormSetValue } from 'react-hook-form'
 import { TokenFormValues } from '../../../AccessToken.schemas'
 
 export interface ResourceAccessProps {
   control: Control<TokenFormValues>
   resourceAccess: string
+  setValue: UseFormSetValue<TokenFormValues>
 }
 
 export interface ResourceItem {
