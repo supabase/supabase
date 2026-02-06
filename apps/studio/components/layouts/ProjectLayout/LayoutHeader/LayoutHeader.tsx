@@ -25,7 +25,7 @@ import { CommandMenuTriggerInput } from 'ui-patterns'
 
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
-import { HelpPopover } from './HelpPopover'
+import { HelpDropdown } from './HelpDropdown'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
@@ -229,7 +229,7 @@ export const LayoutHeader = ({
                       '[&_.command-shortcut>div]:text-foreground-lighter'
                     )}
                   />
-                  <HelpPopover />
+                  <HelpDropdown />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
@@ -255,7 +255,7 @@ export const LayoutHeader = ({
                         [&_.command-shortcut>div]:text-foreground-lighter
                       "
                   />
-                  <HelpPopover />
+                  <HelpDropdown />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (

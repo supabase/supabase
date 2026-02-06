@@ -19,8 +19,7 @@ export const ASSISTANT_SUGGESTIONS = {
   name: 'Support' as const,
   initialInput: 'I need help with my project',
   suggestions: {
-    title:
-      'I can help you with your project, here are some example prompts to get you started:',
+    title: 'I can help you with your project, here are some example prompts to get you started:',
     prompts: [
       { label: 'Database Health', description: 'Summarise my database health and performance' },
       { label: 'Debug Logs', description: 'View and debug my edge function logs' },

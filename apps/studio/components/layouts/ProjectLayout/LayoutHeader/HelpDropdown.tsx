@@ -6,7 +6,10 @@ import SVG from 'react-inlinesvg'
 
 import { IS_PLATFORM } from 'common'
 import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import { ASSISTANT_SUGGESTIONS, HelpSection } from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
+import {
+  ASSISTANT_SUGGESTIONS,
+  HelpSection,
+} from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -14,9 +17,16 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { Button, cn, Popover, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import {
+  Button,
+  cn,
+  Popover,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+} from 'ui'
 
-export const HelpPopover = () => {
+export const HelpDropdown = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -37,7 +47,7 @@ export const HelpPopover = () => {
     <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <ButtonTooltip
-          id="help-popover-button"
+          id="help-dropdown-button"
           type="outline"
           size="tiny"
           className={cn(

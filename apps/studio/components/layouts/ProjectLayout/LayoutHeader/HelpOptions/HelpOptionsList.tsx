@@ -62,7 +62,12 @@ export const HelpOptionsList = ({
         }
         if (id === 'docs') {
           return (
-            <ButtonGroupItem key={id} size={size} icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
+            <ButtonGroupItem
+              key={id}
+              size={size}
+              icon={<BookOpen strokeWidth={1.5} size={14} />}
+              asChild
+            >
               <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
                 Docs
               </a>
@@ -71,8 +76,17 @@ export const HelpOptionsList = ({
         }
         if (id === 'troubleshooting') {
           return (
-            <ButtonGroupItem key={id} size={size} icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
-              <a href={`${DOCS_URL}/guides/troubleshooting?products=platform`} target="_blank" rel="noreferrer">
+            <ButtonGroupItem
+              key={id}
+              size={size}
+              icon={<Wrench strokeWidth={1.5} size={14} />}
+              asChild
+            >
+              <a
+                href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Troubleshooting
               </a>
             </ButtonGroupItem>
@@ -80,7 +94,12 @@ export const HelpOptionsList = ({
         }
         if (id === 'discord') {
           return (
-            <ButtonGroupItem key={id} size={size} icon={<SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />} asChild>
+            <ButtonGroupItem
+              key={id}
+              size={size}
+              icon={<SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />}
+              asChild
+            >
               <a href={DISCORD_URL} target="_blank" rel="noreferrer">
                 Ask on Discord
               </a>
@@ -89,7 +108,12 @@ export const HelpOptionsList = ({
         }
         if (id === 'status') {
           return (
-            <ButtonGroupItem key={id} size={size} icon={<Activity strokeWidth={1.5} size={14} />} asChild>
+            <ButtonGroupItem
+              key={id}
+              size={size}
+              icon={<Activity strokeWidth={1.5} size={14} />}
+              asChild
+            >
               <a href={STATUS_URL} target="_blank" rel="noreferrer">
                 Supabase status
               </a>
@@ -98,7 +122,12 @@ export const HelpOptionsList = ({
         }
         if (id === 'support') {
           return (
-            <ButtonGroupItem key={id} size={size} icon={<Mail strokeWidth={1.5} size={14} />} asChild>
+            <ButtonGroupItem
+              key={id}
+              size={size}
+              icon={<Mail strokeWidth={1.5} size={14} />}
+              asChild
+            >
               <SupportLink queryParams={supportLinkQueryParams} onClick={onSupportClick}>
                 Contact support
               </SupportLink>

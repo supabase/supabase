@@ -138,9 +138,9 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
       const attachmentUrl =
         screenshot && profile?.gotrue_id
           ? await uploadAttachment({
-            image: screenshot,
-            userId: profile.gotrue_id,
-          })
+              image: screenshot,
+              userId: profile.gotrue_id,
+            })
           : undefined
       const formattedFeedback =
         attachmentUrl !== undefined ? `${feedback}\n\nAttachments:\n${attachmentUrl}` : feedback
