@@ -44,10 +44,6 @@ export const useTablesRolesAccessQuery = <TData = TablesRolesAccessData>(
     queryKey: tableKeys.rolesAccess(projectRef, schema),
     queryFn: ({ signal }) =>
       getTablesWithAnonAuthenticatedAccess({ projectRef, connectionString, schema }, signal),
-    enabled:
-      enabled &&
-      typeof projectRef !== 'undefined' &&
-      typeof schema !== 'undefined' &&
-      !!connectionString,
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
     ...options,
   })
