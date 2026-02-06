@@ -40,8 +40,7 @@ test.describe('StatusPageBanner', () => {
       for (const key of Object.keys(localStorage)) {
         if (
           key.startsWith('incident-banner-dismissed-') ||
-          key.startsWith('maintenance-banner-dismissed-') ||
-          key === 'e2e-incident-banner-override'
+          key.startsWith('maintenance-banner-dismissed-')
         ) {
           localStorage.removeItem(key)
         }
