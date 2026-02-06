@@ -93,33 +93,25 @@ export const getResourcePermissions = (
 }
 
 export const getRealAccess = (resource: string, tokenPermissions: string[]) => {
-  const hasPermission = (permission: string) => tokenPermissions.includes(permission)
   const resourcePermissions = getResourcePermissions(resource)
+  const actionTypes = ['read', 'write', 'create', 'delete'] as const
+  const grantedActions = actionTypes.filter(action => 
+    resourcePermissions[action]?.some(p => tokenPermissions.includes(p))
+  )
 
-  if (!resourcePermissions) {
+  if (grantedActions.length === 0) {
     return 'no access'
   }
-
-  const hasRead = resourcePermissions['read']?.some((p: string) => hasPermission(p)) || false
-  const hasWrite = resourcePermissions['write']?.some((p: string) => hasPermission(p)) || false
-  const hasCreate = resourcePermissions['create']?.some((p: string) => hasPermission(p)) || false
-  const hasDelete = resourcePermissions['delete']?.some((p: string) => hasPermission(p)) || false
-
-  const actions: string[] = []
-  if (hasRead) actions.push('read')
-  if (hasWrite) actions.push('write')
-  if (hasCreate) actions.push('create')
-  if (hasDelete) actions.push('delete')
-
-  if (actions.length === 0) {
-    return 'no access'
-  } else if (actions.length === 1) {
-    return actions[0]
-  } else if (hasRead && hasWrite && actions.length === 2) {
+  
+  if (grantedActions.length === 1) {
+    return grantedActions[0]
+  }
+  
+  if (grantedActions.length === 2 && grantedActions[0] === 'read' && grantedActions[1] === 'write') {
     return 'read-write'
-  } else {
-    return actions.join('-')
   }
+  
+  return grantedActions.join('-')
 }
 
 export const formatAccessText = (action: string): string => {
