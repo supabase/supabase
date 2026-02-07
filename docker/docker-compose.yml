@@ -79,6 +79,7 @@ services:
       analytics:
         condition: service_healthy
     environment:
+      KONG_PORT_MAPS: ${KONG_HTTP_PORT}:8000,${KONG_HTTPS_PORT}:8443
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
       # https://github.com/supabase/cli/issues/14
