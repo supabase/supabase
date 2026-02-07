@@ -298,9 +298,9 @@ Deno.serve(async (req) => {
       return json(400, { error: err.message });
     }
 
-    console.error('generateObject error:', err);
+    console.error('generateText error:', err);
     return json(500, {
-      error: 'Failed to process generateObject request',
+      error: 'Failed to process generateText request',
       details: err instanceof Error ? err.message : String(err),
     });
   }
