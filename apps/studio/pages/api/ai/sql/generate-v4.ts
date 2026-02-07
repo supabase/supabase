@@ -10,6 +10,7 @@ import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getTools } from 'lib/ai/tools'
+import { getURL } from 'lib/helpers'
 import apiWrapper from 'lib/api/apiWrapper'
 import { executeQuery } from 'lib/api/self-hosted/query'
 
@@ -138,6 +139,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       authorization,
       aiOptInLevel,
       accessToken,
+      baseUrl: getURL(),
     })
 
     // Get a list of all schemas to add to context

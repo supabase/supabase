@@ -727,6 +727,7 @@ export const auth: NavMenuConstant = {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
+            { name: 'Overview', url: '/guides/auth/server-side' },
             { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
             {
               name: 'Migrating from Auth Helpers',
@@ -1482,6 +1483,11 @@ export const api: NavMenuConstant = {
       items: [],
     },
     {
+      name: 'Generating Python Types',
+      url: '/guides/api/rest/generating-python-types',
+      items: [],
+    },
+    {
       name: 'Tools',
       url: '/guides/api',
       items: [{ name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' }],
@@ -1493,6 +1499,7 @@ export const api: NavMenuConstant = {
         { name: 'Creating API routes', url: '/guides/api/creating-routes' },
         { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        { name: 'Error Codes', url: '/guides/api/rest/postgrest-error-codes' },
       ],
     },
     {
@@ -1663,7 +1670,14 @@ export const functions: NavMenuConstant = {
       name: 'Integrations',
       url: undefined,
       items: [
-        { name: 'Supabase Auth', url: '/guides/functions/auth' },
+        {
+          name: 'Supabase Auth',
+          url: '/guides/functions/auth',
+          items: [
+            { name: 'Securing your functions', url: '/guides/functions/auth' },
+            { name: 'Legacy JWT secret', url: '/guides/functions/auth-legacy-jwt' },
+          ],
+        },
         { name: 'Supabase Database (Postgres)', url: '/guides/functions/connect-to-postgres' },
         { name: 'Supabase Storage', url: '/guides/functions/storage-caching' },
       ],
@@ -1837,6 +1851,10 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Realtime Reports',
+          url: '/guides/realtime/reports' as `/${string}`,
+        },
+        {
           name: 'Subscribing to Database Changes',
           url: '/guides/realtime/subscribing-to-database-changes' as `/${string}`,
         },
@@ -1858,7 +1876,7 @@ export const realtime: NavMenuConstant = {
       name: 'Deep dive',
       url: undefined,
       items: [
-        { name: 'Quotas', url: '/guides/realtime/quotas', enabled: billingEnabled },
+        { name: 'Limits', url: '/guides/realtime/limits', enabled: billingEnabled },
         {
           name: 'Pricing',
           url: '/guides/realtime/pricing' as `/${string}`,

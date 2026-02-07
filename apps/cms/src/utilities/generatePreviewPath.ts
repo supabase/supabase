@@ -1,4 +1,5 @@
-import { PayloadRequest, CollectionSlug } from 'payload'
+import { CollectionSlug, PayloadRequest } from 'payload'
+
 import { WWW_SITE_ORIGIN } from './constants'
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {

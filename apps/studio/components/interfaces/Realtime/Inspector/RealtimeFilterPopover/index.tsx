@@ -2,6 +2,9 @@ import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -35,8 +38,17 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
   const [tempConfig, setTempConfig] = useState(config)
 
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
 
   // Update tempConfig when config changes to ensure consistency
   useEffect(() => {
@@ -75,7 +87,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             )}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-[365px]" align="start" portal={true}>
+        <PopoverContent_Shadcn_ className="p-0 w-[365px]" align="start">
           <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
             Listen to event types
           </div>
@@ -155,10 +167,19 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               />
             </div>
             <p className="text-xs text-foreground-light pt-1">
-              {config.enableDbChanges
-                ? 'Listen for Database inserts, updates, deletes and more'
-                : 'Enable realtime publications to listen for database changes'}
+              Listen for Database inserts, updates, deletes and more
             </p>
+            {!config.enableDbChanges && (
+              <p className="text-xs text-foreground-light mt-2">
+                Enable{' '}
+                <InlineLink
+                  href={`/project/${ref}/database/publications${!!realtimePublication ? `/${realtimePublication.id}` : ''}`}
+                >
+                  realtime publications
+                </InlineLink>{' '}
+                for your tables to listen for database changes
+              </p>
+            )}
           </div>
 
           {tempConfig.enableDbChanges && config.enableDbChanges && (

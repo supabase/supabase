@@ -2,21 +2,11 @@ import { motion } from 'framer-motion'
 import { CircleDotDashed, GitMerge, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
+import { ActionRun } from '@/data/actions/action-detail-query'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
-interface WorkflowRun {
-  id: string
-  status: string
-  branch_id?: string
-  check_run_id?: number | null
-  created_at?: string
-  updated_at?: string
-  workdir?: string | null
-  git_config?: unknown
-}
-
 interface WorkflowLogsCardProps {
-  workflowRun: WorkflowRun | null | undefined
+  workflowRun: ActionRun | null | undefined
   logs: string | undefined
   isLoading?: boolean
   onClose?: () => void
@@ -27,7 +17,7 @@ interface WorkflowLogsCardProps {
   overrideAction?: React.ReactNode
 }
 
-const WorkflowLogsCard = ({
+export const WorkflowLogsCard = ({
   workflowRun,
   logs,
   isLoading = false,
@@ -46,19 +36,16 @@ const WorkflowLogsCard = ({
     }
   }, [logs])
 
-  const showSuccessIcon = workflowRun?.status === 'FUNCTIONS_DEPLOYED'
-  const isFailed =
-    workflowRun?.status && ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(workflowRun.status)
-  const isPolling =
-    workflowRun?.status !== 'FUNCTIONS_DEPLOYED' &&
-    (!workflowRun?.status ||
-      !['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(workflowRun.status))
+  const workflowRunStatus = workflowRun?.status
+  const isSuccess = workflowRunStatus === 'SUCCESS'
+  const isFailed = workflowRunStatus === 'FAILED'
+  const isPolling = workflowRunStatus === 'RUNNING'
 
   const displayTitle =
     overrideTitle ||
     (isPolling
       ? 'Processing...'
-      : showSuccessIcon
+      : isSuccess
         ? 'Workflow completed successfully'
         : isFailed
           ? 'Workflow failed'
@@ -73,13 +60,13 @@ const WorkflowLogsCard = ({
       >
         <CircleDotDashed size={16} strokeWidth={1.5} className="text-warning" />
       </motion.div>
-    ) : showSuccessIcon ? (
+    ) : isSuccess ? (
       <GitMerge size={16} strokeWidth={1.5} className="text-brand" />
     ) : null)
 
   return (
     <Card className="bg-background overflow-hidden h-64 flex flex-col">
-      <CardHeader className={showSuccessIcon ? 'text-brand' : isFailed ? 'text-destructive' : ''}>
+      <CardHeader className={isSuccess ? 'text-brand' : isFailed ? 'text-destructive' : ''}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {displayIcon}
@@ -123,5 +110,3 @@ const WorkflowLogsCard = ({
     </Card>
   )
 }
-
-export default WorkflowLogsCard

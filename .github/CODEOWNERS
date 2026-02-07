@@ -1,8 +1,10 @@
 /packages/ui/  @supabase/design
-/packages/shared-data/pricing.ts @roryw10 @supabase/billing
-/packages/shared-data/plans.ts @roryw10 @supabase/billing
+/packages/shared-data/pricing.ts @supabase/billing
+/packages/shared-data/plans.ts @supabase/billing
 /packages/common/telemetry-constants.ts @supabase/growth-eng
+/packages/dev-tools/ @supabase/growth-eng
 /packages/pg-meta @supabase/postgres @avallete
+/packages/ui-patterns @supabase/design
 
 /apps/studio/ @supabase/Dashboard
 
@@ -20,3 +22,5 @@
 /apps/studio/pages/new/index.tsx                                    @supabase/security
 
 /apps/studio/data/sql/queries/                                      @supabase/postgres @avallete
+
+/packages/shared-data/compute-disk-limits.ts @supabase/infra

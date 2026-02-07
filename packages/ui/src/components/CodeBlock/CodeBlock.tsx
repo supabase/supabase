@@ -1,17 +1,11 @@
 'use client'
 
+import curl from 'highlightjs-curl'
 import { noop } from 'lodash'
 import { Check, Copy } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Children, ReactNode, useState } from 'react'
 import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
-
-import { copyToClipboard } from '../../lib/utils'
-import { cn } from '../../lib/utils/cn'
-import { Button } from '../Button/Button'
-import { monokaiCustomTheme } from './CodeBlock.utils'
-
-import curl from 'highlightjs-curl'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
@@ -29,6 +23,11 @@ import {
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
+
+import { copyToClipboard } from '../../lib/utils'
+import { cn } from '../../lib/utils/cn'
+import { Button } from '../Button/Button'
+import { monokaiCustomTheme } from './CodeBlock.utils'
 
 export type CodeBlockLang =
   | 'js'

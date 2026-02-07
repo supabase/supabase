@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 import { proxy, useSnapshot } from 'valtio'
 
+import { ResponseError } from '@/types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import {
   inverseValidObjectKeyRegex,
@@ -716,7 +717,7 @@ function createStorageExplorerState({
           })
         }
 
-        if (state.openedFolders[columnIndex].name === folder.name) {
+        if (state.openedFolders[columnIndex]?.name === folder.name) {
           state.setSelectedFilePreview(undefined)
           state.popOpenedFoldersAtIndex(columnIndex - 1)
         }
@@ -1448,34 +1449,55 @@ function createStorageExplorerState({
 
       const toastId = toast.loading(`Deleting ${prefixes.length} file(s)...`)
 
-      await deleteBucketObject({
-        projectRef: state.projectRef,
-        bucketId: state.selectedBucket.id,
-        paths: prefixes,
-      })
-
-      if (!isDeleteFolder) {
-        // If parent folders are empty, reinstate .emptyFolderPlaceholder to persist them
-        const parentFolderPrefixes = uniq(
-          prefixes.map((prefix) => {
-            const segments = prefix.split('/')
-            return segments.slice(0, segments.length - 1).join('/')
-          })
-        )
-        await Promise.all(
-          parentFolderPrefixes.map((prefix) => state.validateParentFolderEmpty(prefix))
-        )
-
-        toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
-          id: toastId,
-          closeButton: true,
-          duration: SONNER_DEFAULT_DURATION,
-          description: undefined,
+      try {
+        await deleteBucketObject({
+          projectRef: state.projectRef,
+          bucketId: state.selectedBucket.id,
+          paths: prefixes,
         })
-        await state.refetchAllOpenedFolders()
-        state.setSelectedItemsToDelete([])
-      } else {
-        toast.dismiss(toastId)
+
+        if (!isDeleteFolder) {
+          // If parent folders are empty, reinstate .emptyFolderPlaceholder to persist them
+          const parentFolderPrefixes = uniq(
+            prefixes.map((prefix) => {
+              const segments = prefix.split('/')
+              return segments.slice(0, segments.length - 1).join('/')
+            })
+          )
+          await Promise.all(
+            parentFolderPrefixes.map((prefix) => state.validateParentFolderEmpty(prefix))
+          )
+
+          toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
+            id: toastId,
+            closeButton: true,
+            duration: SONNER_DEFAULT_DURATION,
+            description: undefined,
+          })
+          await state.refetchAllOpenedFolders()
+          state.setSelectedItemsToDelete([])
+        } else {
+          toast.dismiss(toastId)
+        }
+      } catch (err) {
+        if (!isDeleteFolder) {
+          toast.error(`Failed to delete ${prefixes.length} file(s)`, {
+            id: toastId,
+            closeButton: true,
+            duration: SONNER_DEFAULT_DURATION,
+            description: (err as ResponseError).message,
+          })
+
+          if (!files.some((f) => f.prefix)) {
+            files.forEach((file) => {
+              const { name, columnIndex } = file
+              state.updateRowStatus({ name, status: STORAGE_ROW_STATUS.READY, columnIndex })
+            })
+          }
+        } else {
+          toast.dismiss(toastId)
+          throw err
+        }
       }
     },
 
