@@ -8,9 +8,10 @@
     "strict": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vinxi/types/client"],
+    "types": ["vinxi/types/client","@solidjs/router"],
     "paths": {
       "~/*": ["./src/*"]
+    
     }
   }
 }
