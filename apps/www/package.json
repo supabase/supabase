@@ -45,6 +45,7 @@
     "common-tags": "^1.8.2",
     "config": "workspace:*",
     "dayjs": "^1.11.12",
+    "dev-tools": "workspace:*",
     "eslint-config-supabase": "workspace:*",
     "framer-motion": "^11.0.3",
     "globby": "^13.2.2",

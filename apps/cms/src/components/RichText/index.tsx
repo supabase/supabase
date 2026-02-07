@@ -1,4 +1,3 @@
-import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import {
   DefaultNodeTypes,
   SerializedBlockNode,
@@ -6,22 +5,22 @@ import {
   type DefaultTypedEditorState,
 } from '@payloadcms/richtext-lexical'
 import {
+  RichText as ConvertRichText,
   JSXConvertersFunction,
   LinkJSXConverter,
-  RichText as ConvertRichText,
 } from '@payloadcms/richtext-lexical/react'
 
+import { BannerBlock } from '@/blocks/Banner/Component'
 import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
-
+import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { QuoteBlock } from '@/blocks/Quote/Component'
+import { YouTubeBlock } from '@/blocks/YouTube/Component'
 import type {
   BannerBlock as BannerBlockProps,
   MediaBlock as MediaBlockProps,
   QuoteBlock as QuoteBlockProps,
   YouTubeBlock as YouTubeBlockProps,
 } from '@/payload-types'
-import { BannerBlock } from '@/blocks/Banner/Component'
-import { QuoteBlock } from '@/blocks/Quote/Component'
-import { YouTubeBlock } from '@/blocks/YouTube/Component'
 import { cn } from '@/utilities/ui'
 
 type NodeTypes =
