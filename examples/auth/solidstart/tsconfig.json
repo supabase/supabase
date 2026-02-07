@@ -1,17 +1,13 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "strict": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vinxi/types/client","@solidjs/router"],
+    "types": ["vite/client"],
     "paths": {
       "~/*": ["./src/*"]
-    
     }
   }
 }

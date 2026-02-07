@@ -1,29 +1,19 @@
-import { action, redirect, useAction } from '@solidjs/router'
+import { A } from '@solidjs/router'
+import { action, redirect, useAction, useSubmission } from '@solidjs/router'
+import { Show } from 'solid-js'
+import { createClient } from '~/lib/supabase/server'
 
-import { getSupabaseServerClient } from '~/lib/supabase/server'
-
-const loginAction = action(async (formData: FormData) => {
+const signInAction = action(async (formData: FormData) => {
   'use server'
-  const emailEntry = formData.get('email')
-  const passwordEntry = formData.get('password')
+  const email = formData.get('email')?.toString()
+  const password = formData.get('password')?.toString()
 
-  // Validate that fields exist and are non-empty
-  if (!emailEntry || typeof emailEntry !== 'string' || !emailEntry.trim()) {
-    return { error: 'Email is required' }
+  if (!email || !password) {
+    return { error: 'Email and password are required' }
   }
 
-  if (!passwordEntry || typeof passwordEntry !== 'string' || !passwordEntry.trim()) {
-    return { error: 'Password is required' }
-  }
-
-  const email = emailEntry.toString()
-  const password = passwordEntry.toString()
-
-  const supabase = getSupabaseServerClient()
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
+  const supabase = createClient()
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
     return { error: error.message }
@@ -32,15 +22,45 @@ const loginAction = action(async (formData: FormData) => {
   throw redirect('/')
 })
 
+const signUpAction = action(async (formData: FormData) => {
+  'use server'
+  const email = formData.get('email')?.toString()
+  const password = formData.get('password')?.toString()
+
+  if (!email || !password) {
+    return { error: 'Email and password are required' }
+  }
+
+  const supabase = createClient()
+  const { error } = await supabase.auth.signUp({ email, password })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  return { success: 'Check your email to confirm your account!' }
+})
+
 export default function Login() {
-  const login = useAction(loginAction)
+  const signIn = useAction(signInAction)
+  const signUp = useAction(signUpAction)
+  const signingIn = useSubmission(signInAction)
+  const signingUp = useSubmission(signUpAction)
 
   return (
-    <main>
-      <h1>Sign In</h1>
+    <div style={{ 'max-width': '400px', margin: '50px auto', padding: '20px' }}>
+      <A href="/" style={{ 'margin-bottom': '20px', display: 'inline-block' }}>
+        ← Back
+      </A>
 
-      <form action={login} method="post">
-        <div>
+      <h1>Sign In / Sign Up</h1>
+
+      <form method="post" style={{ 'margin-bottom': '20px' }} onsubmit={(e) => {
+        e.preventDefault()
+        const formData = new FormData(e.currentTarget)
+        signIn(formData)
+      }}>
+        <div style={{ 'margin-bottom': '15px' }}>
           <label for="email">Email</label>
           <input
             id="email"
@@ -48,10 +68,11 @@ export default function Login() {
             type="email"
             required
             placeholder="you@example.com"
+            style={{ width: '100%', padding: '8px', 'margin-top': '5px' }}
           />
         </div>
 
-        <div>
+        <div style={{ 'margin-bottom': '15px' }}>
           <label for="password">Password</label>
           <input
             id="password"
@@ -59,11 +80,57 @@ export default function Login() {
             type="password"
             required
             placeholder="••••••••"
+            style={{ width: '100%', padding: '8px', 'margin-top': '5px' }}
           />
         </div>
 
-        <button type="submit">Sign In</button>
+        <button
+          type="submit"
+          disabled={signingIn.pending}
+          style={{
+            padding: '10px 20px',
+            background: '#10b981',
+            color: 'white',
+            border: 'none',
+            'border-radius': '4px',
+            cursor: signingIn.pending ? 'not-allowed' : 'pointer',
+            'margin-right': '10px'
+          }}
+        >
+          {signingIn.pending ? 'Signing In...' : 'Sign In'}
+        </button>
+
+        <button
+          type="button"
+          onclick={(e) => {
+            const form = e.currentTarget.closest('form')!
+            signUp(new FormData(form))
+          }}
+          disabled={signingUp.pending}
+          style={{
+            padding: '10px 20px',
+            background: '#6366f1',
+            color: 'white',
+            border: 'none',
+            'border-radius': '4px',
+            cursor: signingUp.pending ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {signingUp.pending ? 'Signing Up...' : 'Sign Up'}
+        </button>
+
+        <Show when={signingIn.result?.error || signingUp.result?.error}>
+          <p style={{ color: 'red', 'margin-top': '10px' }}>
+            {signingIn.result?.error || signingUp.result?.error}
+          </p>
+        </Show>
+
+        <Show when={signingUp.result?.success}>
+          <p style={{ color: 'green', 'margin-top': '10px' }}>
+            {signingUp.result?.success}
+          </p>
+        </Show>
       </form>
-    </main>
+    </div>
   )
 }

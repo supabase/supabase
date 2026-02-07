@@ -1,6 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
 import { getHeader, setCookie } from 'vinxi/http'
-import { getSupabaseConfig } from './config'
 
 /**
  * Creates a Supabase client for server-side usage with cookie-based session management.
@@ -21,17 +20,16 @@ import { getSupabaseConfig } from './config'
  * ```ts
  * const getUser = cache(async () => {
  *   'use server'
- *   const supabase = getSupabaseServerClient()
+ *   const supabase = createClient()
  *   const { data: { user } } = await supabase.auth.getUser()
  *   return user
  * }, 'user')
  * ```
  */
-export function getSupabaseServerClient() {
-  const { url, anonKey } = getSupabaseConfig()
+export function createClient() {
   return createServerClient(
-    url,
-    anonKey,
+    import.meta.env.VITE_SUPABASE_URL!,
+    import.meta.env.VITE_SUPABASE_ANON_KEY!,
     {
       cookies: {
         /**

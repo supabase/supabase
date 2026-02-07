@@ -1,6 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
 import { getHeader, setCookie } from 'vinxi/http'
-import { getSupabaseConfig } from './config'
 
 /**
  * Updates and refreshes the user's Supabase session.
@@ -21,8 +20,8 @@ import { getSupabaseConfig } from './config'
  *
  * @example
  * ```ts
- * // src/middleware.ts
- * import { updateSession } from '~/lib/supabase/middleware'
+ * // middleware.ts
+ * import { updateSession } from './lib/supabase/middleware'
  *
  * export default createMiddleware({
  *   onRequest: [
@@ -34,10 +33,9 @@ import { getSupabaseConfig } from './config'
  * ```
  */
 export async function updateSession() {
-  const { url, anonKey } = getSupabaseConfig()
   const supabase = createServerClient(
-    url,
-    anonKey,
+    import.meta.env.VITE_SUPABASE_URL!,
+    import.meta.env.VITE_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
