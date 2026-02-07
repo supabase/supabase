@@ -1,4 +1,5 @@
 import { action, redirect, useAction } from '@solidjs/router'
+
 import { getSupabaseServerClient } from '~/lib/supabase/server'
 
 const loginAction = action(async (formData: FormData) => {
@@ -6,6 +7,7 @@ const loginAction = action(async (formData: FormData) => {
   const emailEntry = formData.get('email')
   const passwordEntry = formData.get('password')
 
+  // Validate that fields exist and are non-empty
   if (!emailEntry || typeof emailEntry !== 'string' || !emailEntry.trim()) {
     return { error: 'Email is required' }
   }
@@ -18,9 +20,14 @@ const loginAction = action(async (formData: FormData) => {
   const password = passwordEntry.toString()
 
   const supabase = getSupabaseServerClient()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
 
-  if (error) return { error: error.message }
+  if (error) {
+    return { error: error.message }
+  }
 
   throw redirect('/')
 })
@@ -32,24 +39,31 @@ export default function Login() {
     <main>
       <h1>Sign In</h1>
 
-      {/* Only change: use:enhance instead of action={login} */}
-     <form method="post">
-  <div>
-    <label for="email">Email</label>
-    <input id="email" name="email" type="email" required placeholder="you@example.com" />
-  </div>
+      <form action={login} method="post">
+        <div>
+          <label for="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            placeholder="you@example.com"
+          />
+        </div>
 
-  <div>
-    <label for="password">Password</label>
-    <input id="password" name="password" type="password" required placeholder="••••••••" />
-  </div>
+        <div>
+          <label for="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            placeholder="••••••••"
+          />
+        </div>
 
-  <button type="submit">Sign In</button>
-</form>
-
-
-
-      
+        <button type="submit">Sign In</button>
+      </form>
     </main>
   )
 }
