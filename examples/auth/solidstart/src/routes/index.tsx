@@ -87,7 +87,7 @@ export default function Home() {
       }}>
         <p>
           Powered by{' '}
-          <a href="https://supabase.com" target="_blank" style={{ color: '#10b981', 'font-weight': 'bold' }}>
+          <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', 'font-weight': 'bold' }}>
             Supabase
           </a>
         </p>

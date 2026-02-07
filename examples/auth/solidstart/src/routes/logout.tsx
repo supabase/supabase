@@ -1,7 +1,7 @@
-import { action, redirect } from '@solidjs/router'
+import { action, redirect, useAction } from '@solidjs/router'
 import { createClient } from '~/lib/supabase/server'
 
-export const POST = action(async () => {
+const logoutAction = action(async () => {
   'use server'
   const supabase = createClient()
   await supabase.auth.signOut()
@@ -9,5 +9,11 @@ export const POST = action(async () => {
 })
 
 export default function Logout() {
-  return null
+  const logout = useAction(logoutAction)
+
+  return (
+    <form action={logout} method="post">
+      <button type="submit">Sign Out</button>
+    </form>
+  )
 }
