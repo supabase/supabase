@@ -226,7 +226,7 @@ Deno.serve(async (req) => {
 */
 
 import { createOpenAI } from 'npm:@ai-sdk/openai';
-import { generateObject } from 'npm:ai';
+import { generateText, Output } from "npm:ai";
 import { z } from 'npm:zod';
 
 const corsHeaders = {
@@ -283,14 +283,16 @@ Deno.serve(async (req) => {
       typeof modelName === 'string' ? modelName : 'gpt-5.1-chat-latest',
     );
 
-    const result = await generateObject({
+    const result = await generateText({
       model,
       system: SYSTEM_PROMPT,
       prompt,
-      schema: RecipeSchema,
+      output: Output.object({
+        schema: RecipeSchema,
+      }),
     });
 
-    return json(200, result.object);
+    return json(200, result.output);
   } catch (err) {
     if (err instanceof ClientError) {
       return json(400, { error: err.message });
