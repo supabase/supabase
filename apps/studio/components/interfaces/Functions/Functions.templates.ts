@@ -186,13 +186,13 @@ Deno.serve(async (req) => {
       throw new ClientError('Request must include a messages array');
     }
 
-    const normalizedMessages = convertToModelMessages(messages);
+    const normalizedMessages = await convertToModelMessages(messages);
 
     const model = openai(
       typeof modelName === 'string' ? modelName : 'gpt-5.1-chat-latest',
     );
 
-    const result = await streamText({
+    const result = streamText({
       model,
       messages: normalizedMessages,
       system: SYSTEM_PROMPT,
