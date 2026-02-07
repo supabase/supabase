@@ -27,7 +27,7 @@ To access the auth token securely for your Edge Function call, we recommend stor
 
 ### Invoke an Edge Function every minute
 
-Store `project_url` and `anon_key` in Supabase Vault:
+Store `project_url` and `publishable_key` in Supabase Vault:
 
 ```sql
 select vault.create_secret('https://project-ref.supabase.co', 'project_url');
