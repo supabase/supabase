@@ -1,7 +1,8 @@
+import { useFlag } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Loading } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
 import { CreditCodeRedemption } from '@/components/interfaces/Organization/BillingSettings/CreditCodeRedemption'
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
@@ -16,14 +17,15 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import type { NextPageWithLayout } from '@/types'
 
 const RedeemCreditsContent = () => {
+  const redeemCodeEnabled = useFlag('redeemCodeEnabled')
+  const [selectedOrg, setSelectedOrg] = useState<string | null>(null)
+
   const {
     data: organizations,
     isLoading: areOrganizationsLoading,
     isFetched: isOrganizationsFetched,
     isSuccess: wasOrganizationsRequestSuccessful,
   } = useOrganizationsQuery()
-
-  const [selectedOrg, setSelectedOrg] = useState<string | null>(null)
 
   if (!isOrganizationsFetched) {
     return (
@@ -46,33 +48,46 @@ const RedeemCreditsContent = () => {
 
   return (
     <div className="grid md:grid-cols-2 pt-10 gap-8">
-      <div>
-        <p>
-          To redeem your credits, select one of your organizations. The credits will be applied to
-          that organization only and cannot be transferred or shared between organizations.
-        </p>
-        <p className="mt-8">
-          <span className="font-bold text-foreground-light">Want to start fresh?</span> Create a new
-          organization first. You will have to revisit this link after creating the organization to
-          redeem the code.
-        </p>
-        <Button asChild className="mt-4" size="tiny" type="primary">
-          <Link href={`/new`}>Create organization</Link>
-        </Button>
+      <div className="flex flex-col gap-y-8">
+        <div className="flex flex-col gap-y-1">
+          <p>To redeem your credits, select one of your organizations.</p>
+          <p className="text-sm text-foreground-light text-balance">
+            The credits will be applied to that organization only and cannot be transferred or
+            shared between organizations.
+          </p>
+        </div>
+
+        <div>
+          <p>Want to start fresh?</p>
+          <p className="mt-1 text-sm text-foreground-light text-balance">
+            Create a new organization first. You will have to revisit this link after creating the
+            organization to redeem the code.
+          </p>
+          <Button asChild className="mt-4 w-min" size="tiny" type="primary">
+            <Link href={`/new`}>Create organization</Link>
+          </Button>
+        </div>
       </div>
 
-      <div className="space-y-2">
-        {organizations?.map((org) => (
-          <div key={org.id} onClickCapture={() => setSelectedOrg(org.slug)}>
-            <OrganizationCard isLink={false} organization={org} />
-          </div>
-        ))}
+      <div className="flex flex-col gap-y-2">
+        {redeemCodeEnabled ? (
+          organizations?.map((org) => (
+            <OrganizationCard
+              key={org.id}
+              isLink={false}
+              organization={org}
+              onClick={() => setSelectedOrg(org.slug)}
+            />
+          ))
+        ) : (
+          <Admonition type="note" title="Code redemption coming soon" />
+        )}
       </div>
 
       {selectedOrg && (
         <CreditCodeRedemption
+          modalVisible
           slug={selectedOrg}
-          modalVisible={true}
           onClose={() => setSelectedOrg(null)}
         />
       )}
