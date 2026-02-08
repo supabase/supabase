@@ -237,7 +237,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1]',
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
@@ -255,7 +255,9 @@ export const Grid = memo(
                 <>
                   {page > 1 ? (
                     <div className="flex flex-col items-center justify-center">
-                      <p className="text-sm text-light">This page does not have any data</p>
+                      <p className="text-sm text-light pointer-events-auto">
+                        This page does not have any data
+                      </p>
                       <div className="flex items-center space-x-2 mt-4">
                         <Button
                           type="default"
