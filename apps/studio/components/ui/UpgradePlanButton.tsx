@@ -1,13 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { PropsWithChildren } from 'react'
-
 import { useFlag, useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import Link from 'next/link'
+import { PropsWithChildren } from 'react'
 import { Button } from 'ui'
+
 import { ButtonTooltip } from './ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from './RequestUpgradeToBillingOwners'
 
@@ -24,6 +24,8 @@ interface UpgradePlanButtonProps {
   featureProposition?: string
   disabled?: boolean
   className?: string
+  slug?: string
+  size?: 'tiny' | 'medium'
 }
 
 /**
@@ -40,18 +42,22 @@ export const UpgradePlanButton = ({
   disabled,
   children,
   className,
+  slug: slugParam,
+  size,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan?.id === 'free'
-  const slug = organization?.slug ?? '_'
+  const slug = slugParam ?? organization?.slug ?? '_'
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
   const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+    'stripe.subscriptions',
+    undefined,
+    { organizationSlug: slug }
   )
 
   const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
@@ -85,6 +91,7 @@ export const UpgradePlanButton = ({
         addon={addon}
         featureProposition={featureProposition}
         className={className}
+        size={size}
       >
         {children}
       </RequestUpgradeToBillingOwners>
@@ -96,6 +103,7 @@ export const UpgradePlanButton = ({
       <ButtonTooltip
         disabled
         type={variant}
+        size={size}
         className={className}
         tooltip={{
           content: {
@@ -110,7 +118,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={variant} disabled={disabled} className={className}>
+    <Button asChild type={variant} size={size} disabled={disabled} className={className}>
       {link}
     </Button>
   )

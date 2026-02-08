@@ -5,12 +5,10 @@ import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Calendar, PartyPopper } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -25,10 +23,11 @@ import {
   Input_Shadcn_,
   Separator,
 } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
@@ -79,12 +78,17 @@ export const CreditCodeRedemption = ({
   })
 
   const {
-    mutateAsync: redeemCode,
+    mutate: redeemCode,
     isPending: redeemingCode,
     error: errorRedeemingCode,
     data: codeRedemptionResult,
     reset: resetCodeRedemption,
-  } = useOrganizationCreditCodeRedemptionMutation()
+  } = useOrganizationCreditCodeRedemptionMutation({
+    onSuccess: () => {
+      form.setValue('code', '')
+      resetCaptcha()
+    },
+  })
 
   const resetCaptcha = () => {
     captchaTokenRef.current = null
@@ -111,16 +115,7 @@ export const CreditCodeRedemption = ({
 
   const onSubmit: SubmitHandler<CreditCodeRedemptionForm> = async ({ code }) => {
     const token = await initHcaptcha()
-
-    await redeemCode(
-      { slug, code, hcaptchaToken: token },
-      {
-        onSuccess: () => {
-          form.setValue('code', '')
-          resetCaptcha()
-        },
-      }
-    )
+    redeemCode({ slug, code, hcaptchaToken: token })
   }
 
   const onCodeRedemptionDialogVisibilityChange = (visible: boolean) => {
@@ -198,11 +193,11 @@ export const CreditCodeRedemption = ({
         {codeRedemptionResult ? (
           <div className="p-8">
             <div className="text-center flex items-center justify-center">
-              <PartyPopper className="h-20 w-20" />
+              <PartyPopper strokeWidth={1} className="h-14 w-14" />
             </div>
 
             <div className="text-center">
-              <p className="font-bold text-lg mt-2">Credits Redeemed!</p>
+              <p className=" text-lg mt-2">Credits redeemed!</p>
             </div>
             <Separator className="my-4" />
             <div className="flex w-full justify-center items-center">
@@ -217,12 +212,12 @@ export const CreditCodeRedemption = ({
               <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-4 rounded-lg">
                 <Calendar className="h-4 w-4" />
                 <span>
-                  {'Expires on '}
-                  {new Date(codeRedemptionResult.credits_expire_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+                  Expires on{' '}
+                  <TimestampInfo
+                    className="text-sm"
+                    utcTimestamp={codeRedemptionResult.credits_expire_at}
+                    labelFormat="MMMM DD, YYYY"
+                  />
                 </span>
               </div>
             )}
@@ -230,11 +225,15 @@ export const CreditCodeRedemption = ({
             {org?.plan.id === 'free' && (
               <div className="mt-4 space-y-4">
                 <Separator />
-                <Button className="w-full" size={'medium'} type="primary" asChild>
-                  <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>
-                    Upgrade Your Organization
-                  </Link>
-                </Button>
+                <UpgradePlanButton
+                  plan="Pro"
+                  className="w-full"
+                  source="code-redeem"
+                  size="medium"
+                  slug={org.slug}
+                >
+                  Upgrade organization
+                </UpgradePlanButton>
               </div>
             )}
           </div>
@@ -288,9 +287,9 @@ export const CreditCodeRedemption = ({
 
                     <Admonition type="note" title="Potential future charges">
                       <p>
-                        Credits are applied to <strong>{org?.name}</strong> only and can't be shared
-                        or transferred to other organizations. Credits are automatically used toward
-                        invoices.
+                        Credits are applied to <strong>{org?.name}</strong> only and cannot be
+                        shared or transferred to other organizations. Credits are automatically used
+                        toward invoices.
                       </p>
                       <p className="mt-2">
                         When credits run out on a paid plan, your default payment method will be
