@@ -3,7 +3,7 @@ import { readdir, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-import { FunctionArtifact } from './types'
+import { FunctionArtifact, FunctionFileEntry } from './types'
 
 export class FileSystemFunctionsArtifactStore {
   constructor(private folderPath: string) {}
@@ -28,6 +28,34 @@ export class FileSystemFunctionsArtifactStore {
     if (!functionFolder) return
 
     return parseFolderToFunctionArtifact(functionFolder)
+  }
+
+  async getFileEntriesBySlug(slug: string): Promise<Array<FunctionFileEntry>> {
+    if (slug === 'main') return []
+
+    const functionFolderPath = path.resolve(this.folderPath, slug)
+    if (!functionFolderPath.startsWith(path.resolve(this.folderPath) + path.sep)) return []
+
+    const entries = await readdir(functionFolderPath, {
+      recursive: true,
+      withFileTypes: true,
+    })
+
+    const fileEntries = await Promise.all(
+      entries
+        .filter((entry) => entry.isFile())
+        .map(async (entry) => {
+          const absolutePath = path.join(entry.parentPath, entry.name)
+          const fileStat = await stat(absolutePath)
+          return {
+            absolutePath,
+            relativePath: path.relative(functionFolderPath, absolutePath),
+            size: fileStat.size,
+          }
+        })
+    )
+
+    return fileEntries
   }
 }
 

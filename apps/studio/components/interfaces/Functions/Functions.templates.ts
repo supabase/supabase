@@ -136,37 +136,175 @@ app.get(/slug/(.*)/, (req, res) => {
 app.listen(8000);`,
   },
   {
-    value: 'openai-completion',
-    name: 'OpenAI Text Completion',
-    description: 'Generate text completions using OpenAI GPT-3',
-    content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts"
-import { OpenAI } from "npm:openai@4.8.0"
+    value: 'stream-text-with-ai-sdk',
+    name: 'Stream text with AI SDK',
+    description: 'Generate and stream text with Vercel AI SDK',
+    content: `/*
+ * Setup OPENAI_API_KEY secret to get started.
+ * For usage with useChat, point transport.api to this endpoint
+ * and include your publishable key as Authorization: Bearer <key> in transport.headers.
+ */
 
-const openai = new OpenAI({
-  apiKey: Deno.env.get('OPENAI_API_KEY')
-})
+import { createOpenAI } from 'npm:@ai-sdk/openai';
+import { convertToModelMessages, streamText } from 'npm:ai';
 
-Deno.serve(async (req)=>{
-  const { prompt } = await req.json()
-  const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
-    messages: [
-      {
-        role: "user",
-        content: prompt
-      }
-    ]
-  })
-  return new Response(JSON.stringify({
-    text: response.choices[0].message.content
-  }), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Connection': 'keep-alive'
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, content-type',
+  'Access-Control-Max-Age': '3600',
+  Vary: 'Access-Control-Request-Headers',
+};
+
+const json = (status: number, body: unknown) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+
+class ClientError extends Error {}
+
+const openai = createOpenAI({
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+});
+
+const SYSTEM_PROMPT = 'You are a helpful AI assistant.';
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    const body = await req.json().catch(() => {
+      throw new ClientError('Invalid JSON payload');
+    }) as { messages?: unknown; model?: unknown };
+
+    const { messages, model: modelName } = body;
+
+    if (!Array.isArray(messages)) {
+      throw new ClientError('Request must include a messages array');
     }
-  })
-})`,
+
+    const normalizedMessages = await convertToModelMessages(messages);
+
+    const model = openai(
+      typeof modelName === 'string' ? modelName : 'gpt-5.1-chat-latest',
+    );
+
+    const result = streamText({
+      model,
+      messages: normalizedMessages,
+      system: SYSTEM_PROMPT,
+    });
+
+    return result.toUIMessageStreamResponse({
+      headers: corsHeaders,
+      sendReasoning: true,
+      sendSources: true,
+    });
+  } catch (err) {
+    if (err instanceof ClientError) {
+      return json(400, { error: err.message });
+    }
+
+    console.error('Assistant chat error:', err);
+    return json(500, {
+      error: 'Failed to process chat request',
+      details: err instanceof Error ? err.message : String(err),
+    });
+  }
+});`,
+  },
+  {
+    value: 'generate-recipes-with-ai-sdk',
+    name: 'Generate recipes with AI SDK',
+    description: 'Generate structured cooking recipes with Vercel AI SDK',
+    content: `/*
+* 1) Setup OPENAI_API_KEY secret to get started.
+* 2) Call this endpoint with { prompt, model? } to generate a recipe object matching the schema below.
+*/
+
+import { createOpenAI } from 'npm:@ai-sdk/openai';
+import { generateText, Output } from "npm:ai";
+import { z } from 'npm:zod';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, content-type',
+  'Access-Control-Max-Age': '3600',
+  Vary: 'Access-Control-Request-Headers',
+};
+
+const json = (status: number, body: unknown) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+
+class ClientError extends Error {}
+
+const openai = createOpenAI({
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+});
+
+const RecipeSchema = z.object({
+  recipe: z.object({
+    name: z.string(),
+    ingredients: z.array(z.string()),
+    steps: z.array(z.string()),
+  }),
+});
+
+const SYSTEM_PROMPT =
+  'You are a recipe generator. Always return a structured recipe matching the given schema.';
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    const body = await req.json().catch(() => {
+      throw new ClientError('Invalid JSON payload');
+    }) as {
+      model?: unknown;
+      prompt?: unknown;
+    };
+
+    const { model: modelName, prompt } = body;
+
+    if (typeof prompt !== 'string' || !prompt.trim()) {
+      throw new ClientError('Request must include a non-empty prompt string');
+    }
+
+    const model = openai(
+      typeof modelName === 'string' ? modelName : 'gpt-5.1-chat-latest',
+    );
+
+    const result = await generateText({
+      model,
+      system: SYSTEM_PROMPT,
+      prompt,
+      output: Output.object({
+        schema: RecipeSchema,
+      }),
+    });
+
+    return json(200, result.output);
+  } catch (err) {
+    if (err instanceof ClientError) {
+      return json(400, { error: err.message });
+    }
+
+    console.error('generateText error:', err);
+    return json(500, {
+      error: 'Failed to process generateText request',
+      details: err instanceof Error ? err.message : String(err),
+    });
+  }
+});`,
   },
   {
     value: 'stripe-webhook',

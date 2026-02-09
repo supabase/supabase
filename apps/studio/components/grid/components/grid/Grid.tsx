@@ -237,7 +237,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute top-9 p-2 w-full z-[1]',
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1]',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
@@ -245,14 +245,16 @@ export const Grid = memo(
               onDragLeave={onDragOver}
               onDrop={onFileDrop}
             >
-              {isLoading && !isDisabled && <GenericSkeletonLoader />}
+              {isLoading && !isDisabled && (
+                <GenericSkeletonLoader className="w-full top-9 absolute p-2" />
+              )}
 
               {isError && <GridError error={error} />}
 
               {isSuccess && (
                 <>
                   {page > 1 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light">This page does not have any data</p>
                       <div className="flex items-center space-x-2 mt-4">
                         <Button
@@ -265,7 +267,7 @@ export const Grid = memo(
                       </div>
                     </div>
                   ) : (filters ?? []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light pointer-events-auto">
                         {isDraggedOver ? (
                           isValidFileDraggedOver ? (
@@ -312,7 +314,7 @@ export const Grid = memo(
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light pointer-events-auto">
                         The filters applied have returned no results from this table
                       </p>
