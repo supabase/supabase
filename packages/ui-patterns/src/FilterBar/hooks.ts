@@ -18,6 +18,7 @@ export function useFilterBarState() {
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [activeInput, setActiveInput] = useState<ActiveInput>(null)
   const newPathRef = useRef<number[]>([])
+  const [highlightedConditionPath, setHighlightedConditionPath] = useState<number[] | null>(null)
 
   return {
     isLoading,
@@ -30,6 +31,8 @@ export function useFilterBarState() {
     activeInput,
     setActiveInput,
     newPathRef,
+    highlightedConditionPath,
+    setHighlightedConditionPath,
   }
 }
 
@@ -122,7 +125,8 @@ export function useDeferredBlur(wrapperRef: React.RefObject<HTMLElement>, onBlur
 export function useHighlightNavigation(
   itemsLength: number,
   onEnter: (index: number) => void,
-  fallbackKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  fallbackKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void,
+  options?: { skipEnterWhenFilterHighlighted?: boolean }
 ) {
   const [highlightedIndex, setHighlightedIndex] = useState(0)
 
@@ -145,7 +149,11 @@ export function useHighlightNavigation(
         return
       }
       if (e.key === 'Enter' || e.key === 'Tab') {
-        // Only select dropdown item if there are items available
+        // Edge case: when a filter is highlighted, skip dropdown selection and let fallback handle it
+        if (options?.skipEnterWhenFilterHighlighted) {
+          if (fallbackKeyDown) fallbackKeyDown(e)
+          return
+        }
         if (itemsLength > 0) {
           e.preventDefault()
           onEnter(highlightedIndex)
@@ -160,7 +168,13 @@ export function useHighlightNavigation(
       }
       if (fallbackKeyDown) fallbackKeyDown(e)
     },
-    [itemsLength, highlightedIndex, onEnter, fallbackKeyDown]
+    [
+      itemsLength,
+      highlightedIndex,
+      onEnter,
+      fallbackKeyDown,
+      options?.skipEnterWhenFilterHighlighted,
+    ]
   )
 
   const reset = useCallback(() => setHighlightedIndex(0), [])

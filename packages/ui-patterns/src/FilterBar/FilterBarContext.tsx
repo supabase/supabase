@@ -24,6 +24,7 @@ export type FilterBarContextValue = {
   freeformText: string
   isLoading: boolean
   error: string | null
+  highlightedConditionPath: number[] | null
 
   // Handlers
   onFilterChange: (filters: FilterGroup) => void
@@ -110,6 +111,8 @@ export function FilterBarRoot({
     setActiveInput,
     newPathRef,
     setIsCommandMenuVisible,
+    highlightedConditionPath,
+    setHighlightedConditionPath,
   } = useFilterBarState()
 
   const { loadingOptions, propertyOptionsCache, loadPropertyOptions, optionsError } =
@@ -163,6 +166,8 @@ export function FilterBarRoot({
     setActiveInput,
     activeFilters: filters,
     onFilterChange,
+    highlightedConditionPath,
+    setHighlightedConditionPath,
   })
 
   const handleInputFocus = useCallback(
@@ -229,14 +234,20 @@ export function FilterBarRoot({
       }
       setIsCommandMenuVisible(false)
       setActiveInput(null)
+      // Clear highlight when clicking outside
+      setHighlightedConditionPath(null)
     }, 0)
-  }, [setIsCommandMenuVisible, setActiveInput, hideTimeoutRef])
+  }, [setIsCommandMenuVisible, setActiveInput, hideTimeoutRef, setHighlightedConditionPath])
 
   const handleGroupFreeformChange = useCallback(
     (_path: number[], value: string) => {
+      // Clear highlight when user types
+      if (highlightedConditionPath) {
+        setHighlightedConditionPath(null)
+      }
       onFreeformTextChange(value)
     },
-    [onFreeformTextChange]
+    [onFreeformTextChange, highlightedConditionPath, setHighlightedConditionPath]
   )
 
   const handleLabelClick = useCallback(
@@ -282,6 +293,7 @@ export function FilterBarRoot({
     freeformText,
     isLoading: loading,
     error,
+    highlightedConditionPath,
 
     // Handlers
     onFilterChange,
