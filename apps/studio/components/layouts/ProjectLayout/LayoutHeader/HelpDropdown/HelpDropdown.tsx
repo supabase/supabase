@@ -21,7 +21,7 @@ import {
 } from 'ui'
 
 import { ASSISTANT_SUGGESTIONS } from './HelpDropdown.constants'
-import { getSupportLinkQueryParams } from './HelpOptions.utils'
+import { getSupportLinkQueryParams } from './HelpDropdown.utils'
 import { HelpSection } from './HelpSection'
 
 export const HelpDropdown = () => {
