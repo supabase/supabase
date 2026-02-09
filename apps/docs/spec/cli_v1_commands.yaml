@@ -78,7 +78,7 @@ flags:
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: "yes"
+  - id: 'yes'
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'

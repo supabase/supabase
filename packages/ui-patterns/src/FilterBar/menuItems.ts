@@ -3,8 +3,8 @@ import { FilterBarAction, FilterGroup, FilterProperty } from './types'
 import {
   findConditionByPath,
   isCustomOptionObject,
-  isFilterOptionObject,
   isFilterOperatorObject,
+  isFilterOptionObject,
 } from './utils'
 
 export type MenuItem = {
@@ -36,12 +36,17 @@ export function buildOperatorItems(
   return availableOperators
     .filter((op) => {
       if (!shouldFilter) return true
-      const searchText = isFilterOperatorObject(op) ? op.value : op
-      return searchText.toUpperCase().includes(operatorValue)
+      if (isFilterOperatorObject(op)) {
+        return (
+          op.value.toUpperCase().includes(operatorValue) ||
+          op.label.toUpperCase().includes(operatorValue)
+        )
+      }
+      return op.toUpperCase().includes(operatorValue)
     })
     .map((op) => {
       if (isFilterOperatorObject(op)) {
-        return { value: op.value, label: op.label }
+        return { value: op.value, label: `${op.label} (${op.value})` }
       }
       return { value: op, label: op }
     })

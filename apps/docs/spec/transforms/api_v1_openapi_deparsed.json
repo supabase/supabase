@@ -172,6 +172,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_read"]
+          },
+          {
+            "fga_permissions": ["branching_development_read"]
           }
         ],
         "summary": "Get database branch config",
@@ -374,6 +380,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Update database branch config",
@@ -449,6 +461,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_delete"]
+          },
+          {
+            "fga_permissions": ["branching_development_delete"]
           }
         ],
         "summary": "Delete a database branch",
@@ -534,6 +552,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Pushes a database branch",
@@ -619,6 +643,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Merges a database branch",
@@ -704,6 +734,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Resets a database branch",
@@ -771,6 +807,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Restore a scheduled branch deletion",
@@ -839,6 +881,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "[Beta] Diffs a database branch",
@@ -3783,6 +3831,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_read"]
+          },
+          {
+            "fga_permissions": ["branching_development_read"]
           }
         ],
         "summary": "List all database branches",
@@ -4017,6 +4071,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_create"]
+          },
+          {
+            "fga_permissions": ["branching_development_create"]
           }
         ],
         "summary": "Create a database branch",
@@ -4236,6 +4296,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_read"]
+          },
+          {
+            "fga_permissions": ["branching_development_read"]
           }
         ],
         "summary": "Get a database branch",
@@ -15465,6 +15531,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["database_write"]
           },
           {
             "fga_permissions": ["database_read"]

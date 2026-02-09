@@ -1,19 +1,19 @@
-import { Input, Checkbox_Shadcn_ as Checkbox, Textarea, Button } from 'ui'
+import { Button, Checkbox_Shadcn_ as Checkbox, Input, Textarea } from 'ui'
 import {
-  FieldSet,
-  FieldLegend,
-  FieldDescription,
   Field,
-  FieldLabel,
+  FieldDescription,
   FieldGroup,
+  FieldLabel,
+  FieldLegend,
   FieldSeparator,
+  FieldSet,
 } from 'ui/src/components/shadcn/ui/field'
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui/src/components/shadcn/ui/select'
 
 export default function FieldDemo() {

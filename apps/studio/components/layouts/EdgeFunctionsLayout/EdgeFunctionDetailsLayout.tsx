@@ -119,15 +119,15 @@ const EdgeFunctionDetailsLayout = ({
                 label: 'Logs',
                 href: `/project/${ref}/functions/${functionSlug}/logs`,
               },
-              {
-                label: 'Code',
-                href: `/project/${ref}/functions/${functionSlug}/code`,
-              },
             ]
           : []),
         {
           label: 'Details',
           href: `/project/${ref}/functions/${functionSlug}/details`,
+        },
+        {
+          label: 'Code',
+          href: `/project/${ref}/functions/${functionSlug}/code`,
         },
       ]
     : []
@@ -264,15 +264,15 @@ const EdgeFunctionDetailsLayout = ({
                   />
                 )}
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                {IS_PLATFORM && (
-                  <>
-                    <Popover_Shadcn_>
-                      <PopoverTrigger_Shadcn_ asChild>
-                        <Button type="default" icon={<Download />}>
-                          Download
-                        </Button>
-                      </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_ align="end" className="p-0">
+                <Popover_Shadcn_>
+                  <PopoverTrigger_Shadcn_ asChild>
+                    <Button type="default" icon={<Download />}>
+                      Download
+                    </Button>
+                  </PopoverTrigger_Shadcn_>
+                  <PopoverContent_Shadcn_ align="end" className="p-0">
+                    {IS_PLATFORM && (
+                      <>
                         <div className="p-3 flex flex-col gap-y-2">
                           <p className="text-xs text-foreground-light">Download via CLI</p>
                           <Input
@@ -285,18 +285,22 @@ const EdgeFunctionDetailsLayout = ({
                           />
                         </div>
                         <Separator className="!bg-border-overlay" />
-                        <div className="py-2 px-1">
-                          <Button
-                            type="text"
-                            className="w-min hover:bg-transparent"
-                            icon={<FileArchive />}
-                            onClick={downloadFunction}
-                          >
-                            Download as ZIP
-                          </Button>
-                        </div>
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
+                      </>
+                    )}
+                    <div className="py-2 px-1">
+                      <Button
+                        type="text"
+                        className="w-min hover:bg-transparent"
+                        icon={<FileArchive />}
+                        onClick={downloadFunction}
+                      >
+                        Download as ZIP
+                      </Button>
+                    </div>
+                  </PopoverContent_Shadcn_>
+                </Popover_Shadcn_>
+                {IS_PLATFORM && (
+                  <>
                     {!!functionSlug && (
                       <Button
                         type="default"

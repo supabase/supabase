@@ -1,13 +1,13 @@
 import {
-  FilterGroup,
-  FilterCondition,
-  FilterProperty,
-  CustomOptionObject,
-  FilterOptionObject,
-  FilterOperatorObject,
   AsyncOptionsFunction,
-  SyncOptionsFunction,
+  CustomOptionObject,
+  FilterCondition,
+  FilterGroup,
+  FilterOperatorObject,
+  FilterOptionObject,
+  FilterProperty,
   isGroup,
+  SyncOptionsFunction,
 } from './types'
 
 export function pathsEqual(a: number[], b: number[]): boolean {
@@ -133,17 +133,9 @@ export function addFilterToGroup(
   property: FilterProperty
 ): FilterGroup {
   if (path.length === 0) {
-    const firstOperator = property.operators?.[0] || '='
-    const operatorValue = isFilterOperatorObject(firstOperator)
-      ? firstOperator.value
-      : firstOperator
-
     return {
       ...group,
-      conditions: [
-        ...group.conditions,
-        { propertyName: property.name, value: '', operator: operatorValue },
-      ],
+      conditions: [...group.conditions, { propertyName: property.name, value: '', operator: '' }],
     }
   }
 

@@ -1,11 +1,12 @@
 'use client'
 
+import { stringify as stringifyToml } from '@std/toml/stringify'
+import yaml from 'js-yaml'
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
-import yaml from 'js-yaml'
-import { stringify as stringifyToml } from '@std/toml/stringify'
 import { Button, cn } from 'ui'
 import { CodeBlock, type CodeBlockLang } from 'ui/src/components/CodeBlock'
+
 import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
 import { getMcpButtonData } from '../utils/getMcpButtonData'
 
