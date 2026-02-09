@@ -7,12 +7,12 @@ import { useContextMenu } from 'react-contexify'
 import { toast } from 'sonner'
 
 import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Checkbox, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
@@ -57,15 +57,15 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
 }
 
 export interface FileExplorerColumnProps {
-  index: number
+  index?: number
   column: StorageColumn
   fullWidth?: boolean
-  selectedItems: StorageItemWithColumn[]
-  itemSearchString: string
-  onFilesUpload: (event: any, index: number) => void
-  onSelectAllItemsInColumn: (index: number) => void
-  onSelectColumnEmptySpace: (index: number) => void
-  onColumnLoadMore: (index: number, column: StorageColumn) => void
+  selectedItems?: StorageItemWithColumn[]
+  itemSearchString?: string
+  onFilesUpload?: (event: any, index: number) => void
+  onSelectAllItemsInColumn?: (index: number) => void
+  onSelectColumnEmptySpace?: (index: number) => void
+  onColumnLoadMore?: (index: number, column: StorageColumn) => void
 }
 
 export const FileExplorerColumn = ({
@@ -73,7 +73,7 @@ export const FileExplorerColumn = ({
   column,
   fullWidth = false,
   selectedItems = [],
-  itemSearchString,
+  itemSearchString = '',
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,

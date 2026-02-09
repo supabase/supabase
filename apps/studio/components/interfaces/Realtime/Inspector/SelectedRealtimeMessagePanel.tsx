@@ -23,7 +23,7 @@ export const SelectedRealtimeMessagePanel = ({ log }: { log: LogData }) => {
       </div>
       <LogsDivider />
       <div className="px-8">
-        <h3 className="mb-4 text-sm text-foreground-lighter">Metadata</h3>
+        <h3 className="mb-4 text-sm text-foreground-lighter">Payload</h3>
         <pre className="syntax-highlight overflow-x-auto text-sm">
           <div
             className="text-wrap"

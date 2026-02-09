@@ -1,24 +1,34 @@
 ---
 title: 'Analytics Buckets'
-subtitle: ''
+subtitle: 'Store large datasets for analytics and reporting.'
 ---
 
-<Admonition type="caution">
+<Admonition type="caution" title="This feature is in alpha">
 
-This feature is in **Private Alpha**. API stability and backward compatibility are not guaranteed at this stage. Reach out from this [Form](https://forms.supabase.com/analytics-buckets) to request access
+Expect rapid changes, limited features, and possible breaking updates. [share feedback](https://github.com/orgs/supabase/discussions/40116) as we refine the experience and expand access.
 
 </Admonition>
 
-**Analytics Buckets** are designed for analytical workflows on large datasets without impacting your main database.
+Analytics buckets enable analytical workflows on large-scale datasets while keeping your primary database optimized for transactional operations.
 
-Postgres tables are optimized for handling real-time, transactional workloads with frequent inserts, updates, deletes and low-latency queries. **Analytical workloads** have very different requirements: processing large volumes of historical data, running complex queries and aggregations, minimizing storage costs, and ensuring these analytical queries do not interfere with the production traffic.
+## Why Analytics buckets?
 
-**Analytics Buckets** address these requirements using [Apache Iceberg](https://iceberg.apache.org/), an open-table format for managing large analytical datasets efficiently.
+Postgres tables are purpose-built for transactional workloads with frequent inserts, updates, deletes, and low-latency queries. Analytical workloads have fundamentally different requirements:
 
-Analytics Buckets are ideal for
-• Data warehousing and business intelligence
-• Historical data archiving
-• Periodically refreshed real-time analytics
-• Complex analytical queries over large datasets
+- Processing large volumes of historical data
+- Running complex queries and aggregations
+- Minimizing storage costs
+- Preventing analytical queries from impacting production traffic
 
-By separating transactional and analytical workloads, Supabase makes it easy to build scalable analytics pipelines without impacting your primary Postgres performance.
+Analytics buckets address these requirements using [Apache Iceberg](https://iceberg.apache.org/), an open-table format specifically designed for efficient management of large analytical datasets.
+
+## Ideal use cases
+
+Analytics buckets are perfect for:
+
+- **Data warehousing and business intelligence** - Build scalable data warehouses for BI tools
+- **Historical data archiving** - Retain large volumes of historical data cost-effectively
+- **Periodically refreshed analytics** - Maintain near real-time analytical views
+- **Complex analytical queries** - Execute sophisticated aggregations and joins over large datasets
+
+By separating transactional and analytical workloads, Supabase lets you build scalable analytics pipelines without compromising your primary Postgres performance.

@@ -1,17 +1,7 @@
-import {
-  BarChart3,
-  Code,
-  Database,
-  GitBranch,
-  Shield,
-  Table,
-  Upload,
-  User,
-  UserPlus,
-} from 'lucide-react'
-
-import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
+import { DOCS_URL } from 'lib/constants'
+import { BarChart3, Code, Database, GitBranch, Shield, Table, Upload, UserPlus } from 'lucide-react'
 import { AiIconAnimation, CodeBlock } from 'ui'
+
 import type { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 import type { GettingStartedStatuses } from './useGettingStartedProgress'
 
@@ -74,7 +64,7 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Create schema file',
-          href: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
+          href: `${DOCS_URL}/guides/local-development/declarative-database-schemas`,
           variant: 'default',
         },
         {
@@ -99,7 +89,7 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Create a seed file',
-          href: 'https://supabase.com/docs/guides/local-development/seeding-your-database',
+          href: `${DOCS_URL}/guides/local-development/seeding-your-database`,
           variant: 'default',
         },
         {
@@ -145,7 +135,7 @@ export const getCodeWorkflowSteps = ({
       title: 'Connect your application',
       icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
       description:
-        'Your project is ready; use the framework selector to preview starter code and launch the Connect flow with the client library you prefer.',
+        'Your project is ready; open the Connect sheet to grab connection details and setup guidance.',
       actions: connectActions,
     },
     {
@@ -158,7 +148,7 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Read docs',
-          href: 'https://supabase.com/docs/guides/auth',
+          href: `${DOCS_URL}/guides/auth`,
           variant: 'default',
         },
       ],
@@ -173,12 +163,12 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Create a bucket via SQL',
-          href: 'https://supabase.com/docs/guides/storage/buckets/creating-buckets?queryGroups=language&language=sql',
+          href: `${DOCS_URL}/guides/storage/buckets/creating-buckets?queryGroups=language&language=sql`,
           variant: 'default',
         },
         {
           label: 'Upload a file',
-          href: 'https://supabase.com/docs/guides/storage/uploads/standard-uploads',
+          href: `${DOCS_URL}/guides/storage/uploads/standard-uploads`,
           variant: 'default',
         },
       ],
@@ -193,7 +183,7 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Create and deploy via CLI',
-          href: `https://supabase.com/docs/guides/functions/quickstart`,
+          href: `${DOCS_URL}/guides/functions/quickstart`,
           variant: 'default',
         },
         { label: 'View functions', href: `/project/${ref}/functions`, variant: 'default' },
@@ -318,7 +308,7 @@ export const getNoCodeWorkflowSteps = ({
       title: 'Connect your application',
       icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
       description:
-        'Your project is ready; use the framework selector to preview starter code and launch the Connect flow to wire up your app.',
+        'Your project is ready; open the Connect sheet to grab connection details and setup guidance.',
       actions: connectActions,
     },
     {
@@ -331,7 +321,7 @@ export const getNoCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Read docs',
-          href: 'https://supabase.com/docs/guides/auth',
+          href: `${DOCS_URL}/guides/auth`,
           variant: 'default',
         },
       ],
@@ -343,7 +333,7 @@ export const getNoCodeWorkflowSteps = ({
       icon: <Upload strokeWidth={1} className="text-foreground-muted" size={16} />,
       description:
         "Let's add file storage to your app by creating a bucket and uploading your first file from the buckets dashboard.",
-      actions: [{ label: 'Buckets', href: `/project/${ref}/storage/buckets`, variant: 'default' }],
+      actions: [{ label: 'Buckets', href: `/project/${ref}/storage/files`, variant: 'default' }],
     },
     {
       key: 'create-edge-function',
@@ -386,5 +376,3 @@ export const getNoCodeWorkflowSteps = ({
     },
   ]
 }
-
-export const DEFAULT_FRAMEWORK_KEY = FRAMEWORKS[0]?.key ?? 'nextjs'

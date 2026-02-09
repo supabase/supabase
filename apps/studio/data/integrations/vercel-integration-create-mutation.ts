@@ -37,7 +37,7 @@ export async function createVercelIntegration({
 
   if (error) handleError(error)
   // [Joshen] API isn't typed on this endpoint
-  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/integrations/vercel/vercel-integration.controller.ts#L50
+  // https://github.com/supabase/platform/blob/develop/api/src/routes/platform/integrations/vercel/vercel-integration.controller.ts#L50
   return data as { id: string }
 }
 

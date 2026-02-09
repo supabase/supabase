@@ -1,9 +1,4 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { isEmpty, noop } from 'lodash'
-import { ExternalLink, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import {
@@ -19,9 +14,14 @@ import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { isEmpty, noop } from 'lodash'
+import { ExternalLink, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import type { Dictionary } from 'types'
 import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
-import ActionBar from '../ActionBar'
+
+import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -62,7 +62,7 @@ export interface ColumnEditorProps {
   updateEditorDirty: () => void
 }
 
-const ColumnEditor = ({
+export const ColumnEditor = ({
   column,
   selectedTable,
   visible = false,
@@ -206,6 +206,7 @@ const ColumnEditor = ({
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
+          visible={visible}
         />
       }
     >
@@ -373,5 +374,3 @@ const ColumnEditor = ({
     </SidePanel>
   )
 }
-
-export default ColumnEditor

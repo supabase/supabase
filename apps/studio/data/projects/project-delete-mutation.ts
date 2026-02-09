@@ -5,6 +5,7 @@ import { del, handleError } from 'data/fetchers'
 import { organizationKeys } from 'data/organizations/keys'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { projectKeys } from './keys'
+import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
 
 export type ProjectDeleteVariables = {
   projectRef: string
@@ -31,27 +32,19 @@ export const useProjectDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   return useMutation<ProjectDeleteData, ResponseError, ProjectDeleteVariables>({
     mutationFn: (vars) => deleteProject(vars),
     async onSuccess(data, variables, context) {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
-        queryClient.invalidateQueries({ queryKey: projectKeys.detail(data.ref) }),
-      ])
+      await Promise.all([queryClient.invalidateQueries({ queryKey: projectKeys.detail(data.ref) })])
 
       if (variables.organizationSlug) {
         await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: projectKeys.infiniteListByOrg(variables.organizationSlug),
-          }),
+          invalidateProjectsQuery(),
           queryClient.invalidateQueries({
             queryKey: organizationKeys.detail(variables.organizationSlug),
           }),
-          queryClient.invalidateQueries({
-            queryKey: projectKeys.orgProjects(variables.organizationSlug),
-          }),
-
           queryClient.invalidateQueries({
             queryKey: organizationKeys.freeProjectLimitCheck(variables.organizationSlug),
           }),

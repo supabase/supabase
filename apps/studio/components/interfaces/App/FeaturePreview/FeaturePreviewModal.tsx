@@ -1,19 +1,20 @@
-import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode } from 'react'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
+import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
+import Link from 'next/link'
+import { ReactNode } from 'react'
+import { Badge, Button, cn, Modal, ScrollArea } from 'ui'
+
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
-import { SecurityNotificationsPreview } from './SecurityNotificationsPreview'
+import { QueueOperationsPreview } from './QueueOperationsPreview'
+import { TableFilterBarPreview } from './TableFilterBarPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
@@ -24,7 +25,8 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]: <SecurityNotificationsPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]: <QueueOperationsPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]: <TableFilterBarPreview />,
 }
 
 const FeaturePreviewModal = () => {
@@ -103,7 +105,7 @@ const FeaturePreviewModal = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-x-2">
                 <p>{selectedFeature?.name}</p>
-                {selectedFeature?.isNew && <Badge color="green">New</Badge>}
+                {selectedFeature?.isNew && <Badge variant="success">New</Badge>}
               </div>
               <div className="flex items-center gap-x-2">
                 {selectedFeature?.discussionsUrl !== undefined && (

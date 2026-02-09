@@ -1,13 +1,3 @@
-import { PageContainer } from 'ui-patterns/PageContainer'
-import {
-  PageHeader,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-  PageHeaderDescription,
-  PageHeaderAside,
-} from 'ui-patterns/PageHeader'
-import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import {
   Button,
   Card,
@@ -23,6 +13,16 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 export default function PageLayoutListSimple() {
   const items = [
@@ -34,7 +34,7 @@ export default function PageLayoutListSimple() {
   return (
     <div className="w-full">
       <PageHeader size="large">
-        <PageHeaderMeta size="large">
+        <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Projects</PageHeaderTitle>
             <PageHeaderDescription>

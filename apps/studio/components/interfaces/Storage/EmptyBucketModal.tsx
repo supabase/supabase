@@ -26,7 +26,7 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
   const { ref: projectRef } = useParams()
   const { fetchFolderContents } = useStorageExplorerStateSnapshot()
 
-  const { mutate: emptyBucket, isLoading } = useBucketEmptyMutation({
+  const { mutate: emptyBucket, isPending } = useBucketEmptyMutation({
     onSuccess: async () => {
       if (bucket === undefined) return
       await fetchFolderContents({
@@ -60,7 +60,7 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
         <DialogSectionSeparator />
         <Admonition
           type="destructive"
-          className="rounded-none border-x-0 border-t-0 mb-0"
+          className="rounded-none border-x-0 border-t-0"
           title="This action cannot be undone"
           description="The contents of your bucket cannot be recovered once deleted."
         />
@@ -70,10 +70,10 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
           </p>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={onClose}>
+          <Button type="default" disabled={isPending} onClick={onClose}>
             Cancel
           </Button>
-          <Button type="danger" loading={isLoading} onClick={onEmptyBucket}>
+          <Button type="danger" loading={isPending} onClick={onEmptyBucket}>
             Empty bucket
           </Button>
         </DialogFooter>

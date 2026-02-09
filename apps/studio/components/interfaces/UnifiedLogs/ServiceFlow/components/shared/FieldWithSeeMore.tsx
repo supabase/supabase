@@ -78,11 +78,7 @@ export const FieldWithSeeMore = ({
     }
 
     if (showValueAsBadge && primaryValue && primaryValue !== 'N/A') {
-      return (
-        <Badge variant="secondary" size="small">
-          {primaryValue}
-        </Badge>
-      )
+      return <Badge variant="secondary">{primaryValue}</Badge>
     }
 
     return (

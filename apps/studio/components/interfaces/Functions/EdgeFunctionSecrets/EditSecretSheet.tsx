@@ -61,7 +61,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
   const isValid = form.formState.isValid
 
   const { ref: projectRef } = useParams()
-  const { mutate: updateSecret, isLoading: isUpdating } = useSecretsCreateMutation({
+  const { mutate: updateSecret, isPending: isUpdating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully updated secret "${variables.secrets[0].name}"`)
       onClose()

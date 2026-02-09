@@ -1,13 +1,18 @@
 import {
-  FilterGroup,
-  FilterCondition,
-  FilterProperty,
-  CustomOptionObject,
-  FilterOptionObject,
   AsyncOptionsFunction,
-  SyncOptionsFunction,
+  CustomOptionObject,
+  FilterCondition,
+  FilterGroup,
+  FilterOperatorObject,
+  FilterOptionObject,
+  FilterProperty,
   isGroup,
+  SyncOptionsFunction,
 } from './types'
+
+export function pathsEqual(a: number[], b: number[]): boolean {
+  return a.length === b.length && a.every((v, i) => v === b[i])
+}
 
 export function findGroupByPath(group: FilterGroup, path: number[]): FilterGroup | null {
   if (path.length === 0) return group
@@ -51,6 +56,12 @@ export function isCustomOptionObject(option: any): option is CustomOptionObject 
 
 export function isFilterOptionObject(option: any): option is FilterOptionObject {
   return typeof option === 'object' && option !== null && 'value' in option && 'label' in option
+}
+
+export function isFilterOperatorObject(operator: any): operator is FilterOperatorObject {
+  return (
+    typeof operator === 'object' && operator !== null && 'value' in operator && 'label' in operator
+  )
 }
 
 export function isAsyncOptionsFunction(
@@ -124,10 +135,7 @@ export function addFilterToGroup(
   if (path.length === 0) {
     return {
       ...group,
-      conditions: [
-        ...group.conditions,
-        { propertyName: property.name, value: '', operator: property.operators?.[0] || '=' },
-      ],
+      conditions: [...group.conditions, { propertyName: property.name, value: '', operator: '' }],
     }
   }
 

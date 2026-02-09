@@ -37,7 +37,7 @@ const PROVIDER_EMAIL = {
       description:
         'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
       type: 'boolean',
-      link: 'https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection',
+      link: `${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection`,
       isPaid: true,
     },
     PASSWORD_MIN_LENGTH: {
@@ -523,7 +523,7 @@ const EXTERNAL_PROVIDER_APPLE = {
     EXTERNAL_APPLE_CLIENT_ID: string()
       .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(
-        /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+        /^([a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
         'Invalid characters. Each ID should follow a reverse-domain style string (e.g. com.example.app). Use commas to separate multiple IDs.'
       )
       .when('EXTERNAL_APPLE_ENABLED', {
@@ -1201,7 +1201,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
 const EXTERNAL_PROVIDER_TWITTER = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Twitter',
+  title: 'Twitter (Deprecated)',
   link: `${DOCS_URL}/guides/auth/social-login/auth-twitter`,
   properties: {
     EXTERNAL_TWITTER_ENABLED: {
@@ -1240,6 +1240,53 @@ const EXTERNAL_PROVIDER_TWITTER = {
   }),
   misc: {
     iconKey: 'twitter-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_X = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'X / Twitter (OAuth 2.0)',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-twitter`,
+  properties: {
+    EXTERNAL_X_ENABLED: {
+      title: 'X / Twitter enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_X_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_X_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+    EXTERNAL_X_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_X_ENABLED: boolean().required(),
+    EXTERNAL_X_CLIENT_ID: string().when('EXTERNAL_X_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_X_SECRET: string().when('EXTERNAL_X_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_X_EMAIL_OPTIONAL: boolean().optional(),
+  }),
+  misc: {
+    iconKey: 'x-icon',
+    hasLightIcon: true,
     requiresRedirect: true,
   },
 }
@@ -1562,6 +1609,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_LINKEDIN_OIDC,
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
+  EXTERNAL_PROVIDER_X,
   EXTERNAL_PROVIDER_TWITTER,
   EXTERNAL_PROVIDER_SLACK_OIDC,
   EXTERNAL_PROVIDER_SLACK,

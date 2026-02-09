@@ -35,32 +35,32 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
   }
 
   // For static posts, look up author info from authors.json
-  const authorArray = blog.author?.split(',') || []
+  const authorArray = blog.author?.split(',').map((a) => a.trim()) || []
   const author = []
 
   for (let i = 0; i < authorArray.length; i++) {
-    author.push(
-      authors.find((authors: any) => {
-        return authors.author_id === authorArray[i]
-      })
-    )
+    const foundAuthor = authors.find((authors: any) => {
+      return authors.author_id === authorArray[i]
+    })
+    if (foundAuthor) {
+      author.push(foundAuthor)
+    }
   }
 
   return renderFeaturedThumb(blog, author)
 }
 
 function renderFeaturedThumb(blog: PostTypes, author: any[]) {
+  const resolveImagePath = (img: string | undefined): string | null => {
+    if (!img) return null
+    return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
+  }
+
   const imageUrl = blog.isCMS
-    ? blog.thumb
-      ? blog.thumb
-      : blog.image
-        ? blog.image
-        : '/images/blog/blog-placeholder.png'
-    : blog.thumb
-      ? `/images/blog/${blog.thumb}`
-      : blog.image
-        ? `/images/blog/${blog.image}`
-        : '/images/blog/blog-placeholder.png'
+    ? blog.imgThumb || blog.imgSocial || '/images/blog/blog-placeholder.png'
+    : resolveImagePath(blog.imgThumb) ||
+      resolveImagePath(blog.imgSocial) ||
+      '/images/blog/blog-placeholder.png'
 
   return (
     <div key={blog.slug} className="w-full">

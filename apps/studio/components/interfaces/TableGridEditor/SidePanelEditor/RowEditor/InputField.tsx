@@ -35,7 +35,7 @@ export interface InputFieldProps {
   onSelectForeignKey?: () => void
 }
 
-const InputField = ({
+export const InputField = ({
   field,
   errors,
   isEditable = true,
@@ -353,5 +353,3 @@ const InputField = ({
     />
   )
 }
-
-export default InputField

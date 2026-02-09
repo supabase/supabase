@@ -21,7 +21,7 @@ const DropAllReplicasConfirmationModal = ({
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
   const { data: databases } = useReadReplicasQuery({ projectRef })
-  const { mutateAsync: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation()
+  const { mutateAsync: removeReadReplica, isPending: isRemoving } = useReadReplicaRemoveMutation()
 
   const onConfirmRemove = async () => {
     if (!projectRef) return console.error('Project is required')

@@ -29,11 +29,8 @@ function DatabaseBackupsNav({ active }: Props) {
       enabled: databaseRestoreToNewProject && cloud_provider !== 'FLY',
       id: 'rtnp',
       label: (
-        <div className="flex items-center gap-1">
-          Restore to new project{' '}
-          <Badge size="small" className="!text-[10px] px-1.5 py-0">
-            Beta
-          </Badge>
+        <div className="flex items-center gap-2">
+          Restore to new project <Badge variant="warning">Beta</Badge>
         </div>
       ),
       href: `/project/${ref}/database/backups/restore-to-new-project`,

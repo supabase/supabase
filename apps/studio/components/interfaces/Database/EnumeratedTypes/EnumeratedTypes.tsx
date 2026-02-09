@@ -6,11 +6,10 @@ import { toast } from 'sonner'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -27,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
@@ -38,7 +38,13 @@ export const EnumeratedTypes = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const deletingTypeIdRef = useRef<string | null>(null)
 
-  const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -90,7 +96,7 @@ export const EnumeratedTypes = () => {
             className="w-full lg:w-52"
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for a type"
-            icon={<Search size={14} />}
+            icon={<Search />}
           />
         </div>
 

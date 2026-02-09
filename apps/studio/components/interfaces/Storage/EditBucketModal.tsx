@@ -69,7 +69,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const { value: fileSizeLimit } = convertFromBytes(bucket?.file_size_limit ?? 0)
 
-  const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation({
+  const { mutate: updateBucket, isPending: isUpdating } = useBucketUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated bucket "${bucket?.name}"`)
       onClose()

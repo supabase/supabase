@@ -17,7 +17,7 @@ const DeletePaymentMethodModal = ({
 }: DeletePaymentMethodModalProps) => {
   const { slug } = useParams()
 
-  const { mutate: deletePayment, isLoading: isDeleting } =
+  const { mutate: deletePayment, isPending: isDeleting } =
     useOrganizationPaymentMethodDeleteMutation({
       onSuccess: () => {
         toast.success(

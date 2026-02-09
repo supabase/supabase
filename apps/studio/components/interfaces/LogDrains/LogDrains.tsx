@@ -1,13 +1,16 @@
-import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
-import React, { useState } from 'react'
-import { toast } from 'sonner'
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useTrack } from 'lib/telemetry/track'
+import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
+import { cloneElement, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
+  Card,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -18,16 +21,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Card,
-  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
-import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { LogDrainsCard } from './LogDrainsCard'
+import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { VoteLink } from './VoteLink'
-import { useTrack } from 'lib/telemetry/track'
 
 export function LogDrains({
   onNewDrainClick,
@@ -36,25 +37,28 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
-  const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
-  const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
+  const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('log_drains')
   const track = useTrack()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
   const { ref } = useParams()
   const {
     data: logDrains,
-    isLoading,
+    isPending: isLoading,
     refetch,
     error,
     isError,
   } = useLogDrainsQuery(
     { ref },
     {
-      enabled: logDrainsEnabled,
+      enabled: hasAccessToLogDrains,
     }
   )
   const sentryEnabled = useFlag('SentryLogDrain')
+  const s3Enabled = useFlag('S3logdrain')
+  const axiomEnabled = useFlag('axiomLogDrain')
+  const last9Enabled = useFlag('Last9LogDrain')
   const hasLogDrains = !!logDrains?.length
 
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
@@ -69,11 +73,7 @@ export function LogDrains({
     },
   })
 
-  if (!orgPlanLoading && !logDrainsEnabled) {
-    return <LogDrainsEmpty />
-  }
-
-  if (isLoading || orgPlanLoading) {
+  if (isLoading || isLoadingEntitlement) {
     return (
       <div>
         <GenericSkeletonLoader />
@@ -81,17 +81,31 @@ export function LogDrains({
     )
   }
 
+  if (!isLoadingEntitlement && !hasAccessToLogDrains) {
+    return <LogDrainsEmpty />
+  }
+
+  if (isError) {
+    return <AlertError subject="Failed to load log drains" error={error}></AlertError>
+  }
+
   if (!isLoading && !hasLogDrains) {
     return (
       <>
         <div className="grid lg:grid-cols-2 gap-4">
-          {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
+          {LOG_DRAIN_TYPES.filter((t) => {
+            if (t.value === 'sentry') return sentryEnabled
+            if (t.value === 's3') return s3Enabled
+            if (t.value === 'axiom') return axiomEnabled
+            if (t.value === 'last9') return last9Enabled
+            return true
+          }).map((src) => (
             <LogDrainsCard
               key={src.value}
               title={src.name}
               description={src.description}
               icon={src.icon}
-              rightLabel="Additional $60"
+              rightLabel={IS_PLATFORM ? 'Additional $60' : undefined}
               onClick={() => {
                 onNewDrainClick(src.value)
               }}
@@ -101,10 +115,6 @@ export function LogDrains({
         <VoteLink />
       </>
     )
-  }
-
-  if (isError) {
-    return <AlertError error={error}></AlertError>
   }
 
   return (
@@ -141,13 +151,16 @@ export function LogDrains({
                   </TableCell>
                   <TableCell className="text-foreground-light">
                     <div className="flex items-center gap-2">
-                      {React.cloneElement(
-                        LOG_DRAIN_TYPES.find((t) => t.value === drain.type)
-                          ?.icon as React.ReactElement,
-                        { width: 16, height: 16 }
+                      {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.icon && (
+                        <span className="text-foreground-light">
+                          {cloneElement(LOG_DRAIN_TYPES.find((t) => t.value === drain.type)!.icon, {
+                            height: 16,
+                            width: 16,
+                          })}
+                        </span>
                       )}
                       <span className="truncate max-w-40">
-                        {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name}
+                        {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name ?? drain.type}
                       </span>
                     </div>
                   </TableCell>
@@ -194,10 +207,7 @@ export function LogDrains({
               if (selectedLogDrain && ref) {
                 deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
                 track('log_drain_confirm_button_submitted', {
-                  destination: selectedLogDrain.type as Exclude<
-                    LogDrainType,
-                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3'
-                  >,
+                  destination: selectedLogDrain.type,
                 })
               }
             }}

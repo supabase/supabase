@@ -1,5 +1,5 @@
 import { Monaco } from '@monaco-editor/react'
-import { IDisposable } from 'monaco-editor'
+import type { IDisposable } from 'monaco-editor'
 import { useEffect, useRef } from 'react'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -78,7 +78,7 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
         async provideDocumentFormattingEdits(model) {
           const value = model.getValue()
           const formatted = formatSql(value)
-          if (id) snapV2.setSql(id, formatted)
+          if (id) snapV2.setSql({ id, sql: formatted })
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
       })

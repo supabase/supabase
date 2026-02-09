@@ -1,6 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { useParams } from 'common'
+import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
+import { Plus, ShieldCheck } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert_Shadcn_,
@@ -24,10 +27,6 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { useParams } from 'common'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { Plus, ShieldCheck } from 'lucide-react'
-
 const NAME_SCHEMA = z
   .string()
   .min(4, 'Name must be at least 4 characters')
@@ -45,23 +44,22 @@ const SCHEMA = z.object({
   description: z.string().max(256, "Description shouldn't be too long").trim(),
 })
 
-const CreateSecretAPIKeyDialog = () => {
-  const [visible, setVisible] = useState(false)
+export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
+  const [visible, setVisible] = useQueryState('new', parseAsString)
 
-  const onClose = (value: boolean) => {
-    setVisible(value)
+  const onOpenChange = (value: boolean) => {
+    if (value) setVisible('secret')
+    else setVisible('')
   }
 
+  const defaultValues = { name: '', description: '' }
   const form = useForm<z.infer<typeof SCHEMA>>({
     resolver: zodResolver(SCHEMA),
-    defaultValues: {
-      name: '',
-      description: '',
-    },
+    defaultValues,
   })
 
-  const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
+  const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
     createAPIKey(
@@ -74,14 +72,15 @@ const CreateSecretAPIKeyDialog = () => {
       {
         onSuccess: (data) => {
           toast.success(`Your secret API key ${data.prefix}... is ready.`)
-          onClose(false)
+          form.reset(defaultValues)
+          onOpenChange(false)
         },
       }
     )
   }
 
   return (
-    <Dialog open={visible} onOpenChange={onClose}>
+    <Dialog open={visible === 'secret'} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button type="default" className="mt-2" icon={<Plus />}>
           New secret key
@@ -168,5 +167,3 @@ const CreateSecretAPIKeyDialog = () => {
     </Dialog>
   )
 }
-
-export default CreateSecretAPIKeyDialog

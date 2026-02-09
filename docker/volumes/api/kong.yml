@@ -27,8 +27,8 @@ acls:
 ###
 basicauth_credentials:
   - consumer: DASHBOARD
-    username: $DASHBOARD_USERNAME
-    password: $DASHBOARD_PASSWORD
+    username: '$DASHBOARD_USERNAME'
+    password: '$DASHBOARD_PASSWORD'
 
 ###
 ### API Routes

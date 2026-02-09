@@ -72,6 +72,14 @@ const default__padding_and_text = {
   xlarge: `${defaults.size.text.xlarge} ${defaults.size.padding.xlarge}`,
 }
 
+const with_icon_spacing_sizes = {
+  tiny: 'pl-7',
+  small: 'pl-8',
+  medium: 'pl-8',
+  large: 'pl-10',
+  xlarge: 'pl-11',
+}
+
 /*
  * Animations
  *
@@ -446,7 +454,7 @@ export default {
        `,
     },
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: with_icon_spacing_sizes,
     size: {
       ...default__padding_and_text,
     },
@@ -492,7 +500,7 @@ export default {
        `,
     },
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: with_icon_spacing_sizes,
     size: {
       ...default__padding_and_text,
     },
@@ -539,7 +547,7 @@ export default {
     },
     disabled: 'opacity-50',
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: with_icon_spacing_sizes,
     size: {
       ...default__padding_and_text,
     },
@@ -803,8 +811,8 @@ export default {
             tiny: `pl-6`,
             small: `pl-6`,
             medium: `pl-7`,
-            large: `pl-10`,
-            xlarge: `pl-10`,
+            large: `pl-7`,
+            xlarge: `pl-7`,
           },
           align: {
             vertical: 'flex flex-col space-y-1',
@@ -1383,7 +1391,7 @@ export default {
   inputIconContainer: {
     base: `
     absolute inset-y-0
-    left-0 pl-3 flex
+    left-0 pl-2 flex
     items-center pointer-events-none
     text-foreground-light
     [&_svg]:stroke-[1.5]
@@ -1392,10 +1400,10 @@ export default {
       tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
       small: '[&_svg]:h-[18px] [&_svg]:w-[18px]',
       medium: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
-      large: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
-      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px]',
-      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
-      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
+      large: '[&_svg]:h-[20px] [&_svg]:w-[20px] pl-3',
+      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px] pl-3',
+      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px] pl-3',
+      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px] pl-3',
     },
   },
 

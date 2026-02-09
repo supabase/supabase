@@ -1,12 +1,12 @@
 import React from 'react'
 import { Card } from 'ui'
 import {
+  InnerSideBarTitle,
   InnerSideMenuCollapsible,
-  InnerSideMenuCollapsibleTrigger,
   InnerSideMenuCollapsibleContent,
+  InnerSideMenuCollapsibleTrigger,
   InnerSideMenuItem,
   InnerSideMenuSeparator,
-  InnerSideBarTitle,
 } from 'ui-patterns/InnerSideMenu'
 
 export default function InnerSideMenuBasic() {

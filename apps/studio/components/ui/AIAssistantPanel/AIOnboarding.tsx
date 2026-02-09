@@ -38,7 +38,7 @@ export const AIOnboarding = ({
   const { ref: projectRef } = useParams()
   const {
     data: lints,
-    isLoading: isLoadingLints,
+    isPending: isLoadingLints,
     isFetching: isFetchingLints,
   } = useProjectLintsQuery({ projectRef })
   const isLintsLoading = isLoadingLints || isFetchingLints

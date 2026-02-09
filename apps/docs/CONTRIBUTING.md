@@ -149,7 +149,7 @@ If you're a library maintainer, follow these steps when updating function parame
 
 If you copy the same content multiple times across different files, create a **partial** for content reuse instead. Partials are MDX files contained in [`apps/docs/content/_partials`](https://github.com/supabase/supabase/tree/master/apps/docs/content/_partials). They contain reusable snippets that can be inserted in multiple pages. For example, you can create a partial to define a common setup step for a group of tutorials.
 
-To use a partial, import it into your MDX file. You can also set up a partial to automatically import by including it in the `components` within [`apps/docs/components/index.tsx`](https://github.com/supabase/supabase/blob/master/apps/docs/components/index.tsx).
+To use a partial, import it into your MDX file. You can also set up a partial to automatically import by including it in the `components` within [`apps/docs/features/docs/MdxBase.shared.tsx`](https://github.com/supabase/supabase/blob/master/apps/docs/features/docs/MdxBase.shared.tsx).
 
 ## Components and elements
 
@@ -331,4 +331,4 @@ Here are some exceptions and Supabase-specific guidelines.
 
 Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) aggregates all content sources (eg. guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
 
-Search uses a hybrid of native Postgres FTS and embedding similarity search based on [`pgvector`](https://github.com/pgvector/pgvector). At runtime, a PostgREST call triggers the RPC that runs the weighted FTS search, and an [Edge Function](https://github.com/supabase/blob/master/supabase/functions) is executed to perform the embedding search.
+Search uses a hybrid of native Postgres FTS and embedding similarity search based on [`pgvector`](https://github.com/pgvector/pgvector). At runtime, a PostgREST call triggers the RPC that runs the weighted FTS search, and an [Edge Function](https://github.com/supabase/supabase/tree/master/supabase/functions) is executed to perform the embedding search.

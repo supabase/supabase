@@ -1,13 +1,13 @@
 'use client'
 
-import { useGetSuggestions } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-suggestions'
-import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 import { Terminal } from 'lucide-react'
-import { Badge } from '@/registry/default/components/ui/badge'
 import { useMemo } from 'react'
-
 import ReactMarkdown from 'react-markdown'
+
+import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
+import { Badge } from '@/registry/default/components/ui/badge'
 import { Skeleton } from '@/registry/default/components/ui/skeleton'
+import { useGetSuggestions } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-suggestions'
 
 export function SuggestionsManager({ projectRef }: { projectRef: string }) {
   const { data: suggestions, isLoading, error } = useGetSuggestions(projectRef)
@@ -37,7 +37,7 @@ export function SuggestionsManager({ projectRef }: { projectRef: string }) {
     <div className="p-6 pt-4 lg:p-12 lg:pt-12 max-w-3xl mx-auto">
       <h2 className="text-base lg:text-xl font-semibold mb-1">Suggestions</h2>
       <p className="text-muted-foreground mb-4 lg:mb-8 text-sm lg:text-base">
-        Improve your project's security and performance.
+        Improve your project&apos;s security and performance.
       </p>
       {isLoading && (
         <div className="space-y-2">

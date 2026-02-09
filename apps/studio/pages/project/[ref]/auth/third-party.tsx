@@ -5,12 +5,12 @@ import { ThirdPartyAuthForm } from 'components/interfaces/Auth/ThirdPartyAuthFor
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { AuthProvidersLayout } from 'components/layouts/AuthLayout/AuthProvidersLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
 const ThirdPartyPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -34,9 +34,9 @@ const ThirdPartyPage: NextPageWithLayout = () => {
       {isPermissionsLoaded && !canReadAuthSettings ? (
         <NoPermission isFullPage resourceText="access your project's auth provider settings" />
       ) : (
-        <ScaffoldContainer className="pb-16">
+        <PageContainer size="default" className="pb-16">
           <ThirdPartyAuthForm />
-        </ScaffoldContainer>
+        </PageContainer>
       )}
     </AuthProvidersLayout>
   )

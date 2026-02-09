@@ -7,7 +7,7 @@ import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
 
 const OrgTeamSettings: NextPageWithLayout = () => {
-  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
+  const { isPending: isLoadingPermissions } = usePermissionsQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   return selectedOrganization === undefined && isLoadingPermissions ? (

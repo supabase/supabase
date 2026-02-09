@@ -5,9 +5,9 @@ import {
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   PrePostTab,
   Switch,
@@ -73,7 +73,7 @@ export default function PageLayoutSettings() {
   return (
     <div className="w-full">
       <PageHeader size="default">
-        <PageHeaderMeta size="default">
+        <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>User Sessions</PageHeaderTitle>
             <PageHeaderDescription>

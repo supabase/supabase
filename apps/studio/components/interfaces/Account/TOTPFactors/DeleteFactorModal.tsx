@@ -26,7 +26,7 @@ const DeleteFactorModal = ({
     ''
   )
 
-  const { mutate: unenroll, isLoading } = useMfaUnenrollMutation({
+  const { mutate: unenroll, isPending } = useMfaUnenrollMutation({
     onSuccess: async () => {
       if (lastVisitedOrganization) {
         await queryClient.invalidateQueries({
@@ -46,7 +46,7 @@ const DeleteFactorModal = ({
       title="Confirm to delete factor"
       confirmLabel="Delete"
       confirmLabelLoading="Deleting"
-      loading={isLoading}
+      loading={isPending}
       onCancel={onClose}
       onConfirm={() => factorId && unenroll({ factorId })}
       alert={{
