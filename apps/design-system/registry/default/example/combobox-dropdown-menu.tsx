@@ -1,17 +1,15 @@
 'use client'
 
-import * as React from 'react'
 import { Calendar, MoreHorizontal, Tags, Trash, User } from 'lucide-react'
-
-import { Button, CommandList_Shadcn_, ScrollArea } from 'ui'
+import * as React from 'react'
 import {
+  Button,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
-} from 'ui'
-import {
+  CommandList_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -23,6 +21,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  ScrollArea,
 } from 'ui'
 
 const labels = [

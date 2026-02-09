@@ -1,18 +1,13 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import sharp from 'sharp'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { seoPlugin } from '@payloadcms/plugin-seo'
+import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { buildConfig, type Plugin } from 'payload'
-import { defaultLexical } from './fields/defaultLexical.ts'
-import { getServerSideURL } from './utilities/getURL.ts'
-import { WWW_SITE_ORIGIN } from './utilities/constants.ts'
-
-import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
-import type { Customer, Event, Post } from './payload-types'
+import sharp from 'sharp'
 
 import { Authors } from './collections/Authors.ts'
 import { Categories } from './collections/Categories.ts'
@@ -22,6 +17,10 @@ import { Media } from './collections/Media.ts'
 import { Posts } from './collections/Posts/index.ts'
 import { Tags } from './collections/Tags.ts'
 import { Users } from './collections/Users.ts'
+import { defaultLexical } from './fields/defaultLexical.ts'
+import type { Customer, Event, Post } from './payload-types'
+import { WWW_SITE_ORIGIN } from './utilities/constants.ts'
+import { getServerSideURL } from './utilities/getURL.ts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)

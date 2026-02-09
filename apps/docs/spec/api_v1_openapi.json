@@ -36,7 +36,11 @@
           },
           "500": { "description": "Failed to retrieve database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_read"] },
+          { "fga_permissions": ["branching_development_read"] }
+        ],
         "summary": "Get database branch config",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
@@ -81,7 +85,11 @@
           },
           "500": { "description": "Failed to update database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Update database branch config",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -129,7 +137,11 @@
           },
           "500": { "description": "Failed to delete database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_delete"] },
+          { "fga_permissions": ["branching_development_delete"] }
+        ],
         "summary": "Delete a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -178,7 +190,11 @@
           },
           "500": { "description": "Failed to push database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Pushes a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -227,7 +243,11 @@
           },
           "500": { "description": "Failed to merge database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Merges a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -276,7 +296,11 @@
           },
           "500": { "description": "Failed to reset database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Resets a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -319,7 +343,11 @@
           },
           "500": { "description": "Failed to restore database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Restore a scheduled branch deletion",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -364,7 +392,11 @@
           },
           "500": { "description": "Failed to diff database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "[Beta] Diffs a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -1328,7 +1360,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_read"] },
+          { "fga_permissions": ["branching_development_read"] }
+        ],
         "summary": "List all database branches",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
@@ -1365,7 +1401,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_create"] },
+          { "fga_permissions": ["branching_development_create"] }
+        ],
         "summary": "Create a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -1425,7 +1465,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_read"] },
+          { "fga_permissions": ["branching_development_read"] }
+        ],
         "summary": "Get a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
@@ -4191,7 +4235,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to run sql query" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_read"] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["database_write"] },
+          { "fga_permissions": ["database_read"] }
+        ],
         "summary": "[Beta] Run sql query",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],

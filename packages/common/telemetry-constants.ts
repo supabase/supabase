@@ -1769,9 +1769,9 @@ export interface HomeProjectUsageServiceClickedEvent {
      */
     total_requests: number
     /**
-     * Number of errors for this service
+     * Number of errors for this service (optional, only sent when error data is available)
      */
-    error_count: number
+    error_count?: number
   }
   groups: TelemetryGroups
 }
@@ -2367,6 +2367,8 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'sentry'
       | 's3'
       | 'axiom'
+      | 'last9'
+      | 'otlp'
   }
   groups: TelemetryGroups
 }
@@ -2395,6 +2397,8 @@ export interface LogDrainConfirmButtonSubmittedEvent {
       | 'sentry'
       | 's3'
       | 'axiom'
+      | 'last9'
+      | 'otlp'
   }
   groups: TelemetryGroups
 }

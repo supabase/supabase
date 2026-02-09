@@ -2,10 +2,11 @@
 
 import { forwardRef, useCallback, type HTMLAttributes } from 'react'
 import { useInView } from 'react-intersection-observer'
+
 import {
   getAnchor,
-  removeAnchor,
   highlightSelectedTocItem,
+  removeAnchor,
   unHighlightSelectedTocItems,
 } from './CustomHTMLElements.utils'
 

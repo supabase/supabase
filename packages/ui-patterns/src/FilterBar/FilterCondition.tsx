@@ -10,6 +10,7 @@ import {
   PopoverAnchor_Shadcn_,
   PopoverContent_Shadcn_,
 } from 'ui'
+
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
 import { useDeferredBlur, useHighlightNavigation } from './hooks'
@@ -133,13 +134,28 @@ export function FilterCondition({
     }
   }, [isActive, isLoading, valueItems, showValueCustom])
 
+  const handleOperatorBackspace = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Backspace' && condition.operator === '') {
+        e.preventDefault()
+        handleRemoveCondition(path)
+        setActiveInput({ type: 'group', path: path.slice(0, -1) })
+      }
+    },
+    [condition.operator, setActiveInput, path, handleRemoveCondition]
+  )
+
   const {
     highlightedIndex: opHighlightedIndex,
     handleKeyDown: handleOperatorKeyDown,
     reset: resetOpHighlight,
-  } = useHighlightNavigation(operatorItems.length, (index) => {
-    if (operatorItems[index]) handleSelectMenuItem(operatorItems[index])
-  })
+  } = useHighlightNavigation(
+    operatorItems.length,
+    (index) => {
+      if (operatorItems[index]) handleSelectMenuItem(operatorItems[index])
+    },
+    handleOperatorBackspace
+  )
 
   const {
     highlightedIndex: valHighlightedIndex,
@@ -317,6 +333,7 @@ export function FilterCondition({
         onClick={onRemove}
         className="group hover:text-foreground hover:!bg-surface-600 rounded-none px-1 h-auto py-0"
         aria-label={`Remove ${property.label} filter`}
+        tabIndex={-1}
       />
     </div>
   )

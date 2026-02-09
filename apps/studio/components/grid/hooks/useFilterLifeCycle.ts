@@ -44,8 +44,13 @@ export function useSyncFiltersToUrl() {
 
     // Debounce URL updates by 500ms
     timeoutRef.current = setTimeout(() => {
+      const completeFilters = snap.filters.filter((filter) => {
+        const value = filter.value
+        return value !== '' && value !== null && value !== undefined
+      })
+
       // Convert filters to URL format
-      const urlFilters = filtersToUrlParams(snap.filters)
+      const urlFilters = filtersToUrlParams(completeFilters)
 
       // Update URL params
       setParams((prev) => ({

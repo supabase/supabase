@@ -1,4 +1,5 @@
-import { forwardRef, ReactNode, PropsWithChildren, HTMLAttributes } from 'react'
+import { forwardRef, HTMLAttributes, PropsWithChildren, ReactNode } from 'react'
+
 import { cn } from '../../lib/utils'
 
 export interface PrePostTabProps extends HTMLAttributes<HTMLDivElement> {

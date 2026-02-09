@@ -1,7 +1,8 @@
-import { expect, test, afterAll } from 'vitest'
-import { createTestDatabase, cleanupRoot, createDatabaseWithAuthSchema } from '../../db/utils'
-import { getPaginatedUsersSQL } from '../../../src/sql/studio/get-users-paginated'
 import { randomUUID } from 'crypto'
+import { afterAll, expect, test } from 'vitest'
+
+import { getPaginatedUsersSQL } from '../../../src/sql/studio/get-users-paginated'
+import { cleanupRoot, createDatabaseWithAuthSchema, createTestDatabase } from '../../db/utils'
 
 afterAll(async () => {
   await cleanupRoot()

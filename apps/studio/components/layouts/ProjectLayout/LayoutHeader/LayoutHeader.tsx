@@ -22,7 +22,7 @@ import { ReactNode, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns'
-
+import { DevToolbarTrigger } from 'dev-tools'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
@@ -215,6 +215,7 @@ export const LayoutHeader = ({
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
+                <DevToolbarTrigger />
                 <FeedbackDropdown />
 
                 <div className="flex items-center gap-2">
@@ -273,7 +274,7 @@ export const LayoutHeader = ({
         </div>
       </header>
 
-      {isFlagResolved ? isConnectSheetEnabled ? <ConnectSheet /> : <Connect /> : null}
+      {isFlagResolved && isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
     </>
   )
 }
