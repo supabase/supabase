@@ -1,14 +1,13 @@
-import { Activity, BookOpen, Mail, Wrench } from 'lucide-react'
-import { useRouter } from 'next/router'
-import SVG from 'react-inlinesvg'
-
 import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DOCS_URL } from 'lib/constants'
+import { Activity, BookOpen, Mail, Wrench } from 'lucide-react'
+import { useRouter } from 'next/router'
+import SVG from 'react-inlinesvg'
 import { AiIconAnimation, ButtonGroup, ButtonGroupItem } from 'ui'
 
-import type { HelpOptionId } from './helpOptionsConfig'
-import { HELP_OPTION_IDS } from './helpOptionsConfig'
+import type { HelpOptionId } from './HelpDropdown.constants'
+import { HELP_OPTION_IDS } from './HelpDropdown.constants'
 
 const DISCORD_URL = 'https://discord.supabase.com'
 const STATUS_URL = 'https://status.supabase.com'

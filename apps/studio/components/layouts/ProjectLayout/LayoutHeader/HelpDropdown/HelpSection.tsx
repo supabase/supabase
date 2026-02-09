@@ -1,7 +1,7 @@
+import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
 import { cn } from 'ui'
 
-import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import type { HelpOptionId } from './helpOptionsConfig'
+import type { HelpOptionId } from './HelpDropdown.constants'
 import { HelpOptionsList } from './HelpOptionsList'
 
 type HelpSectionProps = {

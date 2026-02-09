@@ -1,21 +1,14 @@
-import { HelpCircle } from 'lucide-react'
-import Image from 'next/legacy/image'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import SVG from 'react-inlinesvg'
-
 import { IS_PLATFORM } from 'common'
-import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import {
-  ASSISTANT_SUGGESTIONS,
-  getSupportLinkQueryParams,
-  HelpSection,
-} from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { HelpCircle } from 'lucide-react'
+import Image from 'next/legacy/image'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import SVG from 'react-inlinesvg'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
@@ -26,6 +19,10 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
+
+import { ASSISTANT_SUGGESTIONS } from './HelpDropdown.constants'
+import { getSupportLinkQueryParams } from './HelpOptions.utils'
+import { HelpSection } from './HelpSection'
 
 export const HelpDropdown = () => {
   const router = useRouter()
