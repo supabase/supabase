@@ -145,7 +145,8 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                           const newRows = permissionRows.filter((_, i) => i !== index)
                           setValue(
                             'permissionRows' as Path<TFormValues>,
-                            newRows as PathValue<TFormValues, Path<TFormValues>>
+                            newRows as PathValue<TFormValues, Path<TFormValues>>,
+                            { shouldValidate: true, shouldDirty: true }
                           )
                         }}
                         icon={<X size={16} />}
