@@ -1,19 +1,18 @@
+import { useParams } from 'common'
+import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+import { createLintSummaryPrompt, EntityTypeIcon } from 'components/interfaces/Linter/Linter.utils'
+import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { Activity, ExternalLink, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { EntityTypeIcon, createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
-import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
-  AiIconAnimation,
   Card,
   CardContent,
   CardHeader,
@@ -153,23 +152,30 @@ export const AdvisorWidget = () => {
                         {lintText.replace(/\\`/g, '`')}
                       </p>
                     </button>
-                    <ButtonTooltip
-                      type="text"
-                      className="px-1 opacity-0 group-hover:opacity-100 w-7"
-                      icon={<AiIconAnimation size={16} />}
+                    <div
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
-                        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                        snap.newChat({
-                          name: 'Summarize lint',
-                          initialInput: createLintSummaryPrompt(lint),
-                        })
                       }}
-                      tooltip={{
-                        content: { side: 'bottom', text: 'Help me fix this issue' },
-                      }}
-                    />
+                      className="opacity-0 group-hover:opacity-100"
+                    >
+                      <AiAssistantDropdown
+                        label="Ask Assistant"
+                        iconOnly
+                        tooltip="Help me fix this issue"
+                        buildPrompt={() => createLintSummaryPrompt(lint)}
+                        onOpenAssistant={() => {
+                          openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                          snap.newChat({
+                            name: 'Summarize lint',
+                            initialInput: createLintSummaryPrompt(lint),
+                          })
+                        }}
+                        telemetrySource="advisor_widget"
+                        type="text"
+                        className="px-1 w-7"
+                      />
+                    </div>
                   </div>
                 </li>
               )
