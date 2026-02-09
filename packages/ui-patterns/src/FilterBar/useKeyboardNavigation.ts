@@ -1,7 +1,11 @@
 import { KeyboardEvent, useCallback } from 'react'
 
-import { ActiveInput } from './hooks'
-import { FilterGroup } from './types'
+import {
+  ConditionPath,
+  HighlightNavigationResult,
+  KeyboardNavigationConfig,
+  NavigationDirection,
+} from './types'
 import { findConditionByPath, findGroupByPath, removeFromGroup } from './utils'
 
 export function useKeyboardNavigation({
@@ -11,16 +15,9 @@ export function useKeyboardNavigation({
   onFilterChange,
   highlightedConditionPath,
   setHighlightedConditionPath,
-}: {
-  activeInput: ActiveInput
-  setActiveInput: (input: ActiveInput) => void
-  activeFilters: FilterGroup
-  onFilterChange: (filters: FilterGroup) => void
-  highlightedConditionPath: number[] | null
-  setHighlightedConditionPath: (path: number[] | null) => void
-}) {
+}: KeyboardNavigationConfig) {
   const removeByPath = useCallback(
-    (path: number[]) => {
+    (path: ConditionPath) => {
       const updatedFilters = removeFromGroup(activeFilters, path)
       onFilterChange(updatedFilters)
     },
@@ -28,7 +25,7 @@ export function useKeyboardNavigation({
   )
 
   const findFirstConditionInGroup = useCallback(
-    (groupPath: number[]): number[] | null => {
+    (groupPath: ConditionPath): ConditionPath | null => {
       const group = findGroupByPath(activeFilters, groupPath)
       if (!group || group.conditions.length === 0) return null
 
@@ -42,7 +39,7 @@ export function useKeyboardNavigation({
   )
 
   const findLastConditionInGroup = useCallback(
-    (groupPath: number[]): number[] | null => {
+    (groupPath: ConditionPath): ConditionPath | null => {
       const group = findGroupByPath(activeFilters, groupPath)
       if (!group || group.conditions.length === 0) return null
 
@@ -57,7 +54,7 @@ export function useKeyboardNavigation({
   )
 
   const findPreviousCondition = useCallback(
-    (currentPath: number[]): number[] | null => {
+    (currentPath: ConditionPath): ConditionPath | null => {
       const groupPath = currentPath.slice(0, -1)
       const conditionIndex = currentPath[currentPath.length - 1]
 
@@ -83,7 +80,7 @@ export function useKeyboardNavigation({
   )
 
   const getHighlightNavigationPath = useCallback(
-    (direction: 'prev' | 'next'): number[] | 'clear' | null => {
+    (direction: NavigationDirection): HighlightNavigationResult => {
       if (activeInput?.type !== 'group') return null
 
       const group = findGroupByPath(activeFilters, activeInput.path)
@@ -115,7 +112,7 @@ export function useKeyboardNavigation({
   )
 
   const applyHighlightNavigation = useCallback(
-    (result: number[] | 'clear' | null) => {
+    (result: HighlightNavigationResult) => {
       if (result === 'clear') {
         setHighlightedConditionPath(null)
       } else if (result) {

@@ -2,9 +2,15 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react'
 
-import { ActiveInput, useFilterBarState, useOptionsCache } from './hooks'
+import { useFilterBarState, useOptionsCache } from './hooks'
 import { MenuItem } from './menuItems'
-import { FilterBarAction, FilterGroup, FilterOptionObject, FilterProperty } from './types'
+import {
+  ActiveInputState,
+  FilterBarAction,
+  FilterGroup,
+  FilterOptionObject,
+  FilterProperty,
+} from './types'
 import { useCommandHandling } from './useCommandHandling'
 import { useKeyboardNavigation } from './useKeyboardNavigation'
 import {
@@ -20,7 +26,7 @@ export type FilterBarContextValue = {
   // Core state
   filters: FilterGroup
   filterProperties: FilterProperty[]
-  activeInput: ActiveInput
+  activeInput: ActiveInputState
   freeformText: string
   isLoading: boolean
   error: string | null
@@ -29,7 +35,7 @@ export type FilterBarContextValue = {
   // Handlers
   onFilterChange: (filters: FilterGroup) => void
   onFreeformTextChange: (text: string) => void
-  setActiveInput: (input: ActiveInput) => void
+  setActiveInput: (input: ActiveInputState) => void
   handleInputChange: (path: number[], value: string) => void
   handleOperatorChange: (path: number[], value: string) => void
   handleRemoveCondition: (path: number[]) => void

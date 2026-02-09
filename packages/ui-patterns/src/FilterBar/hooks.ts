@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { AsyncOptionsFunction, FilterOptionObject, FilterProperty } from './types'
+import {
+  ActiveInputState,
+  AsyncOptionsFunction,
+  ConditionPath,
+  FilterOptionObject,
+  FilterProperty,
+} from './types'
 import { isAsyncOptionsFunction } from './utils'
-
-export type ActiveInput =
-  | { type: 'value'; path: number[] }
-  | { type: 'operator'; path: number[] }
-  | { type: 'group'; path: number[] }
-  | null
 
 export type HighlightNavigationOptions = {
   skipEnterWhenFilterHighlighted?: boolean
@@ -20,9 +20,11 @@ export function useFilterBarState() {
   const [error, setError] = useState<string | null>(null)
   const [isCommandMenuVisible, setIsCommandMenuVisible] = useState(false)
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const [activeInput, setActiveInput] = useState<ActiveInput>(null)
-  const newPathRef = useRef<number[]>([])
-  const [highlightedConditionPath, setHighlightedConditionPath] = useState<number[] | null>(null)
+  const [activeInput, setActiveInput] = useState<ActiveInputState>(null)
+  const newPathRef = useRef<ConditionPath>([])
+  const [highlightedConditionPath, setHighlightedConditionPath] = useState<ConditionPath | null>(
+    null
+  )
 
   return {
     isLoading,
