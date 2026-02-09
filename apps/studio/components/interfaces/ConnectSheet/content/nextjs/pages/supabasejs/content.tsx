@@ -21,27 +21,27 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       code: `
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.${projectKeys?.publishableKey ? 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'NEXT_PUBLIC_SUPABASE_ANON_KEY'};
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.${projectKeys?.publishableKey ? 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'NEXT_PUBLIC_SUPABASE_ANON_KEY'}!;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
-        `,
+`,
     },
     {
-      name: '_app.tsx',
+      name: 'pages/index.tsx',
       language: 'tsx',
       code: `
 import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'
 
-function Page() {
+export default function Page() {
   const [todos, setTodos] = useState([])
 
   useEffect(() => {
-    function getTodos() {
+    async function getTodos() {
       const { data: todos } = await supabase.from('todos').select()
 
-      if (todos.length > 1) {
+      if (todos) {
         setTodos(todos)
       }
     }
@@ -50,15 +50,13 @@ function Page() {
   }, [])
 
   return (
-    <div>
+    <ul>
       {todos.map((todo) => (
-        <li key={todo}>{todo}</li>
+        <li key={todo.id}>{todo.name}</li>
       ))}
-    </div>
+    </ul>
   )
 }
-export default Page
-
 `,
     },
   ]

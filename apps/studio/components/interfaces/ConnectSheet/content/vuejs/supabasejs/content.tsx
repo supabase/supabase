@@ -29,7 +29,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
     },
     {
       name: 'App.vue',
-      language: 'jsx',
+      language: 'html',
       code: `
 <script setup>
   import { ref, onMounted } from 'vue'

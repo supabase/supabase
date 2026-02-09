@@ -24,24 +24,24 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.${projectKeys.publishableKey ? 'VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'VITE_SUPABASE_ANON_KEY'};
 
-const supabase = createClient(supabaseUrl, supabaseKey);
-        `,
+export const supabase = createClient(supabaseUrl, supabaseKey);
+`,
     },
     {
       name: 'App.tsx',
       language: 'tsx',
       code: `
 import { useState, useEffect } from 'react'
-import { supabase } from '../utils/supabase'
+import { supabase } from './utils/supabase'
 
-function Page() {
+export default function App() {
   const [todos, setTodos] = useState([])
 
   useEffect(() => {
     async function getTodos() {
       const { data: todos } = await supabase.from('todos').select()
 
-      if (todos.length > 1) {
+      if (todos) {
         setTodos(todos)
       }
     }
@@ -50,14 +50,13 @@ function Page() {
   }, [])
 
   return (
-    <div>
+    <ul>
       {todos.map((todo) => (
-        <li key={todo}>{todo}</li>
+        <li key={todo.id}>{todo.name}</li>
       ))}
-    </div>
+    </ul>
   )
 }
-export default Page
 `,
     },
   ]

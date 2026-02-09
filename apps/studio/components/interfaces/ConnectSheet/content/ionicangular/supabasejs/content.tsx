@@ -85,7 +85,7 @@ export class AppComponent implements OnInit {
 <ion-content>
 <ion-list>
   <ion-item *ngFor="let todo of todos">
-    <ion-label>{{ todo.title }}</ion-label>
+    <ion-label>{{ todo.name }}</ion-label>
   </ion-item>
 </ion-list>
 </ion-content>

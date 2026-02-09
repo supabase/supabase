@@ -25,7 +25,7 @@ import Foundation
 
 struct Todo: Identifiable, Decodable {
   var id: Int
-  var title: String
+  var name: String
 }
 `,
     },
@@ -42,7 +42,7 @@ struct ContentView: View {
   var body: some View {
     NavigationStack {
       List(todos) { todo in
-        Text(todo.title)
+        Text(todo.name)
       }
       .navigationTitle("Todos")
       .task {

@@ -21,22 +21,22 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       code: `
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.${projectKeys.publishableKey ? 'VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'VITE_SUPABASE_ANON_KEY'};
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.${projectKeys.publishableKey ? 'VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'VITE_SUPABASE_ANON_KEY'};
 
-export const supabase = createClient(supabaseUrl!, supabaseKey!);
-        `,
+export const supabase = createClient(supabaseUrl, supabaseKey);
+`,
     },
     {
-      name: 'src/App.jsx',
-      language: 'jsx',
+      name: 'src/App.tsx',
+      language: 'tsx',
       code: `
 import { supabase } from '../utils/supabase'
 import { createResource, For } from "solid-js";
 
 async function getTodos() {
   const { data: todos } = await supabase.from("todos").select();
-  return data;
+  return todos;
 }
 
 function App() {

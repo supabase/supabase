@@ -16,9 +16,8 @@ EXPO_PUBLIC_SUPABASE_KEY=${projectKeys.publishableKey ?? '<prefer publishable ke
       name: 'utils/supabase.ts',
       language: 'ts',
       code: `
-import 'react-native-url-polyfill/auto'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createClient, processLock } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 
 export const supabase = createClient(
   process.env.EXPO_PUBLIC_SUPABASE_URL!,
@@ -29,7 +28,6 @@ export const supabase = createClient(
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false,
-      lock: processLock,
     },
   })
         `,
@@ -72,7 +70,7 @@ export default function App() {
       <FlatList
         data={todos}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <Text key={item.id}>{item.title}</Text>}
+        renderItem={({ item }) => <Text key={item.id}>{item.name}</Text>}
       />
     </View>
   );
