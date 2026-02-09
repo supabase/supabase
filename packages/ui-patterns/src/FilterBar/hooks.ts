@@ -11,6 +11,10 @@ export type ActiveInput =
   | { type: 'group'; path: number[] }
   | null
 
+export type HighlightNavigationOptions = {
+  skipEnterWhenFilterHighlighted?: boolean
+}
+
 export function useFilterBarState() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -126,7 +130,7 @@ export function useHighlightNavigation(
   itemsLength: number,
   onEnter: (index: number) => void,
   fallbackKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void,
-  options?: { skipEnterWhenFilterHighlighted?: boolean }
+  options?: HighlightNavigationOptions
 ) {
   const [highlightedIndex, setHighlightedIndex] = useState(0)
 
