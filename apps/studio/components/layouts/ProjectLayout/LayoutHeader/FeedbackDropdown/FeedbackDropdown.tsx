@@ -1,26 +1,23 @@
-import { Lightbulb, TriangleAlert } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { IS_PLATFORM } from 'common'
-import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import {
-  ASSISTANT_SUGGESTIONS,
-  getSupportLinkQueryParams,
-  HelpSection,
-} from 'components/layouts/ProjectLayout/LayoutHeader/HelpOptions'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Lightbulb, TriangleAlert } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
 } from 'ui'
+
+import { ASSISTANT_SUGGESTIONS } from '../HelpDropdown/HelpDropdown.constants'
+import { getSupportLinkQueryParams } from '../HelpDropdown/HelpDropdown.utils'
+import { HelpSection } from '../HelpDropdown/HelpSection'
 import { FeedbackWidget } from './FeedbackWidget'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
