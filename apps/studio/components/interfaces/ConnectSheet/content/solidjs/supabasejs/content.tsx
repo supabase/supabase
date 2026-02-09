@@ -8,10 +8,10 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       name: '.env.local',
       language: 'bash',
       code: [
-        `SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+        `VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
         projectKeys?.publishableKey
-          ? `SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
-          : `SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
+          ? `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+          : `VITE_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
         '',
       ].join('\n'),
     },
@@ -21,8 +21,8 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       code: `
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.${projectKeys.publishableKey ? 'SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'SUPABASE_ANON_KEY'};
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.${projectKeys.publishableKey ? 'VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'VITE_SUPABASE_ANON_KEY'};
 
 export const supabase = createClient(supabaseUrl!, supabaseKey!);
         `,
@@ -44,7 +44,7 @@ function App() {
 
   return (
     <ul>
-      <For each={todos()}>{(country) => <li>{todo.name}</li>}</For>
+      <For each={todos()}>{(todo) => <li>{todo.name}</li>}</For>
     </ul>
   );
 }

@@ -146,7 +146,7 @@ export const connectSchema: ConnectSchema = {
       type: 'select',
       label: 'Variant',
       options: getFrameworkVariantOptions,
-      defaultValue: 'app',
+      defaultValue: 'vite',
       dependsOn: { mode: ['framework'], framework: ['nextjs', 'react'] }, // Only show for frameworks with multiple variants
     },
     library: {

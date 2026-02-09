@@ -31,7 +31,7 @@ export default async function Page() {
   return (
     <ul>
       {todos?.map((todo) => (
-        <li>{todo}</li>
+        <li key={todo.id}>{todo.name}</li>
       ))}
     </ul>
   )

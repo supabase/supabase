@@ -38,7 +38,7 @@ function Page() {
   const [todos, setTodos] = useState([])
 
   useEffect(() => {
-    function getTodos() {
+    async function getTodos() {
       const { data: todos } = await supabase.from('todos').select()
 
       if (todos.length > 1) {

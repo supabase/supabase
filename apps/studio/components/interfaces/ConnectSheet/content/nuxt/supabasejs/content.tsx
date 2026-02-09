@@ -7,40 +7,47 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
     {
       name: '.env.local',
       language: 'bash',
-      code: `
-SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-SUPABASE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}
-        `,
+      code: [
+        `SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+        `SUPABASE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}`,
+        '',
+      ].join('\n'),
     },
     {
-      name: 'utils/supabase.ts',
+      name: 'nuxt.config.ts',
       language: 'ts',
       code: `
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseKey);
-        `,
+export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseKey: process.env.SUPABASE_KEY,
+    },
+  },
+})
+`,
     },
     {
-      name: 'src/App.vue',
-      language: 'jsx',
+      name: 'app.vue',
+      language: 'html',
       code: `
 <script setup>
-  import { supabase } from '../utils/supabase'
-  const todos = ref([])
+import { ref, onMounted } from 'vue'
+import { createClient } from '@supabase/supabase-js'
 
-  async function getTodos() {
-    const { data } = await supabase.from('todos').select()
-    todos.value = data
-  }
+const config = useRuntimeConfig()
+const supabase = createClient(config.public.supabaseUrl, config.public.supabaseKey)
 
-  onMounted(() => {
-    getTodos()
-  })
+const todos = ref([])
 
+async function getTodos() {
+  const { data } = await supabase.from('todos').select()
+  todos.value = data
+}
+
+onMounted(() => {
+  getTodos()
+})
 </script>
 
 <template>

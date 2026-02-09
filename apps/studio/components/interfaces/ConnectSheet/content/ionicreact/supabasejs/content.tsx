@@ -83,7 +83,7 @@ export default function App() {
         <IonContent>
           <IonList>
             {todos.map((todo) => (
-              <IonItem key={todo.id}>{todo.title}</IonItem>
+              <IonItem key={todo.id}>{todo.name}</IonItem>
             ))}
           </IonList>
         </IonContent>
