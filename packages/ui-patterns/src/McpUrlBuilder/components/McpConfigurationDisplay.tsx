@@ -98,7 +98,7 @@ export function McpConfigurationDisplay({
       )}
 
       {selectedClient.primaryInstructions &&
-        selectedClient.primaryInstructions(clientConfig, onCopyCallback)}
+        selectedClient.primaryInstructions(clientConfig, onCopyCallback, { isPlatform })}
 
       {selectedClient.configFile && (
         <>
@@ -122,7 +122,7 @@ export function McpConfigurationDisplay({
       )}
 
       {selectedClient.alternateInstructions &&
-        selectedClient.alternateInstructions(clientConfig, onCopyCallback)}
+        selectedClient.alternateInstructions(clientConfig, onCopyCallback, { isPlatform })}
 
       {(selectedClient.docsUrl || selectedClient.externalDocsUrl) && (
         <div className="flex items-center gap-2 text-xs text-foreground-light">
