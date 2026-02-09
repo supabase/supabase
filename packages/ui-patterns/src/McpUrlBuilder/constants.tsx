@@ -244,7 +244,7 @@ export const MCP_CLIENTS: McpClient[] = [
                   href="https://github.com/supabase-community/gemini-extension"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-brand hover:underline"
+                  className="text-brand-link hover:underline"
                 >
                   extension
                 </a>{' '}
@@ -253,7 +253,7 @@ export const MCP_CLIENTS: McpClient[] = [
                   href="https://github.com/supabase/agent-skills"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-brand hover:underline"
+                  className="text-brand-link hover:underline"
                 >
                   agent skills
                 </a>
@@ -493,7 +493,7 @@ export const MCP_CLIENTS: McpClient[] = [
           href="https://kiro.dev/docs/powers/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-brand hover:underline"
+          className="text-brand-link hover:underline"
         >
           power
         </a>{' '}

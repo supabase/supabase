@@ -132,7 +132,7 @@ export function McpConfigurationDisplay({
               href={selectedClient.docsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand hover:underline inline-flex items-center"
+              className="text-brand-link hover:underline inline-flex items-center"
             >
               View setup guide
               <ExternalLink className="h-3 w-3 ml-1" />
@@ -143,7 +143,7 @@ export function McpConfigurationDisplay({
               href={selectedClient.externalDocsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand hover:underline inline-flex items-center"
+              className="text-brand-link hover:underline inline-flex items-center"
             >
               View {selectedClient.label} docs
               <ExternalLink className="h-3 w-3 ml-1" />
