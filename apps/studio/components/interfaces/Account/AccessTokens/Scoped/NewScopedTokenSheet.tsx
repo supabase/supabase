@@ -2,10 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
 
 import {
   useAccessTokenCreateMutation,
@@ -28,7 +27,7 @@ import { Admonition } from 'ui-patterns'
 import { BasicInfo } from './Form/BasicInfo'
 import { Permissions } from './Form/Permissions/Permissions'
 import { ResourceAccess } from './Form/ResourceAccess/ResourceAccess'
-import { EXPIRES_AT_OPTIONS, type ScopedAccessTokenPermission } from '../AccessToken.constants'
+import { CUSTOM_EXPIRY_VALUE, EXPIRES_AT_OPTIONS, type ScopedAccessTokenPermission } from '../AccessToken.constants'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { mapPermissionToFGA, getExpirationDate } from '../AccessToken.utils'
 import { TokenSchema, type TokenFormValues } from '../AccessToken.schemas'
@@ -47,8 +46,6 @@ export const NewScopedTokenSheet = ({
   onCreateToken,
 }: NewScopedTokenSheetProps) => {
   const [resourceSearchOpen, setResourceSearchOpen] = useState(false)
-  const [customExpiryDate, setCustomExpiryDate] = useState<{ date: string } | undefined>(undefined)
-  const [isCustomExpiry, setIsCustomExpiry] = useState(false)
   const { organizations, projects } = useOrgAndProjectData()
 
   const form = useForm<TokenFormValues>({
@@ -56,6 +53,7 @@ export const NewScopedTokenSheet = ({
     defaultValues: {
       tokenName: '',
       expiresAt: EXPIRES_AT_OPTIONS['month'].value,
+      customExpiryDate: undefined,
       resourceAccess: 'all-orgs',
       selectedOrganizations: [],
       selectedProjects: [],
@@ -121,13 +119,10 @@ export const NewScopedTokenSheet = ({
       }
     }
 
-    let finalExpiresAt: string | undefined
-
-    if (isCustomExpiry && customExpiryDate) {
-      finalExpiresAt = customExpiryDate.date
-    } else {
-      finalExpiresAt = getExpirationDate(values.expiresAt || '')
-    }
+    const finalExpiresAt =
+      values.expiresAt === CUSTOM_EXPIRY_VALUE
+        ? values.customExpiryDate
+        : getExpirationDate(values.expiresAt || '')
 
     const permissions = permissionRows
       .flatMap((row) => {
@@ -196,29 +191,29 @@ export const NewScopedTokenSheet = ({
     form.reset({
       tokenName: '',
       expiresAt: EXPIRES_AT_OPTIONS['month'].value,
+      customExpiryDate: undefined,
       resourceAccess: 'all-orgs',
       selectedOrganizations: [],
       selectedProjects: [],
       permissionRows: [],
     })
-    setCustomExpiryDate(undefined)
-    setIsCustomExpiry(false)
     onOpenChange(false)
   }
 
-  const handleCustomDateChange = (date: { date: string } | undefined) => {
-    setCustomExpiryDate(date)
-  }
+  const handleCustomDateChange = useCallback((date: { date: string } | undefined) => {
+    form.setValue('customExpiryDate', date?.date, { shouldValidate: true })
+  }, [form])
 
-  const handleCustomExpiryChange = (isCustom: boolean) => {
-    setIsCustomExpiry(isCustom)
-    if (isCustom && !customExpiryDate) {
-      const defaultCustomDate = {
-        date: dayjs().endOf('day').toISOString(),
-      }
-      setCustomExpiryDate(defaultCustomDate)
+  const handleCustomExpiryChange = useCallback((isCustom: boolean) => {
+    if (isCustom && !form.getValues('customExpiryDate')) {
+      form.setValue('customExpiryDate', dayjs().endOf('day').toISOString(), {
+        shouldValidate: true,
+      })
     }
-  }
+    if (!isCustom) {
+      form.setValue('customExpiryDate', undefined, { shouldValidate: true })
+    }
+  }, [form])
 
   return (
     <Sheet
