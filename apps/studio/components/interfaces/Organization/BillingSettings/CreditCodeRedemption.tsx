@@ -225,35 +225,24 @@ export const CreditCodeRedemption = ({
               </div>
             )}
 
-            <div className="mt-4 flex flex-col gap-y-4">
-              <Separator />
-              <div className="flex justify-center items-center gap-x-2">
-                {org?.plan.id === 'free' && (
-                  <UpgradePlanButton plan="Pro" source="code-redeem" slug={org.slug}>
-                    Upgrade organization
-                  </UpgradePlanButton>
-                )}
+            {(!router.pathname.includes('/org/') || org?.plan.id === 'free') && (
+              <div className="mt-4 flex flex-col gap-y-4">
+                <Separator />
+                <div className="flex justify-center items-center gap-x-2">
+                  {org?.plan.id === 'free' && (
+                    <UpgradePlanButton plan="Pro" source="code-redeem" slug={org.slug}>
+                      Upgrade organization
+                    </UpgradePlanButton>
+                  )}
 
-                {(!router.pathname.includes('/org/') || org?.plan.id === 'free') && (
-                  <div className="mt-4 flex flex-col gap-y-4">
-                    <Separator />
-                    <div className="flex justify-center items-center gap-x-2">
-                      {org?.plan.id === 'free' && (
-                        <UpgradePlanButton plan="Pro" source="code-redeem" slug={org.slug}>
-                          Upgrade organization
-                        </UpgradePlanButton>
-                      )}
-
-                      {!router.pathname.includes('/org/') && (
-                        <Button asChild type="default">
-                          <Link href={`/org/${org?.slug}`}>Go to organization</Link>
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )}
+                  {!router.pathname.includes('/org/') && (
+                    <Button asChild type="default">
+                      <Link href={`/org/${org?.slug}`}>Go to organization</Link>
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ) : (
           <>
