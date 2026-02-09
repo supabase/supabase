@@ -255,9 +255,6 @@ export function useKeyboardNavigation({
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Backspace') {
         handleBackspace(e)
-      } else if (e.key === ' ' && activeInput?.type === 'value') {
-        e.preventDefault()
-        setActiveInput({ type: 'group', path: [] })
       } else if (e.key === 'ArrowLeft') {
         handleArrowLeft(e)
       } else if (e.key === 'ArrowRight') {
