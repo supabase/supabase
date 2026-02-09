@@ -237,7 +237,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute inset-0 flex flex-col items-center justify-center p-2 z-[1]',
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1]',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
@@ -245,7 +245,9 @@ export const Grid = memo(
               onDragLeave={onDragOver}
               onDrop={onFileDrop}
             >
-              {isLoading && !isDisabled && <GenericSkeletonLoader />}
+              {isLoading && !isDisabled && (
+                <GenericSkeletonLoader className="w-full top-9 absolute p-2" />
+              )}
 
               {isError && <GridError error={error} />}
 

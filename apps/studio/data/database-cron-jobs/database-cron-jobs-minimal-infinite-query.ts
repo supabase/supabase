@@ -1,29 +1,16 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-import { COST_THRESHOLD_ERROR, executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 
-import { getCronJobsSql } from '../sql/queries/get-cron-jobs'
+import { getCronJobsMinimalSql } from '../sql/queries/get-cron-jobs'
+import {
+  CRON_JOBS_PAGE_LIMIT,
+  CronJob,
+  DatabaseCronJobRunsVariables,
+} from './database-cron-jobs-infinite-query'
 import { databaseCronJobsKeys } from './keys'
 
-export const CRON_JOBS_PAGE_LIMIT = 20
-
-export type DatabaseCronJobRunsVariables = {
-  projectRef?: string
-  connectionString?: string | null
-  searchTerm?: string
-}
-
-export type CronJob = {
-  jobid: number
-  jobname: string | null
-  active: boolean
-  command: string
-  schedule: string
-  latest_run?: string
-  status?: string
-}
-
-export async function getDatabaseCronJobs({
+export async function getDatabaseCronJobsMinimal({
   projectRef,
   connectionString,
   searchTerm,
@@ -34,34 +21,33 @@ export async function getDatabaseCronJobs({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: getCronJobsSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
-    queryKey: ['cron-jobs'],
-    preflightCheck: true,
+    sql: getCronJobsMinimalSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
+    queryKey: ['cron-jobs-minimal'],
   })
 
   return result
 }
 
-type DatabaseCronJobsInfiniteData = CronJob[]
-type DatabaseCronJobsInfiniteError = ResponseError
+type DatabaseCronJobsMinimalInfiniteData = CronJob[]
+type DatabaseCronJobsMinimalInfiniteError = ResponseError
 
-export const useCronJobsInfiniteQuery = <TData = DatabaseCronJobsInfiniteData>(
+export const useCronJobsMinimalInfiniteQuery = <TData = DatabaseCronJobsMinimalInfiniteData>(
   { projectRef, connectionString, searchTerm }: DatabaseCronJobRunsVariables,
   {
     enabled = true,
     ...options
   }: UseCustomInfiniteQueryOptions<
-    DatabaseCronJobsInfiniteData,
-    DatabaseCronJobsInfiniteError,
+    DatabaseCronJobsMinimalInfiniteData,
+    DatabaseCronJobsMinimalInfiniteError,
     InfiniteData<TData>,
     readonly unknown[],
     number
   > = {}
 ) =>
   useInfiniteQuery({
-    queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
+    queryKey: databaseCronJobsKeys.listInfiniteMinimal(projectRef, searchTerm),
     queryFn: ({ pageParam }) => {
-      return getDatabaseCronJobs({
+      return getDatabaseCronJobsMinimal({
         projectRef,
         connectionString,
         searchTerm,
@@ -76,10 +62,6 @@ export const useCronJobsInfiniteQuery = <TData = DatabaseCronJobsInfiniteData>(
       const hasNextPage = lastPage.length >= CRON_JOBS_PAGE_LIMIT
       if (!hasNextPage) return undefined
       return page
-    },
-    retry: (failureCount, error) => {
-      if (error.message === COST_THRESHOLD_ERROR) return false
-      return failureCount < 3
     },
     ...options,
   })
