@@ -237,7 +237,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1]',
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
