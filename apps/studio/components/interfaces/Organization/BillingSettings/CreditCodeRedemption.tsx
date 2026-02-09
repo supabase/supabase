@@ -300,7 +300,7 @@ export const CreditCodeRedemption = ({
                     {errorRedeemingCode && (
                       <Admonition
                         type="warning"
-                        title="Code cannot be redeemed"
+                        title="Unable to redeem code"
                         description={errorRedeemingCode?.message}
                       />
                     )}
