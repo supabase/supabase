@@ -25,7 +25,6 @@ interface UpgradePlanButtonProps {
   disabled?: boolean
   className?: string
   slug?: string
-  size?: 'tiny' | 'medium'
 }
 
 /**
@@ -43,7 +42,6 @@ export const UpgradePlanButton = ({
   children,
   className,
   slug: slugParam,
-  size,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -91,7 +89,6 @@ export const UpgradePlanButton = ({
         addon={addon}
         featureProposition={featureProposition}
         className={className}
-        size={size}
       >
         {children}
       </RequestUpgradeToBillingOwners>
@@ -103,7 +100,6 @@ export const UpgradePlanButton = ({
       <ButtonTooltip
         disabled
         type={variant}
-        size={size}
         className={className}
         tooltip={{
           content: {
@@ -118,7 +114,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={variant} size={size} disabled={disabled} className={className}>
+    <Button asChild type={variant} disabled={disabled} className={className}>
       {link}
     </Button>
   )

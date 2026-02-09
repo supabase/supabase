@@ -5,10 +5,12 @@ import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Calendar, PartyPopper } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -190,7 +192,7 @@ export const CreditCodeRedemption = ({
           }}
         />
 
-        {codeRedemptionResult ? (
+        {!!codeRedemptionResult ? (
           <div className="p-8">
             <div className="text-center flex items-center justify-center">
               <PartyPopper strokeWidth={1} className="h-14 w-14" />
@@ -222,20 +224,19 @@ export const CreditCodeRedemption = ({
               </div>
             )}
 
-            {org?.plan.id === 'free' && (
-              <div className="mt-4 space-y-4">
-                <Separator />
-                <UpgradePlanButton
-                  plan="Pro"
-                  className="w-full"
-                  source="code-redeem"
-                  size="medium"
-                  slug={org.slug}
-                >
-                  Upgrade organization
-                </UpgradePlanButton>
+            <div className="mt-4 flex flex-col gap-y-4">
+              <Separator />
+              <div className="flex justify-center items-center gap-x-2">
+                {org?.plan.id === 'free' && (
+                  <UpgradePlanButton plan="Pro" source="code-redeem" slug={org.slug}>
+                    Upgrade organization
+                  </UpgradePlanButton>
+                )}
+                <Button asChild type="default">
+                  <Link href={`/org/${org?.slug}`}>Go to organization</Link>
+                </Button>
               </div>
-            )}
+            </div>
           </div>
         ) : (
           <>

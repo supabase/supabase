@@ -1,7 +1,7 @@
 import { useFlag } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, Loading } from 'ui'
+import { Button } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
 import { CreditCodeRedemption } from '@/components/interfaces/Organization/BillingSettings/CreditCodeRedemption'
@@ -13,6 +13,7 @@ import {
   ScaffoldHeader,
   ScaffoldTitle,
 } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import type { NextPageWithLayout } from '@/types'
 
@@ -22,28 +23,31 @@ const RedeemCreditsContent = () => {
 
   const {
     data: organizations,
-    isLoading: areOrganizationsLoading,
-    isFetched: isOrganizationsFetched,
-    isSuccess: wasOrganizationsRequestSuccessful,
+    error: errorOrganizations,
+    isLoading: isLoadingOrganizations,
+    isError: isErrorOrganizations,
   } = useOrganizationsQuery()
 
-  if (!isOrganizationsFetched) {
+  if (isLoadingOrganizations) {
     return (
-      <Loading active={areOrganizationsLoading}>
-        <div className="grid md:grid-cols-2 pt-10 gap-8">
-          <ShimmeringLoader className="w-full" />
-
-          <div className="space-y-4">
-            <ShimmeringLoader className="w-full h-14" />
-            <ShimmeringLoader className="w-full h-14" />
-          </div>
+      <div className="grid md:grid-cols-2 pt-10 gap-8">
+        <ShimmeringLoader className="w-full" />
+        <div className="space-y-4">
+          <ShimmeringLoader className="w-full h-14" />
+          <ShimmeringLoader className="w-full h-14" />
         </div>
-      </Loading>
+      </div>
     )
   }
 
-  if (!wasOrganizationsRequestSuccessful) {
-    return <p className="mt-4">Error loading redeem credit page. Try again later.</p>
+  if (isErrorOrganizations) {
+    return (
+      <AlertError
+        className="mt-4"
+        error={errorOrganizations}
+        subject="Failed to retrieve organizations"
+      />
+    )
   }
 
   return (
@@ -64,7 +68,7 @@ const RedeemCreditsContent = () => {
             organization to redeem the code.
           </p>
           <Button asChild className="mt-4 w-min" size="tiny" type="primary">
-            <Link href={`/new`}>Create organization</Link>
+            <Link href="/new">Create organization</Link>
           </Button>
         </div>
       </div>

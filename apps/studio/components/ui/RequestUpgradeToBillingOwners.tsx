@@ -47,7 +47,6 @@ interface RequestUpgradeToBillingOwnersProps {
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
   className?: string
-  size?: 'tiny' | 'medium'
 }
 
 export const RequestUpgradeToBillingOwners = ({
@@ -57,7 +56,6 @@ export const RequestUpgradeToBillingOwners = ({
   featureProposition,
   children,
   className,
-  size,
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const [open, setOpen] = useState(false)
   const track = useTrack()
@@ -157,7 +155,7 @@ export const RequestUpgradeToBillingOwners = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button block={block} type="primary" size={size} className={className}>
+        <Button block={block} type="primary" className={className}>
           {buttonText}
         </Button>
       </DialogTrigger>
