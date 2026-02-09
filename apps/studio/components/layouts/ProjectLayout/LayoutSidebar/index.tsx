@@ -1,5 +1,7 @@
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { ResizableHandle, ResizablePanel, cn } from 'ui'
+import { cn, ResizableHandle, ResizablePanel } from 'ui'
+
+import { useIsSidebarToolbarEnabled } from '../../../interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 // Having these params as props as otherwise it's quite hard to visually check the sizes in DefaultLayout
 // as react resizeable panels requires all these values to be valid to render correctly
@@ -17,6 +19,7 @@ export const LayoutSidebar = ({
   defaultSize = 30,
 }: LayoutSidebarProps) => {
   const { activeSidebar } = useSidebarManagerSnapshot()
+  const showSidebarToolbar = useIsSidebarToolbarEnabled()
 
   if (!activeSidebar?.component) return null
 
@@ -35,7 +38,9 @@ export const LayoutSidebar = ({
           'h-[100dvh]',
           'md:absolute md:h-auto md:w-1/2',
           'lg:w-2/5',
-          'xl:relative xl:border-l-0'
+          'xl:relative xl:border-l-0',
+          showSidebarToolbar &&
+            'border-t md:!border-t-0 md:border-l h-[calc(100dvh-50px)] xl:h-[calc(100dvh-48px)] md:top-[48px] xl:top-0 bottom-50 md:bottom-0 w-full md:w-1/2 lg:w-2/5'
         )}
       >
         {activeSidebar?.component()}

@@ -22,22 +22,22 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
+  cn,
   CodeBlock,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
-  HoverCard_Shadcn_,
   KeyboardShortcut,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   SQL_ICON,
-  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 

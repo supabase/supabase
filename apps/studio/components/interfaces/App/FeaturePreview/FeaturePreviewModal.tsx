@@ -14,6 +14,7 @@ import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { QueueOperationsPreview } from './QueueOperationsPreview'
+import { SidebarToolbarPreview } from './SidebarToolbarPreview'
 import { TableFilterBarPreview } from './TableFilterBarPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 
@@ -27,6 +28,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]: <QueueOperationsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]: <TableFilterBarPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_SIDEBAR_TOOLBAR]: <SidebarToolbarPreview />,
 }
 
 const FeaturePreviewModal = () => {

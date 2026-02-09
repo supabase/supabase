@@ -4,9 +4,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 03 Feb 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 06 Feb 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/x-twitter-oauth-2-provider</guid>
+  <title>X / Twitter OAuth 2.0 is now available for Supabase Auth</title>
+  <link>https://supabase.com/blog/x-twitter-oauth-2-provider</link>
+  <description>You can now add &quot;Sign in with X&quot; to your application using the new X / Twitter (OAuth 2.0) provider in Supabase Auth.</description>
+  <pubDate>Fri, 06 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/bknd-joins-supabase</guid>
   <title>BKND joins Supabase</title>
   <link>https://supabase.com/blog/bknd-joins-supabase</link>

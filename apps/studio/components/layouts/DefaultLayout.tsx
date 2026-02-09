@@ -1,18 +1,20 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from 'components/interfaces/Sidebar'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
+import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
+import { cn, ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
+
+import { useIsSidebarToolbarEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader/LayoutHeader'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import { SidebarToolbar } from './ProjectLayout/SidebarToolbar'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
@@ -38,6 +40,7 @@ export const DefaultLayout = ({
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
   const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
+  const showSidebarToolbar = useIsSidebarToolbarEnabled()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -74,7 +77,12 @@ export const DefaultLayout = ({
               />
             </div>
             {/* Main Content Area */}
-            <div className="flex flex-1 w-full overflow-y-hidden">
+            <div
+              className={cn(
+                'flex flex-1 w-full overflow-y-hidden',
+                showSidebarToolbar && 'flex-col md:flex-row'
+              )}
+            >
               {/* Sidebar - Only show for project pages, not account pages */}
               {!router.pathname.startsWith('/account') && <Sidebar />}
               {/* Main Content with Layout Sidebar */}
@@ -100,6 +108,7 @@ export const DefaultLayout = ({
                   defaultSize={100 - contentMaxSizePercentage}
                 />
               </ResizablePanelGroup>
+              {showSidebarToolbar && <SidebarToolbar />}
             </div>
           </div>
         </ProjectContextProvider>

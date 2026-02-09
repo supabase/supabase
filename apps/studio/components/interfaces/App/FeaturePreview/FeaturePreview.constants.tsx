@@ -50,4 +50,11 @@ export const FEATURE_PREVIEWS = [
     isNew: true,
     isPlatformOnly: false,
   },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SIDEBAR_TOOLBAR,
+    name: 'Sidebar Toolbar',
+    discussionsUrl: undefined,
+    isNew: true,
+    isPlatformOnly: false,
+  },
 ] as const

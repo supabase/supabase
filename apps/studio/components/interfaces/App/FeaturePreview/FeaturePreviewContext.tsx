@@ -115,12 +115,20 @@ export const useIsTableFilterBarEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
 }
 
+export const useIsSidebarToolbarEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const showSidebarToolbar = useFlag('enableSidebarToolbar')
+
+  return showSidebarToolbar && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SIDEBAR_TOOLBAR]
+}
+
 export const useFeaturePreviewModal = () => {
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
 
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const isSidebarToolbarAvailable = useFlag('enableSidebarToolbar')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
@@ -135,11 +143,18 @@ export const useFeaturePreviewModal = () => {
           return advisorRulesEnabled
         case 'supabase-ui-preview-unified-logs':
           return isUnifiedLogsPreviewAvailable
+        case 'supabase-ui-sidebar-toolbar':
+          return isSidebarToolbarAvailable
         default:
           return true
       }
     },
-    [gitlessBranchingEnabled, advisorRulesEnabled, isUnifiedLogsPreviewAvailable]
+    [
+      gitlessBranchingEnabled,
+      advisorRulesEnabled,
+      isUnifiedLogsPreviewAvailable,
+      isSidebarToolbarAvailable,
+    ]
   )
 
   const selectedFeatureKey = (

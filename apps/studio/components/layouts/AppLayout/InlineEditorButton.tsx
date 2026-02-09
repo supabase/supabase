@@ -15,7 +15,7 @@ const InlineEditorKeyboardTooltip = () => {
   return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'E']} /> : null
 }
 
-export const InlineEditorButton = () => {
+export const InlineEditorButton = ({ className }: { className?: string }) => {
   const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
 
@@ -30,7 +30,8 @@ export const InlineEditorButton = () => {
       id="editor-trigger"
       className={cn(
         'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground',
-        isOpen && 'bg-foreground text-background hover:text-background'
+        isOpen && 'bg-foreground text-background hover:text-background',
+        className
       )}
       onClick={handleClick}
       tooltip={{

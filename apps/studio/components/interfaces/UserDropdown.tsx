@@ -1,15 +1,15 @@
+import { ProfileImage } from 'components/ui/ProfileImage'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
+import { useProfileNameAndPicture } from 'lib/profile'
 import { Command, FlaskConical, Loader2, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { IS_PLATFORM } from 'lib/constants'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useProfileNameAndPicture } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -19,11 +19,15 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Theme,
   singleThemes,
+  Theme,
 } from 'ui'
 import { useCommandMenuOpenedTelemetry, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+
+import {
+  useFeaturePreviewModal,
+  useIsSidebarToolbarEnabled,
+} from './App/FeaturePreview/FeaturePreviewContext'
 
 export function UserDropdown() {
   const router = useRouter()
@@ -32,6 +36,7 @@ export function UserDropdown() {
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
+  const showSidebarToolbar = useIsSidebarToolbarEnabled()
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const sendTelemetry = useCommandMenuOpenedTelemetry()
   const { openFeaturePreviewModal } = useFeaturePreviewModal()
@@ -46,14 +51,21 @@ export function UserDropdown() {
       <DropdownMenuTrigger asChild className="border flex-shrink-0 px-3">
         <Button
           type="default"
-          className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+          className={cn(
+            '[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8',
+            showSidebarToolbar && 'w-7 h-7'
+          )}
         >
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
               <Loader2 className="animate-spin text-foreground-lighter" size={16} />
             </div>
           ) : (
-            <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
+            <ProfileImage
+              alt={username}
+              src={avatarUrl}
+              className={cn('w-8 h-8 rounded-md', showSidebarToolbar && 'w-7 h-7')}
+            />
           )}
         </Button>
       </DropdownMenuTrigger>

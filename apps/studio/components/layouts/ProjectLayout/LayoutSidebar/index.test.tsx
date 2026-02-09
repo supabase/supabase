@@ -1,10 +1,10 @@
 import { act, screen, waitFor } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { sidebarManagerState } from 'state/sidebar-manager-state'
 import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
 import { ResizablePanel, ResizablePanelGroup } from 'ui'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { LayoutSidebar } from './index'
 import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 
@@ -22,9 +22,32 @@ vi.mock('components/ui/AdvisorPanel/AdvisorPanel', () => ({
 
 vi.mock('nuqs', async () => {
   let queryValue = 'ai-assistant'
+
+  const mockParser = {
+    parse: (query: string) => query,
+    serialize: (value: string) => value,
+    withDefault: (defaultValue: string) => ({
+      parse: (query: string | null) => (query !== null ? query : defaultValue),
+      serialize: (v: string) => (v === null ? null : String(v)),
+    }),
+  }
+
   return {
     useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
-    parseAsString: () => {},
+    parseAsString: mockParser,
+    createParser: (parser: {
+      parse: (query: string) => unknown
+      serialize: (value: unknown) => string | null
+    }) => ({
+      parse: parser.parse,
+      serialize: parser.serialize,
+      withDefault: (defaultValue: unknown) => ({
+        parse: (query: string | null) => (query !== null ? parser.parse(query) : defaultValue),
+        serialize: parser.serialize,
+      }),
+    }),
+    createLoader: () => () => ({}),
+    createSerializer: () => () => '',
   }
 })
 

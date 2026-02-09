@@ -1,0 +1,5 @@
+export { SidebarToolbar } from './SidebarToolbar'
+export { ToolbarButton } from './ToolbarButton'
+export { AdvisorBadge } from './AdvisorBadge'
+export type { ToolbarButtonConfig } from './ToolbarButton'
+export type { ToolbarItem } from './SidebarToolbar.utils'
