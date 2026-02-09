@@ -111,6 +111,7 @@
         "PG_META_CRYPTO_KEY",
         "POSTGRES_PASSWORD",
         "POSTGRES_HOST",
+        "POSTGRES_SSL_MODE",
         "POSTGRES_USER_READ_WRITE",
         "POSTGRES_USER_READ_ONLY",
         "POSTGRES_DB",
