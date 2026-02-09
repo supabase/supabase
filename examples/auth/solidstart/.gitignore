@@ -1,6 +1,0 @@
-node_modules
-.vinxi
-.output
-.env
-.env*.local
-dist
