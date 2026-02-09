@@ -1,10 +1,11 @@
-import { ChevronDown, Database, Plus, RefreshCw, X } from 'lucide-react'
+import { ChevronDown, Database, Network, Plus, RefreshCw, X } from 'lucide-react'
 import { ComponentProps, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
 import { BASE_PATH } from 'lib/constants'
@@ -22,8 +23,6 @@ import {
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import { Network } from 'lucide-react'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
@@ -171,6 +170,13 @@ const ReportFilterBar = ({
 
   const [selectedRange, setSelectedRange] = useState<DatePickerValue>(getInitialDatePickerValue())
 
+  // Sync selectedRange when initialDatePickerValue changes
+  useEffect(() => {
+    if (initialDatePickerValue) {
+      setSelectedRange(initialDatePickerValue)
+    }
+  }, [initialDatePickerValue])
+
   return (
     <div className={cn('flex items-center justify-between', className)}>
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
@@ -283,11 +289,7 @@ const ReportFilterBar = ({
               <span>Add filter</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent
-            align={filters.length > 0 ? 'end' : 'start'}
-            portal={true}
-            className="p-0 w-60"
-          >
+          <PopoverContent align={filters.length > 0 ? 'end' : 'start'} className="p-0 w-60">
             <div className="flex flex-col gap-3 p-3">
               <Select
                 size="tiny"

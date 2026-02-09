@@ -36,9 +36,11 @@ export const LogDrainsEmpty = () => {
             <p className="text-foreground-light mb-6">
               Upgrade to a Team or Enterprise Plan to send your logs to your preferred platform
             </p>
-            <UpgradePlanButton type="primary" plan="Team" source="log-drains-empty-state">
-              Upgrade plan
-            </UpgradePlanButton>
+            <UpgradePlanButton
+              plan="Team"
+              source="log-drains-empty-state"
+              featureProposition="use Log Drains"
+            />
           </div>
           <Card
             className={cn('grid grid-cols-1 bg divide-x mb-8', IS_PLATFORM && '@xl:grid-cols-2')}

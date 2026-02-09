@@ -114,7 +114,7 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
       </div>
       <div className="flex-1">
         {hook.enabled ? (
-          <Badge className="space-x-1" variant="brand">
+          <Badge className="space-x-1" variant="success">
             <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">
               <Check className="h-2 w-2 text-background-overlay " strokeWidth={6} />
             </div>

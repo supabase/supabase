@@ -8,7 +8,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
-import { CreateTableInstructionsDialog } from './CreateTableInstructions/CreateTableInstructionsDialog'
+import { CreateTableInstructionsDialog } from './CreateTable/CreateTableInstructionsDialog'
 
 interface BucketHeaderProps {
   showActions?: boolean
@@ -35,14 +35,12 @@ export const BucketHeader = ({
       </div>
       {showActions && (
         <div className="flex items-center gap-x-2">
-          {namespaces.length > 0 && (
-            <>
-              {HIDE_REPLICATION_USER_FLOW ? (
-                <CreateTableInstructionsDialog />
-              ) : (
-                <ConnectTablesDialog onSuccessConnectTables={onSuccessConnectTables} />
-              )}
-            </>
+          {HIDE_REPLICATION_USER_FLOW ? (
+            <CreateTableInstructionsDialog />
+          ) : (
+            namespaces.length > 0 && (
+              <ConnectTablesDialog onSuccessConnectTables={onSuccessConnectTables} />
+            )
           )}
         </div>
       )}

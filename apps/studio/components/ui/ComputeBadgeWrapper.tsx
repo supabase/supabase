@@ -10,7 +10,7 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
-import ShimmeringLoader from './ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -42,7 +42,7 @@ export const ComputeBadgeWrapper = ({
   const cpuArchitecture = getCloudProviderArchitecture(cloudProvider)
 
   // fetches addons
-  const { data: addons, isLoading: isLoadingAddons } = useProjectAddonsQuery(
+  const { data: addons, isPending: isLoadingAddons } = useProjectAddonsQuery(
     { projectRef },
     { enabled: open }
   )
@@ -65,7 +65,7 @@ export const ComputeBadgeWrapper = ({
 
   const isHighestCompute = computeSize === highestComputeAvailable?.replace('ci_', '')
 
-  const { data, isLoading: isLoadingSubscriptions } = useOrgSubscriptionQuery(
+  const { data, isPending: isLoadingSubscriptions } = useOrgSubscriptionQuery(
     { orgSlug: slug },
     { enabled: open }
   )
@@ -79,7 +79,7 @@ export const ComputeBadgeWrapper = ({
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
       <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
-        <div>
+        <div className="flex items-center">
           <ComputeBadge infraComputeSize={computeSize} />
         </div>
       </HoverCardTrigger>

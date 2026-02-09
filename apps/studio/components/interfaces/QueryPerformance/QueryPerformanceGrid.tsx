@@ -23,8 +23,12 @@ import {
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { Admonition } from 'ui-patterns'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { hasIndexRecommendations } from './IndexAdvisor/index-advisor.utils'
+import {
+  hasIndexRecommendations,
+  queryInvolvesProtectedSchemas,
+} from './IndexAdvisor/index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
@@ -41,8 +45,10 @@ import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFi
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
   isLoading: boolean
+  error?: string | null
   currentSelectedQuery?: string | null
   onCurrentSelectQuery?: (query: string) => void
+  onRetry?: () => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -70,8 +76,10 @@ const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
 export const QueryPerformanceGrid = ({
   aggregatedData,
   isLoading,
+  error,
   currentSelectedQuery,
   onCurrentSelectQuery,
+  onRetry,
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
@@ -438,6 +446,51 @@ export const QueryPerformanceGrid = ({
     }
   }, [handleKeyDown])
 
+  const isSelectQuery = (query: string | undefined): boolean => {
+    if (!query) return false
+    const formattedQuery = query.trim().toLowerCase()
+    return (
+      formattedQuery.startsWith('select') ||
+      formattedQuery.startsWith('with pgrst_source') ||
+      formattedQuery.startsWith('with pgrst_payload')
+    )
+  }
+
+  useEffect(() => {
+    if (selectedRow !== undefined && view === 'suggestion') {
+      const query = reportData[selectedRow]?.query
+      if (!isSelectQuery(query)) {
+        setView('details')
+      }
+    }
+  }, [selectedRow, view, reportData])
+
+  if (error) {
+    return (
+      <div className="relative flex flex-grow bg-alternative min-h-0">
+        <div className="flex-1 min-w-0 p-6">
+          <Admonition
+            type="destructive"
+            title="Failed to load query performance data"
+            description={error}
+          >
+            {onRetry && (
+              <div className="mt-4">
+                <Button type="default" onClick={onRetry}>
+                  Try again
+                </Button>
+              </div>
+            )}
+          </Admonition>
+        </div>
+      </div>
+    )
+  }
+
+  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
+  const isProtectedSchemaQuery = queryInvolvesProtectedSchemas(selectedQuery)
+  const canShowIndexesTab = isSelectQuery(selectedQuery) && !isProtectedSchemaQuery
+
   return (
     <div className="relative flex flex-grow bg-alternative min-h-0">
       <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
@@ -477,14 +530,12 @@ export const QueryPerformanceGrid = ({
                     event.stopPropagation()
 
                     if (typeof idx === 'number' && idx >= 0) {
-                      // If onCurrentSelectQuery is provided, use the chart selection logic
                       if (onCurrentSelectQuery) {
                         const query = reportData[idx]?.query
                         if (query) {
                           onCurrentSelectQuery(query)
                         }
                       } else {
-                        // Otherwise, open the detail panel
                         setSelectedRow(idx)
                         const hasRecommendations = hasIndexRecommendations(
                           reportData[idx]?.index_advisor_result,
@@ -553,30 +604,34 @@ export const QueryPerformanceGrid = ({
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
-                <TabsTrigger_Shadcn_
-                  value="suggestion"
-                  className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
-                >
-                  Indexes
-                </TabsTrigger_Shadcn_>
+                {selectedRow !== undefined && canShowIndexesTab && (
+                  <TabsTrigger_Shadcn_
+                    value="suggestion"
+                    className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                  >
+                    Indexes
+                  </TabsTrigger_Shadcn_>
+                )}
               </TabsList_Shadcn_>
             </div>
 
             <TabsContent_Shadcn_ value="details" className="mt-0 flex-grow min-h-0 overflow-y-auto">
               {selectedRow !== undefined && (
                 <QueryDetail
-                  reportType={reportType}
                   selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
+                  onClose={() => setSelectedRow(undefined)}
                 />
               )}
             </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_
-              value="suggestion"
-              className="mt-0 flex-grow min-h-0 overflow-y-auto"
-            >
-              {selectedRow !== undefined && <QueryIndexes selectedRow={reportData[selectedRow]} />}
-            </TabsContent_Shadcn_>
+            {selectedRow !== undefined && canShowIndexesTab && (
+              <TabsContent_Shadcn_
+                value="suggestion"
+                className="mt-0 flex-grow min-h-0 overflow-y-auto"
+              >
+                <QueryIndexes selectedRow={reportData[selectedRow]} />
+              </TabsContent_Shadcn_>
+            )}
           </Tabs_Shadcn_>
         </SheetContent>
       </Sheet>

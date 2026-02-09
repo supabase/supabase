@@ -1,14 +1,14 @@
 'use client'
 
-import { useCallback } from 'react'
-import { useCommandMenuTelemetryContext } from './useCommandMenuTelemetryContext'
-import { useCommandMenuOpen } from './viewHooks'
-
 import type {
-  CommandMenuOpenedEvent,
   CommandMenuCommandClickedEvent,
+  CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
+import { useCallback } from 'react'
+
+import { useCommandMenuTelemetryContext } from './useCommandMenuTelemetryContext'
+import { useCommandMenuOpen } from './viewHooks'
 
 export type CommandMenuTelemetryCallback = (
   event: CommandMenuOpenedEvent | CommandMenuCommandClickedEvent | CommandMenuSearchSubmittedEvent

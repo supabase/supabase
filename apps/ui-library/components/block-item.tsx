@@ -1,8 +1,8 @@
 'use client'
 
-import { OpenInV0Button } from '@/components/open-in-v0-button'
-
 import dynamic from 'next/dynamic'
+
+import { OpenInV0Button } from '@/components/open-in-v0-button'
 
 //The dynamic import is to prevent the command component from being rendered on the server and cause hydration errors
 const Command = dynamic(() => import('./command').then((mod) => mod.Command), { ssr: false })

@@ -32,7 +32,8 @@ const PauseProjectButton = () => {
 
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const isFreePlan = organization?.plan.id === 'free'
-  const isPaidAndNotAwsK8s = !isFreePlan && !isAwsK8s
+  const isBranch = Boolean(project?.parent_project_ref)
+  const isPaidAndNotAwsK8s = !isBranch && !isFreePlan && !isAwsK8s
 
   const { mutate: pauseProject, isPending: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {

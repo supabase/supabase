@@ -176,7 +176,7 @@ export const CreateKeyDialog = ({
             <SelectContent_Shadcn_>
               <SelectItem_Shadcn_ value="ES256">
                 <span>ES256 (ECC)</span>
-                <Badge variant="brand" className="ml-2">
+                <Badge variant="success" className="ml-2">
                   Recommended
                 </Badge>
               </SelectItem_Shadcn_>

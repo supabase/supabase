@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -17,12 +17,14 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
 
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import { realtimeReports } from 'data/reports/v2/realtime.config'
 import type { NextPageWithLayout } from 'types'
+import { Admonition } from 'ui-patterns'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -44,6 +46,7 @@ export default RealtimeReport
 const RealtimeUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { db, chart, ref } = useParams()
+  const showEUAlert = useFlag('realtimeReportEUAlert')
 
   const {
     selectedDateRange,
@@ -86,16 +89,22 @@ const RealtimeUsage = () => {
     })
   }, [ref, selectedDateRange, state.selectedDatabaseId])
 
-  const onRefreshReport = async () => {
-    if (!selectedDateRange) return
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatePickerChange,
+    async () => {
+      if (!selectedDateRange) return
 
-    setIsRefreshing(true)
-    queryClient.invalidateQueries({
-      queryKey: ['projects', ref, 'report-v2', { queryGroup: 'realtime' }],
-    })
-    refetch()
-    setTimeout(() => setIsRefreshing(false), 1000)
-  }
+      setIsRefreshing(true)
+
+      queryClient.invalidateQueries({
+        queryKey: ['projects', ref, 'report-v2', { queryGroup: 'realtime' }],
+      })
+      refetch()
+      setTimeout(() => setIsRefreshing(false), 1000)
+    }
+  )
 
   const urlStateHasSyncedRef = useRef(false)
   useEffect(() => {
@@ -125,6 +134,13 @@ const RealtimeUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector={false} title="Realtime" />
+      {showEUAlert ? (
+        <Admonition
+          type="warning"
+          title="EU projects metrics limitation"
+          description="For EU projects, Realtime metrics may not be accurate at this time. Please do not rely on these numbers for the time being."
+        />
+      ) : null}
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-3">
@@ -208,6 +224,9 @@ const RealtimeUsage = () => {
           />
         </div>
       </ReportStickyNav>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </>
   )
 }

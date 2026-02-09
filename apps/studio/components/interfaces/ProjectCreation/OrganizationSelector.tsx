@@ -61,13 +61,11 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
                 <SelectContent_Shadcn_>
                   <SelectGroup_Shadcn_>
                     {organizations?.map((x) => (
-                      <SelectItem_Shadcn_
-                        key={x.id}
-                        value={x.slug}
-                        className="flex justify-between"
-                      >
-                        <span className="mr-2">{x.name}</span>
-                        <Badge>{x.plan.name}</Badge>
+                      <SelectItem_Shadcn_ key={x.id} value={x.slug}>
+                        <div className="flex justify-between items-center gap-2 w-full">
+                          <span>{x.name}</span>
+                          <Badge className="mt-[1px]">{x.plan.name}</Badge>
+                        </div>
                       </SelectItem_Shadcn_>
                     ))}
                   </SelectGroup_Shadcn_>

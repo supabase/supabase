@@ -1,5 +1,4 @@
 // Reference: https://usehooks.com/useLocalStorage/
-
 import { useCallback, useState } from 'react'
 
 export function useLocalStorage<T>(key: string, initialValue: T) {

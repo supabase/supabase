@@ -55,11 +55,7 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
                       ) : (
                         (organizations ?? []).find((o) => o.slug === field.value)?.name
                       )}
-                      {subscriptionPlanId && (
-                        <Badge variant="outline" className="capitalize">
-                          {subscriptionPlanId}
-                        </Badge>
-                      )}
+                      {subscriptionPlanId && <Badge variant="default">{subscriptionPlanId}</Badge>}
                     </div>
                   </SelectValue_Shadcn_>
                 </SelectTrigger_Shadcn_>

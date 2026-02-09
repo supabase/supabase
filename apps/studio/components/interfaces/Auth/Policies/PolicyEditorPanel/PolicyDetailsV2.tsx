@@ -133,11 +133,9 @@ export const PolicyDetailsV2 = ({
             name="table"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
-                  <p className="text-foreground-light text-sm">Table</p>
-                  <p className="text-foreground-light text-sm">
-                    <code className="text-code-inline">on</code> clause
-                  </p>
+                <FormLabel_Shadcn_>
+                  Table
+                  <code className="text-code-inline">on</code> clause
                 </FormLabel_Shadcn_>
                 {authContext === 'database' && (
                   <FormControl_Shadcn_>
@@ -222,11 +220,8 @@ export const PolicyDetailsV2 = ({
             name="behavior"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
-                  <p className="text-foreground-light text-sm">Policy Behavior</p>
-                  <p className="text-foreground-light text-sm">
-                    <code className="text-code-inline">as</code> clause
-                  </p>
+                <FormLabel_Shadcn_>
+                  Policy Behavior <code className="text-code-inline">as</code> clause
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <Select_Shadcn_
@@ -264,11 +259,8 @@ export const PolicyDetailsV2 = ({
             name="command"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
-                  <p className="text-foreground-light text-sm">Policy Command</p>
-                  <p className="text-foreground-light text-sm">
-                    <code className="text-code-inline">for</code> clause
-                  </p>
+                <FormLabel_Shadcn_>
+                  Policy Command <code className="text-code-inline">for</code> clause
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <RadioGroup_Shadcn_
@@ -305,11 +297,8 @@ export const PolicyDetailsV2 = ({
             name="roles"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
-                  <p className="text-foreground-light text-sm">Target Roles</p>
-                  <p className="text-foreground-light text-sm">
-                    <code className="text-code-inline">to</code> clause
-                  </p>
+                <FormLabel_Shadcn_>
+                  Target Roles <code className="text-code-inline">to</code> clause
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <MultiSelectV2

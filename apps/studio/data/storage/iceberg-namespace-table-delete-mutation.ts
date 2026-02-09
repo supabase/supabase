@@ -1,52 +1,37 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
-import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 type DeleteIcebergNamespaceTableVariables = {
-  catalogUri: string
   warehouse: string
   namespace: string
   table: string
   projectRef?: string
 }
 
-const errorPrefix = 'Failed to delete Iceberg namespace table'
-
 async function deleteIcebergNamespaceTable({
   projectRef,
-  catalogUri,
   warehouse,
   namespace,
   table,
 }: DeleteIcebergNamespaceTableVariables) {
-  try {
-    if (!projectRef) throw new Error(`${errorPrefix}: projectRef is required`)
+  if (!projectRef) throw new Error('projectRef is required')
 
-    const tempApiKeyObj = await getOrRefreshTemporaryApiKey(projectRef)
-    const tempApiKey = tempApiKeyObj.apiKey
+  const { error } = await del(
+    '/platform/storage/{ref}/analytics-buckets/{id}/namespaces/{namespace}/tables/{table}',
+    {
+      params: {
+        path: { ref: projectRef, id: warehouse, namespace, table },
+        query: { purge: true },
+      },
+    }
+  )
 
-    let headers = new Headers()
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      apikey: tempApiKey,
-    })
-    headers.delete('Authorization')
-
-    const url =
-      `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables/${table}?purgeRequested=true`.replaceAll(
-        /(?<!:)\/\//g,
-        '/'
-      )
-
-    const response = await fetchHandler(url, { headers, method: 'DELETE' })
-    return response.status === 204
-  } catch (error) {
-    handleError(error)
-  }
+  if (error) handleError(error)
+  return true
 }
 
 type IcebergNamespaceTableDeleteData = Awaited<ReturnType<typeof deleteIcebergNamespaceTable>>
@@ -75,7 +60,6 @@ export const useIcebergNamespaceTableDeleteMutation = ({
       await queryClient.invalidateQueries({
         queryKey: storageKeys.icebergNamespace({
           projectRef: variables.projectRef,
-          catalog: variables.catalogUri,
           warehouse: variables.warehouse,
           namespace: variables.namespace,
         }),

@@ -38,7 +38,7 @@ export function EventGalleryFilters() {
           return (
             <Badge
               key={category.value}
-              variant={isActive ? 'brand' : 'outline'}
+              variant={isActive ? 'success' : 'default'}
               className="cursor-pointer"
               onClick={() => toggleCategory(category.value)}
             >

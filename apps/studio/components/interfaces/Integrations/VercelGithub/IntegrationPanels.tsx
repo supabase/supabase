@@ -105,7 +105,7 @@ export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInst
                     integration.metadata?.gitHubConnectionOwner)}
               </span>
 
-              <Badge className="capitalize">{integration.metadata?.account.type}</Badge>
+              <Badge>{integration.metadata?.account.type}</Badge>
             </div>
             <div className="flex flex-col gap-0">
               <span className="text-foreground-lighter text-xs">

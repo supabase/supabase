@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useTrack } from 'lib/telemetry/track'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,12 +15,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-  Badge,
   Button,
 } from 'ui'
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
 
 export const EnableIndexAdvisorButton = () => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -68,28 +69,18 @@ export const EnableIndexAdvisorButton = () => {
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={() => setIsDialogOpen(!isDialogOpen)}>
       <AlertDialogTrigger asChild>
-        <Button type="primary">Enable</Button>
+        <Button type="primary" onClick={() => track('index_advisor_banner_enable_button_clicked')}>
+          Enable
+        </Button>
       </AlertDialogTrigger>
 
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Enable Index Advisor</AlertDialogTitle>
           <AlertDialogDescription>
-            Index Advisor is a tool that helps you identify and simulate indexes that can improve
-            query performance. To use Index Advisor, you need to enable the following Postgres
-            extensions:
-            <ul className="list-disc pl-6 py-4 flex flex-col gap-2">
-              <li>
-                <Badge className="font-mono text-foreground">index_advisor</Badge> - Recommends
-                database indexes
-              </li>
-              <li>
-                <Badge className="font-mono text-foreground">hypopg</Badge> - For hypothetical
-                indexes simulation
-              </li>
-            </ul>
-            These extensions help identify and simulate indexes that can improve query performance
-            without having to create actual indexes.
+            This will enable the <code className="text-code-inline">index_advisor</code> and{' '}
+            <code className="text-code-inline">hypopg</code> Postgres extensions so Index Advisor
+            can analyse queries and suggest performance-improving indexes.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -98,10 +89,11 @@ export const EnableIndexAdvisorButton = () => {
             onClick={(e) => {
               e.preventDefault()
               onEnableIndexAdvisor()
+              track('index_advisor_dialog_enable_button_clicked')
             }}
             disabled={isEnablingExtension}
           >
-            {isEnablingExtension ? 'Enabling...' : 'Enable Extensions'}
+            {isEnablingExtension ? 'Enabling...' : 'Enable'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

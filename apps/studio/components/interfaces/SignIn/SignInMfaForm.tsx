@@ -11,13 +11,13 @@ import z from 'zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useAuthError } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SupportLink } from '../Support/SupportLink'
 
 const schema = z.object({
@@ -45,7 +45,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     error: factorsError,
     isError: isErrorFactors,
     isSuccess: isSuccessFactors,
-    isLoading: isLoadingFactors,
+    isPending: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,
@@ -97,7 +97,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
         error={error}
         subject="Error while signing in"
         additionalActions={
-          <Button asChild type="warning" className="w-min">
+          <Button asChild type="default">
             <Link href="/sign-in">Back to sign in</Link>
           </Button>
         }

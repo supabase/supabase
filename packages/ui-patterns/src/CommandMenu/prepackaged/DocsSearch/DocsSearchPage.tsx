@@ -1,15 +1,14 @@
 'use client'
 
-import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-
 import {
   DocsSearchResultType as PageType,
   useDocsSearch,
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
+import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_ } from 'ui'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
@@ -17,9 +16,9 @@ import {
   CommandHeader,
   CommandInput,
   CommandWrapper,
-  TextHighlighter,
   escapeAttributeSelector,
   generateCommandClassNames,
+  TextHighlighter,
   useCrossCompatRouter,
   useQuery,
   useSetCommandMenuOpen,

@@ -1,13 +1,5 @@
-import { Fragment } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
-
-import { isFeatureEnabled } from 'common'
 import ApiSchema from '~/components/ApiSchema'
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
-import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
-import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   getApiEndpointById,
   getCliSpec,
@@ -16,20 +8,34 @@ import {
   getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
-import { type IApiEndPoint } from './Reference.api.utils'
+import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   ApiOperationRequestBodyDetails,
   ApiSchemaParamDetails,
   CollapsibleDetails,
   FnParameterDetails,
   RefSubLayout,
-  RequiredBadge,
   ReturnTypeDetails,
   StickyHeader,
 } from '~/features/docs/Reference.ui'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
+import { isFeatureEnabled } from 'common'
+import { Fragment } from 'react'
+import ReactMarkdown from 'react-markdown'
+import {
+  Badge,
+  cn,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
+
+import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
 import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 
@@ -211,7 +217,11 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     <span className="font-mono text-sm font-medium text-foreground">
                       {flag.name}
                     </span>
-                    <RequiredBadge isOptional={!flag.required} />
+                    {flag.required ? (
+                      <Badge variant="warning">Required</Badge>
+                    ) : (
+                      <Badge variant="default">Optional</Badge>
+                    )}
                   </div>
                   {flag.description && (
                     <ReactMarkdown className="prose break-words text-sm">
@@ -276,6 +286,10 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
+  const endpointFgaPermissionGroups =
+    endpointDetails.security
+      ?.filter((sec) => 'fga_permissions' in sec)
+      .map((sec) => sec.fga_permissions) ?? []
   const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
   const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
   const bodyParameters =
@@ -304,15 +318,9 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           <>
             {endpointDetails.summary}
             {endpointDetails.deprecated && (
-              <span
-                className="
-                  uppercase
-                  whitespace-nowrap align-middle inline-block -translate-y-0.5
-                  border border-amber-700 bg-amber-300 text-amber-900
-                  rounded-full font-mono font-medium text-xs px-2 py-0.5 ml-2"
-              >
+              <Badge variant="warning" className="ml-2">
                 deprecated
-              </span>
+              </Badge>
             )}
           </>
         }
@@ -351,6 +359,27 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
                   {endpointDetails['x-oauth-scope']}
                 </span>
               </li>
+            </ul>
+          </section>
+        )}
+        {endpointFgaPermissionGroups.length > 0 && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              The fine-grained token must include the following permissions to access this endpoint:
+            </h3>
+            <ul>
+              {endpointFgaPermissionGroups.map((group, groupIndex) => (
+                <Fragment key={groupIndex}>
+                  {groupIndex > 0 && (
+                    <li className="my-2 text-foreground-lighter text-sm italic">or</li>
+                  )}
+                  {group.map((perm, permIndex) => (
+                    <li key={permIndex} className="list-['-'] ml-2 pl-2">
+                      <span className="font-mono text-sm font-medium text-foreground">{perm}</span>
+                    </li>
+                  ))}
+                </Fragment>
+              ))}
             </ul>
           </section>
         )}

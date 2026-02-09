@@ -26,6 +26,7 @@ import {
   useReadReplicasQuery,
 } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { AWS_REGIONS_DEFAULT, BASE_PATH, DOCS_URL } from 'lib/constants'
@@ -71,22 +72,23 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const { hasAccess: hasReadReplicaAccess } = useCheckEntitlements('instances.read_replicas')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
-  const isNotOnTeamOrEnterprisePlan = useMemo(
-    () => !['team', 'enterprise'].includes(org?.plan.id ?? ''),
+  const isNotOnHigherPlan = useMemo(
+    () => !['team', 'enterprise', 'platform'].includes(org?.plan.id ?? ''),
     [org]
   )
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled: isNotOnTeamOrEnterprisePlan,
+    enabled: isNotOnHigherPlan,
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
   )
-  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
+  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnHigherPlan
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
@@ -130,9 +132,6 @@ const DeployNewReplicaPanel = ({
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        if (data.is_physical_backups_enabled) setRefetchInterval(false)
-      },
     }
   )
 
@@ -174,7 +173,6 @@ const DeployNewReplicaPanel = ({
     : MAX_REPLICAS_ABOVE_XL
   const reachedMaxReplicas =
     (data ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
-  const isFreePlan = org?.plan.id === 'free'
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
   const currentComputeAddon = addons?.selected_addons.find(
@@ -188,7 +186,7 @@ const DeployNewReplicaPanel = ({
     !reachedMaxReplicas &&
     currentPgVersion >= 15 &&
     isAWSProvider &&
-    !isFreePlan &&
+    hasReadReplicaAccess &&
     isWalgEnabled &&
     currentComputeAddon !== undefined &&
     !hasOverdueInvoices &&
@@ -324,12 +322,12 @@ const DeployNewReplicaPanel = ({
                 <Button asChild type="default">
                   <Link
                     href={
-                      isFreePlan
-                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
-                        : `/project/${projectRef}/settings/compute-and-disk`
+                      hasReadReplicaAccess
+                        ? `/project/${projectRef}/settings/compute-and-disk`
+                        : `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
                     }
                   >
-                    {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
+                    {hasReadReplicaAccess ? 'Change compute size' : 'Upgrade to Pro'}
                   </Link>
                 </Button>
                 <DocsButton
@@ -421,9 +419,9 @@ const DeployNewReplicaPanel = ({
                     <Button asChild type="default">
                       <Link
                         href={
-                          isFreePlan
-                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
-                            : `/project/${projectRef}/settings/compute-and-disk`
+                          hasReadReplicaAccess
+                            ? `/project/${projectRef}/settings/compute-and-disk`
+                            : `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
                         }
                       >
                         Upgrade compute size

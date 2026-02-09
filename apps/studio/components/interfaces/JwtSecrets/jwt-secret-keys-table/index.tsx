@@ -1,17 +1,18 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence } from 'framer-motion'
 import { AlertCircle, RotateCw, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDialog,
@@ -37,7 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
@@ -50,7 +51,7 @@ type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'd
 
 export const JWTSecretKeysTable = () => {
   const { ref: projectRef } = useParams()
-  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
 
   const newJwtSecrets = useFlag('newJwtSecrets')
 
@@ -58,20 +59,23 @@ export const JWTSecretKeysTable = () => {
   const [selectedKeyToUpdate, setSelectedKeyToUpdate] = useState<string>()
   const [shownDialog, setShownDialog] = useState<DialogType>()
 
-  const { canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useApiKeysVisibility()
-  const { data: signingKeys, isLoading: isLoadingSigningKeys } = useJWTSigningKeysQuery(
+  const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
+  const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
     {
       projectRef,
     },
     { enabled: canReadAPIKeys }
   )
-  const { data: legacyKey, isLoading: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
+  const { data: legacyKey, isPending: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
     {
       projectRef,
     },
     { enabled: canReadAPIKeys }
   )
-  const { data: legacyAPIKeysStatus, isLoading: isLoadingLegacyAPIKeysStatus } =
+  const { data: legacyAPIKeysStatus, isPending: isLoadingLegacyAPIKeysStatus } =
     useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
 
   const { mutate: migrateJWTSecret, isPending: isMigrating } = useLegacyJWTSigningKeyCreateMutation(
@@ -236,6 +240,7 @@ export const JWTSecretKeysTable = () => {
                       <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Type
                       </TableHead>
+                      <TableHead />
                       <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Actions
                       </TableHead>

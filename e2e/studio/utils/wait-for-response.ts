@@ -61,7 +61,7 @@ export function createApiResponseWaiter(
   const matcher = buildUrlMatcher(basePath, ref, action, options?.method)
 
   return page
-    .waitForResponse(matcher, { timeout: options?.timeout })
+    .waitForResponse(matcher, { timeout: options?.timeout ?? 30_000 })
     .then(() => {})
     .catch((error) => {
       const trimmedBasePath = basePath.replace(/^\/+|\/+$/g, '')

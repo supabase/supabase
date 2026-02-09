@@ -98,7 +98,8 @@ export const JsonEditor = ({
         connectionString: project?.connectionString,
       },
       {
-        onSuccess: (data) => {
+        onSuccess: (data: unknown | undefined) => {
+          if (data === undefined) return
           setJsonStr(JSON.stringify(data))
         },
       }

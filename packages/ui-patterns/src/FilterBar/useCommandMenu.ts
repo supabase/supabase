@@ -1,9 +1,16 @@
+import { Sparkles } from 'lucide-react'
 import { useMemo } from 'react'
 import * as React from 'react'
-import { Sparkles } from 'lucide-react'
+
 import { ActiveInput } from './hooks'
-import { FilterProperty, FilterGroup } from './types'
-import { findConditionByPath, isCustomOptionObject, isFilterOptionObject } from './utils'
+import { FilterGroup, FilterProperty } from './types'
+import {
+  findConditionByPath,
+  isCustomOptionObject,
+  isFilterOperatorObject,
+  isFilterOptionObject,
+} from './utils'
+
 // Deprecated soon; kept for compatibility during refactor
 
 export type CommandItem = {
@@ -97,8 +104,16 @@ function getOperatorItems(
   const availableOperators = property?.operators || ['=']
 
   return availableOperators
-    .filter((op) => op.toUpperCase().includes(operatorValue))
-    .map((op) => ({ value: op, label: op }))
+    .filter((op) => {
+      const searchText = isFilterOperatorObject(op) ? op.value : op
+      return searchText.toUpperCase().includes(operatorValue)
+    })
+    .map((op) => {
+      if (isFilterOperatorObject(op)) {
+        return { value: op.value, label: op.label }
+      }
+      return { value: op, label: op }
+    })
 }
 
 function getInputValue(

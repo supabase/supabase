@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { cn } from '@/lib/utils'
 import { createClient } from '@/registry/default/clients/react/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
@@ -10,7 +12,6 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import { useState } from 'react'
 
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
@@ -55,8 +56,8 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              You've successfully signed up. Please check your email to confirm your account before
-              signing in.
+              You&apos;ve successfully signed up. Please check your email to confirm your account
+              before signing in.
             </p>
           </CardContent>
         </Card>

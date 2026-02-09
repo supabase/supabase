@@ -5,7 +5,7 @@ import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
@@ -37,8 +37,8 @@ import {
   PageHeader,
   PageHeaderAside,
   PageHeaderBreadcrumb,
-  PageHeaderFooter,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -105,25 +105,29 @@ const EdgeFunctionDetailsLayout = ({
 
   const navigationItems = functionSlug
     ? [
+        ...(IS_PLATFORM
+          ? [
+              {
+                label: 'Overview',
+                href: `/project/${ref}/functions/${functionSlug}`,
+              },
+              {
+                label: 'Invocations',
+                href: `/project/${ref}/functions/${functionSlug}/invocations`,
+              },
+              {
+                label: 'Logs',
+                href: `/project/${ref}/functions/${functionSlug}/logs`,
+              },
+            ]
+          : []),
         {
-          label: 'Overview',
-          href: `/project/${ref}/functions/${functionSlug}`,
-        },
-        {
-          label: 'Invocations',
-          href: `/project/${ref}/functions/${functionSlug}/invocations`,
-        },
-        {
-          label: 'Logs',
-          href: `/project/${ref}/functions/${functionSlug}/logs`,
+          label: 'Details',
+          href: `/project/${ref}/functions/${functionSlug}/details`,
         },
         {
           label: 'Code',
           href: `/project/${ref}/functions/${functionSlug}/code`,
-        },
-        {
-          label: 'Details',
-          href: `/project/${ref}/functions/${functionSlug}/details`,
         },
       ]
     : []
@@ -133,13 +137,58 @@ const EdgeFunctionDetailsLayout = ({
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+
+    // Extract file paths relative to function slug
+    const filePaths = functionBody.files.map((file) => {
+      const nameSections = file.name.split('/')
+      const slugIndex = nameSections.indexOf(functionSlug ?? '')
+      return nameSections.slice(slugIndex + 1).join('/')
+    })
+
+    // Find the deepest relative path (count leading ../ segments)
+    let maxDepth = 0
+    filePaths.forEach((path) => {
+      const segments = path.split('/')
+      let depth = 0
+      for (const segment of segments) {
+        if (segment === '..') {
+          depth++
+        } else {
+          break
+        }
+      }
+      maxDepth = Math.max(maxDepth, depth)
+    })
+
+    // Add files to zip with normalized paths
     functionBody.files.forEach((file) => {
       const nameSections = file.name.split('/')
       const slugIndex = nameSections.indexOf(functionSlug ?? '')
       const fileName = nameSections.slice(slugIndex + 1).join('/')
 
+      // Count and remove leading ../ segments
+      const segments = fileName.split('/')
+      let parentDirCount = 0
+      while (segments.length > 0 && segments[0] === '..') {
+        segments.shift()
+        parentDirCount++
+      }
+
+      // Calculate safe path:
+      // - Files without ../ go into the full base path
+      // - Files with ../ go into a shallower path based on how many levels up they go
+      const depthFromBase = maxDepth - parentDirCount
+      const safePath =
+        depthFromBase > 0
+          ? Array.from({ length: depthFromBase }, (_, i) => (i === 0 ? 'src' : `src${i}`)).join(
+              '/'
+            ) +
+            '/' +
+            segments.join('/')
+          : segments.join('/')
+
       const fileBlob = new Blob([file.content])
-      zipWriter.add(fileName, new BlobReader(fileBlob))
+      zipWriter.add(safePath, new BlobReader(fileBlob))
     })
 
     const blobURL = URL.createObjectURL(await zipWriter.close())
@@ -175,7 +224,7 @@ const EdgeFunctionDetailsLayout = ({
   return (
     <EdgeFunctionsLayout>
       <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader size="full">
+        <PageHeader size="full" className="sticky top-0 z-10 bg-background">
           {breadcrumbItems.length > 0 && (
             <PageHeaderBreadcrumb>
               <BreadcrumbList>
@@ -222,18 +271,22 @@ const EdgeFunctionDetailsLayout = ({
                     </Button>
                   </PopoverTrigger_Shadcn_>
                   <PopoverContent_Shadcn_ align="end" className="p-0">
-                    <div className="p-3 flex flex-col gap-y-2">
-                      <p className="text-xs text-foreground-light">Download via CLI</p>
-                      <Input
-                        copy
-                        showCopyOnHover
-                        readOnly
-                        containerClassName=""
-                        className="text-xs font-mono tracking-tighter"
-                        value={`supabase functions download ${functionSlug}`}
-                      />
-                    </div>
-                    <Separator className="!bg-border-overlay" />
+                    {IS_PLATFORM && (
+                      <>
+                        <div className="p-3 flex flex-col gap-y-2">
+                          <p className="text-xs text-foreground-light">Download via CLI</p>
+                          <Input
+                            copy
+                            showCopyOnHover
+                            readOnly
+                            containerClassName=""
+                            className="text-xs font-mono tracking-tighter"
+                            value={`supabase functions download ${functionSlug}`}
+                          />
+                        </div>
+                        <Separator className="!bg-border-overlay" />
+                      </>
+                    )}
                     <div className="py-2 px-1">
                       <Button
                         type="text"
@@ -246,30 +299,34 @@ const EdgeFunctionDetailsLayout = ({
                     </div>
                   </PopoverContent_Shadcn_>
                 </Popover_Shadcn_>
-                {!!functionSlug && (
-                  <Button
-                    type="default"
-                    icon={<Send />}
-                    onClick={() => {
-                      setIsOpen(true)
-                      sendEvent({
-                        action: 'edge_function_test_side_panel_opened',
-                        groups: {
-                          project: ref ?? 'Unknown',
-                          organization: org?.slug ?? 'Unknown',
-                        },
-                      })
-                    }}
-                  >
-                    Test
-                  </Button>
+                {IS_PLATFORM && (
+                  <>
+                    {!!functionSlug && (
+                      <Button
+                        type="default"
+                        icon={<Send />}
+                        onClick={() => {
+                          setIsOpen(true)
+                          sendEvent({
+                            action: 'edge_function_test_side_panel_opened',
+                            groups: {
+                              project: ref ?? 'Unknown',
+                              organization: org?.slug ?? 'Unknown',
+                            },
+                          })
+                        }}
+                      >
+                        Test
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </PageHeaderAside>
           </PageHeaderMeta>
 
           {navigationItems.length > 0 && (
-            <PageHeaderFooter>
+            <PageHeaderNavigationTabs>
               <NavMenu>
                 {navigationItems.map((item) => {
                   const isActive = router.asPath.split('?')[0] === item.href
@@ -280,7 +337,7 @@ const EdgeFunctionDetailsLayout = ({
                   )
                 })}
               </NavMenu>
-            </PageHeaderFooter>
+            </PageHeaderNavigationTabs>
           )}
         </PageHeader>
 

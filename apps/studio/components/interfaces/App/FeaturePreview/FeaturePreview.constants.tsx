@@ -2,13 +2,6 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
   {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS,
-    name: 'Security notification emails',
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/40349',
-    isNew: true,
-    isPlatformOnly: true,
-  },
-  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
     name: 'New Logs interface',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
@@ -41,6 +34,20 @@ export const FEATURE_PREVIEWS = [
     name: 'Column-level privileges',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     isNew: false,
+    isPlatformOnly: false,
+  },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
+    name: 'Queue table operations',
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/42460',
+    isNew: true,
+    isPlatformOnly: false,
+  },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
+    name: 'New Table Filter Bar',
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/42461',
+    isNew: true,
     isPlatformOnly: false,
   },
 ] as const

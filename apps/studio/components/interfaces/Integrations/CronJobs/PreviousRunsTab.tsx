@@ -158,7 +158,7 @@ export const PreviousRunsTab = () => {
 
   const {
     data,
-    isLoading: isLoadingCronJobRuns,
+    isPending: isLoadingCronJobRuns,
     isFetching,
     fetchNextPage,
   } = useCronJobRunsInfiniteQuery(

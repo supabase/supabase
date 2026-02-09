@@ -1,48 +1,70 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
+import type { SupaRow } from 'components/grid/types'
+import { queueRowDeletesWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Copy, Edit, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { Item, ItemParams, Menu } from 'react-contexify'
 import { toast } from 'sonner'
-
-import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
-import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { copyToClipboard, DialogSectionSeparator } from 'ui'
+import { DialogSectionSeparator, copyToClipboard } from 'ui'
+
 import { formatClipboardValue } from '../../utils/common'
 
-export type RowContextMenuProps = {
+type RowContextMenuProps = {
   rows: SupaRow[]
 }
 
+type RowContextMenuItemProps = ItemParams<{ rowIdx: number }, string>
+
 export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
+  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
-  function onDeleteRow(p: ItemParams) {
-    const { props } = p
-    const { rowIdx } = props
+  function onDeleteRow(p: RowContextMenuItemProps) {
+    const rowIdx = p.props?.rowIdx
+    if (rowIdx === undefined || rowIdx === null) return
+
     const row = rows[rowIdx]
-    if (row) tableEditorSnap.onDeleteRows([row])
+    if (!row) {
+      toast.error('Row not found')
+      return
+    }
+
+    if (isQueueOperationsEnabled) {
+      queueRowDeletesWithOptimisticUpdate({
+        rows: [row],
+        table: snap.originalTable,
+        queryClient,
+        queueOperation: tableEditorSnap.queueOperation,
+        projectRef: project?.ref,
+      })
+      return
+    }
+
+    tableEditorSnap.onDeleteRows([row])
   }
 
-  function onEditRowClick(p: ItemParams) {
-    const { props } = p
-    const { rowIdx } = props
+  function onEditRowClick(p: RowContextMenuItemProps) {
+    const rowIdx = p.props?.rowIdx
+    if (rowIdx === undefined || rowIdx === null) return
+
     const row = rows[rowIdx]
     tableEditorSnap.onEditRow(row)
   }
 
   const onCopyCellContent = useCallback(
-    (p: ItemParams) => {
-      const { props } = p
+    (p: RowContextMenuItemProps) => {
+      const rowIdx = p.props?.rowIdx
+      if (!snap.selectedCellPosition || rowIdx === undefined || rowIdx === null) return
 
-      if (!snap.selectedCellPosition || !props) {
-        return
-      }
-
-      const { rowIdx } = props
       const row = rows[rowIdx]
-
       const columnKey = snap.gridColumns[snap.selectedCellPosition.idx as number].key
 
       const value = row[columnKey]
@@ -55,9 +77,10 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   )
 
   const onCopyRowContent = useCallback(
-    (p: ItemParams) => {
-      const { props } = p
-      const { rowIdx } = props
+    (p: RowContextMenuItemProps) => {
+      const rowIdx = p.props?.rowIdx
+      if (rowIdx === undefined || rowIdx === null) return
+
       const row = rows[rowIdx]
       copyToClipboard(JSON.stringify(row))
       toast.success('Copied row to clipboard')
