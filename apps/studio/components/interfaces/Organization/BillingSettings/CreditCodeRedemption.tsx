@@ -38,7 +38,7 @@ import { useLatest } from '@/hooks/misc/useLatest'
 const FORM_ID = 'credit-code-redemption'
 
 const FormSchema = z.object({
-  code: z.coerce.string(),
+  code: z.string().min(1, 'Code is required'),
 })
 
 type CreditCodeRedemptionForm = z.infer<typeof FormSchema>
@@ -78,6 +78,7 @@ export const CreditCodeRedemption = ({
     resolver: zodResolver(FormSchema),
     defaultValues: { code: '' },
   })
+  const { isValid } = form.formState
 
   const {
     mutate: redeemCode,
@@ -281,7 +282,12 @@ export const CreditCodeRedemption = ({
                       control={form.control}
                       name="code"
                       render={({ field }) => (
-                        <FormItemLayout label="Code" className="gap-1" layout="horizontal">
+                        <FormItemLayout
+                          hideMessage
+                          label="Code"
+                          className="gap-1"
+                          layout="horizontal"
+                        >
                           <Input_Shadcn_
                             {...field}
                             className="uppercase w-56 ml-auto"
@@ -328,7 +334,7 @@ export const CreditCodeRedemption = ({
                       type="primary"
                       className="pointer-events-auto"
                       loading={redeemingCode}
-                      disabled={codeRedemptionDisabled}
+                      disabled={codeRedemptionDisabled || !isValid}
                       htmlType="submit"
                       tooltip={{
                         content: {
