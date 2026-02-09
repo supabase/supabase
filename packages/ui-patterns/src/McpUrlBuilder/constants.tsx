@@ -241,15 +241,23 @@ export const MCP_CLIENTS: McpClient[] = [
               <p className="text-xs text-foreground-light">
                 Install the Supabase{' '}
                 <a
-                  href="https://geminicli.com/docs/extensions/"
+                  href="https://github.com/supabase-community/gemini-extension"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-brand hover:underline"
                 >
                   extension
                 </a>{' '}
-                for Gemini CLI. This bundles the Supabase MCP server connection, agent skills, and
-                reference docs.
+                for Gemini CLI. This bundles the Supabase MCP server connection,{' '}
+                <a
+                  href="https://github.com/supabase/agent-skills"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand hover:underline"
+                >
+                  agent skills
+                </a>
+                , and other context.
               </p>
               <CodeBlock
                 value="gemini extensions install https://github.com/supabase-community/gemini-extension"
