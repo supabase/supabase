@@ -27,7 +27,11 @@ import { Admonition } from 'ui-patterns'
 import { BasicInfo } from './Form/BasicInfo'
 import { Permissions } from './Form/Permissions/Permissions'
 import { ResourceAccess } from './Form/ResourceAccess/ResourceAccess'
-import { CUSTOM_EXPIRY_VALUE, EXPIRES_AT_OPTIONS, type ScopedAccessTokenPermission } from '../AccessToken.constants'
+import {
+  CUSTOM_EXPIRY_VALUE,
+  EXPIRES_AT_OPTIONS,
+  type ScopedAccessTokenPermission,
+} from '../AccessToken.constants'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { mapPermissionToFGA, getExpirationDate } from '../AccessToken.utils'
 import { TokenSchema, type TokenFormValues } from '../AccessToken.schemas'
@@ -200,20 +204,26 @@ export const NewScopedTokenSheet = ({
     onOpenChange(false)
   }
 
-  const handleCustomDateChange = useCallback((date: { date: string } | undefined) => {
-    form.setValue('customExpiryDate', date?.date, { shouldValidate: true })
-  }, [form])
+  const handleCustomDateChange = useCallback(
+    (date: { date: string } | undefined) => {
+      form.setValue('customExpiryDate', date?.date, { shouldValidate: true })
+    },
+    [form]
+  )
 
-  const handleCustomExpiryChange = useCallback((isCustom: boolean) => {
-    if (isCustom && !form.getValues('customExpiryDate')) {
-      form.setValue('customExpiryDate', dayjs().endOf('day').toISOString(), {
-        shouldValidate: true,
-      })
-    }
-    if (!isCustom) {
-      form.setValue('customExpiryDate', undefined, { shouldValidate: true })
-    }
-  }, [form])
+  const handleCustomExpiryChange = useCallback(
+    (isCustom: boolean) => {
+      if (isCustom && !form.getValues('customExpiryDate')) {
+        form.setValue('customExpiryDate', dayjs().endOf('day').toISOString(), {
+          shouldValidate: true,
+        })
+      }
+      if (!isCustom) {
+        form.setValue('customExpiryDate', undefined, { shouldValidate: true })
+      }
+    },
+    [form]
+  )
 
   return (
     <Sheet
