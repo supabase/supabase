@@ -232,6 +232,9 @@ export const Grid = memo(
         <div
           className={cn('flex flex-col relative transition-colors', containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
+          onDragOver={onDragOver}
+          onDragLeave={onDragOver}
+          onDrop={onFileDrop}
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
@@ -241,9 +244,6 @@ export const Grid = memo(
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
-              onDragOver={onDragOver}
-              onDragLeave={onDragOver}
-              onDrop={onFileDrop}
             >
               {isLoading && !isDisabled && (
                 <GenericSkeletonLoader className="w-full top-9 absolute p-2" />
