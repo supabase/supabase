@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import dayjs from 'dayjs'
-import type { AccessTokenSort, BaseToken } from './AccessToken.types'
+import type { BaseToken } from './AccessToken.types'
 
 // Mock PERMISSION_LIST so tests are deterministic and don't break when shared-types updates
 vi.mock('./AccessToken.constants', () => ({
@@ -327,32 +327,35 @@ describe('formatAccessText', () => {
 // --- getExpirationDate ---
 
 describe('getExpirationDate', () => {
-  it('should return a date ~1 hour from now for "hour"', () => {
+  const FIXED_DATE = new Date('2025-06-15T12:00:00.000Z')
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(FIXED_DATE)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('should return a date exactly 1 hour from now for "hour"', () => {
     const result = getExpirationDate('hour')!
-    const diff = dayjs(result).diff(dayjs(), 'minute')
-    expect(diff).toBeGreaterThanOrEqual(59)
-    expect(diff).toBeLessThanOrEqual(61)
+    expect(result).toBe(dayjs(FIXED_DATE).add(1, 'hours').toISOString())
   })
 
-  it('should return a date ~1 day from now for "day"', () => {
+  it('should return a date exactly 1 day from now for "day"', () => {
     const result = getExpirationDate('day')!
-    const diff = dayjs(result).diff(dayjs(), 'hour')
-    expect(diff).toBeGreaterThanOrEqual(23)
-    expect(diff).toBeLessThanOrEqual(25)
+    expect(result).toBe(dayjs(FIXED_DATE).add(1, 'day').toISOString())
   })
 
-  it('should return a date ~7 days from now for "week"', () => {
+  it('should return a date exactly 7 days from now for "week"', () => {
     const result = getExpirationDate('week')!
-    const diff = dayjs(result).diff(dayjs(), 'day')
-    expect(diff).toBeGreaterThanOrEqual(6)
-    expect(diff).toBeLessThanOrEqual(7)
+    expect(result).toBe(dayjs(FIXED_DATE).add(7, 'days').toISOString())
   })
 
-  it('should return a date ~30 days from now for "month"', () => {
+  it('should return a date exactly 30 days from now for "month"', () => {
     const result = getExpirationDate('month')!
-    const diff = dayjs(result).diff(dayjs(), 'day')
-    expect(diff).toBeGreaterThanOrEqual(29)
-    expect(diff).toBeLessThanOrEqual(30)
+    expect(result).toBe(dayjs(FIXED_DATE).add(30, 'days').toISOString())
   })
 
   it('should return undefined for "never"', () => {
