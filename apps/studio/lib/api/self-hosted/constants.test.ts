@@ -23,7 +23,7 @@ describe('api/self-hosted/constants', () => {
     it('should use POSTGRES_PORT when set', async () => {
       vi.stubEnv('POSTGRES_PORT', '5433')
       const { POSTGRES_PORT } = await import('./constants')
-      expect(POSTGRES_PORT).toBe('5433')
+      expect(POSTGRES_PORT).toBe(5433)
     })
 
     it('should default to 5432', async () => {
