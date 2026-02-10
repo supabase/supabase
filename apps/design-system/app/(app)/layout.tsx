@@ -1,8 +1,9 @@
+import { ScrollArea } from 'ui'
+
+import { MobileSidebarSheet } from '@/components/mobile-sidebar-sheet'
 import { SideNavigation } from '@/components/side-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { TopNavigation } from '@/components/top-navigation'
-import { MobileSidebarSheet } from '@/components/mobile-sidebar-sheet'
-import { ScrollArea } from 'ui'
 
 interface AppLayoutProps {
   children: React.ReactNode

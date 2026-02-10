@@ -1,8 +1,3 @@
-import { ChevronDown, ListPlus } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -11,26 +6,33 @@ import { VectorBucketIndex } from 'data/storage/vector-buckets-indexes-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { SqlEditor } from 'icons'
 import { DOCS_URL } from 'lib/constants'
+import { ChevronDown, ListPlus } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import {
   Button,
-  cn,
   CodeBlock,
-  Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
+  Command_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   Sheet,
   SheetContent,
   SheetHeader,
   SheetSection,
   SheetTitle,
   SheetTrigger,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { isGreaterThanOrEqual } from '@/lib/semver'
 
 interface VectorBucketTableExamplesSheetProps {
   index: VectorBucketIndex
@@ -147,6 +149,11 @@ function VectorBucketIndexExamples({
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })
   const foreignTable = wrapperInstance?.tables?.find((x) => x.name === indexName)
 
+  const { extension: wrappersExtension } = useS3VectorsWrapperExtension()
+  const updatedImportForeignSchemaSyntax = !!wrappersExtension?.installed_version
+    ? isGreaterThanOrEqual(wrappersExtension.installed_version, '0.5.7')
+    : false
+
   const dimensionLabel = `Data should match ${dimension} dimension${dimension > 1 ? 's' : ''}`
   const startValue = 0.1
   const dimensionComment = generateDimensionComment(dimension)
@@ -159,12 +166,12 @@ insert into
 values
   (
     'doc-1',
-    '[${dimensionExample}]'::embd${sqlComment},
+    '[${dimensionExample}]'${updatedImportForeignSchemaSyntax ? '::s3vec' : '::embd'}${sqlComment},
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   ),
   (
     'doc-2',
-    '[${dimensionExample}]'::embd${sqlComment},
+    '[${dimensionExample}]'${updatedImportForeignSchemaSyntax ? '::s3vec' : '::embd'}${sqlComment},
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   );`
 

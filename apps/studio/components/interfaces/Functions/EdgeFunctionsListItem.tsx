@@ -1,16 +1,16 @@
+import { IS_PLATFORM } from 'common'
+import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { IS_PLATFORM } from 'common'
-import { useParams } from 'common/hooks'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
+import { TableCell, TableRow, copyToClipboard } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-import { createNavigationHandler } from 'lib/navigation'
+
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import type { EdgeFunctionsResponse } from '@/data/edge-functions/edge-functions-query'
+import { createNavigationHandler } from '@/lib/navigation'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -31,9 +31,10 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${item.slug}`
       : `${protocol}://${endpoint}/functions/v1/${item.slug}`
 
-  const handleNavigation = IS_PLATFORM
-    ? createNavigationHandler(`/project/${ref}/functions/${item.slug}`, router)
-    : undefined
+  const handleNavigation = createNavigationHandler(
+    `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/details`}`,
+    router
+  )
 
   return (
     <TableRow
@@ -42,7 +43,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       onAuxClick={handleNavigation}
       onKeyDown={handleNavigation}
       tabIndex={0}
-      className={cn({ 'cursor-pointer inset-focus': IS_PLATFORM })}
+      className="cursor-pointer inset-focus"
     >
       <TableCell>
         <p className="text-sm text-foreground whitespace-nowrap py-2">{item.name}</p>

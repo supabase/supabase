@@ -1,4 +1,3 @@
-import type { Filter, QueryPagination, QueryTable, Sort, Dictionary } from './types'
 import {
   countQuery,
   deleteQuery,
@@ -7,6 +6,7 @@ import {
   truncateQuery,
   updateQuery,
 } from './Query.utils'
+import type { Dictionary, Filter, QueryPagination, QueryTable, Sort } from './types'
 
 export interface IQueryModifier {
   range: (from: number, to: number) => QueryModifier

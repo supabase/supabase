@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@payloadcms/admin-bar": "^3.52.0",
-    "@payloadcms/db-postgres": "^3.52.0",
+    "@payloadcms/db-postgres": "^3.73.0",
     "@payloadcms/live-preview-react": "^3.52.0",
     "@payloadcms/next": "3.52.0",
     "@payloadcms/payload-cloud": "3.60.0",
@@ -53,7 +53,7 @@
     "prism-react-renderer": "^2.3.1",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "~0.34.0",
+    "sharp": "~0.34.5",
     "tailwind-merge": "^1.13.2",
     "tsx": "catalog:",
     "typescript": "catalog:"

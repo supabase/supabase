@@ -36,7 +36,11 @@
           },
           "500": { "description": "Failed to retrieve database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_read"] },
+          { "fga_permissions": ["branching_development_read"] }
+        ],
         "summary": "Get database branch config",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
@@ -81,7 +85,11 @@
           },
           "500": { "description": "Failed to update database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Update database branch config",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -129,7 +137,11 @@
           },
           "500": { "description": "Failed to delete database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_delete"] },
+          { "fga_permissions": ["branching_development_delete"] }
+        ],
         "summary": "Delete a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -178,7 +190,11 @@
           },
           "500": { "description": "Failed to push database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Pushes a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -227,7 +243,11 @@
           },
           "500": { "description": "Failed to merge database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Merges a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -276,7 +296,11 @@
           },
           "500": { "description": "Failed to reset database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Resets a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -319,7 +343,11 @@
           },
           "500": { "description": "Failed to restore database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "Restore a scheduled branch deletion",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -364,7 +392,11 @@
           },
           "500": { "description": "Failed to diff database branch" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_write"] },
+          { "fga_permissions": ["branching_development_write"] }
+        ],
         "summary": "[Beta] Diffs a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -1328,7 +1360,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["branching_development_read"] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_read"] },
+          { "fga_permissions": ["branching_development_read"] }
+        ],
         "summary": "List all database branches",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
@@ -1365,7 +1401,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["branching_development_write"] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_create"] },
+          { "fga_permissions": ["branching_development_create"] }
+        ],
         "summary": "Create a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -1391,7 +1431,7 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to disable preview branching" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["branching_development_write"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["branching_production_delete"] }],
         "summary": "Disables preview branching",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
@@ -1425,7 +1465,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["branching_development_read"] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["branching_production_read"] },
+          { "fga_permissions": ["branching_development_read"] }
+        ],
         "summary": "Get a database branch",
         "tags": ["Environments"],
         "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
@@ -1600,6 +1644,76 @@
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
         "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
+      }
+    },
+    "/v1/projects/{ref}/jit-access": {
+      "get": {
+        "operationId": "v1-get-jit-access-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve project's JIT access config" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
+        "summary": "[Beta] Get project's just-in-time access configuration.",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["security", "management-api"],
+        "x-oauth-scope": "database:read"
+      },
+      "put": {
+        "operationId": "v1-update-jit-access-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/JitAccessRequestRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update project's just-in-time access configuration." }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
+        "summary": "[Beta] Update project's just-in-time access configuration.",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["security", "management-api"],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/network-bans/retrieve": {
@@ -4121,7 +4235,11 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to run sql query" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_write"] }],
+        "security": [
+          { "bearer": [] },
+          { "fga_permissions": ["database_write"] },
+          { "fga_permissions": ["database_read"] }
+        ],
         "summary": "[Beta] Run sql query",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
@@ -4927,7 +5045,7 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get disk utilization" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_read"] }],
         "summary": "Get disk utilization",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
@@ -4958,7 +5076,7 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to modify database disk" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_add_ons_write"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_write"] }],
         "summary": "Modify database disk",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
@@ -4990,7 +5108,7 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project disk autoscale config" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_read"] }],
         "summary": "Gets project disk autoscale config",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
@@ -5706,12 +5824,9 @@
                 }
               }
             }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["members_read"] }],
+        "security": [{ "bearer": [] }],
         "summary": "List members of an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
@@ -7024,6 +7139,52 @@
         "type": "object",
         "properties": { "custom_hostname": { "type": "string", "maxLength": 253, "minLength": 1 } },
         "required": ["custom_hostname"]
+      },
+      "JitAccessResponse": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "string", "format": "uuid" },
+          "user_roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": { "type": "string", "minLength": 1 },
+                "expires_at": { "type": "number" },
+                "allowed_networks": {
+                  "type": "object",
+                  "properties": {
+                    "allowed_cidrs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    },
+                    "allowed_cidrs_v6": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["role"]
+            }
+          }
+        },
+        "required": ["user_id", "user_roles"]
+      },
+      "JitAccessRequestRequest": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["enabled", "disabled", "unavailable"] }
+        },
+        "required": ["state"]
       },
       "NetworkBanResponse": {
         "type": "object",
@@ -9267,45 +9428,6 @@
         "type": "object",
         "properties": { "message": { "type": "string" } },
         "required": ["message"]
-      },
-      "JitAccessResponse": {
-        "type": "object",
-        "properties": {
-          "user_id": { "type": "string", "format": "uuid" },
-          "user_roles": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "role": { "type": "string", "minLength": 1 },
-                "expires_at": { "type": "number" },
-                "allowed_networks": {
-                  "type": "object",
-                  "properties": {
-                    "allowed_cidrs": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": { "cidr": { "type": "string" } },
-                        "required": ["cidr"]
-                      }
-                    },
-                    "allowed_cidrs_v6": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": { "cidr": { "type": "string" } },
-                        "required": ["cidr"]
-                      }
-                    }
-                  }
-                }
-              },
-              "required": ["role"]
-            }
-          }
-        },
-        "required": ["user_id", "user_roles"]
       },
       "AuthorizeJitAccessBody": {
         "type": "object",

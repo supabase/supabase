@@ -2,9 +2,9 @@
 
 import { Check, Copy } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Button_Shadcn_ } from 'ui'
 
 import { useSendTelemetryEvent } from '@/lib/telemetry'
-import { Button_Shadcn_ } from 'ui'
 
 export function CommandCopyButton({ command }: { command: string }) {
   const [copied, setCopied] = useState(false)
