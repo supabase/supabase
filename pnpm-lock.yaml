@@ -65,28 +65,16 @@ catalogs:
       version: 3.25.76
 
 overrides:
-  '@eslint/eslintrc>js-yaml': ^4.1.1
-  '@nuxt/devtools-wizard>diff': ^8.0.3
-  '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
-  '@tanstack/directive-functions-plugin>vite': ^7.1.11
-  '@tanstack/react-start-plugin>vite': ^7.1.11
-  '@tanstack/start-server-core>h3': ^1.15.5
-  '@tanstack/react-start-server>h3': ^1.15.5
-  '@smithy/config-resolver': ^4.4.0
   esbuild: ^0.25.2
   nodemailer: ^7.0.11
   lodash-es: ^4.17.23
   lodash: ^4.17.23
   payload>undici: ^7.18.2
-  preact: 10.26.10
   refractor>prismjs: ^1.30.0
-  shadcn>diff: ^8.0.3
   tar: ^7.5.7
   tmp: ^0.2.4
-  vinxi>vite: ^7.1.11
-  vinxi>h3: ^1.15.5
 
 importers:
 
@@ -563,7 +551,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nuqs:
         specifier: ^1.19.1
-        version: 1.19.1(next@15.5.10(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))
+        version: 1.19.1(next@15.5.10(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))
       openai:
         specifier: ^4.75.1
         version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
@@ -36122,7 +36110,7 @@ snapshots:
 
   number-flow@0.3.7: {}
 
-  nuqs@1.19.1(next@15.5.10(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)):
+  nuqs@1.19.1(next@15.5.10(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)):
     dependencies:
       mitt: 3.0.1
       next: 15.5.10(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
