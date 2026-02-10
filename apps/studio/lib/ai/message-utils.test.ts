@@ -1,37 +1,38 @@
-import { describe, it, expect } from 'vitest'
-import { prepareMessagesForAPI } from './message-utils'
 import type { UIMessage } from 'ai'
+import { describe, expect, it } from 'vitest'
+
+import { prepareMessagesForAPI } from './message-utils'
 
 describe('prepareMessagesForAPI', () => {
   it('should limit messages to last 7 entries', () => {
     const messages: UIMessage[] = Array.from({ length: 10 }, (_, i) => ({
       id: `msg-${i}`,
       role: 'user',
-      content: `Message ${i}`,
+      parts: [{ type: 'text', text: `Message ${i}` }],
     }))
 
     const result = prepareMessagesForAPI(messages)
 
     expect(result).toHaveLength(7)
-    expect(result[0].content).toBe('Message 3')
-    expect(result[6].content).toBe('Message 9')
+    expect(result[0].parts[0]).toEqual({ type: 'text', text: 'Message 3' })
+    expect(result[6].parts[0]).toEqual({ type: 'text', text: 'Message 9' })
   })
 
   it('should remove results property from assistant messages', () => {
-    const messages: UIMessage[] = [
+    const messages = [
       {
         id: 'msg-1',
         role: 'assistant',
-        content: 'Response',
+        parts: [{ type: 'text', text: 'Response' }],
         results: { data: 'some data' },
-      } as UIMessage & { results?: unknown },
-    ]
+      },
+    ] as Array<UIMessage & { results?: unknown }>
 
     const result = prepareMessagesForAPI(messages)
 
     expect(result).toHaveLength(1)
     expect(result[0]).not.toHaveProperty('results')
-    expect(result[0].content).toBe('Response')
+    expect(result[0].parts[0]).toEqual({ type: 'text', text: 'Response' })
   })
 
   it('should preserve messages without results', () => {
@@ -39,12 +40,12 @@ describe('prepareMessagesForAPI', () => {
       {
         id: 'msg-1',
         role: 'user',
-        content: 'Question',
+        parts: [{ type: 'text', text: 'Question' }],
       },
       {
         id: 'msg-2',
         role: 'assistant',
-        content: 'Answer',
+        parts: [{ type: 'text', text: 'Answer' }],
       },
     ]
 
@@ -66,9 +67,9 @@ describe('prepareMessagesForAPI', () => {
 
   it('should handle array with fewer than 7 messages', () => {
     const messages: UIMessage[] = [
-      { id: 'msg-1', role: 'user', content: 'Message 1' },
-      { id: 'msg-2', role: 'assistant', content: 'Message 2' },
-      { id: 'msg-3', role: 'user', content: 'Message 3' },
+      { id: 'msg-1', role: 'user', parts: [{ type: 'text', text: 'Message 1' }] },
+      { id: 'msg-2', role: 'assistant', parts: [{ type: 'text', text: 'Message 2' }] },
+      { id: 'msg-3', role: 'user', parts: [{ type: 'text', text: 'Message 3' }] },
     ]
 
     const result = prepareMessagesForAPI(messages)
@@ -81,7 +82,7 @@ describe('prepareMessagesForAPI', () => {
     const messages: UIMessage[] = Array.from({ length: 7 }, (_, i) => ({
       id: `msg-${i}`,
       role: i % 2 === 0 ? 'user' : 'assistant',
-      content: `Message ${i}`,
+      parts: [{ type: 'text', text: `Message ${i}` }],
     }))
 
     const result = prepareMessagesForAPI(messages)
@@ -91,20 +92,20 @@ describe('prepareMessagesForAPI', () => {
   })
 
   it('should only remove results from assistant messages, not user messages', () => {
-    const messages: UIMessage[] = [
+    const messages = [
       {
         id: 'msg-1',
         role: 'user',
-        content: 'Question',
+        parts: [{ type: 'text', text: 'Question' }],
         results: { data: 'user data' },
-      } as UIMessage & { results?: unknown },
+      },
       {
         id: 'msg-2',
         role: 'assistant',
-        content: 'Answer',
+        parts: [{ type: 'text', text: 'Answer' }],
         results: { data: 'assistant data' },
-      } as UIMessage & { results?: unknown },
-    ]
+      },
+    ] as Array<UIMessage & { results?: unknown }>
 
     const result = prepareMessagesForAPI(messages)
 
@@ -116,30 +117,30 @@ describe('prepareMessagesForAPI', () => {
   })
 
   it('should handle mixed messages with and without results', () => {
-    const messages: UIMessage[] = [
+    const messages = [
       {
         id: 'msg-1',
         role: 'assistant',
-        content: 'First',
+        parts: [{ type: 'text', text: 'First' }],
         results: { data: 'data1' },
-      } as UIMessage & { results?: unknown },
+      },
       {
         id: 'msg-2',
         role: 'user',
-        content: 'Second',
+        parts: [{ type: 'text', text: 'Second' }],
       },
       {
         id: 'msg-3',
         role: 'assistant',
-        content: 'Third',
+        parts: [{ type: 'text', text: 'Third' }],
       },
       {
         id: 'msg-4',
         role: 'assistant',
-        content: 'Fourth',
+        parts: [{ type: 'text', text: 'Fourth' }],
         results: { data: 'data2' },
-      } as UIMessage & { results?: unknown },
-    ]
+      },
+    ] as Array<UIMessage & { results?: unknown }>
 
     const result = prepareMessagesForAPI(messages)
 

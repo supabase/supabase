@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { noop, EMPTY_OBJ, EMPTY_ARR } from './void'
+import { describe, expect, it } from 'vitest'
+
+import { EMPTY_ARR, EMPTY_OBJ, noop } from './void'
 
 describe('void utilities', () => {
   describe('noop', () => {

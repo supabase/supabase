@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 // End of third-party imports
 
 import { API_URL, BASE_PATH } from 'lib/constants'
-import { HttpResponse, http } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { createMockOrganization, createMockProject } from 'tests/helpers'
 import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock, mswServer } from 'tests/lib/msw'

@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
-  MIRRORED_BREADCRUMBS,
   getMirroredBreadcrumbs,
-  takeBreadcrumbSnapshot,
   getOwnershipOfBreadcrumbSnapshot,
+  MIRRORED_BREADCRUMBS,
+  takeBreadcrumbSnapshot,
 } from './breadcrumbs'
 
 describe('breadcrumbs', () => {

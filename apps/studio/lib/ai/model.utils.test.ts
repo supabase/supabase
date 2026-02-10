@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { getDefaultModelForProvider, PROVIDERS } from './model.utils'
 import type { ProviderName } from './model.utils'
 
@@ -29,7 +30,9 @@ describe('model.utils', () => {
     it('should have bedrock provider with models', () => {
       expect(PROVIDERS.bedrock).toBeDefined()
       expect(PROVIDERS.bedrock.models).toBeDefined()
-      expect(Object.keys(PROVIDERS.bedrock.models)).toContain('anthropic.claude-3-7-sonnet-20250219-v1:0')
+      expect(Object.keys(PROVIDERS.bedrock.models)).toContain(
+        'anthropic.claude-3-7-sonnet-20250219-v1:0'
+      )
       expect(Object.keys(PROVIDERS.bedrock.models)).toContain('openai.gpt-oss-120b-1:0')
     })
 
