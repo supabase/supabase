@@ -2367,6 +2367,8 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'sentry'
       | 's3'
       | 'axiom'
+      | 'last9'
+      | 'otlp'
   }
   groups: TelemetryGroups
 }
@@ -2395,6 +2397,8 @@ export interface LogDrainConfirmButtonSubmittedEvent {
       | 'sentry'
       | 's3'
       | 'axiom'
+      | 'last9'
+      | 'otlp'
   }
   groups: TelemetryGroups
 }

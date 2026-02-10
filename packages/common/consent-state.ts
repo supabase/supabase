@@ -1,6 +1,7 @@
 import type Usercentrics from '@usercentrics/cmp-browser-sdk'
 import type { BaseCategory, UserDecision } from '@usercentrics/cmp-browser-sdk'
 import { proxy, snapshot, useSnapshot } from 'valtio'
+
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 
 export const consentState = proxy({

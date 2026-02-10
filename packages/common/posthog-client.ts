@@ -1,9 +1,19 @@
-import posthog from 'posthog-js'
-import { PostHogConfig } from 'posthog-js'
+import posthog, { PostHogConfig } from 'posthog-js'
 
 // Limit the max number of queued events
 // (e.g. if a user navigates around a lot before accepting consent)
 const MAX_PENDING_EVENTS = 20
+
+export interface ClientTelemetryEvent {
+  id: string
+  timestamp: number
+  eventType: 'capture' | 'identify' | 'pageview' | 'pageleave'
+  eventName: string
+  distinctId?: string
+  properties?: Record<string, unknown>
+}
+
+type ClientTelemetryListener = (event: ClientTelemetryEvent) => void
 
 interface PostHogClientConfig {
   apiKey?: string
@@ -22,6 +32,7 @@ class PostHogClient {
   private pendingExposures: Array<{ experimentId: string; properties: Record<string, any> }> = []
   private config: PostHogClientConfig
   private readonly maxPendingEvents = MAX_PENDING_EVENTS
+  private devListeners: Set<ClientTelemetryListener> = new Set()
 
   constructor(config: PostHogClientConfig = {}) {
     const apiHost =
@@ -120,6 +131,8 @@ class PostHogClient {
       }
 
       posthog.capture('$pageview', properties, { transport: 'sendBeacon' })
+
+      this.emitToDevListeners('pageview', '$pageview', properties)
     } catch (error) {
       console.error('PostHog pageview capture failed:', error)
     }
@@ -141,6 +154,8 @@ class PostHogClient {
     try {
       // Use sendBeacon for page leave to survive tab close
       posthog.capture('$pageleave', properties, { transport: 'sendBeacon' })
+
+      this.emitToDevListeners('pageleave', '$pageleave', properties)
     } catch (error) {
       console.error('PostHog pageleave capture failed:', error)
     }
@@ -157,6 +172,8 @@ class PostHogClient {
 
     try {
       posthog.identify(userId, properties)
+
+      this.emitToDevListeners('identify', '$identify', { userId, ...properties })
     } catch (error) {
       console.error('PostHog identify failed:', error)
     }
@@ -179,17 +196,55 @@ class PostHogClient {
 
   /**
    * Returns PostHog's distinct_id, which holds first-touch attribution data.
-   * Returns undefined until PostHog's `loaded` callback fires.
+   * Falls back to reading from PostHog cookie if SDK isn't initialized yet
+   * (e.g., immediately after OAuth redirect before PostHog loads).
    */
   getDistinctId(): string | undefined {
-    if (!this.initialized) return undefined
+    if (this.initialized) {
+      try {
+        return posthog.get_distinct_id()
+      } catch (error) {
+        console.error('PostHog getDistinctId failed:', error)
+      }
+    }
+
+    // Fallback: parse distinct_id from PostHog cookie
+    return this.getDistinctIdFromCookie()
+  }
+
+  /**
+   * Parse distinct_id from PostHog cookie.
+   * PostHog stores data in a cookie named `ph_<api_key>_posthog` with format:
+   * { distinct_id: "...", ... }
+   */
+  private getDistinctIdFromCookie(): string | undefined {
+    if (typeof document === 'undefined') return undefined
 
     try {
-      return posthog.get_distinct_id()
-    } catch (error) {
-      console.error('PostHog getDistinctId failed:', error)
-      return undefined
+      const cookieName = `ph_${this.config.apiKey}_posthog`
+      const cookies = document.cookie.split(';')
+
+      for (const cookie of cookies) {
+        const trimmed = cookie.trim()
+        const eqIndex = trimmed.indexOf('=')
+        if (eqIndex === -1) continue
+
+        const name = trimmed.substring(0, eqIndex)
+        if (name !== cookieName) continue
+
+        // Use substring instead of split to handle '=' chars in the value
+        const cookieValue = decodeURIComponent(trimmed.substring(eqIndex + 1))
+        const phData = JSON.parse(cookieValue)
+
+        if (phData.distinct_id && typeof phData.distinct_id === 'string') {
+          return phData.distinct_id
+        }
+      }
+    } catch {
+      // No op, cookie may not exist (first visit) or be malformed
     }
+
+    return undefined
   }
 
   /**
@@ -247,6 +302,44 @@ class PostHogClient {
     } catch (error) {
       console.error('PostHog experiment exposure capture failed:', error)
     }
+  }
+
+  subscribeToEvents(listener: ClientTelemetryListener): () => void {
+    this.devListeners.add(listener)
+    return () => this.devListeners.delete(listener)
+  }
+
+  private emitToDevListeners(
+    eventType: ClientTelemetryEvent['eventType'],
+    eventName: string,
+    properties?: Record<string, unknown>
+  ) {
+    if (this.devListeners.size === 0) return
+
+    let distinctId: string | undefined
+    try {
+      const id = posthog.get_distinct_id?.()
+      if (id && id.length > 0) {
+        distinctId = id
+      }
+    } catch {}
+
+    const event: ClientTelemetryEvent = {
+      id: `client-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      timestamp: Date.now(),
+      eventType,
+      eventName,
+      distinctId,
+      properties,
+    }
+
+    this.devListeners.forEach((listener) => {
+      try {
+        listener(event)
+      } catch (e) {
+        console.error('Dev telemetry listener error:', e)
+      }
+    })
   }
 }
 

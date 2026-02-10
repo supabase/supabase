@@ -1,7 +1,7 @@
-import type { YouTubeBlock as YouTubeBlockProps } from '@/payload-types'
-
-import { cn } from '@/utilities/ui'
 import React from 'react'
+
+import type { YouTubeBlock as YouTubeBlockProps } from '@/payload-types'
+import { cn } from '@/utilities/ui'
 
 type Props = {
   className?: string

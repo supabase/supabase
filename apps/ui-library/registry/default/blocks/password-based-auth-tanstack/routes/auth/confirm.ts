@@ -1,8 +1,9 @@
-import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/server'
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getWebRequest } from '@tanstack/react-start/server'
+
+import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/server'
 
 const confirmFn = createServerFn({ method: 'GET' })
   .validator((searchParams: unknown) => {
