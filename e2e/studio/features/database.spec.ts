@@ -1,5 +1,7 @@
 import { expect, Page } from '@playwright/test'
+
 import { env } from '../env.config.js'
+import { dropTable, query } from '../utils/db/index.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import {
@@ -26,68 +28,30 @@ const databaseFunctionName = 'pw_database_function'
 const databaseFunctionNameUpdated = 'pw_database_function_updated'
 const databaseRoleName = 'pw_database_role'
 
-const createTable = async (page: Page, tableName: string, newColumnName: string) => {
-  await page.getByRole('button', { name: 'New table', exact: true }).click()
-  await page.getByTestId('table-name-input').fill(tableName)
-  await page.getByTestId('created_at-extra-options').click()
-  await page.getByText('Is Nullable').click()
-  await page.getByTestId('created_at-extra-options').click({ force: true })
-
-  await page.getByRole('button', { name: 'Add column' }).click()
-  await page.getByRole('textbox', { name: 'column_name' }).fill(newColumnName)
-  await page.getByText('Choose a column type...').click()
-  await page.getByRole('option', { name: 'text Variable-length' }).click()
-
-  await page.getByRole('button', { name: 'Save' }).click()
-
-  await expect(
-    page.getByText(`Table ${tableName} is good to go!`),
-    'Success toast should be visible after table creation'
-  ).toBeVisible({
-    timeout: 50000,
-  })
-
-  await expect(
-    page.getByRole('button', { name: `View ${tableName}`, exact: true }),
-    'Table should be visible after creation'
-  ).toBeVisible()
-}
-
-const deleteTable = async (page: Page, tableName: string) => {
-  await page.getByLabel(`View ${tableName}`, { exact: true }).nth(0).click()
-  await page.getByLabel(`View ${tableName}`, { exact: true }).getByRole('button').nth(1).click()
-  await page.getByText('Delete table').click()
-  await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).click()
-  await page.getByRole('button', { name: 'Delete' }).click()
-  await expect(
-    page.getByText(`Successfully deleted table "${tableName}"`),
-    'Delete confirmation toast should be visible'
-  ).toBeVisible({ timeout: 50000 })
-}
-
 test.describe.serial('Database', () => {
   let page: Page
 
   test.beforeAll(async ({ browser, ref }) => {
+    // Create the shared test table via API
+    await dropTable(databaseTableName) // Clean up if exists
+    await query(`
+      CREATE TABLE IF NOT EXISTS ${databaseTableName} (
+        id bigint generated always as identity not null primary key,
+        created_at timestamptz default now(),
+        ${databaseColumnName} text
+      )
+    `)
+
     page = await browser.newPage()
     const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
     await page.goto(toUrl(`/project/${ref}/editor`))
     await wait
-
-    if ((await page.getByRole('button', { name: `View ${databaseTableName}` }).count()) > 0) {
-      await deleteTable(page, databaseTableName)
-    }
-
-    await createTable(page, databaseTableName, databaseColumnName)
   })
 
-  test.afterAll(async ({ ref }) => {
-    const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
-    await page.goto(toUrl(`/project/${ref}/editor`))
-    await wait
-    if ((await page.getByRole('button', { name: `View ${databaseTableName}` }).count()) > 0) {
-      await deleteTable(page, databaseTableName)
-    }
+  test.afterAll(async () => {
+    // Clean up via API
+    await dropTable(databaseTableName)
+    await page.close()
   })
 
   test.describe('Schema Visualizer', () => {
