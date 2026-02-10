@@ -1,17 +1,17 @@
-import { toast } from 'sonner'
-
 import { useFlag, useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+
 import { ChartConfig } from './ChartConfig'
 import UtilityActions from './UtilityActions'
-import UtilityTabResults from './UtilityTabResults'
 import { UtilityTabExplain } from './UtilityTabExplain'
+import UtilityTabResults from './UtilityTabResults'
 
 export type UtilityPanelProps = {
   id: string
@@ -24,6 +24,7 @@ export type UtilityPanelProps = {
   executeQuery: () => void
   executeExplainQuery: () => void
   onDebug: () => void
+  buildDebugPrompt: () => string
   activeTab?: string
   onActiveTabChange?: (tab: string) => void
 }
@@ -48,6 +49,7 @@ const UtilityPanel = ({
   executeQuery,
   executeExplainQuery,
   onDebug,
+  buildDebugPrompt,
   activeTab = 'results',
   onActiveTabChange,
 }: UtilityPanelProps) => {
@@ -188,6 +190,7 @@ const UtilityPanel = ({
           isExecuting={isExecuting}
           isDisabled={isDisabled}
           onDebug={onDebug}
+          buildDebugPrompt={buildDebugPrompt}
           isDebugging={isDebugging}
         />
       </TabsContent_Shadcn_>

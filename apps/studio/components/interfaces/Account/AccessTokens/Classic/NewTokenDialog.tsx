@@ -7,7 +7,10 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { DatePicker } from 'components/ui/DatePicker'
-import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
+import {
+  useAccessTokenCreateMutation,
+  type NewAccessToken,
+} from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Button,
   Dialog,
@@ -32,9 +35,10 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   CUSTOM_EXPIRY_VALUE,
-  ExpiresAtOptions,
+  EXPIRES_AT_OPTIONS,
   NON_EXPIRING_TOKEN_VALUE,
-} from './AccessTokens.constants'
+} from '../AccessToken.constants'
+import { getExpirationDate } from '../AccessToken.utils'
 
 const formId = 'new-access-token-form'
 
@@ -50,10 +54,10 @@ export interface NewAccessTokenDialogProps {
   open: boolean
   tokenScope: 'V0' | undefined
   onOpenChange: (open: boolean) => void
-  onCreateToken: (token: any) => void
+  onCreateToken: (token: NewAccessToken) => void
 }
 
-export const NewAccessTokenDialog = ({
+export const NewTokenDialog = ({
   open,
   tokenScope,
   onOpenChange,
@@ -64,18 +68,18 @@ export const NewAccessTokenDialog = ({
 
   const form = useForm<z.infer<typeof TokenSchema>>({
     resolver: zodResolver(TokenSchema),
-    defaultValues: { tokenName: '', expiresAt: ExpiresAtOptions['month'].value },
+    defaultValues: { tokenName: '', expiresAt: EXPIRES_AT_OPTIONS['month'].value },
     mode: 'onChange',
   })
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
-    // Use custom date if custom option is selected
-    let expiresAt = values.expiresAt
+    let expiresAt: string | undefined
 
     if (isCustomExpiry && customExpiryDate) {
-      // Use the date from the TokensDatePicker
       expiresAt = customExpiryDate.date
+    } else {
+      expiresAt = getExpirationDate(values.expiresAt || '')
     }
 
     createAccessToken(
@@ -201,11 +205,13 @@ export const NewAccessTokenDialog = ({
                             <SelectValue_Shadcn_ placeholder="Expires at" />
                           </SelectTrigger_Shadcn_>
                           <SelectContent_Shadcn_>
-                            {Object.values(ExpiresAtOptions).map((option) => (
-                              <SelectItem_Shadcn_ key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem_Shadcn_>
-                            ))}
+                            {Object.values(EXPIRES_AT_OPTIONS).map(
+                              (option: { value: string; label: string }) => (
+                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem_Shadcn_>
+                              )
+                            )}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
                       </FormControl_Shadcn_>

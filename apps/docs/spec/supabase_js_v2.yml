@@ -7193,6 +7193,12 @@ functions:
           })
           ```
 
+  - id: cors-headers
+    $ref: '@supabase/supabase-js.cors.corsHeaders'
+
+  - id: functions-setauth
+    $ref: '@supabase/functions-js.FunctionsClient.setAuth'
+
   - id: subscribe
     title: on().subscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
@@ -7442,6 +7448,9 @@ functions:
           ```js
           supabase.removeAllChannels()
           ```
+
+  - id: realtime-setauth
+    $ref: '@supabase/realtime-js.RealtimeClient.setAuth'
 
   - id: file-buckets
     title: 'Overview'
