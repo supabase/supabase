@@ -21,15 +21,21 @@ export type FilterOption = string | FilterOptionObject | CustomOptionObject
 export type AsyncOptionsFunction = (search?: string) => Promise<(string | FilterOptionObject)[]>
 export type SyncOptionsFunction = (search?: string) => (string | FilterOptionObject)[]
 
-export type FilterOperatorGroup = 'comparison' | 'pattern' | 'setNull'
+export type FilterOperatorGroup = 'comparison' | 'pattern' | 'setNull' | 'uncategorized'
 
 export const OPERATOR_GROUP_LABELS: Record<FilterOperatorGroup, string> = {
   comparison: 'COMPARISON',
   pattern: 'PATTERN MATCHING',
   setNull: 'SET & NULL CHECKS',
+  uncategorized: 'OTHER',
 }
 
-export const GROUP_ORDER: FilterOperatorGroup[] = ['comparison', 'pattern', 'setNull']
+export const GROUP_ORDER: FilterOperatorGroup[] = [
+  'comparison',
+  'pattern',
+  'setNull',
+  'uncategorized',
+]
 
 export type OperatorDefinition = {
   value: string
@@ -99,7 +105,7 @@ export type GroupedMenuItem = {
 }
 
 export type MenuItemGroup = {
-  group: FilterOperatorGroup | undefined
+  group: FilterOperatorGroup
   items: GroupedMenuItem[]
 }
 

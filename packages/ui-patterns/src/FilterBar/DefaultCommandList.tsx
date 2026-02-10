@@ -29,9 +29,10 @@ export function DefaultCommandList({
     if (grouped) {
       return groupMenuItemsByOperator(items)
     }
+    // Non-grouped items are treated as a single uncategorized group
     return [
       {
-        group: undefined,
+        group: 'uncategorized',
         items: items.map((item, index) => ({ item, index })),
       },
     ]
@@ -65,7 +66,7 @@ export function DefaultCommandList({
   return (
     <div ref={listRef} className="max-h-[300px] overflow-y-auto py-1">
       {groups.map((groupData, groupIndex) => (
-        <div key={groupData.group ?? 'ungrouped'}>
+        <div key={groupData.group}>
           {groupIndex > 0 && showGroupHeaders && <GroupSeparator />}
           {showGroupHeaders && groupData.group && (
             <GroupHeader label={OPERATOR_GROUP_LABELS[groupData.group]} />

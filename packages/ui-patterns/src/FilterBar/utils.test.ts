@@ -273,7 +273,7 @@ describe('FilterBar Utils', () => {
       expect(result[2].group).toBe('setNull')
     })
 
-    it('places ungrouped items at the end', () => {
+    it('places uncategorized items at the end', () => {
       const items: MenuItem[] = [
         { value: 'custom', label: 'Custom' }, // no group
         { value: '=', label: 'Equals', group: 'comparison' },
@@ -282,7 +282,7 @@ describe('FilterBar Utils', () => {
 
       expect(result).toHaveLength(2)
       expect(result[0].group).toBe('comparison')
-      expect(result[1].group).toBeUndefined()
+      expect(result[1].group).toBe('uncategorized')
     })
 
     it('handles single group scenario', () => {
@@ -310,7 +310,7 @@ describe('FilterBar Utils', () => {
       expect(result[0].items[2].item.value).toBe('>')
     })
 
-    it('handles all items being ungrouped', () => {
+    it('handles all items being uncategorized', () => {
       const items: MenuItem[] = [
         { value: 'a', label: 'A' },
         { value: 'b', label: 'B' },
@@ -318,7 +318,7 @@ describe('FilterBar Utils', () => {
       const result = groupMenuItemsByOperator(items)
 
       expect(result).toHaveLength(1)
-      expect(result[0].group).toBeUndefined()
+      expect(result[0].group).toBe('uncategorized')
       expect(result[0].items).toHaveLength(2)
     })
   })

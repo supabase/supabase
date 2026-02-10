@@ -3,6 +3,7 @@ import {
   CustomOptionObject,
   FilterCondition,
   FilterGroup,
+  FilterOperatorGroup,
   FilterOperatorObject,
   FilterOptionObject,
   FilterProperty,
@@ -262,39 +263,16 @@ export function updateGroupAtPath(
   }
 }
 
-/**
- * Groups menu items by their operator group property.
- * Items are grouped in the order specified by GROUP_ORDER.
- * Items without a group are placed at the end.
- *
- * @param items - Array of menu items to group
- * @returns Array of menu item groups with their items and original indices
- */
 export function groupMenuItemsByOperator(items: MenuItem[]): MenuItemGroup[] {
-  const grouped = new Map<MenuItem['group'], GroupedMenuItem[]>()
+  const grouped = items.reduce<Map<FilterOperatorGroup, GroupedMenuItem[]>>((acc, item, index) => {
+    const group: FilterOperatorGroup = item.group ?? 'uncategorized'
+    const existing = acc.get(group) ?? []
+    acc.set(group, [...existing, { item, index }])
+    return acc
+  }, new Map())
 
-  items.forEach((item, index) => {
-    const group = item.group
-    if (!grouped.has(group)) {
-      grouped.set(group, [])
-    }
-    grouped.get(group)!.push({ item, index })
-  })
-
-  const result: MenuItemGroup[] = []
-
-  // Add groups in defined order
-  for (const groupKey of GROUP_ORDER) {
-    if (grouped.has(groupKey)) {
-      result.push({ group: groupKey, items: grouped.get(groupKey)! })
-      grouped.delete(groupKey)
-    }
-  }
-
-  // Add ungrouped items last
-  if (grouped.has(undefined)) {
-    result.push({ group: undefined, items: grouped.get(undefined)! })
-  }
-
-  return result
+  return GROUP_ORDER.filter((groupKey) => grouped.has(groupKey)).map((groupKey) => ({
+    group: groupKey,
+    items: grouped.get(groupKey) ?? [],
+  }))
 }
