@@ -22,7 +22,9 @@ export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonition
     const clone = contentElement.cloneNode(true) as HTMLElement
     clone
       .querySelectorAll('pre, button, svg, input, textarea, select, [aria-hidden="true"]')
-      .forEach((element) => element.remove())
+      .forEach((element) => {
+        element.remove()
+      })
 
     const text = clone.textContent ?? ''
     return normalizeTextLines(text)
