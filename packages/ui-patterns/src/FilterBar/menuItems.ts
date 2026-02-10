@@ -1,21 +1,10 @@
-import { ActiveInputState, FilterBarAction, FilterGroup, FilterProperty } from './types'
+import { ActiveInputState, FilterBarAction, FilterGroup, FilterProperty, MenuItem } from './types'
 import {
   findConditionByPath,
   isCustomOptionObject,
   isFilterOperatorObject,
   isFilterOptionObject,
 } from './utils'
-
-export type MenuItem = {
-  value: string
-  label: string
-  icon?: React.ReactNode
-  isCustom?: boolean
-  customOption?: (props: any) => React.ReactElement
-  isAction?: boolean
-  action?: FilterBarAction
-  actionInputValue?: string
-}
 
 export function buildOperatorItems(
   activeInput: Extract<ActiveInputState, { type: 'operator' }> | null,
@@ -45,9 +34,14 @@ export function buildOperatorItems(
     })
     .map((op) => {
       if (isFilterOperatorObject(op)) {
-        return { value: op.value, label: `${op.label} (${op.value})` }
+        return {
+          value: op.value,
+          label: op.label,
+          group: op.group,
+          operatorSymbol: op.value,
+        }
       }
-      return { value: op, label: op }
+      return { value: op, label: op, operatorSymbol: op }
     })
 }
 

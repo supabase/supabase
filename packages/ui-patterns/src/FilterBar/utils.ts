@@ -6,7 +6,11 @@ import {
   FilterOperatorObject,
   FilterOptionObject,
   FilterProperty,
+  GROUP_ORDER,
+  GroupedMenuItem,
   isGroup,
+  MenuItem,
+  MenuItemGroup,
   SyncOptionsFunction,
 } from './types'
 
@@ -256,4 +260,41 @@ export function updateGroupAtPath(
       index === current ? updateGroupAtPath(condition as FilterGroup, rest, newGroup) : condition
     ),
   }
+}
+
+/**
+ * Groups menu items by their operator group property.
+ * Items are grouped in the order specified by GROUP_ORDER.
+ * Items without a group are placed at the end.
+ *
+ * @param items - Array of menu items to group
+ * @returns Array of menu item groups with their items and original indices
+ */
+export function groupMenuItemsByOperator(items: MenuItem[]): MenuItemGroup[] {
+  const grouped = new Map<MenuItem['group'], GroupedMenuItem[]>()
+
+  items.forEach((item, index) => {
+    const group = item.group
+    if (!grouped.has(group)) {
+      grouped.set(group, [])
+    }
+    grouped.get(group)!.push({ item, index })
+  })
+
+  const result: MenuItemGroup[] = []
+
+  // Add groups in defined order
+  for (const groupKey of GROUP_ORDER) {
+    if (grouped.has(groupKey)) {
+      result.push({ group: groupKey, items: grouped.get(groupKey)! })
+      grouped.delete(groupKey)
+    }
+  }
+
+  // Add ungrouped items last
+  if (grouped.has(undefined)) {
+    result.push({ group: undefined, items: grouped.get(undefined)! })
+  }
+
+  return result
 }

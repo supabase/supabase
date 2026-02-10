@@ -1,19 +1,17 @@
-import React from 'react'
-import {
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-} from 'ui'
+import { useEffect, useMemo, useRef } from 'react'
 
-import { MenuItem } from './menuItems'
+import { CommandListItem } from './CommandListItem'
+import { EmptyState, GroupHeader, GroupSeparator } from './DefaultCommandList.helpers'
+import { MenuItem, MenuItemGroup, OPERATOR_GROUP_LABELS } from './types'
+import { groupMenuItemsByOperator } from './utils'
 
-type DefaultCommandListProps = {
+export type DefaultCommandListProps = {
   items: MenuItem[]
   highlightedIndex: number
   onSelect: (item: MenuItem) => void
   includeIcon?: boolean
+  grouped?: boolean
+  selectedValue?: string
 }
 
 export function DefaultCommandList({
@@ -21,25 +19,70 @@ export function DefaultCommandList({
   highlightedIndex,
   onSelect,
   includeIcon = true,
+  grouped = false,
+  selectedValue,
 }: DefaultCommandListProps) {
+  const listRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
+
+  const groups: MenuItemGroup[] = useMemo(() => {
+    if (grouped) {
+      return groupMenuItemsByOperator(items)
+    }
+    return [
+      {
+        group: undefined,
+        items: items.map((item, index) => ({ item, index })),
+      },
+    ]
+  }, [grouped, items])
+
+  const showGroupHeaders = groups.length > 1
+
+  useEffect(() => {
+    const itemEl = itemRefs.current.get(highlightedIndex)
+    if (itemEl && listRef.current) {
+      itemEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    }
+  }, [highlightedIndex])
+
+  const setItemRef = (index: number) => (el: HTMLDivElement | null) => {
+    if (el) {
+      itemRefs.current.set(index, el)
+    } else {
+      itemRefs.current.delete(index)
+    }
+  }
+
+  if (items.length === 0) {
+    return (
+      <div ref={listRef} className="max-h-[300px] overflow-y-auto py-1">
+        <EmptyState />
+      </div>
+    )
+  }
+
   return (
-    <Command_Shadcn_>
-      <CommandList_Shadcn_>
-        <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-        <CommandGroup_Shadcn_>
-          {items.map((item, idx) => (
-            <CommandItem_Shadcn_
+    <div ref={listRef} className="max-h-[300px] overflow-y-auto py-1">
+      {groups.map((groupData, groupIndex) => (
+        <div key={groupData.group ?? 'ungrouped'}>
+          {groupIndex > 0 && showGroupHeaders && <GroupSeparator />}
+          {showGroupHeaders && groupData.group && (
+            <GroupHeader label={OPERATOR_GROUP_LABELS[groupData.group]} />
+          )}
+          {groupData.items.map(({ item, index }) => (
+            <CommandListItem
               key={`${item.value}-${item.label}`}
-              value={item.value}
-              onSelect={() => onSelect(item)}
-              className={`text-xs ${idx === highlightedIndex ? 'bg-surface-400' : ''}`}
-            >
-              {includeIcon && item.icon}
-              {item.label}
-            </CommandItem_Shadcn_>
+              item={item}
+              isHighlighted={index === highlightedIndex}
+              isSelected={selectedValue === item.value}
+              includeIcon={includeIcon}
+              onSelect={onSelect}
+              setRef={setItemRef(index)}
+            />
           ))}
-        </CommandGroup_Shadcn_>
-      </CommandList_Shadcn_>
-    </Command_Shadcn_>
+        </div>
+      ))}
+    </div>
   )
 }

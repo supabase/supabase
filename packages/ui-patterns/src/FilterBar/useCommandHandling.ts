@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 
-import { MenuItem } from './menuItems'
-import { ActiveInputState, FilterGroup, FilterProperty } from './types'
+import { ActiveInputState, FilterGroup, FilterProperty, MenuItem } from './types'
 import { addFilterToGroup, addGroupToGroup, findGroupByPath, isCustomOptionObject } from './utils'
 
 export function useCommandHandling({

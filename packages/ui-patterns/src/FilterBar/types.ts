@@ -21,9 +21,26 @@ export type FilterOption = string | FilterOptionObject | CustomOptionObject
 export type AsyncOptionsFunction = (search?: string) => Promise<(string | FilterOptionObject)[]>
 export type SyncOptionsFunction = (search?: string) => (string | FilterOptionObject)[]
 
+export type FilterOperatorGroup = 'comparison' | 'pattern' | 'setNull'
+
+export const OPERATOR_GROUP_LABELS: Record<FilterOperatorGroup, string> = {
+  comparison: 'COMPARISON',
+  pattern: 'PATTERN MATCHING',
+  setNull: 'SET & NULL CHECKS',
+}
+
+export const GROUP_ORDER: FilterOperatorGroup[] = ['comparison', 'pattern', 'setNull']
+
+export type OperatorDefinition = {
+  value: string
+  label: string
+  group: FilterOperatorGroup
+}
+
 export type FilterOperatorObject = {
   value: string
   label: string
+  group?: FilterOperatorGroup
 }
 
 export type FilterOperator = string | FilterOperatorObject
@@ -61,6 +78,29 @@ export type FilterBarAction = {
     inputValue: string,
     context: { path: ConditionPath; activeFilters: FilterGroup }
   ) => void | Promise<void>
+}
+
+export type MenuItem = {
+  value: string
+  label: string
+  icon?: React.ReactNode
+  isCustom?: boolean
+  customOption?: (props: CustomOptionProps) => React.ReactElement
+  isAction?: boolean
+  action?: FilterBarAction
+  actionInputValue?: string
+  group?: FilterOperatorGroup
+  operatorSymbol?: string
+}
+
+export type GroupedMenuItem = {
+  item: MenuItem
+  index: number
+}
+
+export type MenuItemGroup = {
+  group: FilterOperatorGroup | undefined
+  items: GroupedMenuItem[]
 }
 
 export type SerializableFilterProperty = Pick<
