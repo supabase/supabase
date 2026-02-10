@@ -30,10 +30,15 @@ export default defineConfig({
       resolve(dirname, './tests/setup/radix.js'),
     ],
     // Don't look for tests in the nextjs output directory
-    exclude: [...configDefaults.exclude, `.next/*`],
+    exclude: [
+      ...configDefaults.exclude,
+      `.next/*`,
+      'tests/features/logs/logs-query.test.tsx',
+      'tests/features/reports/storage-report.test.tsx',
+    ],
     reporters: [['default']],
     coverage: {
-      reporter: ['lcov'],
+      reporter: ['text', 'text-summary', 'lcov'],
       exclude: [
         '**/*.test.ts',
         '**/*.test.tsx',

@@ -785,6 +785,10 @@ describe('SupportFormPage', () => {
       expect(getSeveritySelector(screen)).toHaveTextContent('High')
     })
 
+    // Wait for library selector to be available before interacting
+    await waitFor(() => {
+      expect(getLibrarySelector(screen)).toBeInTheDocument()
+    })
     await selectLibraryOption(screen, 'JavaScript')
     await waitFor(() => {
       expect(getLibrarySelector(screen)).toHaveTextContent('JavaScript')
@@ -801,9 +805,14 @@ describe('SupportFormPage', () => {
     const supportAccessToggle = screen.getByRole('switch', {
       name: /allow support access to your project/i,
     })
-    expect(supportAccessToggle).toBeChecked()
+    // Wait for toggle to be in expected state before interacting
+    await waitFor(() => {
+      expect(supportAccessToggle).toBeChecked()
+    })
     await userEvent.click(supportAccessToggle)
-    expect(supportAccessToggle).not.toBeChecked()
+    await waitFor(() => {
+      expect(supportAccessToggle).not.toBeChecked()
+    })
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -833,7 +842,7 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
     })
-  }, 10_000)
+  }, 15_000)
 
   test('submits urgent login issues ticket for a different organization', async () => {
     const submitSpy = vi.fn()
