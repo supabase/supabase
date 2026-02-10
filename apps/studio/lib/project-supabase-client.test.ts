@@ -24,8 +24,11 @@ describe('project-supabase-client', () => {
       const projectRef = 'test-project-ref'
       const clientEndpoint = 'https://test.supabase.co'
 
-      apiKeysUtils.getOrRefreshTemporaryApiKey.mockResolvedValue({ apiKey: mockApiKey })
-      supabaseJs.createClient.mockReturnValue(mockClient)
+      vi.mocked(apiKeysUtils.getOrRefreshTemporaryApiKey).mockResolvedValue({
+        apiKey: mockApiKey,
+        expiryTimeMs: Date.now() + 3600000,
+      })
+      vi.mocked(supabaseJs.createClient).mockReturnValue(mockClient as any)
 
       const result = await createProjectSupabaseClient(projectRef, clientEndpoint)
 
@@ -49,12 +52,16 @@ describe('project-supabase-client', () => {
       const mockApiKey = 'test-api-key-456'
       const mockClient = { from: vi.fn() }
 
-      apiKeysUtils.getOrRefreshTemporaryApiKey.mockResolvedValue({ apiKey: mockApiKey })
-      supabaseJs.createClient.mockReturnValue(mockClient)
+      vi.mocked(apiKeysUtils.getOrRefreshTemporaryApiKey).mockResolvedValue({
+        apiKey: mockApiKey,
+        expiryTimeMs: Date.now() + 3600000,
+      })
+      vi.mocked(supabaseJs.createClient).mockReturnValue(mockClient as any)
 
       await createProjectSupabaseClient('ref', 'https://example.com')
 
-      const config = supabaseJs.createClient.mock.calls[0][2]
+      const config = vi.mocked(supabaseJs.createClient).mock.calls[0][2]
+      if (!config?.auth?.storage) throw new Error('storage config is missing')
       const storage = config.auth.storage
 
       // Test storage methods return expected values
@@ -65,7 +72,7 @@ describe('project-supabase-client', () => {
 
     it('should throw error if API key retrieval fails', async () => {
       const error = new Error('Failed to get API key')
-      apiKeysUtils.getOrRefreshTemporaryApiKey.mockRejectedValue(error)
+      vi.mocked(apiKeysUtils.getOrRefreshTemporaryApiKey).mockRejectedValue(error)
 
       await expect(createProjectSupabaseClient('ref', 'https://example.com')).rejects.toThrow(
         'Failed to get API key'
@@ -78,8 +85,11 @@ describe('project-supabase-client', () => {
       const mockApiKey = 'api-key'
       const mockClient = { from: vi.fn() }
 
-      apiKeysUtils.getOrRefreshTemporaryApiKey.mockResolvedValue({ apiKey: mockApiKey })
-      supabaseJs.createClient.mockReturnValue(mockClient)
+      vi.mocked(apiKeysUtils.getOrRefreshTemporaryApiKey).mockResolvedValue({
+        apiKey: mockApiKey,
+        expiryTimeMs: Date.now() + 3600000,
+      })
+      vi.mocked(supabaseJs.createClient).mockReturnValue(mockClient as any)
 
       await createProjectSupabaseClient('project-123', 'https://project123.supabase.co')
 
@@ -95,12 +105,16 @@ describe('project-supabase-client', () => {
       const mockApiKey = 'api-key'
       const mockClient = { from: vi.fn() }
 
-      apiKeysUtils.getOrRefreshTemporaryApiKey.mockResolvedValue({ apiKey: mockApiKey })
-      supabaseJs.createClient.mockReturnValue(mockClient)
+      vi.mocked(apiKeysUtils.getOrRefreshTemporaryApiKey).mockResolvedValue({
+        apiKey: mockApiKey,
+        expiryTimeMs: Date.now() + 3600000,
+      })
+      vi.mocked(supabaseJs.createClient).mockReturnValue(mockClient as any)
 
       await createProjectSupabaseClient('ref', 'https://example.com')
 
-      const config = supabaseJs.createClient.mock.calls[0][2]
+      const config = vi.mocked(supabaseJs.createClient).mock.calls[0][2]
+      if (!config?.auth) throw new Error('auth config is missing')
 
       expect(config.auth.persistSession).toBe(false)
       expect(config.auth.autoRefreshToken).toBe(false)
