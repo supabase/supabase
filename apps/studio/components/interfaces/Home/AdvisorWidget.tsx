@@ -6,6 +6,7 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { useTrack } from 'lib/telemetry/track'
 import { Activity, ExternalLink, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
@@ -49,6 +50,7 @@ export const AdvisorWidget = () => {
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { setSelectedItem } = useAdvisorStateSnapshot()
+  const track = useTrack()
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
@@ -169,6 +171,12 @@ export const AdvisorWidget = () => {
                           snap.newChat({
                             name: 'Summarize lint',
                             initialInput: createLintSummaryPrompt(lint),
+                          })
+                          track('advisor_assistant_button_clicked', {
+                            origin: 'homepage',
+                            advisorCategory: lint.categories[0],
+                            advisorType: lint.name,
+                            advisorLevel: lint.level,
                           })
                         }}
                         telemetrySource="advisor_widget"
