@@ -75,7 +75,10 @@ describe('ai/tools/rendering-tools', () => {
 
       // Test the execute function
       if (!renameTool.execute) throw new Error('execute is undefined')
-      const result = await renameTool.execute({ newName: 'Test Chat' }, { toolCallId: 'test', messages: [] })
+      const result = await renameTool.execute(
+        { newName: 'Test Chat' },
+        { toolCallId: 'test', messages: [] }
+      )
       expect(result).toEqual({ status: 'Chat request sent to client' })
     })
 

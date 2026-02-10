@@ -62,7 +62,9 @@ describe('api/self-hosted/functions/index', () => {
         getFunctionBySlug: vi.fn(),
         getFileEntriesBySlug: vi.fn(),
       }
-      vi.mocked(fileSystemStore.FileSystemFunctionsArtifactStore).mockReturnValue(mockInstance as any)
+      vi.mocked(fileSystemStore.FileSystemFunctionsArtifactStore).mockReturnValue(
+        mockInstance as any
+      )
       process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER = '/tmp/test'
 
       const result = getFunctionsArtifactStore()
