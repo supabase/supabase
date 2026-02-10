@@ -45,7 +45,7 @@ export function DefaultCommandList({
   useEffect(() => {
     const itemEl = itemRefs.current.get(highlightedIndex)
     if (itemEl && listRef.current) {
-      itemEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      itemEl.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [highlightedIndex])
 
