@@ -1,8 +1,9 @@
-import { expect, Page } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { createTable as dbCreateTable, dropTable } from '../utils/db/index.js'
+import { expect, Page } from '@playwright/test'
+
 import { env } from '../env.config.js'
+import { createTable as dbCreateTable, dropTable } from '../utils/db/index.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test } from '../utils/test.js'
@@ -165,7 +166,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameActions}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     await page.getByRole('menuitem', { name: 'Copy name' }).click()
     await page.waitForTimeout(500)
@@ -176,7 +177,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameActions}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     await page.getByRole('menuitem', { name: 'Copy table schema' }).click()
     await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-definition-') // wait for endpoint to generate schema
@@ -193,7 +194,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameActions}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     await page.getByRole('menuitem', { name: 'Duplicate table' }).click()
     await page.getByRole('button', { name: 'Save' }).click()
@@ -367,7 +368,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameGridEditor}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     await page.getByRole('menuitem', { name: 'Edit table' }).click()
     await page.getByTestId('table-name-input').fill(tableNameUpdated)
@@ -386,7 +387,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameUpdated}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     // Open nested export submenu via keyboard (more stable than hover in headless)
     const exportDataItemCsv = page.getByRole('menuitem', { name: 'Export data' })
@@ -425,7 +426,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameUpdated}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     // Open nested export submenu via keyboard (more stable than hover in headless)
     const exportDataItemSql = page.getByRole('menuitem', { name: 'Export data' })
@@ -459,7 +460,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameUpdated}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
 
     const exportDataItemCli = page.getByRole('menuitem', { name: 'Export data' })
