@@ -65,14 +65,14 @@ export const getConnectionStringPooler = ({
 
   // User Id=${directUser};Password=${password};Server=${directHost};Port=${directPort};Database=${directName}`
   const directDotNetString = `{
-  "ConnectionStringPooler": {
+  "ConnectionStrings": {
     "DefaultConnection": "Host=${directHost};Database=${directName};Username=${directUser};Password=${password};SSL Mode=Require;Trust Server Certificate=true"
   }
 }`
 
   // `User Id=${poolerUser};Password=${password};Server=${poolerHost};Port=${poolerPort};Database=${poolerName}${isMd5 ? `;Options='reference=${projectRef}'` : ''}`
   const poolerDotNetString = `{
-  "ConnectionStringPooler": {
+  "ConnectionStrings": {
     "DefaultConnection": "User Id=${poolerUser};Password=${password};Server=${poolerHost};Port=${poolerPort};Database=${poolerName}${isMd5 ? `;Options='reference=${projectRef}'` : ''}"
   }
 }`
@@ -86,7 +86,7 @@ export const getConnectionStringPooler = ({
 
   const poolerUriString = poolingInfo?.connectionString ?? ''
 
-  const nodejsPoolerUriString = `DATABASE_URL=${poolingInfo?.connectionString}`
+  const nodejsPoolerUriString = `DATABASE_URL=${poolingInfo?.connectionString ?? ''}`
 
   const poolerGolangString = `user=${poolerUser} 
 password=${password} 
