@@ -11,6 +11,7 @@ import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
 import go from 'react-syntax-highlighter/dist/cjs/languages/hljs/go'
 import http from 'react-syntax-highlighter/dist/cjs/languages/hljs/http'
+import ini from 'react-syntax-highlighter/dist/cjs/languages/hljs/ini'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
@@ -23,6 +24,7 @@ import {
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import swift from 'react-syntax-highlighter/dist/cjs/languages/hljs/swift'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
+import xml from 'react-syntax-highlighter/dist/cjs/languages/hljs/xml'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
 
 import { copyToClipboard } from '../../lib/utils'
@@ -164,6 +166,8 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('go', go)
   SyntaxHighlighter.registerLanguage('pgsql', pgsql)
   SyntaxHighlighter.registerLanguage('swift', swift)
+  SyntaxHighlighter.registerLanguage('html', xml)
+  SyntaxHighlighter.registerLanguage('toml', ini)
   SyntaxHighlighter.registerLanguage('yaml', yaml)
 
   const large = false
