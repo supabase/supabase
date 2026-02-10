@@ -136,19 +136,6 @@ export const FRAMEWORKS: ConnectionType[] = [
     guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/reactjs`,
     children: [
       {
-        key: 'create-react-app',
-        label: 'Create React App',
-        icon: 'react',
-        children: [
-          {
-            key: 'supabasejs',
-            label: 'supabase-js',
-            icon: 'supabase',
-            children: [],
-          },
-        ],
-      },
-      {
         key: 'vite',
         label: 'Vite',
         icon: 'vite',
@@ -158,6 +145,19 @@ export const FRAMEWORKS: ConnectionType[] = [
             label: 'Supabase-js',
             children: [],
             icon: 'supabase',
+          },
+        ],
+      },
+      {
+        key: 'create-react-app',
+        label: 'Create React App',
+        icon: 'react',
+        children: [
+          {
+            key: 'supabasejs',
+            label: 'supabase-js',
+            icon: 'supabase',
+            children: [],
           },
         ],
       },

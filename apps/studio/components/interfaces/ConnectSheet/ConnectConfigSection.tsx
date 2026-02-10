@@ -1,15 +1,14 @@
-import { useTheme } from 'next-themes'
 import {
   RadioGroupStacked,
   RadioGroupStackedItem,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Switch,
 } from 'ui'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -34,14 +33,12 @@ export function ConnectConfigSection({
   onFieldChange,
   getFieldOptions,
 }: ConnectConfigSectionProps) {
-  const { resolvedTheme } = useTheme()
-  const formLayoutClassName =
-    'md:gap-8 md:[&>div:first-child]:!w-[calc(50%-16px)] md:[&_[data-formlayout-id=labelContainer]]:!w-[calc(50%-16px)]'
-
   if (activeFields.length === 0) return null
 
+  const formLayoutClassName = 'md:[&>div:first-child]:!w-1/3 xl:[&>div:first-child]:!w-2/5'
+
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-y-4">
       {activeFields.map((field) => {
         const options = getFieldOptions(field.id)
         const value = state[field.id]
@@ -56,8 +53,9 @@ export function ConnectConfigSection({
         switch (field.type) {
           case 'radio-grid':
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
+                isReactForm={false}
                 layout="flex-row-reverse"
                 label={field.label}
                 className={formLayoutClassName}
@@ -82,13 +80,14 @@ export function ConnectConfigSection({
                     </RadioGroupStackedItem>
                   ))}
                 </RadioGroupStacked>
-              </FormLayout>
+              </FormItemLayout>
             )
 
           case 'radio-list':
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
+                isReactForm={false}
                 layout="flex-row-reverse"
                 label={field.label}
                 className={formLayoutClassName}
@@ -119,13 +118,14 @@ export function ConnectConfigSection({
                     </RadioGroupStackedItem>
                   ))}
                 </RadioGroupStacked>
-              </FormLayout>
+              </FormItemLayout>
             )
 
           case 'select':
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
+                isReactForm={false}
                 layout="flex-row-reverse"
                 label={field.label}
                 description={field.description}
@@ -146,13 +146,14 @@ export function ConnectConfigSection({
                     ))}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
-              </FormLayout>
+              </FormItemLayout>
             )
 
           case 'switch':
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
+                isReactForm={false}
                 layout="flex-row-reverse"
                 label={field.label}
                 description={field.description}
@@ -163,13 +164,14 @@ export function ConnectConfigSection({
                   checked={Boolean(value)}
                   onCheckedChange={(v) => onFieldChange(field.id, v)}
                 />
-              </FormLayout>
+              </FormItemLayout>
             )
 
           case 'multi-select':
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
+                isReactForm={false}
                 layout="flex-row-reverse"
                 label={field.label}
                 description={field.description}
@@ -202,7 +204,7 @@ export function ConnectConfigSection({
                     </MultiSelectorList>
                   </MultiSelectorContent>
                 </MultiSelector>
-              </FormLayout>
+              </FormItemLayout>
             )
 
           default:

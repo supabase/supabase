@@ -8,9 +8,6 @@ export type ProjectKeys = {
   publishableKey: string | null
 }
 
-/** @deprecated Use ProjectKeys instead */
-export type projectKeys = ProjectKeys
-
 // ============================================================================
 // Connection Strings
 // ============================================================================
@@ -54,13 +51,13 @@ export type ConditionalValue<T> =
 // Schema Types - Modes
 // ============================================================================
 
-export type ConnectMode = string
+type ConnectMode = string
 
 // ============================================================================
 // Schema Types - Fields
 // ============================================================================
 
-export type FieldType = 'select' | 'radio-grid' | 'radio-list' | 'switch' | 'multi-select'
+type FieldType = 'select' | 'radio-grid' | 'radio-list' | 'switch' | 'multi-select'
 
 export interface FieldOption {
   value: string
@@ -69,9 +66,9 @@ export interface FieldOption {
   description?: string
 }
 
-export type FieldOptionsResolver = (state: ConnectState) => FieldOption[]
+type FieldOptionsResolver = (state: ConnectState) => FieldOption[]
 
-export interface FieldDefinition {
+interface FieldDefinition {
   id: string
   type: FieldType
   label: string

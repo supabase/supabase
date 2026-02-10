@@ -5,7 +5,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, cn } from 'ui'
+import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
 
 import type { ProjectKeys } from './Connect.types'
 import { ConnectConfigSection } from './ConnectConfigSection'
@@ -67,19 +67,15 @@ export const ConnectSheet = () => {
         </SheetHeader>
 
         <div className="flex flex-1 flex-col overflow-y-auto">
-          {/* Configuration Section */}
-          <div className="space-y-6 border-b p-8 shrink-0">
-            <div>
-              <ConnectConfigSection
-                activeFields={activeFields}
-                state={state}
-                onFieldChange={updateField}
-                getFieldOptions={getFieldOptions}
-              />
-            </div>
+          <div className="border-b p-8">
+            <ConnectConfigSection
+              activeFields={activeFields}
+              state={state}
+              onFieldChange={updateField}
+              getFieldOptions={getFieldOptions}
+            />
           </div>
 
-          {/* Steps Section */}
           <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
         </div>
       </SheetContent>

@@ -1,26 +1,15 @@
-import { Copy } from 'lucide-react'
-import { useEffect, useRef, useState, type RefObject } from 'react'
-
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, copyToClipboard } from 'ui'
+import { type RefObject } from 'react'
+import { Badge } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import CopyButton from '@/components/ui/CopyButton'
 
 interface CopyPromptAdmonitionProps {
   stepsContainerRef: RefObject<HTMLDivElement | null>
 }
 
 export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonitionProps) {
-  const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const [hasCopiedPrompt, setHasCopiedPrompt] = useState(false)
-
-  useEffect(() => {
-    return () => {
-      if (copyResetTimerRef.current) {
-        clearTimeout(copyResetTimerRef.current)
-      }
-    }
-  }, [])
-
   const normalizeTextLines = (value: string) => {
     return value
       .split('\n')
@@ -96,7 +85,7 @@ export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonition
 
   const handleCopyPrompt = () => {
     const stepElements = stepsContainerRef.current?.querySelectorAll('[data-connect-step]')
-    if (!stepElements?.length) return
+    if (!stepElements?.length) return ''
 
     const promptContent = Array.from(stepElements)
       .map((stepElement, index) => {
@@ -124,14 +113,7 @@ export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonition
       })
       .join('\n\n')
 
-    copyToClipboard(promptContent)
-    setHasCopiedPrompt(true)
-    if (copyResetTimerRef.current) {
-      clearTimeout(copyResetTimerRef.current)
-    }
-    copyResetTimerRef.current = setTimeout(() => {
-      setHasCopiedPrompt(false)
-    }, 2000)
+    return promptContent
   }
 
   return (
@@ -139,14 +121,8 @@ export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonition
       type="tip"
       showIcon={false}
       layout="horizontal"
-      className="mb-6"
-      actions={
-        <Button type="default" size="small" icon={<Copy size={14} />} onClick={handleCopyPrompt}>
-          {hasCopiedPrompt ? 'Copied' : 'Copy prompt'}
-        </Button>
-      }
+      actions={<CopyButton type="default" copyLabel="Copy prompt" asyncText={handleCopyPrompt} />}
     >
-      {/* Background image */}
       <div className="absolute -inset-16 z-0 opacity-50">
         <img
           src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
@@ -161,8 +137,7 @@ export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonition
         <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2">
+      <div className="relative flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between">
         <div className="flex flex-col gap-y-0.5">
           <div className="flex flex-col gap-y-2 items-start">
             <Badge variant="success" className="-ml-0.5">
@@ -170,7 +145,7 @@ export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonition
             </Badge>
             <p className="heading-default">Prompt your agent</p>
           </div>
-          <p className="text-sm text-foreground-lighter text-balance">
+          <p className="text-sm text-foreground-lighter text-balance max-w-72">
             Copy a prompt with everything your agent needs to connect your app for you.
           </p>
         </div>

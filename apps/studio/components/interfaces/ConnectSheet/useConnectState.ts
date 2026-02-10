@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 
+import { getActiveFields, resolveState, resolveSteps } from './connect.resolver'
+import { connectSchema } from './connect.schema'
 import type {
   ConnectSchema,
   ConnectState,
@@ -7,12 +9,6 @@ import type {
   ResolvedField,
   ResolvedStep,
 } from './Connect.types'
-import { getActiveFields, resolveState, resolveSteps } from './connect.resolver'
-import { connectSchema } from './connect.schema'
-
-// ============================================================================
-// Hook
-// ============================================================================
 
 export interface UseConnectStateReturn {
   state: ConnectState
