@@ -1086,6 +1086,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/hardening-data-api' as `/${string}`,
         },
         {
+          name: 'Using Custom Schemas',
+          url: '/guides/api/using-custom-schemas' as `/${string}`,
+        },
+        {
           name: 'Custom Claims & RBAC',
           url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac' as `/${string}`,
         },

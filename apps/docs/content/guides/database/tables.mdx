@@ -446,6 +446,12 @@ create table private.salaries (
 );
 ```
 
+<Admonition type="tip">
+
+If you want to access a custom schema through the Supabase Data API, you need to expose it and grant the appropriate permissions. See [Using Custom Schemas](/docs/guides/api/using-custom-schemas) for detailed steps. For security best practices around schema exposure, see [Hardening the Data API](/docs/guides/database/hardening-data-api).
+
+</Admonition>
+
 ## Views
 
 A View is a convenient shortcut to a query. Creating a view does not involve new tables or data. When run, an underlying query is executed, returning its results to the user.
