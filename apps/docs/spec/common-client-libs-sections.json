@@ -816,13 +816,6 @@
             "type": "function"
           },
           {
-            "id": "send-mobile-otp",
-            "title": "Send a one-time passcode",
-            "slug": "auth-api-sendmobileotp",
-            "product": "auth-server",
-            "type": "function"
-          },
-          {
             "id": "update-user-by-id",
             "title": "Update a user",
             "slug": "auth-admin-updateuserbyid",
@@ -833,13 +826,6 @@
             "id": "auth-js-gotrueadminapi-signout",
             "title": "Sign out a user (admin)",
             "slug": "auth-admin-signout",
-            "product": "auth-admin",
-            "type": "function"
-          },
-          {
-            "id": "mfa-list-factors",
-            "title": "List all factors for a user",
-            "slug": "auth-admin-mfa-listfactors",
             "product": "auth-admin",
             "type": "function"
           },
