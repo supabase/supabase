@@ -13,8 +13,19 @@ vi.mock('./fileSystemStore', () => ({
 }))
 
 describe('api/self-hosted/functions/index', () => {
+  let originalEdgeFunctionsFolder: string | undefined
+
   beforeEach(() => {
-    vi.clearAllMocks()
+    originalEdgeFunctionsFolder = process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER
+    vi.resetAllMocks()
+  })
+
+  afterEach(() => {
+    if (originalEdgeFunctionsFolder !== undefined) {
+      process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER = originalEdgeFunctionsFolder
+    } else {
+      delete process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER
+    }
   })
 
   describe('getFunctionsArtifactStore', () => {
