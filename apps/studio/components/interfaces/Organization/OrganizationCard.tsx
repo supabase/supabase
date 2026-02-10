@@ -29,7 +29,7 @@ export const OrganizationCard = ({
     <ActionCard
       bgColor="bg border"
       className={cn(
-        'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center',
+        'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center max-h-min',
         className
       )}
       icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
