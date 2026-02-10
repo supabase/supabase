@@ -100,18 +100,14 @@ describe('togglePermissionResource', () => {
   })
 
   it('should append to existing rows when adding', () => {
-    const existing: PermissionRow[] = [
-      { resource: 'organization:billing', actions: ['read'] },
-    ]
+    const existing: PermissionRow[] = [{ resource: 'organization:billing', actions: ['read'] }]
     const result = togglePermissionResource(existing, membersResource)
     expect(result).toHaveLength(2)
     expect(result[1]).toEqual({ resource: 'organization:members', actions: ['read'] })
   })
 
   it('should not mutate the original array', () => {
-    const existing: PermissionRow[] = [
-      { resource: 'organization:billing', actions: ['read'] },
-    ]
+    const existing: PermissionRow[] = [{ resource: 'organization:billing', actions: ['read'] }]
     const original = [...existing]
     togglePermissionResource(existing, membersResource)
     expect(existing).toEqual(original)

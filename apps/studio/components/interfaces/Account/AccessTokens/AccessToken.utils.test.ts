@@ -5,13 +5,55 @@ import type { AccessTokenSort, BaseToken } from './AccessToken.types'
 // Mock PERMISSION_LIST so tests are deterministic and don't break when shared-types updates
 vi.mock('./AccessToken.constants', () => ({
   PERMISSION_LIST: [
-    { scope: 'organization', resource: 'billing', action: 'read', id: 'org-billing-read', title: 'Read Billing' },
-    { scope: 'organization', resource: 'billing', action: 'write', id: 'org-billing-write', title: 'Manage Billing' },
-    { scope: 'organization', resource: 'members', action: 'read', id: 'org-members-read', title: 'Read Members' },
-    { scope: 'organization', resource: 'members', action: 'write', id: 'org-members-write', title: 'Manage Members' },
-    { scope: 'organization', resource: 'members', action: 'create', id: 'org-members-create', title: 'Create Members' },
-    { scope: 'organization', resource: 'members', action: 'delete', id: 'org-members-delete', title: 'Delete Members' },
-    { scope: 'project', resource: 'database', action: 'read', id: 'proj-db-read', title: 'Read Database' },
+    {
+      scope: 'organization',
+      resource: 'billing',
+      action: 'read',
+      id: 'org-billing-read',
+      title: 'Read Billing',
+    },
+    {
+      scope: 'organization',
+      resource: 'billing',
+      action: 'write',
+      id: 'org-billing-write',
+      title: 'Manage Billing',
+    },
+    {
+      scope: 'organization',
+      resource: 'members',
+      action: 'read',
+      id: 'org-members-read',
+      title: 'Read Members',
+    },
+    {
+      scope: 'organization',
+      resource: 'members',
+      action: 'write',
+      id: 'org-members-write',
+      title: 'Manage Members',
+    },
+    {
+      scope: 'organization',
+      resource: 'members',
+      action: 'create',
+      id: 'org-members-create',
+      title: 'Create Members',
+    },
+    {
+      scope: 'organization',
+      resource: 'members',
+      action: 'delete',
+      id: 'org-members-delete',
+      title: 'Delete Members',
+    },
+    {
+      scope: 'project',
+      resource: 'database',
+      action: 'read',
+      id: 'proj-db-read',
+      title: 'Read Database',
+    },
   ],
 }))
 
