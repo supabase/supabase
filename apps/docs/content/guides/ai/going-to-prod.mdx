@@ -6,7 +6,7 @@ subtitle: 'Going to production checklist for AI applications.'
 sidebar_label: 'Going to Production'
 ---
 
-This guide will help you to prepare your application for production. We'll provide actionable steps to help you scale your application, ensure that it is reliable, can handle the load, and provide optimal accuracy for your use case.
+This guide will help you prepare your application for production. We'll provide actionable steps to help you scale your application, ensure that it is reliable, can handle the load, and provide optimal accuracy for your use case.
 
 See our [Engineering for Scale](/docs/guides/ai/engineering-for-scale) guide for more information about engineering at scale.
 
@@ -68,7 +68,7 @@ The values of lists and probes directly affect accuracy and queries per second (
 - Higher `probes` means that select queries will be slower, but you can achieve better accuracy.
 - `lists` and `probes` are not independent. Higher `lists` means that you will have to use higher `probes` to achieve the same accuracy.
 
-You can find more examples of how `lists` and `probes` constants affect accuracy and QPS in [pgvector 0.4.0 performance](/blog/pgvector-performance) blogpost.
+You can find more examples of how `lists` and `probes` constants affect accuracy and QPS in [pgvector 0.4.0 performance](/blog/pgvector-performance) blog post.
 
 <Image
   alt="multi database"
