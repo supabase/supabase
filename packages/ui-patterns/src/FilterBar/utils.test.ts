@@ -275,7 +275,7 @@ describe('FilterBar Utils', () => {
 
     it('places uncategorized items at the end', () => {
       const items: MenuItem[] = [
-        { value: 'custom', label: 'Custom' }, // no group
+        { value: 'custom', label: 'Custom', group: 'uncategorized' },
         { value: '=', label: 'Equals', group: 'comparison' },
       ]
       const result = groupMenuItemsByOperator(items)
@@ -283,6 +283,19 @@ describe('FilterBar Utils', () => {
       expect(result).toHaveLength(2)
       expect(result[0].group).toBe('comparison')
       expect(result[1].group).toBe('uncategorized')
+    })
+
+    it('treats items without a group as uncategorized', () => {
+      const items: MenuItem[] = [
+        { value: 'custom', label: 'Custom' },
+        { value: '=', label: 'Equals', group: 'comparison' },
+      ]
+      const result = groupMenuItemsByOperator(items)
+
+      expect(result).toHaveLength(2)
+      expect(result[0].group).toBe('comparison')
+      expect(result[1].group).toBe('uncategorized')
+      expect(result[1].items[0].item.value).toBe('custom')
     })
 
     it('handles single group scenario', () => {
@@ -312,8 +325,8 @@ describe('FilterBar Utils', () => {
 
     it('handles all items being uncategorized', () => {
       const items: MenuItem[] = [
-        { value: 'a', label: 'A' },
-        { value: 'b', label: 'B' },
+        { value: 'a', label: 'A', group: 'uncategorized' },
+        { value: 'b', label: 'B', group: 'uncategorized' },
       ]
       const result = groupMenuItemsByOperator(items)
 
