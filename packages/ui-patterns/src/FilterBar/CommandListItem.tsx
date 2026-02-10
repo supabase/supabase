@@ -25,7 +25,7 @@ export function CommandListItem({
     <div
       ref={setRef}
       role="option"
-      aria-selected={isHighlighted}
+      aria-selected={isSelected}
       onClick={() => onSelect(item)}
       className={cn(
         'relative flex items-center justify-between gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-none text-foreground-light',
