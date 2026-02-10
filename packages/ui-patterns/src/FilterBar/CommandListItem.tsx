@@ -28,7 +28,7 @@ export function CommandListItem({
       aria-selected={isHighlighted}
       onClick={() => onSelect(item)}
       className={cn(
-        'relative flex items-center justify-between gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-none',
+        'relative flex items-center justify-between gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-none text-foreground-light',
         isHighlighted && 'bg-surface-300',
         !isHighlighted && 'hover:bg-surface-200'
       )}
