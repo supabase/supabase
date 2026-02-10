@@ -86,15 +86,15 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    await page.getByRole('button', { name: 'View Details' }).click()
+    await page.getByRole('button', { name: /Review/ }).click()
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
-    await expect(sidePanel.getByText('Cell Edits (1)')).toBeVisible()
+    await expect(sidePanel.getByText('1 cell edit')).toBeVisible()
     await expect(sidePanel.getByTitle('original value')).toBeVisible()
     await expect(sidePanel.getByTitle('edited value')).toBeVisible()
 
-    await sidePanel.getByRole('button', { name: /Save All/ }).click()
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
     await expect(page.getByRole('gridcell', { name: 'edited value' })).toBeVisible()
@@ -126,9 +126,9 @@ test.describe('Queue Table Operations', () => {
     await page.keyboard.press('Enter')
 
     await expect(page.getByText('1 pending change')).toBeVisible()
-    await page.getByRole('button', { name: 'View Details' }).click()
+    await page.getByRole('button', { name: /Review/ }).click()
 
-    await page.getByRole('button', { name: 'Cancel All' }).click()
+    await page.getByRole('button', { name: 'Revert', exact: true }).click()
 
     await expect(page.getByRole('gridcell', { name: 'keep this value' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'should be cancelled' })).not.toBeVisible()
@@ -161,14 +161,14 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByRole('gridcell', { name: 'new row value' })).toBeVisible()
 
-    await page.getByRole('button', { name: 'View Details' }).click()
+    await page.getByRole('button', { name: /Review/ }).click()
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
-    await expect(sidePanel.getByText('Rows to Add (1)')).toBeVisible()
+    await expect(sidePanel.getByText('1 row addition')).toBeVisible()
     await expect(sidePanel.getByText('New row', { exact: true })).toBeVisible()
 
-    await sidePanel.getByRole('button', { name: /Save All/ }).click()
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
     await expect(page.getByRole('gridcell', { name: 'new row value' })).toBeVisible()
@@ -202,13 +202,13 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    await page.getByRole('button', { name: 'View Details' }).click()
+    await page.getByRole('button', { name: /Review/ }).click()
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('2 operations')).toBeVisible()
-    await expect(sidePanel.getByText('Rows to Add (2)')).toBeVisible()
+    await expect(sidePanel.getByText('2 row additions')).toBeVisible()
 
-    await sidePanel.getByRole('button', { name: /Save All/ }).click()
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
     await expect(page.getByRole('gridcell', { name: 'row one' })).toBeVisible()
@@ -243,15 +243,15 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    await page.getByRole('button', { name: 'View Details' }).click()
+    await page.getByRole('button', { name: /Review/ }).click()
 
     const sidePanel = page.getByRole('dialog')
-    const removeButtons = sidePanel.getByRole('button', { name: 'Remove operation' })
+    const removeButtons = sidePanel.getByRole('button', { name: 'Revert change' })
     await removeButtons.last().click()
 
     await expect(sidePanel.getByText('1 operation')).toBeVisible()
 
-    await sidePanel.getByRole('button', { name: /Save All/ }).click()
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
     await expect(page.getByRole('gridcell', { name: 'keep this row' })).toBeVisible()
@@ -285,7 +285,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('dialog').getByText('Pending changes')).toBeVisible()
 
     await page.keyboard.press('ControlOrMeta+.')
-    await expect(page.getByRole('button', { name: 'View Details' })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Review/ })).toBeVisible()
 
     await page.keyboard.press('ControlOrMeta+s')
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
@@ -318,14 +318,14 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    await page.getByRole('button', { name: 'View Details' }).click()
+    await page.getByRole('button', { name: /Review/ }).click()
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
-    await expect(sidePanel.getByText('Rows to Delete (1)')).toBeVisible()
+    await expect(sidePanel.getByText('1 row deletion')).toBeVisible()
     await expect(sidePanel.getByText('Delete row', { exact: true })).toBeVisible()
 
-    await sidePanel.getByRole('button', { name: /Save All/ }).click()
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
     await expect(page.getByRole('gridcell', { name: 'row to delete' })).not.toBeVisible()
@@ -354,8 +354,8 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    await page.getByRole('button', { name: 'View Details' }).click()
-    await page.getByRole('button', { name: 'Cancel All' }).click()
+    await page.getByRole('button', { name: /Review/ }).click()
+    await page.getByRole('button', { name: 'Revert', exact: true }).click()
 
     await expect(page.getByRole('gridcell', { name: 'should not be deleted' })).toBeVisible()
     await expect(page.getByText('pending change')).not.toBeVisible()
@@ -397,14 +397,14 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('3 pending changes')).toBeVisible()
 
-    await page.getByRole('button', { name: 'View Details' }).click()
+    await page.getByRole('button', { name: /Review/ }).click()
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('3 operations')).toBeVisible()
-    await expect(sidePanel.getByText('Rows to Delete (1)')).toBeVisible()
-    await expect(sidePanel.getByText('Rows to Add (1)')).toBeVisible()
-    await expect(sidePanel.getByText('Cell Edits (1)')).toBeVisible()
+    await expect(sidePanel.getByText('1 row deletion')).toBeVisible()
+    await expect(sidePanel.getByText('1 row addition')).toBeVisible()
+    await expect(sidePanel.getByText('1 cell edit')).toBeVisible()
 
-    await sidePanel.getByRole('button', { name: /Save All/ }).click()
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
     await expect(page.getByRole('gridcell', { name: 'edited row' })).toBeVisible()
@@ -447,11 +447,11 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    await page.getByRole('button', { name: 'View Details' }).click()
+    await page.getByRole('button', { name: /Review/ }).click()
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('2 operations')).toBeVisible()
 
-    await sidePanel.getByRole('button', { name: /Save All/ }).click()
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
 
     await page.getByRole('button', { name: `View ${tableName1}`, exact: true }).click()
