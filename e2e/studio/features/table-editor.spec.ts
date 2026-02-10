@@ -1204,7 +1204,7 @@ testRunner('table editor', () => {
       return dt
     }, csvBuffer.toString('base64'))
 
-    const gridContainer = page.locator('[class*="flex flex-col relative transition-colors"]')
+    const gridContainer = page.getByTestId('table-editor-grid-container')
 
     await gridContainer.dispatchEvent('dragover', { dataTransfer })
     await expect(

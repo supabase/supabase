@@ -230,6 +230,7 @@ export const Grid = memo(
 
       return (
         <div
+          data-testid="table-editor-grid-container"
           className={cn('flex flex-col relative transition-colors', containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
           onDragOver={onDragOver}
