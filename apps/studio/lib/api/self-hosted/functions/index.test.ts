@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as util from '../util'
 import * as fileSystemStore from './fileSystemStore'
@@ -57,7 +57,7 @@ describe('api/self-hosted/functions/index', () => {
 
     it('should return FileSystemFunctionsArtifactStore instance', () => {
       const mockInstance = { someMethod: vi.fn() }
-      fileSystemStore.FileSystemFunctionsArtifactStore.mockReturnValue(mockInstance)
+      vi.mocked(fileSystemStore.FileSystemFunctionsArtifactStore).mockReturnValue(mockInstance)
       process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER = '/tmp/test'
 
       const result = getFunctionsArtifactStore()
