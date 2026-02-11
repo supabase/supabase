@@ -77,31 +77,6 @@ const nextConfig = {
   },
   async headers() {
     return [
-      // Allow CMS preview iframe embedding by omitting X-Frame-Options for blog routes
-      {
-        source: '/blog/:slug*',
-        headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'all',
-          },
-          // No X-Frame-Options header to allow iframe embedding
-        ],
-      },
-      // Default X-Frame-Options for all other paths
-      {
-        source: '/((?!blog|api-v2/cms/preview).*)',
-        headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'all',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-        ],
-      },
       {
         source: '/.well-known/vercel/flags',
         headers: [
