@@ -28,14 +28,15 @@ export default function BlogPostClient(props: BlogPostPageProps) {
 
   const blogMetaData = props.blog
 
-  const blogAuthors =
-    ('author' in blogMetaData ? (blogMetaData.author as string) : '')
-      ?.split(',')
-      .map((authorId: string) => {
-        const foundAuthor = authors.find((author) => author.author_id === authorId)
-        return foundAuthor ?? null
-      })
-      .filter(isNotNullOrUndefined) || []
+  const blogAuthors = (blogMetaData.author ?? '')
+    ?.split(',')
+    .map((authorId) => authorId.trim())
+    .filter(Boolean)
+    .map((authorId) => {
+      const foundAuthor = authors.find((author) => author.author_id === authorId)
+      return foundAuthor ?? null
+    })
+    .filter(isNotNullOrUndefined)
 
   return (
     <BlogPostRenderer
