@@ -7,12 +7,14 @@ import {
   addGroupToGroup,
   findConditionByPath,
   findGroupByPath,
+  getActionItemLabel,
   groupMenuItemsByOperator,
   isAsyncOptionsFunction,
   isCustomOptionObject,
   isFilterOptionObject,
   isSyncOptionsFunction,
   removeFromGroup,
+  truncateText,
   updateNestedLogicalOperator,
   updateNestedOperator,
   updateNestedValue,
@@ -333,6 +335,56 @@ describe('FilterBar Utils', () => {
       expect(result).toHaveLength(1)
       expect(result[0].group).toBe('uncategorized')
       expect(result[0].items).toHaveLength(2)
+    })
+  })
+
+  describe('truncateText', () => {
+    it('returns text unchanged if under max length', () => {
+      expect(truncateText('hello', 10)).toBe('hello')
+    })
+
+    it('returns text unchanged if exactly max length', () => {
+      expect(truncateText('hello', 5)).toBe('hello')
+    })
+
+    it('truncates text and adds ellipsis if over max length', () => {
+      expect(truncateText('hello world', 5)).toBe('hello...')
+    })
+
+    it('handles empty string', () => {
+      expect(truncateText('', 10)).toBe('')
+    })
+  })
+
+  describe('getActionItemLabel', () => {
+    it('returns original label for non-action items', () => {
+      const item: MenuItem = { value: 'test', label: 'Test Label' }
+      expect(getActionItemLabel(item)).toBe('Test Label')
+    })
+
+    it('returns original label for action items without input value', () => {
+      const item: MenuItem = { value: 'ai', label: 'Filter by AI', isAction: true }
+      expect(getActionItemLabel(item)).toBe('Filter by AI')
+    })
+
+    it('returns formatted label for action items with input value', () => {
+      const item: MenuItem = {
+        value: 'ai',
+        label: 'Filter by AI',
+        isAction: true,
+        actionInputValue: 'Find users',
+      }
+      expect(getActionItemLabel(item)).toBe('Ask AI: "Find users"')
+    })
+
+    it('truncates long input values at 30 characters', () => {
+      const item: MenuItem = {
+        value: 'ai',
+        label: 'Filter by AI',
+        isAction: true,
+        actionInputValue: 'Find all users who registered in the last 30 days',
+      }
+      expect(getActionItemLabel(item)).toBe('Ask AI: "Find all users who registered ..."')
     })
   })
 })

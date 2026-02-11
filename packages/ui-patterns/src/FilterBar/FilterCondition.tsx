@@ -260,7 +260,6 @@ export function FilterCondition({
             highlightedIndex={opHighlightedIndex}
             onSelect={handleSelectMenuItem}
             includeIcon={false}
-            selectedValue={condition.operator}
             grouped
           />
         </PopoverContent_Shadcn_>
