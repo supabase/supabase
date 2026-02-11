@@ -302,8 +302,9 @@ export const UsersV2 = () => {
       providers: selectedProviders,
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
-      // improved search will always have a column specified
-      ...(specificFilterColumn !== 'freeform' || improvedSearchEnabled
+      // Use column-based search when: improved search is enabled, or when
+      // searching on a specific column with active keywords
+      ...((improvedSearchEnabled || (specificFilterColumn !== 'freeform' && !!filterKeywords))
         ? { column: specificFilterColumn as OptimizedSearchColumns }
         : { column: undefined }),
 
@@ -343,7 +344,7 @@ export const UsersV2 = () => {
   const updateStorageFilter = (value: SpecificFilterColumn) => {
     setLocalStorageFilter(value)
     setSpecificFilterColumn(value)
-    if (value !== 'freeform' && !improvedSearchEnabled) {
+    if (value !== 'freeform' && !improvedSearchEnabled && !!filterKeywords) {
       updateSortByValue('id:asc')
     }
   }
@@ -692,6 +693,7 @@ export const UsersV2 = () => {
 
                 <SortDropdown
                   specificFilterColumn={specificFilterColumn}
+                  filterKeywords={filterKeywords}
                   sortColumn={sortColumn}
                   sortOrder={sortOrder}
                   sortByValue={sortByValue}
