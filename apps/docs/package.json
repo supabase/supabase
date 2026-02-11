@@ -123,6 +123,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@babel/core": "*",
     "@graphiql/toolkit": "^0.9.1",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/typescript": "4.1.6",

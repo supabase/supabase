@@ -165,9 +165,7 @@ export const FeatureFlagProvider = ({
 
       const isLocalDev = process.env.NODE_ENV === 'development'
 
-      const safeParse = (
-        value: string | undefined
-      ): Record<string, boolean | number | string> => {
+      const safeParse = (value: string | undefined): Record<string, boolean | number | string> => {
         if (!value) return {}
         try {
           return JSON.parse(value)

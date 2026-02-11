@@ -1,5 +1,5 @@
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'

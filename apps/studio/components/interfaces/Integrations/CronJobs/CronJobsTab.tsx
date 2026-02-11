@@ -1,9 +1,3 @@
-import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { MouseEvent, UIEvent, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
@@ -13,17 +7,21 @@ import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQuer
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { isGreaterThanOrEqual } from 'lib/semver'
-import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
+import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { MouseEvent, UIEvent, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { LoadingLine, Sheet, SheetContent } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { formatCronJobColumns } from './CronJobs.utils'
-import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
+import { CronJobRunDetailsOverflowNoticeV2 } from './CronJobsTab.CleanupNotice'
 import { CronJobsTabDataGrid } from './CronJobsTab.DataGrid'
-import { CronJobRunDetailsEstimateErrorNotice } from './CronJobsTab.EstimateErrorNotice'
 import { CronJobsTabHeader } from './CronJobsTab.Header'
-import { useCronJobsCleanupActions } from './CronJobsTab.useCleanupActions'
 import { useCronJobsData } from './CronJobsTab.useCronJobsData'
 import { DeleteCronJob } from './DeleteCronJob'
 
@@ -47,82 +45,11 @@ export const CronjobsTab = () => {
     setSearchQuery(null)
   }
 
-  const { dataStatus, isQueryEnabled, grid, count } = useCronJobsData({
+  const { grid, count } = useCronJobsData({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     searchQuery,
   })
-
-  const {
-    cleanupInterval,
-    setCleanupInterval,
-    cleanupState,
-    runBatchedDeletion,
-    scheduleCleanup,
-    cancelDeletion,
-  } = useCronJobsCleanupActions({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const gridOverlay = useMemo(() => {
-    switch (dataStatus.status) {
-      case 'overflow-confirmed':
-        return (
-          <CronJobRunDetailsOverflowNotice
-            mode="confirmed"
-            estimatedRows={dataStatus.estimatedRows}
-            selectedInterval={cleanupInterval}
-            onIntervalChange={setCleanupInterval}
-            cleanupState={cleanupState}
-            onRunDeleteSql={() => runBatchedDeletion(cleanupInterval)}
-            onRunScheduleSql={() => scheduleCleanup(cleanupInterval)}
-            onCancelDeletion={cancelDeletion}
-            onRetryDeletion={() => runBatchedDeletion(cleanupInterval)}
-            onRefresh={grid.refetch}
-          />
-        )
-
-      case 'overflow-suspected':
-        return (
-          <CronJobRunDetailsOverflowNotice
-            mode="suspected"
-            estimatedRows={dataStatus.estimatedRows}
-            selectedInterval={cleanupInterval}
-            onIntervalChange={setCleanupInterval}
-            cleanupState={cleanupState}
-            onRunDeleteSql={() => runBatchedDeletion(cleanupInterval)}
-            onRunScheduleSql={() => scheduleCleanup(cleanupInterval)}
-            onCancelDeletion={cancelDeletion}
-            onRetryDeletion={() => runBatchedDeletion(cleanupInterval)}
-            onRefresh={grid.refetch}
-          />
-        )
-
-      case 'estimate-error':
-        return (
-          <CronJobRunDetailsEstimateErrorNotice
-            error={dataStatus.error}
-            isRetrying={dataStatus.isRetrying}
-            onRetry={dataStatus.retry}
-          />
-        )
-
-      case 'loading':
-      case 'ready':
-      default:
-        return undefined
-    }
-  }, [
-    dataStatus,
-    cleanupInterval,
-    setCleanupInterval,
-    cleanupState,
-    runBatchedDeletion,
-    scheduleCleanup,
-    cancelDeletion,
-    grid.refetch,
-  ])
 
   const deletingCronJobIdRef = useRef<string | null>(null)
 
@@ -184,8 +111,6 @@ export const CronjobsTab = () => {
   const xScroll = useRef<number>(0)
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    if (!isQueryEnabled) return
-
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
     xScroll.current = event.currentTarget.scrollLeft
 
@@ -259,6 +184,7 @@ export const CronjobsTab = () => {
             onCreateJob={onOpenCreateJobSheet}
           />
           <LoadingLine loading={grid.isLoading || grid.isRefetching || grid.isFetchingNextPage} />
+          {grid.isMinimal && <CronJobRunDetailsOverflowNoticeV2 refetchJobs={grid.refetch} />}
           <CronJobsTabDataGrid
             columns={columns}
             rows={grid.rows}
@@ -267,7 +193,6 @@ export const CronjobsTab = () => {
             searchQuery={searchQuery}
             onScroll={handleScroll}
             onRowClick={handleRowClick}
-            overlay={gridOverlay}
           />
           <CronJobsFooter count={count} />
         </div>

@@ -11,7 +11,10 @@ const HomePage: NextPageWithLayout = () => {
   const homeNewVariant = usePHFlag<string>('homeNew')
   const isHomeNew = homeNewVariant === 'new-home'
 
-  useTrackExperimentExposure('home_new', IS_PLATFORM ? homeNewVariant : undefined)
+  useTrackExperimentExposure(
+    'home_new',
+    IS_PLATFORM && typeof homeNewVariant !== 'boolean' ? homeNewVariant : undefined
+  )
 
   if (isHomeNew) {
     return <HomeV2 />
