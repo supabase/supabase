@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { useParams, useFlag } from 'common'
+import { useParams, useFlag, useFeatureFlags } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { ObservabilityOverview } from 'components/interfaces/Observability/ObservabilityOverview'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -20,6 +20,7 @@ export const UserReportPage: NextPageWithLayout = () => {
   const { ref } = useParams()
 
   const { profile } = useProfile()
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const showOverview = useFlag('observabilityOverview')
   const [showCreateReportModal, setShowCreateReportModal] = useQueryState(
     'newReport',
@@ -37,6 +38,7 @@ export const UserReportPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (!isSuccess) return
+    if (!flagsLoaded) return // Wait for flags to load before checking redirect
     if (showOverview) return // Don't redirect if overview is enabled
 
     const reports = data.content
@@ -44,7 +46,7 @@ export const UserReportPage: NextPageWithLayout = () => {
       .sort((a, b) => a.name.localeCompare(b.name))
     if (reports.length >= 1) router.push(`/project/${ref}/observability/${reports[0].id}`)
     if (reports.length === 0) router.push(`/project/${ref}/observability/api-overview`)
-  }, [isSuccess, data, router, ref, showOverview])
+  }, [isSuccess, data, router, ref, showOverview, flagsLoaded])
 
   const { can: canCreateReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
