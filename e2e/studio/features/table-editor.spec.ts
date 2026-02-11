@@ -1,7 +1,9 @@
-import { expect, Page } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
+import { expect, Page } from '@playwright/test'
+
 import { env } from '../env.config.js'
+import { createTable as dbCreateTable, dropTable } from '../utils/db/index.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test } from '../utils/test.js'
@@ -164,7 +166,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameActions}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     await page.getByRole('menuitem', { name: 'Copy name' }).click()
     await page.waitForTimeout(500)
@@ -175,7 +177,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameActions}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     await page.getByRole('menuitem', { name: 'Copy table schema' }).click()
     await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-definition-') // wait for endpoint to generate schema
@@ -192,7 +194,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameActions}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     await page.getByRole('menuitem', { name: 'Duplicate table' }).click()
     await page.getByRole('button', { name: 'Save' }).click()
@@ -366,7 +368,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameGridEditor}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     await page.getByRole('menuitem', { name: 'Edit table' }).click()
     await page.getByTestId('table-name-input').fill(tableNameUpdated)
@@ -385,7 +387,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameUpdated}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     // Open nested export submenu via keyboard (more stable than hover in headless)
     const exportDataItemCsv = page.getByRole('menuitem', { name: 'Export data' })
@@ -424,7 +426,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameUpdated}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
     // Open nested export submenu via keyboard (more stable than hover in headless)
     const exportDataItemSql = page.getByRole('menuitem', { name: 'Export data' })
@@ -458,7 +460,7 @@ testRunner('table editor', () => {
     await page
       .getByRole('button', { name: `View ${tableNameUpdated}`, exact: true })
       .getByRole('button')
-      .nth(1)
+      .nth(2)
       .click()
 
     const exportDataItemCli = page.getByRole('menuitem', { name: 'Export data' })
@@ -1171,5 +1173,66 @@ testRunner('table editor', () => {
     // Clean up
     await deleteTable(page, ref, sourceTableName)
     await deleteTable(page, ref, targetTableName)
+  })
+
+  test('CSV drag and drop imports data on empty table', async ({ page, ref }) => {
+    const tableName = 'pw_table_csv_drag_drop'
+
+    await dropTable(tableName)
+    await dbCreateTable(tableName, columnName)
+
+    const loadPromise = waitForTableToLoad(page, ref)
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await loadPromise
+
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    await expect(
+      page.getByText('or drag and drop a CSV file here'),
+      'Empty table should show drag and drop hint'
+    ).toBeVisible()
+
+    const csvFilePath = path.join(import.meta.dirname, 'files', 'table-editor-drag-drop.csv')
+    const csvBuffer = fs.readFileSync(csvFilePath)
+
+    // Synthesize a DataTransfer with the CSV file to simulate a browser file drag-and-drop
+    const dataTransfer = await page.evaluateHandle((csvBase64: string) => {
+      const dt = new DataTransfer()
+      const bytes = Uint8Array.from(atob(csvBase64), (c) => c.charCodeAt(0))
+      const file = new File([bytes], 'table-editor-drag-drop.csv', { type: 'text/csv' })
+      dt.items.add(file)
+      return dt
+    }, csvBuffer.toString('base64'))
+
+    const gridContainer = page.getByTestId('table-editor-grid-container')
+
+    await gridContainer.dispatchEvent('dragover', { dataTransfer })
+    await expect(
+      page.getByText('Drop your CSV file here'),
+      'Drag feedback should show when CSV is dragged over'
+    ).toBeVisible()
+
+    await gridContainer.dispatchEvent('drop', { dataTransfer })
+
+    await expect(
+      page.getByText('A total of 3 rows will be'),
+      'Import dialog should show correct row count from CSV'
+    ).toBeVisible({ timeout: 10_000 })
+
+    const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('button', { name: 'Import data' }).click()
+    await waitForCsvInsert
+    await waitForGridDataToLoad(page, ref)
+
+    await expect(
+      page.getByText('3 records'),
+      'Table should show 3 records after drag and drop import'
+    ).toBeVisible()
+    await expect(page.getByRole('gridcell', { name: 'drag drop value 1' })).toBeVisible()
+
+    await dropTable(tableName)
   })
 })

@@ -22,6 +22,7 @@ export type FilterConditionProps = {
   path: number[]
   isActive: boolean
   isOperatorActive: boolean
+  isHighlighted: boolean
 }
 
 export function FilterCondition({
@@ -29,6 +30,7 @@ export function FilterCondition({
   path,
   isActive,
   isOperatorActive,
+  isHighlighted,
 }: FilterConditionProps) {
   const {
     filters: rootFilters,
@@ -210,7 +212,8 @@ export function FilterCondition({
       ref={wrapperRef}
       className={cn(
         'flex items-stretch px-0 bg-muted group shrink-0',
-        variant === 'pill' ? 'rounded border' : 'border-r'
+        variant === 'pill' ? 'rounded border' : 'border-r',
+        isHighlighted && 'ring-2 ring-primary'
       )}
     >
       <span
@@ -257,6 +260,7 @@ export function FilterCondition({
             highlightedIndex={opHighlightedIndex}
             onSelect={handleSelectMenuItem}
             includeIcon={false}
+            grouped
           />
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>

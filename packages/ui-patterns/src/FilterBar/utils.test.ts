@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { describe, expect, it } from 'vitest'
 
-import { FilterGroup, FilterProperty } from './types'
+import { FilterGroup, FilterProperty, MenuItem } from './types'
 import {
   addFilterToGroup,
   addGroupToGroup,
   findConditionByPath,
   findGroupByPath,
+  groupMenuItemsByOperator,
   isAsyncOptionsFunction,
   isCustomOptionObject,
   isFilterOptionObject,
@@ -225,6 +226,113 @@ describe('FilterBar Utils', () => {
       expect(isSyncOptionsFunction(syncFn)).toBe(true)
       expect(isSyncOptionsFunction(asyncFn)).toBe(true) // Both are functions
       expect(isSyncOptionsFunction(array)).toBe(false)
+    })
+  })
+
+  describe('groupMenuItemsByOperator', () => {
+    it('returns empty array for empty input', () => {
+      expect(groupMenuItemsByOperator([])).toEqual([])
+    })
+
+    it('groups items by their group property', () => {
+      const items: MenuItem[] = [
+        { value: '=', label: 'Equals', group: 'comparison' },
+        { value: '~~', label: 'Like', group: 'pattern' },
+        { value: '<>', label: 'Not equal', group: 'comparison' },
+      ]
+      const result = groupMenuItemsByOperator(items)
+
+      expect(result).toHaveLength(2)
+      expect(result[0].group).toBe('comparison')
+      expect(result[0].items).toHaveLength(2)
+      expect(result[1].group).toBe('pattern')
+      expect(result[1].items).toHaveLength(1)
+    })
+
+    it('maintains original indices for keyboard navigation', () => {
+      const items: MenuItem[] = [
+        { value: '=', label: 'Equals', group: 'comparison' },
+        { value: '~~', label: 'Like', group: 'pattern' },
+      ]
+      const result = groupMenuItemsByOperator(items)
+
+      expect(result[0].items[0].index).toBe(0)
+      expect(result[1].items[0].index).toBe(1)
+    })
+
+    it('respects GROUP_ORDER for group ordering', () => {
+      const items: MenuItem[] = [
+        { value: 'in', label: 'In list', group: 'setNull' },
+        { value: '~~', label: 'Like', group: 'pattern' },
+        { value: '=', label: 'Equals', group: 'comparison' },
+      ]
+      const result = groupMenuItemsByOperator(items)
+
+      expect(result[0].group).toBe('comparison')
+      expect(result[1].group).toBe('pattern')
+      expect(result[2].group).toBe('setNull')
+    })
+
+    it('places uncategorized items at the end', () => {
+      const items: MenuItem[] = [
+        { value: 'custom', label: 'Custom', group: 'uncategorized' },
+        { value: '=', label: 'Equals', group: 'comparison' },
+      ]
+      const result = groupMenuItemsByOperator(items)
+
+      expect(result).toHaveLength(2)
+      expect(result[0].group).toBe('comparison')
+      expect(result[1].group).toBe('uncategorized')
+    })
+
+    it('treats items without a group as uncategorized', () => {
+      const items: MenuItem[] = [
+        { value: 'custom', label: 'Custom' },
+        { value: '=', label: 'Equals', group: 'comparison' },
+      ]
+      const result = groupMenuItemsByOperator(items)
+
+      expect(result).toHaveLength(2)
+      expect(result[0].group).toBe('comparison')
+      expect(result[1].group).toBe('uncategorized')
+      expect(result[1].items[0].item.value).toBe('custom')
+    })
+
+    it('handles single group scenario', () => {
+      const items: MenuItem[] = [
+        { value: '=', label: 'Equals', group: 'comparison' },
+        { value: '<>', label: 'Not equal', group: 'comparison' },
+      ]
+      const result = groupMenuItemsByOperator(items)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].group).toBe('comparison')
+      expect(result[0].items).toHaveLength(2)
+    })
+
+    it('preserves item order within groups', () => {
+      const items: MenuItem[] = [
+        { value: '=', label: 'Equals', group: 'comparison' },
+        { value: '<>', label: 'Not equal', group: 'comparison' },
+        { value: '>', label: 'Greater than', group: 'comparison' },
+      ]
+      const result = groupMenuItemsByOperator(items)
+
+      expect(result[0].items[0].item.value).toBe('=')
+      expect(result[0].items[1].item.value).toBe('<>')
+      expect(result[0].items[2].item.value).toBe('>')
+    })
+
+    it('handles all items being uncategorized', () => {
+      const items: MenuItem[] = [
+        { value: 'a', label: 'A', group: 'uncategorized' },
+        { value: 'b', label: 'B', group: 'uncategorized' },
+      ]
+      const result = groupMenuItemsByOperator(items)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].group).toBe('uncategorized')
+      expect(result[0].items).toHaveLength(2)
     })
   })
 })

@@ -3,10 +3,15 @@ import {
   CustomOptionObject,
   FilterCondition,
   FilterGroup,
+  FilterOperatorGroup,
   FilterOperatorObject,
   FilterOptionObject,
   FilterProperty,
+  GROUP_ORDER,
+  GroupedMenuItem,
   isGroup,
+  MenuItem,
+  MenuItemGroup,
   SyncOptionsFunction,
 } from './types'
 
@@ -256,4 +261,18 @@ export function updateGroupAtPath(
       index === current ? updateGroupAtPath(condition as FilterGroup, rest, newGroup) : condition
     ),
   }
+}
+
+export function groupMenuItemsByOperator(items: MenuItem[]): MenuItemGroup[] {
+  const grouped = items.reduce<Map<FilterOperatorGroup, GroupedMenuItem[]>>((acc, item, index) => {
+    const group: FilterOperatorGroup = item.group ?? 'uncategorized'
+    const existing = acc.get(group) ?? []
+    acc.set(group, [...existing, { item, index }])
+    return acc
+  }, new Map())
+
+  return GROUP_ORDER.filter((groupKey) => grouped.has(groupKey)).map((groupKey) => ({
+    group: groupKey,
+    items: grouped.get(groupKey) ?? [],
+  }))
 }

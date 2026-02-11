@@ -1,7 +1,6 @@
 'use client'
 
 import dayjs from 'dayjs'
-import mdxComponents from 'lib/mdx/mdxComponents'
 import { ChevronLeft } from 'lucide-react'
 import { MDXRemote } from 'next-mdx-remote'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
@@ -10,20 +9,22 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import type { ComponentType } from 'react'
-import type { CMSAuthor, PostReturnType, ProcessedBlogData, Tag } from 'types/post'
+import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types/post'
 import { Badge } from 'ui'
 
-const ShareArticleActions = dynamic(() => import('components/Blog/ShareArticleActions'))
-const CTABanner = dynamic(() => import('components/CTABanner'))
-const LW11Summary = dynamic(() => import('components/LaunchWeek/11/LW11Summary'))
-const LW12Summary = dynamic(() => import('components/LaunchWeek/12/LWSummary'))
-const LW13Summary = dynamic(() => import('components/LaunchWeek/13/Releases/LWSummary'))
-const LW14Summary = dynamic(() => import('components/LaunchWeek/14/Releases/LWSummary'))
-const LW15Summary = dynamic(() => import('components/LaunchWeek/15/LWSummary'))
-const BlogLinks = dynamic(() => import('components/LaunchWeek/7/BlogLinks'))
-const LWXSummary = dynamic(() => import('components/LaunchWeek/X/LWXSummary'))
-const DefaultLayout = dynamic(() => import('components/Layouts/Default'))
-const DraftModeBanner = dynamic(() => import('components/Blog/DraftModeBanner'))
+import mdxComponents from '@/lib/mdx/mdxComponents'
+
+const ShareArticleActions = dynamic(() => import('@/components/Blog/ShareArticleActions'))
+const CTABanner = dynamic(() => import('@/components/CTABanner'))
+const LW11Summary = dynamic(() => import('@/components/LaunchWeek/11/LW11Summary'))
+const LW12Summary = dynamic(() => import('@/components/LaunchWeek/12/LWSummary'))
+const LW13Summary = dynamic(() => import('@/components/LaunchWeek/13/Releases/LWSummary'))
+const LW14Summary = dynamic(() => import('@/components/LaunchWeek/14/Releases/LWSummary'))
+const LW15Summary = dynamic(() => import('@/components/LaunchWeek/15/LWSummary'))
+const BlogLinks = dynamic(() => import('@/components/LaunchWeek/7/BlogLinks'))
+const LWXSummary = dynamic(() => import('@/components/LaunchWeek/X/LWXSummary'))
+const DefaultLayout = dynamic(() => import('@/components/Layouts/Default'))
+const DraftModeBanner = dynamic(() => import('@/components/Blog/DraftModeBanner'))
 const ReactMarkdown = dynamic<{ children: string }>(
   () =>
     import('react-markdown').then(
@@ -36,7 +37,6 @@ const BlogPostRenderer = ({
   blog,
   blogMetaData,
   isDraftMode,
-  livePreviewData,
   prevPost,
   nextPost,
   authors,
@@ -44,43 +44,18 @@ const BlogPostRenderer = ({
   blog: ProcessedBlogData
   blogMetaData: ProcessedBlogData
   isDraftMode: boolean
-  livePreviewData?: ProcessedBlogData
-  isLivePreviewLoading?: boolean
   prevPost?: PostReturnType | null
   nextPost?: PostReturnType | null
-  authors: CMSAuthor[]
+  authors: StaticAuthor[]
 }) => {
   const [previewData] = useState<ProcessedBlogData>(blog)
 
-  const shouldUseLivePreview = isDraftMode && blog.isCMS
-
   // For LivePreview, we'll use the raw content directly with ReactMarkdown
   // instead of trying to use MDXRemote which requires specific serialization
-  const isLivePreview = isDraftMode && (livePreviewData !== undefined || previewData !== blog)
+  const isLivePreview = isDraftMode && previewData !== blog
 
   // Extract raw content from data if available
   const livePreviewContent = useMemo(() => {
-    // Priority 1: Use data from LivePreview hook (only in draft mode)
-    if (
-      isDraftMode &&
-      shouldUseLivePreview &&
-      livePreviewData &&
-      typeof livePreviewData === 'object'
-    ) {
-      // If content is a string, use it directly
-      if (typeof (livePreviewData as unknown as { content?: unknown }).content === 'string') {
-        return (livePreviewData as unknown as { content?: string }).content as string
-      }
-
-      // If content is from source property
-      if (
-        (livePreviewData as unknown as { source?: unknown }).source &&
-        typeof (livePreviewData as unknown as { source?: unknown }).source === 'string'
-      ) {
-        return (livePreviewData as unknown as { source?: string }).source as string
-      }
-    }
-
     // Priority 2: Use data from postMessage updates
     if (isDraftMode && previewData !== blog) {
       // If content is a string, use it directly
@@ -98,9 +73,8 @@ const BlogPostRenderer = ({
     }
 
     return blog.source || ''
-  }, [isDraftMode, shouldUseLivePreview, livePreviewData, previewData, blog])
+  }, [isDraftMode, previewData, blog])
 
-  const isCMS = blogMetaData.isCMS
   const isLaunchWeek7 = blogMetaData.launchweek === '7'
   const isLaunchWeekX = blogMetaData.launchweek?.toString().toLocaleLowerCase() === 'x'
   const isGAWeek = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '11'
@@ -157,13 +131,11 @@ const BlogPostRenderer = ({
     </div>
   )
 
-  const imageUrl = isCMS
-    ? blogMetaData.imgThumb ?? ''
-    : blogMetaData.imgThumb
-      ? blogMetaData.imgThumb.startsWith('/') || blogMetaData.imgThumb.startsWith('http')
-        ? blogMetaData.imgThumb
-        : `/images/blog/${blogMetaData.imgThumb}`
-      : ''
+  const imageUrl = blogMetaData.imgThumb
+    ? blogMetaData.imgThumb.startsWith('/') || blogMetaData.imgThumb.startsWith('http')
+      ? blogMetaData.imgThumb
+      : `/images/blog/${blogMetaData.imgThumb}`
+    : ''
 
   return (
     <>
@@ -203,11 +175,7 @@ const BlogPostRenderer = ({
                     <div className="flex justify-between">
                       <div className="flex-1 flex flex-wrap gap-3 pt-2 md:gap-0 lg:gap-3">
                         {authors.map((author, i: number) => {
-                          // Handle both static and CMS author image formats
-                          const authorImageUrl =
-                            typeof author.author_image_url === 'string'
-                              ? author.author_image_url
-                              : (author.author_image_url as { url: string })?.url || ''
+                          const authorImageUrl = author.author_image_url
 
                           const authorId =
                             (author as any).author_id ||

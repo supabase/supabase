@@ -1,24 +1,18 @@
+// @ts-check
+
+import fsSync, { promises as fs } from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat.js'
 import utc from 'dayjs/plugin/utc.js'
-import fsSync, { promises as fs } from 'fs'
 import matter from 'gray-matter'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
 dayjs.extend(utc)
 dayjs.extend(advancedFormat)
 
 // Constants
 const FILENAME_SUBSTRING = 11 // based on YYYY-MM-DD format
-const CMS_SITE_ORIGIN =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? 'https://cms.supabase.com'
-    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
-      typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
-      : 'http://localhost:3030'
-const CMS_API_KEY = process.env.CMS_API_KEY
 
 /**
  * Fixes Safari dates sorting bug
@@ -83,71 +77,13 @@ const getStaticBlogPosts = () => {
 }
 
 /**
- * Get CMS blog posts
- */
-const getCMSBlogPosts = async () => {
-  try {
-    const url = `${CMS_SITE_ORIGIN}/api/posts?depth=2&draft=false&where[_status][equals]=published`
-
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
-      },
-    })
-
-    if (!response.ok) {
-      const responseText = await response.text()
-
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const contentType = response.headers.get('content-type') || ''
-    if (!contentType.toLowerCase().includes('application/json')) {
-      const body = await response.text()
-      console.warn(
-        `[getCMSBlogPosts] Non-JSON response from ${CMS_SITE_ORIGIN}/api/posts (content-type: '${contentType}'). Returning empty posts. Body (truncated): ${body.slice(0, 200)}`
-      )
-      return []
-    }
-
-    const data = await response.json()
-
-    const posts = data.docs
-      .filter((post) => post.slug && post.title && post.description)
-      .map((post) => {
-        const options = { month: 'long', day: 'numeric', year: 'numeric' }
-        const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
-
-        return {
-          slug: post.slug,
-          title: post.title,
-          description: post.description,
-          date: post.date || null, // Keep null if no date instead of using current time
-          formattedDate,
-          url: `/blog/${post.slug}`,
-          isCMS: true,
-          ...post,
-        }
-      })
-
-    return posts
-  } catch (_error) {
-    // don't console error to avoid noise if env vars not set
-    return []
-  }
-}
-
-/**
  * Get all blog posts from both sources
  */
 const getAllBlogPosts = async () => {
   const staticPosts = getStaticBlogPosts()
 
-  const cmsPosts = await getCMSBlogPosts()
-
   // Combine and sort all posts by date
-  const allPosts = [...staticPosts, ...cmsPosts]
+  const allPosts = [...staticPosts]
 
   // Filter out posts without valid dates and sort
   const validPosts = allPosts.sort((a, b) => sortDates(a, b, 'desc'))
@@ -291,12 +227,13 @@ try {
 `
   }
 
-  const formattedDate = allBlogPosts.length > 0
-    ? dayjs(allBlogPosts[0].date)
-      .utcOffset(0, true)
-      .startOf('day')
-      .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
-    : dayjs().utcOffset(0, true).startOf('day').format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
+  const formattedDate =
+    allBlogPosts.length > 0
+      ? dayjs(allBlogPosts[0].date)
+          .utcOffset(0, true)
+          .startOf('day')
+          .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
+      : dayjs().utcOffset(0, true).startOf('day').format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
 
   const rss = `
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
