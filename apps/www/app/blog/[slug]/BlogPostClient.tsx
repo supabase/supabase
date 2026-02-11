@@ -1,7 +1,6 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
 
 import useActiveAnchors from '@/hooks/useActiveAnchors'
 import authors from '@/lib/authors.json'
