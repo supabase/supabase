@@ -228,9 +228,10 @@ test.describe('Filter Bar', () => {
         await freeformInput.click()
         await page.keyboard.press('Backspace')
 
-        await expect(
-          page.locator(`[data-testid="filter-condition-${columnName}"][data-highlighted="true"]`)
-        ).toBeVisible()
+        await expect(page.getByTestId(`filter-condition-${columnName}`)).toHaveAttribute(
+          'data-highlighted',
+          'true'
+        )
       } finally {
         await dropTable(tableName)
       }
@@ -251,9 +252,10 @@ test.describe('Filter Bar', () => {
         const freeformInput = getFilterBarInput(page)
         await freeformInput.click()
         await page.keyboard.press('Backspace')
-        await expect(
-          page.locator(`[data-testid="filter-condition-${columnName}"][data-highlighted="true"]`)
-        ).toBeVisible()
+        await expect(page.getByTestId(`filter-condition-${columnName}`)).toHaveAttribute(
+          'data-highlighted',
+          'true'
+        )
 
         await page.keyboard.press('Backspace')
 
@@ -279,9 +281,10 @@ test.describe('Filter Bar', () => {
         await freeformInput.click()
         await page.keyboard.press('ArrowLeft')
 
-        await expect(
-          page.locator(`[data-testid="filter-condition-${columnName}"][data-highlighted="true"]`)
-        ).toBeVisible()
+        await expect(page.getByTestId(`filter-condition-${columnName}`)).toHaveAttribute(
+          'data-highlighted',
+          'true'
+        )
       } finally {
         await dropTable(tableName)
       }
@@ -302,14 +305,16 @@ test.describe('Filter Bar', () => {
         const freeformInput = getFilterBarInput(page)
         await freeformInput.click()
         await page.keyboard.press('ArrowLeft')
-        await expect(
-          page.locator(`[data-testid="filter-condition-${columnName}"][data-highlighted="true"]`)
-        ).toBeVisible()
+        await expect(page.getByTestId(`filter-condition-${columnName}`)).toHaveAttribute(
+          'data-highlighted',
+          'true'
+        )
 
         await page.keyboard.press('ArrowRight')
-        await expect(
-          page.locator(`[data-testid="filter-condition-${columnName}"][data-highlighted="true"]`)
-        ).not.toBeVisible()
+        await expect(page.getByTestId(`filter-condition-${columnName}`)).not.toHaveAttribute(
+          'data-highlighted',
+          'true'
+        )
       } finally {
         await dropTable(tableName)
       }
@@ -330,14 +335,16 @@ test.describe('Filter Bar', () => {
         const freeformInput = getFilterBarInput(page)
         await freeformInput.click()
         await page.keyboard.press('ArrowLeft')
-        await expect(
-          page.locator(`[data-testid="filter-condition-${columnName}"][data-highlighted="true"]`)
-        ).toBeVisible()
+        await expect(page.getByTestId(`filter-condition-${columnName}`)).toHaveAttribute(
+          'data-highlighted',
+          'true'
+        )
 
         await page.keyboard.press('Escape')
-        await expect(
-          page.locator(`[data-testid="filter-condition-${columnName}"][data-highlighted="true"]`)
-        ).not.toBeVisible()
+        await expect(page.getByTestId(`filter-condition-${columnName}`)).not.toHaveAttribute(
+          'data-highlighted',
+          'true'
+        )
       } finally {
         await dropTable(tableName)
       }
@@ -358,9 +365,10 @@ test.describe('Filter Bar', () => {
         const freeformInput = getFilterBarInput(page)
         await freeformInput.click()
         await page.keyboard.press('Backspace')
-        await expect(
-          page.locator(`[data-testid="filter-condition-${columnName}"][data-highlighted="true"]`)
-        ).toBeVisible()
+        await expect(page.getByTestId(`filter-condition-${columnName}`)).toHaveAttribute(
+          'data-highlighted',
+          'true'
+        )
 
         await page.keyboard.press('Enter')
         await expect(page.getByTestId(`filter-value-${columnName}`)).toBeFocused()
