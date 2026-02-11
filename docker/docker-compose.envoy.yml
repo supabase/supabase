@@ -10,7 +10,7 @@ services:
   # Envoy API gateway
   api-gw:
     container_name: supabase-envoy
-    image: envoyproxy/envoy:v1.28.0
+    image: envoyproxy/envoy:v1.37.0
     restart: unless-stopped
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
