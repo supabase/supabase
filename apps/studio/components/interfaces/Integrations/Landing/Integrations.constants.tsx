@@ -1,4 +1,4 @@
-import { Clock5, Layers, Timer, Vault, Webhook, Receipt } from 'lucide-react'
+import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
@@ -251,6 +251,53 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
             () =>
               import('components/interfaces/Integrations/Webhooks/ListTab').then(
                 (mod) => mod.WebhooksListTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+      }
+      return null
+    },
+  },
+  {
+    id: 'data_api',
+    type: 'custom' as const,
+    requiredExtensions: [],
+    name: `Data API`,
+    icon: ({ className, ...props } = {}) => (
+      <Code2 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+    ),
+    description: 'Auto-generate an API directly from your database schema',
+    docsUrl: `${DOCS_URL}/guides/api`,
+    author: authorSupabase,
+    navigation: [
+      {
+        route: 'overview',
+        label: 'Overview',
+      },
+      {
+        route: 'settings',
+        label: 'Settings',
+      },
+    ],
+    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/DataApi/OverviewTab').then(
+                (mod) => mod.DataApiOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'settings':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/DataApi/SettingsTab').then(
+                (mod) => mod.DataApiSettingsTab
               ),
             {
               loading: Loading,
