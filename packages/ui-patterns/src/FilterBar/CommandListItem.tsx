@@ -28,19 +28,19 @@ export function CommandListItem({
       aria-selected={isSelected}
       onClick={() => onSelect(item)}
       className={cn(
-        'relative flex items-center justify-between gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-none text-foreground-light',
+        'relative flex items-center gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-none text-foreground-light',
         isHighlighted && 'bg-surface-300',
         !isHighlighted && 'hover:bg-surface-200'
       )}
     >
-      <span className="flex items-center gap-2">
+      <span className="w-4 flex-shrink-0">
+        {isSelected && <Check className="h-4 w-4 text-foreground-muted" strokeWidth={2} />}
+      </span>
+      <span className="flex items-center gap-2 flex-1">
         {includeIcon && item.icon}
         {item.label}
       </span>
-      <span className="flex items-center gap-1.5">
-        {item.operatorSymbol && <OperatorSymbolBadge symbol={item.operatorSymbol} />}
-        {isSelected && <Check className="h-4 w-4 text-foreground-muted" strokeWidth={2} />}
-      </span>
+      {item.operatorSymbol && <OperatorSymbolBadge symbol={item.operatorSymbol} />}
     </div>
   )
 }
