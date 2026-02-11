@@ -1,7 +1,6 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
-
 
 @Component({
   selector: 'app-avatar',
@@ -22,10 +21,8 @@ export class AvatarComponent {
 
   @Output() upload = new EventEmitter<string>()
 
-  constructor(
-    private readonly supabase: SupabaseService,
-    private readonly dom: DomSanitizer
-  ) {}
+  private readonly supabase = inject(SupabaseService)
+  private readonly dom = inject(DomSanitizer)
 
   async downloadImage(path: string) {
     try {

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, inject, Input, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { User } from '@supabase/supabase-js'
 import { Profile, SupabaseService } from '../supabase.service'
@@ -30,10 +30,10 @@ export class AccountComponent implements OnInit {
   @Input()
   user!: User
 
-  constructor(
-    private readonly supabase: SupabaseService,
-    private formBuilder: FormBuilder
-  ) {
+  private readonly supabase = inject(SupabaseService)
+  private readonly formBuilder = inject(FormBuilder)
+
+  constructor() {
     this.updateProfileForm = this.formBuilder.group({
       username: '',
       website: '',

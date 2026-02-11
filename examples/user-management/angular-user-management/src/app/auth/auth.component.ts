@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { SupabaseService } from '../supabase.service'
 
@@ -10,10 +10,8 @@ import { SupabaseService } from '../supabase.service'
 })
 export class AuthComponent {
   signInForm!: FormGroup
-  constructor(
-    private readonly supabase: SupabaseService,
-    private readonly formBuilder: FormBuilder
-  ) {}
+  private readonly supabase = inject(SupabaseService)
+  private readonly formBuilder = inject(FormBuilder)
 
   loading = false
   ngOnInit() {

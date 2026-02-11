@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { User } from '@supabase/supabase-js'
 import { SupabaseService } from './supabase.service'
 
@@ -12,7 +12,7 @@ import { AuthComponent } from './auth/auth.component'
   imports: [AccountComponent, AuthComponent],
 })
 export class AppComponent implements OnInit {
-  constructor(private readonly supabase: SupabaseService) {}
+  private readonly supabase = inject(SupabaseService)
 
   title = 'angular-user-management'
   user: User | null = null
