@@ -1,13 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { indexOf } from 'lodash'
-import { Lock } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -18,21 +10,27 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { indexOf } from 'lodash'
+import { Lock } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-  CollapsibleContent_Shadcn_,
   Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   PrePostTab,
   Skeleton,
@@ -49,6 +47,8 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import { z } from 'zod'
+
 import { HardenAPIModal } from './HardenAPIModal'
 
 const formSchema = z
@@ -128,7 +128,7 @@ export const PostgrestConfig = () => {
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
-  const dbSchema = config?.db_schema ? config?.db_schema.replace(/ /g, '').split(',') : []
+  const dbSchema = config?.db_schema ? config?.db_schema.split(',').map((x) => x.trim()) : []
   const defaultValues = {
     dbSchema,
     maxRows: config?.max_rows,
@@ -311,38 +311,37 @@ export const PostgrestConfig = () => {
                                 </MultiSelectorContent>
                               </MultiSelector>
                             )}
-
-                            {!field.value.includes('public') && field.value.length > 0 && (
-                              <Admonition
-                                type="default"
-                                title="The public schema for this project is not exposed"
-                                className="mt-2"
-                                description={
-                                  <>
-                                    <p className="prose text-sm">
-                                      You will not be able to query tables and views in the{' '}
-                                      <code className="text-code-inline">public</code> schema via
-                                      supabase-js or HTTP clients.
-                                    </p>
-                                    {isGraphqlExtensionEnabled && (
-                                      <>
-                                        <p className="prose text-sm mt-2">
-                                          Tables in the{' '}
-                                          <code className="text-code-inline">public</code> schema
-                                          are still exposed over our GraphQL endpoints.
-                                        </p>
-                                        <Button asChild type="default" className="mt-2">
-                                          <Link href={`/project/${projectRef}/database/extensions`}>
-                                            Disable the pg_graphql extension
-                                          </Link>
-                                        </Button>
-                                      </>
-                                    )}
-                                  </>
-                                }
-                              />
-                            )}
                           </FormItemLayout>
+                          {!field.value.includes('public') && field.value.length > 0 && (
+                            <Admonition
+                              type="default"
+                              title="The public schema for this project is not exposed"
+                              className="mt-2"
+                              description={
+                                <>
+                                  <p className="text-sm">
+                                    You will not be able to query tables and views in the{' '}
+                                    <code className="text-code-inline">public</code> schema via
+                                    supabase-js or HTTP clients.
+                                  </p>
+                                  {isGraphqlExtensionEnabled && (
+                                    <>
+                                      <p className="text-sm">
+                                        Tables in the{' '}
+                                        <code className="text-code-inline">public</code> schema are
+                                        still exposed over our GraphQL endpoints.
+                                      </p>
+                                      <Button asChild type="default" className="mt-2">
+                                        <Link href={`/project/${projectRef}/database/extensions`}>
+                                          Disable the pg_graphql extension
+                                        </Link>
+                                      </Button>
+                                    </>
+                                  )}
+                                </>
+                              }
+                            />
+                          )}
                         </FormItem_Shadcn_>
                       )}
                     />

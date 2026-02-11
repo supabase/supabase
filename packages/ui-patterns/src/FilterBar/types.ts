@@ -51,13 +51,15 @@ export function isGroup(condition: FilterCondition | FilterGroup): condition is 
   return 'logicalOperator' in condition
 }
 
+export type ConditionPath = number[]
+
 export type FilterBarAction = {
   value: string
   label: string
   icon?: React.ReactNode
   onSelect: (
     inputValue: string,
-    context: { path: number[]; activeFilters: FilterGroup }
+    context: { path: ConditionPath; activeFilters: FilterGroup }
   ) => void | Promise<void>
 }
 
@@ -71,5 +73,24 @@ export type SerializableFilterProperty = Pick<
 export type AIFilterRequestPayload = {
   prompt: string
   filterProperties: SerializableFilterProperty[]
-  currentPath: number[]
+  currentPath: ConditionPath
+}
+
+export type NavigationDirection = 'prev' | 'next'
+
+export type HighlightNavigationResult = ConditionPath | 'clear' | null
+
+export type ActiveInputState =
+  | { type: 'value'; path: ConditionPath }
+  | { type: 'operator'; path: ConditionPath }
+  | { type: 'group'; path: ConditionPath }
+  | null
+
+export type KeyboardNavigationConfig = {
+  activeInput: ActiveInputState
+  setActiveInput: (input: ActiveInputState) => void
+  activeFilters: FilterGroup
+  onFilterChange: (filters: FilterGroup) => void
+  highlightedConditionPath: ConditionPath | null
+  setHighlightedConditionPath: (path: ConditionPath | null) => void
 }

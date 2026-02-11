@@ -1,5 +1,4 @@
-import { ActiveInput } from './hooks'
-import { FilterBarAction, FilterGroup, FilterProperty } from './types'
+import { ActiveInputState, FilterBarAction, FilterGroup, FilterProperty } from './types'
 import {
   findConditionByPath,
   isCustomOptionObject,
@@ -19,7 +18,7 @@ export type MenuItem = {
 }
 
 export function buildOperatorItems(
-  activeInput: Extract<ActiveInput, { type: 'operator' }> | null,
+  activeInput: Extract<ActiveInputState, { type: 'operator' }> | null,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
   hasTypedSinceFocus: boolean = true
@@ -89,7 +88,7 @@ export function buildPropertyItems(params: {
 }
 
 export function buildValueItems(
-  activeInput: Extract<ActiveInput, { type: 'value' }> | null,
+  activeInput: Extract<ActiveInputState, { type: 'value' }> | null,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
   propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>,
