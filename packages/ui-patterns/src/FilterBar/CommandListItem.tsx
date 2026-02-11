@@ -1,4 +1,3 @@
-import { Check } from 'lucide-react'
 import { cn } from 'ui'
 
 import { OperatorSymbolBadge } from './OperatorSymbolBadge'
@@ -7,7 +6,6 @@ import { MenuItem } from './types'
 export type CommandListItemProps = {
   item: MenuItem
   isHighlighted: boolean
-  isSelected: boolean
   includeIcon: boolean
   onSelect: (item: MenuItem) => void
   setRef: (el: HTMLDivElement | null) => void
@@ -16,7 +14,6 @@ export type CommandListItemProps = {
 export function CommandListItem({
   item,
   isHighlighted,
-  isSelected,
   includeIcon,
   onSelect,
   setRef,
@@ -25,18 +22,14 @@ export function CommandListItem({
     <div
       ref={setRef}
       role="option"
-      aria-selected={isSelected}
       onClick={() => onSelect(item)}
       className={cn(
-        'relative flex items-center gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-none text-foreground-light',
+        'relative flex items-center justify-between gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-none text-foreground-light',
         isHighlighted && 'bg-surface-300',
         !isHighlighted && 'hover:bg-surface-200'
       )}
     >
-      <span className="w-4 flex-shrink-0">
-        {isSelected && <Check className="h-4 w-4 text-foreground-muted" strokeWidth={2} />}
-      </span>
-      <span className="flex items-center gap-2 flex-1">
+      <span className="flex items-center gap-2">
         {includeIcon && item.icon}
         {item.label}
       </span>

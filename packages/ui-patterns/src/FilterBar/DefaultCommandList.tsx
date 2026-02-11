@@ -13,7 +13,6 @@ export type DefaultCommandListProps = {
   onSelect: (item: MenuItem) => void
   includeIcon?: boolean
   grouped?: boolean
-  selectedValue?: string
 }
 
 export function DefaultCommandList({
@@ -22,7 +21,6 @@ export function DefaultCommandList({
   onSelect,
   includeIcon = true,
   grouped = false,
-  selectedValue,
 }: DefaultCommandListProps) {
   const listRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
@@ -78,7 +76,6 @@ export function DefaultCommandList({
               key={`${item.value}-${item.label}`}
               item={item}
               isHighlighted={index === highlightedIndex}
-              isSelected={selectedValue === item.value}
               includeIcon={includeIcon}
               onSelect={onSelect}
               setRef={setItemRef(index)}
