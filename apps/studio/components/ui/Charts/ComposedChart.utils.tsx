@@ -221,8 +221,8 @@ export const CustomTooltip = ({
     return (
       <div
         className={cn(
-          'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
-          !isActiveHoveredChart && 'opacity-0'
+          'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl',
+          isActiveHoveredChart ? 'opacity-100' : 'opacity-0'
         )}
       >
         <p className="text-foreground-light text-xs">{localTimeZone}</p>
