@@ -51,11 +51,7 @@ describe('FilterBar', () => {
       />
     )
 
-    expect(
-      screen.getByPlaceholderText(
-        'Ask AI for help (e.g. Find all users with name John) or filter...'
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Filter by Name, Status, Count')).toBeInTheDocument()
   })
 
   it('renders with search input', () => {
@@ -69,9 +65,7 @@ describe('FilterBar', () => {
       />
     )
 
-    const input = screen.getByPlaceholderText(
-      'Ask AI for help (e.g. Find all users with name John) or filter...'
-    )
+    const input = screen.getByPlaceholderText('Filter by Name, Status, Count')
     expect(input).toBeInTheDocument()
   })
 
@@ -92,9 +86,7 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText(
-      'Ask AI for help (e.g. Find all users with name John) or filter...'
-    )
+    const freeform = screen.getByPlaceholderText('Filter by Name, Status, Count')
     freeform.focus()
     await user.click(freeform)
 
@@ -144,9 +136,7 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText(
-      'Ask AI for help (e.g. Find all users with name John) or filter...'
-    )
+    const freeform = screen.getByPlaceholderText('Filter by Name, Status, Count')
     await user.click(freeform)
     await user.click(screen.getByText('Status'))
 
@@ -236,9 +226,7 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText(
-      'Ask AI for help (e.g. Find all users with name John) or filter...'
-    )
+    const freeform = screen.getByPlaceholderText('Filter by Name, Status, Count...')
     await user.click(freeform)
     await user.click(screen.getByText('Tag'))
 
@@ -300,9 +288,7 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText(
-      'Ask AI for help (e.g. Find all users with name John) or filter...'
-    )
+    const freeform = screen.getByPlaceholderText('Filter by Name, Status, Count')
     await user.click(freeform)
     expect(await screen.findByText('Name')).toBeInTheDocument()
 

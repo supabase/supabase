@@ -5,6 +5,7 @@ import { FilterGroup, FilterProperty, MenuItem } from './types'
 import {
   addFilterToGroup,
   addGroupToGroup,
+  buildFilterPlaceholder,
   findConditionByPath,
   findGroupByPath,
   getActionItemLabel,
@@ -385,6 +386,73 @@ describe('FilterBar Utils', () => {
         actionInputValue: 'Find all users who registered in the last 30 days',
       }
       expect(getActionItemLabel(item)).toBe('Ask AI: "Find all users who registered ..."')
+    })
+  })
+
+  describe('buildFilterPlaceholder', () => {
+    it('returns default message for empty properties without actions', () => {
+      expect(buildFilterPlaceholder([])).toBe('Add filters...')
+    })
+
+    it('returns default message with AI mention when actions exist', () => {
+      expect(buildFilterPlaceholder([], { hasActions: true })).toBe('Add filters or ask AI...')
+    })
+
+    it('shows single property name without actions', () => {
+      const props = [{ label: 'Name', name: 'name', type: 'string' as const }]
+      expect(buildFilterPlaceholder(props)).toBe('Filter by Name')
+    })
+
+    it('shows single property name with AI suffix when actions exist', () => {
+      const props = [{ label: 'Name', name: 'name', type: 'string' as const }]
+      expect(buildFilterPlaceholder(props, { hasActions: true })).toBe('Filter by Name or ask AI')
+    })
+
+    it('shows multiple property names up to max', () => {
+      const props = [
+        { label: 'Name', name: 'name', type: 'string' as const },
+        { label: 'Status', name: 'status', type: 'string' as const },
+        { label: 'Created At', name: 'created_at', type: 'date' as const },
+      ]
+      expect(buildFilterPlaceholder(props)).toBe('Filter by Name, Status, Created At')
+    })
+
+    it('truncates with ellipsis when more than max properties', () => {
+      const props = [
+        { label: 'Name', name: 'name', type: 'string' as const },
+        { label: 'Status', name: 'status', type: 'string' as const },
+        { label: 'Created At', name: 'created_at', type: 'date' as const },
+        { label: 'Updated At', name: 'updated_at', type: 'date' as const },
+      ]
+      expect(buildFilterPlaceholder(props)).toBe('Filter by Name, Status, Created At...')
+    })
+
+    it('truncates with ellipsis and AI suffix when actions exist', () => {
+      const props = [
+        { label: 'Name', name: 'name', type: 'string' as const },
+        { label: 'Status', name: 'status', type: 'string' as const },
+        { label: 'Created At', name: 'created_at', type: 'date' as const },
+        { label: 'Updated At', name: 'updated_at', type: 'date' as const },
+      ]
+      expect(buildFilterPlaceholder(props, { hasActions: true })).toBe(
+        'Filter by Name, Status, Created At... or ask AI'
+      )
+    })
+
+    it('respects custom maxProperties parameter', () => {
+      const props = [
+        { label: 'Name', name: 'name', type: 'string' as const },
+        { label: 'Status', name: 'status', type: 'string' as const },
+      ]
+      expect(buildFilterPlaceholder(props, { maxProperties: 1 })).toBe('Filter by Name...')
+    })
+
+    it('does not add ellipsis when properties equal maxProperties', () => {
+      const props = [
+        { label: 'Name', name: 'name', type: 'string' as const },
+        { label: 'Status', name: 'status', type: 'string' as const },
+      ]
+      expect(buildFilterPlaceholder(props, { maxProperties: 2 })).toBe('Filter by Name, Status')
     })
   })
 })

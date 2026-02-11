@@ -288,3 +288,24 @@ export function getActionItemLabel(item: MenuItem): string {
   }
   return item.label
 }
+
+export function buildFilterPlaceholder(
+  filterProperties: FilterProperty[],
+  options: { maxProperties?: number; hasActions?: boolean } = {}
+): string {
+  const { maxProperties = 3, hasActions = false } = options
+
+  if (filterProperties.length === 0) {
+    return hasActions ? 'Add filters or ask AI...' : 'Add filters...'
+  }
+
+  const propertyNames = filterProperties
+    .slice(0, maxProperties)
+    .map((prop) => prop.label)
+    .join(', ')
+
+  const suffix = filterProperties.length > maxProperties ? '...' : ''
+  const aiSuffix = hasActions ? ' or ask AI' : ''
+
+  return `Filter by ${propertyNames}${suffix}${aiSuffix}`
+}
