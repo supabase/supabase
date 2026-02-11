@@ -31,6 +31,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     supportsOperators,
     actions,
     variant,
+    highlightedConditionPath,
     handleInputBlur,
     handleGroupFreeformFocus,
     handleGroupFreeformChange,
@@ -83,6 +84,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     return activeInput.type === 'operator' && pathsEqual(conditionPath, activeInput.path)
   }
 
+  const isConditionHighlighted = (conditionPath: number[]) => {
+    if (!highlightedConditionPath) return false
+    return pathsEqual(conditionPath, highlightedConditionPath)
+  }
+
   const items = useMemo(
     () =>
       buildPropertyItems({
@@ -106,7 +112,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     (index) => {
       if (items[index]) handleSelectMenuItem(items[index])
     },
-    handleKeyDown
+    handleKeyDown,
+    { skipEnterWhenFilterHighlighted: highlightedConditionPath !== null }
   )
 
   useEffect(() => {
@@ -156,12 +163,15 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   path={currentPath}
                   isActive={isConditionActive(currentPath)}
                   isOperatorActive={isOperatorActive(currentPath)}
+                  isHighlighted={isConditionHighlighted(currentPath)}
                 />
               )}
             </React.Fragment>
           )
         })}
-        <Popover_Shadcn_ open={isActive && !isLoading && items.length > 0}>
+        <Popover_Shadcn_
+          open={isActive && !isLoading && items.length > 0 && !highlightedConditionPath}
+        >
           <PopoverAnchor_Shadcn_ asChild>
             {isRootGroup ? (
               <Input_Shadcn_

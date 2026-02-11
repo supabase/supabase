@@ -14,25 +14,58 @@ If you're having trouble invoking an Edge Function or experiencing CORS issues, 
 
 ## Proper CORS handling
 
-Make sure your function handles OPTIONS preflight requests:
+Make sure your function handles OPTIONS preflight requests.
+
+### Recommended (v2.95.0+)
+
+<Admonition type="tip">
+
+**For `@supabase/supabase-js` v2.95.0 and later:** Import CORS headers directly from the SDK to ensure they stay synchronized with any new headers added to the client libraries.
+
+</Admonition>
 
 ```tsx
+// Recommended approach
+import { corsHeaders } from '@supabase/supabase-js/cors' // v2.95.0+
+
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   // Your function logic here
-  return new Response('Success', {
-    headers: { 'Access-Control-Allow-Origin': '*' },
+  return new Response(JSON.stringify({ status: 'Success' }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+})
+```
+
+### For versions before 2.95.0
+
+If you're using `@supabase/supabase-js` before v2.95.0, you'll need to hardcode the CORS headers. Add a `cors.ts` file within a [`_shared` folder](/docs/guides/functions/quickstart#organizing-your-edge-functions):
+
+```ts
+// _shared/cors.ts
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+```
+
+Then import it in your function:
+
+```tsx
+import { corsHeaders } from '../_shared/cors.ts'
+
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  // Your function logic here
+  return new Response(JSON.stringify({ status: 'Success' }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
 })
 ```

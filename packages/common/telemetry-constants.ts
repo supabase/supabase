@@ -2489,6 +2489,31 @@ export interface QueryPerformanceAIExplanationButtonClickedEvent {
 }
 
 /**
+ * User copied an AI prompt to clipboard instead of using the built-in assistant.
+ * This allows users to paste the prompt into external AI tools (Cursor, Claude, etc.)
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiPromptCopiedEvent {
+  action: 'ai_prompt_copied'
+  properties: {
+    /**
+     * Source/location where the prompt was copied from
+     */
+    source:
+      | 'explain_visualizer'
+      | 'query_performance'
+      | 'sql_debug'
+      | 'lint_detail'
+      | 'advisor_section'
+      | 'advisor_widget'
+      | 'branch_review'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User opened the request upgrade modal (for users without billing permissions).
  *
  * @group Events
@@ -2788,6 +2813,7 @@ export type TelemetryEvent =
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
+  | AiPromptCopiedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
