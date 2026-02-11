@@ -81,7 +81,7 @@ let supabase = SupabaseClient(
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {
-        try await Clerk.shared.session?.getToken()?.jwt
+        try await Clerk.shared.auth.getToken()
       }
     )
   )
