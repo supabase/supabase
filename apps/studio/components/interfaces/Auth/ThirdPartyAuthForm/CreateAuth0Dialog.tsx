@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -26,8 +25,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 interface CreateAuth0IntegrationProps {
   visible: boolean
   onClose: () => void
-  // TODO: Remove this if this Dialog is only used for creating.
-  onDelete: () => void
 }
 
 const FORM_ID = 'create-auth0-auth-integration-form'
@@ -41,14 +38,7 @@ const FormSchema = z.object({
     .regex(/^[A-Za-z0-9-.]+$/, 'Project IDs should only have alphanumeric characters and hyphens.'), // Only allow alphanumeric characters and hyphens.
 })
 
-export const CreateAuth0IntegrationDialog = ({
-  visible,
-  onClose,
-  onDelete,
-}: CreateAuth0IntegrationProps) => {
-  // TODO: Remove this if this Dialog is only used for creating.
-  const isCreating = true
-
+export const CreateAuth0IntegrationDialog = ({ visible, onClose }: CreateAuth0IntegrationProps) => {
   const { ref: projectRef } = useParams()
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
@@ -90,9 +80,7 @@ export const CreateAuth0IntegrationDialog = ({
     <Dialog open={visible} onOpenChange={() => onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="truncate">
-            {isCreating ? `Add new Auth0 connection` : `Update existing Auth0 connection`}
-          </DialogTitle>
+          <DialogTitle className="truncate">Add new Auth0 connection</DialogTitle>
         </DialogHeader>
         <Separator />
         <DialogSection>
@@ -161,19 +149,11 @@ export const CreateAuth0IntegrationDialog = ({
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          {!isCreating && (
-            <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
-                Remove connection
-              </Button>
-            </div>
-          )}
-
           <Button disabled={isPending} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
-            {isCreating ? 'Create connection' : 'Update connection'}
+            Create connection
           </Button>
         </DialogFooter>
       </DialogContent>

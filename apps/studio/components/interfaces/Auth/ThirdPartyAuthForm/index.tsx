@@ -133,31 +133,26 @@ export const ThirdPartyAuthForm = () => {
 
         <CreateFirebaseAuthIntegrationDialog
           visible={selectedIntegration === 'firebase'}
-          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
         <CreateAwsCognitoAuthIntegrationDialog
           visible={selectedIntegration === 'awsCognito'}
-          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
         <CreateAuth0IntegrationDialog
           visible={selectedIntegration === 'auth0'}
-          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
         <CreateClerkAuthIntegrationDialog
           visible={selectedIntegration === 'clerk'}
-          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
         <CreateWorkOSIntegrationDialog
           visible={selectedIntegration === 'workos'}
-          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
