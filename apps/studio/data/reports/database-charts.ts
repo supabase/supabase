@@ -237,7 +237,7 @@ export const getReportAttributesV2: (
       showMaxValue: true,
       hideChartType: false,
       showGrid: true,
-      YAxisProps: { width: 30 },
+      YAxisProps: { width: 40 },
       defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
@@ -270,7 +270,7 @@ export const getReportAttributesV2: (
       showMaxValue: true,
       hideChartType: false,
       showGrid: true,
-      YAxisProps: { width: 30 },
+      YAxisProps: { width: 40 },
       defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
@@ -333,7 +333,7 @@ export const getReportAttributesV2: (
       showLegend: true,
       showMaxValue: true,
       showGrid: true,
-      YAxisProps: { width: 30 },
+      YAxisProps: { width: 40 },
       hideChartType: false,
       defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
@@ -365,7 +365,7 @@ export const getReportAttributesV2: (
       showLegend: false,
       showMaxValue: false,
       showGrid: true,
-      YAxisProps: { width: 30 },
+      YAxisProps: { width: 40 },
       hideChartType: false,
       defaultChartStyle: 'bar',
       attributes: [
