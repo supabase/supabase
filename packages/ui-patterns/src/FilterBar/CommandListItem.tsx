@@ -29,6 +29,7 @@ export function CommandListItem({
         isHighlighted && 'bg-surface-300',
         !isHighlighted && 'hover:bg-surface-200'
       )}
+      data-testid={`filter-menu-item-${item.value}`}
     >
       <span className="flex items-center gap-2">
         {includeIcon && item.icon}
