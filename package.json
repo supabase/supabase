@@ -8,13 +8,11 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "turbo run build",
-    "build:cms": "turbo run build --filter=cms --parallel",
     "build:studio": "turbo run build --filter=studio",
     "build:design-system": "turbo run build --filter=design-system",
     "build:docs": "turbo run build --filter=docs",
     "clean": "turbo run clean --parallel && rimraf -G node_modules/{*,.bin,.modules.yaml}",
     "dev": "turbo run dev --parallel",
-    "dev:cms": "turbo run dev --filter=cms --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
     "dev:studio-local": "pnpm setup:cli && NODE_ENV=test pnpm --prefix ./apps/studio dev",
     "dev:docs": "turbo run dev --filter=docs --parallel",
