@@ -9,7 +9,6 @@ import { useOrganizationDeleteMutation } from 'data/organizations/organization-d
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button } from 'ui'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 
 export const DeleteOrganizationButton = () => {
@@ -37,12 +36,15 @@ export const DeleteOrganizationButton = () => {
     },
   })
 
-  const onConfirmDelete = async (values: any) => {
+  const onConfirmDelete = () => {
     if (!canDeleteOrganization) {
-      return toast.error('You do not have the required permissions to delete this organization')
+      toast.error('You do not have permission to delete this organization')
+      return
     }
-    if (!orgSlug) return console.error('Org slug is required')
-
+    if (!orgSlug) {
+      console.error('Org slug is required')
+      return
+    }
     deleteOrganization({ slug: orgSlug })
   }
 
