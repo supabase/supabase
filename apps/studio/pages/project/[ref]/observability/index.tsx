@@ -57,6 +57,11 @@ export const UserReportPage: NextPageWithLayout = () => {
     }
   )
 
+  // Wait for flags to load before rendering to avoid flashing wrong page
+  if (!flagsLoaded || isLoading) {
+    return <LogoLoader />
+  }
+
   // Show overview page if feature flag is enabled
   if (showOverview) {
     return <ObservabilityOverview />
@@ -64,11 +69,8 @@ export const UserReportPage: NextPageWithLayout = () => {
 
   return (
     <div className="h-full w-full">
-      {isLoading ? (
-        <LogoLoader />
-      ) : (
-        <>
-          <ProductEmptyState
+      <>
+        <ProductEmptyState
             title="Observability"
             ctaButtonLabel="New custom report"
             onClickCta={() => {
@@ -91,7 +93,6 @@ export const UserReportPage: NextPageWithLayout = () => {
             afterSubmit={() => setShowCreateReportModal(false)}
           />
         </>
-      )}
     </div>
   )
 }
