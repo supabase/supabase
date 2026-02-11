@@ -129,7 +129,6 @@ export function ConnectConfigSection({
             )
 
           case 'select':
-            console.log(options, field.id)
             return (
               <FormItemLayout
                 key={field.id}
