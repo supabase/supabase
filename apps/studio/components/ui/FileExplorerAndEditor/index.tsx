@@ -340,7 +340,7 @@ export const FileExplorerAndEditor = ({
 
   return (
     <div
-      className={`flex-1 overflow-hidden flex h-full relative ${isDragOver ? 'bg-blue-50' : ''}`}
+      className={`flex-1 overflow-hidden flex h-full relative ${isDragOver ? 'bg-selection' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}

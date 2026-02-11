@@ -90,7 +90,7 @@ export const FileExplorerRowEditing = ({
   return (
     <div
       style={style}
-      className="storage-row flex items-center justify-between rounded bg-gray-500"
+      className="storage-row flex items-center justify-between rounded bg-selection"
     >
       <div className="flex h-full flex-grow items-center px-2.5">
         <div>
