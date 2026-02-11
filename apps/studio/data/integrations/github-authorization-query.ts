@@ -4,7 +4,6 @@ import { get } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { integrationKeys } from './keys'
 
-// FIXME(kamil): Do not retry, a single check is fine.
 export async function getGitHubAuthorization(signal?: AbortSignal) {
   const { data, error } = await get('/platform/integrations/github/authorization', {
     signal,
@@ -27,6 +26,7 @@ export const useGitHubAuthorizationQuery = <TData = GitHubAuthorizationData>({
     queryFn: ({ signal }) => getGitHubAuthorization(signal),
     enabled,
     staleTime: 0,
+    retry: false,
     ...options,
   })
 }
