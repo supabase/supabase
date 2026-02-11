@@ -1,0 +1,160 @@
+resources:
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: auth
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: auth
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: auth
+                    port_value: 9999
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: rest
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: rest
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: rest
+                    port_value: 3000
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: realtime
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: realtime
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: realtime-dev.supabase-realtime
+                    port_value: 4000
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: storage
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: storage
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: storage
+                    port_value: 5000
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: functions
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: functions
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: functions
+                    port_value: 9000
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: analytics
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: analytics
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: analytics
+                    port_value: 4000
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: meta
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: meta
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: meta
+                    port_value: 8080
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: studio
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: studio
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: studio
+                    port_value: 3000
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000

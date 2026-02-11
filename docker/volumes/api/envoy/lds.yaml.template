@@ -1,0 +1,374 @@
+resources:
+  - '@type': type.googleapis.com/envoy.config.listener.v3.Listener
+    name: http_listener
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 8000
+    filter_chains:
+      - filters:
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              '@type': type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+              stat_prefix: ingress_http
+              upgrade_configs:
+                - upgrade_type: websocket
+              access_log:
+                - name: envoy.access_loggers.stdout
+                  typed_config:
+                    '@type': type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
+                    log_format:
+                      text_format_source:
+                        inline_string: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT% - - [%START_TIME(%d/%b/%Y:%H:%M:%S %z)%] \"%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%\" %RESPONSE_CODE% %BYTES_SENT% \"%REQ(REFERER)%\" \"%REQ(USER-AGENT)%\"\n"
+              http_filters:
+                # CORS filter
+                - name: envoy.filters.http.cors
+                  typed_config:
+                    '@type': type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+
+                # RBAC filter for API key validation
+                - name: envoy.filters.http.rbac
+                  typed_config:
+                    '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBAC
+                    rules:
+                      action: DENY
+                      policies:
+                        # Deny requests without valid API key to protected routes
+                        api_key_required:
+                          permissions:
+                            - and_rules:
+                                rules:
+                                  # Match protected paths that need API key
+                                  - or_rules:
+                                      rules:
+                                        - url_path:
+                                            path:
+                                              prefix: /auth/v1/
+                                        - url_path:
+                                            path:
+                                              prefix: /rest/v1/
+                                        - url_path:
+                                            path:
+                                              prefix: /graphql/v1
+                                        - url_path:
+                                            path:
+                                              prefix: /realtime/v1/
+                                        - url_path:
+                                            path:
+                                              prefix: /pg/
+                                  # Exclude open auth routes
+                                  - not_rule:
+                                      or_rules:
+                                        rules:
+                                          - url_path:
+                                              path:
+                                                exact: /auth/v1/verify
+                                          - url_path:
+                                              path:
+                                                prefix: /auth/v1/verify?
+                                          - url_path:
+                                              path:
+                                                exact: /auth/v1/callback
+                                          - url_path:
+                                              path:
+                                                prefix: /auth/v1/callback?
+                                          - url_path:
+                                              path:
+                                                exact: /auth/v1/authorize
+                                          - url_path:
+                                              path:
+                                                prefix: /auth/v1/authorize?
+                          principals:
+                            # Deny if no valid API key
+                            - not_id:
+                                or_ids:
+                                  ids:
+                                    - header:
+                                        name: apikey
+                                        string_match:
+                                          exact: "${ANON_KEY}"
+                                    - header:
+                                        name: apikey
+                                        string_match:
+                                          exact: "${SERVICE_ROLE_KEY}"
+                                    - header:
+                                        name: Authorization
+                                        string_match:
+                                          prefix: "Bearer ${ANON_KEY}"
+                                    - header:
+                                        name: Authorization
+                                        string_match:
+                                          prefix: "Bearer ${SERVICE_ROLE_KEY}"
+                        # /pg/ requires service_role only
+                        pg_service_role_only:
+                          permissions:
+                            - url_path:
+                                path:
+                                  prefix: /pg/
+                          principals:
+                            - not_id:
+                                or_ids:
+                                  ids:
+                                    - header:
+                                        name: apikey
+                                        string_match:
+                                          exact: "${SERVICE_ROLE_KEY}"
+                                    - header:
+                                        name: Authorization
+                                        string_match:
+                                          prefix: "Bearer ${SERVICE_ROLE_KEY}"
+
+                # Lua filter for removing apikey from forwarded requests where hide_credentials is needed
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    default_source_code:
+                      inline_string: |
+                        function envoy_on_request(request_handle)
+                        end
+                    source_codes:
+                      hide_apikey:
+                        inline_string: |
+                          function envoy_on_request(request_handle)
+                            request_handle:headers():remove("apikey")
+                            -- Also strip apikey from query string
+                            local path = request_handle:headers():get(":path")
+                            if path then
+                              path = path:gsub("&apikey=[^&]*", ""):gsub("%?apikey=[^&]*&", "?"):gsub("%?apikey=[^&]*$", "")
+                              request_handle:headers():replace(":path", path)
+                            end
+                          end
+                      add_graphql_header:
+                        inline_string: |
+                          function envoy_on_request(request_handle)
+                            request_handle:headers():add("Content-Profile", "graphql_public")
+                            request_handle:headers():remove("apikey")
+                            local path = request_handle:headers():get(":path")
+                            if path then
+                              path = path:gsub("&apikey=[^&]*", ""):gsub("%?apikey=[^&]*&", "?"):gsub("%?apikey=[^&]*$", "")
+                              request_handle:headers():replace(":path", path)
+                            end
+                          end
+
+                # Router filter
+                - name: envoy.filters.http.router
+                  typed_config:
+                    '@type': type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+              route_config:
+                name: local_route
+                virtual_hosts:
+                  - name: supabase_services
+                    domains:
+                      - "*"
+                    typed_per_filter_config:
+                      envoy.filters.http.cors:
+                        '@type': type.googleapis.com/envoy.extensions.filters.http.cors.v3.CorsPolicy
+                        allow_origin_string_match:
+                          - safe_regex:
+                              regex: ".*"
+                        allow_methods: GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,TRACE,CONNECT
+                        allow_headers: "*"
+                        expose_headers: "*"
+                        max_age: "3600"
+                        allow_credentials: true
+                    routes:
+                      # Block /api/mcp
+                      - match:
+                          prefix: /api/mcp
+                        direct_response:
+                          status: 403
+                          body:
+                            inline_string: "Access is forbidden."
+
+                      # Block /mcp
+                      - match:
+                          prefix: /mcp
+                        direct_response:
+                          status: 403
+                          body:
+                            inline_string: "Access is forbidden."
+
+                      # Open Auth routes (no API key required)
+                      - match:
+                          path: /auth/v1/verify
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /verify
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+
+                      - match:
+                          prefix: /auth/v1/verify
+                        route:
+                          cluster: auth
+                          regex_rewrite:
+                            pattern:
+                              regex: ^/auth/v1/verify
+                            substitution: /verify
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+
+                      - match:
+                          path: /auth/v1/callback
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /callback
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+
+                      - match:
+                          prefix: /auth/v1/callback
+                        route:
+                          cluster: auth
+                          regex_rewrite:
+                            pattern:
+                              regex: ^/auth/v1/callback
+                            substitution: /callback
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+
+                      - match:
+                          path: /auth/v1/authorize
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /authorize
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+
+                      - match:
+                          prefix: /auth/v1/authorize
+                        route:
+                          cluster: auth
+                          regex_rewrite:
+                            pattern:
+                              regex: ^/auth/v1/authorize
+                            substitution: /authorize
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+
+                      # Secure Auth routes (API key required, credentials NOT hidden)
+                      - match:
+                          prefix: /auth/v1/
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /
+                          timeout: 30s
+
+                      # REST routes (API key required, credentials hidden)
+                      - match:
+                          prefix: /rest/v1/
+                        route:
+                          cluster: rest
+                          prefix_rewrite: /
+                          timeout: 120s
+                        typed_per_filter_config:
+                          envoy.filters.http.lua:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                            name: hide_apikey
+
+                      # GraphQL routes (API key required, add Content-Profile header)
+                      - match:
+                          prefix: /graphql/v1
+                        route:
+                          cluster: rest
+                          prefix_rewrite: /rpc/graphql
+                          timeout: 120s
+                        typed_per_filter_config:
+                          envoy.filters.http.lua:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                            name: add_graphql_header
+
+                      # Realtime WebSocket routes
+                      - match:
+                          prefix: /realtime/v1/
+                        route:
+                          cluster: realtime
+                          prefix_rewrite: /socket/
+                          timeout: 0s
+                          upgrade_configs:
+                            - upgrade_type: websocket
+
+                      # Realtime REST API
+                      - match:
+                          prefix: /realtime/v1/api
+                        route:
+                          cluster: realtime
+                          prefix_rewrite: /api
+                          timeout: 30s
+
+                      # Storage routes (no API key required - storage handles its own auth)
+                      - match:
+                          prefix: /storage/v1/
+                        route:
+                          cluster: storage
+                          prefix_rewrite: /
+                          timeout: 300s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+
+                      # Edge Functions routes (no API key required - functions handle their own auth)
+                      - match:
+                          prefix: /functions/v1/
+                        route:
+                          cluster: functions
+                          prefix_rewrite: /
+                          timeout: 300s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+
+                      # Analytics routes (no API key required)
+                      - match:
+                          prefix: /analytics/v1/
+                        route:
+                          cluster: analytics
+                          prefix_rewrite: /
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+
+                      # pg-meta routes (service_role only)
+                      - match:
+                          prefix: /pg/
+                        route:
+                          cluster: meta
+                          prefix_rewrite: /
+                          timeout: 30s
+
+                      # Studio/Dashboard (catch-all with basic auth via RBAC)
+                      - match:
+                          prefix: /
+                        route:
+                          cluster: studio
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: DENY
+                                policies:
+                                  require_basic_auth:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - not_id:
+                                          header:
+                                            name: authorization
+                                            string_match:
+                                              exact: "Basic ${DASHBOARD_BASIC_AUTH}"

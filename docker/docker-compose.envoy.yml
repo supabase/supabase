@@ -1,0 +1,42 @@
+# Envoy override for Kong
+# Usage: docker compose -f docker-compose.yml -f docker-compose.envoy.yml up
+
+services:
+  # Disable the original Kong service
+  kong:
+    profiles:
+      - disabled
+
+  # Envoy API gateway
+  api:
+    container_name: supabase-envoy
+    image: envoyproxy/envoy:v1.28.0
+    restart: unless-stopped
+    ports:
+      - ${KONG_HTTP_PORT}:8000/tcp
+      - ${KONG_HTTPS_PORT:-8443}:8443/tcp
+      - 9901:9901/tcp
+    volumes:
+      - ./volumes/api/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ./volumes/api/envoy/cds.yaml:/etc/envoy/cds.yaml:ro
+      - ./volumes/api/envoy/lds.yaml.template:/etc/envoy/lds.yaml.template:ro
+      - ./volumes/api/envoy/docker-entrypoint.sh:/docker-entrypoint.sh:ro
+    depends_on:
+      analytics:
+        condition: service_healthy
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
+      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+    entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9901/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      default:
+        aliases:
+          - kong
+          - envoy
