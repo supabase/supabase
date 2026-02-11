@@ -82,9 +82,9 @@ export const Connect = () => {
   const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
   const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
   const [queryWith, setQueryWith] = useQueryState('with', parseAsString)
-  const [_, setQueryType] = useQueryState('type', parseAsString)
-  const [__, setQuerySource] = useQueryState('source', parseAsString)
-  const [___, setQueryMethod] = useQueryState('method', parseAsString)
+  const [, setQueryType] = useQueryState('type', parseAsString)
+  const [, setQuerySource] = useQueryState('source', parseAsString)
+  const [, setQueryMethod] = useQueryState('method', parseAsString)
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs

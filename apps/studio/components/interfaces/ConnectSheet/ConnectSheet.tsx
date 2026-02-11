@@ -28,7 +28,7 @@ export const ConnectSheet = () => {
     'showConnect',
     parseAsBoolean.withDefault(false)
   )
-  const [_, setConnectTab] = useQueryState('connectTab', parseAsString)
+  const [, setConnectTab] = useQueryState('connectTab', parseAsString)
 
   const handleOpenChange = (sheetOpen: boolean) => {
     if (!sheetOpen) {
