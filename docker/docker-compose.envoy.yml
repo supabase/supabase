@@ -8,7 +8,7 @@ services:
       - disabled
 
   # Envoy API gateway
-  api:
+  api-gw:
     container_name: supabase-envoy
     image: envoyproxy/envoy:v1.28.0
     restart: unless-stopped
