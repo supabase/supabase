@@ -2,14 +2,14 @@ import { Component, Input, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { User } from '@supabase/supabase-js'
 import { Profile, SupabaseService } from '../supabase.service'
-import { CommonModule } from '@angular/common'
+
 import { AvatarComponent } from '../avatar/avatar.component'
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.css'],
-  imports: [CommonModule, AvatarComponent, ReactiveFormsModule],
+  imports: [AvatarComponent, ReactiveFormsModule],
 })
 export class AccountComponent implements OnInit {
   loading = false
