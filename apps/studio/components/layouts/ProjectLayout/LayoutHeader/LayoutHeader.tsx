@@ -77,7 +77,7 @@ export const LayoutHeader = ({
 
   const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
   const isFlagResolved = connectSheetFlag !== undefined
-  const isConnectSheetEnabled = true // connectSheetFlag === true || connectSheetFlag === 'variation'
+  const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
 
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
