@@ -1,8 +1,8 @@
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
-import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
+const ContentFile = ({ connectionStringPooler }: StepContentProps) => {
   const files = [
     {
       name: '.env',
@@ -27,7 +27,7 @@ DATABASE_URL="${connectionStringPooler.transactionShared}"
 `,
     },
     {
-      name: 'drizzle/schema.tsx',
+      name: 'drizzle/schema.ts',
       language: 'tsx',
       code: `
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";

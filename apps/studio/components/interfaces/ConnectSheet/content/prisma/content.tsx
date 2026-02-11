@@ -1,9 +1,9 @@
 import { IS_PLATFORM } from 'lib/constants'
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
-import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
+const ContentFile = ({ connectionStringPooler }: StepContentProps) => {
   const files = [
     {
       name: '.env.local',

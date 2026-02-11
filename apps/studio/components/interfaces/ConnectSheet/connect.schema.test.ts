@@ -73,7 +73,7 @@ describe('connect.schema:structure', () => {
 describe('connect.schema:fields', () => {
   test('framework field should have correct type', () => {
     const field = connectSchema.fields.framework
-    expect(field.type).toBe('radio-grid')
+    expect(field.type).toBe('select')
     expect(field.options).toEqual({ source: 'frameworks' })
     expect(field.defaultValue).toBe('nextjs')
   })

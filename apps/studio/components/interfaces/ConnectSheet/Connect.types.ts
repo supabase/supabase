@@ -21,28 +21,6 @@ export interface ConnectionStringPooler {
   direct?: string
 }
 
-/** @deprecated Use ConnectionStringPooler instead */
-export type ConnectionStrings = ConnectionStringPooler
-
-/** @deprecated Use StepContentProps instead */
-export interface ContentFileProps {
-  projectKeys: {
-    apiUrl: string
-    anonKey?: string
-    publishableKey?: string
-  }
-  connectionStringPooler: {
-    transactionShared: string
-    sessionShared: string
-    transactionDedicated?: string
-    sessionDedicated?: string
-    ipv4SupportedForDedicatedPooler: boolean
-    direct?: string
-  }
-  connectionTab: 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
-  onCopy?: () => void
-}
-
 // ============================================================================
 // Schema Types - Conditional Resolution
 // ============================================================================
