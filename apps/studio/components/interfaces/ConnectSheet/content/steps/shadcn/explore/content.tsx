@@ -1,7 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 
-import type { StepContentProps } from '../../../../Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 function ShadcnExploreContent(_props: StepContentProps) {
   return (

@@ -1,6 +1,6 @@
 import { CodeBlock } from 'ui'
 
-import type { StepContentProps } from '../../../../../Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 function ClaudeAuthenticateContent(_props: StepContentProps) {
   return (

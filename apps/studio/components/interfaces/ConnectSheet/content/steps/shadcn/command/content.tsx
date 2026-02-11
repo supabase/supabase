@@ -2,7 +2,7 @@ import { Copy } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button, copyToClipboard } from 'ui'
 
-import type { StepContentProps } from '../../../../Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 function getShadcnCommand(state: StepContentProps['state']): string | null {
   if (state.framework === 'nextjs') {

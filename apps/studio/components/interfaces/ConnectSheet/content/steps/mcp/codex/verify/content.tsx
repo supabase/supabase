@@ -1,4 +1,4 @@
-import type { StepContentProps } from '../../../../../Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 function CodexVerifyContent(_props: StepContentProps) {
   return (

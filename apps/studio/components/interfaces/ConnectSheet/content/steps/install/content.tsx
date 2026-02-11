@@ -2,9 +2,9 @@ import { Copy } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button, copyToClipboard } from 'ui'
 
-import { INSTALL_COMMANDS } from '../../../connect.schema'
-import type { StepContentProps } from '../../../Connect.types'
-import { resolveFrameworkLibraryKey } from '../../../Connect.utils'
+import { INSTALL_COMMANDS } from '@/components/interfaces/ConnectSheet/connect.schema'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import { resolveFrameworkLibraryKey } from '@/components/interfaces/ConnectSheet/Connect.utils'
 
 /**
  * Gets the install command for the current framework selection.

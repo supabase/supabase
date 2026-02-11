@@ -1,6 +1,6 @@
 import { CodeBlock } from 'ui'
 
-import type { StepContentProps } from '../../../../../Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 import { useMcpUrl } from '@/components/interfaces/ConnectSheet/useMcpUrl'
 
 function CodexAddServerContent({ state, projectKeys }: StepContentProps) {

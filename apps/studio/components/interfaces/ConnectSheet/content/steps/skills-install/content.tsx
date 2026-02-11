@@ -2,7 +2,7 @@ import { Copy } from 'lucide-react'
 import { useState } from 'react'
 import { Button, copyToClipboard } from 'ui'
 
-import type { StepContentProps } from '../../../Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 const SKILLS_COMMAND = 'npx skills add supabase/agent-skills'
 

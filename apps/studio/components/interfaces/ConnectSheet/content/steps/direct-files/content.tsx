@@ -6,16 +6,16 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   type ConnectionStringMethod,
   type DatabaseConnectionType,
-} from '../../../Connect.constants'
-import type { StepContentProps } from '../../../Connect.types'
-import { ConnectionParameters } from '../../../ConnectionParameters'
+} from '@/components/interfaces/ConnectSheet/Connect.constants'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/ConnectionParameters'
 import {
-  PASSWORD_PLACEHOLDER,
   buildConnectionParameters,
   buildSafeConnectionString,
   parseConnectionParams,
+  PASSWORD_PLACEHOLDER,
   resolveConnectionString,
-} from '../../../ConnectionString.utils'
+} from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 
 const DOTNET_CONFIG_COMMAND =
   'dotnet add package Microsoft.Extensions.Configuration.Json --version YOUR_DOTNET_VERSION'

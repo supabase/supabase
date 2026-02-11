@@ -12,7 +12,7 @@ import {
 } from 'ui-patterns/McpUrlBuilder'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { StepContentProps } from '../../../../Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 function McpCursorContent({ state, projectKeys }: StepContentProps) {
   const { ref: projectRef } = useParams()

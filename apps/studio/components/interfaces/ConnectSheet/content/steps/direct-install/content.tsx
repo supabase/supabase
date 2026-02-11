@@ -1,7 +1,7 @@
 import { CodeBlock } from 'ui'
 
-import type { StepContentProps } from '../../../Connect.types'
-import examples from '../../../DirectConnectionExamples'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import examples from '@/components/interfaces/ConnectSheet/DirectConnectionExamples'
 
 /**
  * Step component for direct connection install commands.

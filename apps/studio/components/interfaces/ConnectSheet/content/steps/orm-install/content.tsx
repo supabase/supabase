@@ -1,6 +1,6 @@
 import { CodeBlock } from 'ui'
 
-import type { StepContentProps } from '../../../Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 const ORM_INSTALL_COMMANDS: Record<string, string[]> = {
   prisma: ['npm install prisma --save-dev', 'npx prisma init'],
