@@ -195,8 +195,12 @@ export function ConnectConfigSection({
                   <MultiSelectorContent>
                     <MultiSelectorList>
                       {options.map((option) => (
-                        <MultiSelectorItem key={option.value} value={option.value}>
-                          <div className="flex flex-col">
+                        <MultiSelectorItem
+                          key={option.value}
+                          value={option.value}
+                          className="items-start"
+                        >
+                          <div className="flex flex-col ml-2 gap-y-0.5">
                             <span className="font-medium">{option.label}</span>
                             {option.description && (
                               <span className="text-xs text-foreground-light">
