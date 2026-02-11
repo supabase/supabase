@@ -10,6 +10,7 @@ import {
   PopoverAnchor_Shadcn_,
   PopoverContent_Shadcn_,
 } from 'ui'
+
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
 import { useDeferredBlur, useHighlightNavigation } from './hooks'
@@ -21,6 +22,7 @@ export type FilterConditionProps = {
   path: number[]
   isActive: boolean
   isOperatorActive: boolean
+  isHighlighted: boolean
 }
 
 export function FilterCondition({
@@ -28,6 +30,7 @@ export function FilterCondition({
   path,
   isActive,
   isOperatorActive,
+  isHighlighted,
 }: FilterConditionProps) {
   const {
     filters: rootFilters,
@@ -133,13 +136,28 @@ export function FilterCondition({
     }
   }, [isActive, isLoading, valueItems, showValueCustom])
 
+  const handleOperatorBackspace = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Backspace' && condition.operator === '') {
+        e.preventDefault()
+        handleRemoveCondition(path)
+        setActiveInput({ type: 'group', path: path.slice(0, -1) })
+      }
+    },
+    [condition.operator, setActiveInput, path, handleRemoveCondition]
+  )
+
   const {
     highlightedIndex: opHighlightedIndex,
     handleKeyDown: handleOperatorKeyDown,
     reset: resetOpHighlight,
-  } = useHighlightNavigation(operatorItems.length, (index) => {
-    if (operatorItems[index]) handleSelectMenuItem(operatorItems[index])
-  })
+  } = useHighlightNavigation(
+    operatorItems.length,
+    (index) => {
+      if (operatorItems[index]) handleSelectMenuItem(operatorItems[index])
+    },
+    handleOperatorBackspace
+  )
 
   const {
     highlightedIndex: valHighlightedIndex,
@@ -194,7 +212,8 @@ export function FilterCondition({
       ref={wrapperRef}
       className={cn(
         'flex items-stretch px-0 bg-muted group shrink-0',
-        variant === 'pill' ? 'rounded border' : 'border-r'
+        variant === 'pill' ? 'rounded border' : 'border-r',
+        isHighlighted && 'ring-2 ring-primary'
       )}
     >
       <span
@@ -317,6 +336,7 @@ export function FilterCondition({
         onClick={onRemove}
         className="group hover:text-foreground hover:!bg-surface-600 rounded-none px-1 h-auto py-0"
         aria-label={`Remove ${property.label} filter`}
+        tabIndex={-1}
       />
     </div>
   )

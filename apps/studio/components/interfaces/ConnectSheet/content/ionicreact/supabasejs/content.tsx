@@ -1,8 +1,8 @@
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
-import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-const ContentFile = ({ projectKeys }: ContentFileProps) => {
+const ContentFile = ({ projectKeys }: StepContentProps) => {
   const files = [
     {
       name: '.env',
@@ -19,7 +19,7 @@ REACT_APP_SUPABASE_KEY=${projectKeys.publishableKey ?? '<prefer publishable key 
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
-const supabaseKey = process.env.REACT_APP_SUPABASE_KEY
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 `,
@@ -83,7 +83,7 @@ export default function App() {
         <IonContent>
           <IonList>
             {todos.map((todo) => (
-              <IonItem key={todo.id}>{todo.title}</IonItem>
+              <IonItem key={todo.id}>{todo.name}</IonItem>
             ))}
           </IonList>
         </IonContent>

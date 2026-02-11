@@ -1,8 +1,8 @@
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
-import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-const ContentFile = ({ projectKeys }: ContentFileProps) => {
+const ContentFile = ({ projectKeys }: StepContentProps) => {
   const files = [
     {
       name: '.env.local',
@@ -31,7 +31,7 @@ export default async function Page() {
   return (
     <ul>
       {todos?.map((todo) => (
-        <li>{todo}</li>
+        <li key={todo.id}>{todo.name}</li>
       ))}
     </ul>
   )
@@ -42,13 +42,13 @@ export default async function Page() {
       name: 'utils/supabase/server.ts',
       language: 'ts',
       code: `
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.${projectKeys?.publishableKey ? 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'NEXT_PUBLIC_SUPABASE_ANON_KEY'};
 
-export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
+export const createClient = (cookieStore: Awaited<ReturnType<typeof cookies>>) => {
   return createServerClient(
     supabaseUrl!,
     supabaseKey!,
@@ -92,7 +92,7 @@ export const createClient = () =>
       name: 'utils/supabase/middleware.ts',
       language: 'ts',
       code: `
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

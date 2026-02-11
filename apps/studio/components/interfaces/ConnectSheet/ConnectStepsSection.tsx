@@ -1,6 +1,3 @@
-import dynamic from 'next/dynamic'
-import { useMemo, useRef } from 'react'
-
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -9,6 +6,8 @@ import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configur
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { pluckObjectFields } from 'lib/helpers'
+import dynamic from 'next/dynamic'
+import { useMemo, useRef } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type {
@@ -154,20 +153,18 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
 
   return (
     <div className="bg-muted/50 flex-1">
-      <div className="p-8">
-        <h3 className="heading-subTitle mb-6">Connect your app</h3>
+      <div className="p-8 flex flex-col gap-y-6">
+        <h3>Connect your app</h3>
 
         <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
 
-        <div className="space-y-0" ref={stepsContainerRef}>
+        <div className="mt-6" ref={stepsContainerRef}>
           {steps.map((step, index) => (
             <ConnectSheetStep
               key={step.id}
               number={index + 1}
               title={step.title}
               description={step.description}
-              isFirst={index === 0}
-              isLast={index === steps.length - 1}
             >
               <StepContent
                 contentId={step.content}

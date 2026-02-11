@@ -1,8 +1,8 @@
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
-import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-const ContentFile = ({ projectKeys }: ContentFileProps) => {
+const ContentFile = ({ projectKeys }: StepContentProps) => {
   const files = [
     {
       name: 'Supabase.swift',
@@ -25,7 +25,7 @@ import Foundation
 
 struct Todo: Identifiable, Decodable {
   var id: Int
-  var title: String
+  var name: String
 }
 `,
     },
@@ -42,7 +42,7 @@ struct ContentView: View {
   var body: some View {
     NavigationStack {
       List(todos) { todo in
-        Text(todo.title)
+        Text(todo.name)
       }
       .navigationTitle("Todos")
       .task {

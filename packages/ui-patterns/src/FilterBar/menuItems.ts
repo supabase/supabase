@@ -1,10 +1,9 @@
-import { ActiveInput } from './hooks'
-import { FilterBarAction, FilterGroup, FilterProperty } from './types'
+import { ActiveInputState, FilterBarAction, FilterGroup, FilterProperty } from './types'
 import {
   findConditionByPath,
   isCustomOptionObject,
-  isFilterOptionObject,
   isFilterOperatorObject,
+  isFilterOptionObject,
 } from './utils'
 
 export type MenuItem = {
@@ -19,7 +18,7 @@ export type MenuItem = {
 }
 
 export function buildOperatorItems(
-  activeInput: Extract<ActiveInput, { type: 'operator' }> | null,
+  activeInput: Extract<ActiveInputState, { type: 'operator' }> | null,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
   hasTypedSinceFocus: boolean = true
@@ -36,12 +35,17 @@ export function buildOperatorItems(
   return availableOperators
     .filter((op) => {
       if (!shouldFilter) return true
-      const searchText = isFilterOperatorObject(op) ? op.value : op
-      return searchText.toUpperCase().includes(operatorValue)
+      if (isFilterOperatorObject(op)) {
+        return (
+          op.value.toUpperCase().includes(operatorValue) ||
+          op.label.toUpperCase().includes(operatorValue)
+        )
+      }
+      return op.toUpperCase().includes(operatorValue)
     })
     .map((op) => {
       if (isFilterOperatorObject(op)) {
-        return { value: op.value, label: op.label }
+        return { value: op.value, label: `${op.label} (${op.value})` }
       }
       return { value: op, label: op }
     })
@@ -84,7 +88,7 @@ export function buildPropertyItems(params: {
 }
 
 export function buildValueItems(
-  activeInput: Extract<ActiveInput, { type: 'value' }> | null,
+  activeInput: Extract<ActiveInputState, { type: 'value' }> | null,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
   propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>,

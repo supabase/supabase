@@ -208,7 +208,7 @@ export const APIKeys = () => {
                 Connect to your project from a variety of frameworks, ORMs, an MCP server, or even
                 directly via connection string.
               </p>
-              <ConnectButton renderDialog={false} />
+              <ConnectButton />
             </div>
           </CardContent>
         </>

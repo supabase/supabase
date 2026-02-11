@@ -3,15 +3,17 @@ import { orderCommandSectionsByPriority } from 'components/interfaces/App/Comman
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Plug } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 export function useConnectCommands() {
-  const router = useRouter()
   const setIsOpen = useSetCommandMenuOpen()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  const [_, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [__, setConnectTab] = useQueryState('connectTab', parseAsString)
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.ACTIONS,
@@ -20,14 +22,7 @@ export function useConnectCommands() {
         id: 'connect-to-project',
         name: 'Connect to your project',
         action: () => {
-          router.push(
-            {
-              pathname: router.pathname,
-              query: { ...router.query, showConnect: 'true' },
-            },
-            undefined,
-            { shallow: true }
-          )
+          setShowConnect(true)
           setIsOpen(false)
         },
         icon: () => <Plug className="rotate-90" />,
@@ -36,14 +31,8 @@ export function useConnectCommands() {
         id: 'connect-mcp',
         name: 'Connect via MCP',
         action: () => {
-          router.push(
-            {
-              pathname: router.pathname,
-              query: { ...router.query, showConnect: 'true', connectTab: 'mcp' },
-            },
-            undefined,
-            { shallow: true }
-          )
+          setShowConnect(true)
+          setConnectTab('mcp')
           setIsOpen(false)
         },
         icon: () => <Plug className="rotate-90" />,

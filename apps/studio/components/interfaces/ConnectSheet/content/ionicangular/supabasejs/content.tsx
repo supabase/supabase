@@ -1,8 +1,8 @@
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
-import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-const ContentFile = ({ projectKeys }: ContentFileProps) => {
+const ContentFile = ({ projectKeys }: StepContentProps) => {
   const files = [
     {
       name: 'environments/environment.ts',
@@ -85,7 +85,7 @@ export class AppComponent implements OnInit {
 <ion-content>
 <ion-list>
   <ion-item *ngFor="let todo of todos">
-    <ion-label>{{ todo.title }}</ion-label>
+    <ion-label>{{ todo.name }}</ion-label>
   </ion-item>
 </ion-list>
 </ion-content>

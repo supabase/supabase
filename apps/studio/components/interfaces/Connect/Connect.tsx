@@ -1,9 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
-
 import { ApiKeysTabContent } from 'components/interfaces/Connect/ApiKeysTabContent'
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
@@ -13,35 +9,34 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
+  cn,
+  Dialog,
   DIALOG_PADDING_X,
   DIALOG_PADDING_Y,
-  Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogSectionSeparator,
   DialogTitle,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
 } from 'ui'
+
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
-import Link from 'next/link'
 
-interface ConnectProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
-
-export const Connect = ({ open, onOpenChange }: ConnectProps) => {
+export const Connect = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
 
@@ -82,6 +77,7 @@ export const Connect = ({ open, onOpenChange }: ConnectProps) => {
     }
   }
 
+  const [open, setOpen] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
   const [tab, setTab] = useQueryState('connectTab', parseAsString.withDefault('direct'))
   const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
   const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
@@ -253,12 +249,12 @@ export const Connect = ({ open, onOpenChange }: ConnectProps) => {
     setQueryMethod(null)
   }
 
-  const handleDialogChange = (nextOpen: boolean) => {
-    if (!nextOpen) {
+  const handleDialogChange = (dialogOpen: boolean) => {
+    if (!dialogOpen) {
       setTab(null)
       resetQueryStates()
     }
-    onOpenChange(nextOpen)
+    setOpen(dialogOpen)
   }
 
   useEffect(() => {

@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest'
 
-import type { ConditionalValue, ConnectSchema, ConnectState, StepTree } from './Connect.types'
 import {
   getActiveFields,
   getDefaultState,
@@ -8,6 +7,7 @@ import {
   resolveConditional,
   resolveSteps,
 } from './connect.resolver'
+import type { ConditionalValue, ConnectSchema, ConnectState, StepTree } from './Connect.types'
 
 // ============================================================================
 // resolveConditional Tests

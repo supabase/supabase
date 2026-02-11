@@ -1,19 +1,16 @@
-import { BASE_PATH } from 'lib/constants'
 import { Box, Cable, Database, Sparkles } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import {
+  cn,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Switch,
-  cn,
 } from 'ui'
-import { ClientSelectDropdown, MCP_CLIENTS } from 'ui-patterns/McpUrlBuilder'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -22,12 +19,9 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
-import { FRAMEWORKS, MOBILES } from './Connect.constants'
 import type { ConnectMode, FieldOption, ResolvedField } from './Connect.types'
 import { ConnectionIcon } from './ConnectionIcon'
-import { FrameworkSelector } from './FrameworkSelector'
 
-// Icon mapping for modes
 const MODE_ICONS: Record<string, React.ReactNode> = {
   framework: <Box size={16} strokeWidth={1.5} />,
   direct: <Database size={16} strokeWidth={1.5} />,
@@ -48,17 +42,12 @@ export function ConnectConfigSection({
   onFieldChange,
   getFieldOptions,
 }: ConnectConfigSectionProps) {
-  const { resolvedTheme } = useTheme()
-  const formLayoutClassName =
-    'md:gap-8 md:[&>div:first-child]:!w-[calc(50%-16px)] md:[&_[data-formlayout-id=labelContainer]]:!w-[calc(50%-16px)]'
-
   if (activeFields.length === 0) return null
 
-  // Get all frameworks for the combobox
-  const allFrameworks = [...FRAMEWORKS, ...MOBILES]
+  const formLayoutClassName = 'md:[&>div:first-child]:!w-1/3 xl:[&>div:first-child]:!w-2/5'
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-y-4">
       {activeFields.map((field) => {
         const options = getFieldOptions(field.id)
         const value = state[field.id]
@@ -72,34 +61,12 @@ export function ConnectConfigSection({
 
         switch (field.type) {
           case 'radio-grid':
-            // For framework field, use the combobox selector
-            if (field.id === 'framework') {
-              return (
-                <FormLayout
-                  key={field.id}
-                  layout="flex-row-reverse"
-                  label={field.label}
-                  description="What is your preferred coding agent"
-                  className={formLayoutClassName}
-                >
-                  <FrameworkSelector
-                    value={String(value ?? '')}
-                    onChange={(v) => onFieldChange(field.id, v)}
-                    items={allFrameworks}
-                    className="w-full"
-                    size="small"
-                  />
-                </FormLayout>
-              )
-            }
-
-            // Default radio-grid behavior for other fields
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
-                layout="flex-row-reverse"
+                isReactForm={false}
+                layout="horizontal"
                 label={field.label}
-                className={formLayoutClassName}
               >
                 <RadioGroupStacked
                   value={String(value ?? '')}
@@ -121,16 +88,16 @@ export function ConnectConfigSection({
                     </RadioGroupStackedItem>
                   ))}
                 </RadioGroupStacked>
-              </FormLayout>
+              </FormItemLayout>
             )
 
           case 'radio-list':
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
-                layout="flex-row-reverse"
+                isReactForm={false}
+                layout="horizontal"
                 label={field.label}
-                className={formLayoutClassName}
               >
                 <RadioGroupStacked
                   value={String(value ?? '')}
@@ -158,41 +125,17 @@ export function ConnectConfigSection({
                     </RadioGroupStackedItem>
                   ))}
                 </RadioGroupStacked>
-              </FormLayout>
+              </FormItemLayout>
             )
 
           case 'select':
-            // Special case for MCP client - use the custom dropdown
-            if (field.id === 'mcpClient') {
-              const selectedClient = MCP_CLIENTS.find((c) => c.key === value) ?? MCP_CLIENTS[0]
-              return (
-                <FormLayout
-                  key={field.id}
-                  layout="flex-row-reverse"
-                  label={field.label}
-                  description={field.description}
-                  className={formLayoutClassName}
-                >
-                  <ClientSelectDropdown
-                    basePath={BASE_PATH}
-                    theme={(resolvedTheme ?? 'dark') as 'light' | 'dark'}
-                    label=""
-                    className="w-full"
-                    clients={MCP_CLIENTS}
-                    selectedClient={selectedClient}
-                    onClientChange={(v) => onFieldChange(field.id, v)}
-                  />
-                </FormLayout>
-              )
-            }
-
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
-                layout="flex-row-reverse"
+                isReactForm={false}
+                layout="horizontal"
                 label={field.label}
                 description={field.description}
-                className={formLayoutClassName}
               >
                 <Select_Shadcn_
                   value={String(value ?? '')}
@@ -209,34 +152,35 @@ export function ConnectConfigSection({
                     ))}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
-              </FormLayout>
+              </FormItemLayout>
             )
 
           case 'switch':
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
-                layout="flex-row-reverse"
+                isReactForm={false}
+                layout="horizontal"
                 label={field.label}
                 description={field.description}
-                className={formLayoutClassName}
+                className="[&>div>label>span]:!break-keep [&>div>label>span]:text-balance"
               >
                 <Switch
                   id={field.id}
                   checked={Boolean(value)}
                   onCheckedChange={(v) => onFieldChange(field.id, v)}
                 />
-              </FormLayout>
+              </FormItemLayout>
             )
 
           case 'multi-select':
             return (
-              <FormLayout
+              <FormItemLayout
                 key={field.id}
-                layout="flex-row-reverse"
+                isReactForm={false}
+                layout="horizontal"
                 label={field.label}
                 description={field.description}
-                className={formLayoutClassName}
               >
                 <MultiSelector
                   values={Array.isArray(value) ? value : []}
@@ -265,7 +209,7 @@ export function ConnectConfigSection({
                     </MultiSelectorList>
                   </MultiSelectorContent>
                 </MultiSelector>
-              </FormLayout>
+              </FormItemLayout>
             )
 
           default:
@@ -275,10 +219,6 @@ export function ConnectConfigSection({
     </div>
   )
 }
-
-// ============================================================================
-// Mode Selector
-// ============================================================================
 
 interface ModeSelectorProps {
   modes: Array<{ id: ConnectMode; label: string; description: string }>

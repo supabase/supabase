@@ -1,0 +1,17 @@
+---
+title = "'Cloudflare Origin Error 1016' on Custom Domain"
+topics = [ "platform" ]
+keywords = []
+[[errors]]
+code = "1016"
+message = "Cloudflare Origin Error"
+---
+
+When encountering a 'Cloudflare Origin Error 1016' when accessing a custom domain URL, it indicates an SSL certificate validation failure. This error typically occurs because the custom domain's SSL certificate has expired, leading Cloudflare to deactivate routing to the origin server.
+
+## How to resolve this issue
+
+1.  Navigate to your project's [custom domain settings](/dashboard/project/_/settings/custom-domain).
+2.  Initiate a DNS record re-verification. This action prompts an attempt to renew the SSL certificate.
+3.  If the error persists after re-verification, remove the custom domain configuration from your project.
+4.  Re-add the custom domain configuration. Ensure all DNS records are correctly established as instructed by the dashboard. This process forces a hard reset and triggers a new certificate request.

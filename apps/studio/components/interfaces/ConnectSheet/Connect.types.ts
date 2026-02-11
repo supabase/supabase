@@ -8,9 +8,6 @@ export type ProjectKeys = {
   publishableKey: string | null
 }
 
-/** @deprecated Use ProjectKeys instead */
-export type projectKeys = ProjectKeys
-
 // ============================================================================
 // Connection Strings
 // ============================================================================
@@ -90,7 +87,7 @@ export interface ModeDefinition {
 // Schema Types - Fields
 // ============================================================================
 
-export type FieldType = 'select' | 'radio-grid' | 'radio-list' | 'switch' | 'multi-select'
+type FieldType = 'select' | 'radio-grid' | 'radio-list' | 'switch' | 'multi-select'
 
 export interface FieldOption {
   value: string
@@ -99,7 +96,9 @@ export interface FieldOption {
   description?: string
 }
 
-export interface FieldDefinition {
+type FieldOptionsResolver = (state: ConnectState) => FieldOption[]
+
+interface FieldDefinition {
   id: string
   type: FieldType
   label: string
@@ -178,10 +177,4 @@ export interface StepContentProps {
   state: ConnectState
   projectKeys: ProjectKeys
   connectionStringPooler: ConnectionStringPooler
-}
-
-/** @deprecated Use StepContentProps instead */
-export interface StepComponentProps {
-  state: ConnectState
-  projectKeys: ProjectKeys
 }

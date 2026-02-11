@@ -63,6 +63,7 @@
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
+    "dev-tools": "workspace:*",
     "eslint-config-supabase": "workspace:*",
     "framer-motion": "^11.0.3",
     "github-slugger": "^2.0.0",
@@ -122,6 +123,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@babel/core": "*",
     "@graphiql/toolkit": "^0.9.1",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/typescript": "4.1.6",

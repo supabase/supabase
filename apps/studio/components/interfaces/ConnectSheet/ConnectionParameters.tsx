@@ -19,7 +19,7 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
       {parameters.map((param) => (
         <div key={param.key} className="py-0.5 group/param">
           <div className="text-xs flex items-center">
-            <span className="text-foreground-lighter">{param.key}: </span>
+            <span className="text-foreground-lighter">{param.key}:</span>
             <span className="ml-1 text-foreground">{param.value}</span>
             <button
               onClick={() => {

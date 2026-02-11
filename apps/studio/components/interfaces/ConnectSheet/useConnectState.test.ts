@@ -1,5 +1,6 @@
-import { describe, test, expect } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
+import { describe, expect, test } from 'vitest'
+
 import { useConnectState } from './useConnectState'
 
 describe('useConnectState', () => {

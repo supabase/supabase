@@ -86,7 +86,7 @@ export const getConnectionStrings = ({
 
   const poolerUriString = poolingInfo?.connectionString ?? ''
 
-  const nodejsPoolerUriString = `DATABASE_URL=${poolingInfo?.connectionString}`
+  const nodejsPoolerUriString = `DATABASE_URL=${poolingInfo?.connectionString ?? ''}`
 
   const poolerGolangString = `user=${poolerUser} 
 password=${password} 

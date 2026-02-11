@@ -196,7 +196,7 @@ export const connectSchema: ConnectSchema = {
     // Framework fields
     framework: {
       id: 'framework',
-      type: 'radio-grid',
+      type: 'select',
       label: 'Framework',
       options: { source: 'frameworks' },
       defaultValue: 'nextjs',
@@ -237,7 +237,7 @@ export const connectSchema: ConnectSchema = {
       id: 'useSharedPooler',
       type: 'switch',
       label: 'Use IPv4 connection (Shared Pooler)',
-      description: 'Only recommended when your network does not support IPv6',
+      description: 'Recommended when your network does not support IPv6',
       defaultValue: false,
       dependsOn: { connectionMethod: ['transaction'] },
     },

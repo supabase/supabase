@@ -4,9 +4,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 27 Jan 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 03 Feb 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/bknd-joins-supabase</guid>
+  <title>BKND joins Supabase</title>
+  <link>https://supabase.com/blog/bknd-joins-supabase</link>
+  <description>Dennis Senn, creator of BKND, is joining Supabase to build a Lite offering for agentic workloads.</description>
+  <pubDate>Tue, 03 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-privatelink-available</guid>
   <title>Supabase PrivateLink is now available</title>
   <link>https://supabase.com/blog/supabase-privatelink-available</link>

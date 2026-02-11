@@ -1,17 +1,17 @@
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
-import type { ContentFileProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-const ContentFile = ({ projectKeys }: ContentFileProps) => {
+const ContentFile = ({ projectKeys }: StepContentProps) => {
   const files = [
     {
       name: '.env.local',
       language: 'bash',
       code: [
-        `SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+        `VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
         projectKeys?.publishableKey
-          ? `SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
-          : `SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
+          ? `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+          : `VITE_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
         '',
       ].join('\n'),
     },
@@ -21,22 +21,22 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       code: `
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.${projectKeys.publishableKey ? 'SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'SUPABASE_ANON_KEY'};
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.${projectKeys.publishableKey ? 'VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'VITE_SUPABASE_ANON_KEY'};
 
-export const supabase = createClient(supabaseUrl!, supabaseKey!);
-        `,
+export const supabase = createClient(supabaseUrl, supabaseKey);
+`,
     },
     {
-      name: 'src/App.jsx',
-      language: 'jsx',
+      name: 'src/App.tsx',
+      language: 'tsx',
       code: `
 import { supabase } from '../utils/supabase'
 import { createResource, For } from "solid-js";
 
 async function getTodos() {
   const { data: todos } = await supabase.from("todos").select();
-  return data;
+  return todos;
 }
 
 function App() {
@@ -44,7 +44,7 @@ function App() {
 
   return (
     <ul>
-      <For each={todos()}>{(country) => <li>{todo.name}</li>}</For>
+      <For each={todos()}>{(todo) => <li>{todo.name}</li>}</For>
     </ul>
   );
 }

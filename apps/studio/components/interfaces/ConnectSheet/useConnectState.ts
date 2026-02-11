@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-
 import { FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from 'ui-patterns/McpUrlBuilder'
+
 import {
   connectionStringMethodOptions,
   DATABASE_CONNECTION_TYPES,
@@ -8,6 +8,13 @@ import {
   MOBILES,
   ORMS,
 } from './Connect.constants'
+import {
+  getActiveFields,
+  getDefaultState,
+  resetDependentFields,
+  resolveSteps,
+} from './connect.resolver'
+import { connectSchema } from './connect.schema'
 import type {
   ConnectMode,
   ConnectSchema,
@@ -17,13 +24,6 @@ import type {
   ResolvedStep,
 } from './Connect.types'
 import { resolveFrameworkLibraryKey } from './Connect.utils'
-import {
-  getActiveFields,
-  getDefaultState,
-  resetDependentFields,
-  resolveSteps,
-} from './connect.resolver'
-import { connectSchema } from './connect.schema'
 
 // ============================================================================
 // Data Source Helpers

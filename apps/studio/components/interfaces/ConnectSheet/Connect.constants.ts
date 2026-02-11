@@ -12,6 +12,15 @@ export type DatabaseConnectionType =
   | 'python'
   | 'sqlalchemy'
 
+export const INSTALL_COMMANDS: Record<string, string> = {
+  supabasejs: 'npm install @supabase/supabase-js',
+  supabasepy: 'pip install supabase',
+  supabaseflutter: 'flutter pub add supabase_flutter',
+  supabaseswift:
+    'swift package add-dependency https://github.com/supabase-community/supabase-swift',
+  supabasekt: 'implementation("io.github.jan-tennert.supabase:supabase-kt:VERSION")',
+}
+
 export const DATABASE_CONNECTION_TYPES: {
   id: DatabaseConnectionType
   label: string
@@ -127,19 +136,6 @@ export const FRAMEWORKS: ConnectionType[] = [
     guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/reactjs`,
     children: [
       {
-        key: 'create-react-app',
-        label: 'Create React App',
-        icon: 'react',
-        children: [
-          {
-            key: 'supabasejs',
-            label: 'supabase-js',
-            icon: 'supabase',
-            children: [],
-          },
-        ],
-      },
-      {
         key: 'vite',
         label: 'Vite',
         icon: 'vite',
@@ -149,6 +145,19 @@ export const FRAMEWORKS: ConnectionType[] = [
             label: 'Supabase-js',
             children: [],
             icon: 'supabase',
+          },
+        ],
+      },
+      {
+        key: 'create-react-app',
+        label: 'Create React App',
+        icon: 'react',
+        children: [
+          {
+            key: 'supabasejs',
+            label: 'supabase-js',
+            icon: 'supabase',
+            children: [],
           },
         ],
       },
