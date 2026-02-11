@@ -30,8 +30,8 @@ export const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewPr
 
               <a
                 onClick={breadcrumb.onClick || (() => {})}
-                className={`text-gray-1100 block px-2 py-1 text-xs leading-5 focus:bg-gray-100 focus:text-gray-900 focus:outline-none ${
-                  breadcrumb.onClick ? 'cursor-pointer hover:text-white' : ''
+                className={`text-foreground-light block px-2 py-1 text-xs leading-5 focus:bg-selection focus:text-foreground focus:outline-none ${
+                  breadcrumb.onClick ? 'cursor-pointer hover:text-foreground' : ''
                 }`}
               >
                 {breadcrumb.label}
