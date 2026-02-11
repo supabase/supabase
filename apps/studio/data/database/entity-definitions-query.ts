@@ -26,11 +26,23 @@ with records as (
         'NO_TRIGGERS'
       )
       when 'v' then concat(
-        'create view ', concat(nc.nspname, '.', c.relname), ' as',
+        'create view ', concat(nc.nspname, '.', c.relname),
+        case
+          when c.reloptions is not null and array_length(c.reloptions, 1) > 0
+          then concat(' with (', array_to_string(c.reloptions, ', '), ')')
+          else ''
+        end,
+        ' as',
         pg_get_viewdef(concat(nc.nspname, '.', c.relname), true)
       )
       when 'm' then concat(
-        'create materialized view ', concat(nc.nspname, '.', c.relname), ' as',
+        'create materialized view ', concat(nc.nspname, '.', c.relname),
+        case
+          when c.reloptions is not null and array_length(c.reloptions, 1) > 0
+          then concat(' with (', array_to_string(c.reloptions, ', '), ')')
+          else ''
+        end,
+        ' as',
         pg_get_viewdef(concat(nc.nspname, '.', c.relname), true)
       )
       when 'f' then concat('create foreign table ', nc.nspname, '.', c.relname, ' ( ... )')
