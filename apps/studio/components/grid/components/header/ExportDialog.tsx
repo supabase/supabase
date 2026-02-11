@@ -78,7 +78,7 @@ export const ExportDialog = ({
   const query = queryWithSemicolon.replace(/;\s*$/, '')
 
   const csvExportCommand = `
-${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()
+${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ','" > ${outputName}.csv`.trim()
 
   const sqlExportCommand = `
 pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
