@@ -220,7 +220,7 @@ const PanelHeader = (props: any) => {
       <div
         className={
           'flex items-center space-x-3 opacity-80 transition ' +
-          (props.href ? 'cursor-pointer hover:text-gray-1200 hover:opacity-100' : '')
+          (props.href ? 'cursor-pointer hover:text-foreground hover:opacity-100' : '')
         }
       >
         <div>{props.icon}</div>
