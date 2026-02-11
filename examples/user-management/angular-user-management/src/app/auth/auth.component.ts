@@ -1,12 +1,12 @@
 import { Component } from '@angular/core'
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { SupabaseService } from '../supabase.service'
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
-  standalone: false,
+  imports: [ReactiveFormsModule],
 })
 export class AuthComponent {
   signInForm!: FormGroup

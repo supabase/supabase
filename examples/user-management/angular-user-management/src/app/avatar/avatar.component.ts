@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
+import { CommonModule } from '@angular/common'
 
 @Component({
   selector: 'app-avatar',
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.css'],
-  standalone: false,
+  imports: [CommonModule],
 })
 export class AvatarComponent {
   _avatarUrl: SafeResourceUrl | undefined
