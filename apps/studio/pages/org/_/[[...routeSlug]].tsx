@@ -26,10 +26,10 @@ const GenericOrganizationPage: NextPage = () => {
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (orgSlug: string) => {
       if (!Array.isArray(slug)) {
-        return `/org/${orgSlug}/general${!!queryString ? `${queryString}` : ''}`
+        return `/org/${orgSlug}/general${!!queryString ? `?${queryString}` : ''}`
       } else {
         const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-        return `/org/${orgSlug}/${slugPath}${!!queryString ? `${queryString}` : ''}`
+        return `/org/${orgSlug}/${slugPath}${!!queryString ? `?${queryString}` : ''}`
       }
     }
   }
