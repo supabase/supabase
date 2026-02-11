@@ -66,7 +66,7 @@ const SparkBar = ({
     return (
       <div
         className={`relative rounded w-5 overflow-hidden border p-1 ${
-          bgClass ? bgClass : 'bg-gray-400'
+          bgClass ? bgClass : 'bg-surface-400'
         } ${borderClass ? borderClass : 'border-none'}`}
         style={{ height: totalHeight }}
       >
