@@ -252,7 +252,8 @@ app.get("/auth/callback", async function (req, res) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  const redirectPath = next.startsWith('/') ? next : `/${next}`
+  const isSafePath = next.startsWith('/') && !next.startsWith('//')
+  const redirectPath = isSafePath ? next : '/'
   res.redirect(303, redirectPath)
 })
 ```
