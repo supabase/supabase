@@ -26,7 +26,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ? requestUrl
       : requestUrl.replace(process.env.SUPABASE_PUBLIC_URL, process.env.SUPABASE_URL)
 
-    const validEdgeFnUrl = isValidEdgeFunctionURL(url)
+    const validEdgeFnUrl = isValidEdgeFunctionURL(url, IS_PLATFORM)
 
     if (!validEdgeFnUrl) {
       return res.status(400).json({
