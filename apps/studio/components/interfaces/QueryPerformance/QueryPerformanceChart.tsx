@@ -261,8 +261,14 @@ export const QueryPerformanceChart = ({
 
     const baseAttributes = attributeMap[selectedMetric] || []
 
-    // Add selected query line based on current metric
     if (currentSelectedQuery && querySpecificData) {
+      const dimmedBaseAttributes = baseAttributes.map((attr) => ({
+        ...attr,
+        color: attr.color
+          ? { light: attr.color.light + '4D', dark: attr.color.dark + '4D' }
+          : attr.color,
+      }))
+
       const selectedQueryAttributes: Record<string, MultiAttribute> = {
         query_latency: {
           attribute: 'selected_query_time',
@@ -300,7 +306,7 @@ export const QueryPerformanceChart = ({
 
       const selectedQueryAttr = selectedQueryAttributes[selectedMetric]
       if (selectedQueryAttr) {
-        return [...baseAttributes, selectedQueryAttr]
+        return [...dimmedBaseAttributes, selectedQueryAttr]
       }
     }
 
