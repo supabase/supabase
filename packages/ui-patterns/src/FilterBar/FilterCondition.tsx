@@ -72,6 +72,13 @@ export function FilterCondition({
     }
   }, [isActive, setHasTypedValue])
 
+  // Sync the uncontrolled input when condition.value changes externally (e.g., from dropdown selection)
+  useEffect(() => {
+    if (valueRef.current && valueRef.current.value !== (condition.value ?? '').toString()) {
+      valueRef.current.value = (condition.value ?? '').toString()
+    }
+  }, [condition.value])
+
   useEffect(() => {
     if (isActive && valueRef.current) {
       valueRef.current.focus()
@@ -270,7 +277,7 @@ export function FilterCondition({
             <Input_Shadcn_
               ref={valueRef}
               type="text"
-              value={(condition.value ?? '').toString()}
+              defaultValue={(condition.value ?? '').toString()}
               onChange={onValueChange}
               onFocus={() => handleInputFocus(path)}
               onBlur={handleValueBlur}
