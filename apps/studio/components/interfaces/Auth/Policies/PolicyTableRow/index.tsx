@@ -5,7 +5,7 @@ import { memo, useMemo } from 'react'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
+import { useTableApiAccessQuery } from 'data/privileges/table-api-access-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Card,
@@ -66,17 +66,22 @@ const PolicyTableRowComponent = ({
     [exposedSchemas, table.schema]
   )
 
-  const { data: tablesWithAnonAuthAccess = new Set() } = useTablesRolesAccessQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: table.schema,
-  })
+  const { data: apiAccessMap } = useTableApiAccessQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString ?? undefined,
+      schemaName: table.schema,
+      tableNames: [table.name],
+    },
+    { enabled: Boolean(project?.ref && table.schema && table.name) }
+  )
 
-  const hasAnonAuthenticatedRolesAccess = tablesWithAnonAuthAccess.has(table.name)
-  const hasApiAccess = isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
+  const apiAccessData = apiAccessMap?.[table.name]
+  const hasApiAccess = apiAccessData?.apiAccessType === 'access'
   const isPubliclyReadableWritable = !isRLSEnabled && hasApiAccess
   const rlsEnabledNoPolicies = isRLSEnabled && hasApiAccess && policies.length === 0
-  const isApiDisabledDueToRoles = isTableExposedThroughAPI && !hasAnonAuthenticatedRolesAccess
+  const isApiDisabledDueToRoles =
+    isTableExposedThroughAPI && apiAccessData?.apiAccessType === 'exposed-schema-no-grants'
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
