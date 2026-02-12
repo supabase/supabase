@@ -22,7 +22,7 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import { getApiEndpoint } from './DataApiProjectUrlCard.utils'
+import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
 
 export const DataApiProjectUrlCard = () => {
   const { isPending: isLoading } = useSelectedProjectQuery()
