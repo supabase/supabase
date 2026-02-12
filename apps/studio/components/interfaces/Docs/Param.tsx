@@ -68,7 +68,7 @@ const Param = ({
               Type
             </label>
             <div>
-              <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-foreground-light">
+              <span className="flex grow-0 bg-surface-300 px-2 py-0.5 rounded-md text-foreground-light">
                 <span className="flex items-center gap-2 text-sm">
                   <Code size="14" />
                   <span>{getColumnType(type, format)}</span>
@@ -81,7 +81,7 @@ const Param = ({
               Format
             </label>
             <div>
-              <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-foreground-light">
+              <span className="flex grow-0 bg-surface-300 px-2 py-0.5 rounded-md text-foreground-light">
                 <span className="flex items-center gap-2 text-sm">
                   <Database size="14" />
                   <span>{format}</span>
