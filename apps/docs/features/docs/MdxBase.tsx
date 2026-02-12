@@ -10,8 +10,8 @@ import { components } from '~/features/docs/MdxBase.shared'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 const mdxOptions: SerializeOptions = {
+  blockJS: false,
   mdxOptions: {
-    useDynamicImport: true,
     remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
     rehypePlugins: [rehypeKatex as any],
   },
