@@ -92,7 +92,7 @@ export const ResourceContent = ({
                     table: resourceId,
                     column: x.id,
                   }}
-                  onDesciptionUpdated={refreshDocs}
+                  onDescriptionUpdated={refreshDocs}
                 />
               </div>
               <div className="code">
