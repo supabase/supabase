@@ -35,7 +35,10 @@ export default function Introduction({ selectedLang }: Props) {
           <p>
             All projects have a RESTful endpoint that you can use with your project's API key to
             query and manage your database. These can be obtained from the{' '}
-            <InlineLink href={`/project/${projectRef}/integrations/data_api/overview`}>API settings</InlineLink>.
+            <InlineLink href={`/project/${projectRef}/integrations/data_api/overview`}>
+              API settings
+            </InlineLink>
+            .
           </p>
           <p>
             You can initialize a new Supabase client using the <code>createClient()</code> method.

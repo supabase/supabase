@@ -43,10 +43,7 @@ export const DataApiDocsTab = () => {
     [openApiSpec]
   )
 
-  const activePage = useMemo(
-    () => getActivePage({ page, resource, rpc }),
-    [page, resource, rpc]
-  )
+  const activePage = useMemo(() => getActivePage({ page, resource, rpc }), [page, resource, rpc])
 
   const docsBasePath = projectRef ? `/project/${projectRef}/integrations/data_api/docs` : undefined
 
