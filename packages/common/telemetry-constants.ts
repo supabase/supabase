@@ -2676,6 +2676,24 @@ export interface RlsEventTriggerBannerCreateButtonClickedEvent {
 }
 
 /**
+ * User clicked the Run button in the log explorer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/logs/explorer
+ */
+export interface LogExplorerQueryRunButtonClickedEvent {
+  action: 'log_explorer_query_run_button_clicked'
+  properties: {
+    /**
+     * Whether the user is editing a saved query
+     */
+    is_saved_query: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2745,6 +2763,7 @@ export type TelemetryEvent =
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
+  | LogExplorerQueryRunButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
