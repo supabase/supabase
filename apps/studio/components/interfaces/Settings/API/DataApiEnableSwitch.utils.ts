@@ -1,6 +1,8 @@
 import { unsafeEntitiesInApiSql } from '@/data/queries/sql/tables-without-rls'
 import { executeSql } from '@/data/sql/execute-sql-query'
 
+import type { EnableCheckAction, EnableCheckState } from './DataApiEnableSwitch.types'
+
 export type ExposedEntity = {
   schema: string
   name: string
@@ -44,4 +46,23 @@ export const getDefaultSchemas = (dbSchema: string | null | undefined) => {
       .filter((schema) => schema.length > 0) ?? []
 
   return schemas.length > 0 ? schemas : ['public']
+}
+
+export function enableCheckReducer(
+  state: EnableCheckState,
+  action: EnableCheckAction
+): EnableCheckState {
+  switch (state.status) {
+    case 'idle':
+      if (action.type === 'START_CHECK') return { status: 'checking' }
+      return state
+    case 'checking':
+      if (action.type === 'ENTITIES_FOUND')
+        return { status: 'confirming', unsafeEntities: action.unsafeEntities }
+      if (action.type === 'DISMISS') return { status: 'idle' }
+      return state
+    case 'confirming':
+      if (action.type === 'DISMISS') return { status: 'idle' }
+      return state
+  }
 }

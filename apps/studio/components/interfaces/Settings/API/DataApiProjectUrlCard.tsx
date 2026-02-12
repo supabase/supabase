@@ -22,6 +22,7 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { getApiEndpoint } from './DataApiProjectUrlCard.utils'
 
 export const DataApiProjectUrlCard = () => {
   const { isPending: isLoading } = useSelectedProjectQuery()
@@ -47,18 +48,17 @@ export const DataApiProjectUrlCard = () => {
     syncSelectedDb()
   }, [syncSelectedDb, querySource, projectRef])
 
-  // Get the API service
-  const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
   const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
   const loadBalancerSelected = state.selectedDatabaseId === 'load-balancer'
   const replicaSelected = selectedDatabase?.identifier !== projectRef
 
-  const endpoint =
-    isCustomDomainActive && state.selectedDatabaseId === projectRef
-      ? `https://${customDomainData.customDomain.hostname}`
-      : loadBalancerSelected
-        ? loadBalancers?.[0].endpoint ?? ''
-        : selectedDatabase?.restUrl ?? ''
+  const endpoint = getApiEndpoint({
+    selectedDatabaseId: state.selectedDatabaseId,
+    projectRef,
+    customDomainData,
+    loadBalancers,
+    selectedDatabase,
+  })
 
   return (
     <PageSection className="first:pt-0">
