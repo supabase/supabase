@@ -184,7 +184,6 @@ export const useReportFilters = ({
     const urlFilterJson = JSON.stringify(filtersFromUrl)
 
     if (currentFilterJson !== urlFilterJson) {
-      console.log('Syncing local filters from URL change:', { filtersFromUrl, localFilters })
       setLocalFilters(filtersFromUrl)
     }
   }, [queryFilters, isInitialized, convertQueryFiltersToReportFilters])
@@ -233,14 +232,6 @@ export const useReportFilters = ({
           )
       )
 
-      console.log('Filter Update:', {
-        localFilters,
-        reportFilterItems,
-        productFilters,
-        otherFilters,
-        newFilterState,
-      })
-
       // Remove only the non-product filters that we manage
       if (otherFilters.length > 0) {
         onRemoveFilters(otherFilters)
@@ -252,7 +243,6 @@ export const useReportFilters = ({
   }, [localFilters, isInitialized])
 
   const handleFilterChange = (newFilters: ReportFilter[]) => {
-    console.log('handleFilterChange called with:', newFilters)
     setLocalFilters(newFilters)
   }
 
