@@ -484,7 +484,7 @@ const EXTERNAL_PROVIDER_APPLE = {
                     body.aud === 'https://appleid.apple.com'
                   )
                 } catch (e: any) {
-                  console.log(e)
+                  console.error(e)
                   return false
                 }
 
@@ -502,7 +502,7 @@ const EXTERNAL_PROVIDER_APPLE = {
                   const body = JSON.parse(parts[1])
                   return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
                 } catch (e: any) {
-                  console.log(e)
+                  console.error(e)
                   return false
                 }
 
