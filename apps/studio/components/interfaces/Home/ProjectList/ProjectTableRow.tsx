@@ -102,7 +102,7 @@ export const ProjectTableRow = ({
             {(isGithubIntegrated || isVercelIntegrated) && (
               <div className="flex items-center gap-x-1.5">
                 {isVercelIntegrated && (
-                  <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center text-black dark:text-white">
+                  <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center text-foreground">
                     <InlineSVG
                       src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
                       title="Vercel Icon"
