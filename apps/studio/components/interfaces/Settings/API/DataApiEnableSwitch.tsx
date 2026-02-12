@@ -102,13 +102,13 @@ export const DataApiEnableSwitch = () => {
   })
 
   const syncForm = useStaticEffectEvent(() => {
-    form.reset({ enableDataApi: isEnabled })
+    if (!isEnabledCheckPending) {
+      form.reset({ enableDataApi: isEnabled })
+    }
   })
   useEffect(() => {
-    if (!isLoading) {
-      syncForm()
-    }
-  }, [syncForm, isLoading])
+    syncForm()
+  }, [syncForm, isEnabled])
 
   const doUpdate = (enableDataApi: boolean) => {
     if (!projectRef || !config) return
