@@ -19,7 +19,7 @@ export const FormHeader = ({
   return (
     <div
       className={cn(
-        `w-full mb-6 flex flex-col sm:flex-row md:items-center justify-between gap-4 ${className}`
+        `w-full mb-6 flex flex-col sm:flex-row md:items-center justify-between gap-4 h-[var(--header-height)] ${className}`
       )}
     >
       <div className="space-y-1">

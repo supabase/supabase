@@ -38,7 +38,7 @@ export const AdvisorFilters = ({
 }: AdvisorFiltersProps) => {
   return (
     <div className="border-b overflow-x-auto">
-      <div className="flex items-center justify-between gap-x-4 h-[var(--header-height)]">
+      <div className="flex items-center justify-between gap-x-4 h-[calc(var(--header-height)-1px)]">
         <Tabs_Shadcn_ value={activeTab} onValueChange={onTabChange} className="h-full pl-4">
           <TabsList_Shadcn_ className="border-b-0 gap-4 h-full">
             <TabsTrigger_Shadcn_ value="all" className="h-full text-xs">
