@@ -11,7 +11,7 @@ import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-app
 import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -68,8 +68,6 @@ export const OAuthAppsList = () => {
   } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
 
-  const deletingOAuthAppIdRef = useRef<string | null>(null)
-
   const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
@@ -118,9 +116,6 @@ export const OAuthAppsList = () => {
     onSuccess: () => {
       toast.success(`Successfully deleted OAuth app`)
       setSelectedAppToDelete(null)
-    },
-    onError: () => {
-      deletingOAuthAppIdRef.current = null
     },
   })
 
@@ -447,7 +442,6 @@ export const OAuthAppsList = () => {
         selectedApp={appToDelete}
         setVisible={setSelectedAppToDelete}
         onDelete={(params: Parameters<typeof deleteOAuthApp>[0]) => {
-          deletingOAuthAppIdRef.current = params.clientId ?? null
           deleteOAuthApp(params)
         }}
         isLoading={isDeletingApp}

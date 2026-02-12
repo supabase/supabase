@@ -51,7 +51,7 @@ export const SecretsManagement = () => {
     isRefetching,
     refetch,
   } = useVaultSecretsQuery({
-    projectRef: project?.ref!,
+    projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const allSecrets = useMemo(() => data || [], [data])

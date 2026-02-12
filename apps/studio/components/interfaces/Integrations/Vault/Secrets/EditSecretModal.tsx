@@ -40,7 +40,7 @@ export const EditSecretModal = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const { data: secrets = [], isSuccess } = useVaultSecretsQuery({
-    projectRef: project?.ref!,
+    projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const [secretIdToEdit, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)

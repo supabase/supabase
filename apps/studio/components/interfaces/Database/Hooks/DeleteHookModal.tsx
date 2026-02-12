@@ -35,7 +35,7 @@ export const DeleteHookModal = () => {
 
   async function handleDelete() {
     if (!project) return console.error('Project ref is required')
-    if (!selectedHook) return toast.error('Unable find selected hook')
+    if (!selectedHook) return toast.error('Unable to find selected hook')
 
     deleteDatabaseTrigger({
       trigger: selectedHook,

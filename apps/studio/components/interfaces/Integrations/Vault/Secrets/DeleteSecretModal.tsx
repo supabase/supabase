@@ -11,7 +11,7 @@ export const DeleteSecretModal = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const { data: secrets = [], isSuccess } = useVaultSecretsQuery({
-    projectRef: project?.ref!,
+    projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 

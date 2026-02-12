@@ -104,7 +104,9 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
         {encryptedMetadata.map((metadata) => (
           <div key={metadata.name} className="flex items-center space-x-2 text-sm">
             <Link
-              href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
+              href={`/project/${ref}/settings/vault/secrets?search=${encodeURIComponent(
+                `${wrapper.name}_${metadata.name}`
+              )}`}
               className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"
             >
               <span className="truncate" title={metadata.label}>
