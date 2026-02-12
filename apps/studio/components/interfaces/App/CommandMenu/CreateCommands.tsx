@@ -333,8 +333,8 @@ export function useCreateCommands(options?: CommandOptions) {
         const getIcon = () => {
           if (isWrapper) {
             return (
-              <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
-                {integration.icon()}
+              <div className="w-6 h-6 relative bg-surface-100 border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
+                {integration.icon({ className: 'w-full h-full text-foreground' })}
               </div>
             )
           }
