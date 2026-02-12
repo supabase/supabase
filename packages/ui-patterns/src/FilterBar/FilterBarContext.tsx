@@ -3,13 +3,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react'
 
 import { useFilterBarState, useOptionsCache } from './hooks'
-import { MenuItem } from './menuItems'
 import {
   ActiveInputState,
   FilterBarAction,
   FilterGroup,
   FilterOptionObject,
   FilterProperty,
+  MenuItem,
 } from './types'
 import { useCommandHandling } from './useCommandHandling'
 import { useKeyboardNavigation } from './useKeyboardNavigation'

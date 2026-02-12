@@ -30,7 +30,6 @@
     "@octokit/graphql": "^8.0.0",
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@octokit/rest": "^21.0.0",
-    "@payloadcms/live-preview-react": "^3.0.0",
     "@radix-ui/react-dialog": "^1.0.5",
     "@sentry/nextjs": "catalog:",
     "@supabase/supabase-js": "catalog:",
@@ -91,7 +90,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.4",
+    "@babel/core": "*",
     "@hookform/resolvers": "^3.1.1",
     "@types/animejs": "^3.1.12",
     "@types/classnames": "^2.3.1",
