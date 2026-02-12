@@ -53,7 +53,12 @@ export const DocsMenu = ({
               }
 
               return (
-                <Link key={item.key} href={item.url} className="block">
+                <Link
+                  key={item.key}
+                  href={item.url}
+                  className="block"
+                  aria-current={isActive ? 'page' : undefined}
+                >
                   {content}
                 </Link>
               )

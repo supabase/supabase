@@ -70,7 +70,9 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
             <p>
               We have provided you a Client Key to get started. You will soon be able to add as many
               keys as you like. You can find the <code>anon</code> key in the{' '}
-              <InlineLink href={`/project/${projectRef}/settings/api`}>API Settings</InlineLink>{' '}
+              <InlineLink href={`/project/${projectRef}/settings/api-keys`}>
+                API Keys Settings
+              </InlineLink>{' '}
               page.
             </p>
           </>
@@ -107,7 +109,9 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
             <p>
               We have provided you with a Service Key to get started. Soon you will be able to add
               as many keys as you like. You can find the <code>service_role</code> in the{' '}
-              <InlineLink href={`/project/${projectRef}/settings/api`}>API Settings</InlineLink>{' '}
+              <InlineLink href={`/project/${projectRef}/settings/api-keys`}>
+                API Keys Settings
+              </InlineLink>{' '}
               page.
             </p>
           </>

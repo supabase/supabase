@@ -4,13 +4,23 @@ import SVG from 'react-inlinesvg'
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
+export const getActivePage = (params: {
+  page?: string
+  resource?: string
+  rpc?: string
+}): string => {
+  const { page, resource, rpc } = params
+  if (!page && !resource && !rpc) return 'introduction'
+  return (page || rpc || resource) as string
+}
+
 export const generateDocsMenu = (
   ref: string,
-  tables: string[],
-  functions: string[],
+  tables: Array<string>,
+  functions: Array<string>,
   flags?: { authEnabled: boolean },
   basePath?: string
-): ProductMenuGroup[] => {
+): Array<ProductMenuGroup> => {
   const docsBasePath = basePath ?? `/project/${ref}/api`
 
   return [

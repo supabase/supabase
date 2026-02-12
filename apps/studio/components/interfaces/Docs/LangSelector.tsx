@@ -16,7 +16,7 @@ import {
   ToggleGroupItem,
 } from 'ui'
 
-import type { showApiKey } from '@/components/interfaces/Docs/Docs.types'
+import type { ShowApiKey } from '@/components/interfaces/Docs/Docs.types'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
@@ -24,9 +24,9 @@ const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
 interface LangSelectorProps {
   selectedLang: 'js' | 'bash'
-  selectedApiKey: showApiKey
+  selectedApiKey: ShowApiKey
   setSelectedLang: (selectedLang: 'js' | 'bash') => void
-  setSelectedApiKey: (showApiKey: showApiKey) => void
+  setSelectedApiKey: (key: ShowApiKey) => void
 }
 
 export const LangSelector = ({

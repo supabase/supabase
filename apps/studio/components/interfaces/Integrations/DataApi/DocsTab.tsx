@@ -2,13 +2,13 @@ import { useParams } from 'common'
 import { useMemo, useState } from 'react'
 import { ShimmeringLoader } from 'ui-patterns'
 
-import type { showApiKey } from '../../Docs/Docs.types'
+import type { ShowApiKey } from '../../Docs/Docs.types'
 import { LangSelector } from '../../Docs/LangSelector'
 import { DataApiDisabledState } from '@/components/interfaces/Integrations/DataApi/DataApiDisabledState'
 import { DocView } from '@/components/interfaces/Integrations/DataApi/DocView'
 import { DocsMenu } from '@/components/interfaces/Integrations/DataApi/DocsMenu'
 import { DocsMobileNav } from '@/components/interfaces/Integrations/DataApi/DocsMobileNav'
-import { generateDocsMenu } from '@/components/layouts/DocsLayout/DocsLayout.utils'
+import { generateDocsMenu, getActivePage } from '@/components/layouts/DocsLayout/DocsLayout.utils'
 import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -23,7 +23,7 @@ export const DataApiDocsTab = () => {
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   const [selectedLang, setSelectedLang] = useState<'js' | 'bash'>('js')
-  const [selectedApikey, setSelectedApiKey] = useState<showApiKey>(DEFAULT_KEY)
+  const [selectedApiKey, setSelectedApiKey] = useState<ShowApiKey>(DEFAULT_KEY)
 
   const { isEnabled, isPending: isConfigLoading } = useIsDataApiEnabled({ projectRef })
 
@@ -43,10 +43,10 @@ export const DataApiDocsTab = () => {
     [openApiSpec]
   )
 
-  const activePage = useMemo(() => {
-    if (!page && !resource && !rpc) return 'introduction'
-    return (page || rpc || resource) as string
-  }, [page, resource, rpc])
+  const activePage = useMemo(
+    () => getActivePage({ page, resource, rpc }),
+    [page, resource, rpc]
+  )
 
   const docsBasePath = projectRef ? `/project/${projectRef}/integrations/data_api/docs` : undefined
 
@@ -72,7 +72,7 @@ export const DataApiDocsTab = () => {
       <aside className="hidden lg:flex flex-col gap-y-6 w-60 shrink-0 p-10">
         <LangSelector
           selectedLang={selectedLang}
-          selectedApiKey={selectedApikey}
+          selectedApiKey={selectedApiKey}
           setSelectedLang={(lang: 'js' | 'bash') => setSelectedLang(lang)}
           setSelectedApiKey={setSelectedApiKey}
         />
@@ -83,11 +83,11 @@ export const DataApiDocsTab = () => {
           activePage={activePage}
           menu={menu}
           selectedLang={selectedLang}
-          selectedApikey={selectedApikey}
+          selectedApiKey={selectedApiKey}
           setSelectedLang={setSelectedLang}
           setSelectedApiKey={setSelectedApiKey}
         />
-        <DocView selectedLang={selectedLang} selectedApikey={selectedApikey} />
+        <DocView selectedLang={selectedLang} selectedApiKey={selectedApiKey} />
       </div>
     </div>
   )

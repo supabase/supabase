@@ -2,7 +2,7 @@ import { Menu } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 
-import type { showApiKey } from '../../Docs/Docs.types'
+import type { ShowApiKey } from '../../Docs/Docs.types'
 import { LangSelector } from '../../Docs/LangSelector'
 import { DocsMenu } from '@/components/interfaces/Integrations/DataApi/DocsMenu'
 import { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
@@ -11,16 +11,16 @@ interface DocsMobileNavProps {
   activePage: string
   menu: Array<ProductMenuGroup>
   selectedLang: 'js' | 'bash'
-  selectedApikey: showApiKey
+  selectedApiKey: ShowApiKey
   setSelectedLang: (lang: 'js' | 'bash') => void
-  setSelectedApiKey: (key: showApiKey) => void
+  setSelectedApiKey: (key: ShowApiKey) => void
 }
 
 export const DocsMobileNav = ({
   activePage,
   menu,
   selectedLang,
-  selectedApikey,
+  selectedApiKey,
   setSelectedLang,
   setSelectedApiKey,
 }: DocsMobileNavProps) => {
@@ -47,7 +47,7 @@ export const DocsMobileNav = ({
           <div className="flex flex-col gap-y-6 px-5 pb-6">
             <LangSelector
               selectedLang={selectedLang}
-              selectedApiKey={selectedApikey}
+              selectedApiKey={selectedApiKey}
               setSelectedLang={setSelectedLang}
               setSelectedApiKey={setSelectedApiKey}
             />

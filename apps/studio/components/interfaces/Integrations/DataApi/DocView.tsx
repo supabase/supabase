@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 
-import type { showApiKey } from '../../Docs/Docs.types'
+import type { ShowApiKey } from '../../Docs/Docs.types'
 import { GeneralContent } from '@/components/interfaces/Docs/GeneralContent'
 import { ResourceContent } from '@/components/interfaces/Docs/ResourceContent'
 import { RpcContent } from '@/components/interfaces/Docs/RpcContent'
@@ -16,10 +16,10 @@ import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query
 
 interface DocViewProps {
   selectedLang: 'js' | 'bash'
-  selectedApikey: showApiKey
+  selectedApiKey: ShowApiKey
 }
 
-export const DocView = ({ selectedLang, selectedApikey }: DocViewProps) => {
+export const DocView = ({ selectedLang, selectedApiKey }: DocViewProps) => {
   const { ref: projectRef, page, resource, rpc } = useParams()
 
   const { data: settings, error: settingsError } = useProjectSettingsV2Query({ projectRef })
@@ -55,7 +55,7 @@ export const DocView = ({ selectedLang, selectedApikey }: DocViewProps) => {
             selectedLang={selectedLang}
             resourceId={resource}
             resources={resources}
-            showApiKey={selectedApikey.key}
+            showApiKey={selectedApiKey.key}
             refreshDocs={refetch}
           />
         ) : rpc ? (
@@ -64,11 +64,11 @@ export const DocView = ({ selectedLang, selectedApikey }: DocViewProps) => {
             rpcId={rpc}
             paths={paths}
             rpcs={rpcs}
-            showApiKey={selectedApikey.key}
+            showApiKey={selectedApiKey.key}
             refreshDocs={refetch}
           />
         ) : (
-          <GeneralContent selectedLang={selectedLang} showApiKey={selectedApikey.key} page={page} />
+          <GeneralContent selectedLang={selectedLang} showApiKey={selectedApiKey.key} page={page} />
         )}
       </div>
     </div>
