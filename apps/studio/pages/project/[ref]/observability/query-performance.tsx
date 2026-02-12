@@ -101,7 +101,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
             href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
           />
           <DatabaseSelector />
-          {isPgStatMonitorEnabled && (
+          {isPgStatMonitorEnabled || isSupamonitorEnabled && (
             <LogsDatePicker
               value={datePickerValue}
               helpers={datePickerHelpers.filter(
