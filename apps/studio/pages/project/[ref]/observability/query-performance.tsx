@@ -101,18 +101,19 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
             href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
           />
           <DatabaseSelector />
-          {isPgStatMonitorEnabled || isSupamonitorEnabled && (
-            <LogsDatePicker
-              value={datePickerValue}
-              helpers={datePickerHelpers.filter(
-                (h) =>
-                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
-                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
-                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
-              )}
-              onSubmit={handleDatePickerChange}
-            />
-          )}
+          {isPgStatMonitorEnabled ||
+            (isSupamonitorEnabled && (
+              <LogsDatePicker
+                value={datePickerValue}
+                helpers={datePickerHelpers.filter(
+                  (h) =>
+                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
+                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
+                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
+                )}
+                onSubmit={handleDatePickerChange}
+              />
+            ))}
         </div>
       </div>
       <QueryPerformance

@@ -229,16 +229,16 @@ export function ComposedChart({
 
     const lastDataPoint = data[data.length - 1]
       ? Object.entries(data[data.length - 1])
-        .map(([key, value]) => ({
-          dataKey: key,
-          value: value as number,
-        }))
-        .filter(
-          (entry) =>
-            entry.dataKey !== 'timestamp' &&
-            entry.dataKey !== 'period_start' &&
-            attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
-        )
+          .map(([key, value]) => ({
+            dataKey: key,
+            value: value as number,
+          }))
+          .filter(
+            (entry) =>
+              entry.dataKey !== 'timestamp' &&
+              entry.dataKey !== 'period_start' &&
+              attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
+          )
       : undefined
 
     if (focusDataIndex !== null) {
@@ -276,34 +276,34 @@ export function ComposedChart({
   const chartData =
     data && !!data[0]
       ? Object.entries(data[0])
-        ?.map(([key, value]) => ({
-          name: key,
-          value: value,
-        }))
-        .filter(
-          (att) =>
-            att.name !== 'timestamp' &&
-            att.name !== 'period_start' &&
-            att.name !== maxAttribute?.attribute &&
-            !referenceLines.map((a) => a.attribute).includes(att.name) &&
-            attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
-        )
-        .map((att, index) => {
-          const attribute = attributes.find((attr) => attr.attribute === att.name)
-          return {
-            ...att,
-            color: attribute?.color
-              ? isDarkMode
-                ? attribute.color.dark
-                : attribute.color.light
-              : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
-            fill: attribute?.fill
-              ? isDarkMode
-                ? attribute.fill.dark
-                : attribute.fill.light
-              : STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length],
-          }
-        })
+          ?.map(([key, value]) => ({
+            name: key,
+            value: value,
+          }))
+          .filter(
+            (att) =>
+              att.name !== 'timestamp' &&
+              att.name !== 'period_start' &&
+              att.name !== maxAttribute?.attribute &&
+              !referenceLines.map((a) => a.attribute).includes(att.name) &&
+              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
+          )
+          .map((att, index) => {
+            const attribute = attributes.find((attr) => attr.attribute === att.name)
+            return {
+              ...att,
+              color: attribute?.color
+                ? isDarkMode
+                  ? attribute.color.dark
+                  : attribute.color.light
+                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+              fill: attribute?.fill
+                ? isDarkMode
+                  ? attribute.fill.dark
+                  : attribute.fill.light
+                : STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length],
+            }
+          })
       : []
 
   const stackedAttributes = chartData.filter((att) => {
@@ -465,38 +465,38 @@ export function ComposedChart({
 
           {chartStyle === 'bar'
             ? visibleAttributes.map((attribute) => (
-              <Bar
-                key={attribute.name}
-                dataKey={attribute.name}
-                stackId={attributes?.find((a) => a.attribute === attribute?.name)?.stackId ?? '1'}
-                fill={attribute.color}
-                radius={0.75}
-                opacity={1}
-                name={
-                  attributes?.find((a) => a.attribute === attribute?.name)?.label ||
-                  attribute?.name
-                }
-                maxBarSize={24}
-              />
-            ))
+                <Bar
+                  key={attribute.name}
+                  dataKey={attribute.name}
+                  stackId={attributes?.find((a) => a.attribute === attribute?.name)?.stackId ?? '1'}
+                  fill={attribute.color}
+                  radius={0.75}
+                  opacity={1}
+                  name={
+                    attributes?.find((a) => a.attribute === attribute?.name)?.label ||
+                    attribute?.name
+                  }
+                  maxBarSize={24}
+                />
+              ))
             : visibleAttributes.map((attribute, i) => (
-              <Area
-                key={attribute.name}
-                type="linear"
-                dataKey={attribute.name}
-                stackId="1"
-                fill={`url(#gradient-${attribute.name})`}
-                fillOpacity={1}
-                stroke={attribute.color}
-                radius={20}
-                animationDuration={375}
-                name={
-                  attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
-                }
-                dot={false}
-                activeDot={false}
-              />
-            ))}
+                <Area
+                  key={attribute.name}
+                  type="linear"
+                  dataKey={attribute.name}
+                  stackId="1"
+                  fill={`url(#gradient-${attribute.name})`}
+                  fillOpacity={1}
+                  stroke={attribute.color}
+                  radius={20}
+                  animationDuration={375}
+                  name={
+                    attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
+                  }
+                  dot={false}
+                  activeDot={false}
+                />
+              ))}
           {/* Max value, if available */}
           {maxAttribute && _showMaxValue && (
             <Line
