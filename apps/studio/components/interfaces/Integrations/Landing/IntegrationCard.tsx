@@ -23,7 +23,7 @@ export const IntegrationLoadingCard = () => {
   return (
     <div className={cn(INTEGRATION_CARD_STYLE, 'pl-5 pr-6 py-3 gap-3 inline-flex h-[110px]')}>
       <div className="w-10 h-10 relative">
-        <ShimmeringLoader className="w-full h-full bg-white border rounded-md" />
+        <ShimmeringLoader className="w-full h-full bg-surface-100 border rounded-md" />
       </div>
       <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-y-2">
         <div className="w-full flex-col justify-start items-start gap-y-1 flex">
@@ -87,8 +87,8 @@ export const IntegrationCard = ({
       <Card className="h-full">
         <CardContent className="flex flex-col p-4 @2xl:p-6 h-full">
           <div className="flex items-start justify-between mb-4">
-            <div className="shrink-0 w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
-              {icon()}
+            <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">
+              {icon({ className: 'w-full h-full text-foreground' })}
             </div>
             {isInstalled && (
               <div className="flex items-center gap-x-1">
