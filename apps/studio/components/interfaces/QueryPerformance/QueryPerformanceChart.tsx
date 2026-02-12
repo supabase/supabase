@@ -64,7 +64,12 @@ export const QueryPerformanceChart = ({
       case 'query_latency': {
         let trueP95: number = 0
 
-        if (parsedLogs && parsedLogs.length > 0) {
+        const hasHistogramData =
+          parsedLogs &&
+          parsedLogs.length > 0 &&
+          parsedLogs.some((log) => log.resp_calls && Array.isArray(log.resp_calls))
+
+        if (hasHistogramData) {
           const bucketCount = parsedLogs[0]?.resp_calls?.length || 50
           const combinedHistogram = new Array(bucketCount).fill(0)
 
@@ -78,11 +83,9 @@ export const QueryPerformanceChart = ({
             }
           })
 
-          // [kemal]: this might need a revisit
           const percentiles = calculatePercentilesFromHistogram(combinedHistogram)
           trueP95 = percentiles.p95
         } else {
-          // [kemal]: fallback to weighted average
           const totalCalls = chartData.reduce((sum, d) => sum + d.calls, 0)
           trueP95 =
             totalCalls > 0
