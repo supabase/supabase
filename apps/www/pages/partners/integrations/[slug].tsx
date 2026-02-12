@@ -341,6 +341,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // Parse markdown
   const overview = await serialize(partner.overview, {
     blockJS: false,
+    scope: {
+      chCodeConfig: codeHikeOptions,
+    },
     mdxOptions: {
       remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
     },
