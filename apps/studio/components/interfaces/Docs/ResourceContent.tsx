@@ -57,7 +57,7 @@ export const ResourceContent = ({
   return (
     <>
       <h2 className="doc-section__table-name text-foreground mt-0 flex items-center px-6 gap-2">
-        <span className="bg-slate-300 p-2 rounded-lg">
+        <span className="bg-surface-300 p-2 rounded-lg">
           <Table2 size={18} />
         </span>
         <span className="text-2xl font-bold">{resourceId}</span>
@@ -154,7 +154,7 @@ export const ResourceContent = ({
           </div>
           <div className="doc-section">
             <article className="code-column text-foreground">
-              <h4 className="mt-0 text-white">Filtering</h4>
+              <h4 className="mt-0 text-foreground">Filtering</h4>
               <p>Supabase provides a wide range of filters.</p>
               <p>
                 <a
