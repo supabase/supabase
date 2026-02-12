@@ -142,25 +142,28 @@ export const LangSelector = ({
                   </>
                 )}
 
-                <DropdownMenuSeparator />
-
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel>JWT-based legacy keys</DropdownMenuLabel>
-                  {legacyKeys.map((key) => {
-                    const value = key.api_key
-                    return (
-                      <DropdownMenuRadioItem
-                        key={key.id}
-                        value={value}
-                        onClick={() =>
-                          setSelectedApiKey({ name: `Legacy key: ${key.name}`, key: value })
-                        }
-                      >
-                        {key.name}
-                      </DropdownMenuRadioItem>
-                    )
-                  })}
-                </DropdownMenuGroup>
+                {legacyKeys.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>JWT-based legacy keys</DropdownMenuLabel>
+                      {legacyKeys.map((key) => {
+                        const value = key.api_key
+                        return (
+                          <DropdownMenuRadioItem
+                            key={key.id}
+                            value={value}
+                            onClick={() =>
+                              setSelectedApiKey({ name: `Legacy key: ${key.name}`, key: value })
+                            }
+                          >
+                            {key.name}
+                          </DropdownMenuRadioItem>
+                        )
+                      })}
+                    </DropdownMenuGroup>
+                  </>
+                )}
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>

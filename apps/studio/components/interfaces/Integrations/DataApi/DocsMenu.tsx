@@ -27,8 +27,7 @@ export const DocsMenu = ({
                 <span
                   className={cn(
                     'flex items-center',
-                    isActive ? 'text-foreground' : 'text-foreground-light hover:text-foreground',
-                    isDisabled && 'pointer-events-none opacity-50'
+                    isActive ? 'text-foreground' : 'text-foreground-light hover:text-foreground'
                   )}
                 >
                   <span className="truncate">{item.name}</span>
@@ -38,13 +37,26 @@ export const DocsMenu = ({
                 </span>
               )
 
+              if (isDisabled) {
+                return (
+                  <span
+                    key={item.key}
+                    className="block pointer-events-none opacity-50"
+                    aria-disabled="true"
+                    tabIndex={-1}
+                  >
+                    {content}
+                  </span>
+                )
+              }
+
               if (item.isExternal) {
                 return (
                   <a
                     key={item.key}
                     href={item.url}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="block"
                   >
                     {content}

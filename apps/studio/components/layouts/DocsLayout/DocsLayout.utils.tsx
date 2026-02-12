@@ -21,7 +21,7 @@ export const generateDocsMenu = (
   flags?: { authEnabled: boolean },
   basePath?: string
 ): Array<ProductMenuGroup> => {
-  const docsBasePath = basePath ?? `/project/${ref}/api`
+  const docsBasePath = basePath ?? `/project/${ref}/integrations/data_api/docs`
 
   return [
     {

@@ -40,8 +40,8 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
             <p>Supabase makes it easy to manage your users.</p>
             <p>
               Supabase assigns each user a unique ID. You can reference this ID anywhere in your
-              database. For example, you might create a <code>profiles</code> table references the
-              user using a <code>user_id</code> field.
+              database. For example, you might create a <code>profiles</code> table that references
+              the user using a <code>user_id</code> field.
             </p>
             <p>
               Supabase already has built in the routes to sign up, login, and log out for managing
