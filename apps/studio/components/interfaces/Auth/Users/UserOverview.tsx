@@ -477,11 +477,11 @@ export const RowData = ({ property, value }: { property: string; value?: string 
         {typeof value === 'boolean' ? (
           <div className="h-[26px] flex items-center justify-center min-w-[70px]">
             {value ? (
-              <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+              <div className="rounded-full w-4 h-4 bg-foreground flex items-center justify-center">
                 <Check size={10} className="text-contrast" strokeWidth={4} />
               </div>
             ) : (
-              <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+              <div className="rounded-full w-4 h-4 bg-foreground flex items-center justify-center">
                 <X size={10} className="text-contrast" strokeWidth={4} />
               </div>
             )}
