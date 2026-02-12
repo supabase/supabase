@@ -283,17 +283,17 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0
       '@mdx-js/loader':
-        specifier: ^2.1.5
-        version: 2.3.0(supports-color@8.1.1)(webpack@5.94.0)
+        specifier: ^3.0.0
+        version: 3.1.1(supports-color@8.1.1)(webpack@5.94.0)
       '@mdx-js/react':
-        specifier: ^2.3.0
-        version: 2.3.0(react@18.3.1)
+        specifier: ^3.0.0
+        version: 3.1.1(@types/react@18.3.3)(react@18.3.1)
       '@next/bundle-analyzer':
         specifier: 15.3.1
         version: 15.3.1
       '@next/mdx':
         specifier: 15.3.1
-        version: 15.3.1(@mdx-js/loader@2.3.0(supports-color@8.1.1)(webpack@5.94.0))(@mdx-js/react@2.3.0(react@18.3.1))
+        version: 15.3.1(@mdx-js/loader@3.1.1(supports-color@8.1.1)(webpack@5.94.0))(@mdx-js/react@3.1.1(@types/react@18.3.3)(react@18.3.1))
       '@octokit/auth-app':
         specifier: ^7.0.0
         version: 7.1.5
@@ -427,8 +427,8 @@ importers:
         specifier: 'catalog:'
         version: 15.5.10(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       next-mdx-remote:
-        specifier: ^4.4.1
-        version: 4.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
+        specifier: ^6.0.0
+        version: 6.0.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
       next-plugin-yaml:
         specifier: ^1.0.1
         version: 1.0.1
@@ -478,8 +478,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       remark-gfm:
-        specifier: ^3.0.1
-        version: 3.0.1(supports-color@8.1.1)
+        specifier: ^4.0.0
+        version: 4.0.1(supports-color@8.1.1)
       remark-math:
         specifier: ^6.0.0
         version: 6.0.0(supports-color@8.1.1)
@@ -1568,14 +1568,14 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
       '@mdx-js/react':
-        specifier: ^2.3.0
-        version: 2.3.0(react@18.3.1)
+        specifier: ^3.0.0
+        version: 3.1.1(@types/react@18.3.3)(react@18.3.1)
       '@next/bundle-analyzer':
         specifier: 15.3.1
         version: 15.3.1
       '@next/mdx':
         specifier: 15.3.1
-        version: 15.3.1(@mdx-js/loader@2.3.0(supports-color@8.1.1)(webpack@5.94.0))(@mdx-js/react@2.3.0(react@18.3.1))
+        version: 15.3.1(@mdx-js/loader@3.1.1(supports-color@8.1.1)(webpack@5.94.0))(@mdx-js/react@3.1.1(@types/react@18.3.3)(react@18.3.1))
       '@octokit/auth-app':
         specifier: ^7.0.0
         version: 7.1.5
@@ -1685,8 +1685,8 @@ importers:
         specifier: 'catalog:'
         version: 15.5.10(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       next-mdx-remote:
-        specifier: ^4.4.1
-        version: 4.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
+        specifier: ^6.0.0
+        version: 6.0.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
       next-seo:
         specifier: ^6.5.0
         version: 6.5.0(next@15.5.10(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1736,8 +1736,8 @@ importers:
         specifier: ^15.0.1
         version: 15.0.1(supports-color@8.1.1)
       remark-gfm:
-        specifier: ^3.0.1
-        version: 3.0.1(supports-color@8.1.1)
+        specifier: ^4.0.0
+        version: 4.0.1(supports-color@8.1.1)
       shared-data:
         specifier: workspace:*
         version: link:../../packages/shared-data
@@ -4536,20 +4536,21 @@ packages:
     peerDependencies:
       esbuild: ^0.25.2
 
-  '@mdx-js/loader@2.3.0':
-    resolution: {integrity: sha512-IqsscXh7Q3Rzb+f5DXYk0HU71PK+WuFsEhf+mSV3fOhpLcEpgsHvTQ2h0T6TlZ5gHOaBeFjkXwB52by7ypMyNg==}
+  '@mdx-js/loader@3.1.1':
+    resolution: {integrity: sha512-0TTacJyZ9mDmY+VefuthVshaNIyCGZHJG2fMnGaDttCt8HmjUF7SizlHJpaCDoGnN635nK1wpzfpx/Xx5S4WnQ==}
     peerDependencies:
-      webpack: '>=4'
-
-  '@mdx-js/mdx@2.3.0':
-    resolution: {integrity: sha512-jLuwRlz8DQfQNiUCJR50Y09CGPq3fLtmtUQfVrj79E0JWu3dvsVcxVIcfhR5h0iXu+/z++zDrYeiJqifRynJkA==}
+      webpack: '>=5'
+    peerDependenciesMeta:
+      webpack:
+        optional: true
 
   '@mdx-js/mdx@3.0.1':
     resolution: {integrity: sha512-eIQ4QTrOWyL3LWEe/bu6Taqzq2HQvHcyTMaOrI95P2/LmJE7AsfPfgJGuFLPVqBUE1BC1rik3VIhU+s9u72arA==}
 
-  '@mdx-js/react@2.3.0':
-    resolution: {integrity: sha512-zQH//gdOmuu7nt2oJR29vFhDv88oGPmVw6BggmrHeMI+xgEkp1B2dX9/bMBSYtK0dyLX/aOmesKS09g222K1/g==}
+  '@mdx-js/react@3.1.1':
+    resolution: {integrity: sha512-f++rKLQgUVYDAtECQ6fn/is15GkEH9+nZPM3MS0RcxVqoTfawHvDlSCH7JbMhAM6uJ32v3eXLvLmLvjGu7PTQw==}
     peerDependencies:
+      '@types/react': '>=16'
       react: '>=16'
 
   '@mermaid-js/parser@0.6.3':
@@ -11660,14 +11661,8 @@ packages:
     resolution: {integrity: sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==}
     engines: {node: '>=4.0'}
 
-  estree-util-attach-comments@2.1.1:
-    resolution: {integrity: sha512-+5Ba/xGGS6mnwFbXIuQiDPTbuTxuMCooq3arVv7gPZtYpjp+VXH/NkHAP35OOefPhNG/UGqU3vt/LTABwcHX0w==}
-
   estree-util-attach-comments@3.0.0:
     resolution: {integrity: sha512-cKUwm/HUcTDsYh/9FgnuFqpfquUbwIqwKM26BVCGDPVgvaCl/nDCCjUfiLlx6lsEZ3Z4RFxNbOQ60pkaEwFxGw==}
-
-  estree-util-build-jsx@2.2.2:
-    resolution: {integrity: sha512-m56vOXcOBuaF+Igpb9OPAy7f9w9OIkb5yhjsZuaPm7HoGi4oTOQi0h2+yZ+AtKklYFZ+rPC4n0wYCJCEU1ONqg==}
 
   estree-util-build-jsx@3.0.1:
     resolution: {integrity: sha512-8U5eiL6BTrPxp/CHbs2yMgP8ftMhR5ww1eIKoWRMlqvltHF8fZn5LRDvTKuxD3DUn+shRbLGqXemcP51oFCsGQ==}
@@ -11677,9 +11672,6 @@ packages:
 
   estree-util-is-identifier-name@3.0.0:
     resolution: {integrity: sha512-hFtqIDZTIUZ9BXLb8y4pYGyk6+wekIivNVTcmvk8NoOh+VeRn5y6cEHzbURrWbfp1fIqdVipilzj+lfaadNZmg==}
-
-  estree-util-to-js@1.2.0:
-    resolution: {integrity: sha512-IzU74r1PK5IMMGZXUVZbmiu4A1uhiPgW5hm1GjcOfr4ZzHaMPpLNJjR7HjXiIOzi25nZDrgFTobHTkV5Q6ITjA==}
 
   estree-util-to-js@2.0.0:
     resolution: {integrity: sha512-WDF+xj5rRWmD5tj6bIqRi6CkLIXbbNQUcxQHzGysQzvHmdYG2G7p/Tf0J0gpxGgkeMZNTIjT/AoSvC9Xehcgdg==}
@@ -12515,9 +12507,6 @@ packages:
   hast-util-raw@9.0.1:
     resolution: {integrity: sha512-5m1gmba658Q+lO5uqL5YNGQWeh1MYWZbZmWrM5lncdcuiXuo5E2HT/CIOp0rLF8ksfSwiCVJ3twlgVRyTGThGA==}
 
-  hast-util-to-estree@2.3.3:
-    resolution: {integrity: sha512-ihhPIUPxN0v0w6M5+IiAZZrn0LH2uZomeWwhn7uP7avZC6TE7lIiEh2yBMPr5+zi1aUCXq6VoYRgs2Bw9xmycQ==}
-
   hast-util-to-estree@3.1.3:
     resolution: {integrity: sha512-48+B/rJWAp0jamNbAAf9M7Uf//UVqAoMmgXhBdxTDJLGKY+LRnZ99qcG+Qjl5HfMpYNzS5v4EAwVEF34LeAj7w==}
 
@@ -12786,9 +12775,6 @@ packages:
 
   inline-style-parser@0.1.1:
     resolution: {integrity: sha512-7NXolsK4CAS5+xvdj5OMMbI962hU/wvwoxk+LWR9Ek9bVtyuuYScDN6eS0rUm6TxApFpw7CX1o4uJzcd4AyD3Q==}
-
-  inline-style-parser@0.2.3:
-    resolution: {integrity: sha512-qlD8YNDqyTKTyuITrDOffsl6Tdhv+UC4hcdAVuQsK4IMQ99nSgd1MIA/Q+jQYoh9r3hVUXhYh7urSRmXPkW04g==}
 
   inline-style-parser@0.2.4:
     resolution: {integrity: sha512-0aO8FkhNZlj/ZIbNi7Lxxr12obT7cL1moPfE4tg1LkX7LlLfC6DeX4l2ZEud1ukP9jNQyNnfzQVqwbwmAATY4Q==}
@@ -13756,10 +13742,6 @@ packages:
   mark.js@8.11.1:
     resolution: {integrity: sha512-1I+1qpDt4idfgLQG+BNWmrqku+7/2bi5nLf4YwF8y8zXvmfiTBY3PV3ZibfrjBueCByROpuBjLLFCajqkgYoLQ==}
 
-  markdown-extensions@1.1.1:
-    resolution: {integrity: sha512-WWC0ZuMzCyDHYCasEGs4IPvLyTGftYwh6wIEOULOF0HXcqZlhwRzrK0w2VUlxWA98xnvb/jszw4ZSkJ6ADpM6Q==}
-    engines: {node: '>=0.10.0'}
-
   markdown-extensions@2.0.0:
     resolution: {integrity: sha512-o5vL7aDWatOTX8LzaS1WMoaoxIiLRQJuIKKe2wAw6IeULDHaqbiqiggmx+pKvZDb1Sj+pE46Sn1T7lCqfFtg1Q==}
     engines: {node: '>=16'}
@@ -14516,12 +14498,11 @@ packages:
       react: '*'
       react-dom: '*'
 
-  next-mdx-remote@4.4.1:
-    resolution: {integrity: sha512-1BvyXaIou6xy3XoNF4yaMZUCb6vD2GTAa5ciOa6WoO+gAUTYsb1K4rI/HSC2ogAWLrb/7VSV52skz07vOzmqIQ==}
+  next-mdx-remote@6.0.0:
+    resolution: {integrity: sha512-cJEpEZlgD6xGjB4jL8BnI8FaYdN9BzZM4NwadPe1YQr7pqoWjg9EBCMv3nXBkuHqMRfv2y33SzUsuyNh9LFAQQ==}
     engines: {node: '>=14', npm: '>=7'}
     peerDependencies:
-      react: '>=16.x <=18.x'
-      react-dom: '>=16.x <=18.x'
+      react: '>=16'
 
   next-plugin-yaml@1.0.1:
     resolution: {integrity: sha512-k13wbpN33wTgrgWUBiXPtObXO94JOEiwvYKJ3X0JrBz2yaW24EfNaVqHwA0dwhsn9PyPIKhPhgsu3bhJsNs+cQ==}
@@ -16382,9 +16363,6 @@ packages:
   remark-mdx-frontmatter@4.0.0:
     resolution: {integrity: sha512-PZzAiDGOEfv1Ua7exQ8S5kKxkD8CDaSb4nM+1Mprs6u8dyvQifakh+kCj6NovfGXW+bTvrhjaR3srzjS2qJHKg==}
 
-  remark-mdx@2.3.0:
-    resolution: {integrity: sha512-g53hMkpM0I98MU266IzDFMrTD980gNF3BJnkyFcmN+dD873mQeD5rdMO3Y2X+x8umQfbSE0PcoEDl7ledSA+2g==}
-
   remark-mdx@3.0.1:
     resolution: {integrity: sha512-3Pz3yPQ5Rht2pM5R+0J2MrGoBSrzf+tJG94N+t/ilfdh8YLyyKYtidAYwTveB20BoHAcwIopOUqhcmh2F7hGYA==}
 
@@ -17244,9 +17222,6 @@ packages:
   style-to-object@0.4.2:
     resolution: {integrity: sha512-1JGpfPB3lo42ZX8cuPrheZbfQ6kqPPnPHlKMyeRYtfKD+0jG+QsXgXN57O/dvJlzlB2elI6dGmrPnl5VPQFPaA==}
 
-  style-to-object@1.0.6:
-    resolution: {integrity: sha512-khxq+Qm3xEyZfKd/y9L3oIWQimxuc4STrQKtQn8aSDRHb8mFgpukgX1hdzfrMEW6JCjyJ8p89x+IUMVnCBI1PA==}
-
   style-to-object@1.0.8:
     resolution: {integrity: sha512-xT47I/Eo0rwJmaXC4oilDGDWLohVhR6o/xAQcPQN8q6QBuZVL8qMYL85kLmST5cPjAorwvqIA4qXTRQoYHaL6g==}
 
@@ -17906,6 +17881,9 @@ packages:
   unist-util-remove-position@5.0.0:
     resolution: {integrity: sha512-Hp5Kh3wLxv0PHj9m2yZhhLt58KzPtEYKQQ4yxfYFEO7EvHwzyDYnduhHnY1mDxoqr7VUwVuHXk9RXKIiYS1N8Q==}
 
+  unist-util-remove@4.0.0:
+    resolution: {integrity: sha512-b4gokeGId57UVRX/eVKej5gXqGlc9+trkORhFJpu9raqZkZhU0zm8Doi05+HaiBsMEIJowL+2WtQ5ItjsngPXg==}
+
   unist-util-stringify-position@2.0.3:
     resolution: {integrity: sha512-3faScn5I+hy9VleOq/qNbAd6pAx7iH5jYBMS9I1HgQVijz/4mv5Bvw5iw1sC/90CODiKo81G/ps8AJrISn687g==}
 
@@ -17926,6 +17904,9 @@ packages:
 
   unist-util-visit@5.0.0:
     resolution: {integrity: sha512-MR04uvD+07cwl/yhVuVWAtw+3GOR/knlL55Nd/wAdblk27GCVt3lqpTivy/tkJcZoNPzTwS1Y+KMojlLDhoTzg==}
+
+  unist-util-visit@5.1.0:
+    resolution: {integrity: sha512-m+vIdyeCOpdr/QeQCu2EzxX/ohgS8KbnPDgFni4dQsfSCtpz8UqDyY5GjRru8PDKuYn7Fq19j1CQ+nJSsGKOzg==}
 
   universal-github-app-jwt@2.2.0:
     resolution: {integrity: sha512-G5o6f95b5BggDGuUfKDApKaCgNYy2x7OdHY0zSMF081O0EJobw+1130VONhrA7ezGSV2FNOGyM+KQpQZAr9bIQ==}
@@ -18210,8 +18191,8 @@ packages:
   vfile-location@5.0.2:
     resolution: {integrity: sha512-NXPYyxyBSH7zB5U6+3uDdd6Nybz6o6/od9rk8bp9H8GR3L+cm/fC0uUTbqBmUTnMCUDslAGBOIKNfvvb+gGlDg==}
 
-  vfile-matter@3.0.1:
-    resolution: {integrity: sha512-CAAIDwnh6ZdtrqAuxdElUqQRQDQgbbIrYtDYI8gCjXS1qQ+1XdLoK8FIZWxJwn0/I+BkSSZpar3SOgjemQz4fg==}
+  vfile-matter@5.0.1:
+    resolution: {integrity: sha512-o6roP82AiX0XfkyTHyRCMXgHfltUNlXSEqCIS80f+mbAyiQBE2fxtDVMtseyytGx75sihiJFo/zR6r/4LTs2Cw==}
 
   vfile-message@2.0.4:
     resolution: {integrity: sha512-DjssxRGkMvifUOJre00juHoP9DPWuzjxKuMDrhNbk2TdaYYBNMStsNhEOt3idrtI12VQYM/1+iM0KOzXi4pxwQ==}
@@ -21496,33 +21477,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@mdx-js/loader@2.3.0(supports-color@8.1.1)(webpack@5.94.0)':
+  '@mdx-js/loader@3.1.1(supports-color@8.1.1)(webpack@5.94.0)':
     dependencies:
-      '@mdx-js/mdx': 2.3.0(supports-color@8.1.1)
-      source-map: 0.7.4
+      '@mdx-js/mdx': 3.0.1(supports-color@8.1.1)
+      source-map: 0.7.6
+    optionalDependencies:
       webpack: 5.94.0
-    transitivePeerDependencies:
-      - supports-color
-
-  '@mdx-js/mdx@2.3.0(supports-color@8.1.1)':
-    dependencies:
-      '@types/estree-jsx': 1.0.1
-      '@types/mdx': 2.0.10
-      estree-util-build-jsx: 2.2.2
-      estree-util-is-identifier-name: 2.1.0
-      estree-util-to-js: 1.2.0
-      estree-walker: 3.0.3
-      hast-util-to-estree: 2.3.3(supports-color@8.1.1)
-      markdown-extensions: 1.1.1
-      periscopic: 3.1.0
-      remark-mdx: 2.3.0(supports-color@8.1.1)
-      remark-parse: 10.0.2(supports-color@8.1.1)
-      remark-rehype: 10.1.0
-      unified: 10.1.2
-      unist-util-position-from-estree: 1.1.2
-      unist-util-stringify-position: 3.0.3
-      unist-util-visit: 4.1.2
-      vfile: 5.3.7
     transitivePeerDependencies:
       - supports-color
 
@@ -21549,12 +21509,12 @@ snapshots:
       unified: 11.0.5
       unist-util-position-from-estree: 2.0.0
       unist-util-stringify-position: 4.0.0
-      unist-util-visit: 5.0.0
+      unist-util-visit: 5.1.0
       vfile: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@mdx-js/react@2.3.0(react@18.3.1)':
+  '@mdx-js/react@3.1.1(@types/react@18.3.3)(react@18.3.1)':
     dependencies:
       '@types/mdx': 2.0.10
       '@types/react': 18.3.3
@@ -21700,12 +21660,12 @@ snapshots:
     dependencies:
       fast-glob: 3.3.1
 
-  '@next/mdx@15.3.1(@mdx-js/loader@2.3.0(supports-color@8.1.1)(webpack@5.94.0))(@mdx-js/react@2.3.0(react@18.3.1))':
+  '@next/mdx@15.3.1(@mdx-js/loader@3.1.1(supports-color@8.1.1)(webpack@5.94.0))(@mdx-js/react@3.1.1(@types/react@18.3.3)(react@18.3.1))':
     dependencies:
       source-map: 0.7.4
     optionalDependencies:
-      '@mdx-js/loader': 2.3.0(supports-color@8.1.1)(webpack@5.94.0)
-      '@mdx-js/react': 2.3.0(react@18.3.1)
+      '@mdx-js/loader': 3.1.1(supports-color@8.1.1)(webpack@5.94.0)
+      '@mdx-js/react': 3.1.1(@types/react@18.3.3)(react@18.3.1)
 
   '@next/swc-darwin-arm64@15.5.7':
     optional: true
@@ -29671,19 +29631,9 @@ snapshots:
 
   estraverse@5.3.0: {}
 
-  estree-util-attach-comments@2.1.1:
-    dependencies:
-      '@types/estree': 1.0.5
-
   estree-util-attach-comments@3.0.0:
     dependencies:
       '@types/estree': 1.0.5
-
-  estree-util-build-jsx@2.2.2:
-    dependencies:
-      '@types/estree-jsx': 1.0.1
-      estree-util-is-identifier-name: 2.1.0
-      estree-walker: 3.0.3
 
   estree-util-build-jsx@3.0.1:
     dependencies:
@@ -29695,12 +29645,6 @@ snapshots:
   estree-util-is-identifier-name@2.1.0: {}
 
   estree-util-is-identifier-name@3.0.0: {}
-
-  estree-util-to-js@1.2.0:
-    dependencies:
-      '@types/estree-jsx': 1.0.1
-      astring: 1.8.6
-      source-map: 0.7.6
 
   estree-util-to-js@2.0.0:
     dependencies:
@@ -30707,30 +30651,10 @@ snapshots:
       mdast-util-to-hast: 13.2.1
       parse5: 7.2.1
       unist-util-position: 5.0.0
-      unist-util-visit: 5.0.0
+      unist-util-visit: 5.1.0
       vfile: 6.0.3
       web-namespaces: 2.0.1
       zwitch: 2.0.4
-
-  hast-util-to-estree@2.3.3(supports-color@8.1.1):
-    dependencies:
-      '@types/estree': 1.0.5
-      '@types/estree-jsx': 1.0.1
-      '@types/hast': 2.3.6
-      '@types/unist': 2.0.8
-      comma-separated-tokens: 2.0.3
-      estree-util-attach-comments: 2.1.1
-      estree-util-is-identifier-name: 2.1.0
-      hast-util-whitespace: 2.0.1
-      mdast-util-mdx-expression: 1.3.2(supports-color@8.1.1)
-      mdast-util-mdxjs-esm: 1.3.1(supports-color@8.1.1)
-      property-information: 6.3.0
-      space-separated-tokens: 2.0.2
-      style-to-object: 0.4.2
-      unist-util-position: 4.0.4
-      zwitch: 2.0.4
-    transitivePeerDependencies:
-      - supports-color
 
   hast-util-to-estree@3.1.3(supports-color@8.1.1):
     dependencies:
@@ -30781,7 +30705,7 @@ snapshots:
       mdast-util-mdxjs-esm: 2.0.1(supports-color@8.1.1)
       property-information: 6.3.0
       space-separated-tokens: 2.0.2
-      style-to-object: 1.0.6
+      style-to-object: 1.0.8
       unist-util-position: 5.0.0
       vfile-message: 4.0.2
     transitivePeerDependencies:
@@ -31078,8 +31002,6 @@ snapshots:
   ini@4.1.1: {}
 
   inline-style-parser@0.1.1: {}
-
-  inline-style-parser@0.2.3: {}
 
   inline-style-parser@0.2.4: {}
 
@@ -32078,8 +32000,6 @@ snapshots:
 
   mark.js@8.11.1: {}
 
-  markdown-extensions@1.1.1: {}
-
   markdown-extensions@2.0.0: {}
 
   markdown-it@12.3.2:
@@ -32449,7 +32369,7 @@ snapshots:
       micromark-util-sanitize-uri: 2.0.1
       trim-lines: 3.0.1
       unist-util-position: 5.0.0
-      unist-util-visit: 5.0.0
+      unist-util-visit: 5.1.0
       vfile: 6.0.3
 
   mdast-util-to-markdown@1.5.0:
@@ -32471,7 +32391,7 @@ snapshots:
       mdast-util-phrasing: 4.1.0
       mdast-util-to-string: 4.0.0
       micromark-util-decode-string: 2.0.0
-      unist-util-visit: 5.0.0
+      unist-util-visit: 5.1.0
       zwitch: 2.0.4
 
   mdast-util-to-string@3.2.0:
@@ -33412,15 +33332,18 @@ snapshots:
       - markdown-wasm
       - supports-color
 
-  next-mdx-remote@4.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1):
+  next-mdx-remote@6.0.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1):
     dependencies:
-      '@mdx-js/mdx': 2.3.0(supports-color@8.1.1)
-      '@mdx-js/react': 2.3.0(react@18.3.1)
+      '@babel/code-frame': 7.29.0
+      '@mdx-js/mdx': 3.0.1(supports-color@8.1.1)
+      '@mdx-js/react': 3.1.1(@types/react@18.3.3)(react@18.3.1)
       react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      vfile: 5.3.7
-      vfile-matter: 3.0.1
+      unist-util-remove: 4.0.0
+      unist-util-visit: 5.1.0
+      vfile: 6.0.3
+      vfile-matter: 5.0.1
     transitivePeerDependencies:
+      - '@types/react'
       - supports-color
 
   next-plugin-yaml@1.0.1:
@@ -35781,13 +35704,6 @@ snapshots:
       unified: 11.0.5
       yaml: 2.8.1
 
-  remark-mdx@2.3.0(supports-color@8.1.1):
-    dependencies:
-      mdast-util-mdx: 2.0.1(supports-color@8.1.1)
-      micromark-extension-mdxjs: 1.0.1
-    transitivePeerDependencies:
-      - supports-color
-
   remark-mdx@3.0.1(supports-color@8.1.1):
     dependencies:
       mdast-util-mdx: 3.0.0(supports-color@8.1.1)
@@ -36883,10 +36799,6 @@ snapshots:
     dependencies:
       inline-style-parser: 0.1.1
 
-  style-to-object@1.0.6:
-    dependencies:
-      inline-style-parser: 0.2.3
-
   style-to-object@1.0.8:
     dependencies:
       inline-style-parser: 0.2.4
@@ -37611,7 +37523,13 @@ snapshots:
   unist-util-remove-position@5.0.0:
     dependencies:
       '@types/unist': 3.0.3
-      unist-util-visit: 5.0.0
+      unist-util-visit: 5.1.0
+
+  unist-util-remove@4.0.0:
+    dependencies:
+      '@types/unist': 3.0.3
+      unist-util-is: 6.0.0
+      unist-util-visit-parents: 6.0.1
 
   unist-util-stringify-position@2.0.3:
     dependencies:
@@ -37642,6 +37560,12 @@ snapshots:
       unist-util-visit-parents: 5.1.3
 
   unist-util-visit@5.0.0:
+    dependencies:
+      '@types/unist': 3.0.3
+      unist-util-is: 6.0.0
+      unist-util-visit-parents: 6.0.1
+
+  unist-util-visit@5.1.0:
     dependencies:
       '@types/unist': 3.0.3
       unist-util-is: 6.0.0
@@ -37889,11 +37813,10 @@ snapshots:
       '@types/unist': 3.0.3
       vfile: 6.0.3
 
-  vfile-matter@3.0.1:
+  vfile-matter@5.0.1:
     dependencies:
-      '@types/js-yaml': 4.0.6
-      is-buffer: 2.0.5
-      js-yaml: 4.1.1
+      vfile: 6.0.3
+      yaml: 2.8.1
 
   vfile-message@2.0.4:
     dependencies:

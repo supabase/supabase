@@ -121,14 +121,15 @@ export const generateProductRoutes = (
 export const generateOtherRoutes = (
   ref?: string,
   project?: Project,
-  features?: { unifiedLogs?: boolean; showReports?: boolean }
+  features?: { unifiedLogs?: boolean; showReports?: boolean; apiDocsSidePanel?: boolean }
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
-  const { unifiedLogs, showReports } = features ?? {}
+  const { unifiedLogs, showReports, apiDocsSidePanel } = features ?? {}
   const unifiedLogsEnabled = unifiedLogs ?? false
   const reportsEnabled = showReports ?? true
+  const apiDocsSidePanelEnabled = apiDocsSidePanel ?? false
 
   return [
     {
@@ -159,12 +160,18 @@ export const generateOtherRoutes = (
             ? `/project/${ref}/logs`
             : `/project/${ref}/logs/explorer`),
     },
-    {
-      key: 'api',
-      label: 'API Docs',
-      icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
-    },
+    ...(apiDocsSidePanelEnabled
+      ? [
+          {
+            key: 'api',
+            label: 'API Docs',
+            icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link:
+              ref &&
+              (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/data_api/docs`),
+          },
+        ]
+      : []),
     {
       key: 'integrations',
       label: 'Integrations',
