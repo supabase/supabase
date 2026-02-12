@@ -31,7 +31,7 @@ interface ParamProps {
   required: boolean
   description: boolean
   metadata?: any
-  onDesciptionUpdated?: () => void
+  onDescriptionUpdated?: () => void
 }
 const Param = ({
   name,
@@ -40,7 +40,7 @@ const Param = ({
   required,
   description,
   metadata = {},
-  onDesciptionUpdated = noop,
+  onDescriptionUpdated = noop,
 }: ParamProps) => {
   return (
     <>
@@ -97,7 +97,7 @@ const Param = ({
           <Description
             content={description?.toString()}
             metadata={metadata}
-            onChange={onDesciptionUpdated}
+            onChange={onDescriptionUpdated}
           />
         </div>
       )}
