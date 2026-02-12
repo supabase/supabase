@@ -7,6 +7,7 @@ import { LangSelector } from '../../Docs/LangSelector'
 import { DataApiDisabledState } from '@/components/interfaces/Integrations/DataApi/DataApiDisabledState'
 import { DocView } from '@/components/interfaces/Integrations/DataApi/DocView'
 import { DocsMenu } from '@/components/interfaces/Integrations/DataApi/DocsMenu'
+import { DocsMobileNav } from '@/components/interfaces/Integrations/DataApi/DocsMobileNav'
 import { generateDocsMenu } from '@/components/layouts/DocsLayout/DocsLayout.utils'
 import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
@@ -78,6 +79,14 @@ export const DataApiDocsTab = () => {
         <DocsMenu activePage={activePage} menu={menu} />
       </aside>
       <div className="flex-1 min-w-0 relative">
+        <DocsMobileNav
+          activePage={activePage}
+          menu={menu}
+          selectedLang={selectedLang}
+          selectedApikey={selectedApikey}
+          setSelectedLang={setSelectedLang}
+          setSelectedApiKey={setSelectedApiKey}
+        />
         <DocView selectedLang={selectedLang} selectedApikey={selectedApikey} />
       </div>
     </div>
