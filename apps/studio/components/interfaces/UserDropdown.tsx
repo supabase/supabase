@@ -80,7 +80,7 @@ export function UserDropdown() {
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="/account/me"
                   onClick={() => {
@@ -94,14 +94,14 @@ export function UserDropdown() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="flex gap-2"
+                className="flex gap-2 cursor-pointer"
                 onClick={openFeaturePreviewModal}
                 onSelect={openFeaturePreviewModal}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="https://supabase.com/changelog"
                   target="_blank"
@@ -124,7 +124,7 @@ export function UserDropdown() {
             }}
           >
             {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+              <DropdownMenuRadioItem key={theme.value} value={theme.value} className="cursor-pointer">
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}
@@ -135,6 +135,7 @@ export function UserDropdown() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
+                className="cursor-pointer"
                 onSelect={() => {
                   router.push('/logout')
                 }}

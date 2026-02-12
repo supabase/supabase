@@ -36,14 +36,14 @@ export const LocalDropdown = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="w-44">
         <DropdownMenuItem
-          className="flex gap-2"
+          className="flex gap-2 cursor-pointer"
           onClick={openFeaturePreviewModal}
           onSelect={openFeaturePreviewModal}
         >
           <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Feature previews
         </DropdownMenuItem>
-        <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
+        <DropdownMenuItem className="flex gap-2 cursor-pointer" onClick={() => setCommandMenuOpen(true)}>
           <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Command menu
         </DropdownMenuItem>
@@ -57,7 +57,7 @@ export const LocalDropdown = () => {
             }}
           >
             {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+              <DropdownMenuRadioItem key={theme.value} value={theme.value} className="cursor-pointer">
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}
