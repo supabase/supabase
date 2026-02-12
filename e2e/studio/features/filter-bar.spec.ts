@@ -203,8 +203,11 @@ test.describe('Filter Bar', () => {
       }
     })
 
-    test('Backspace on empty input highlights last filter', async ({ page, ref }) => {
-      const tableName = `${tableNamePrefix}_bksp_hl`
+    test('Backspace on empty input highlights last filter, second Backspace deletes it', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_bksp_hl_del`
       const columnName = 'name'
 
       await createTable(tableName, columnName, [{ name: 'Alice' }])
@@ -219,30 +222,6 @@ test.describe('Filter Bar', () => {
         await freeformInput.click()
         await page.keyboard.press('Backspace')
 
-        await expect(page.getByTestId(`filter-condition-${columnName}`)).toHaveAttribute(
-          'data-highlighted',
-          'true'
-        )
-      } finally {
-        await dropTable(tableName)
-      }
-    })
-
-    test('Backspace again deletes highlighted filter', async ({ page, ref }) => {
-      const tableName = `${tableNamePrefix}_bksp_del`
-      const columnName = 'name'
-
-      await createTable(tableName, columnName, [{ name: 'Alice' }])
-
-      try {
-        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
-        await navigateToTable(page, ref, tableName)
-
-        await addFilter(page, ref, columnName, '=', 'Alice')
-
-        const freeformInput = getFilterBarInput(page)
-        await freeformInput.click()
-        await page.keyboard.press('Backspace')
         await expect(page.getByTestId(`filter-condition-${columnName}`)).toHaveAttribute(
           'data-highlighted',
           'true'
