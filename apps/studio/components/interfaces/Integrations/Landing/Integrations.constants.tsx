@@ -59,7 +59,7 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Queues`,
     icon: ({ className, ...props } = {}) => (
-      <Layers className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <Layers className={cn('inset-0 p-2 text-foreground w-full h-full', className)} {...props} />
     ),
     description: 'Lightweight message queue in Postgres',
     docsUrl: 'https://github.com/tembo-io/pgmq',
@@ -119,7 +119,7 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
     requiredExtensions: ['pg_cron'],
     name: `Cron`,
     icon: ({ className, ...props } = {}) => (
-      <Clock5 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <Clock5 className={cn('inset-0 p-2 text-foreground w-full h-full', className)} {...props} />
     ),
     description: 'Schedule recurring Jobs in Postgres',
     docsUrl: 'https://github.com/citusdata/pg_cron',
@@ -174,7 +174,7 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
     name: `Vault`,
     status: 'beta',
     icon: ({ className, ...props } = {}) => (
-      <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <Vault className={cn('inset-0 p-2 text-foreground w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
     docsUrl: DOCS_URL,
@@ -217,7 +217,7 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
     type: 'postgres_extension' as const,
     name: `Database Webhooks`,
     icon: ({ className, ...props } = {}) => (
-      <Webhook className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <Webhook className={cn('inset-0 p-2 text-foreground w-full h-full', className)} {...props} />
     ),
     description:
       'Send real-time data from your database to another system when a table event occurs',
