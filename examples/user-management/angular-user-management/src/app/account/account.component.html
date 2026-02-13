@@ -2,7 +2,7 @@
   <app-avatar [avatarUrl]="this.avatarUrl" (upload)="updateAvatar($event)"></app-avatar>
   <div>
     <label for="email">Email</label>
-    <input id="email" type="text" [value]="user.email" disabled />
+    <input id="email" type="text" [value]="user().email" disabled />
   </div>
   <div>
     <label for="username">Name</label>

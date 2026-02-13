@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from '@angular/core'
+import { Component, inject, OnInit, input } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { User } from '@supabase/supabase-js'
 import { Profile, SupabaseService } from '../supabase.service'
@@ -27,8 +27,7 @@ export class AccountComponent implements OnInit {
     await this.updateProfile()
   }
 
-  @Input()
-  user!: User
+  readonly user = input.required<User>();
 
   private readonly supabase = inject(SupabaseService)
   private readonly formBuilder = inject(FormBuilder)
@@ -55,7 +54,7 @@ export class AccountComponent implements OnInit {
   async getProfile() {
     try {
       this.loading = true
-      const { data: profile, error, status } = await this.supabase.profile(this.user)
+      const { data: profile, error, status } = await this.supabase.profile(this.user())
 
       if (error && status !== 406) {
         throw error
@@ -82,7 +81,7 @@ export class AccountComponent implements OnInit {
       const avatar_url = this.updateProfileForm.value.avatar_url as string
 
       const { error } = await this.supabase.updateProfile({
-        id: this.user.id,
+        id: this.user().id,
         username,
         website,
         avatar_url,

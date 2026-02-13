@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core'
+import { Component, effect, EventEmitter, inject, input, Input, Output } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
 
@@ -11,12 +11,15 @@ import { SupabaseService } from '../supabase.service'
 export class AvatarComponent {
   _avatarUrl: SafeResourceUrl | undefined
   uploading = false
+  avatarUrl = input<string>()
 
-  @Input()
-  set avatarUrl(url: string | null) {
-    if (url) {
-      this.downloadImage(url)
-    }
+  constructor() {
+    effect(() => {
+      const url = this.avatarUrl()
+      if (url) {
+        this.downloadImage(url)
+      }
+    })
   }
 
   @Output() upload = new EventEmitter<string>()
