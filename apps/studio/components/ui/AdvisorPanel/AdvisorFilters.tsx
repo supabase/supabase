@@ -1,9 +1,8 @@
-import { X } from 'lucide-react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
+import { X } from 'lucide-react'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
-import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
+import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 const severityOptions = [
   { label: 'Critical', value: 'critical' },
@@ -39,7 +38,7 @@ export const AdvisorFilters = ({
 }: AdvisorFiltersProps) => {
   return (
     <div className="border-b overflow-x-auto">
-      <div className="flex items-center justify-between gap-x-4 h-[46px]">
+      <div className="flex items-center justify-between gap-x-4 h-[calc(var(--header-height)-1px)]">
         <Tabs_Shadcn_ value={activeTab} onValueChange={onTabChange} className="h-full pl-4">
           <TabsList_Shadcn_ className="border-b-0 gap-4 h-full">
             <TabsTrigger_Shadcn_ value="all" className="h-full text-xs">

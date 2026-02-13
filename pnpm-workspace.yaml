@@ -58,6 +58,7 @@ minimumReleaseAgeExclude:
   - diff
   - lodash-es
   - lodash
+  - next-mdx-remote
 
 onlyBuiltDependencies:
   - supabase

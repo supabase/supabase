@@ -3,7 +3,6 @@ import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
@@ -13,7 +12,7 @@ import { isGreaterThanOrEqual } from 'lib/semver'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { MouseEvent, UIEvent, useMemo, useRef, useState } from 'react'
+import { MouseEvent, UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { LoadingLine, Sheet, SheetContent } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -34,6 +33,8 @@ export const CronjobsTab = () => {
   const { data: org } = useSelectedOrganizationQuery()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
+
+  const [isDirty, setIsDirty] = useState(false)
   const [search, setSearch] = useState(searchQuery)
 
   const handleSearchSubmit = () => {
@@ -51,29 +52,15 @@ export const CronjobsTab = () => {
     searchQuery,
   })
 
-  const deletingCronJobIdRef = useRef<string | null>(null)
+  const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+  )
 
-  const { setValue: setCronJobForEditing, value: cronJobForEditing } = useQueryStateWithSelect({
-    urlKey: 'edit',
-    select: (jobid: string) => {
-      if (!jobid) return undefined
-      const job = grid.rows.find((j) => j.jobid.toString() === jobid)
-      return job
-        ? { jobname: job.jobname, schedule: job.schedule, active: job.active, command: job.command }
-        : undefined
-    },
-    enabled: grid.rows.length > 0 && !grid.isLoading,
-    onError: () => toast.error(`Cron job not found`),
-  })
+  const [cronJobIdForEditing, setCronJobForEditing] = useQueryState('edit', parseAsString)
+  const cronJobForEditing = grid.rows.find((j) => j.jobid.toString() === cronJobIdForEditing)
 
-  const { setValue: setCronJobForDeletion, value: cronJobForDeletion } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (jobid: string) =>
-      jobid ? grid.rows.find((j) => j.jobid.toString() === jobid) : undefined,
-    enabled: grid.rows.length > 0 && !grid.isLoading,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingCronJobIdRef, selectedId, `Cron job not found`),
-  })
+  const [, setCronJobForDeletion] = useQueryState('delete', parseAsString)
 
   const { data: extensions = [] } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -127,12 +114,6 @@ export const CronjobsTab = () => {
     grid.fetchNextPage()
   }
 
-  // Create job sheet
-  const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
-  )
-
   const onOpenCreateJobSheet = () => {
     sendEvent({
       action: 'cron_job_create_clicked',
@@ -156,7 +137,6 @@ export const CronjobsTab = () => {
     createNavigationHandler(url, router)(event)
   }
 
-  const [isDirty, setIsDirty] = useState(false)
   const onClose = () => {
     setCronJobForEditing(null)
     setCreateCronJobSheetShown(false)
@@ -169,6 +149,13 @@ export const CronjobsTab = () => {
       onClose()
     },
   })
+
+  useEffect(() => {
+    if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
+      toast('Cron job not found')
+      setCronJobForEditing(null)
+    }
+  }, [cronJobForEditing, cronJobIdForEditing, grid.isSuccess, setCronJobForEditing])
 
   return (
     <>
@@ -198,19 +185,7 @@ export const CronjobsTab = () => {
         </div>
       </div>
 
-      {cronJobForDeletion && (
-        <DeleteCronJob
-          visible={!!cronJobForDeletion}
-          onClose={() => {
-            deletingCronJobIdRef.current = null
-            setCronJobForDeletion(null)
-          }}
-          onDeleteStart={(jobId) => {
-            deletingCronJobIdRef.current = jobId
-          }}
-          cronJob={cronJobForDeletion}
-        />
-      )}
+      <DeleteCronJob />
 
       <Sheet open={!!createCronJobSheetShown || !!cronJobForEditing} onOpenChange={confirmOnClose}>
         <SheetContent size="default" tabIndex={undefined}>

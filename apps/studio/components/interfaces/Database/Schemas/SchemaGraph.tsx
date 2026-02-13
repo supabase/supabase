@@ -203,7 +203,7 @@ export const SchemaGraph = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-muted">
+      <div className="flex items-center justify-between p-4 border-b border-muted h-[var(--header-height)]">
         {isLoadingSchemas && (
           <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
         )}
@@ -328,10 +328,6 @@ export const SchemaGraph = () => {
                   type: 'smoothstep',
                   animated: true,
                   deletable: false,
-                  style: {
-                    stroke: 'hsl(var(--border-stronger))',
-                    strokeWidth: 1,
-                  },
                 }}
                 nodeTypes={nodeTypes}
                 fitView

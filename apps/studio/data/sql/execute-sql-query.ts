@@ -113,6 +113,11 @@ export async function executeSql<T = any>(
           query: `explain ${sql}`,
           disable_statement_timeout: isStatementTimeoutDisabled,
         },
+        params: {
+          ...options.params,
+          // @ts-expect-error: This is just a client side thing to identify queries better
+          query: { key: 'preflight-check' },
+        },
       })
       const parsedTree = !!costCheck ? createNodeTree(costCheck) : undefined
       const summary = !!parsedTree ? calculateSummary(parsedTree) : undefined

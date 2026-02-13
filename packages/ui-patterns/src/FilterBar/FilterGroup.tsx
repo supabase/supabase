@@ -195,6 +195,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
                 disabled={isLoading}
+                data-testid="filter-bar-freeform-input"
               />
             ) : (
               <div className="relative inline-block">
