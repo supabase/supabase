@@ -1,4 +1,4 @@
-import { Component, effect, EventEmitter, inject, input, Input, Output } from '@angular/core'
+import { Component, effect, inject, input, Input, output } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
 
@@ -22,7 +22,7 @@ export class AvatarComponent {
     })
   }
 
-  @Output() upload = new EventEmitter<string>()
+  readonly upload = output<string>();
 
   private readonly supabase = inject(SupabaseService)
   private readonly dom = inject(DomSanitizer)
