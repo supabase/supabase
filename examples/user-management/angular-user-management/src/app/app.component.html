@@ -1,8 +1,8 @@
 <div class="container" style="padding: 50px 0 100px 0">
   @if (user) {
-    <app-account [user]="user"></app-account>
+    <app-account [user]="user" />
   }
   @if (!user) {
-    <app-auth></app-auth>
+    <app-auth />
   }
 </div>

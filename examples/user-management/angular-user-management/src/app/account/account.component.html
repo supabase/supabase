@@ -1,5 +1,5 @@
 <form [formGroup]="updateProfileForm" (ngSubmit)="updateProfile()" class="form-widget">
-  <app-avatar [avatarUrl]="this.avatarUrl" (upload)="updateAvatar($event)"></app-avatar>
+  <app-avatar [avatarUrl]="this.avatarUrl" (upload)="updateAvatar($event)" />
   <div>
     <label for="email">Email</label>
     <input id="email" type="text" [value]="user().email" disabled />
