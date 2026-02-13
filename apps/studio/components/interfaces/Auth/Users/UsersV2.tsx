@@ -535,7 +535,7 @@ export const UsersV2 = () => {
           </Alert_Shadcn_>
         )}
 
-        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2 border-t">
+        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
               <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
