@@ -1,23 +1,24 @@
-import { BarChart, Shield } from 'lucide-react'
-import { useCallback, useMemo } from 'react'
-
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useTrack } from 'lib/telemetry/track'
+import { BarChart, Shield } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
 import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { Markdown } from '../Markdown'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery(
+  const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery(
     {
       projectRef,
     },
@@ -37,12 +38,12 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   const totalErrors = errorLints.length
 
   const titleContent = useMemo(() => {
-    if (totalErrors === 0) return <h2>Assistant found no issues</h2>
+    if (totalErrors === 0) return <h2>Advisor found no issues</h2>
     const issuesText = totalErrors === 1 ? 'issue' : 'issues'
     const numberDisplay = totalErrors.toString()
     return (
       <h2>
-        Assistant found {numberDisplay} {issuesText}
+        Advisor found {numberDisplay} {issuesText}
       </h2>
     )
   }, [totalErrors])
@@ -113,33 +114,41 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                       )}
                       <CardTitle className="text-foreground-light">{lint.categories[0]}</CardTitle>
                     </div>
-                    <ButtonTooltip
-                      type="text"
-                      className="w-7 h-7"
-                      icon={<AiIconAnimation size={16} />}
+                    <div
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
-                        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                        snap.newChat({
-                          name: 'Summarize lint',
-                          initialInput: createLintSummaryPrompt(lint),
-                        })
-                        track('advisor_assistant_button_clicked', {
-                          origin: 'homepage',
-                          advisorCategory: lint.categories[0],
-                          advisorType: lint.name,
-                          advisorLevel: lint.level,
-                        })
                       }}
-                      tooltip={{
-                        content: { side: 'bottom', text: 'Help me fix this issue' },
-                      }}
-                    />
+                    >
+                      <AiAssistantDropdown
+                        label="Ask Assistant"
+                        iconOnly
+                        tooltip="Help me fix this issue"
+                        buildPrompt={() => createLintSummaryPrompt(lint)}
+                        onOpenAssistant={() => {
+                          openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                          snap.newChat({
+                            name: 'Summarize lint',
+                            initialInput: createLintSummaryPrompt(lint),
+                          })
+                          track('advisor_assistant_button_clicked', {
+                            origin: 'homepage',
+                            advisorCategory: lint.categories[0],
+                            advisorType: lint.name,
+                            advisorLevel: lint.level,
+                          })
+                        }}
+                        telemetrySource="advisor_section"
+                        type="text"
+                        className="w-7 h-7"
+                      />
+                    </div>
                   </CardHeader>
                   <CardContent className="p-6 pt-16 flex flex-col justify-end flex-1 overflow-auto">
-                    {lint.detail ? lint.detail.substring(0, 100) : lint.title}
-                    {lint.detail && lint.detail.length > 100 && '...'}
+                    <h3 className="mb-1">{lint.title}</h3>
+                    <Markdown className="leading-6 text-sm text-foreground-light">
+                      {lint.detail && lint.detail.replace(/\\`/g, '`')}
+                    </Markdown>
                   </CardContent>
                 </Card>
               )
@@ -155,8 +164,8 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
 function EmptyState() {
   return (
-    <Card className="bg-transparent">
-      <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
+    <Card className="bg-transparent h-64">
+      <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
         <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
           No security or performance errors found

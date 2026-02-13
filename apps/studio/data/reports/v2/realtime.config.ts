@@ -1,5 +1,9 @@
 import type { AnalyticsData, AnalyticsInterval } from 'data/analytics/constants'
-import { getInfraMonitoring, InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
+import { mapResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
+import {
+  getInfraMonitoringAttributes,
+  InfraMonitoringAttribute,
+} from 'data/analytics/infra-monitoring-query'
 import { ReportConfig } from './reports.types'
 
 async function runInfraMonitoringQuery(
@@ -10,16 +14,26 @@ async function runInfraMonitoringQuery(
   interval: AnalyticsInterval,
   databaseIdentifier?: string
 ): Promise<AnalyticsData> {
-  const data = await getInfraMonitoring({
+  const response = await getInfraMonitoringAttributes({
     projectRef,
-    attribute,
+    attributes: [attribute],
     startDate,
     endDate,
     interval,
     databaseIdentifier,
   })
 
-  return data
+  // Use shared mapping function that handles both single and multi-attribute response formats
+  const mapped = mapResponseToAnalyticsData(response, [attribute])
+  const analyticsData = mapped[attribute]
+
+  return {
+    data: analyticsData?.data ?? [],
+    format: analyticsData?.format,
+    yAxisLimit: analyticsData?.yAxisLimit,
+    total: analyticsData?.total,
+    totalGrouped: { [attribute]: analyticsData?.total },
+  } as AnalyticsData
 }
 
 export const realtimeReports = ({
@@ -48,7 +62,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Total number of connected realtime clients.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const data = await runInfraMonitoringQuery(
         projectRef,
@@ -81,7 +95,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'bar',
     titleTooltip: '',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const { data } = await runInfraMonitoringQuery(
         projectRef,
@@ -120,7 +134,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'bar',
     titleTooltip: '',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const { data } = await runInfraMonitoringQuery(
         projectRef,
@@ -159,7 +173,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'bar',
     titleTooltip: '',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const { data } = await runInfraMonitoringQuery(
         projectRef,
@@ -197,7 +211,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: '',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const data = await runInfraMonitoringQuery(
         projectRef,
@@ -231,7 +245,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Median size of message payloads sent',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}B`,
@@ -271,7 +285,7 @@ export const realtimeReports = ({
     defaultChartStyle: 'line',
     titleTooltip:
       'Median time between database commit and broadcast when using broadcast from database.',
-    availableIn: ['pro', 'team', 'enterprise'],
+    availableIn: ['pro', 'team', 'enterprise', 'platform'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -311,7 +325,7 @@ export const realtimeReports = ({
     defaultChartStyle: 'line',
     titleTooltip:
       'Execution median time of RLS (Row Level Security) to subscribe to a private channel',
-    availableIn: ['pro', 'team', 'enterprise'],
+    availableIn: ['pro', 'team', 'enterprise', 'platform'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -351,7 +365,7 @@ export const realtimeReports = ({
     defaultChartStyle: 'line',
     titleTooltip:
       'Execution median time of RLS (Row Level Security) to publish to a private channel',
-    availableIn: ['pro', 'team', 'enterprise'],
+    availableIn: ['pro', 'team', 'enterprise', 'platform'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,

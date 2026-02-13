@@ -83,23 +83,11 @@ The following sections explain how these attributes affect disk performance.
 
 ### Compute size
 
-The compute size of your project sets the upper limit for disk throughput and IOPS. The table below shows the limits for each instance size. For instance, an 8XL compute instance has a maximum throughput of 9,500 Mbps and a maximum IOPS of 40,000.
+The compute size of your project affects the effective disk throughput and IOPS. The table below shows both the baseline (sustained) limits and the burst (maximum) limits for each instance size. For instance, an 8XL compute instance has a throughput of 1,188 MB/s and IOPS of 40,000.
 
-| Compute Instance | Disk Throughput | IOPS        |
-| ---------------- | --------------- | ----------- |
-| Nano (free)      | 43 Mbps         | 250 IOPS    |
-| Micro            | 87 Mbps         | 500 IOPS    |
-| Small            | 174 Mbps        | 1,000 IOPS  |
-| Medium           | 347 Mbps        | 2,000 IOPS  |
-| Large            | 630 Mbps        | 3,600 IOPS  |
-| XL               | 1,188 Mbps      | 6,000 IOPS  |
-| 2XL              | 2,375 Mbps      | 12,000 IOPS |
-| 4XL              | 4,750 Mbps      | 20,000 IOPS |
-| 8XL              | 9,500 Mbps      | 40,000 IOPS |
-| 12XL             | 14,250 Mbps     | 50,000 IOPS |
-| 16XL             | 19,000 Mbps     | 80,000 IOPS |
+<ComputeDiskLimitsTable />
 
-Smaller compute instances like Nano, Micro, Small, and Medium have baseline performance levels that can occasionally be exceeded for short periods of time. If it does exceed the baseline, you should consider upgrading your instance size for a more reliable performance.
+Smaller compute instances like Nano, Micro, Small, and Medium can burst above baseline for short periods of time. Once burst capacity is exhausted, performance returns to baseline. If you need consistent disk performance, consider upgrading your compute size.
 
 Larger compute instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits which you can [configure](/docs/guides/platform/manage-your-usage/disk-throughput). If you hit your IOPS or throughput limit, throttling will occur.
 

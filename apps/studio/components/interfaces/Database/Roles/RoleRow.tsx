@@ -93,7 +93,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               <button
                 id="collapsible-trigger"
                 type="button"
-                className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
+                className="group flex w-full items-center justify-between rounded py-3 px-[var(--card-padding-x)] text-foreground"
                 onClick={(event: any) => {
                   if (event.target.id === 'collapsible-trigger') setIsExpanded(!isExpanded)
                 }}

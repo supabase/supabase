@@ -135,7 +135,7 @@ const DowngradeModal = ({
               <strong>Before you downgrade to the {selectedPlan?.name} plan, consider:</strong>
               <ul className="space-y-2 mt-2">
                 <li className="list-disc ml-6 text-foreground-light">
-                  Your projects no longer require their respective add ons.
+                  Your projects no longer require their respective add-ons.
                 </li>
                 <li className="list-disc ml-6 text-foreground-light">
                   Your resource consumption are well within the {selectedPlan?.name} plan's quota.

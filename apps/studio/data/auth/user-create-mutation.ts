@@ -46,6 +46,7 @@ export const useUserCreateMutation = ({
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: authKeys.usersInfinite(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: authKeys.usersCount(projectRef) }),
       ])
 
       await onSuccess?.(data, variables, context)

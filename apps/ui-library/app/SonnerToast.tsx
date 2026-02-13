@@ -1,7 +1,8 @@
 'use client'
 
-import { useConfig } from '@/hooks/use-config'
 import { SonnerToaster as Toaster } from 'ui'
+
+import { useConfig } from '@/hooks/use-config'
 
 export function SonnerToaster() {
   const [config] = useConfig()

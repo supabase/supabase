@@ -1,23 +1,23 @@
-import dayjs from 'dayjs'
-import { Archive, Database, GitBranch } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { useParams } from 'common'
 import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
+import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseMigrationVersion } from 'lib/migration-utils'
+import { Archive, Database, GitBranch } from 'lucide-react'
+import { useMemo } from 'react'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { ServiceStatus } from './ServiceStatus'
 
 export const ActivityStats = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: branchesData, isLoading: isLoadingBranches } = useBranchesQuery({
+  const { data: branchesData, isPending: isLoadingBranches } = useBranchesQuery({
     projectRef: project?.parent_project_ref ?? project?.ref,
   })
   const isDefaultProject = project?.parent_project_ref === undefined
@@ -37,7 +37,7 @@ export const ActivityStats = () => {
       )[0]
   }, [branchesData])
 
-  const { data: migrationsData, isLoading: isLoadingMigrations } = useMigrationsQuery({
+  const { data: migrationsData, isPending: isLoadingMigrations } = useMigrationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -46,7 +46,7 @@ export const ActivityStats = () => {
     [migrationsData]
   )
 
-  const { data: backupsData, isLoading: isLoadingBackups } = useBackupsQuery({
+  const { data: backupsData, isPending: isLoadingBackups } = useBackupsQuery({
     projectRef: project?.ref,
   })
   const latestBackup = useMemo(() => {
@@ -143,6 +143,7 @@ export const ActivityStats = () => {
                   'truncate',
                   !latestNonDefaultBranch && 'text-foreground-lighter truncate'
                 )}
+                title={latestNonDefaultBranch?.name ?? 'No branches'}
               >
                 {latestNonDefaultBranch?.name ?? 'No branches'}
               </p>

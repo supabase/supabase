@@ -3,10 +3,13 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import ReactFlow, { Background, Handle, Position, ReactFlowProvider } from 'reactflow'
+
 import 'reactflow/dist/style.css'
 
+import { useParams } from 'common'
 import { BASE_PATH } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
+
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const STATIC_NODES = [
@@ -61,22 +64,25 @@ const STATIC_EDGES = [
   { id: 'e1-4', source: '1', target: '4', type: 'smoothstep', animated: true },
 ]
 
-export const ReplicationComingSoon = ({ projectRef }: { projectRef: string }) => {
+export const ReplicationComingSoon = () => {
   return (
     <ReactFlowProvider>
-      <ReplicationStaticMockup projectRef={projectRef} />
+      <ReplicationStaticMockup />
     </ReactFlowProvider>
   )
 }
 
-const ReplicationStaticMockup = ({ projectRef }: { projectRef: string }) => {
+const ReplicationStaticMockup = () => {
+  const { ref: projectRef = '_' } = useParams()
   const nodes = useMemo(() => STATIC_NODES, [])
   const edges = useMemo(() => STATIC_EDGES, [])
 
   const { resolvedTheme } = useTheme()
 
   const backgroundPatternColor =
-    resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
+    resolvedTheme === 'dark' && projectRef !== '_'
+      ? 'rgba(255, 255, 255, 0.3)'
+      : 'rgba(0, 0, 0, 0.4)'
 
   const nodeTypes = useMemo(
     () => ({

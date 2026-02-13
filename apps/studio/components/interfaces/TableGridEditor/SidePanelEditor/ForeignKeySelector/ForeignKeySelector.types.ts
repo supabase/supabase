@@ -10,3 +10,16 @@ export interface ForeignKey {
   updateAction: string
   toRemove?: boolean
 }
+
+export interface SelectorErrors {
+  columns?: string
+  types?: SelectorTypeError[]
+  typeNotice?: SelectorTypeError[]
+}
+
+export interface SelectorTypeError {
+  source: string
+  sourceType: string
+  target: string
+  targetType: string
+}
