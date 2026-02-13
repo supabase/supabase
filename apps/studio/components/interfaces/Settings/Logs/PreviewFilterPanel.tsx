@@ -94,7 +94,7 @@ const PreviewFilterPanel = ({
   return (
     <div
       className={cn(
-        'flex w-full items-center justify-between overflow-x-scroll no-scrollbar h-[var(--header-height)]',
+        'flex w-full items-center justify-between overflow-x-scroll no-scrollbar h-[calc(var(--header-height)-1px)]',
         condensedLayout ? ' p-3' : '',
         className
       )}
