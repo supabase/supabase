@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { SupabaseService } from '../supabase.service'
 
@@ -13,7 +13,7 @@ export class AuthComponent {
   private readonly supabase = inject(SupabaseService)
   private readonly formBuilder = inject(FormBuilder)
 
-  loading = false
+  loading = signal(false)
   ngOnInit() {
     this.signInForm = this.formBuilder.group({
       email: '',
@@ -22,7 +22,7 @@ export class AuthComponent {
 
   async onSubmit(): Promise<void> {
     try {
-      this.loading = true
+      this.loading.set(true)
       const email = this.signInForm.value.email as string
       const { error } = await this.supabase.signIn(email)
       if (error) throw error
@@ -33,7 +33,7 @@ export class AuthComponent {
       }
     } finally {
       this.signInForm.reset()
-      this.loading = false
+      this.loading.set(false)
     }
   }
 }
