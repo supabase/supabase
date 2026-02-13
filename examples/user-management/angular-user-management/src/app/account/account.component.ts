@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, input } from '@angular/core'
+import { Component, inject, OnInit, input, signal } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { User } from '@supabase/supabase-js'
 import { Profile, SupabaseService } from '../supabase.service'
@@ -12,8 +12,8 @@ import { AvatarComponent } from '../avatar/avatar.component'
   imports: [AvatarComponent, ReactiveFormsModule],
 })
 export class AccountComponent implements OnInit {
-  loading = false
-  profile!: Profile
+  loading = signal(false)
+  profile = signal<Profile | null>(null)
   updateProfileForm!: FormGroup
 
   get avatarUrl() {
@@ -27,7 +27,7 @@ export class AccountComponent implements OnInit {
     await this.updateProfile()
   }
 
-  readonly user = input.required<User>();
+  readonly user = input.required<User>()
 
   private readonly supabase = inject(SupabaseService)
   private readonly formBuilder = inject(FormBuilder)
@@ -43,7 +43,7 @@ export class AccountComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.getProfile()
 
-    const { username, website, avatar_url } = this.profile
+    const { username, website, avatar_url } = this.profile() || {}
     this.updateProfileForm.patchValue({
       username,
       website,
@@ -53,7 +53,7 @@ export class AccountComponent implements OnInit {
 
   async getProfile() {
     try {
-      this.loading = true
+      this.loading.set(true)
       const { data: profile, error, status } = await this.supabase.profile(this.user())
 
       if (error && status !== 406) {
@@ -61,20 +61,20 @@ export class AccountComponent implements OnInit {
       }
 
       if (profile) {
-        this.profile = profile
+        this.profile.set(profile)
       }
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message)
       }
     } finally {
-      this.loading = false
+      this.loading.set(false)
     }
   }
 
   async updateProfile(): Promise<void> {
     try {
-      this.loading = true
+      this.loading.set(true)
 
       const username = this.updateProfileForm.value.username as string
       const website = this.updateProfileForm.value.website as string
@@ -92,7 +92,7 @@ export class AccountComponent implements OnInit {
         alert(error.message)
       }
     } finally {
-      this.loading = false
+      this.loading.set(false)
     }
   }
 

@@ -12,10 +12,10 @@
     <label for="website">Website</label>
     <input formControlName="website" id="website" type="url" />
   </div>
-
+  @let isLoading = loading();
   <div>
-    <button type="submit" class="button primary block" [disabled]="loading">
-      {{ loading ? 'Loading ...' : 'Update' }}
+    <button type="submit" class="button primary block" [disabled]="isLoading">
+      {{ isLoading ? 'Loading ...' : 'Update' }}
     </button>
   </div>
 
