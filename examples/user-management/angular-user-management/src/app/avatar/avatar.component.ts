@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, Input, output, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, effect, inject, input, Input, output, signal } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
 
@@ -6,7 +6,7 @@ import { SupabaseService } from '../supabase.service'
   selector: 'app-avatar',
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.css'],
-  imports: [],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvatarComponent {
   _avatarUrl = signal<SafeResourceUrl | null>(null)

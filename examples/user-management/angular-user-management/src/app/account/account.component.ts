@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, input, signal } from '@angular/core'
+import { Component, inject, OnInit, input, signal, ChangeDetectionStrategy } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { User } from '@supabase/supabase-js'
 import { Profile, SupabaseService } from '../supabase.service'
@@ -10,6 +10,7 @@ import { AvatarComponent } from '../avatar/avatar.component'
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.css'],
   imports: [AvatarComponent, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountComponent implements OnInit {
   loading = signal(false)

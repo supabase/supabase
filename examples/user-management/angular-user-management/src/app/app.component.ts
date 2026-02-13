@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core'
 import { User } from '@supabase/supabase-js'
 import { SupabaseService } from './supabase.service'
 
@@ -10,6 +10,7 @@ import { AuthComponent } from './auth/auth.component'
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   imports: [AccountComponent, AuthComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   private readonly supabase = inject(SupabaseService)
