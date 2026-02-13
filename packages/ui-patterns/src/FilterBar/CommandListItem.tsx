@@ -2,6 +2,7 @@ import { cn } from 'ui'
 
 import { OperatorSymbolBadge } from './OperatorSymbolBadge'
 import { MenuItem } from './types'
+import { getActionItemLabel } from './utils'
 
 export type CommandListItemProps = {
   item: MenuItem
@@ -28,10 +29,11 @@ export function CommandListItem({
         isHighlighted && 'bg-surface-300',
         !isHighlighted && 'hover:bg-surface-200'
       )}
+      data-testid={`filter-menu-item-${item.value}`}
     >
       <span className="flex items-center gap-2">
         {includeIcon && item.icon}
-        {item.label}
+        {getActionItemLabel(item)}
       </span>
       {item.operatorSymbol && <OperatorSymbolBadge symbol={item.operatorSymbol} />}
     </div>
