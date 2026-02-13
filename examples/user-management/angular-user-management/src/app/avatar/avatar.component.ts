@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, Input, output } from '@angular/core'
+import { Component, effect, inject, input, Input, output, signal } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
 
@@ -9,8 +9,8 @@ import { SupabaseService } from '../supabase.service'
   imports: [],
 })
 export class AvatarComponent {
-  _avatarUrl: SafeResourceUrl | undefined
-  uploading = false
+  _avatarUrl = signal<SafeResourceUrl | null>(null)
+  uploading = signal(false)
   avatarUrl = input<string>()
 
   constructor() {
@@ -31,7 +31,7 @@ export class AvatarComponent {
     try {
       const { data } = await this.supabase.downLoadImage(path)
       if (data instanceof Blob) {
-        this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(URL.createObjectURL(data))
+        this._avatarUrl.set(this.dom.bypassSecurityTrustResourceUrl(URL.createObjectURL(data)))
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -42,7 +42,7 @@ export class AvatarComponent {
 
   async uploadAvatar(event: any) {
     try {
-      this.uploading = true
+      this.uploading.set(true)
       if (!event.target.files || event.target.files.length === 0) {
         throw new Error('You must select an image to upload.')
       }
@@ -58,7 +58,7 @@ export class AvatarComponent {
         alert(error.message)
       }
     } finally {
-      this.uploading = false
+      this.uploading.set(false)
     }
   }
 }

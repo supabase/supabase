@@ -1,19 +1,22 @@
+@let currentAvatarUrl = avatarUrl();
 <div>
-  @if (_avatarUrl) {
+  @if (currentAvatarUrl) {
     <img
-      [src]="_avatarUrl"
+      [src]="currentAvatarUrl"
       alt="Avatar"
       class="avatar image"
       style="height: 150px; width: 150px"
       />
   }
 </div>
-@if (!_avatarUrl) {
+@if (!currentAvatarUrl) {
   <div class="avatar no-image" style="height: 150px; width: 150px"></div>
 }
+
+@let  isUploading = uploading();
 <div style="width: 150px">
   <label class="button primary block" for="single">
-    {{ uploading ? "Uploading ..." : "Upload" }}
+    {{ isUploading ? "Uploading ..." : "Upload" }}
   </label>
   <input
     style="visibility: hidden; position: absolute"
@@ -21,6 +24,6 @@
     id="single"
     accept="image/*"
     (change)="uploadAvatar($event)"
-    [disabled]="uploading"
+    [disabled]="isUploading"
     />
 </div>
