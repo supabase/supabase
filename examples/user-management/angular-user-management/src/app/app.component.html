@@ -1,8 +1,9 @@
 <div class="container" style="padding: 50px 0 100px 0">
-  @if (user) {
-    <app-account [user]="user" />
+  @let currentUser = user();
+  @if (currentUser) {
+    <app-account [user]="currentUser" />
   }
-  @if (!user) {
+  @if (!currentUser) {
     <app-auth />
   }
 </div>
