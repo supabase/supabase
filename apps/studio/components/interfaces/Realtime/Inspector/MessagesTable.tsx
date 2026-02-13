@@ -140,11 +140,8 @@ const MessagesTable = ({
 
   return (
     <>
-      <section
-        className="flex w-full flex-col"
-        style={{ maxHeight: 'calc(100vh - var(--header-height) - 3rem)' }}
-      >
-        <ShimmerLine active={enabled} className="absolute top-0" />
+      <section className="flex w-full flex-col md:max-h-[calc(100vh-var(--header-height)-3rem)]">
+        <ShimmerLine active={enabled} />
         <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
           <div className="flex flex-grow flex-col">
             {enabled && (
