@@ -25,13 +25,13 @@ const temp_removePostgrestText = (content: string) => {
   return cleansed
 }
 
-interface DescrptionProps {
+interface DescriptionProps {
   content: string
   metadata: { table?: string; column?: string; rpc?: string }
   onChange: (value: string) => void
 }
 
-const Description = ({ content, metadata, onChange = noop }: DescrptionProps) => {
+const Description = ({ content, metadata, onChange = noop }: DescriptionProps) => {
   const contentText = temp_removePostgrestText(content || '').trim()
   const [value, setValue] = useState(contentText)
   const [isUpdating, setIsUpdating] = useState(false)
