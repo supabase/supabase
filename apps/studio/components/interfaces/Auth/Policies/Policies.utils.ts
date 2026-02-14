@@ -393,7 +393,7 @@ export const generateAiPoliciesForTable = async ({
     // AI response now includes all structured fields
     return aiPolicies as GeneratedPolicy[]
   } catch (error) {
-    console.log('AI policy generation failed:', error)
+    console.error('AI policy generation failed:', error)
     return []
   }
 }
