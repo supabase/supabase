@@ -26,11 +26,9 @@ interface KV {
 }
 
 async function dereference({ input, output }: { input: string; output: string }) {
-  console.log('input', input)
-
   const specRaw = fs.readFileSync(input, 'utf8')
   const spec = JSON.parse(specRaw)
-  const kv = chilrenReducer({}, spec)
+  const kv = childrenReducer({}, spec)
 
   // console.log('kv', kv)
   const dereferenced = dereferenceReducer(spec, kv)
@@ -39,9 +37,9 @@ async function dereference({ input, output }: { input: string; output: string })
   // console.log('JSON.stringify(dereferenced)', JSON.stringify(spec))
 }
 
-function chilrenReducer(acc: KV, child: any): KV {
+function childrenReducer(acc: KV, child: any): KV {
   if (!!child.children) {
-    child.children.forEach((x: any) => chilrenReducer(acc, x))
+    child.children.forEach((x: any) => childrenReducer(acc, x))
   }
 
   const { id }: { id: string } = child
@@ -50,7 +48,7 @@ function chilrenReducer(acc: KV, child: any): KV {
 }
 
 // Recurse through all children, and if the `type.type` == 'reference'
-// then it will add a key "dereferecnced" to the object.
+// then it will add a key "dereferenced" to the object.
 function dereferenceReducer(child: any, kv: KV) {
   if (!!child.children) {
     child.children.forEach((x: any) => dereferenceReducer(x, kv))
