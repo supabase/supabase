@@ -26,7 +26,7 @@ export const Header = () => {
           <img
             src={`${BASE_PATH}/img/supabase-logo.svg`}
             alt="Supabase"
-            className="border-default rounded border p-1 hover:border-white"
+            className="border-default rounded border p-1 hover:border-stronger"
             style={{ height: 24 }}
           />
         </Link>
