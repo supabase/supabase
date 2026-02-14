@@ -1361,7 +1361,7 @@ function createStorageExplorerState({
       }
 
       const t2 = new Date()
-      console.log(
+      console.debug(
         `Total time taken for ${formattedFilesToUpload.length} files: ${((t2 as any) - (t1 as any)) / 1000} seconds`
       )
     },
