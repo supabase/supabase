@@ -3,11 +3,15 @@ import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
 import type { SupaRow } from 'components/grid/types'
 import { queueRowDeletesWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { getCellValue } from 'data/table-rows/get-cell-value-mutation'
+import { fetchSelectedTableRows } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from 'lib/role-impersonation'
 import { Copy, Edit, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { Item, ItemParams, Menu } from 'react-contexify'
 import { toast } from 'sonner'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { DialogSectionSeparator, copyToClipboard } from 'ui'
@@ -26,6 +30,7 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   function onDeleteRow(p: RowContextMenuItemProps) {
     const rowIdx = p.props?.rowIdx
@@ -59,6 +64,19 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     tableEditorSnap.onEditRow(row)
   }
 
+  const buildPkMatch = useCallback(
+    (row: SupaRow): Record<string, any> | null => {
+      const primaryKey = snap.table?.primaryKey
+      if (!primaryKey || primaryKey.length === 0) return null
+      const pkMatch: Record<string, any> = {}
+      for (const col of primaryKey) {
+        pkMatch[col] = row[col]
+      }
+      return pkMatch
+    },
+    [snap.table?.primaryKey]
+  )
+
   const onCopyCellContent = useCallback(
     (p: RowContextMenuItemProps) => {
       const rowIdx = p.props?.rowIdx
@@ -67,13 +85,28 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       const row = rows[rowIdx]
       const columnKey = snap.gridColumns[snap.selectedCellPosition.idx as number].key
 
-      const value = row[columnKey]
-      const text = formatClipboardValue(value)
+      let valuePromise: Promise<string>
 
-      copyToClipboard(text)
-      toast.success('Copied cell value to clipboard')
+      const pkMatch = project ? buildPkMatch(row) : null
+      if (project && pkMatch) {
+        valuePromise = getCellValue({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: { schema: snap.table.schema ?? 'public', name: snap.table.name },
+          column: columnKey,
+          pkMatch,
+        })
+          .then((value) => formatClipboardValue(value))
+          .catch(() => formatClipboardValue(row[columnKey]))
+      } else {
+        valuePromise = Promise.resolve(formatClipboardValue(row[columnKey]))
+      }
+
+      copyToClipboard(valuePromise).then(() => {
+        toast.success('Copied cell value to clipboard')
+      })
     },
-    [rows, snap.gridColumns, snap.selectedCellPosition]
+    [rows, snap.gridColumns, snap.selectedCellPosition, project, snap.table, buildPkMatch]
   )
 
   const onCopyRowContent = useCallback(
@@ -82,10 +115,28 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       if (rowIdx === undefined || rowIdx === null) return
 
       const row = rows[rowIdx]
-      copyToClipboard(JSON.stringify(row))
-      toast.success('Copied row to clipboard')
+
+      let textPromise: Promise<string>
+
+      if (project && snap.table) {
+        textPromise = fetchSelectedTableRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: snap.table,
+          selectedRows: [row],
+          roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+        })
+          .then((fullRows) => JSON.stringify(fullRows.length > 0 ? fullRows[0] : row))
+          .catch(() => JSON.stringify(row))
+      } else {
+        textPromise = Promise.resolve(JSON.stringify(row))
+      }
+
+      copyToClipboard(textPromise).then(() => {
+        toast.success('Copied row to clipboard')
+      })
     },
-    [rows]
+    [rows, project, snap.table, roleImpersonationState]
   )
 
   return (

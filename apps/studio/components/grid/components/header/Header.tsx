@@ -14,7 +14,7 @@ import {
 } from 'components/layouts/TableEditorLayout/ExportAllRows'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { fetchSelectedTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -298,31 +298,51 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   }
 
   const onCopyRows = (type: 'csv' | 'json' | 'sql') => {
-    const rows = allRows.filter((x) => snap.selectedRows.has(x.idx))
+    if (!project) return
 
-    if (type === 'csv') {
-      const csv = formatRowsForCSV({
-        rows,
-        columns: snap.table!.columns.map((column) => column.name),
-      })
-      copyToClipboard(csv)
-    } else if (type === 'sql') {
-      const sqlStatements = formatTableRowsToSQL(snap.table, rows)
-      copyToClipboard(sqlStatements)
-    } else if (type === 'json') {
-      copyToClipboard(JSON.stringify(rows))
-    }
+    const selectedRows = allRows.filter((x) => snap.selectedRows.has(x.idx))
 
-    toast.success('Copied rows to clipboard')
+    const rowsPromise = fetchSelectedTableRows({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      table: snap.table,
+      selectedRows,
+      filters,
+      sorts,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+    }).catch(() => {
+      toast.error('Failed to fetch full row data. Copied data may be truncated.')
+      return selectedRows
+    })
+
+    const textPromise = rowsPromise.then((rows) => {
+      if (type === 'csv') {
+        return formatRowsForCSV({
+          rows,
+          columns: snap.table!.columns.map((column) => column.name),
+        })
+      } else if (type === 'sql') {
+        return formatTableRowsToSQL(snap.table, rows)
+      } else {
+        return JSON.stringify(rows)
+      }
+    })
+
+    copyToClipboard(textPromise).then(() => {
+      toast.success('Copied rows to clipboard')
+    })
   }
 
   const exportParams = snap.allRowsSelected
     ? ({ type: 'fetch_all', filters, sorts } as const)
     : ({
-        type: 'provided_rows',
+        type: 'fetch_selected' as const,
         table: snap.table,
-        rows: allRows.filter((x) => snap.selectedRows.has(x.idx)),
-      } as const)
+        selectedRows: allRows.filter((x) => snap.selectedRows.has(x.idx)),
+        filters,
+        sorts,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+      })
 
   const { exportCsv, confirmationModal: exportCsvConfirmationModal } = useExportAllRowsAsCsv(
     project
