@@ -14,11 +14,13 @@ export const guidesData = {
       name: 'Kubernetes',
       description: 'Helm charts to deploy a Supabase on Kubernetes.',
       href: 'https://github.com/supabase-community/supabase-kubernetes',
+      maintainerNeeded: false,
     },
     {
       name: 'Traefik',
       description: 'A self-hosted Supabase setup with Traefik as a reverse proxy.',
       href: 'https://github.com/supabase-community/supabase-traefik',
+      maintainerNeeded: true,
     },
   ],
 

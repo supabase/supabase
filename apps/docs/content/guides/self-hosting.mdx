@@ -41,7 +41,7 @@ There are several other ways to deploy Supabase with the help of community-drive
           title={
             <span className="flex items-center gap-2">
               {x.name}
-                  <Badge>Maintainer needed</Badge>
+              {x.maintainerNeeded !== false && <Badge>Maintainer needed</Badge>}
             </span>
           }
         >
