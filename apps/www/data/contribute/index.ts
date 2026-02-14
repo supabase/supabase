@@ -147,7 +147,7 @@ export async function getUnansweredThreads(
   }
 
   if (channel && channel !== 'all') {
-    console.log('channel', channel)
+    console.debug('channel', channel)
     query = query.eq('source', channel.toLowerCase())
   }
 
