@@ -73,6 +73,10 @@ const tagQuery = `
   `
 
 async function getLatestRelease(after: string | null = null) {
+  if (!process.env.DOCS_GITHUB_APP_PRIVATE_KEY) {
+    return null
+  }
+
   try {
     const {
       repository: {
@@ -354,7 +358,22 @@ const getContent = async (params: Params) => {
 
     const tag = await getLatestRelease()
     if (!tag) {
-      throw new Error('No latest release found for federated wrappers pages')
+      editLink = `${org}/${repo}`
+      content =
+        `> Note: This page fetches wrapper docs from the external \`${org}/${repo}\` repo at build time.\n` +
+        '>\n' +
+        '> Set `DOCS_GITHUB_APP_PRIVATE_KEY` (and related GitHub App env vars) to enable fetching the latest wrapper docs.\n\n' +
+        `For now, you can view the latest version on: ${externalSite}\n`
+
+      return {
+        pathname:
+          `/guides/database/extensions/wrappers${params.slug?.length ? `/${params.slug.join('/')}` : ''}` satisfies `/${string}`,
+        isExternal,
+        editLink: newEditLink(editLink),
+        meta,
+        content,
+        assetsBaseUrl,
+      }
     }
 
     const repoPath = `${org}/${repo}/${tag}/${docsDir}/${remoteFile}`

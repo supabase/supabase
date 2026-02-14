@@ -89,6 +89,10 @@ export async function getAllTroubleshootingErrors() {
 }
 
 async function getTroubleshootingUpdatedDatesInternal() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return new Map<string, Date>()
+  }
+
   const databaseIds = (await getAllTroubleshootingEntries())
     .map((entry) => entry.data.database_id)
     .filter((id) => !id.startsWith('pseudo-'))

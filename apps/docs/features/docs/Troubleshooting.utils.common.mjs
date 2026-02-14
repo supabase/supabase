@@ -121,7 +121,8 @@ export async function getAllTroubleshootingEntriesInternal() {
     if (!isFile) return null
 
     const fileContents = await readFile(filePath, 'utf-8')
-    const { content, data: frontmatter } = matter(fileContents, {
+    const normalizedContents = fileContents.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+    const { content, data: frontmatter } = matter(normalizedContents, {
       language: 'toml',
       engines: { toml: parse },
     })

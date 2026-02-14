@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { motion } from 'framer-motion'
 import {
   Button,
@@ -13,11 +13,24 @@ import { ChevronsUpDown } from 'lucide-react'
 import TwoOptionToggle from '../../../studio/components/ui/TwoOptionToggle'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
-// Separate Supabase client for survey project
-const externalSupabase = createClient(
-  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY!
-)
+// Separate Supabase client for survey project.
+// Keep it lazy to avoid hard-throwing during Next build when env vars are absent.
+let externalSupabase: SupabaseClient<any, any, any> | null | undefined
+
+function getExternalSupabase() {
+  if (externalSupabase !== undefined) return externalSupabase
+
+  const url = process.env.NEXT_PUBLIC_SURVEY_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY
+
+  if (!url || !anonKey) {
+    externalSupabase = null
+    return externalSupabase
+  }
+
+  externalSupabase = createClient<any>(url, anonKey)
+  return externalSupabase
+}
 
 // Sentinel for “no filter”
 const NO_FILTER = 'unset'
@@ -116,30 +129,35 @@ function useSurveyData(
         setIsLoading(true)
         setError(null)
 
-        let data, fetchError
+        const supabase = getExternalSupabase()
 
-        const functionParamsData = functionParams(activeFilters)
-        const { data: functionData, error: functionError } = await externalSupabase.rpc(
-          functionName,
-          functionParamsData
-        )
-        data = functionData
-        fetchError = functionError
-
-        if (fetchError) {
-          console.error('Error executing SQL query:', fetchError)
-          setError(fetchError.message)
+        if (!supabase) {
+          setError('Survey data is unavailable (missing NEXT_PUBLIC survey Supabase env vars).')
           return
         }
 
+        const functionParamsData = functionParams(activeFilters)
+        const { data: functionData, error: functionError } = await supabase.rpc(
+          functionName,
+          functionParamsData
+        )
+
+        if (functionError) {
+          console.error('Error executing SQL query:', functionError)
+          setError(functionError.message)
+          return
+        }
+
+        const rows = Array.isArray(functionData) ? functionData : []
+
         // Calculate total for percentage calculation
-        const total = data.reduce(
+        const total = rows.reduce(
           (sum: number, row: any) => sum + parseInt(row.count || row.total),
           0
         )
 
         // Transform the data to match chart format
-        const processedData = data.map((row: any) => {
+        const processedData = rows.map((row: any) => {
           const count = parseInt(row.count || row.total)
           const rawPercentage = total > 0 ? (count / total) * 100 : 0
           const roundedPercentage = Math.round(rawPercentage)

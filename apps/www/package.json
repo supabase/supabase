@@ -14,7 +14,7 @@
     "pretypecheck": "next typegen",
     "typecheck": "pnpm run content:build && tsc --noEmit",
     "content:build": "node scripts/generateStaticContent.mjs",
-    "postbuild": "node ./internals/generate-sitemap.mjs && ./../../scripts/upload-static-assets.sh"
+    "postbuild": "node ./internals/generate-sitemap.mjs && node -e \"const { spawnSync } = require('node:child_process'); if (process.platform === 'win32' || process.env.SKIP_ASSET_UPLOAD === '1') process.exit(0); const r = spawnSync('bash', ['./../../scripts/upload-static-assets.sh'], { stdio: 'inherit' }); process.exit(r.status ?? 1);\""
   },
   "dependencies": {
     "@bsmnt/scrollytelling": "^0.3.3",

@@ -24,7 +24,7 @@
     "last-changed:reset": "pnpm run last-changed -- --reset",
     "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
-    "postbuild": "pnpm run build:sitemap && pnpm run build:llms && ./../../scripts/upload-static-assets.sh",
+    "postbuild": "pnpm run build:sitemap && pnpm run build:llms && node -e \"const { spawnSync } = require('node:child_process'); if (process.platform === 'win32' || process.env.SKIP_ASSET_UPLOAD === '1') process.exit(0); const r = spawnSync('bash', ['./../../scripts/upload-static-assets.sh'], { stdio: 'inherit' }); process.exit(r.status ?? 1);\"",
     "prebuild": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
     "predev": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
     "preembeddings": "pnpm run codegen:references",

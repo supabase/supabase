@@ -7,6 +7,8 @@ const { getCSP } = require('./csp')
 // Required for nextjs standalone build
 const path = require('path')
 
+const isWindows = process.platform === 'win32'
+
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN
   if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
@@ -32,7 +34,7 @@ function getAssetPrefix() {
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
-  output: 'standalone',
+  ...(isWindows ? {} : { output: 'standalone' }),
   async rewrites() {
     return [
       {
