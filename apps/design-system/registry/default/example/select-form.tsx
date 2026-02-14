@@ -4,23 +4,22 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
 import {
   Button,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Select_Shadcn_,
+  Form_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
 } from 'ui'
+import { z } from 'zod'
 
 const FormSchema = z.object({
   email: z

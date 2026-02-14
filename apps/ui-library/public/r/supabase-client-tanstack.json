@@ -12,12 +12,12 @@
   "files": [
     {
       "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
+      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\r\nimport { createBrowserClient } from '@supabase/ssr'\r\n\r\nexport function createClient() {\r\n  return createBrowserClient(\r\n    import.meta.env.VITE_SUPABASE_URL!,\r\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\r\n  )\r\n}\r\n",
       "type": "registry:lib"
     },
     {
       "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-      "content": "import { createServerClient } from '@supabase/ssr'\nimport { parseCookies, setCookie } from '@tanstack/react-start/server'\n\nexport function createClient() {\n  return createServerClient(\n    process.env.VITE_SUPABASE_URL!,\n    process.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return Object.entries(parseCookies()).map(\n            ([name, value]) =>\n              ({\n                name,\n                value,\n              }) as { name: string; value: string }\n          )\n        },\n        setAll(cookies) {\n          cookies.forEach((cookie) => {\n            setCookie(cookie.name, cookie.value)\n          })\n        },\n      },\n    }\n  )\n}\n",
+      "content": "import { createServerClient } from '@supabase/ssr'\r\nimport { parseCookies, setCookie } from '@tanstack/react-start/server'\r\n\r\nexport function createClient() {\r\n  return createServerClient(\r\n    process.env.VITE_SUPABASE_URL!,\r\n    process.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\r\n    {\r\n      cookies: {\r\n        getAll() {\r\n          return Object.entries(parseCookies()).map(\r\n            ([name, value]) =>\r\n              ({\r\n                name,\r\n                value,\r\n              }) as { name: string; value: string }\r\n          )\r\n        },\r\n        setAll(cookies) {\r\n          cookies.forEach((cookie) => {\r\n            setCookie(cookie.name, cookie.value)\r\n          })\r\n        },\r\n      },\r\n    }\r\n  )\r\n}\r\n",
       "type": "registry:lib"
     }
   ],

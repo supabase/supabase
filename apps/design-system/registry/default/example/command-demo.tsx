@@ -1,7 +1,5 @@
 import { Calculator, Calendar, CreditCard, Settings, Smile, User } from 'lucide-react'
-
 import {
-  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -9,6 +7,7 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   CommandShortcut_Shadcn_,
+  Command_Shadcn_,
 } from 'ui'
 
 export default function CommandDemo() {

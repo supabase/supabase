@@ -1,6 +1,7 @@
 'use client'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns'
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+import { TOCItems, TOCScrollArea, Toc } from 'ui-patterns'
+import { AnchorProvider, type AnchorProviderProps } from 'ui-patterns'
 
 export default function MultiSelectDemo() {
   return (
@@ -154,8 +155,6 @@ const TocComponent = () => {
     </Toc>
   )
 }
-
-import { type AnchorProviderProps, AnchorProvider } from 'ui-patterns'
 
 interface TOCHeader {
   id?: string

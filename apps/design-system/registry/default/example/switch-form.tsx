@@ -3,18 +3,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
 import {
   Button,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
+  Form_Shadcn_,
   Switch,
 } from 'ui'
+import { z } from 'zod'
 
 const FormSchema = z.object({
   marketing_emails: z.boolean().default(false).optional(),
