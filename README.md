@@ -266,7 +266,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Lithuanian / lietuvių](/i18n/README.lt.md)
 - [Latvian / latviski](/i18n/README.lv.md)
 - [Malay / Bahasa Malaysia](/i18n/README.ms.md)
-- [Marathi / मराठी](i18n/README.mr.md)
+- [Marathi / मराठी](/i18n/README.mr.md)
 - [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb.md)
 - [Persian / فارسی](/i18n/README.fa.md)
 - [Polish / Polski](/i18n/README.pl.md)
