@@ -46,9 +46,8 @@ const Step = ({ children, title, step }) => {
   const { ref } = useInView({
     rootMargin: '10px 20px 30px 40px',
     threshold: 1,
-    onChange: (inView, entry) => {
-      if (window.scrollY === 0) console.log('out of view', title)
-      if (inView) console.log('in view', title) // highlightSelectedTocItem(entry.target.id)
+    onChange: (_inView, _entry) => {
+      // Intentionally empty — highlighting logic removed
     },
   })
 
