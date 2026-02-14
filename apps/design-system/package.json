@@ -12,9 +12,9 @@
     "start": "next start",
     "lint": "eslint .",
     "content:dev": "contentlayer2 dev",
-    "content:build": "contentlayer2 build",
+    "content:build": "node -e \"const path=require('node:path');const{spawnSync}=require('node:child_process');const pkgJson=process.env.npm_package_json;if(!pkgJson){console.error('npm_package_json is undefined');process.exit(1);}const dir=path.dirname(pkgJson);const config=path.join(dir,'contentlayer.config.js');const env={...process.env,INIT_CWD:dir,PWD:dir.replace(/\\\\/g,'/')};const r=spawnSync('contentlayer2',['build','-c',config],{stdio:'inherit',shell:true,cwd:dir,env});process.exit(r.status??1);\"",
     "clean": "rimraf node_modules .next .turbo",
-    "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
+    "typecheck": "node -e \"const path=require('node:path');const{spawnSync}=require('node:child_process');const pkgJson=process.env.npm_package_json;if(!pkgJson){console.error('npm_package_json is undefined');process.exit(1);}const dir=path.dirname(pkgJson);const config=path.join(dir,'contentlayer.config.js');const env={...process.env,INIT_CWD:dir,PWD:dir.replace(/\\\\/g,'/')};const r=spawnSync('contentlayer2',['build','-c',config],{stdio:'inherit',shell:true,cwd:dir,env});process.exit(r.status??1);\" && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
