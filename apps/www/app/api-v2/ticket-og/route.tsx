@@ -67,7 +67,7 @@ export async function GET(req: Request) {
       .eq('username', username)
       .maybeSingle()
 
-    if (error) console.log('Failed to fetch user. Inner error:', error.message)
+    if (error) console.error('Failed to fetch user. Inner error:', error.message)
     if (!user) throw new Error(error?.message ?? 'user not found')
 
     const FONT_SANS = fetch(new URL(FONT_URLS['SANS'], import.meta.url)).then((res) =>
