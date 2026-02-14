@@ -44,7 +44,7 @@ export const DecryptedReadOnlyInput = ({
     : value
 
   return (
-    <CardContent className="py-6 border-b border-panel-border-interior-light">
+    <CardContent className="py-6 border-b border-muted">
       <FormItemLayout
         layout="horizontal"
         label={

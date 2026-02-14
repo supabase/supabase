@@ -124,13 +124,7 @@ export const DisplayApiSettings = ({
         </div>
       ) : (
         apiKeys.map((x, i: number) => (
-          <Panel.Content
-            key={x.api_key}
-            className={
-              i >= 1 &&
-              'border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark'
-            }
-          >
+          <Panel.Content key={x.api_key} className={i >= 1 && 'border-t border-muted'}>
             <FormLayout
               layout="horizontal"
               label={

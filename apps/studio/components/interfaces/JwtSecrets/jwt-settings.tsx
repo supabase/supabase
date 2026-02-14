@@ -187,7 +187,7 @@ const JWTSettings = () => {
                 </div>
               }
             >
-              <Panel.Content className="space-y-6 border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+              <Panel.Content className="space-y-6 border-t border-muted">
                 {isError ? (
                   <div className="flex items-center justify-center py-8 space-x-2">
                     <AlertCircle size={16} strokeWidth={1.5} />
