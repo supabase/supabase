@@ -1,6 +1,7 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
+import { ChevronDown } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import React, { useEffect, useRef } from 'react'
@@ -32,6 +33,9 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const { resolvedTheme } = useTheme()
   const activeItem = props.subItem.url === pathname
   const activeItemRef = useRef<HTMLLIElement>(null)
+
+  const isChildActive =
+    props.subItem.items && props.subItem.items.some((child: any) => child.url === pathname)
 
   const LinkContainer = (props) => {
     const isExternal = props.url.startsWith('https://')
@@ -67,7 +71,62 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
           </span>
         </>
       )}
-      <Accordion.Item key={props.subItem.label} value={props.subItem.url}>
+      {props.subItem.items && props.subItem.items.length > 0 ? (
+        <Accordion.Root
+          collapsible
+          type="single"
+          className="space-y-0.5"
+          defaultValue={isChildActive ? props.subItem.url : undefined}
+        >
+          <Accordion.Item key={props.subItem.url || props.subItem.name} value={props.subItem.url}>
+            <Accordion.Trigger
+              className={[
+                'flex items-center gap-2 w-full',
+                'cursor-pointer transition text-sm',
+                activeItem
+                  ? 'text-brand-link font-medium'
+                  : 'hover:text-foreground text-foreground-lighter',
+              ].join(' ')}
+            >
+              <span className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  {props.subItem.icon && (
+                    <Image
+                      alt={props.subItem.name}
+                      src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
+                      width={15}
+                      height={15}
+                    />
+                  )}
+                  {props.subItem.name}
+                </div>
+                <ChevronDown className="w-4 h-4 transition-transform data-open-parent:rotate-180" />
+              </span>
+            </Accordion.Trigger>
+            <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
+              {props.subItem.items
+                .filter((subItem) => subItem.enabled !== false)
+                .map((subSubItem) => {
+                  return (
+                    <li key={`${props.subItem.name}-${subSubItem.url}`}>
+                      <Link
+                        href={`${subSubItem.url}`}
+                        className={[
+                          'cursor-pointer transition text-sm',
+                          subSubItem.url === pathname
+                            ? 'text-brand-link'
+                            : 'hover:text-brand-link text-foreground-lighter',
+                        ].join(' ')}
+                      >
+                        {subSubItem.name}
+                      </Link>
+                    </li>
+                  )
+                })}
+            </Accordion.Content>
+          </Accordion.Item>
+        </Accordion.Root>
+      ) : (
         <li key={props.subItem.name} ref={activeItem ? activeItemRef : null}>
           <LinkContainer
             url={props.subItem.url}
@@ -80,42 +139,20 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
             ].join(' ')}
             parent={props.subItem.parent}
           >
-            {props.subItem.icon && (
-              <Image
-                alt={props.subItem.name}
-                src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
-                width={15}
-                height={15}
-              />
-            )}
-            {props.subItem.name}
+            <div className="flex items-center gap-2">
+              {props.subItem.icon && (
+                <Image
+                  alt={props.subItem.name}
+                  src={`${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
+                  width={15}
+                  height={15}
+                />
+              )}
+              {props.subItem.name}
+            </div>
           </LinkContainer>
         </li>
-
-        {props.subItem.items && props.subItem.items.length > 0 && (
-          <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-            {props.subItem.items
-              .filter((subItem) => subItem.enabled !== false)
-              .map((subSubItem) => {
-                return (
-                  <li key={props.subItem.name}>
-                    <Link
-                      href={`${subSubItem.url}`}
-                      className={[
-                        'cursor-pointer transition text-sm',
-                        subSubItem.url === pathname
-                          ? 'text-brand-link'
-                          : 'hover:text-brand-link text-foreground-lighter',
-                      ].join(' ')}
-                    >
-                      {subSubItem.name}
-                    </Link>
-                  </li>
-                )
-              })}
-          </Accordion.Content>
-        )}
-      </Accordion.Item>
+      )}
     </>
   )
 })

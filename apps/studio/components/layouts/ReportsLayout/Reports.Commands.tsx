@@ -77,7 +77,7 @@ export function useReportsGotoCommands(options?: CommandOptions) {
           {
             id: QUERY_PERFORMANCE_COMMAND_ID,
             name: 'Query Performance Reports',
-            route: `/project/${ref}/advisors/query-performance`,
+            route: `/project/${ref}/reports/query-performance`,
             defaultHidden: true,
           },
         ]

@@ -2070,7 +2070,7 @@ functions:
               (2, 'viola'),
               (3, 'cello');
             ```
-        reponse: |
+        response: |
           ```json
           {
             "data": [
@@ -3059,6 +3059,19 @@ functions:
           ```swift
           supabase.realtime.removeAllChannels()
           ```
+
+  - id: file-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with File Buckets.
+  # - id: analytics-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Analytics Buckets.
+  # - id: vector-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Vector Buckets.
 
   - id: list-buckets
     title: listBuckets()

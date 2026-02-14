@@ -2,9 +2,10 @@ import { ChevronRight, ChevronsDown, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { ElementRef, forwardRef } from 'react'
 import {
+  cn,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -16,9 +17,9 @@ import {
   TooltipContent,
   TooltipTrigger,
   TreeViewItemVariant,
-  cn,
 } from 'ui'
-import ShimmeringLoader from '../ShimmeringLoader'
+
+import { ShimmeringLoader } from '../ShimmeringLoader'
 
 const InnerSideBarTitle = forwardRef<HTMLSpanElement, React.ComponentPropsWithoutRef<'span'>>(
   (props, ref) => {
@@ -204,7 +205,7 @@ const InnerSideBarFilterSearchInput = forwardRef<
         />
       ) : (
         <Search
-          className="absolute left-2 top-2 text-foreground-muted"
+          className="absolute left-2 top-0 bottom-0 my-auto text-foreground-muted"
           size={14}
           strokeWidth={1.5}
         />

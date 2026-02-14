@@ -1,11 +1,15 @@
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { CommandOptions } from 'ui-patterns/CommandMenu'
-import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+import { useRouter } from 'next/router'
+import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
+import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
+  const router = useRouter()
+  const setIsOpen = useSetCommandMenuOpen()
   let { ref } = useParams()
   ref ||= '_'
 
@@ -42,7 +46,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-api',
         name: 'API Settings',
-        route: `/project/${ref}/settings/api`,
+        route: `/project/${ref}/integrations/data_api/settings`,
         defaultHidden: true,
       },
       {
@@ -88,25 +92,35 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-database-password',
         name: 'Database password',
-        route: `/project/${ref}/settings/general#database-password`,
+        route: `/project/${ref}/database/settings#database-password`,
         defaultHidden: true,
       },
       {
         id: 'nav-project-settings-connection-string',
         name: 'Connection string',
-        route: `/project/${ref}/settings/general#connection-string`,
+        action: () => {
+          router.push(
+            {
+              pathname: router.pathname,
+              query: { ...router.query, showConnect: 'true' },
+            },
+            undefined,
+            { shallow: true }
+          )
+          setIsOpen(false)
+        },
         defaultHidden: true,
-      },
+      } as ICommand,
       {
         id: 'nav-project-settings-connection-pooling',
         name: 'Connection pooling',
-        route: `/project/${ref}/settings/general#connection-pooling`,
+        route: `/project/${ref}/database/settings#connection-pooler`,
         defaultHidden: true,
       },
       {
         id: 'nav-project-settings-ssl-configuration',
         name: 'SSL configuration',
-        route: `/project/${ref}/settings/general#ssl-configuration`,
+        route: `/project/${ref}/database/settings#ssl-configuration`,
         defaultHidden: true,
       },
       {

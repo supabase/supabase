@@ -29,6 +29,9 @@ export type QueryPerformanceQueryOpts = {
   orderBy?: QueryPerformanceSort
   roles?: string[]
   runIndexAdvisor?: boolean
+  minCalls?: number
+  minTotalTime?: number
+  filterIndexAdvisor?: boolean
 }
 
 export const useQueryPerformanceQuery = ({
@@ -37,6 +40,9 @@ export const useQueryPerformanceQuery = ({
   searchQuery = '',
   roles,
   runIndexAdvisor = false,
+  minCalls,
+  minTotalTime,
+  filterIndexAdvisor = false,
 }: QueryPerformanceQueryOpts) => {
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
@@ -46,6 +52,10 @@ export const useQueryPerformanceQuery = ({
       ? `auth.rolname in (${roles.map((r) => `'${r}'`).join(', ')})`
       : '',
     searchQuery.length > 0 ? `statements.query ~* '${searchQuery}'` : '',
+    typeof minCalls === 'number' && minCalls > 0 ? `statements.calls >= ${minCalls}` : '',
+    typeof minTotalTime === 'number' && minTotalTime > 0
+      ? `(statements.total_exec_time + statements.total_plan_time) >= ${minTotalTime}`
+      : '',
   ]
     .filter((x) => x.length > 0)
     .join(' AND ')
@@ -55,7 +65,8 @@ export const useQueryPerformanceQuery = ({
     [],
     whereSql.length > 0 ? `WHERE ${whereSql}` : undefined,
     orderBySql,
-    runIndexAdvisor
+    runIndexAdvisor,
+    filterIndexAdvisor
   )
   return useDbQuery({
     sql,

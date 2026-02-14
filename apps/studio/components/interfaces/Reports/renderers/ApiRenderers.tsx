@@ -1,30 +1,47 @@
-import sumBy from 'lodash/sumBy'
-import { ChevronRight } from 'lucide-react'
-import { Fragment, useState } from 'react'
-
 import { useParams } from 'common'
+import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
-  jsonSyntaxHighlight,
+  MAP_CHART_THEME,
+  buildCountsByIso2,
+  computeMarkerRadius,
+  extractIso2FromFeatureProps,
+  getFillColor,
+  getFillOpacity,
+  isKnownCountryCode,
+  isMicroCountry,
+  iso2ToCountryName,
+} from 'components/interfaces/Reports/utils/geo'
+import {
   TextFormatter,
+  jsonSyntaxHighlight,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import BarChart from 'components/ui/Charts/BarChart'
+import { geoCentroid } from 'd3-geo'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { ResponseError } from 'types'
+import { BASE_PATH } from 'lib/constants'
+import sumBy from 'lodash/sumBy'
+import { ChevronRight } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { Fragment, useRef, useState } from 'react'
+import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
+import type { ResponseError } from 'types'
 import {
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Collapsible,
-  WarningIcon,
-  Collapsible_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
   CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  WarningIcon,
 } from 'ui'
-import { queryParamsToObject } from '../Reports.utils'
+import * as z from 'zod'
+
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
+import { queryParamsToObject } from '../Reports.utils'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -33,14 +50,14 @@ export const NetworkTrafficRenderer = (
     egress: number
   }>
 ) => {
-  const { data, error, isError } = useFillTimeseriesSorted(
-    props.data,
-    'timestamp',
-    ['ingress_mb', 'egress_mb'],
-    0,
-    props.params?.iso_timestamp_start,
-    props.params?.iso_timestamp_end
-  )
+  const { data, error, isError } = useFillTimeseriesSorted({
+    data: props.data,
+    timestampKey: 'timestamp',
+    valueKey: ['ingress_mb', 'egress_mb'],
+    defaultValue: 0,
+    startDate: props.params?.iso_timestamp_start,
+    endDate: props.params?.iso_timestamp_end,
+  })
 
   const totalIngress = sumBy(props.data, 'ingress_mb')
   const totalEgress = sumBy(props.data, 'egress_mb')
@@ -59,7 +76,7 @@ export const NetworkTrafficRenderer = (
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve network traffic</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
   }
@@ -104,14 +121,14 @@ export const TotalRequestsChartRenderer = (
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
-  const { data, error, isError } = useFillTimeseriesSorted(
-    props.data,
-    'timestamp',
-    'count',
-    0,
-    props.params?.iso_timestamp_start,
-    props.params?.iso_timestamp_end
-  )
+  const { data, error, isError } = useFillTimeseriesSorted({
+    data: props.data,
+    timestampKey: 'timestamp',
+    valueKey: 'count',
+    defaultValue: 0,
+    startDate: props.params?.iso_timestamp_start,
+    endDate: props.params?.iso_timestamp_end,
+  })
 
   if (!!props.error) {
     const error = (
@@ -123,7 +140,7 @@ export const TotalRequestsChartRenderer = (
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve total requests</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
   }
@@ -236,14 +253,14 @@ export const ErrorCountsChartRenderer = (
     return acc + datum.count
   }, 0)
 
-  const { data, error, isError } = useFillTimeseriesSorted(
-    props.data,
-    'timestamp',
-    'count',
-    0,
-    props.params?.iso_timestamp_start,
-    props.params?.iso_timestamp_end
-  )
+  const { data, error, isError } = useFillTimeseriesSorted({
+    data: props.data,
+    timestampKey: 'timestamp',
+    valueKey: 'count',
+    defaultValue: 0,
+    startDate: props.params?.iso_timestamp_start,
+    endDate: props.params?.iso_timestamp_end,
+  })
 
   if (!!props.error) {
     const error = (
@@ -255,7 +272,7 @@ export const ErrorCountsChartRenderer = (
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve request errors</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
   }
@@ -285,14 +302,14 @@ export const ResponseSpeedChartRenderer = (
     avg: datum.avg,
   }))
 
-  const { data, error, isError } = useFillTimeseriesSorted(
-    transformedData,
-    'timestamp',
-    'avg',
-    0,
-    props.params?.iso_timestamp_start,
-    props.params?.iso_timestamp_end
-  )
+  const { data, error, isError } = useFillTimeseriesSorted({
+    data: transformedData,
+    timestampKey: 'timestamp',
+    valueKey: 'avg',
+    defaultValue: 0,
+    startDate: props.params?.iso_timestamp_start,
+    endDate: props.params?.iso_timestamp_end,
+  })
 
   const lastAvg = props.data[props.data.length - 1]?.avg
 
@@ -306,7 +323,7 @@ export const ResponseSpeedChartRenderer = (
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve response speeds</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
   }
@@ -385,3 +402,247 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
     </CollapsibleContent_Shadcn_>
   </Collapsible_Shadcn_>
 )
+export const RequestsByCountryMapRenderer = (
+  props: ReportWidgetProps<{
+    country: string | null
+    count: number
+  }>
+) => {
+  const WORLD_TOPO_URL = `${BASE_PATH}/json/worldmap.json`
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [hoverInfo, setHoverInfo] = useState<{
+    x: number
+    y: number
+    title: string
+    subtitle: string
+    visible: boolean
+  }>({ x: 0, y: 0, title: '', subtitle: '', visible: false })
+
+  const countsByIso2 = buildCountsByIso2(props.data)
+  const max = Object.values(countsByIso2).reduce((m, v) => (v > m ? v : m), 0)
+  const { resolvedTheme } = useTheme()
+  const theme = resolvedTheme === 'dark' ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
+
+  if (!!props.error) {
+    const AlertErrorSchema = z.object({ message: z.string() })
+    const parsed =
+      typeof props.error === 'string'
+        ? { success: true, data: { message: props.error } }
+        : AlertErrorSchema.safeParse(props.error)
+    const alertError = parsed.success ? parsed.data : null
+    return <AlertError subject="Failed to retrieve requests by geography" error={alertError} />
+  }
+
+  return (
+    <div ref={containerRef} className="w-full h-[420px] relative border-t">
+      <ComposableMap
+        projection="geoMercator"
+        projectionConfig={{ scale: 155 }}
+        className="w-full h-full"
+        style={{ backgroundColor: theme.oceanFill }}
+      >
+        <ZoomableGroup minZoom={1} maxZoom={5} zoom={1.3}>
+          <Geographies geography={WORLD_TOPO_URL}>
+            {({ geographies }) => (
+              <>
+                {geographies.map((geo) => {
+                  const title =
+                    (geo.properties?.name as string) ||
+                    (geo.properties?.NAME as string) ||
+                    'Unknown'
+                  const iso2 = extractIso2FromFeatureProps(
+                    (geo.properties || undefined) as Record<string, unknown> | undefined
+                  )
+                  // Skip Antarctica entirely (causes hover issues)
+                  if ((title || '').toLowerCase() === 'antarctica') {
+                    return null
+                  }
+                  const value = iso2 ? countsByIso2[iso2] || 0 : 0
+                  const baseOpacity = getFillOpacity(value, max, theme)
+                  const tooltipTitle = title
+                  const tooltipSubtitle = `${value.toLocaleString()} requests`
+                  return (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      onMouseMove={(e) => {
+                        const rect = containerRef.current?.getBoundingClientRect()
+                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                        setHoverInfo({
+                          x,
+                          y,
+                          title: tooltipTitle,
+                          subtitle: tooltipSubtitle,
+                          visible: true,
+                        })
+                      }}
+                      onMouseEnter={(e) => {
+                        const rect = containerRef.current?.getBoundingClientRect()
+                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                        setHoverInfo({
+                          x,
+                          y,
+                          title: tooltipTitle,
+                          subtitle: tooltipSubtitle,
+                          visible: true,
+                        })
+                      }}
+                      onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
+                      style={{
+                        default: {
+                          fill: getFillColor(value, max, theme),
+                          stroke: theme.boundaryStroke,
+                          strokeWidth: 0.4,
+                          opacity: baseOpacity,
+                          outline: 'none',
+                          cursor: 'default',
+                        },
+                        hover: {
+                          fill: getFillColor(value, max, theme),
+                          stroke: 'transparent',
+                          strokeWidth: 0,
+                          opacity: Math.max(0, baseOpacity * 0.8),
+                          outline: 'none',
+                          cursor: 'default',
+                        },
+                        pressed: {
+                          fill: getFillColor(value, max, theme),
+                          stroke: 'transparent',
+                          strokeWidth: 0,
+                          opacity: Math.max(0, baseOpacity * 0.8),
+                          outline: 'none',
+                          cursor: 'default',
+                        },
+                      }}
+                      aria-label={`${tooltipTitle} — ${tooltipSubtitle}`}
+                    />
+                  )
+                })}
+
+                {geographies.map((geo) => {
+                  const title =
+                    (geo.properties?.name as string) ||
+                    (geo.properties?.NAME as string) ||
+                    'Unknown'
+                  if (!isMicroCountry(title)) return null
+                  const iso2 = extractIso2FromFeatureProps(
+                    (geo.properties || undefined) as Record<string, unknown> | undefined
+                  )
+                  const value = iso2 ? countsByIso2[iso2] || 0 : 0
+                  if (value <= 0) return null
+                  const [lon, lat] = geoCentroid(geo)
+                  const r = computeMarkerRadius(value, max)
+                  const tooltipTitle = title
+                  const tooltipSubtitle = `${value.toLocaleString()} requests`
+                  return (
+                    <Marker
+                      key={`marker-${geo.rsmKey}`}
+                      coordinates={[lon, lat]}
+                      onMouseMove={(e) => {
+                        const rect = containerRef.current?.getBoundingClientRect()
+                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                        setHoverInfo({
+                          x,
+                          y,
+                          title: tooltipTitle,
+                          subtitle: tooltipSubtitle,
+                          visible: true,
+                        })
+                      }}
+                      onMouseEnter={(e) => {
+                        const rect = containerRef.current?.getBoundingClientRect()
+                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                        setHoverInfo({
+                          x,
+                          y,
+                          title: tooltipTitle,
+                          subtitle: tooltipSubtitle,
+                          visible: true,
+                        })
+                      }}
+                      onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
+                    >
+                      <circle r={r} fill={theme.markerFill} />
+                    </Marker>
+                  )
+                })}
+
+                {(() => {
+                  const present = new Set<string>()
+                  for (const g of geographies) {
+                    const code = extractIso2FromFeatureProps(
+                      (g.properties || undefined) as Record<string, unknown> | undefined
+                    )
+                    if (code) present.add(code)
+                  }
+
+                  const markers: JSX.Element[] = []
+                  for (const iso2 in countsByIso2) {
+                    const count = countsByIso2[iso2]
+                    if (count <= 0) continue
+                    // Do not render Antarctica
+                    if (iso2.toUpperCase() === 'AQ') continue
+                    if (present.has(iso2)) continue
+                    if (!isKnownCountryCode(iso2)) continue
+                    const ll = COUNTRY_LAT_LON[iso2]
+                    const r = computeMarkerRadius(count, max)
+                    const tooltipTitle = iso2ToCountryName(iso2)
+                    const tooltipSubtitle = `${count.toLocaleString()} requests`
+                    markers.push(
+                      <Marker
+                        key={`fallback-${iso2}`}
+                        coordinates={[ll.lon, ll.lat]}
+                        onMouseMove={(e) => {
+                          const rect = containerRef.current?.getBoundingClientRect()
+                          const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                          const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                          setHoverInfo({
+                            x,
+                            y,
+                            title: tooltipTitle,
+                            subtitle: tooltipSubtitle,
+                            visible: true,
+                          })
+                        }}
+                        onMouseEnter={(e) => {
+                          const rect = containerRef.current?.getBoundingClientRect()
+                          const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                          const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                          setHoverInfo({
+                            x,
+                            y,
+                            title: tooltipTitle,
+                            subtitle: tooltipSubtitle,
+                            visible: true,
+                          })
+                        }}
+                        onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
+                      >
+                        <circle r={r} fill={theme.markerFill} />
+                      </Marker>
+                    )
+                  }
+
+                  return markers
+                })()}
+              </>
+            )}
+          </Geographies>
+        </ZoomableGroup>
+      </ComposableMap>
+      {hoverInfo.visible && (
+        <div
+          className="pointer-events-none absolute z-10 rounded bg-surface-100 p-1.5 border border-surface-200 text-sm"
+          style={{ left: hoverInfo.x, top: hoverInfo.y }}
+        >
+          <h3 className="text-foreground-lighter text-sm">{hoverInfo.title}</h3>
+          <p className="text-foreground text-sm">{hoverInfo.subtitle}</p>
+        </div>
+      )}
+    </div>
+  )
+}

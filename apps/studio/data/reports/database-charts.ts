@@ -2,214 +2,10 @@ import { numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
 import { Project } from '../projects/project-detail-query'
-
-export const getReportAttributes = (diskConfig?: DiskAttributesData): ReportAttributes[] => {
-  return [
-    {
-      id: 'ram-usage',
-      label: 'Memory usage',
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      showMaxValue: false,
-      showGrid: false,
-      syncId: 'database-reports',
-      valuePrecision: 0,
-      format: '%',
-      attributes: [
-        {
-          attribute: 'ram_usage',
-          provider: 'infra-monitoring',
-          label: 'Memory usage',
-          format: '%',
-          tooltip: 'RAM usage by the database',
-        },
-      ],
-    },
-    {
-      id: 'avg_cpu_usage',
-      label: 'Average CPU usage',
-      syncId: 'database-reports',
-      format: '%',
-      valuePrecision: 2,
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      showGrid: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'avg_cpu_usage',
-          provider: 'infra-monitoring',
-          label: 'Average CPU usage',
-          format: '%',
-          tooltip: 'Average CPU usage',
-        },
-      ],
-    },
-    {
-      id: 'max_cpu_usage',
-      label: 'Max CPU usage',
-      syncId: 'database-reports',
-      format: '%',
-      valuePrecision: 2,
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      showGrid: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'max_cpu_usage',
-          provider: 'infra-monitoring',
-          label: 'Max CPU usage',
-          format: '%',
-          tooltip: 'Max CPU usage',
-        },
-      ],
-    },
-    {
-      id: 'disk-iops',
-      label: 'Disk Input/Output operations per second (IOPS)',
-      syncId: 'database-reports',
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: true,
-      valuePrecision: 2,
-      showLegend: true,
-      hideChartType: false,
-      showGrid: true,
-      showMaxValue: false,
-      YAxisProps: {
-        width: 35,
-        tickFormatter: (value: any) => numberFormatter(value, 2),
-      },
-      defaultChartStyle: 'line',
-      docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#compute-size`,
-      attributes: [
-        {
-          attribute: 'disk_iops_write',
-          provider: 'infra-monitoring',
-          label: 'Write IOPS',
-          tooltip:
-            'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
-        },
-        {
-          attribute: 'disk_iops_read',
-          provider: 'infra-monitoring',
-          label: 'Read IOPS',
-          tooltip:
-            'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
-        },
-        {
-          attribute: 'disk_iops_max',
-          provider: 'reference-line',
-          label: 'Max IOPS',
-          value: diskConfig?.attributes?.iops,
-          tooltip:
-            'Maximum IOPS (Input/Output Operations Per Second) for your current compute size',
-          isMaxValue: true,
-        },
-      ],
-    },
-    {
-      id: 'disk-io-usage',
-      label: 'Disk IO Usage',
-      syncId: 'database-reports',
-      availableIn: ['team', 'enterprise'],
-      hide: false,
-      format: '%',
-      attributes: [],
-    },
-    {
-      id: 'pooler-database-connections',
-      label: 'Pooler to Database connections',
-      syncId: 'database-reports',
-      valuePrecision: 0,
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      hideChartType: false,
-      showGrid: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'pg_stat_database_num_backends',
-          provider: 'infra-monitoring',
-          label: 'Database connections',
-          tooltip: 'Number of pooler connections to the database',
-        },
-      ],
-    },
-    {
-      id: 'supavisor-connections',
-      label: 'Shared Pooler connections',
-      syncId: 'database-reports',
-      valuePrecision: 0,
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      showGrid: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'supavisor_connections_active',
-          provider: 'infra-monitoring',
-          label: 'Client to Shared Pooler connections',
-          tooltip: 'Active connections from clients to the shared pooler',
-        },
-      ],
-    },
-    {
-      id: 'pgbouncer-connections',
-      label: 'Dedicated Pooler connections',
-      syncId: 'database-reports',
-      valuePrecision: 0,
-      availableIn: ['pro', 'team'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      showGrid: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'client_connections_pgbouncer',
-          provider: 'infra-monitoring',
-          label: 'Client to Dedicated Pooler connections',
-          tooltip: 'PgBouncer connections',
-        },
-      ],
-    },
-    {
-      id: 'disk-size',
-      label: 'Disk Usage',
-      syncId: 'database-reports',
-      availableIn: ['team', 'enterprise'],
-      hide: false,
-      attributes: [],
-    },
-  ]
-}
 
 export const getReportAttributesV2: (
   org: Organization,
@@ -227,12 +23,12 @@ export const getReportAttributesV2: (
       id: 'ram-usage',
       label: 'Memory usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
-      availableIn: ['team', 'enterprise'],
+      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       showMaxValue: false,
       showGrid: true,
       syncId: 'database-reports',
@@ -272,7 +68,7 @@ export const getReportAttributesV2: (
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
-      availableIn: ['team', 'enterprise'],
+      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -280,10 +76,14 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 45,
-        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+        tickFormatter: (value: any) => {
+          // avoid displaying 100.00%
+          if (value === 100) return '100%'
+          return `${numberFormatter(value, 2)}%`
+        },
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'cpu_usage_busy_system',
@@ -339,19 +139,19 @@ export const getReportAttributesV2: (
       label: 'Disk Input/Output operations per second (IOPS)',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
       syncId: 'database-reports',
-      availableIn: ['team', 'enterprise'],
+      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
-      valuePrecision: 2,
+      valuePrecision: 0,
       showLegend: true,
       hideChartType: false,
       showGrid: true,
       showMaxValue: true,
       YAxisProps: {
         width: 35,
-        tickFormatter: (value: any) => numberFormatter(value, 2),
+        tickFormatter: (value: any) => numberFormatter(value, 0),
       },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'disk_iops_write',
@@ -379,48 +179,99 @@ export const getReportAttributesV2: (
       ],
     },
     {
-      id: 'disk-io-usage',
-      label: 'Disk IO Usage',
-      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-io-usage`,
+      id: 'disk-throughput',
+      label: 'Disk throughput',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
-      availableIn: ['team', 'enterprise'],
+      availableIn: ['team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
-      format: '%',
-      valuePrecision: 6,
-      showLegend: false,
-      showMaxValue: false,
+      format: 'bytes-per-second',
+      valuePrecision: 1,
+      showLegend: true,
+      showMaxValue: true,
       hideChartType: false,
       showGrid: true,
       YAxisProps: {
         width: 70,
-        tickFormatter: (value: any) => `${numberFormatter(value, 6)}%`,
+        tickFormatter: (value: any) => `${formatBytes(value, 1)}/s`,
       },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'stackedAreaLine',
       attributes: [
         {
-          attribute: 'disk_io_usage',
+          attribute: 'disk_bytes_read',
           provider: 'infra-monitoring',
-          label: 'IO Usage',
-          tooltip:
-            'The actual number of IO operations per second that the database is currently using',
+          label: 'Read throughput',
+          tooltip: 'Disk read throughput (bytes per second)',
+        },
+        {
+          attribute: 'disk_bytes_written',
+          provider: 'infra-monitoring',
+          label: 'Write throughput',
+          tooltip: 'Disk write throughput (bytes per second)',
+        },
+        {
+          attribute: 'disk_throughput_max',
+          provider: 'reference-line',
+          label: 'Max throughput',
+          value:
+            diskConfig?.attributes?.type === 'gp3' &&
+            typeof diskConfig.attributes.throughput_mbps === 'number'
+              ? diskConfig.attributes.throughput_mbps * 1024 * 1024
+              : undefined,
+          tooltip: 'Maximum disk throughput for your current compute size',
+          isMaxValue: true,
         },
       ],
     },
     {
+      // Client Connections metric for free tier
+      id: 'client-connections-basic',
+      label: 'Database Connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      availableIn: ['free'],
+      hide: !isFreePlan,
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: true,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: { width: 30 },
+      defaultChartStyle: 'bar',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
+      attributes: [
+        {
+          attribute: 'pg_stat_database_num_backends',
+          provider: 'infra-monitoring',
+          label: 'Total connections',
+          tooltip: 'Total number of active database connections',
+        },
+        {
+          attribute: 'max_db_connections',
+          provider: 'reference-line',
+          label: 'Max connections',
+          value: maxConnections?.maxConnections,
+          tooltip: 'Max available connections for your current compute size',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      // advanced client connections metric for paid and above
       id: 'client-connections',
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['team', 'enterprise'],
-      hide: false,
+      availableIn: ['pro', 'team', 'enterprise', 'platform'],
+      hide: isFreePlan,
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
@@ -476,7 +327,7 @@ export const getReportAttributesV2: (
       label: 'Dedicated Pooler Client Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team'],
+      availableIn: ['pro', 'team', 'enterprise', 'platform'],
       hide: isFreePlan,
       showTooltip: true,
       showLegend: true,
@@ -484,7 +335,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
@@ -508,7 +359,7 @@ export const getReportAttributesV2: (
       label: 'Shared Pooler (Supavisor) client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team'],
+      availableIn: ['pro', 'team', 'enterprise', 'platform'],
       hide: isFreePlan,
       showTooltip: false,
       showLegend: false,
@@ -516,7 +367,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'supavisor_connections_active',
@@ -531,7 +382,7 @@ export const getReportAttributesV2: (
       label: 'Disk Usage',
       syncId: 'database-reports',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team'],
+      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -542,7 +393,7 @@ export const getReportAttributesV2: (
         tickFormatter: (value: any) => formatBytes(value, 1),
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-size`,
       attributes: [
         {

@@ -1,49 +1,47 @@
-import { sortBy } from 'lodash'
-import { AlertCircle, Search, Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
-import { DatabaseIndex, useIndexesQuery } from 'data/database-indexes/indexes-query'
+import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { sortBy } from 'lodash'
+import { AlertCircle, Search, Trash } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
-  Input,
+  Card,
   SidePanel,
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableRow,
   TableHeader,
-  Card,
+  TableRow,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
-import CreateIndexSidePanel from './CreateIndexSidePanel'
+import { CreateIndexSidePanel } from './CreateIndexSidePanel'
 
 const Indexes = () => {
   const { data: project } = useSelectedProjectQuery()
   const { schema: urlSchema, table } = useParams()
 
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [showCreateIndex, setShowCreateIndex] = useState(false)
-  const [selectedIndex, setSelectedIndex] = useState<DatabaseIndex>()
-  const [selectedIndexToDelete, setSelectedIndexToDelete] = useState<DatabaseIndex>()
 
   const {
     data: allIndexes,
     error: indexesError,
-    isLoading: isLoadingIndexes,
+    isPending: isLoadingIndexes,
     isSuccess: isSuccessIndexes,
     isError: isErrorIndexes,
   } = useIndexesQuery({
@@ -51,9 +49,21 @@ const Indexes = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const [showCreateIndex, setShowCreateIndex] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false)
+  )
+
+  const [editIndexId, setEditIndexId] = useQueryState('edit', parseAsString)
+  const selectedIndex = allIndexes?.find((idx) => idx.name === editIndexId)
+
+  const [deleteIndexId, setDeleteIndexId] = useQueryState('delete', parseAsString)
+  const selectedIndexToDelete = allIndexes?.find((idx) => idx.name === deleteIndexId)
+
   const {
     data: schemas,
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isSuccess: isSuccessSchemas,
     isError: isErrorSchemas,
   } = useSchemasQuery({
@@ -61,9 +71,13 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const { mutate: deleteIndex, isLoading: isExecuting } = useDatabaseIndexDeleteMutation({
+  const {
+    mutate: deleteIndex,
+    isPending: isExecuting,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      setSelectedIndexToDelete(undefined)
+      setDeleteIndexId(null)
       toast.success('Successfully deleted index')
     },
   })
@@ -78,7 +92,6 @@ const Indexes = () => {
 
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
     if (!project) return console.error('Project is required')
-
     deleteIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,
@@ -97,6 +110,20 @@ const Indexes = () => {
   useEffect(() => {
     if (table !== undefined) setSearch(table)
   }, [table])
+
+  useEffect(() => {
+    if (isSuccessIndexes && !!editIndexId && !selectedIndex) {
+      toast('Index not found')
+      setEditIndexId(null)
+    }
+  }, [isSuccessIndexes, editIndexId, selectedIndex, setEditIndexId])
+
+  useEffect(() => {
+    if (isSuccessIndexes && !!deleteIndexId && !selectedIndexToDelete && !isSuccessDelete) {
+      toast('Index not found')
+      setDeleteIndexId(null)
+    }
+  }, [isSuccessIndexes, deleteIndexId, selectedIndexToDelete, isSuccessDelete, setDeleteIndexId])
 
   return (
     <>
@@ -125,7 +152,7 @@ const Indexes = () => {
               className="w-full lg:w-52"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search for an index"
-              icon={<Search size={14} />}
+              icon={<Search />}
             />
 
             {!isSchemaLocked && (
@@ -154,14 +181,14 @@ const Indexes = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead key="schema">Schema</TableHead>
                       <TableHead key="table">Table</TableHead>
+                      <TableHead key="columns">Columns</TableHead>
                       <TableHead key="name">Name</TableHead>
-                      <TableHead key="buttons"></TableHead>
+                      <TableHead key="buttons" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortedIndexes.length === 0 && search.length === 0 && (
+                    {indexes.length === 0 && search.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No indexes created yet</p>
@@ -171,7 +198,7 @@ const Indexes = () => {
                         </TableCell>
                       </TableRow>
                     )}
-                    {sortedIndexes.length === 0 && search.length > 0 && (
+                    {indexes.length === 0 && search.length > 0 && (
                       <TableRow>
                         <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No results found</p>
@@ -185,17 +212,17 @@ const Indexes = () => {
                       indexes.map((index) => (
                         <TableRow key={index.name}>
                           <TableCell>
-                            <p title={index.schema}>{index.schema}</p>
+                            <p title={index.table}>{index.table}</p>
                           </TableCell>
                           <TableCell>
-                            <p title={index.table}>{index.table}</p>
+                            <p title={index.columns}>{index.columns}</p>
                           </TableCell>
                           <TableCell>
                             <p title={index.name}>{index.name}</p>
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end items-center space-x-2">
-                              <Button type="default" onClick={() => setSelectedIndex(index)}>
+                              <Button type="default" onClick={() => setEditIndexId(index.name)}>
                                 View definition
                               </Button>
                               {!isSchemaLocked && (
@@ -204,7 +231,7 @@ const Indexes = () => {
                                   type="text"
                                   className="px-1"
                                   icon={<Trash />}
-                                  onClick={() => setSelectedIndexToDelete(index)}
+                                  onClick={() => setDeleteIndexId(index.name)}
                                 />
                               )}
                             </div>
@@ -221,14 +248,14 @@ const Indexes = () => {
 
       <SidePanel
         size="xlarge"
-        visible={selectedIndex !== undefined}
+        visible={!!selectedIndex}
         header={
           <>
             <span>Index:</span>
             <code className="text-sm ml-2">{selectedIndex?.name}</code>
           </>
         }
-        onCancel={() => setSelectedIndex(undefined)}
+        onCancel={() => setEditIndexId(null)}
       >
         <div className="h-full">
           <div className="relative h-full">
@@ -248,7 +275,7 @@ const Indexes = () => {
         variant="warning"
         size="medium"
         loading={isExecuting}
-        visible={selectedIndexToDelete !== undefined}
+        visible={!!selectedIndexToDelete}
         title={
           <>
             Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
@@ -259,7 +286,7 @@ const Indexes = () => {
         onConfirm={() =>
           selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
         }
-        onCancel={() => setSelectedIndexToDelete(undefined)}
+        onCancel={() => setDeleteIndexId(null)}
         alert={{
           title: 'This action cannot be undone',
           description:

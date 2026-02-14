@@ -1,35 +1,39 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode, useMemo, useState } from 'react'
-
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
+import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
 import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
 import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
-import EditorPanel from 'components/ui/EditorPanel/EditorPanel'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { DevToolbarTrigger } from 'dev-tools'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { IS_PLATFORM } from 'lib/constants'
+import { ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ReactNode, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
-import { useRouter } from 'next/router'
+import { CommandMenuTriggerInput } from 'ui-patterns'
+
 import { BreadcrumbsView } from './BreadcrumbsView'
-import { FeedbackDropdown } from './FeedbackDropdown'
-import { HelpPopover } from './HelpPopover'
+import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
+import { HelpDropdown } from './HelpDropdown/HelpDropdown'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
-import MergeRequestButton from './MergeRequestButton'
-import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
+import { MergeRequestButton } from './MergeRequestButton'
+import { Connect } from '@/components/interfaces/Connect/Connect'
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
+import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
+import { usePHFlag } from '@/hooks/ui/useFlag'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -57,30 +61,27 @@ interface LayoutHeaderProps {
   backToDashboardURL?: string
 }
 
-const LayoutHeader = ({
+export const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerTitle,
   showProductMenu,
   backToDashboardURL,
 }: LayoutHeaderProps) => {
-  const { ref: projectRef, slug } = useParams()
   const router = useRouter()
+  const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
 
-  const isAccountPage = router.pathname.startsWith('/account')
+  const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
+  const isFlagResolved = connectSheetFlag !== undefined
+  const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
 
-  const [showEditorPanel, setShowEditorPanel] = useState(false)
-  useHotKey(
-    () => {
-      if (projectRef) setShowEditorPanel(!showEditorPanel)
-    },
-    'e',
-    [showEditorPanel, projectRef]
-  )
+  const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
+
+  const isAccountPage = router.pathname.startsWith('/account')
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -158,9 +159,7 @@ const LayoutHeader = ({
                     {exceedingLimits && (
                       <div className="ml-2">
                         <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                          <Badge variant="destructive" className="whitespace-nowrap">
-                            Exceeding usage limits
-                          </Badge>
+                          <Badge variant="destructive">Exceeding usage limits</Badge>
                         </Link>
                       </div>
                     )}
@@ -207,7 +206,7 @@ const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
-                  <Connect />
+                  <ConnectButton />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -217,15 +216,27 @@ const LayoutHeader = ({
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
+                <DevToolbarTrigger />
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center rounded-full border">
-                  <HelpPopover />
-                  <NotificationsPopoverV2 />
+                <div className="flex items-center gap-2">
+                  <CommandMenuTriggerInput
+                    showShortcut={commandMenuEnabled}
+                    placeholder="Search..."
+                    className={cn(
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent',
+                      '[&_.command-shortcut>div]:border-none',
+                      '[&_.command-shortcut>div]:pr-2',
+                      '[&_.command-shortcut>div]:bg-transparent',
+                      '[&_.command-shortcut>div]:text-foreground-lighter'
+                    )}
+                  />
+                  <HelpDropdown />
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -236,11 +247,22 @@ const LayoutHeader = ({
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="flex items-center gap-2">
+                  <CommandMenuTriggerInput
+                    placeholder="Search..."
+                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
+                        [&_.command-shortcut>div]:border-none
+                        [&_.command-shortcut>div]:pr-2
+                        [&_.command-shortcut>div]:bg-transparent
+                        [&_.command-shortcut>div]:text-foreground-lighter
+                      "
+                  />
+                  <HelpDropdown />
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -252,9 +274,8 @@ const LayoutHeader = ({
           </div>
         </div>
       </header>
-      <EditorPanel open={showEditorPanel} onClose={() => setShowEditorPanel(false)} />
+
+      {isFlagResolved ? isConnectSheetEnabled ? <ConnectSheet /> : <Connect /> : null}
     </>
   )
 }
-
-export default LayoutHeader

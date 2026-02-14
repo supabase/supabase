@@ -13,22 +13,33 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const fullCurrentPath = useCurrentPath()
   const [currentPath] = fullCurrentPath.split('#')
 
-  const showSsoSettings = useIsFeatureEnabled('organization:show_sso_settings')
+  const {
+    organizationShowSsoSettings: showSsoSettings,
+    organizationShowSecuritySettings: showSecuritySettings,
+    organizationShowLegalDocuments: showLegalDocuments,
+  } = useIsFeatureEnabled([
+    'organization:show_sso_settings',
+    'organization:show_security_settings',
+    'organization:show_legal_documents',
+  ])
 
   const navMenuItems = [
     {
       label: 'General',
       href: `/org/${slug}/general`,
     },
-    {
-      label: 'Security',
-      href: `/org/${slug}/security`,
-    },
+    ...(showSecuritySettings
+      ? [
+          {
+            label: 'Security',
+            href: `/org/${slug}/security`,
+          },
+        ]
+      : []),
     {
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
-
     ...(showSsoSettings
       ? [
           {
@@ -42,10 +53,14 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
     },
-    {
-      label: 'Legal Documents',
-      href: `/org/${slug}/documents`,
-    },
+    ...(showLegalDocuments
+      ? [
+          {
+            label: 'Legal Documents',
+            href: `/org/${slug}/documents`,
+          },
+        ]
+      : []),
   ]
 
   return (

@@ -3,15 +3,24 @@
  *
  * If Elements is on a higher level, we risk losing all form state in case a payment fails.
  */
-
+import { zodResolver } from '@hookform/resolvers/zod'
 import { AddressElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import type { PaymentMethod } from '@stripe/stripe-js'
 import {
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
   type SetupIntent,
 } from '@stripe/stripe-js'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { Form } from '@ui/components/shadcn/ui/form'
+import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
+import { getURL } from 'lib/helpers'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -31,19 +40,7 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
-import {
-  TAX_IDS,
-  type TaxId,
-} from '../../../Organization/BillingSettings/BillingCustomerData/TaxID.constants'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { Form } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { getURL } from 'lib/helpers'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
-import type { PaymentMethod } from '@stripe/stripe-js'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
@@ -76,7 +73,7 @@ export type PaymentMethodElementRef = {
   >
 }
 
-const NewPaymentMethodElement = forwardRef(
+export const NewPaymentMethodElement = forwardRef(
   (
     {
       email,
@@ -242,9 +239,9 @@ const NewPaymentMethodElement = forwardRef(
     }, [availableTaxIds, stripeAddress])
 
     return (
-      <div className="space-y-4">
-        <p className="text-sm text-foreground-light mb-2">
-          Please ensure CVC and postal codes match what is on file for your card.
+      <div className="space-y-2">
+        <p className="text-sm text-foreground-lighter">
+          Please ensure CVC and postal codes match what’s on file for your card.
         </p>
 
         <PaymentElement
@@ -256,14 +253,14 @@ const NewPaymentMethodElement = forwardRef(
         />
 
         {fullyLoaded && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 py-4">
             <Checkbox_Shadcn_
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
             />
-            <label htmlFor="business" className="text-foreground-light text-sm leading-none">
-              I'm purchasing as a business
+            <label htmlFor="business" className="text-foreground text-sm leading-none">
+              I’m purchasing as a business
             </label>
           </div>
         )}
@@ -367,5 +364,3 @@ const NewPaymentMethodElement = forwardRef(
 )
 
 NewPaymentMethodElement.displayName = 'NewPaymentMethodElement'
-
-export { NewPaymentMethodElement }

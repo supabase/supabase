@@ -1,7 +1,9 @@
 import React from 'react'
+
 // @ts-ignore
 import defaultTheme from '../../theme/defaultTheme'
 import { cn } from '../../utils'
+
 // @ts-ignore
 // import FormLayoutStyles from './FormLayout.module.css'
 
@@ -116,7 +118,7 @@ export function FormLayout({
 
   // console.log('error', error)
 
-  const renderError = (
+  const renderError = error && (
     <p
       data-state={error ? 'show' : 'hide'}
       className={[__styles.error.base, __styles.error.size[size]].join(' ')}

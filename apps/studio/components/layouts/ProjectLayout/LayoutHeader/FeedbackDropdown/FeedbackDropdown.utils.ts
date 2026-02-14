@@ -1,8 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
+import { createSupportStorageClient } from 'components/interfaces/Support/support-storage-client'
+import { generateAttachmentURLs } from 'data/support/generate-attachment-urls-mutation'
 import { uuidv4 } from 'lib/helpers'
-
-const SUPPORT_API_URL = process.env.NEXT_PUBLIC_SUPPORT_API_URL || ''
-const SUPPORT_API_KEY = process.env.NEXT_PUBLIC_SUPPORT_ANON_KEY || ''
 
 export const convertB64toBlob = (image: string) => {
   const contentType = 'image/png'
@@ -25,40 +23,114 @@ export const convertB64toBlob = (image: string) => {
   return blob
 }
 
-export const uploadAttachment = async (ref: string, image: string) => {
-  const supabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      // @ts-ignore
-      multiTab: false,
-      detectSessionInUrl: false,
-      localStorage: {
-        getItem: (key: string) => undefined,
-        setItem: (key: string, value: string) => {},
-        removeItem: (key: string) => {},
-      },
-    },
-  })
+type UploadAttachmentArgs = {
+  image: string
+  userId?: string
+}
 
-  const blob = convertB64toBlob(image)
-  const name = `${ref || 'no-project'}/${uuidv4()}.png`
-  const options = { cacheControl: '3600' }
-  const { data: file, error: uploadError } = await supabaseClient.storage
-    .from('feedback-attachments')
-    .upload(name, blob, options)
-
-  if (uploadError) {
-    console.error('Failed to upload:', uploadError)
+export const uploadAttachment = async ({ image, userId }: UploadAttachmentArgs) => {
+  if (!userId) {
+    console.error(
+      '[FeedbackWidget > uploadAttachment] Unable to upload screenshot, missing user ID'
+    )
     return undefined
   }
 
-  if (file) {
-    const { data } = await supabaseClient.storage
-      .from('feedback-attachments')
-      .createSignedUrls([file.path], 10 * 365 * 24 * 60 * 60)
-    return data?.[0].signedUrl
+  const supabaseClient = createSupportStorageClient()
+
+  const blob = convertB64toBlob(image)
+  const filename = `${userId}/${uuidv4()}.png`
+  const options = { cacheControl: '3600' }
+
+  const { data: file, error: uploadError } = await supabaseClient.storage
+    .from('feedback-attachments')
+    .upload(filename, blob, options)
+
+  if (uploadError || !file) {
+    console.error('Failed to upload screenshot attachment:', uploadError)
+    return undefined
   }
 
-  return undefined
+  const signedUrls = await generateAttachmentURLs({
+    bucket: 'feedback-attachments',
+    filenames: [file.path],
+  })
+  return signedUrls[0]
+}
+
+/**
+ * Client-side heuristic to quickly detect obvious support requests
+ * This provides immediate feedback before the AI classification completes
+ */
+export function isLikelySupportRequest(text: string): boolean {
+  if (!text || text.trim().length === 0) return false
+
+  const lowerText = text.toLowerCase()
+
+  // Common support request patterns
+  const supportPatterns = [
+    // Help requests
+    /need help/i,
+    /having trouble/i,
+    /having issues/i,
+    /having problems/i,
+    /can you help/i,
+    /could you help/i,
+    /please help/i,
+    /need help/i,
+    /how do/i,
+    /how can/i,
+    /how to/i,
+    /why isn't/i,
+    /why doesn't/i,
+    /why won't/i,
+    /why can't/i,
+
+    // Problem indicators
+    /it's not working/i,
+    /it doesn't work/i,
+    /it won't work/i,
+    /it can't work/i,
+    /isn't working/i,
+    /doesn't work/i,
+    /won't work/i,
+    /can't work/i,
+    /not work/i,
+    /i can't/i,
+    /i cannot/i,
+    /unable to/i,
+    /wrong/i,
+    /bad/i,
+
+    // Bug/error indicators
+    /\bbug\b/i,
+    /\bbroken\b/i,
+    /\berror\b/i,
+    /\berrors\b/i,
+    /\bfailed\b/i,
+    /\bfailure\b/i,
+    /\bfailing\b/i,
+    /\bcrash\b/i,
+    /\bcrashed\b/i,
+    /\bcrashing\b/i,
+
+    // Issue/problem keywords
+    /\bissue\b/i,
+    /\bissues\b/i,
+    /\bproblem\b/i,
+    /\bproblems\b/i,
+    /\btrouble\b/i,
+    /\bdifficulty\b/i,
+    /\bdifficulties\b/i,
+
+    // Support-specific phrases
+    /support ticket/i,
+    /contact support/i,
+    /get help/i,
+    /need assistance/i,
+    /require assistance/i,
+    /technical support/i,
+  ]
+
+  return supportPatterns.some((pattern) => pattern.test(lowerText))
 }

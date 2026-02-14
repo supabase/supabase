@@ -984,6 +984,66 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.email.notification.type.enabled'
+    title: 'auth.email.notification.<type>.enabled'
+    tags: ['auth']
+    required: false
+    description: |
+      Determines whether or not to send email notifications for the given type.
+
+      The full list of email notification types are:
+
+      - `password_changed`
+      - `email_changed`
+      - `phone_changed`
+      - `mfa_factor_enrolled`
+      - `mfa_factor_unenrolled`
+      - `identity_linked`
+      - `identity_unlinked`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.notification.type.subject'
+    title: 'auth.email.notification.<type>.subject'
+    tags: ['auth']
+    required: false
+    description: |
+      The subject for the given email notification type.
+
+      The full list of email notification types are:
+
+      - `password_changed`
+      - `email_changed`
+      - `phone_changed`
+      - `mfa_factor_enrolled`
+      - `mfa_factor_unenrolled`
+      - `identity_linked`
+      - `identity_unlinked`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.notification.type.content_path'
+    title: 'auth.email.notification.<type>.content_path'
+    tags: ['auth']
+    required: false
+    description: |
+      The relative path to the content template for the given email notification type.
+
+      The full list of email notification types are:
+
+      - `password_changed`
+      - `email_changed`
+      - `phone_changed`
+      - `mfa_factor_enrolled`
+      - `mfa_factor_unenrolled`
+      - `identity_linked`
+      - `identity_unlinked`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.sms.enable_signup'
     title: 'auth.sms.enable_signup'
     tags: ['auth']

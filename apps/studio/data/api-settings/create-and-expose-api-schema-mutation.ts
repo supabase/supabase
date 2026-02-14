@@ -1,22 +1,25 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { configKeys } from 'data/config/keys'
 import { databaseKeys } from 'data/database/keys'
 import { handleError, patch } from 'data/fetchers'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type CreateAndExposeAPISchemaVariables = {
   projectRef: string
   connectionString?: string | null
   existingPostgrestConfig: {
-    db_pool: any
+    db_pool?: number | null
     max_rows: number
     db_extra_search_path: string
     db_schema: string
   }
 }
+
+type UpdatePostgrestConfigBody = components['schemas']['UpdatePostgrestConfigBody']
 
 export async function createAndExposeApiSchema({
   projectRef,
@@ -31,14 +34,17 @@ grant usage on schema api to anon, authenticated;
   await executeSql({ projectRef, connectionString, sql })
 
   const { db_extra_search_path, db_pool, db_schema, max_rows } = existingPostgrestConfig
+
+  const body: UpdatePostgrestConfigBody = {
+    max_rows,
+    db_extra_search_path,
+    db_schema: `api, ${db_schema}`,
+  }
+  if (db_pool) body.db_pool = db_pool
+
   const { error } = await patch('/platform/projects/{ref}/config/postgrest', {
     params: { path: { ref: projectRef } },
-    body: {
-      db_pool,
-      max_rows,
-      db_extra_search_path,
-      db_schema: `api, ${db_schema}`,
-    },
+    body,
   })
 
   if (error) handleError(error)
@@ -52,7 +58,7 @@ export const useCreateAndExposeAPISchemaMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     CreateAndExposeAPISchemaData,
     ResponseError,
     CreateAndExposeAPISchemaVariables
@@ -65,12 +71,13 @@ export const useCreateAndExposeAPISchemaMutation = ({
     CreateAndExposeAPISchemaData,
     ResponseError,
     CreateAndExposeAPISchemaVariables
-  >((vars) => createAndExposeApiSchema(vars), {
+  >({
+    mutationFn: (vars) => createAndExposeApiSchema(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries(databaseKeys.schemas(projectRef)),
-        queryClient.invalidateQueries(configKeys.postgrest(projectRef)),
+        queryClient.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },

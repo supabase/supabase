@@ -1,6 +1,6 @@
-import { type Registry } from 'shadcn/registry'
+import type { RegistryItem } from 'shadcn/schema'
 
-export const examples: Registry['items'] = [
+export const examples: RegistryItem[] = [
   {
     name: 'dropzone-demo',
     type: 'registry:example',

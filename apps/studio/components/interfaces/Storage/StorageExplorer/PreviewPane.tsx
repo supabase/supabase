@@ -1,10 +1,9 @@
 import { Transition } from '@headlessui/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isEmpty } from 'lodash'
-import { AlertCircle, ChevronDown, Clipboard, Download, Loader, Trash2, X } from 'lucide-react'
+import { AlertCircle, ChevronDown, Copy, Download, Loader, Trash2, X } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 
-import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
@@ -19,7 +18,6 @@ import {
 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 
@@ -28,7 +26,7 @@ const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 const PreviewFile = ({ item }: { item: StorageItem }) => {
   const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
 
-  const { data: previewUrl, isLoading } = useFetchFileUrlQuery({
+  const { data: previewUrl, isPending: isLoading } = useFetchFileUrlQuery({
     file: item,
     projectRef: projectRef,
     bucket: selectedBucket,
@@ -116,14 +114,13 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
 }
 
 export const PreviewPane = () => {
-  const { ref: projectRef, bucketId } = useParams()
-
   const {
     selectedBucket,
     selectedFilePreview: file,
     setSelectedItemsToDelete,
     setSelectedFilePreview,
     setSelectedFileCustomExpiry,
+    downloadFile,
   } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
 
@@ -148,7 +145,10 @@ export const PreviewPane = () => {
       leaveFrom="transform opacity-100"
       leaveTo="transform opacity-0"
     >
-      <div className="h-full border-l border-overlay bg-surface-100 p-4" style={{ width }}>
+      <div
+        className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
+        style={{ width }}
+      >
         {/* Preview Header */}
         <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
           <X
@@ -202,16 +202,16 @@ export const PreviewPane = () => {
           <div className="flex space-x-2 border-b border-overlay pb-4">
             <Button
               type="default"
-              icon={<Download size={16} strokeWidth={2} />}
+              icon={<Download />}
               disabled={file.isCorrupted}
-              onClick={async () => await downloadFile({ projectRef, bucketId, file })}
+              onClick={() => downloadFile(file)}
             >
               Download
             </Button>
             {selectedBucket.public ? (
               <Button
                 type="outline"
-                icon={<Clipboard size={16} strokeWidth={2} />}
+                icon={<Copy />}
                 onClick={() => onCopyUrl(file.name)}
                 disabled={file.isCorrupted}
               >
@@ -222,7 +222,7 @@ export const PreviewPane = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     type="outline"
-                    icon={<Clipboard size={16} strokeWidth={2} />}
+                    icon={<Copy />}
                     iconRight={<ChevronDown />}
                     disabled={file.isCorrupted}
                   >

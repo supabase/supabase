@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import {
   calculateIOPSPrice,
@@ -12,6 +13,7 @@ import {
   DISK_PRICING,
   DiskType,
 } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
@@ -24,6 +26,7 @@ import {
   useReadReplicasQuery,
 } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { AWS_REGIONS_DEFAULT, BASE_PATH, DOCS_URL } from 'lib/constants'
@@ -69,22 +72,23 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const { hasAccess: hasReadReplicaAccess } = useCheckEntitlements('instances.read_replicas')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
-  const isNotOnTeamOrEnterprisePlan = useMemo(
-    () => !['team', 'enterprise'].includes(org?.plan.id ?? ''),
+  const isNotOnHigherPlan = useMemo(
+    () => !['team', 'enterprise', 'platform'].includes(org?.plan.id ?? ''),
     [org]
   )
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled: isNotOnTeamOrEnterprisePlan,
+    enabled: isNotOnHigherPlan,
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
   )
-  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
+  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnHigherPlan
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
@@ -123,18 +127,22 @@ const DeployNewReplicaPanel = ({
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
   const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
 
-  useProjectDetailQuery(
+  const { data: projectDetail, isSuccess: isProjectDetailSuccess } = useProjectDetailQuery(
     { ref: projectRef },
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        if (data.is_physical_backups_enabled) setRefetchInterval(false)
-      },
     }
   )
 
-  const { mutate: enablePhysicalBackups, isLoading: isEnabling } = useEnablePhysicalBackupsMutation(
+  useEffect(() => {
+    if (!isProjectDetailSuccess) return
+    if (projectDetail.is_physical_backups_enabled) {
+      setRefetchInterval(false)
+    }
+  }, [projectDetail?.is_physical_backups_enabled, isProjectDetailSuccess])
+
+  const { mutate: enablePhysicalBackups, isPending: isEnabling } = useEnablePhysicalBackupsMutation(
     {
       onSuccess: () => {
         toast.success(
@@ -145,7 +153,7 @@ const DeployNewReplicaPanel = ({
     }
   )
 
-  const { mutate: setUpReplica, isLoading: isSettingUp } = useReadReplicaSetUpMutation({
+  const { mutate: setUpReplica, isPending: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
       const region = AVAILABLE_REPLICA_REGIONS.find((r) => r.key === selectedRegion)?.name
       toast.success(`Spinning up new replica in ${region ?? ' Unknown'}...`)
@@ -165,7 +173,6 @@ const DeployNewReplicaPanel = ({
     : MAX_REPLICAS_ABOVE_XL
   const reachedMaxReplicas =
     (data ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
-  const isFreePlan = org?.plan.id === 'free'
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
   const currentComputeAddon = addons?.selected_addons.find(
@@ -179,7 +186,7 @@ const DeployNewReplicaPanel = ({
     !reachedMaxReplicas &&
     currentPgVersion >= 15 &&
     isAWSProvider &&
-    !isFreePlan &&
+    hasReadReplicaAccess &&
     isWalgEnabled &&
     currentComputeAddon !== undefined &&
     !hasOverdueInvoices &&
@@ -287,13 +294,16 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-2">
               <Button type="default">
-                <Link
-                  href={`/support/new?category=Sales&ref=${projectRef}&subject=Enquiry%20on%20read%20replicas&message=Project%20DB%20version:%20${project?.dbVersion}`}
-                  target="_blank"
-                  rel="noreferrer"
+                <SupportLink
+                  queryParams={{
+                    projectRef,
+                    category: SupportCategories.SALES_ENQUIRY,
+                    subject: 'Enquiry on read replicas',
+                    message: `Project DB version: ${project?.dbVersion}`,
+                  }}
                 >
                   Contact support
-                </Link>
+                </SupportLink>
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
@@ -312,12 +322,12 @@ const DeployNewReplicaPanel = ({
                 <Button asChild type="default">
                   <Link
                     href={
-                      isFreePlan
-                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
-                        : `/project/${projectRef}/settings/compute-and-disk`
+                      hasReadReplicaAccess
+                        ? `/project/${projectRef}/settings/compute-and-disk`
+                        : `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
                     }
                   >
-                    {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
+                    {hasReadReplicaAccess ? 'Change compute size' : 'Upgrade to Pro'}
                   </Link>
                 </Button>
                 <DocsButton
@@ -409,9 +419,9 @@ const DeployNewReplicaPanel = ({
                     <Button asChild type="default">
                       <Link
                         href={
-                          isFreePlan
-                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
-                            : `/project/${projectRef}/settings/compute-and-disk`
+                          hasReadReplicaAccess
+                            ? `/project/${projectRef}/settings/compute-and-disk`
+                            : `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
                         }
                       >
                         Upgrade compute size
@@ -447,7 +457,10 @@ const DeployNewReplicaPanel = ({
                   />
                 )}
               >
-                {region.name}
+                <p className="flex items-center gap-x-2">
+                  <span>{region.name}</span>
+                  <span className="text-xs text-foreground-lighter font-mono">{region.region}</span>
+                </p>
               </Listbox.Option>
             ))}
           </Listbox>

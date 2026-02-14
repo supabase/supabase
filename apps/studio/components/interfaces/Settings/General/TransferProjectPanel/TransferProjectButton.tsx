@@ -3,10 +3,12 @@ import { Loader, Shield, Users, Wrench } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { projectKeys } from 'data/projects/keys'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -15,7 +17,7 @@ import { DOCS_URL } from 'lib/constants'
 import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-const TransferProjectButton = () => {
+export const TransferProjectButton = () => {
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
@@ -31,7 +33,7 @@ const TransferProjectButton = () => {
   const {
     mutate: transferProject,
     error: transferError,
-    isLoading: isTransferring,
+    isPending: isTransferring,
   } = useProjectTransferMutation({
     onSuccess: () => {
       toast.success(`Successfully transferred project ${project?.name}.`)
@@ -42,12 +44,12 @@ const TransferProjectButton = () => {
   const {
     data: transferPreviewData,
     error: transferPreviewError,
-    isLoading: transferPreviewIsLoading,
-    remove,
+    isPending: transferPreviewIsLoading,
   } = useProjectTransferPreviewQuery(
     { projectRef, targetOrganizationSlug: selectedOrg },
     { enabled: !isTransferring && isOpen }
   )
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (isOpen) {
@@ -55,8 +57,11 @@ const TransferProjectButton = () => {
       setSelectedOrg(undefined)
     } else {
       // Invalidate cache
-      remove()
+      queryClient.removeQueries({
+        queryKey: projectKeys.projectTransferPreview(projectRef, selectedOrg),
+      })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   const { can: canTransferProject } = useAsyncCheckPermissions(
@@ -265,22 +270,14 @@ const TransferProjectButton = () => {
                   <Admonition
                     type="danger"
                     title="Project cannot be transferred"
-                    description={
-                      <>
-                        <p>{transferPreviewError.message}</p>
-                      </>
-                    }
+                    description={transferPreviewError.message}
                   />
                 )}
                 {transferError && (
                   <Admonition
                     type="danger"
                     title="Project cannot be transferred"
-                    description={
-                      <>
-                        <p>{transferError.message}</p>
-                      </>
-                    }
+                    description={transferError.message}
                   />
                 )}
               </div>
@@ -291,5 +288,3 @@ const TransferProjectButton = () => {
     </>
   )
 }
-
-export default TransferProjectButton

@@ -1,0 +1,4 @@
+/* Focus styles for keyboard navigation on interactive table rows */
+.inset-focus {
+  @apply ease-out duration-100 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-600 focus-visible:rounded-md transition-all;
+}

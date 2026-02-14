@@ -3,14 +3,12 @@
 import type {
   Branch,
   Org,
-  Project,
   Variable,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
-import type { ProjectApiData } from '~/lib/fetch/projectApi'
 
 import { Check, Copy } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { withErrorBoundary } from 'react-error-boundary'
 import { proxy, useSnapshot } from 'valtio'
@@ -31,11 +29,16 @@ import {
   toOrgProjectValue,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
 import { useCopy } from '~/hooks/useCopy'
+import { useDebounce } from '~/hooks/useDebounce'
 import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
-import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
-import { useProjectApiQuery } from '~/lib/fetch/projectApi'
-import { isProjectPaused, useProjectsQuery } from '~/lib/fetch/projects'
+import { useSupavisorConfigQuery, type SupavisorConfigData } from '~/lib/fetch/pooler'
+import { useProjectKeysQuery, useProjectSettingsQuery } from '~/lib/fetch/projectApi'
+import {
+  isProjectPaused,
+  ProjectInfoInfinite,
+  useProjectsInfiniteQuery,
+} from '~/lib/fetch/projects-infinite'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 
@@ -67,8 +70,8 @@ type VariableDataState =
 
 const projectsStore = proxy({
   selectedOrg: null as Org | null,
-  selectedProject: null as Project | null,
-  setSelectedOrgProject: (org: Org | null, project: Project | null) => {
+  selectedProject: null as ProjectInfoInfinite | null,
+  setSelectedOrgProject: (org: Org | null, project: ProjectInfoInfinite | null) => {
     projectsStore.selectedOrg = org
     storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org?.id.toString())
 
@@ -90,6 +93,9 @@ function OrgProjectSelector() {
   const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
 
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
+
   const { selectedOrg, selectedProject, setSelectedOrgProject } = useSnapshot(projectsStore)
 
   const {
@@ -97,11 +103,21 @@ function OrgProjectSelector() {
     isPending: organizationsIsPending,
     isError: organizationsIsError,
   } = useOrganizationsQuery({ enabled: isLoggedIn })
+
   const {
-    data: projects,
+    data: projectsData,
     isPending: projectsIsPending,
     isError: projectsIsError,
-  } = useProjectsQuery({ enabled: isLoggedIn })
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useProjectsInfiniteQuery(
+    { search: search.length === 0 ? search : debouncedSearch },
+    { enabled: isLoggedIn }
+  )
+  const projects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const anyIsPending = organizationsIsPending || projectsIsPending
   const anyIsError = organizationsIsError || projectsIsError
@@ -141,7 +157,7 @@ function OrgProjectSelector() {
       const storedMaybeProjectRef = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT)
 
       let storedOrg: Org | undefined
-      let storedProject: Project | undefined
+      let storedProject: ProjectInfoInfinite | undefined
       if (storedMaybeOrgId && storedMaybeProjectRef) {
         storedOrg = organizations!.find((org) => org.id === Number(storedMaybeOrgId))
         storedProject = projects!.find((project) => project.ref === storedMaybeProjectRef)
@@ -167,6 +183,11 @@ function OrgProjectSelector() {
         stateSummary === 'loggedIn.dataSuccess.hasNoData'
       }
       options={formattedData}
+      selectedDisplayName={
+        selectedOrg && selectedProject
+          ? toDisplayNameOrgProject(selectedOrg, selectedProject)
+          : undefined
+      }
       selectedOption={
         selectedOrg && selectedProject ? toOrgProjectValue(selectedOrg, selectedProject) : undefined
       }
@@ -181,6 +202,13 @@ function OrgProjectSelector() {
           setSelectedOrgProject(org, project)
         }
       }}
+      search={search}
+      isFetching={isFetching}
+      isFetchingNextPage={isFetchingNextPage}
+      hasNextPage={hasNextPage}
+      fetchNextPage={fetchNextPage}
+      setSearch={setSearch}
+      useCommandSearch={false}
     />
   )
 }
@@ -190,6 +218,7 @@ function BranchSelector() {
   const isLoggedIn = useIsLoggedIn()
 
   const { selectedProject, selectedBranch, setSelectedBranch } = useSnapshot(projectsStore)
+  const [branchSearch, setBranchSearch] = useState('')
 
   const projectPaused = isProjectPaused(selectedProject)
   const hasBranches = selectedProject?.is_branch_enabled ?? false
@@ -253,7 +282,10 @@ function BranchSelector() {
         stateSummary === 'loggedIn.branches.dataSuccess.noData'
       }
       options={formattedData}
+      selectedDisplayName={selectedBranch?.name}
       selectedOption={selectedBranch ? toBranchValue(selectedBranch) : undefined}
+      search={branchSearch}
+      setSearch={setBranchSearch}
       onSelectOption={(option) => {
         const [branchId] = fromBranchValue(option)
         if (branchId) {
@@ -274,14 +306,25 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
 
-  const needsApiQuery = variable === 'publishableKey' || variable === 'url'
+  const needsApiQuery = variable === 'publishable' || variable === 'anon' || variable === 'url'
   const needsSupavisorQuery = variable === 'sessionPooler'
 
   const {
-    data: apiData,
-    isPending: isApiPending,
-    isError: isApiError,
-  } = useProjectApiQuery(
+    data: apiSettingsData,
+    isPending: isApiSettingsPending,
+    isError: isApiSettingsError,
+  } = useProjectSettingsQuery(
+    {
+      projectRef: ref,
+    },
+    { enabled: isLoggedIn && !!ref && !projectPaused && needsApiQuery }
+  )
+
+  const {
+    data: apiKeysData,
+    isPending: isApiKeysPending,
+    isError: isApiKeysError,
+  } = useProjectKeysQuery(
     {
       projectRef: ref,
     },
@@ -299,15 +342,6 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     { enabled: isLoggedIn && !!ref && !projectPaused && needsSupavisorQuery }
   )
 
-  function isInvalidApiData(apiData: ProjectApiData) {
-    switch (variable) {
-      case 'url':
-        return !apiData.app_config?.endpoint
-      case 'publishableKey':
-        return !apiData.service_api_keys?.some((key) => key.tags === 'anon')
-    }
-  }
-
   function isInvalidSupavisorData(supavisorData: SupavisorConfigData) {
     return supavisorData.length === 0
   }
@@ -320,24 +354,29 @@ function VariableView({ variable, className }: { variable: Variable; className?:
         ? 'loggedIn.noSelectedProject'
         : projectPaused
           ? 'loggedIn.selectedProject.projectPaused'
-          : (needsApiQuery ? isApiPending : isSupavisorPending)
+          : (needsApiQuery ? isApiSettingsPending || isApiKeysPending : isSupavisorPending)
             ? 'loggedIn.selectedProject.dataPending'
             : (
                   needsApiQuery
-                    ? isApiError || isInvalidApiData(apiData!)
+                    ? isApiSettingsError || isApiKeysError
                     : isSupavisorError || isInvalidSupavisorData(supavisorConfig!)
                 )
               ? 'loggedIn.selectedProject.dataError'
               : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = ''
+
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
-        variableValue = `https://${apiData?.app_config?.endpoint}`
+        variableValue = `https://${apiSettingsData?.app_config?.endpoint}`
         break
-      case 'publishableKey':
-        variableValue = apiData?.service_api_keys?.find((key) => key.tags === 'anon')?.api_key || ''
+      case 'anon':
+        variableValue =
+          apiKeysData?.find((key) => key.type === 'legacy' && key.id === 'anon')?.api_key || ''
+        break
+      case 'publishable':
+        variableValue = apiKeysData?.find((key) => key.type === 'publishable')?.api_key || ''
         break
       case 'sessionPooler':
         variableValue = supavisorConfig?.[0]?.connection_string || ''

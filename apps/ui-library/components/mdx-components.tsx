@@ -1,7 +1,5 @@
 import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Link from 'next/link'
-
-import type { Style } from '@/registry/styles'
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionContent_Shadcn_ as AccordionContent,
@@ -9,6 +7,7 @@ import {
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   cn,
 } from 'ui'
+
 import { BlockItem } from './block-item'
 import { BlockPreview } from './block-preview'
 import { Callout } from './callout'
@@ -18,6 +17,7 @@ import { DualRealtimeChat } from './dual-realtime-chat'
 import { RegistryBlock } from './registry-block'
 import { StyleWrapper } from './style-wrapper'
 import TanStackBeta from './tanstack-beta'
+import type { Style } from '@/registry/styles'
 
 const components = {
   RegistryBlock,
@@ -158,11 +158,21 @@ const components = {
   ),
   Callout,
   ComponentPreview,
+  CopyButton,
   TanStackBeta,
+  Card: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
+    <div
+      className={cn(
+        'flex w-full flex-col items-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow transition-colors hover:bg-muted/50 sm:p-10',
+        className
+      )}
+      {...props}
+    />
+  ),
   LinkedCard: ({ className, ...props }: React.ComponentProps<typeof Link>) => (
     <Link
       className={cn(
-        'flex w-full flex-col items-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow transition-colors hover:bg-muted/50 sm:p-10',
+        'flex w-full flex-col items-center justify-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow transition-colors hover:bg-muted/50 sm:p-10 h-52',
         className
       )}
       {...props}

@@ -1,43 +1,35 @@
-import { BarChart, Shield } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import {
-  createLintSummaryPrompt,
-  LintCategoryBadge,
-  lintInfoMap,
-} from 'components/interfaces/Linter/Linter.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useTrack } from 'lib/telemetry/track'
+import { BarChart, Shield } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
+import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import {
-  AiIconAnimation,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetSection,
-  SheetTitle,
-} from 'ui'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import LintDetail from 'components/interfaces/Linter/LintDetail'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-export const AdvisorSection = () => {
+import { Markdown } from '../Markdown'
+
+export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery(
+    {
+      projectRef,
+    },
+    {
+      enabled: !showEmptyState,
+    }
+  )
+  const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { data: organization } = useSelectedOrganizationQuery()
-
-  const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const { setSelectedItem } = useAdvisorStateSnapshot()
 
   const errorLints: Lint[] = useMemo(() => {
     return lints?.filter((lint) => lint.level === LINTER_LEVELS.ERROR) ?? []
@@ -46,52 +38,42 @@ export const AdvisorSection = () => {
   const totalErrors = errorLints.length
 
   const titleContent = useMemo(() => {
-    if (totalErrors === 0) return <h2>Assistant found no issues</h2>
+    if (totalErrors === 0) return <h2>Advisor found no issues</h2>
     const issuesText = totalErrors === 1 ? 'issue' : 'issues'
     const numberDisplay = totalErrors.toString()
     return (
       <h2>
-        Assistant found {numberDisplay} {issuesText}
+        Advisor found {numberDisplay} {issuesText}
       </h2>
     )
   }, [totalErrors])
 
   const handleAskAssistant = useCallback(() => {
-    snap.toggleAssistant()
-    if (projectRef && organization?.slug) {
-      sendEvent({
-        action: 'home_advisor_ask_assistant_clicked',
-        properties: {
-          issues_count: totalErrors,
-        },
-        groups: {
-          project: projectRef,
-          organization: organization.slug,
-        },
-      })
-    }
-  }, [snap, sendEvent, projectRef, organization, totalErrors])
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    track('advisor_assistant_button_clicked', {
+      origin: 'homepage',
+      issuesCount: totalErrors,
+    })
+  }, [track, openSidebar, totalErrors])
 
   const handleCardClick = useCallback(
     (lint: Lint) => {
-      setSelectedLint(lint)
-      if (projectRef && organization?.slug) {
-        sendEvent({
-          action: 'home_advisor_issue_card_clicked',
-          properties: {
-            issue_category: lint.categories[0] || 'UNKNOWN',
-            issue_name: lint.name,
-            issues_count: totalErrors,
-          },
-          groups: {
-            project: projectRef,
-            organization: organization.slug,
-          },
-        })
-      }
+      setSelectedItem(lint.cache_key, 'lint')
+      openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
+      track('advisor_detail_opened', {
+        origin: 'homepage',
+        advisorSource: 'lint',
+        advisorCategory: lint.categories[0],
+        advisorType: lint.name,
+        advisorLevel: lint.level,
+      })
     },
-    [sendEvent, projectRef, organization]
+    [track, setSelectedItem, openSidebar]
   )
+
+  if (showEmptyState) {
+    return <EmptyState />
+  }
 
   return (
     <div>
@@ -132,82 +114,63 @@ export const AdvisorSection = () => {
                       )}
                       <CardTitle className="text-foreground-light">{lint.categories[0]}</CardTitle>
                     </div>
-                    <ButtonTooltip
-                      type="text"
-                      className="w-7 h-7"
-                      icon={<AiIconAnimation size={16} />}
+                    <div
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
-                        snap.newChat({
-                          name: 'Summarize lint',
-                          open: true,
-                          initialInput: createLintSummaryPrompt(lint),
-                        })
-                        if (projectRef && organization?.slug) {
-                          sendEvent({
-                            action: 'home_advisor_fix_issue_clicked',
-                            properties: {
-                              issue_category: lint.categories[0] || 'UNKNOWN',
-                              issue_name: lint.name,
-                            },
-                            groups: {
-                              project: projectRef,
-                              organization: organization.slug,
-                            },
+                      }}
+                    >
+                      <AiAssistantDropdown
+                        label="Ask Assistant"
+                        iconOnly
+                        tooltip="Help me fix this issue"
+                        buildPrompt={() => createLintSummaryPrompt(lint)}
+                        onOpenAssistant={() => {
+                          openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                          snap.newChat({
+                            name: 'Summarize lint',
+                            initialInput: createLintSummaryPrompt(lint),
                           })
-                        }
-                      }}
-                      tooltip={{
-                        content: { side: 'bottom', text: 'Help me fix this issue' },
-                      }}
-                    />
+                          track('advisor_assistant_button_clicked', {
+                            origin: 'homepage',
+                            advisorCategory: lint.categories[0],
+                            advisorType: lint.name,
+                            advisorLevel: lint.level,
+                          })
+                        }}
+                        telemetrySource="advisor_section"
+                        type="text"
+                        className="w-7 h-7"
+                      />
+                    </div>
                   </CardHeader>
                   <CardContent className="p-6 pt-16 flex flex-col justify-end flex-1 overflow-auto">
-                    {lint.detail ? lint.detail.substring(0, 100) : lint.title}
-                    {lint.detail && lint.detail.length > 100 && '...'}
+                    <h3 className="mb-1">{lint.title}</h3>
+                    <Markdown className="leading-6 text-sm text-foreground-light">
+                      {lint.detail && lint.detail.replace(/\\`/g, '`')}
+                    </Markdown>
                   </CardContent>
                 </Card>
               )
             })}
           </Row>
-          <Sheet open={selectedLint !== null} onOpenChange={() => setSelectedLint(null)}>
-            <SheetContent>
-              {selectedLint && (
-                <>
-                  <SheetHeader>
-                    <div className="flex items-center gap-4">
-                      <SheetTitle>
-                        {lintInfoMap.find((item) => item.name === selectedLint.name)?.title ??
-                          'Unknown'}
-                      </SheetTitle>
-                      <LintCategoryBadge category={selectedLint.categories[0]} />
-                    </div>
-                  </SheetHeader>
-                  <SheetSection>
-                    {selectedLint && projectRef && (
-                      <LintDetail
-                        lint={selectedLint}
-                        projectRef={projectRef!}
-                        onAskAssistant={() => setSelectedLint(null)}
-                      />
-                    )}
-                  </SheetSection>
-                </>
-              )}
-            </SheetContent>
-          </Sheet>
         </>
       ) : (
-        <Card className="bg-transparent">
-          <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
-            <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
-            <p className="text-sm text-foreground-light text-center">
-              No security or performance errors found
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState />
       )}
     </div>
+  )
+}
+
+function EmptyState() {
+  return (
+    <Card className="bg-transparent h-64">
+      <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
+        <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
+        <p className="text-sm text-foreground-light text-center">
+          No security or performance errors found
+        </p>
+      </CardContent>
+    </Card>
   )
 }

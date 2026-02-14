@@ -17,7 +17,7 @@ export const DeployEdgeFunctionWarningModal = ({
     <ConfirmationModal
       visible={visible}
       size="medium"
-      title="Confirm deploying updates"
+      title="Confirm to deploy updates"
       confirmLabel="Deploy updates"
       confirmLabelLoading="Deploying updates"
       variant="warning"

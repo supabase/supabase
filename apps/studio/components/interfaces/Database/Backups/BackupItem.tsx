@@ -25,7 +25,7 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
     'queue_job.restore.prepare'
   )
 
-  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+  const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
       const { fileUrl } = res
 
@@ -114,9 +114,11 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
             <Badge variant="default">{backup.isPhysicalBackup ? 'Physical' : 'Logical'}</Badge>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            Learn more about backup types{' '}
+            {backup.isPhysicalBackup
+              ? 'File-level backups of your entire database.'
+              : 'SQL-based backups of your entire database.'}{' '}
             <InlineLink href="https://supabase.com/blog/postgresql-physical-logical-backups">
-              here
+              Learn more
             </InlineLink>
           </TooltipContent>
         </Tooltip>

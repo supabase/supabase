@@ -1,6 +1,6 @@
 import fs from 'fs'
-import path from 'path'
 import matter from 'gray-matter'
+import path from 'path'
 import { generateReadingTime } from './helpers'
 
 type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
@@ -8,6 +8,25 @@ type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | 
 // substring amount for file names
 // based on YYYY-MM-DD format
 export const FILENAME_SUBSTRING = 11
+
+export type Post = {
+  slug: string
+  title?: string
+  description?: string
+  author?: string
+  imgSocial?: string
+  imgThumb?: string
+  categories?: string[]
+  tags?: string[]
+  date?: string
+  toc_depth?: number
+  formattedDate: string
+  readingTime: string
+  url: string
+  path: string
+
+  [key: string]: any // Allow additional properties from frontmatter
+}
 
 type GetSortedPostsParams = {
   directory: Directories
@@ -24,7 +43,7 @@ export const getSortedPosts = ({
   tags,
   categories,
   currentPostSlug,
-}: GetSortedPostsParams) => {
+}: GetSortedPostsParams): Post[] => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 

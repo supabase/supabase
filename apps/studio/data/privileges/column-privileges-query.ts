@@ -1,10 +1,10 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { privilegeKeys } from './keys'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type ColumnPrivilegesVariables = {
   projectRef?: string
@@ -47,13 +47,11 @@ export const useColumnPrivilegesQuery = <TData = ColumnPrivilegesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ColumnPrivilegesData, ColumnPrivilegesError, TData> = {}
+  }: UseCustomQueryOptions<ColumnPrivilegesData, ColumnPrivilegesError, TData> = {}
 ) =>
-  useQuery<ColumnPrivilegesData, ColumnPrivilegesError, TData>(
-    privilegeKeys.columnPrivilegesList(projectRef),
-    ({ signal }) => getColumnPrivileges({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ColumnPrivilegesData, ColumnPrivilegesError, TData>({
+    queryKey: privilegeKeys.columnPrivilegesList(projectRef),
+    queryFn: ({ signal }) => getColumnPrivileges({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

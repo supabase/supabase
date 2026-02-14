@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
@@ -7,8 +7,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { IS_PLATFORM } from 'lib/constants'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
 interface SettingsLayoutProps {
@@ -21,12 +20,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
-  useEffect(() => {
-    if (!IS_PLATFORM) {
-      router.push('/project/default')
-    }
-  }, [router])
-
   // billing pages live under /billing/invoices and /billing/subscription, etc
   // so we need to pass the [5]th part of the url to the menu
   const page = router.pathname.includes('billing')
@@ -35,6 +28,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
 
   const {
     projectAuthAll: authEnabled,
+    authenticationShowProviders: authProvidersEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
     billingInvoices: invoicesEnabled,
@@ -43,6 +37,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     billingAll,
   } = useIsFeatureEnabled([
     'project_auth:all',
+    'authentication:show_providers',
     'project_edge_function:all',
     'project_storage:all',
     'billing:invoices',
@@ -53,6 +48,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
     auth: authEnabled,
+    authProviders: authProvidersEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,

@@ -1,6 +1,5 @@
 'use client'
 
-import { PropsWithChildren } from 'react'
 import { CH } from '@code-hike/mdx/components'
 import dynamic from 'next/dynamic'
 import { ArrowUpRight, Triangle } from 'lucide-react'
@@ -12,13 +11,29 @@ import {
   CollapsibleTrigger_Shadcn_,
   Heading,
   Image,
+  Mermaid,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import type { PropsWithChildren } from 'react'
 import type { ImageProps } from 'ui/src/components/Image/Image'
 
 const Avatar = dynamic(() => import('~/components/Avatar'))
 const Chart = dynamic(() => import('~/components/Charts/PGCharts'))
 const CodeBlock = dynamic(() => import('~/components/CodeBlock/CodeBlock'))
+const Tabs = dynamic(() => import('~/components/Tabs/Tabs'), { ssr: false })
+const TabPanel = dynamic(
+  () => import('~/components/Tabs/Tabs').then((mod) => ({ default: mod.TabPanel })),
+  { ssr: false }
+)
+const NamedCodeBlock = dynamic(
+  () =>
+    import('~/components/CodeTabs').then((mod) => ({
+      default: mod.NamedCodeBlock,
+    })),
+  {
+    ssr: false,
+  }
+)
 const ImageFadeStack = dynamic(() => import('~/components/ImageFadeStack'))
 const ImageGrid = dynamic(() => import('~/components/ImageGrid'))
 const InlineCodeTag = dynamic(() => import('~/components/InlineCode'))
@@ -73,6 +88,9 @@ const BlogCollapsible = ({
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
+    Tabs,
+    TabPanel,
+    NamedCodeBlock,
     CH,
     h1: (props: any) => <Heading {...props} tag="h1" />,
     h2: (props: any) => <Heading {...props} tag="h2" />,
@@ -88,7 +106,12 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     },
     pre: (props: any) => {
       if (props.className !== ignoreClass) {
-        return <CodeBlock {...props.children.props} />
+        const childProps = props.children?.props
+        // Detect mermaid code blocks and render with Mermaid component
+        if (childProps?.className === 'language-mermaid') {
+          return <Mermaid chart={childProps.children} />
+        }
+        return <CodeBlock {...childProps} />
       } else {
         return <code {...props} />
       }
@@ -110,6 +133,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
           />
         )
       }
+      // biome-ignore lint/a11y/useAltText: provided in props
       return <img {...props} />
     },
     Img: ({ zoomable = true, className, ...props }: ImageProps & { wide?: boolean }) => (
@@ -128,6 +152,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       <p className={cn('-mt-6 text-foreground-lighter text-lg', props.className)} {...props} />
     ),
     Admonition,
+    Mermaid,
   }
 
   return components as any

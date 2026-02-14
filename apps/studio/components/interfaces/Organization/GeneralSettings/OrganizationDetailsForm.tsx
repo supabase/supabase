@@ -40,7 +40,7 @@ export const OrganizationDetailsForm = () => {
     'organizations'
   )
 
-  const { mutate: updateOrganization, isLoading: isUpdatingDetails } =
+  const { mutate: updateOrganization, isPending: isUpdatingDetails } =
     useOrganizationUpdateMutation()
 
   const orgDetailsForm = useForm<z.infer<typeof OrgDetailsSchema>>({
@@ -85,18 +85,14 @@ export const OrganizationDetailsForm = () => {
         onSubmit={orgDetailsForm.handleSubmit(onUpdateOrganizationDetails)}
       >
         <Card>
-          <CardContent className="pt-6">
+          <CardContent>
             <FormField_Shadcn_
               control={orgDetailsForm.control}
               name="name"
               render={({ field }) => (
                 <FormItemLayout label="Organization name" layout="flex-row-reverse">
                   <FormControl_Shadcn_>
-                    <Input
-                      {...field}
-                      className="w-96 max-w-full"
-                      disabled={!canUpdateOrganization || isUpdatingDetails}
-                    />
+                    <Input {...field} disabled={!canUpdateOrganization || isUpdatingDetails} />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -105,16 +101,12 @@ export const OrganizationDetailsForm = () => {
           <CardContent>
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
               <PrePostTab
+                className="w-full [&>div:first-child]:flex-grow [&>div:last-child]:px-1.5"
                 postTab={
                   <CopyButton type="text" iconOnly text={selectedOrganization?.slug ?? ''} />
                 }
               >
-                <Input
-                  disabled
-                  className="w-64 max-w-full"
-                  id="slug"
-                  value={selectedOrganization?.slug ?? ''}
-                />
+                <Input disabled id="slug" value={selectedOrganization?.slug ?? ''} />
               </PrePostTab>
             </FormItemLayout>
           </CardContent>

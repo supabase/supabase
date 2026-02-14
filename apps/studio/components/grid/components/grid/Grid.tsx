@@ -1,38 +1,42 @@
-import { forwardRef, memo, Ref, useRef } from 'react'
-import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { ref as valtioRef } from 'valtio'
-
+import type { PostgresColumn } from '@supabase/postgres-meta'
+import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
+import { useIsTableFilterBarEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
+import { forwardRef, memo, Ref, useCallback, useMemo, useRef } from 'react'
+import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import type { Filter, GridProps, SupaRow } from '../../types'
+import { ref as valtioRef } from 'valtio'
+
+import { useTableFilter } from '../../hooks/useTableFilter'
+import type { GridProps, SupaRow } from '../../types'
+import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
+import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
+import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
 }
 
 interface IGrid extends GridProps {
-  rows: any[]
-  error: any
+  rows: SupaRow[]
+  error: ResponseError | null
+  isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
   isError: boolean
-  filters: Filter[]
-  onApplyFilters: (appliedFilters: Filter[]) => void
 }
 
 // [Joshen] Just for visibility this is causing some hook errors in the browser
@@ -47,20 +51,22 @@ export const Grid = memo(
         rowClass,
         rows,
         error,
+        isDisabled = false,
         isLoading,
         isSuccess,
         isError,
-        filters,
-        onApplyFilters,
       },
       ref: Ref<DataGridHandle> | undefined
     ) => {
+      const newFilterBarEnabled = useIsTableFilterBarEnabled()
+
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
+      const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
+      const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
 
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
-      const isBranch = project?.parent_project_ref !== undefined
 
       const onRowsChange = useOnRowsChange(rows)
 
@@ -68,24 +74,35 @@ export const Grid = memo(
         snap.setSelectedRows(selectedRows)
       }
 
-      const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
+      const selectedCellRef = useRef<{
+        rowIdx: number
+        row: SupaRow
+        column: CalculatedColumn<SupaRow, unknown>
+      } | null>(null)
 
-      function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
+      function onSelectedCellChange(args: {
+        rowIdx: number
+        row: SupaRow
+        column: CalculatedColumn<SupaRow, unknown>
+      }) {
         selectedCellRef.current = args
         snap.setSelectedCellPosition({ idx: args.column.idx, rowIdx: args.rowIdx })
       }
 
+      const page = snap.page
       const table = snap.table
       const tableEntityType = snap.originalTable?.entity_type
       const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
       const isTableEmpty = (rows ?? []).length === 0
 
-      const isForeignTableMissingVaultKeyError =
-        isForeignTable && isError && error.message.includes('query vault failed')
-
       const { mutate: sendEvent } = useSendEventMutation()
 
-      const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
+      const {
+        isValidFile: isValidFileDraggedOver,
+        isDraggedOver,
+        onDragOver,
+        onFileDrop,
+      } = useCsvFileDrop({
         enabled: isTableEmpty && !isForeignTable,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => {
@@ -122,27 +139,99 @@ export const Grid = memo(
         return fk !== undefined ? formatForeignKeys([fk])[0] : undefined
       }
 
-      function onRowDoubleClick(row: any, column: any) {
+      function onRowDoubleClick(row: SupaRow, column: { name: string }) {
         const foreignKey = getColumnForeignKey(column.name)
 
         if (foreignKey) {
           tableEditorSnap.onEditForeignKeyColumnValue({
             foreignKey,
             row,
-            column,
+            column: column as unknown as PostgresColumn,
           })
         }
       }
 
-      const removeAllFilters = () => onApplyFilters([])
+      const removeAllFilters = useCallback(() => {
+        if (newFilterBarEnabled) {
+          clearNewFilters()
+        } else {
+          clearOldFilters()
+        }
+      }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
+
+      const filters = useMemo(() => {
+        if (newFilterBarEnabled) {
+          return newFilters
+        } else {
+          return oldFilters
+        }
+      }, [newFilters, oldFilters, newFilterBarEnabled])
+
+      // Compute columns with cellClass for dirty cells
+      // This needs to be computed at render time so it reacts to operation queue changes
+      const columnsWithDirtyCellClass = useMemo(() => {
+        const primaryKeys = isTableLike(snap.originalTable) ? snap.originalTable.primary_keys : []
+        const pendingOperations = tableEditorSnap.operationQueue.operations
+
+        // If no pending operations, return columns as-is
+        if (pendingOperations.length === 0) {
+          return snap.gridColumns as CalculatedColumn<SupaRow, unknown>[]
+        }
+
+        return (snap.gridColumns as CalculatedColumn<SupaRow, unknown>[]).map((col) => {
+          // Skip special columns like select column
+          if (col.key === 'select-row' || col.key === 'add-column') {
+            return col
+          }
+
+          return {
+            ...col,
+            cellClass: (row: SupaRow) => {
+              // Build row identifiers from primary keys
+              const rowIdentifiers: Record<string, unknown> = {}
+              for (const pk of primaryKeys) {
+                rowIdentifiers[pk.name] = row[pk.name]
+              }
+
+              // Check if this cell has pending changes
+              const isDirty = tableEditorSnap.hasPendingCellChange(
+                snap.table.id,
+                rowIdentifiers,
+                col.key
+              )
+              return isDirty ? 'rdg-cell--dirty' : undefined
+            },
+          }
+        })
+      }, [snap.gridColumns, snap.originalTable, snap.table.id, tableEditorSnap])
+
+      // Compute rowClass function to style pending add/delete rows
+      const computedRowClass = useMemo(() => {
+        return (row: SupaRow) => {
+          const classes: string[] = []
+
+          // Call the original rowClass if provided
+          if (rowClass) {
+            const originalClass = rowClass(row)
+            if (originalClass) {
+              classes.push(originalClass)
+            }
+          }
+          if (isPendingAddRow(row)) {
+            classes.push('rdg-row--added')
+          }
+          if (isPendingDeleteRow(row)) {
+            classes.push('rdg-row--deleted')
+          }
+
+          return classes.length > 0 ? classes.join(' ') : undefined
+        }
+      }, [rowClass])
 
       return (
         <div
-          className={cn(
-            'flex flex-col relative transition-colors',
-            containerClass,
-            isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand-600'
-          )}
+          data-testid="table-editor-grid-container"
+          className={cn('flex flex-col relative transition-colors', containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
           onDragOver={onDragOver}
           onDragLeave={onDragOver}
@@ -151,65 +240,53 @@ export const Grid = memo(
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
             <div
-              style={{ height: `calc(100% - 35px)` }}
-              className="absolute top-9 p-2 w-full z-[1] pointer-events-none"
+              className={cn(
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none',
+                isTableEmpty && isDraggedOver && 'border-2 border-dashed',
+                isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
+              )}
             >
-              {isLoading && <GenericSkeletonLoader />}
-              {isError ? (
-                isForeignTableMissingVaultKeyError ? (
-                  <Admonition
-                    type="warning"
-                    className="pointer-events-auto"
-                    title="Failed to retrieve rows from foreign table"
-                  >
-                    <p>
-                      The key that's used to retrieve data from your foreign table is either
-                      incorrect or missing. Verify the key in your{' '}
-                      <InlineLink href={`/project/${project?.ref}/integrations?category=wrapper`}>
-                        wrapper's settings
-                      </InlineLink>{' '}
-                      or in{' '}
-                      <InlineLink href={`/project/${project?.ref}/integrations/vault/overview`}>
-                        Vault
-                      </InlineLink>
-                      .
-                    </p>
-                    {isBranch && (
-                      <p>
-                        Note: Vault keys from the main project do not sync to branches. You may add
-                        them manually into{' '}
-                        <InlineLink href={`/project/${project?.ref}/integrations/vault/overview`}>
-                          Vault
-                        </InlineLink>{' '}
-                        if you want to query foreign tables while on a branch.
-                      </p>
-                    )}
-                  </Admonition>
-                ) : (
-                  <AlertError
-                    className="pointer-events-auto"
-                    error={error}
-                    subject="Failed to retrieve rows from table"
-                  >
-                    {filters.length > 0 && (
-                      <p>
-                        Verify that the filter values are correct, as the error may stem from an
-                        incorrectly applied filter
-                      </p>
-                    )}
-                  </AlertError>
-                )
-              ) : null}
+              {isLoading && !isDisabled && (
+                <GenericSkeletonLoader className="w-full top-9 absolute p-2" />
+              )}
+
+              {isError && (
+                <div className="w-full top-9 absolute p-2 pointer-events-auto">
+                  <GridError error={error} />
+                </div>
+              )}
+
               {isSuccess && (
                 <>
-                  {(filters ?? []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light">
-                        {isDraggedOver ? 'Drop your CSV file here' : 'This table is empty'}
+                  {page > 1 ? (
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="text-sm text-light">This page does not have any data</p>
+                      <div className="flex items-center space-x-2 mt-4">
+                        <Button
+                          type="default"
+                          className="pointer-events-auto"
+                          onClick={() => snap.setPage(1)}
+                        >
+                          Head back to first page
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (filters ?? []).length === 0 ? (
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="text-sm text-light pointer-events-auto">
+                        {isDraggedOver ? (
+                          isValidFileDraggedOver ? (
+                            'Drop your CSV file here'
+                          ) : (
+                            <span className="text-destructive">Only CSV files are accepted</span>
+                          )
+                        ) : (
+                          'This table is empty'
+                        )}
                       </p>
                       {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
                         <div className="flex items-center space-x-2 mt-4">
-                          <p className="text-sm text-light">
+                          <p className="text-sm text-light pointer-events-auto">
                             This table is a foreign table. Add data to the connected source to get
                             started.
                           </p>
@@ -234,7 +311,7 @@ export const Grid = memo(
                             >
                               Import data from CSV
                             </Button>
-                            <p className="text-xs text-foreground-light">
+                            <p className="text-xs text-foreground-light pointer-events-auto">
                               or drag and drop a CSV file here
                             </p>
                           </div>
@@ -242,8 +319,8 @@ export const Grid = memo(
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center col-span-full">
-                      <p className="text-sm text-light">
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="text-sm text-light pointer-events-auto">
                         The filters applied have returned no results from this table
                       </p>
                       <div className="flex items-center space-x-2 mt-4">
@@ -265,8 +342,8 @@ export const Grid = memo(
           <DataGrid
             ref={ref}
             className={`${gridClass} flex-grow`}
-            rowClass={rowClass}
-            columns={snap.gridColumns as CalculatedColumn<any, any>[]}
+            rowClass={computedRowClass}
+            columns={columnsWithDirtyCellClass}
             rows={rows ?? []}
             renderers={{ renderRow: RowRenderer }}
             rowKeyGetter={rowKeyGetter}
@@ -275,7 +352,11 @@ export const Grid = memo(
             onRowsChange={onRowsChange}
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
-            onCellDoubleClick={(props) => onRowDoubleClick(props.row, props.column)}
+            onCellDoubleClick={(props) => {
+              if (typeof props.column.name === 'string') {
+                onRowDoubleClick(props.row, { name: props.column.name })
+              }
+            }}
             onCellKeyDown={handleCopyCell}
           />
         </div>

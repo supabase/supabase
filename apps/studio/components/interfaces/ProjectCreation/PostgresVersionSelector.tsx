@@ -19,14 +19,14 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { smartRegionToExactRegion } from './ProjectCreation.utils'
 
 interface PostgresVersionDetails {
-  postgresEngine: PostgresEngine | undefined
-  releaseChannel: ReleaseChannel | undefined
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
+  releaseChannel?: ReleaseChannel
 }
 
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
   dbRegion: string
-  organizationSlug: string | undefined
+  organizationSlug?: string
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
   type?: 'create' | 'unpause'
@@ -69,7 +69,7 @@ export const PostgresVersionSelector = ({
 
   const {
     data: createVersions,
-    isLoading: isLoadingProjectCreateVersions,
+    isPending: isLoadingProjectCreateVersions,
     isSuccess,
   } = useProjectCreationPostgresVersionsQuery(
     {
@@ -80,7 +80,7 @@ export const PostgresVersionSelector = ({
     { enabled: type === 'create' }
   )
 
-  const { data: unpauseVersions, isLoading: isLoadingProjectUnpauseVersions } =
+  const { data: unpauseVersions, isPending: isLoadingProjectUnpauseVersions } =
     useProjectUnpausePostgresVersionsQuery(
       { projectRef: project?.ref },
       { enabled: type === 'unpause' }
@@ -129,16 +129,12 @@ export const PostgresVersionSelector = ({
                 >
                   <div className="flex flex-row items-center justify-between w-full">
                     <span className="text-foreground">{postgresVersion}</span>
-                    <div>
+                    <div className="flex flex-row gap-x-2">
                       {value.release_channel !== 'ga' && (
-                        <Badge variant="warning" className="mr-1 capitalize">
-                          {value.release_channel}
-                        </Badge>
+                        <Badge variant="warning">{value.release_channel}</Badge>
                       )}
                       {value.postgres_engine.includes('oriole') && (
-                        <Badge variant="default" className="mr-1">
-                          OrioleDB
-                        </Badge>
+                        <Badge variant="default">OrioleDB</Badge>
                       )}
                     </div>
                   </div>

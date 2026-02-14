@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Filter, Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { ExportDialog } from 'components/grid/components/header/ExportDialog'
@@ -11,10 +12,11 @@ import { ProtectedSchemaWarning } from 'components/interfaces/Database/Protected
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import InfiniteList from 'components/ui/InfiniteList'
+import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useTableApiAccessQuery } from 'data/privileges/table-api-access-query'
 import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
@@ -38,7 +40,7 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
-import EntityListItem from './EntityListItem'
+import { EntityListItem } from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 export const TableEditorMenu = () => {
@@ -76,13 +78,24 @@ export const TableEditorMenu = () => {
       filterTypes: visibleTypes,
     },
     {
-      keepPreviousData: Boolean(searchText),
+      placeholderData: Boolean(searchText) ? keepPreviousData : undefined,
     }
   )
 
   const entityTypes = useMemo(
     () => data?.pages.flatMap((page) => page.data.entities),
     [data?.pages]
+  )
+  const entityNames = useMemo(() => entityTypes?.map((entity) => entity.name) ?? [], [entityTypes])
+
+  const { data: apiAccessByTableName } = useTableApiAccessQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString ?? undefined,
+      schemaName: selectedSchema,
+      tableNames: entityNames,
+    },
+    { enabled: Boolean(selectedSchema && entityNames.length > 0) }
   )
 
   const { can: canCreateTables } = useAsyncCheckPermissions(
@@ -104,15 +117,37 @@ export const TableEditorMenu = () => {
 
   const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
 
-  const onSelectExportCLI = async (id: number) => {
-    const table = await getTableEditor({
-      id: id,
-      projectRef,
-      connectionString: project?.connectionString,
-    })
-    const supaTable = table && parseSupaTable(table)
-    setTableToExport(supaTable)
-  }
+  const onSelectExportCLI = useCallback(
+    async (id: number) => {
+      const table = await getTableEditor({
+        id: id,
+        projectRef,
+        connectionString: project?.connectionString,
+      })
+      const supaTable = table && parseSupaTable(table)
+      setTableToExport(supaTable)
+    },
+    [project?.connectionString, projectRef]
+  )
+
+  const getItemKey = useCallback(
+    (index: number) => {
+      const item = entityTypes?.[index]
+      return item?.id ? String(item.id) : `table-editor-entity-${index}`
+    },
+    [entityTypes]
+  )
+
+  const entityProps = useMemo(
+    () => ({
+      projectRef: project?.ref!,
+      id: Number(id),
+      isLocked: isSchemaLocked,
+      onExportCLI: () => onSelectExportCLI(Number(id)),
+      apiAccessMap: apiAccessByTableName,
+    }),
+    [project?.ref, id, isSchemaLocked, onSelectExportCLI, apiAccessByTableName]
+  )
 
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
@@ -133,7 +168,6 @@ export const TableEditorMenu = () => {
               setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
-            portal={!isMobile}
           />
 
           <div className="grid gap-3 mx-4">
@@ -147,7 +181,7 @@ export const TableEditorMenu = () => {
                 icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
                 type="default"
                 className="justify-start"
-                onClick={snap.onAddTable}
+                onClick={() => snap.onAddTable()}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -164,7 +198,7 @@ export const TableEditorMenu = () => {
             )}
           </div>
         </div>
-        <div className="flex flex-auto flex-col gap-2 pb-4">
+        <div className="grow min-h-0 flex flex-col gap-2 pb-4">
           <InnerSideBarFilters className="mx-2">
             <InnerSideBarFilterSearchInput
               autoFocus={!isMobile}
@@ -261,21 +295,20 @@ export const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1 flex-grow" data-testid="tables-list">
-                  <InfiniteList
-                    items={entityTypes}
-                    // @ts-expect-error
+                <div className="flex flex-1 min-h-0 w-full" data-testid="tables-list">
+                  <InfiniteListDefault
+                    className="h-full w-full"
+                    items={entityTypes!}
                     ItemComponent={EntityListItem}
-                    itemProps={{
-                      projectRef: project?.ref!,
-                      id: Number(id),
-                      isSchemaLocked,
-                      onExportCLI: () => onSelectExportCLI(Number(id)),
-                    }}
-                    getItemSize={() => 28}
+                    LoaderComponent={LoaderForIconMenuItems}
+                    itemProps={entityProps}
+                    getItemKey={getItemKey}
+                    getItemSize={(index) =>
+                      index !== 0 && index === entityTypes!.length ? 85 : 28
+                    }
                     hasNextPage={hasNextPage}
                     isLoadingNextPage={isFetchingNextPage}
-                    onLoadNextPage={() => fetchNextPage()}
+                    onLoadNextPage={fetchNextPage}
                   />
                 </div>
               )}

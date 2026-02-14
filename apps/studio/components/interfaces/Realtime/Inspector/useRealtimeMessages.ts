@@ -1,9 +1,5 @@
 import { RealtimeChannel, RealtimeClient } from '@supabase/realtime-js'
-import {
-  DEFAULT_GLOBAL_OPTIONS,
-  DEFAULT_REALTIME_OPTIONS,
-} from '@supabase/supabase-js/dist/main/lib/constants'
-import { merge, sortBy, take } from 'lodash'
+import { sortBy, take } from 'lodash'
 import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -12,6 +8,8 @@ import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import type { LogData } from './Messages.types'
+
+const DEFAULT_HEADERS = { 'X-Client-Info': 'supabase-js-web/studio' }
 
 function reducer(
   state: LogData[],
@@ -101,12 +99,10 @@ export const useRealtimeMessages = (
       return
     }
 
-    const realtimeOptions = merge(DEFAULT_REALTIME_OPTIONS, { params: { log_level: logLevel } })
-
     const options = {
-      headers: DEFAULT_GLOBAL_OPTIONS.headers,
-      ...realtimeOptions,
-      params: { apikey: token, ...realtimeOptions.params },
+      vsn: '2.0.0',
+      headers: DEFAULT_HEADERS,
+      params: { apikey: token, log_level: logLevel },
     }
     const realtimeClient = new RealtimeClient(realtimeUrl, options)
 
@@ -168,7 +164,7 @@ export const useRealtimeMessages = (
     }
 
     // Finally, subscribe to the Channel we just setup
-    newChannel.subscribe(async (status) => {
+    newChannel.subscribe(async (status, err) => {
       if (status === 'SUBSCRIBED') {
         // Let LiveView know we connected so we can update the button text
         // pushMessageTo('#conn_info', 'broadcast_subscribed', { host: host })
@@ -192,9 +188,11 @@ export const useRealtimeMessages = (
           })
         }
       } else if (status === 'CHANNEL_ERROR') {
-        toast.error(
-          `Failed to connect to the channel ${channelName}: This may be due to restrictive RLS policies. Check your role and try again.`
-        )
+        if (err?.message) {
+          toast.error(`Failed to connect with the following error: ${err.message}`)
+        } else {
+          toast.error(`Failed to connect. Please check your RLS policies and try again.`)
+        }
 
         newChannel.unsubscribe()
         setChannel(undefined)

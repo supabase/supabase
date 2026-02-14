@@ -10,8 +10,8 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { generateDocsMenu } from './DocsLayout.utils'
+import { ProjectLayout } from '../ProjectLayout'
+import { generateDocsMenu, getActivePage } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
@@ -19,10 +19,11 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const { data: selectedProject } = useSelectedProjectQuery()
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
-  const { data, isLoading, error } = useOpenAPISpecQuery(
-    { projectRef: ref },
-    { enabled: !isPaused }
-  )
+  const {
+    data,
+    isPending: isLoading,
+    error,
+  } = useOpenAPISpecQuery({ projectRef: ref }, { enabled: !isPaused })
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const hideMenu = isNewAPIDocsEnabled && router.pathname.endsWith('/graphiql')
@@ -33,8 +34,11 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
 
     const { page, rpc, resource } = router.query
-    if (!page && !resource && !rpc) return 'introduction'
-    return (page || rpc || resource || '') as string
+    return getActivePage({
+      page: page as string | undefined,
+      resource: resource as string | undefined,
+      rpc: rpc as string | undefined,
+    })
   }
 
   if (error) {

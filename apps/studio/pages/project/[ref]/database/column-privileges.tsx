@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AlertCircle, XIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -22,7 +22,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { PgRole, useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
@@ -34,6 +33,7 @@ import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
@@ -47,25 +47,26 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const [selectedTable, setSelectedTable] = useState<string | undefined>(paramTable)
   const [selectedRole, setSelectedRole] = useState<string>('authenticated')
 
-  const { data: tableList, isLoading: isLoadingTables } = useTablesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      onSuccess(data) {
-        const tables = data
-          .filter((table) => table.schema === selectedSchema)
-          .map((table) => table.name)
+  const {
+    data: tableList,
+    isPending: isLoadingTables,
+    isSuccess: isSuccessTables,
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
-        if (tables[0] && selectedTable === undefined) {
-          setSelectedTable(tables[0])
-        }
-      },
+  useEffect(() => {
+    if (!isSuccessTables) return
+    const tables = tableList
+      .filter((table) => table.schema === selectedSchema)
+      .map((table) => table.name)
+    if (tables[0] && selectedTable === undefined) {
+      setSelectedTable(tables[0])
     }
-  )
+  }, [isSuccessTables, tableList, selectedSchema, selectedTable])
 
-  const { data: allRoles, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
+  const { data: allRoles, isPending: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -76,7 +77,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
   const {
     data: allTablePrivileges,
-    isLoading: isLoadingTablePrivileges,
+    isPending: isLoadingTablePrivileges,
     isError: isErrorTablePrivileges,
     error: errorTablePrivileges,
   } = useTablePrivilegesQuery({
@@ -102,7 +103,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
   const {
     data: allColumnPrivileges,
-    isLoading: isLoadingColumnPrivileges,
+    isPending: isLoadingColumnPrivileges,
     isError: isErrorColumnPrivileges,
     error: errorColumnPrivileges,
   } = useColumnPrivilegesQuery({
@@ -238,7 +239,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   <AlertCircle strokeWidth={2} />
                   <AlertTitle_Shadcn_>
                     Changes to column privileges will not be reflected in migrations when running{' '}
-                    <code className="text-xs">supabase db diff</code>.
+                    <code className="text-code-inline">supabase db diff</code>.
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
                     Column privileges are not supported in the current version of the Supabase CLI.
@@ -268,10 +269,12 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     If you remove a column privilege for a role, that role will lose all access to
                     that column.
                     <br />
-                    All operations selecting <code className="text-xs">*</code> (including{' '}
-                    <code className="text-xs">returning *</code> for{' '}
-                    <code className="text-xs">insert</code>, <code className="text-xs">update</code>
-                    , and <code className="text-xs">delete</code>) will fail.
+                    All operations selecting <code className="text-code-inline">
+                      *
+                    </code> (including <code className="text-code-inline">returning *</code> for{' '}
+                    <code className="text-code-inline">insert</code>,{' '}
+                    <code className="text-code-inline">update</code>, and{' '}
+                    <code className="text-code-inline">delete</code>) will fail.
                   </AlertDescription_Shadcn_>
                   <Button
                     type="outline"

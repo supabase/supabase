@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invalidateSchemasQuery } from './schemas-query'
 
 export type HooksEnableVariables = {
@@ -24,26 +24,24 @@ export const useHooksEnableMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<HooksEnableData, ResponseError, HooksEnableVariables>,
+  UseCustomMutationOptions<HooksEnableData, ResponseError, HooksEnableVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<HooksEnableData, ResponseError, HooksEnableVariables>(
-    (vars) => enableDatabaseWebhooks(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { ref } = variables
-        await onSuccess?.(data, variables, context)
-        await invalidateSchemasQuery(queryClient, ref)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to enable webhooks: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<HooksEnableData, ResponseError, HooksEnableVariables>({
+    mutationFn: (vars) => enableDatabaseWebhooks(vars),
+    async onSuccess(data, variables, context) {
+      const { ref } = variables
+      await onSuccess?.(data, variables, context)
+      await invalidateSchemasQuery(queryClient, ref)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to enable webhooks: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

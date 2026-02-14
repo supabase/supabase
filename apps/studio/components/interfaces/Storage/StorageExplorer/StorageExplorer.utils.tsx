@@ -1,10 +1,9 @@
 import { toast } from 'sonner'
 
-import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
 import { StorageObject } from 'data/storage/bucket-objects-list-mutation'
-import { SONNER_DEFAULT_DURATION, copyToClipboard } from 'ui'
+import { copyToClipboard } from 'ui'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
-import { StorageItem, StorageItemMetadata, StorageItemWithColumn } from '../Storage.types'
+import { StorageItem, StorageItemMetadata } from '../Storage.types'
 
 type UploadProgress = {
   percentage: number
@@ -17,7 +16,10 @@ type UploadProgress = {
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 export const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 
-export const copyPathToFolder = (openedFolders: StorageItem[], item: StorageItemWithColumn) => {
+export const copyPathToFolder = (
+  openedFolders: StorageItem[],
+  item: StorageItem & { columnIndex: number }
+) => {
   const folders = openedFolders.slice(0, item.columnIndex).map((folder) => folder.name)
   const path = folders.length > 0 ? `${folders.join('/')}/${item.name}` : item.name
   copyToClipboard(path)
@@ -36,67 +38,6 @@ export const formatTime = (seconds: number) => {
   if (hours > 0) return `${hours}h `
   if (minutes > 0) return `${minutes}m `
   return `${seconds}s`
-}
-
-export const downloadFile = async ({
-  projectRef,
-  bucketId,
-  file,
-  showToast = true,
-  returnBlob = false,
-}: {
-  projectRef?: string
-  bucketId?: string
-  file: StorageItemWithColumn
-  showToast?: boolean
-  returnBlob?: boolean
-}) => {
-  if (!projectRef) return toast.error('Failed to download: Project ref is required')
-  if (!bucketId) return toast.error('Failed to download: Bucket ID is required')
-  if (!file.path) return toast.error('Failed to download: Unable to find path to file')
-
-  const fileName: string = file.name
-  const fileMimeType = file?.metadata?.mimetype ?? undefined
-
-  const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
-
-  try {
-    const data = await downloadBucketObject({
-      projectRef,
-      bucketId,
-      path: file.path,
-    })
-
-    const blob = await data.blob()
-    const newBlob = new Blob([blob], { type: fileMimeType })
-    if (returnBlob) return { name: fileName, blob: newBlob }
-
-    const blobUrl = window.URL.createObjectURL(newBlob)
-    const link = document.createElement('a')
-    link.href = blobUrl
-    link.setAttribute('download', `${fileName}`)
-    document.body.appendChild(link)
-    link.click()
-    link.parentNode?.removeChild(link)
-    window.URL.revokeObjectURL(blob)
-    if (toastId) {
-      toast.success(`Downloading ${fileName}`, {
-        id: toastId,
-        closeButton: true,
-        duration: SONNER_DEFAULT_DURATION,
-      })
-    }
-    return true
-  } catch (err) {
-    if (toastId) {
-      toast.error(`Failed to download ${fileName}`, {
-        id: toastId,
-        closeButton: true,
-        duration: SONNER_DEFAULT_DURATION,
-      })
-    }
-    return false
-  }
 }
 
 export const calculateTotalRemainingTime = (progresses: UploadProgress[]) => {

@@ -66,8 +66,9 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const {
     data: branches = [],
     error: branchesError,
-    isLoading: isLoadingBranches,
+    isPending: isLoadingBranches,
     isError: isErrorBranches,
+    isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
@@ -88,9 +89,11 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
   const isError = isErrorConnections || isErrorBranches
 
+  const isGithubConnected = githubConnection !== undefined
+
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
       toast.error(`Failed to update the branch`)
     },
@@ -215,12 +218,11 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                     <BranchManagementSection
                       header={`${mergeRequestBranches.length} merge requests`}
                     >
-                      {isLoadingBranches && (
+                      {isLoadingBranches ? (
                         <div className="p-4">
                           <GenericSkeletonLoader />
                         </div>
-                      )}
-                      {mergeRequestBranches.length > 0 ? (
+                      ) : mergeRequestBranches.length > 0 ? (
                         mergeRequestBranches.map((branch) => {
                           const isPR = branch.pr_number !== undefined
                           const rowLink = isPR
@@ -228,6 +230,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                             : `/project/${branch.project_ref}/merge`
                           return (
                             <BranchRow
+                              isGithubConnected={isGithubConnected}
                               key={branch.id}
                               label={
                                 <div className="flex items-center gap-x-4">
@@ -258,7 +261,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                               rowLink={rowLink}
                               external={isPR}
                               rowActions={
-                                !isPR && (
+                                // We always want to show the action button to close a merge request
+                                // when user has requested review from dashboard. It doesn't matter
+                                // whether the branch is linked to a GitHub PR.
+                                branch.review_requested_at && (
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button
@@ -327,7 +333,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
       toast.error(`Failed to update the branch`)
     },
@@ -384,7 +390,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
           rel="noreferrer"
           href="https://github.com/orgs/supabase/discussions/18937"
         >
-          Branching Feedback
+          Branching feedback
         </a>
       </Button>
       <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />

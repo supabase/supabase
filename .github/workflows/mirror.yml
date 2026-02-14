@@ -22,19 +22,19 @@ jobs:
       id-token: write
     steps:
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@5fd3084fc36e372ff1fff382a39b10d03659f355 # v2.2.0
         with:
           role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
           aws-region: us-east-1
-      - uses: docker/login-action@v2
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
         with:
           registry: public.ecr.aws
-      - uses: docker/login-action@v2
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: akhilerm/tag-push-action@v2.1.0
+      - uses: akhilerm/tag-push-action@85bf542f43f5f2060ef76262a67ee3607cb6db37 # v2.1.0
         with:
           src: docker.io/supabase/studio:${{ inputs.version }}
           dst: |

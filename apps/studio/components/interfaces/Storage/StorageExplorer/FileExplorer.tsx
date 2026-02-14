@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { cn } from 'ui'
-import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
+import { CONTEXT_MENU_KEYS, STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import { ColumnContextMenu } from './ColumnContextMenu'
 import { FileExplorerColumn } from './FileExplorerColumn'
@@ -14,6 +14,7 @@ export interface FileExplorerProps {
   columns: StorageColumn[]
   selectedItems: StorageItemWithColumn[]
   itemSearchString: string
+  isLoading?: boolean
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
@@ -24,6 +25,7 @@ export const FileExplorer = ({
   columns = [],
   selectedItems = [],
   itemSearchString,
+  isLoading = false,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
@@ -52,7 +54,12 @@ export const FileExplorer = ({
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
       <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
       <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
-      {snap.view === STORAGE_VIEWS.COLUMNS ? (
+
+      {isLoading ? (
+        <FileExplorerColumn
+          column={{ id: '', name: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
+        />
+      ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
           {columns.map((column, index) => (
             <FileExplorerColumn

@@ -37,7 +37,6 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 export default async function handler(req: NextRequest) {
-  console.log('AI Docs request received', supabaseUrl, supabaseServiceKey)
   if (!openAiKey) {
     return new Response(
       JSON.stringify({

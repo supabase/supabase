@@ -1,12 +1,14 @@
-import { ident, literal } from './pg-format'
-import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { SCHEMAS_SQL } from './sql/schemas'
 import { z } from 'zod'
+
+import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
+import { ident, literal } from './pg-format'
+import { SCHEMAS_SQL } from './sql/schemas'
 
 const pgSchemaZod = z.object({
   id: z.number(),
   name: z.string(),
   owner: z.string(),
+  comment: z.string().nullable(),
 })
 const pgSchemaArrayZod = z.array(pgSchemaZod)
 const pgSchemaOptionalZod = z.optional(pgSchemaZod)

@@ -26,10 +26,12 @@ const DeleteFactorModal = ({
     ''
   )
 
-  const { mutate: unenroll, isLoading } = useMfaUnenrollMutation({
+  const { mutate: unenroll, isPending } = useMfaUnenrollMutation({
     onSuccess: async () => {
       if (lastVisitedOrganization) {
-        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+        await queryClient.invalidateQueries({
+          queryKey: organizationKeys.members(lastVisitedOrganization),
+        })
       }
       toast.success(`Successfully deleted factor`)
       onClose()
@@ -44,7 +46,7 @@ const DeleteFactorModal = ({
       title="Confirm to delete factor"
       confirmLabel="Delete"
       confirmLabelLoading="Deleting"
-      loading={isLoading}
+      loading={isPending}
       onCancel={onClose}
       onConfirm={() => factorId && unenroll({ factorId })}
       alert={{

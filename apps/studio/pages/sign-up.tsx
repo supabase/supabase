@@ -44,7 +44,7 @@ const SignUpPage: NextPageWithLayout = () => {
           href="/sign-in"
           className="underline text-foreground hover:text-foreground-light transition"
         >
-          Sign In Now
+          Sign in
         </Link>
       </div>
     </>

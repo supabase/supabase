@@ -1,0 +1,51 @@
+---
+title = "'Manually created databases are not visible in the Supabase Dashboard'"
+topics = [ "auth", "cli", "database", "functions", "platform", "storage" ]
+keywords = []
+---
+
+If you've manually created an additional database within your Supabase project, such as `example_database`, you might observe that it's accessible via external database tools but is not visible in the Supabase Dashboard. This guide explains the underlying reasons for this behavior and how Supabase is designed to handle databases.
+
+---
+
+## Key concepts
+
+Before diving into the problem, let's define some key terms:
+
+- **What is a Postgres Cluster?**
+  In Postgres terminology, a "cluster" refers to a collection of databases managed by a single Postgres server instance. This single instance can host multiple independent databases, each with its own set of tables, users, and permissions. Every Supabase project runs on top of a full Postgres cluster.
+- **What is a Supabase Project?**
+  A Supabase project is an integrated platform that includes a dedicated Postgres database, authentication services, storage, real-time capabilities, and more. Each project is configured to interact seamlessly with its primary database.
+- **What is the Supabase Dashboard?**
+  The Supabase Dashboard is a web-based interface that provides a graphical way to manage your project's database schema, data, authentication rules, storage buckets, functions, and other Supabase services.
+- **What is PostgREST?**
+  PostgREST is a standalone web server that automatically turns your Postgres database directly into a RESTful API. It generates API endpoints based on your database schema, allowing you to interact with your data via HTTP requests without writing custom backend code. Supabase leverages PostgREST to provide its powerful API layer.
+
+---
+
+## Understanding the problem: Multiple databases in Supabase
+
+The core of this behavior stems from the distinction between how Postgres manages databases and how Supabase integrates with them.
+
+- **Postgres's Flexibility:** As a standard Postgres cluster, your Supabase backend is inherently capable of hosting multiple databases. You can connect to your project and manually create additional databases, such as `example_database` or `another_database`, alongside the default `postgres` database. These manually created databases are fully functional Postgres databases, accessible via external tools like TablePlus, `psql`, or any other Postgres client, provided you use the correct connection parameters (e.g., `user=postgres.[your_project_slug] host=... port=... dbname=example_database`).
+
+- **Supabase's Integrated Design:** While Postgres itself supports multiple databases per cluster, the Supabase platform, its Dashboard, and most of its integrated features (such as PostgREST for APIs, Supabase Auth, and Supabase Storage) are specifically engineered to operate exclusively with the project's **default `postgres` database**.
+
+- **The Disconnect Explained:**
+  - **Dashboard Visibility:** The Supabase Dashboard is designed to manage and display information related solely to the `postgres` database within your project. Manually created databases (like `example_database`) will therefore not appear in the Dashboard's interface, as it's not configured to interact with them.
+  - **Service Integration:** Supabase's integrated services are tightly coupled to the `postgres` database. For example, the API layer powered by PostgREST is designed to expose schemas _from the `postgres` database_, not to manage or expose multiple separate databases. This architectural choice simplifies the platform's design, ensures consistent behavior, and allows Supabase to layer its features effectively on top of the `postgres` database. Supporting multiple databases for all integrated services would introduce significant complexity and fundamentally alter Supabase's current model.
+
+---
+
+## Resolution and best practices
+
+To effectively utilize Supabase and its features, consider the following approaches:
+
+- **For Supabase Feature Integration:** If you intend for your data to be managed via the Supabase Dashboard, accessed through auto-generated APIs (PostgREST), or integrated with Supabase's Authentication or Storage services, all your data and schemas **must reside within the project's default `postgres` database**. This is the designated database for full Supabase ecosystem compatibility.
+
+- **When a Truly Separate, Integrated Database is Needed:** If your application architecture requires a logically separate database that also benefits from full Supabase feature integration (Dashboard visibility, APIs, Auth, etc.), the recommended approach is to **create a new Supabase project**. Each new project you create will come with its own dedicated Postgres cluster and its own default `postgres` database, fully integrated with all Supabase services. This ensures that each "database" managed by Supabase has its own isolated environment and complete feature support.
+
+- **Using Manually Created Databases (with caveats):** Creating additional databases within a single Supabase project's Postgres cluster (e.g., `example_database`) is technically possible and accessible via external tools. However, this approach is generally suitable only if:
+  - You do not need these databases to be visible or managed through the Supabase Dashboard.
+  - You do not intend to use Supabase's integrated services (like PostgREST, Auth, or Storage) with these specific databases.
+  - You are comfortable managing these databases entirely through direct Postgres client connections, essentially treating them as standard Postgres databases within the Supabase-provided cluster, but operating outside the Supabase platform's feature set.

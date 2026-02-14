@@ -1,7 +1,6 @@
-import { useIsLoggedIn, useParams } from 'common'
+import { useParams } from 'common'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { PROVIDERS } from 'lib/constants'
+import { PROJECT_STATUS, PROVIDERS } from 'lib/constants'
 
 export function useSelectedProjectQuery({ enabled = true } = {}) {
   const { ref } = useParams()
@@ -11,32 +10,13 @@ export function useSelectedProjectQuery({ enabled = true } = {}) {
     {
       enabled,
       select: (data) => {
-        return { ...data, parentRef: data.parent_project_ref ?? data.ref }
+        return {
+          ...data,
+          parentRef: data.parent_project_ref ?? data.ref,
+        }
       },
     }
   )
-}
-
-export function useProjectByRefQuery(ref?: string) {
-  const isLoggedIn = useIsLoggedIn()
-
-  const projectQuery = useProjectDetailQuery({ ref }, { enabled: isLoggedIn })
-
-  // [Alaister]: This is here for the purpose of improving performance.
-  // Chances are, the user will already have the list of projects in the cache.
-  // We can't exclusively rely on this method, as useProjectsQuery does not return branch projects.
-  const projectsQuery = useProjectsQuery({
-    enabled: isLoggedIn,
-    select: (data) => {
-      return data.projects.find((project) => project.ref === ref)
-    },
-  })
-
-  if (projectQuery.isSuccess) {
-    return projectQuery
-  }
-
-  return projectsQuery
 }
 
 export const useIsAwsCloudProvider = () => {
@@ -53,6 +33,13 @@ export const useIsAwsK8sCloudProvider = () => {
   return isAwsK8s
 }
 
+export const useIsAwsNimbusCloudProvider = () => {
+  const { data: project } = useSelectedProjectQuery()
+  const isAwsNimbus = project?.cloud_provider === PROVIDERS.AWS_NIMBUS.id
+
+  return isAwsNimbus
+}
+
 export const useIsOrioleDb = () => {
   const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = project?.dbVersion?.endsWith('orioledb')
@@ -64,4 +51,9 @@ export const useIsOrioleDbInAws = () => {
   const isOrioleDbInAws =
     project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS.id
   return isOrioleDbInAws
+}
+
+export const useIsProjectActive = () => {
+  const { data: project } = useSelectedProjectQuery()
+  return project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 }

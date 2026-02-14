@@ -1,6 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
-
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type {
   EventChart,
@@ -10,6 +8,8 @@ import type {
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import { genChartQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
+import { useMemo } from 'react'
+
 import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
@@ -68,9 +68,9 @@ function useProjectUsageStats({
     [projectRef, chartQuery, timestampStart, timestampEnd, table]
   )
 
-  const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
-    chartQueryKey,
-    async ({ signal }) => {
+  const { data: eventChartResponse, refetch: refreshEventChart } = useQuery({
+    queryKey: chartQueryKey,
+    queryFn: async ({ signal }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -88,25 +88,23 @@ function useProjectUsageStats({
 
       return data as unknown as EventChart
     },
-    {
-      refetchOnWindowFocus: false,
-      enabled: typeof projectRef !== 'undefined',
-    }
-  )
+    refetchOnWindowFocus: false,
+    enabled: typeof projectRef !== 'undefined',
+  })
 
   const normalizedEventChartData = useTimeseriesUnixToIso(
     eventChartResponse?.result ?? [],
     'timestamp'
   )
 
-  const { data: eventChartData, error: eventChartError } = useFillTimeseriesSorted(
-    normalizedEventChartData,
-    'timestamp',
-    'count',
-    0,
-    timestampStart,
-    timestampEnd || new Date().toISOString()
-  )
+  const { data: eventChartData, error: eventChartError } = useFillTimeseriesSorted({
+    data: normalizedEventChartData,
+    timestampKey: 'timestamp',
+    valueKey: 'count',
+    defaultValue: 0,
+    startDate: timestampStart,
+    endDate: timestampEnd ?? new Date().toISOString(),
+  })
 
   return {
     isLoading: !eventChartResponse,

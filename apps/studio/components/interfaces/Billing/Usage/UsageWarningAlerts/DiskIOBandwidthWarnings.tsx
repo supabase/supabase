@@ -12,7 +12,7 @@ interface DiskIOBandwidthWarningsProps {
   highestIoBudgetConsumption: number
 }
 
-const DiskIOBandwidthWarnings = ({
+export const DiskIOBandwidthWarnings = ({
   isFreePlan,
   hasLatest,
   currentBillingCycleSelected,
@@ -116,5 +116,3 @@ const DiskIOBandwidthWarnings = ({
 
   return null
 }
-
-export default DiskIOBandwidthWarnings

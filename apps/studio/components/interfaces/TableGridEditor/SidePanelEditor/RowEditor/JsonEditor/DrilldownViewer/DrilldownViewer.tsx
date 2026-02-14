@@ -9,7 +9,7 @@ interface DrilldownViewerProps {
   jsonData: Dictionary<any>
 }
 
-const DrilldownViewer = ({ jsonData = {} }: DrilldownViewerProps) => {
+export const DrilldownViewer = ({ jsonData = {} }: DrilldownViewerProps) => {
   const [activeKey, setActiveKey] = useState<string>()
   const [breadCrumbs, setBreadCrumbs] = useState<string[]>([])
   const [jsonPane1, setJsonPane1] = useState<Dictionary<any>>(jsonData)
@@ -92,5 +92,3 @@ const DrilldownViewer = ({ jsonData = {} }: DrilldownViewerProps) => {
     </div>
   )
 }
-
-export default DrilldownViewer

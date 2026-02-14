@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { authKeys } from './keys'
 
 export type AuthHooksUpdateVariables = {
@@ -28,27 +28,25 @@ export const useAuthHooksUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AuthHooksUpdateData, ResponseError, AuthHooksUpdateVariables>,
+  UseCustomMutationOptions<AuthHooksUpdateData, ResponseError, AuthHooksUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthHooksUpdateData, ResponseError, AuthHooksUpdateVariables>(
-    (vars) => updateAuthHooks(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(authKeys.authConfig(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update auth hooks: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<AuthHooksUpdateData, ResponseError, AuthHooksUpdateVariables>({
+    mutationFn: (vars) => updateAuthHooks(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update auth hooks: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

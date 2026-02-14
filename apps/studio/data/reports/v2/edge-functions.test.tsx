@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
-  extractStatusCodesFromData,
-  generateStatusCodeAttributes,
-  transformStatusCodeData,
   transformInvocationData,
   aggregateInvocationsByTimestamp,
   filterToWhereClause,
 } from './edge-functions.config'
+import {
+  extractStatusCodesFromData,
+  generateStatusCodeAttributes,
+  transformStatusCodeData,
+} from 'components/interfaces/Reports/Reports.utils'
 
 const defaultFilters = {
   status_code: null,

@@ -1,8 +1,5 @@
-import { Lock } from 'lucide-react'
-
 import { useParams } from 'common'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
@@ -19,7 +16,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
+    authenticationPerformance,
   } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
     'authentication:third_party_auth',
@@ -27,28 +24,8 @@ export function useAuthGotoCommands(options?: CommandOptions) {
     'authentication:emails',
     'authentication:multi_factor',
     'authentication:attack_protection',
-    'authentication:advanced',
+    'authentication:performance',
   ])
-
-  useRegisterCommands(
-    'Actions',
-    [
-      {
-        id: 'create-rls-policy',
-        name: 'Create RLS policy',
-        value: 'Create RLS (Row Level Security) policy',
-        route: `/project/${ref}/auth/policies`,
-        icon: () => <Lock />,
-      },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      enabled: (options?.enabled ?? true) && ref !== '_',
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.NAVIGATE,
@@ -116,6 +93,13 @@ export function useAuthGotoCommands(options?: CommandOptions) {
               route: `/project/${ref}/auth/templates`,
               defaultHidden: true,
             } as IRouteCommand,
+            {
+              id: 'nav-auth-smtp',
+              name: 'SMTP Settings',
+              value: 'Auth: SMTP Settings (Email Configuration)',
+              route: `/project/${ref}/auth/smtp`,
+              defaultHidden: true,
+            } as IRouteCommand,
           ]
         : []),
       ...(authenticationMultiFactor
@@ -154,13 +138,13 @@ export function useAuthGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/auth/hooks`,
         defaultHidden: true,
       },
-      ...(authenticationAdvanced
+      ...(authenticationPerformance
         ? [
             {
-              id: 'nav-auth-advanced-settings',
-              name: 'Auth Advanced Settings',
-              value: 'Auth: Advanced Settings',
-              route: `/project/${ref}/auth/advanced`,
+              id: 'nav-auth-performance-settings',
+              name: 'Auth Performance Settings',
+              value: 'Auth: Performance Settings',
+              route: `/project/${ref}/auth/performance`,
               defaultHidden: true,
             } as IRouteCommand,
           ]

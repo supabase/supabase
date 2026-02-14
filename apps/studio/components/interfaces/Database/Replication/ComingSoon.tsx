@@ -1,23 +1,15 @@
-import { motion } from 'framer-motion'
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Circle,
-  Database,
-  MoreVertical,
-  Plus,
-  Search,
-} from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Circle, Database, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import ReactFlow, { Background, Handle, Position, ReactFlowProvider } from 'reactflow'
+
 import 'reactflow/dist/style.css'
 
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
+import { useParams } from 'common'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, Card, CardContent, Input_Shadcn_ } from 'ui'
+import { Button, Card, CardContent } from 'ui'
+
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const STATIC_NODES = [
@@ -72,22 +64,25 @@ const STATIC_EDGES = [
   { id: 'e1-4', source: '1', target: '4', type: 'smoothstep', animated: true },
 ]
 
-export const ReplicationComingSoon = ({ projectRef }: { projectRef: string }) => {
+export const ReplicationComingSoon = () => {
   return (
     <ReactFlowProvider>
-      <ReplicationStaticMockup projectRef={projectRef} />
+      <ReplicationStaticMockup />
     </ReactFlowProvider>
   )
 }
 
-const ReplicationStaticMockup = ({ projectRef }: { projectRef: string }) => {
+const ReplicationStaticMockup = () => {
+  const { ref: projectRef = '_' } = useParams()
   const nodes = useMemo(() => STATIC_NODES, [])
   const edges = useMemo(() => STATIC_EDGES, [])
 
   const { resolvedTheme } = useTheme()
 
   const backgroundPatternColor =
-    resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
+    resolvedTheme === 'dark' && projectRef !== '_'
+      ? 'rgba(255, 255, 255, 0.3)'
+      : 'rgba(0, 0, 0, 0.4)'
 
   const nodeTypes = useMemo(
     () => ({
@@ -96,32 +91,29 @@ const ReplicationStaticMockup = ({ projectRef }: { projectRef: string }) => {
       blank: BlankNode,
       cta: () => CTANode({ projectRef }),
     }),
-    []
+    [projectRef]
   )
 
   return (
-    <div className="relative border-t">
-      <div className="h-[500px] w-full relative">
-        <ReactFlow
-          fitView
-          fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
-          className="instance-configuration"
-          zoomOnPinch={false}
-          zoomOnScroll={false}
-          nodesDraggable={true}
-          nodesConnectable={false}
-          zoomOnDoubleClick={false}
-          edgesFocusable={false}
-          edgesUpdatable={false}
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          proOptions={{ hideAttribution: true }}
-        >
-          <Background color={backgroundPatternColor} />
-        </ReactFlow>
-      </div>
-      <StaticDestinations />
+    <div className="relative border-t h-full w-full">
+      <ReactFlow
+        fitView
+        fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
+        className="instance-configuration"
+        zoomOnPinch={false}
+        zoomOnScroll={false}
+        nodesDraggable={true}
+        nodesConnectable={false}
+        zoomOnDoubleClick={false}
+        edgesFocusable={false}
+        edgesUpdatable={false}
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        proOptions={{ hideAttribution: true }}
+      >
+        <Background color={backgroundPatternColor} />
+      </ReactFlow>
     </div>
   )
 }
@@ -171,7 +163,7 @@ const ReplicaNode = ({
       <div className="flex items-start justify-between p-3" style={{ width: NODE_WIDTH / 2 - 10 }}>
         <div className="flex gap-x-3">
           <div className="flex flex-col gap-y-0.5">
-            <p className="">{data.label}</p>
+            <p>{data.label}</p>
             <p className="flex items-center gap-x-1">
               <span className="text-sm text-foreground-light">{data.details}</span>
             </p>
@@ -210,20 +202,22 @@ const BlankNode = () => {
 
 const CTANode = ({ projectRef }: { projectRef: string }) => {
   return (
-    <Card className="w-[500px] p-6">
+    <Card className="w-[570px] p-6">
       <CardContent>
-        <div className="flex items-center gap-x-2 justify-between mb-2">
-          <h2 className="text-lg">Replicate your data in real time</h2>
-          <Badge variant="warning">Early Access</Badge>
-        </div>
+        <h2 className="text-lg mb-2">Stream database changes to external destinations</h2>
+        <p className="text-foreground-light mb-2">
+          Automatically replicate your data to external data warehouses and analytics platforms in
+          real-time. No manual exports, no lag.
+        </p>
         <p className="text-foreground-light">
-          Stream database changes to multiple destinations - no manual exports, no lag. Limited
-          rollout for external destinations has begun, read replicas available now.
+          We are currently in <span className="text-foreground">private alpha</span> and slowly
+          onboarding new customers to ensure stable data pipelines. Request access below to join the
+          waitlist. Read replicas are available now.
         </p>
         <div className="flex items-center gap-x-2 mt-6">
           <Button asChild type="secondary" iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}>
             <Link href="https://forms.supabase.com/pg_replicate" target="_blank" rel="noreferrer">
-              Request early access
+              Request alpha access
             </Link>
           </Button>
           <Button asChild type="default" iconRight={<ArrowRight size={16} strokeWidth={1.5} />}>
@@ -234,81 +228,5 @@ const CTANode = ({ projectRef }: { projectRef: string }) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
-
-const StaticDestinations = () => {
-  const mockRows = [
-    { name: 'BigQuery', tables: 4, lag: '55ms', status: 'Enabled' },
-    { name: 'Iceberg', tables: 4, lag: '85ms', status: 'Enabled' },
-    { name: 'US East', tables: 4, lag: '125ms', status: 'Enabled' },
-  ]
-
-  return (
-    <>
-      <div className="flex flex-col bg-surface-100 px-6 py-6 border-t relative ">
-        <div className="z-10 bg-surface-300 w-full h-full absolute top-0 left-0 opacity-30" />
-
-        <ScaffoldContainer>
-          <ScaffoldSection className="!py-0">
-            <div className="col-span-12">
-              <div className="flex items-center justify-between">
-                <div className="relative w-52">
-                  <Search
-                    size={14}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-                  />
-                  <Input_Shadcn_
-                    className="pl-9 bg-transparent h-8 pointer-events-none"
-                    placeholder="Search..."
-                  />
-                </div>
-                <Button
-                  disabled
-                  type="primary"
-                  icon={<Plus size={16} />}
-                  className="flex items-center pointer-events-none"
-                >
-                  New destination
-                </Button>
-              </div>
-              <Table
-                head={[
-                  <Table.th key="name">Name</Table.th>,
-                  <Table.th key="publication">Publication</Table.th>,
-                  <Table.th key="lag">Lag</Table.th>,
-                  <Table.th key="status">Status</Table.th>,
-                  <Table.th key="actions"></Table.th>,
-                ]}
-                className="mt-4"
-                body={mockRows.map((row, i) => (
-                  <Table.tr key={i}>
-                    <Table.td>{row.name}</Table.td>
-                    <Table.td>
-                      <span className="flex items-center gap-2">
-                        <span className="font-bold">All</span>
-                        <span className="text-sm text-foreground-lighter">{row.tables} tables</span>
-                      </span>
-                    </Table.td>
-                    <Table.td>{row.lag}</Table.td>
-                    <Table.td>
-                      <span className="flex items-center gap-3">
-                        <Circle size={10} className="bg-brand-500 stroke-none rounded-full" />
-                        {row.status}
-                      </span>
-                    </Table.td>
-                    <Table.td className="text-right">
-                      <button className="p-1">
-                        <MoreVertical size={18} />
-                      </button>
-                    </Table.td>
-                  </Table.tr>
-                ))}
-              />
-            </div>
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      </div>
-    </>
   )
 }

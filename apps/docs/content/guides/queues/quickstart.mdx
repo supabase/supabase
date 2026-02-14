@@ -157,7 +157,14 @@ Then enable the required roles permissions.
 
 Once your Queue has been created, you can begin enqueueing and dequeueing Messages.
 
-Here's a TypeScript example using the official Supabase client library:
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```tsx
 import { createClient } from '@supabase/supabase-js'
@@ -205,3 +212,105 @@ const QueuesTest: React.FC = () => {
 
 export default QueuesTest
 ```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+final supabase = Supabase.instance.client;
+
+// Add a Message
+Future<void> sendToQueue() async {
+  final result = await supabase.schema('pgmq_public').rpc('send', params: {
+    'queue_name': 'foo',
+    'message': {'hello': 'world'},
+    'sleep_seconds': 30,
+  });
+  print(result);
+}
+
+// Dequeue Message
+Future<void> popFromQueue() async {
+  final result = await supabase.schema('pgmq_public').rpc('pop', params: {
+    'queue_name': 'foo',
+  });
+  print(result);
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+import Supabase
+
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "supabaseURL")!,
+  supabaseKey: "supabaseKey"
+)
+
+// Add a Message
+func sendToQueue() async throws {
+  let result = try await supabase
+    .schema("pgmq_public")
+    .rpc("send", params: [
+      "queue_name": AnyJSON.string("foo"),
+      "message": AnyJSON.object(["hello": "world"]),
+      "sleep_seconds": AnyJSON.integer(30)
+    ])
+    .execute()
+  print(result)
+}
+
+// Dequeue Message
+func popFromQueue() async throws {
+  let result = try await supabase
+    .schema("pgmq_public")
+    .rpc("pop", params: ["queue_name": "foo"])
+    .execute()
+  print(result)
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client, Client
+
+supabase_url = "supabaseURL"
+supabase_key = "supabaseKey"
+
+supabase: Client = create_client(supabase_url, supabase_key)
+
+# Add a Message
+def send_to_queue():
+    result = supabase.schema("pgmq_public").rpc(
+        "send",
+        {
+            "queue_name": "foo",
+            "message": {"hello": "world"},
+            "sleep_seconds": 30,
+        }
+    ).execute()
+    print(result)
+
+# Dequeue Message
+def pop_from_queue():
+    result = supabase.schema("pgmq_public").rpc(
+        "pop",
+        {"queue_name": "foo"}
+    ).execute()
+    print(result)
+```
+
+</TabPanel>
+</$Show>
+</Tabs>

@@ -96,7 +96,7 @@ export const LockedRenameQuerySection = ({
           </p>
         </div>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">alter</span> policy {oldName}
+          <span className="text-[#569cd6]">alter</span> policy "{oldName}"
         </p>
       </div>
       <div className="flex items-center" style={{ fontSize: '14px' }}>

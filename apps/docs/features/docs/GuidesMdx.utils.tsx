@@ -17,6 +17,9 @@ import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
 import { newEditLink } from './GuidesMdx.template'
 import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 const PUBLISHED_SECTIONS = [
   'ai',
@@ -170,7 +173,7 @@ const genGuideMeta =
     const ogType = pathname.split('/')[2]
 
     return {
-      title: `${meta.title} | Supabase Docs`,
+      title: `${meta.title} | ${metadataTitle || 'Supabase'}`,
       description: meta.description || meta.subtitle,
       // @ts-ignore
       alternates: {

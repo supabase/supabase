@@ -1,12 +1,12 @@
-import { MessageCircle } from 'lucide-react'
+import VideoWithHighlights from 'components/VideoWithHighlights'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import Link from 'next/link'
 import { Button } from 'ui'
-import VideoWithHighlights from 'components/VideoWithHighlights'
 import ProductModules from '../ProductModules'
-import { useSendTelemetryEvent } from 'lib/telemetry'
 
-import tweets from 'shared-data/tweets'
 import MainProducts from 'data/MainProducts'
+import { topTweets } from 'shared-data/tweets'
+import { IconDiscord } from 'ui'
 
 export default () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -173,38 +173,22 @@ export default () => {
       heading: 'Join the community',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
-        <>
-          <Button asChild size="small" iconRight={<MessageCircle size={14} />} type="default">
-            <Link
-              href={'https://github.com/supabase/supabase/discussions'}
-              target="_blank"
-              tabIndex={-1}
-              onClick={() =>
-                sendTelemetryEvent({
-                  action: 'homepage_github_discussions_button_clicked',
-                })
-              }
-            >
-              GitHub discussions
-            </Link>
-          </Button>
-          <Button asChild type="default" size="small" iconRight={<MessageCircle size={14} />}>
-            <Link
-              href={'https://discord.supabase.com/'}
-              target="_blank"
-              tabIndex={-1}
-              onClick={() =>
-                sendTelemetryEvent({
-                  action: 'homepage_discord_button_clicked',
-                })
-              }
-            >
-              Discord
-            </Link>
-          </Button>
-        </>
+        <Button asChild type="default" size="small" icon={<IconDiscord />}>
+          <Link
+            href={'https://discord.supabase.com/'}
+            target="_blank"
+            tabIndex={-1}
+            onClick={() =>
+              sendTelemetryEvent({
+                action: 'homepage_discord_button_clicked',
+              })
+            }
+          >
+            Join us on Discord
+          </Link>
+        </Button>
       ),
-      tweets: tweets.slice(0, 18),
+      tweets: topTweets,
     },
   }
 }

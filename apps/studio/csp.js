@@ -103,6 +103,7 @@ module.exports.getCSP = function getCSP() {
     GOOGLE_MAPS_API_URL,
     POSTHOG_URL,
     ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
+    CLOUDFLARE_CDN_URL,
   ]
   const SCRIPT_SRC_URLS = [
     CLOUDFLARE_CDN_URL,
@@ -112,7 +113,12 @@ module.exports.getCSP = function getCSP() {
     STAPE_URL,
     POSTHOG_URL,
   ]
-  const FRAME_SRC_URLS = [HCAPTCHA_ASSET_URL, STRIPE_JS_URL, STAPE_URL]
+  const FRAME_SRC_URLS = [
+    HCAPTCHA_ASSET_URL,
+    STRIPE_JS_URL,
+    STAPE_URL,
+    ...(isDevOrStaging ? [POSTHOG_URL] : []),
+  ]
   const IMG_SRC_URLS = [
     SUPABASE_URL,
     SUPABASE_COM_URL,

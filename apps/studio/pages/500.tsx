@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSignOut } from 'lib/auth'
 import { Button } from 'ui'
@@ -69,7 +70,7 @@ const Error500: NextPage = () => {
           <Button onClick={onClickLogout}>Head back</Button>
         )}
         <Button type="secondary" asChild>
-          <Link href="/support/new">Submit a support request</Link>
+          <SupportLink>Submit a support request</SupportLink>
         </Button>
       </div>
     </div>

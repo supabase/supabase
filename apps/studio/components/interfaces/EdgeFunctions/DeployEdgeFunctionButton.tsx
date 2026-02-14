@@ -1,39 +1,54 @@
-import { ChevronDown, Code, Terminal } from 'lucide-react'
-import { useRouter } from 'next/router'
-
 import { useParams } from 'common'
-import { TerminalInstructions } from 'components/interfaces/Functions/TerminalInstructions'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { ChevronDown, Code, Terminal } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogSection,
-  DialogTitle,
-  DialogTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
+
 export const DeployEdgeFunctionButton = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
+
   const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()
+  const [, setCreateMethod] = useQueryState('create', parseAsString)
+
+  const isProjectActive = useIsProjectActive()
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="primary" iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1.5} />}>
+      <DropdownMenuTrigger asChild disabled={!isProjectActive}>
+        <ButtonTooltip
+          type="primary"
+          disabled={!isProjectActive}
+          iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1.5} />}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !isProjectActive
+                ? 'Unable to deploy function as project is inactive'
+                : undefined,
+            },
+          }}
+        >
           Deploy a new function
-        </Button>
+        </ButtonTooltip>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
         <DropdownMenuItem
@@ -53,41 +68,29 @@ export const DeployEdgeFunctionButton = () => {
             <p>Write and deploy in the browser</p>
           </div>
         </DropdownMenuItem>
-        <Dialog>
-          <DialogTrigger asChild>
-            <DropdownMenuItem
-              className="gap-4"
-              onSelect={(e) => {
-                e.preventDefault()
-                sendEvent({
-                  action: 'edge_function_via_cli_button_clicked',
-                  properties: { origin: 'secondary_action' },
-                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                })
-              }}
-            >
-              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
-              <div>
-                <span className="text-foreground">Via CLI</span>
-                <p>Write locally, deploy with the CLI</p>
-              </div>
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DialogContent size="large">
-            <DialogTitle className="sr-only">
-              Create your first Edge Function via the CLI
-            </DialogTitle>
-            <DialogSection padding="small">
-              <TerminalInstructions />
-            </DialogSection>
-          </DialogContent>
-        </Dialog>
         <DropdownMenuItem
           className="gap-4"
           onSelect={() => {
+            setCreateMethod('cli')
+            sendEvent({
+              action: 'edge_function_via_cli_button_clicked',
+              properties: { origin: 'secondary_action' },
+              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+            })
+          }}
+        >
+          <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
+          <div>
+            <span className="text-foreground">Via CLI</span>
+            <p>Write locally, deploy with the CLI</p>
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="gap-4"
+          onSelect={() => {
+            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
             snap.newChat({
               name: 'Create new edge function',
-              open: true,
               initialInput: `Create a new edge function that ...`,
               suggestions: {
                 title:

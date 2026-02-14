@@ -1,15 +1,40 @@
+import { IS_PLATFORM } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Lightbulb, TriangleAlert } from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import {
+  Button,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
+  PopoverTrigger_Shadcn_,
+} from 'ui'
 
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import { ASSISTANT_SUGGESTIONS } from '../HelpDropdown/HelpDropdown.constants'
+import { getSupportLinkQueryParams } from '../HelpDropdown/HelpDropdown.utils'
+import { HelpSection } from '../HelpDropdown/HelpSection'
 import { FeedbackWidget } from './FeedbackWidget'
 
-const FeedbackDropdown = ({ className }: { className?: string }) => {
+export const FeedbackDropdown = ({ className }: { className?: string }) => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+  const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const [isOpen, setIsOpen] = useState(false)
-  const [feedback, setFeedback] = useState('')
-  const [screenshot, setScreenshot] = useState<string>()
-  const [stage, setStage] = useState<'select' | 'widget'>('select')
+  const [stage, setStage] = useState<'select' | 'issue-options' | 'widget'>('select')
+
+  const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
+  const supportLinkQueryParams = getSupportLinkQueryParams(
+    project,
+    org,
+    router.query.ref as string | undefined
+  )
 
   return (
     <Popover_Shadcn_
@@ -17,7 +42,6 @@ const FeedbackDropdown = ({ className }: { className?: string }) => {
       open={isOpen}
       onOpenChange={(e) => {
         setIsOpen(e)
-        if (!e) setScreenshot(undefined)
         if (!e) setStage('select')
       }}
     >
@@ -28,8 +52,8 @@ const FeedbackDropdown = ({ className }: { className?: string }) => {
             setIsOpen((isOpen) => !isOpen)
             setStage('select')
           }}
-          type="outline"
-          className="rounded-full h-[32px] border-border"
+          type="text"
+          className="rounded-full h-[32px] text-foreground-light hover:text-foreground"
         >
           <span className={className}>Feedback</span>
         </Button>
@@ -37,44 +61,65 @@ const FeedbackDropdown = ({ className }: { className?: string }) => {
       <PopoverContent_Shadcn_
         side="bottom"
         align="end"
-        className="px-0 flex flex-col pt-1 pb-3 w-96"
+        className="p-0 flex flex-col w-96"
         id="feedback-widget"
       >
         {stage === 'select' && (
           <div className="flex flex-col gap-4 p-4">
             <div className="font-medium text-sm">What would you like to share?</div>
             <div className="grid grid-cols-2 gap-3">
-              <Button type="default" className="h-32" onClick={() => setIsOpen(false)} asChild>
-                <Link href="/support/new">
-                  <span className="grid gap-1 text-center">
-                    <TriangleAlert size="28" className="mx-auto text-destructive-600" />
+              <Button type="default" className="h-32" onClick={() => setStage('issue-options')}>
+                <div className="grid gap-1.5 text-center">
+                  <TriangleAlert size="28" className="mx-auto text-destructive-600" />
+                  <div className="flex flex-col items-center">
                     <span className="text-base">Issue</span>
-                    <span className="text-xm text-foreground-lighter">with my project</span>
-                  </span>
-                </Link>
+                    <span className="text-xs text-foreground-lighter">with my project</span>
+                  </div>
+                </div>
               </Button>
               <Button type="default" className="h-32" onClick={() => setStage('widget')}>
-                <span className="grid gap-1 text-center">
+                <div className="grid gap-1.5 text-center">
                   <Lightbulb size="28" className="mx-auto text-warning" />
-                  <span className="text-base">Idea</span>
-                  <span className="text-xm text-foreground-lighter">to improve Supabase</span>
-                </span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-base">Idea</span>
+                    <span className="text-xs text-foreground-lighter">to improve Supabase</span>
+                  </div>
+                </div>
               </Button>
             </div>
           </div>
         )}
+        {stage === 'issue-options' && (
+          <>
+            <div className="flex flex-col gap-4 p-4">
+              <HelpSection
+                excludeIds={[]}
+                isPlatform={IS_PLATFORM}
+                projectRef={projectRef}
+                supportLinkQueryParams={supportLinkQueryParams}
+                onAssistantClick={() => {
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                  snap.newChat(ASSISTANT_SUGGESTIONS)
+                  setIsOpen(false)
+                }}
+                onSupportClick={() => setIsOpen(false)}
+              />
+            </div>
+            <PopoverSeparator_Shadcn_ />
+            <div className="px-4 pt-4 pb-4">
+              <Button type="default" size="tiny" onClick={() => setStage('widget')}>
+                Leave feedback instead
+              </Button>
+            </div>
+          </>
+        )}
         {stage === 'widget' && (
           <FeedbackWidget
             onClose={() => setIsOpen(false)}
-            feedback={feedback}
-            setFeedback={setFeedback}
-            screenshot={screenshot}
-            setScreenshot={setScreenshot}
+            onSwitchToIssueOptions={() => setStage('issue-options')}
           />
         )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
 }
-
-export default FeedbackDropdown

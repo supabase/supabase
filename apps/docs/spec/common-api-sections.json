@@ -245,6 +245,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-a-migration",
+        "title": "Get a migration",
+        "slug": "v1-get-a-migration",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-a-snippet",
         "title": "Get a snippet",
         "slug": "v1-get-a-snippet",
@@ -260,6 +266,12 @@
         "id": "v1-get-jit-access",
         "title": "Get jit access",
         "slug": "v1-get-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-jit-access-config",
+        "title": "Get jit access config",
+        "slug": "v1-get-jit-access-config",
         "type": "operation"
       },
       {
@@ -317,6 +329,18 @@
         "type": "operation"
       },
       {
+        "id": "v1-patch-a-migration",
+        "title": "Patch a migration",
+        "slug": "v1-patch-a-migration",
+        "type": "operation"
+      },
+      {
+        "id": "v1-read-only-query",
+        "title": "Read only query",
+        "slug": "v1-read-only-query",
+        "type": "operation"
+      },
+      {
         "id": "v1-remove-a-read-replica",
         "title": "Remove a read replica",
         "slug": "v1-remove-a-read-replica",
@@ -326,6 +350,12 @@
         "id": "v1-restore-pitr-backup",
         "title": "Restore pitr backup",
         "slug": "v1-restore-pitr-backup",
+        "type": "operation"
+      },
+      {
+        "id": "v1-rollback-migrations",
+        "title": "Rollback migrations",
+        "slug": "v1-rollback-migrations",
         "type": "operation"
       },
       {
@@ -341,9 +371,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-update-database-password",
+        "title": "Update database password",
+        "slug": "v1-update-database-password",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-jit-access",
         "title": "Update jit access",
         "slug": "v1-update-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-jit-access-config",
+        "title": "Update jit access config",
+        "slug": "v1-update-jit-access-config",
         "type": "operation"
       },
       {
@@ -485,6 +527,12 @@
     "title": "Environments",
     "items": [
       {
+        "id": "v1-count-action-runs",
+        "title": "Count action runs",
+        "slug": "v1-count-action-runs",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-branch",
         "title": "Create a branch",
         "slug": "v1-create-a-branch",
@@ -521,6 +569,24 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-action-run",
+        "title": "Get action run",
+        "slug": "v1-get-action-run",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-action-run-logs",
+        "title": "Get action run logs",
+        "slug": "v1-get-action-run-logs",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-action-runs",
+        "title": "List action runs",
+        "slug": "v1-list-action-runs",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-branches",
         "title": "List all branches",
         "slug": "v1-list-all-branches",
@@ -545,9 +611,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-restore-a-branch",
+        "title": "Restore a branch",
+        "slug": "v1-restore-a-branch",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-a-branch-config",
         "title": "Update a branch config",
         "slug": "v1-update-a-branch-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-action-run-status",
+        "title": "Update action run status",
+        "slug": "v1-update-action-run-status",
         "type": "operation"
       }
     ]
@@ -566,6 +644,12 @@
         "id": "v1-exchange-oauth-token",
         "title": "Exchange oauth token",
         "slug": "v1-exchange-oauth-token",
+        "type": "operation"
+      },
+      {
+        "id": "v1-oauth-authorize-project-claim",
+        "title": "Oauth authorize project claim",
+        "slug": "v1-oauth-authorize-project-claim",
         "type": "operation"
       },
       {
@@ -635,6 +719,24 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-all-projects-for-organization",
+        "title": "Get all projects for organization",
+        "slug": "v1-get-all-projects-for-organization",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-available-regions",
+        "title": "Get available regions",
+        "slug": "v1-get-available-regions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-disk-utilization",
+        "title": "Get disk utilization",
+        "slug": "v1-get-disk-utilization",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-network-restrictions",
         "title": "Get network restrictions",
         "slug": "v1-get-network-restrictions",
@@ -656,6 +758,12 @@
         "id": "v1-get-project",
         "title": "Get project",
         "slug": "v1-get-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-disk-autoscale-config",
+        "title": "Get project disk autoscale config",
+        "slug": "v1-get-project-disk-autoscale-config",
         "type": "operation"
       },
       {
@@ -689,6 +797,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-modify-database-disk",
+        "title": "Modify database disk",
+        "slug": "v1-modify-database-disk",
+        "type": "operation"
+      },
+      {
         "id": "v1-patch-network-restrictions",
         "title": "Patch network restrictions",
         "slug": "v1-patch-network-restrictions",
@@ -707,6 +821,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-update-a-project",
+        "title": "Update a project",
+        "slug": "v1-update-a-project",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-network-restrictions",
         "title": "Update network restrictions",
         "slug": "v1-update-network-restrictions",
@@ -716,6 +836,24 @@
         "id": "v1-upgrade-postgres-version",
         "title": "Upgrade postgres version",
         "slug": "v1-upgrade-postgres-version",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Realtime",
+    "items": [
+      {
+        "id": "v1-get-realtime-config",
+        "title": "Get realtime config",
+        "slug": "v1-get-realtime-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-realtime-config",
+        "title": "Update realtime config",
+        "slug": "v1-update-realtime-config",
         "type": "operation"
       }
     ]

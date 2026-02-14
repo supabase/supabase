@@ -1,11 +1,12 @@
+import { EyeOffIcon } from 'lucide-react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
-import { EyeOffIcon } from 'lucide-react'
-import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { SqlSnippets } from 'types'
+import type { SqlSnippets } from 'types'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export const UnshareSnippetModal = ({
@@ -20,7 +21,7 @@ export const UnshareSnippetModal = ({
   const { ref: projectRef } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { mutate: upsertContent, isLoading: isUpserting } = useContentUpsertMutation({
+  const { mutate: upsertContent, isPending: isUpserting } = useContentUpsertMutation({
     onError: (error) => {
       toast.error(`Failed to update query: ${error.message}`)
     },
@@ -82,7 +83,10 @@ export const UnshareSnippetModal = ({
         description: 'Only you will have access to this query',
       }}
     >
-      <ul className="text-sm text-foreground-light space-y-5">
+      <ul
+        data-testid="confirm-unshare-snippet-modal"
+        className="text-sm text-foreground-light space-y-5"
+      >
         <li className="flex gap-3">
           <EyeOffIcon />
           <span>Project members will no longer be able to view this query.</span>

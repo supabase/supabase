@@ -1,15 +1,15 @@
+import { Clock } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
 import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueriesItem'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import { Button } from 'ui'
-import { Clock } from 'lucide-react'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()

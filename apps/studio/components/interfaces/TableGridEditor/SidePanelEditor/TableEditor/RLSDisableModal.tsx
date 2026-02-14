@@ -1,10 +1,13 @@
 import { AlertOctagon, Lock, ShieldOff } from 'lucide-react'
 
 import { DocsButton } from 'components/ui/DocsButton'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { DOCS_URL } from 'lib/constants'
 import { Alert } from 'ui'
 
-export default function RLSDisableModalContent() {
+export function RLSDisableModalContent() {
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
+
   return (
     <div className="text-sm text-foreground-light grid gap-4">
       <div className="grid gap-1">
@@ -18,12 +21,12 @@ export default function RLSDisableModalContent() {
         </Alert>
         <ul className="mt-4 space-y-5">
           <li className="flex gap-3">
-            <AlertOctagon />
+            <AlertOctagon size={14} />
             <span>All requests to this table will be accepted.</span>
           </li>
 
           <li className="flex gap-3">
-            <ShieldOff />
+            <ShieldOff size={14} />
             <span>Auth policies will not be enforced.</span>
           </li>
 
@@ -47,7 +50,7 @@ export default function RLSDisableModalContent() {
       <DocsButton
         abbrev={false}
         className="w-min mt-3"
-        href={`${DOCS_URL}/guides/auth/row-level-security`}
+        href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
       />
     </div>
   )

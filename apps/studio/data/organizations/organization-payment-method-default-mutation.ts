@@ -1,7 +1,7 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, put } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationPaymentMethodDefaultVariables = {
@@ -34,7 +34,7 @@ export const useOrganizationPaymentMethodMarkAsDefaultMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationPaymentMethodDefaultData,
     ResponseError,
     OrganizationPaymentMethodDefaultVariables
@@ -47,18 +47,22 @@ export const useOrganizationPaymentMethodMarkAsDefaultMutation = ({
     OrganizationPaymentMethodDefaultData,
     ResponseError,
     OrganizationPaymentMethodDefaultVariables
-  >((vars) => markPaymentMethodAsDefault(vars), {
+  >({
+    mutationFn: (vars) => markPaymentMethodAsDefault(vars),
     async onSuccess(data, variables, context) {
       const { slug, paymentMethodId } = variables
       // We do not invalidate payment methods here as endpoint data is stale for 1-2 seconds, so we handle state manually
-      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          defaultPaymentMethodId: paymentMethodId,
-          data: prev.data.map((pm: any) => ({ ...pm, is_default: pm.id === paymentMethodId })),
+      queryClient.setQueriesData(
+        { queryKey: organizationKeys.paymentMethods(slug) },
+        (prev: any) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            defaultPaymentMethodId: paymentMethodId,
+            data: prev.data.map((pm: any) => ({ ...pm, is_default: pm.id === paymentMethodId })),
+          }
         }
-      })
+      )
 
       await onSuccess?.(data, variables, context)
     },

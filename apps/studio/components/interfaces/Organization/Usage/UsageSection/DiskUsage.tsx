@@ -4,9 +4,8 @@ import { useMemo } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { useOrgProjectsQuery } from 'data/projects/org-projects'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -18,12 +17,13 @@ import {
   CriticalIcon,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 
 export interface DiskUsageProps {
   slug: string
-  projectRef?: string
+  projectRef?: string | null
   attribute: CategoryAttribute
   subscription?: OrgSubscription
   usage?: OrgUsageResponse
@@ -31,7 +31,7 @@ export interface DiskUsageProps {
   currentBillingCycleSelected: boolean
 }
 
-const DiskUsage = ({
+export const DiskUsage = ({
   slug,
   projectRef,
   attribute,
@@ -40,23 +40,17 @@ const DiskUsage = ({
   currentBillingCycleSelected,
 }: DiskUsageProps) => {
   const {
-    data: diskUsage,
+    data,
     isError,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     error,
-  } = useOrgProjectsQuery(
-    {
-      orgSlug: slug,
-    },
-    {
-      enabled: currentBillingCycleSelected,
-    }
-  )
+  } = useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
+  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
 
   const relevantProjects = useMemo(() => {
-    return diskUsage
-      ? diskUsage.projects
+    return isSuccess
+      ? projects
           .filter((project) => {
             // We do want to show branches that are exceeding the 8 GB limit, as people could have persistent or very long-living branches
             const isBranchExceedingFreeQuota =
@@ -72,7 +66,8 @@ const DiskUsage = ({
           })
           .filter((it) => it.ref === projectRef || !projectRef)
       : []
-  }, [diskUsage, projectRef])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, projects, projectRef])
 
   const hasProjectsExceedingDiskSize = useMemo(() => {
     return relevantProjects.some((it) =>
@@ -242,5 +237,3 @@ const DiskUsage = ({
     </div>
   )
 }
-
-export default DiskUsage

@@ -1,7 +1,8 @@
 'use client'
 
-import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import { useCallback, useEffect, useState } from 'react'
+
+import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 
 interface UseRealtimeChatProps {
   roomName: string
@@ -35,6 +36,8 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
           setIsConnected(true)
+        } else {
+          setIsConnected(false)
         }
       })
 

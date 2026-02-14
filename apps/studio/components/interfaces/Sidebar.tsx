@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
-import { LOCAL_STORAGE_KEYS, useIsMFAEnabled, useParams } from 'common'
+import { PROJECT_STATUS } from '@/lib/constants'
+import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import {
   generateOtherRoutes,
   generateProductRoutes,
@@ -13,6 +14,7 @@ import {
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
@@ -41,6 +43,7 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
+import { Route } from '../ui/ui.types'
 import {
   useIsAPIDocsSidePanelEnabled,
   useUnifiedLogsPreview,
@@ -161,7 +164,7 @@ export function SideBarNavLink({
   disabled,
   ...props
 }: {
-  route: any
+  route: Route
   active?: boolean
   disabled?: boolean
   onClick?: () => void
@@ -221,10 +224,16 @@ const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAppStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -240,19 +249,20 @@ const ProjectLinks = () => {
     'realtime:all',
   ])
 
+  const authOverviewPageEnabled = useFlag('authOverviewPage')
+
   const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
+    authOverviewPage: authOverviewPageEnabled,
   })
-
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
-
   const otherRoutes = generateOtherRoutes(ref, project, {
     unifiedLogs: isUnifiedLogsEnabled,
     showReports,
+    apiDocsSidePanel: isNewAPIDocsEnabled,
   })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
@@ -264,7 +274,7 @@ const ProjectLinks = () => {
           active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
             key: 'HOME',
-            label: 'Project overview',
+            label: 'Project Overview',
             icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: `/project/${ref}`,
             linkElement: <ProjectIndexPageLink projectRef={ref} />,
@@ -273,6 +283,7 @@ const ProjectLinks = () => {
         {toolRoutes.map((route, i) => (
           <SideBarNavLink
             key={`tools-routes-${i}`}
+            disabled={!isProjectActive}
             route={route}
             active={activeRoute === route.key}
           />
@@ -283,6 +294,7 @@ const ProjectLinks = () => {
         {productRoutes.map((route, i) => (
           <SideBarNavLink
             key={`product-routes-${i}`}
+            disabled={route.key !== 'functions' && !isProjectActive}
             route={route}
             active={activeRoute === route.key}
           />
@@ -291,44 +303,58 @@ const ProjectLinks = () => {
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {otherRoutes.map((route, i) => {
-          if (route.key === 'api' && isNewAPIDocsEnabled) {
+          if (route.key === 'api') {
+            const handleApiClick = () => {
+              if (isNewAPIDocsEnabled) {
+                snap.setShowProjectApiDocs(true)
+              }
+              sendEvent({
+                action: 'api_docs_opened',
+                properties: {
+                  source: 'sidebar',
+                },
+                groups: {
+                  project: ref ?? 'Unknown',
+                  organization: org?.slug ?? 'Unknown',
+                },
+              })
+            }
+
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={{
-                  label: route.label,
-                  icon: route.icon,
-                  key: route.key,
-                }}
-                onClick={() => {
-                  snap.setShowProjectApiDocs(true)
-                }}
+                route={
+                  isNewAPIDocsEnabled
+                    ? {
+                        label: route.label,
+                        icon: route.icon,
+                        key: route.key,
+                      }
+                    : route
+                }
+                active={activeRoute === route.key}
+                disabled={!isProjectActive}
+                onClick={handleApiClick}
               />
             )
           } else if (route.key === 'advisors') {
             return (
               <div className="relative" key={route.key}>
-                {ActiveDot(errorLints, securityLints)}
+                {isProjectActive && ActiveDot(errorLints, securityLints)}
                 <SideBarNavLink
                   key={`other-routes-${i}`}
                   route={route}
+                  disabled={!isProjectActive}
                   active={activeRoute === route.key}
                 />
               </div>
-            )
-          } else if (route.key === 'logs') {
-            return (
-              <SideBarNavLink
-                key={`other-routes-${i}`}
-                route={route}
-                active={activeRoute === route.key}
-              />
             )
           } else {
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
                 route={route}
+                disabled={!isProjectActive}
                 active={activeRoute === route.key}
               />
             )
@@ -353,6 +379,8 @@ const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
 
+  const organizationSlug: string = slug ?? (router.query.orgSlug as string) ?? ''
+
   const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
@@ -364,25 +392,25 @@ const OrganizationLinks = () => {
   const navMenuItems = [
     {
       label: 'Projects',
-      href: `/org/${slug}`,
+      href: `/org/${organizationSlug}`,
       key: 'projects',
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Team',
-      href: `/org/${slug}/team`,
+      href: `/org/${organizationSlug}/team`,
       key: 'team',
       icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Integrations',
-      href: `/org/${slug}/integrations`,
+      href: `/org/${organizationSlug}/integrations`,
       key: 'integrations',
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Usage',
-      href: `/org/${slug}/usage`,
+      href: `/org/${organizationSlug}/usage`,
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
@@ -390,7 +418,7 @@ const OrganizationLinks = () => {
       ? [
           {
             label: 'Billing',
-            href: `/org/${slug}/billing`,
+            href: `/org/${organizationSlug}/billing`,
             key: 'billing',
             icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
           },
@@ -398,11 +426,13 @@ const OrganizationLinks = () => {
       : []),
     {
       label: 'Organization settings',
-      href: `/org/${slug}/general`,
+      href: `/org/${organizationSlug}/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
   ]
+
+  if (!organizationSlug) return null
 
   return (
     <SidebarMenu className="flex flex-col gap-1 items-start">

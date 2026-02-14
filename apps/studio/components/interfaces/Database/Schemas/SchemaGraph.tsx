@@ -1,33 +1,41 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toPng, toSvg } from 'html-to-image'
-import { Check, Clipboard, Download, Loader2 } from 'lucide-react'
+import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
+
 import 'reactflow/dist/style.css'
-import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { tablesToSQL } from 'lib/helpers'
+import { toast } from 'sonner'
 import {
+  Button,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
+
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = () => {
@@ -62,7 +70,7 @@ export const SchemaGraph = () => {
     data: schemas,
     error: errorSchemas,
     isSuccess: isSuccessSchemas,
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isError: isErrorSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,
@@ -73,7 +81,7 @@ export const SchemaGraph = () => {
     data: tables,
     error: errorTables,
     isSuccess: isSuccessTables,
-    isLoading: isLoadingTables,
+    isPending: isLoadingTables,
     isError: isErrorTables,
   } = useTablesQuery({
     projectRef: project?.ref,
@@ -83,10 +91,19 @@ export const SchemaGraph = () => {
   })
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
-  const [_, setStoredPositions] = useLocalStorage(
+  const [, setStoredPositions] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref as string, schema?.id ?? 0),
     {}
   )
+
+  const { can: canUpdateTables } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  const canAddTables = canUpdateTables && !isSchemaLocked
 
   const resetLayout = () => {
     const nodes = reactFlowInstance.getNodes()
@@ -186,7 +203,7 @@ export const SchemaGraph = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-muted">
+      <div className="flex items-center justify-between p-4 border-b border-muted h-[var(--header-height)]">
         {isLoadingSchemas && (
           <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
         )}
@@ -207,7 +224,7 @@ export const SchemaGraph = () => {
             <div className="flex items-center gap-x-2">
               <ButtonTooltip
                 type="outline"
-                icon={copied ? <Check /> : <Clipboard />}
+                icon={copied ? <Check /> : <Copy />}
                 onClick={() => {
                   if (tables) {
                     copyToClipboard(tablesToSQL(tables))
@@ -281,16 +298,26 @@ export const SchemaGraph = () => {
       {isSuccessTables && (
         <>
           {tables.length === 0 ? (
-            <div className="h-full flex items-center justify-center">
-              <ProductEmptyState
-                title="No tables created yet"
-                ctaButtonLabel="Create a new table"
-                ctaUrl={`/project/${ref}/editor?create=table`}
+            <div className="flex items-center justify-center w-full h-full">
+              <Admonition
+                type="default"
+                className="max-w-md"
+                title="No tables in schema"
+                description={
+                  isSchemaLocked
+                    ? `The “${selectedSchema}” schema is managed by Supabase and is read-only through
+                    the dashboard.`
+                    : !canUpdateTables
+                      ? 'You need additional permissions to create tables'
+                      : `The “${selectedSchema}” schema doesn’t have any tables.`
+                }
               >
-                <p className="text-sm text-foreground-light">
-                  There are no tables found in the schema "{selectedSchema}"
-                </p>
-              </ProductEmptyState>
+                {canAddTables && (
+                  <Button asChild className="mt-2" type="default" icon={<Plus />}>
+                    <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
+                  </Button>
+                )}
+              </Admonition>
             </div>
           ) : (
             <div className="w-full h-full">
@@ -301,10 +328,6 @@ export const SchemaGraph = () => {
                   type: 'smoothstep',
                   animated: true,
                   deletable: false,
-                  style: {
-                    stroke: 'hsl(var(--border-stronger))',
-                    strokeWidth: 1,
-                  },
                 }}
                 nodeTypes={nodeTypes}
                 fitView

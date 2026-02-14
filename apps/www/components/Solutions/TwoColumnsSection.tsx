@@ -7,6 +7,7 @@ import SectionContainer from 'components/Layouts/SectionContainer'
 interface AIPrompt {
   id: string
   title: string
+  description?: string
   code: string
   language: string
   docsUrl?: string
