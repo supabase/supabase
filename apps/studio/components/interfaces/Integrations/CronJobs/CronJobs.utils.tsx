@@ -40,6 +40,28 @@ const DEFAULT_CRONJOB_COMMAND = {
   httpBody: '',
 } as const
 
+/**
+ * Extract the content inside jsonb_build_object(...) handling nested parentheses.
+ * The simple regex [^)]* fails when there are subexpressions like
+ * (select ... from vault.decrypted_secrets where name = 'anon_key').
+ */
+function extractJsonbBuildObjectArgs(command: string): string {
+  const marker = 'jsonb_build_object('
+  const startIdx = command.toLowerCase().indexOf(marker)
+  if (startIdx === -1) return ''
+
+  const argsStart = startIdx + marker.length
+  let depth = 1
+  let i = argsStart
+  while (i < command.length && depth > 0) {
+    if (command[i] === '(') depth++
+    else if (command[i] === ')') depth--
+    i++
+  }
+  // i now points one past the closing ')', so the content is [argsStart, i - 1)
+  return depth === 0 ? command.slice(argsStart, i - 1) : ''
+}
+
 export const parseCronJobCommand = (originalCommand: string, projectRef: string): CronJobType => {
   const command = originalCommand
     .replaceAll('$$', ' ')
@@ -54,14 +76,15 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     const urlMatch = command.match(/url:='([^']+)'/i)
     const url = urlMatch?.[1] || ''
 
-    const bodyMatch = command.match(/body:='(.*)'/i)
+    const bodyMatch = command.match(/body:='(.*?)'/i)
     const body = bodyMatch?.[1] || ''
 
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
     const timeout = timeoutMatch?.[1] || ''
 
-    const headersJsonBuildObjectMatch = command.match(/headers:=jsonb_build_object\(([^)]*)/i)
-    const headersJsonBuildObject = headersJsonBuildObjectMatch?.[1] || ''
+    const headersJsonBuildObject = command.toLowerCase().includes('jsonb_build_object(')
+      ? extractJsonbBuildObjectArgs(command)
+      : ''
 
     let headersObjs: { name: string; value: string }[] = []
     if (headersJsonBuildObject) {
@@ -130,7 +153,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
   const regexDBFunction = /select\s+[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\s*\(\)/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
-      .replace('SELECT ', '')
+      .replace(/^SELECT\s+/i, '')
       .replace(/\(.*\);*/, '')
 
       .trim()

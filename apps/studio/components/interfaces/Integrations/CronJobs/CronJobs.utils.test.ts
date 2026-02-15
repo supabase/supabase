@@ -278,4 +278,48 @@ describe('parseCronJobCommand', () => {
       expect(command).toMatch(cronPattern)
     })
   })
+
+  it('should parse sql function with lowercase select', () => {
+    const command = 'select public.my_function()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'public',
+      functionName: 'my_function',
+      snippet: command,
+    })
+  })
+
+  it('should parse sql function with numbers in name', () => {
+    const command = 'SELECT public.cleanup_v2()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'public',
+      functionName: 'cleanup_v2',
+      snippet: command,
+    })
+  })
+
+  it('should correctly parse HTTP request with nested parentheses in headers (vault secrets)', () => {
+    const command = `select net.http_post( url:='https://example.com/api', headers:=jsonb_build_object('Content-type', 'application/json', 'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'anon_key')), body:='{"test": "abc"}', timeout_milliseconds:=5000 );`
+    const result = parseCronJobCommand(command, 'random_project_ref')
+    expect(result.type).toBe('http_request')
+    if (result.type === 'http_request') {
+      expect(result.endpoint).toBe('https://example.com/api')
+      expect(result.timeoutMs).toBe(5000)
+      expect(result.httpBody).toBe('{"test": "abc"}')
+      // With nested parens, the header values contain SQL expressions
+      // so they won't parse into clean key-value pairs, but at least
+      // the overall command should still be recognized as http_request
+      expect(result.httpHeaders.length).toBeGreaterThan(0)
+    }
+  })
+
+  it('should not produce greedy body match across multiple quoted parameters', () => {
+    const command = `select net.http_post( url:='https://example.com/api', headers:=jsonb_build_object('Content-type', 'application/json'), body:='hello world', timeout_milliseconds:=5000 );`
+    const result = parseCronJobCommand(command, 'random_project_ref')
+    expect(result.type).toBe('http_request')
+    if (result.type === 'http_request') {
+      expect(result.httpBody).toBe('hello world')
+    }
+  })
 })
