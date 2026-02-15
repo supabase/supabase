@@ -39,8 +39,8 @@ services:
         condition: service_started
       imgproxy:
         condition: service_started
-      minio:
-        condition: service_healthy
+      minio-createbucket:
+        condition: service_completed_successfully
     healthcheck:
       test:
         [
