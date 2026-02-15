@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { SupabaseService } from '../supabase.service'
 
@@ -9,7 +9,7 @@ import { SupabaseService } from '../supabase.service'
   imports: [ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
   signInForm!: FormGroup
   private readonly supabase = inject(SupabaseService)
   private readonly formBuilder = inject(FormBuilder)
