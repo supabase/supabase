@@ -37,8 +37,9 @@ npm install @supabase/supabase-js
 ```
 
 And finally, we want to save the environment variables in the `src/environments/environment.ts` file.
-All we need are the API URL and the key that you copied [earlier](#get-api-details).
-These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+All we need are the API URL and the anon (public) key that you copied [earlier](#get-api-details).
+You can find both values in your Supabase Dashboard under **Project Settings → API**.
+The anon key is safe to use in a browser because it only grants access according to your database's [Row Level Security](/docs/guides/auth#row-level-security) policies.
 
 <$CodeTabs>
 
@@ -46,7 +47,7 @@ These variables will be exposed on the browser, and that's completely fine since
 export const environment = {
   production: false,
   supabaseUrl: 'YOUR_SUPABASE_URL',
-  supabaseKey: 'YOUR_SUPABASE_KEY',
+  supabaseAnonKey: 'YOUR_SUPABASE_ANON_KEY',
 }
 ```
 
@@ -78,7 +79,7 @@ export class SupabaseService {
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController
   ) {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseAnonKey)
   }
 
   get user() {
