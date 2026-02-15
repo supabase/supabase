@@ -222,6 +222,8 @@ export function FilterCondition({
         variant === 'pill' ? 'rounded border' : 'border-r',
         isHighlighted && 'ring-2 ring-primary'
       )}
+      data-testid={`filter-condition-${property.name}`}
+      data-highlighted={isHighlighted}
     >
       <span
         className="text-xs pl-2 pr-1 cursor-pointer shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center"
@@ -243,6 +245,7 @@ export function FilterCondition({
               className="h-full border-none bg-transparent py-0 px-1 text-center text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-brand w-full absolute left-0 top-0"
               disabled={isLoading}
               aria-label={`Operator for ${property.label}`}
+              data-testid={`filter-operator-${property.name}`}
             />
             <span className="invisible whitespace-pre text-xs block px-1 shrink-0 px-1">
               {condition.operator || ' '}
@@ -285,6 +288,7 @@ export function FilterCondition({
               className="h-full border-none bg-transparent py-0 px-1 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
               disabled={isLoading}
               aria-label={`Value for ${property.label}`}
+              data-testid={`filter-value-${property.name}`}
             />
             <span className="invisible whitespace-pre text-xs block px-1">{localValue || ' '}</span>
           </div>
@@ -343,6 +347,7 @@ export function FilterCondition({
         className="group hover:text-foreground hover:!bg-surface-600 rounded-none px-1 h-auto py-0"
         aria-label={`Remove ${property.label} filter`}
         tabIndex={-1}
+        data-testid={`filter-remove-${property.name}`}
       />
     </div>
   )
