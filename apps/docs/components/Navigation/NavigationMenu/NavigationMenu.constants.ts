@@ -2836,6 +2836,10 @@ export const self_hosting: NavMenuConstant = {
       items: [
         { name: 'Reference', url: '/reference/self-hosting-auth/introduction' },
         { name: 'Configuration', url: '/guides/self-hosting/auth/config' },
+        {
+          name: 'Custom authentication email templates',
+          url: '/guides/self-hosting/auth/custom-authentication-email-templates',
+        },
       ],
     },
     {

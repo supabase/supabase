@@ -1,0 +1,89 @@
+---
+title: "Custom authentication email templates"
+description: "Configure custom authentication email templates with self-hosted Supabase instance"
+subtitle: "Configure custom authentication email templates with self-hosted Supabase instance"
+---
+
+When running a self-hosted Supabase instance, you can fully customize authentication emails sent by Supabase Auth.
+
+## Overview
+
+Supabase Auth does not read email templates from a mounted Docker volume or inline HTML values. Instead, it expects each template to be available at a URL that returns a valid HTML template. This URL:
+
+- Does not need to be public
+- Must be reachable from `auth` service
+- Must return a valid golang template
+
+<Admonition type="tip">
+
+If Supabase Auth cannot fetch the template or if the fetched template is invalid, it falls back to the default template.
+
+</Admonition>
+
+## Supported email flows
+
+You can configure custom email templates for:
+
+- Confirmation (signup)
+- Password recovery
+- Magic link
+- Invite
+- Email change
+
+## Configuration
+
+Create a new directory `templates` inside the existing `volumes` directory and place your templates inside this directory. For simplicity, this guide sets up custom email templates for `Confirmation` and `Password Recovery` flows. Your structure should look similar to this:
+
+```
+volumes/
+  templates/
+    confirm.html
+    recovery.html
+```
+
+To provide templates to Supabase Auth, you need a service that serves static HTML files. This can be any server of your choice. You can even use `kong` service which is included with the default Supabase docker configuration. The only requirement is that the `auth` service must be able to reach it via a HTTP GET request.
+
+This guide uses [halverneus/static-file-server](https://github.com/halverneus/static-file-server) for serving templates. Below is an example configuration showing only the fields that need to be added or modified in your existing `docker-compose.yml` 
+
+```yml
+services:
+  auth:
+    depends_on:
+      templates-server:
+        condition: service_started
+    environment:
+      # Template URLs
+      GOTRUE_MAILER_TEMPLATES_CONFIRMATION: http://templates-server/confirm.html
+      GOTRUE_MAILER_TEMPLATES_RECOVERY: http://templates-server/recovery.html
+      # Uncomment the below env variables when setting up custom templates for rest of the flows
+      # GOTRUE_MAILER_TEMPLATES_MAGIC_LINK: http://templates-server/magic_link.html
+      # GOTRUE_MAILER_TEMPLATES_INVITE: http://templates-server/invite.html
+      # GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGE: http://templates-server/email_change.html
+
+      # Below are optional email subject overrides
+      # GOTRUE_MAILER_SUBJECTS_CONFIRMATION: "Confirm Your Email"
+      # GOTRUE_MAILER_SUBJECTS_RECOVERY: "Reset Your Password"
+      # GOTRUE_MAILER_SUBJECTS_MAGIC_LINK: "Your Magic Link"
+      # GOTRUE_MAILER_SUBJECTS_INVITE: "You have been invited"
+      # GOTRUE_MAILER_SUBJECTS_EMAIL_CHANGE: "Confirm Email Change"
+
+  templates-server:
+    image: halverneus/static-file-server:v1.8.11
+    environment:
+      PORT: 80
+    volumes:
+      - ./volumes/templates:/web
+```
+
+#### What This Configuration Does
+
+- Adds a `templates-server`service that runs alongside the Supabase services in the same docker network.
+- Serves your custom email template files from the `./volumes/templates` directory.
+- Keeps the templates-server private to the Docker network (no published ports), so it is not accessible from outside.
+- Enables the `auth` container to fetch templates using Docker's internal DNS (for example, `http://templates-server/confirm.html`).
+
+After making the changes in `docker-compose.yml` file, restart containers
+
+```sh
+docker compose down && docker compose up -d
+```
