@@ -136,7 +136,7 @@ async function handlePost(request: NextRequest) {
       console.error(error)
     }
 
-    console.log('Returning generic 500 ApplicationError to client')
+    console.warn('Returning generic 500 ApplicationError to client')
 
     // TODO: include more response info in debug environments
     return new Response(
