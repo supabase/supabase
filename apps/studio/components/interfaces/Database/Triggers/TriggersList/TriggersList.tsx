@@ -1,17 +1,12 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DatabaseZap, Search } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
 import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
@@ -22,28 +17,35 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { DatabaseZap, Search } from 'lucide-react'
+import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { DocsButton } from 'components/ui/DocsButton'
+
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 
 export const TriggersList = () => {
   const [selectedTrigger, setSelectedTrigger] = useState<PostgresTrigger>()
   const deletingTriggerIdRef = useRef<string | null>(null)
   const { data: project } = useSelectedProjectQuery()
-  const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
-  const [filterString, setFilterString] = useQueryState(
-    'search',
-    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
+  const [filterString, setFilterString] = useQueryState('search', parseAsString.withDefault(''))
+  const [tablesFilter, setTablesFilter] = useQueryState(
+    'tables',
+    parseAsJson(selectFilterSchema.parse).withDefault([])
   )
 
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
@@ -176,6 +178,7 @@ execute function function_name();`)
   }
 
   const schemaTriggers = triggers.filter((x) => x.schema === selectedSchema)
+  const tables = Array.from(new Set(schemaTriggers.map((x) => x.table))).sort()
 
   return (
     <>
@@ -196,6 +199,13 @@ execute function function_name();`)
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}
+            />
+            <ReportsSelectFilter
+              label="Table"
+              options={tables.map((type) => ({ label: type, value: type }))}
+              value={tablesFilter ?? []}
+              onChange={setTablesFilter}
+              showSearch
             />
           </div>
           <div className="flex items-center gap-2">
@@ -248,9 +258,6 @@ execute function function_name();`)
                 </TableHeader>
                 <TableBody>
                   <TriggerList
-                    schema={selectedSchema}
-                    filterString={filterString}
-                    isLocked={isSchemaLocked}
                     editTrigger={editTrigger}
                     duplicateTrigger={duplicateTrigger}
                     deleteTrigger={deleteTrigger}

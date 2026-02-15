@@ -1,5 +1,6 @@
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { REALTIME_SUBSCRIBE_STATES, type RealtimeChannel } from '@supabase/supabase-js'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
+
 // @ts-ignore
 import { createClient } from '@/lib/supabase/client'
 
@@ -47,11 +48,9 @@ function useThrottleCallback<Params extends unknown[]>(
 
 const supabase = createClient()
 
-const generateRandomColor = () =>
-  `hsl(${Math.floor(Math.random() * 360)}, 100%, 70%)`
+const generateRandomColor = () => `hsl(${Math.floor(Math.random() * 360)}, 100%, 70%)`
 
-const generateRandomNumber = () =>
-  Math.floor(Math.random() * 100)
+const generateRandomNumber = () => Math.floor(Math.random() * 100)
 
 const EVENT_NAME = 'realtime-cursor-move'
 
@@ -101,8 +100,10 @@ export function useRealtimeCursors({
     })
   }
 
-  const { run: handleMouseMove, cancel: cancelThrottle } =
-  useThrottleCallback(sendCursor, throttleMs)
+  const { run: handleMouseMove, cancel: cancelThrottle } = useThrottleCallback(
+    sendCursor,
+    throttleMs
+  )
 
   onMounted(() => {
     const channel = supabase.channel(roomName)
@@ -115,11 +116,15 @@ export function useRealtimeCursors({
         Object.keys(cursors).forEach((k) => delete cursors[k])
         channelRef.value = null
       })
-      .on('presence', { event: 'leave' }, ({ leftPresences }: { leftPresences: Array<{ key: string }> }) => {
-        leftPresences.forEach(({ key }) => {
-          delete cursors[key]
-        })
-      })
+      .on(
+        'presence',
+        { event: 'leave' },
+        ({ leftPresences }: { leftPresences: Array<{ key: string }> }) => {
+          leftPresences.forEach(({ key }) => {
+            delete cursors[key]
+          })
+        }
+      )
       .on('presence', { event: 'join' }, () => {
         if (!cursorPayload.value) return
 

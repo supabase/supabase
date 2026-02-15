@@ -3,44 +3,11 @@
   "ui": "stream",
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist/**",
-        ".next/**"
-      ]
-    },
-    "cms#build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "env": [
-        "BLOG_APP_URL",
-        "CRON_SECRET",
-        "DATABASE_URI",
-        "NEXT_PUBLIC_VERCEL_BRANCH_URL",
-        "NEXT_PUBLIC_SERVER_URL",
-        "NEXT_PUBLIC_VERCEL_ENV",
-        "NODE_ENV",
-        "PAYLOAD_SECRET",
-        "PREVIEW_SECRET",
-        "S3_BUCKET",
-        "S3_ACCESS_KEY_ID",
-        "S3_SECRET_ACCESS_KEY",
-        "S3_REGION",
-        "S3_ENDPOINT",
-        "VERCEL_PROJECT_PRODUCTION_URL"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**"]
     },
     "design-system#build": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "env": [
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_APP_URL",
@@ -53,16 +20,10 @@
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        ".contentlayer/**"
-      ]
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "studio#build": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
         "CI",
@@ -155,23 +116,15 @@
         "SNIPPETS_MANAGEMENT_FOLDER",
         "EDGE_FUNCTIONS_MANAGEMENT_FOLDER"
       ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "www#build": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
         "CI",
         "CF_ACCESS_CLIENT_ID",
         "CF_ACCESS_CLIENT_SECRET",
-        "CMS_API_KEY",
-        "CMS_PREVIEW_SECRET",
-        "CMS_SITE_ORIGIN",
         "NEXT_PUBLIC_MISC_USE_URL",
         "NEXT_PUBLIC_MISC_USE_ANON_KEY",
         "NEXT_PUBLIC_STUDIO_URL",
@@ -235,16 +188,10 @@
         "CUSTOMERIO_API_KEY",
         "CUSTOMERIO_APP_API_KEY"
       ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        ".contentlayer/**"
-      ]
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "ui-library#build": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "env": [
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_APP_URL",
@@ -266,11 +213,7 @@
         "SUPABASE_MANAGEMENT_API_TOKEN",
         "OPENAI_API_KEY"
       ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        ".contentlayer/**"
-      ]
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "lint": {
       "outputs": []
@@ -286,9 +229,7 @@
       "cache": false
     },
     "typecheck": {
-      "dependsOn": [
-        "^typecheck"
-      ],
+      "dependsOn": ["^typecheck"],
       "outputs": []
     }
   }

@@ -228,19 +228,56 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    primaryInstructions: (config, onCopy) => {
+    primaryInstructions: (config, onCopy, options) => {
       const mcpUrl = getMcpUrl(config)
-      const command = `gemini mcp add -t http supabase ${mcpUrl}`
+      const mcpCommand = `gemini mcp add -t http supabase ${mcpUrl}`
       return (
         <div className="space-y-2">
           <p className="text-xs text-warning">
             Ensure you are running Gemini CLI version <code>0.20.2</code> or higher.
           </p>
-          <p className="text-xs text-foreground-light">
-            Add the Supabase MCP server to Gemini CLI:
-          </p>
+          {options?.isPlatform && (
+            <>
+              <p className="text-xs text-foreground-light">
+                Install the Supabase{' '}
+                <a
+                  href="https://github.com/supabase-community/gemini-extension"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-link hover:underline"
+                >
+                  extension
+                </a>{' '}
+                for Gemini CLI. This bundles the Supabase MCP server connection,{' '}
+                <a
+                  href="https://github.com/supabase/agent-skills"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-link hover:underline"
+                >
+                  agent skills
+                </a>
+                , and other context.
+              </p>
+              <CodeBlock
+                value="gemini extensions install https://github.com/supabase-community/gemini-extension"
+                language="bash"
+                focusable={false}
+                className="block"
+                onCopyCallback={() => onCopy('command')}
+              />
+              <p className="text-xs text-foreground-light">
+                Or add just the MCP server to Gemini CLI:
+              </p>
+            </>
+          )}
+          {!options?.isPlatform && (
+            <p className="text-xs text-foreground-light">
+              Add the Supabase MCP server to Gemini CLI:
+            </p>
+          )}
           <CodeBlock
-            value={command}
+            value={mcpCommand}
             language="bash"
             focusable={false}
             className="block"
@@ -456,7 +493,7 @@ export const MCP_CLIENTS: McpClient[] = [
           href="https://kiro.dev/docs/powers/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-brand hover:underline"
+          className="text-brand-link hover:underline"
         >
           power
         </a>{' '}
