@@ -1,16 +1,16 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { ArrowRight } from 'lucide-react'
-import type { PropsWithChildren } from 'react'
-import type { RenderCellProps } from 'react-data-grid'
-
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTableQuery } from 'data/tables/table-retrieve-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ArrowRight } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import type { RenderCellProps } from 'react-data-grid'
 import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
 import { ReferenceRecordPeek } from './ReferenceRecordPeek'
@@ -83,7 +83,14 @@ export const ForeignKeyFormatter = (props: Props) => {
                   tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
                 />
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ align="end" className="p-0 w-96">
+              <PopoverContent_Shadcn_
+                align="end"
+                className="p-0 w-96"
+                onDoubleClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+              >
                 <ReferenceRecordPeek
                   table={targetTable}
                   column={relationship.target_column_name}

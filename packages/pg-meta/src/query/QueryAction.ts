@@ -1,5 +1,5 @@
-import type { QueryTable, Dictionary } from './types'
 import { IQueryFilter, QueryFilter } from './QueryFilter'
+import type { Dictionary, QueryTable } from './types'
 
 export interface IQueryAction {
   count: () => IQueryFilter

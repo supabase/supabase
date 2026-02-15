@@ -262,6 +262,7 @@ const ProjectLinks = () => {
   const otherRoutes = generateOtherRoutes(ref, project, {
     unifiedLogs: isUnifiedLogsEnabled,
     showReports,
+    apiDocsSidePanel: isNewAPIDocsEnabled,
   })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 

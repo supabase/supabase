@@ -13,7 +13,7 @@ Postgres stands out from other databases by opting to create a new process, not 
 
 When a client (backend server) connects to Postgres, the connection is stateful and enduring, allowing clients to greedily hold onto connections without any obligation to give them up. Typically, applications do not continuously send queries to a database, so this pattern underutilizes finite connections that could have serviced other clients.
 
-PostgreSQL's shortcomings are particularly evident when handling transient servers, like edge functions. They not only hoard connections for brief queries but also aggressively open and close connections, straining the database.
+Postgres's shortcomings are particularly evident when handling transient servers, like edge functions. They not only hoard connections for brief queries but also aggressively open and close connections, straining the database.
 
 ### How do poolers solve the problem?
 

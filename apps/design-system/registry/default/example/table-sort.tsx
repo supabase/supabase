@@ -5,8 +5,8 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableHeadSort,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
 
