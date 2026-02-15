@@ -78,7 +78,7 @@ export async function handler(req: Request) {
       .eq('username', username)
       .maybeSingle()
 
-    if (error) console.log('fetch error', error.message)
+    if (error) console.error('fetch error', error.message)
     if (!data) throw new Error(error?.message ?? 'user not found')
     const { name, ticketNumber, metadata } = data
 
@@ -320,7 +320,7 @@ export async function handler(req: Request) {
         username,
         platinum,
       }),
-    }).catch((err) => console.log('generate og err', err))
+    }).catch((err) => console.error('generate og err', err))
 
     const NEW_TIMESTAMP = new Date()
 
