@@ -11,13 +11,13 @@
   "files": [
     {
       "path": "registry/default/clients/react/lib/supabase/client.ts",
-      "content": "import { createClient as createSupabaseClient } from '@supabase/supabase-js'\r\n\r\nexport function createClient() {\r\n  return createSupabaseClient(\r\n    import.meta.env.VITE_SUPABASE_URL!,\r\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\r\n  )\r\n}\r\n",
+      "content": "import { createClient as createSupabaseClient } from '@supabase/supabase-js'\r\n\r\nexport function createClient() {\r\n  return createSupabaseClient(\r\n    import.meta.env.VITE_SUPABASE_URL!,\r\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY!\r\n  )\r\n}\r\n",
       "type": "registry:lib"
     }
   ],
   "envVars": {
     "VITE_SUPABASE_URL": "",
-    "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+    "VITE_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`."
+  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`."
 }

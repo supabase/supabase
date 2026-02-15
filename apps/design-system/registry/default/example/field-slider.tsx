@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Slider } from 'ui'
-
 import { Field, FieldDescription, FieldTitle } from 'ui/src/components/shadcn/ui/field'
 
 export default function FieldSlider() {

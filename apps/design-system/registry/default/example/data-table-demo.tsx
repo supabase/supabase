@@ -3,14 +3,14 @@
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  SortingState,
   useReactTable,
+  VisibilityState,
 } from '@tanstack/react-table'
 import { ChevronDown, MoreVertical } from 'lucide-react'
 import * as React from 'react'
@@ -29,8 +29,8 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableHeadSort,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
 

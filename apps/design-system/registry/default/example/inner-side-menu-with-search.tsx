@@ -2,10 +2,10 @@ import React, { useMemo, useState } from 'react'
 import { Card } from 'ui'
 import {
   InnerSideBarEmptyPanel,
+  InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-  InnerSideBarFilters,
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,

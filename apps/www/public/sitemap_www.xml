@@ -2355,6 +2355,36 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/blog/bknd-joins-supabase</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-is-now-an-official-claude-connector</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/hydra-joins-supabase</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/x-twitter-oauth-2-provider</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-incident-on-february-12-2026</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/customers/asap-work</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -3298,12 +3328,6 @@
 
   <url>
     <loc>https://supabase.com/partners/integrations</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/pricing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
