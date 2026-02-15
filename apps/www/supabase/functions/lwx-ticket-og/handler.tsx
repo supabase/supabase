@@ -33,7 +33,7 @@ export async function handler(req: Request) {
       PLATINUM: `${STORAGE_URL}/assets/og_bg_platinum.png`,
     }
 
-    const geneartedOGImage = new ImageResponse(
+    const generatedOGImage = new ImageResponse(
       (
         <div
           style={{
@@ -82,12 +82,12 @@ export async function handler(req: Request) {
       Deno.env.get('MISC_USE_ANON_KEY') ?? ''
     )
 
-    // return geneartedOGImage
+    // return generatedOGImage
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
       .upload(
         `lwx/og/${platinum ? 'platinum' : 'regular'}/${BUCKET_FOLDER_VERSION}/${username}.png`,
-        geneartedOGImage.body!,
+        generatedOGImage.body!,
         {
           contentType: 'image/png',
           cacheControl: '0',

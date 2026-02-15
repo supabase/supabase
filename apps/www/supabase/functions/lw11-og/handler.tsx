@@ -19,7 +19,7 @@ const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => r
 const LW_TABLE = 'lw11_tickets'
 const LW_MATERIALIZED_VIEW = 'lw11_tickets_platinum'
 
-const STYLING_CONGIF = {
+const STYLING_CONFIG = {
   regular: {
     BACKGROUND: '#f1f1f1',
     FOREGROUND: '#11181C',
@@ -150,8 +150,8 @@ export async function handler(req: Request) {
               height: '628px',
               position: 'relative',
               fontFamily: '"Circular"',
-              color: STYLING_CONGIF[ticketType].FOREGROUND,
-              backgroundColor: STYLING_CONGIF[ticketType].BACKGROUND,
+              color: STYLING_CONFIG[ticketType].FOREGROUND,
+              backgroundColor: STYLING_CONFIG[ticketType].BACKGROUND,
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
@@ -170,7 +170,7 @@ export async function handler(req: Request) {
                 bottom: '-1px',
                 right: '-1px',
                 zIndex: '0',
-                background: STYLING_CONGIF[ticketType].BACKGROUND,
+                background: STYLING_CONFIG[ticketType].BACKGROUND,
               }}
               src={BACKGROUND[ticketType].OG}
             />
@@ -212,7 +212,7 @@ export async function handler(req: Request) {
                   left: TICKET_PADDING_X,
                   textAlign: 'left',
                   width: '50%',
-                  color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND_LIGHT,
+                  color: STYLING_CONFIG[ticketType].TICKET_FOREGROUND_LIGHT,
                   margin: '0',
                   marginBottom: '5',
                   fontFamily: '"SourceCodePro"',
@@ -255,14 +255,14 @@ export async function handler(req: Request) {
                       zIndex: '1',
                       marginBottom: 10,
                       borderRadius: '100%',
-                      border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
+                      border: `1px solid ${STYLING_CONFIG[ticketType].BORDER}`,
                     }}
                     src={profileImg}
                   />
                 )}
                 <p
                   style={{
-                    color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND,
+                    color: STYLING_CONFIG[ticketType].TICKET_FOREGROUND,
                     margin: '0',
                     padding: '0',
                     fontSize: '56',
@@ -279,7 +279,7 @@ export async function handler(req: Request) {
 
                 <div
                   style={{
-                    color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND_LIGHT,
+                    color: STYLING_CONFIG[ticketType].TICKET_FOREGROUND_LIGHT,
                     opacity: 0.8,
                     display: 'flex',
                     fontSize: '32',
@@ -334,14 +334,14 @@ export async function handler(req: Request) {
                   marginBottom: 60,
                   fontSize: 38,
                   letterSpacing: '0',
-                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                  color: STYLING_CONFIG[ticketType].FOREGROUND_LIGHT,
                 }}
               >
                 <span
                   style={{
                     display: 'flex',
                     margin: 0,
-                    color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                    color: STYLING_CONFIG[ticketType].FOREGROUND_LIGHT,
                   }}
                 >
                   Join us for a
@@ -350,7 +350,7 @@ export async function handler(req: Request) {
                   style={{
                     display: 'flex',
                     margin: 0,
-                    color: STYLING_CONGIF[ticketType].FOREGROUND,
+                    color: STYLING_CONFIG[ticketType].FOREGROUND,
                   }}
                 >
                   Special Announcement
@@ -362,7 +362,7 @@ export async function handler(req: Request) {
                   fontFamily: '"SourceCodePro"',
                   fontSize: 26,
                   textTransform: 'uppercase',
-                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                  color: STYLING_CONFIG[ticketType].FOREGROUND_LIGHT,
                 }}
               >
                 April 15-19 / 7AM PT

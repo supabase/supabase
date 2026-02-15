@@ -19,7 +19,7 @@ const BUCKET_FOLDER_VERSION = 'v1'
 const LW_TABLE = 'lwx_tickets'
 const LW_MATERIALIZED_VIEW = 'lwx_tickets_golden'
 
-const STYLING_CONGIF = {
+const STYLING_CONFIG = {
   regular: {
     BACKGROUND: '#303030',
     FOREGROUND: '#F8F9FA',
@@ -134,7 +134,7 @@ export async function handler(req: Request) {
               height: '628px',
               position: 'relative',
               fontFamily: '"Circular"',
-              color: STYLING_CONGIF[ticketType].FOREGROUND,
+              color: STYLING_CONFIG[ticketType].FOREGROUND,
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
@@ -169,7 +169,7 @@ export async function handler(req: Request) {
                 zIndex: '1',
                 margin: 'auto',
                 borderRadius: '20px',
-                border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
+                border: `1px solid ${STYLING_CONFIG[ticketType].BORDER}`,
                 boxShadow: '0px 4px 45px rgba(0, 0, 0, 0.3)',
               }}
               src={BACKGROUND[ticketType].BG}
@@ -195,7 +195,7 @@ export async function handler(req: Request) {
             >
               <p
                 style={{
-                  color: STYLING_CONGIF[ticketType].FOREGROUND,
+                  color: STYLING_CONFIG[ticketType].FOREGROUND,
                   margin: '0',
                   padding: '0',
                   fontSize: '36',
@@ -209,7 +209,7 @@ export async function handler(req: Request) {
 
               <div
                 style={{
-                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                  color: STYLING_CONFIG[ticketType].FOREGROUND_LIGHT,
                   opacity: 0.8,
                   display: 'flex',
                   fontSize: '32',
@@ -244,7 +244,7 @@ export async function handler(req: Request) {
               {/* Ticket No  */}
               <p
                 style={{
-                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                  color: STYLING_CONFIG[ticketType].FOREGROUND_LIGHT,
                   margin: '0',
                   marginBottom: '5',
                   display: 'flex',

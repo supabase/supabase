@@ -269,7 +269,11 @@ const FormField = ({
                 value={option.value}
                 addOnBefore={() => {
                   return option.icon ? (
-                    <img className="h-6 w-6" src={`${BASE_PATH}/img/icons/${option.icon}`} />
+                    <img
+                      className="h-6 w-6"
+                      src={`${BASE_PATH}/img/icons/${option.icon}`}
+                      alt={option.label}
+                    />
                   ) : null
                 }}
               >
