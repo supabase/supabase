@@ -31,6 +31,10 @@ export class AvatarComponent {
     try {
       const { data } = await this.supabase.downLoadImage(path)
       if (data instanceof Blob) {
+        const previousUrl = this._avatarUrl()
+        if (previousUrl) {
+          URL.revokeObjectURL(previousUrl.toString())
+        }
         this._avatarUrl.set(this.dom.bypassSecurityTrustResourceUrl(URL.createObjectURL(data)))
       }
     } catch (error) {
