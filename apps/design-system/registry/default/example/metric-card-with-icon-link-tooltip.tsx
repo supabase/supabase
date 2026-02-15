@@ -34,7 +34,7 @@ export default function MetricsCardDemo() {
   return (
     <div className="w-1/2">
       <MetricCard isLoading={!data.length}>
-        <MetricCardHeader href="https://www.supabase.io">
+        <MetricCardHeader href="https://supabase.com">
           <MetricCardIcon>
             <User2 size={14} strokeWidth={1.5} />
           </MetricCardIcon>
