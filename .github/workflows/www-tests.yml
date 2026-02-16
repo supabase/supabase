@@ -5,6 +5,8 @@ on:
     branches: ['master']
     paths:
       - 'apps/www/**/*.ts*'
+      - 'apps/www/next.config.mjs'
+      - 'apps/www/next.config.js'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
