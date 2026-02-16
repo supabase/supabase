@@ -8,7 +8,6 @@ export default defineConfig({
     }),
   ],
   test: {
-    globals: true,
     exclude: [...configDefaults.exclude, '.next/*'],
   },
 })
