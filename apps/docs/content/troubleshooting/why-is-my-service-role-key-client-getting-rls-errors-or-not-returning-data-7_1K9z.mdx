@@ -15,6 +15,6 @@ Three common cases of the `createClient` `apikey` being replaced by a user sessi
 
 2. Edge functions or other server code setting the `Authorization` header in `createClient` options directly to a user token/JWT. When you set the `Authorization` header directly that overrides the default action of using the `apikey` for the `Authorization` header.
 
-3. Server client initialized with service role using `signUp` to create a user or other auth functions. Many auth functions will return a user session to the client making the call. When that happens the `apikey` will be replaced by the user token/JWT in the `Authorization` header. If you are wanting to create a user in a service role client use `admin.createUser()` instead. Otherwise use a separate Supabase client for for service role from other actions.
+3. Server client initialized with service role using `signUp` to create a user or other auth functions. Many auth functions will return a user session to the client making the call. When that happens the `apikey` will be replaced by the user token/JWT in the `Authorization` header. If you are wanting to create a user in a service role client use `admin.createUser()` instead. Otherwise use a separate Supabase client for service role from other actions.
 
 Also note that adding `service_role` in RLS policies does nothing. Service role will never run the policies to begin with.
