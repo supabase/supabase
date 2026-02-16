@@ -57,6 +57,10 @@ Sentry.init({
   }),
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
+  // Enable performance monitoring - Next.js routes and API calls are automatically instrumented
+  tracesSampleRate: 0.1, // Capture 10% of transactions for performance monitoring
+
   // [Ali] Filter out browser extensions and user scripts (FE-2094)
   // Using denyUrls to block known third-party script patterns
   denyUrls: [/userscript/i],
