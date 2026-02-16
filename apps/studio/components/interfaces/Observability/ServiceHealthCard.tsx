@@ -95,7 +95,7 @@ export const ServiceHealthCard = ({
         </Loading>
       </CardContent>
 
-      <CardFooter className="border-t pt-3 pb-4 px-4 flex gap-2">
+      <CardFooter className="border-t pt-3 pb-4 px-card flex gap-2">
         {reportUrl && (
           <Button type="default" size="tiny" asChild className="flex-1">
             <Link href={reportUrl}>View Report</Link>
