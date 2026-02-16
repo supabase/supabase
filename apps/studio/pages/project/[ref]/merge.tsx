@@ -40,6 +40,7 @@ import {
   NavMenu,
   NavMenuItem,
 } from 'ui'
+import { useIsPgDeltaDiffEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const MergePage: NextPageWithLayout = () => {
@@ -47,6 +48,7 @@ const MergePage: NextPageWithLayout = () => {
   const { ref, workflow_run_id: currentWorkflowRunId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const pgDeltaDiffEnabled = useIsPgDeltaDiffEnabled()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [workflowFinalStatus, setWorkflowFinalStatus] = useState<'SUCCESS' | 'FAILED' | null>(null)
@@ -297,6 +299,7 @@ const MergePage: NextPageWithLayout = () => {
       branchProjectRef: ref,
       baseProjectRef: parentProjectRef,
       migration_version: undefined,
+      pgdelta: pgDeltaDiffEnabled,
     })
   }
 

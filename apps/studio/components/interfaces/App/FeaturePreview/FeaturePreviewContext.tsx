@@ -102,6 +102,11 @@ export const useIsBranching2Enabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
 }
 
+export const useIsPgDeltaDiffEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
+}
+
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]

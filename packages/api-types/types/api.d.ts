@@ -4932,6 +4932,7 @@ export interface operations {
     parameters: {
       query?: {
         included_schemas?: string
+        pgdelta?: string
       }
       header?: never
       path: {
