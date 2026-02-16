@@ -89,7 +89,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     const urlMatch = command.match(/url:='([^']+)'/i)
     const url = urlMatch?.[1] || ''
 
-    const bodyMatch = command.match(/body:='(.*?)'/i)
+    const bodyMatch = command.match(/body:='((?:''|[^'])*)'/i)
     const body = bodyMatch?.[1] || ''
 
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
