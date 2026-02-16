@@ -90,37 +90,25 @@ export const RealtimeSettings = () => {
       },
     })
 
-  const {
-    getEntitlementNumericValue: getEntitledMaxPayloadSize,
-    isEntitlementUnlimited: isMaxPayloadSizeUnlimited,
-  } = useCheckEntitlements('realtime.max_payload_size_in_kb')
-  const entitledMaxPayloadSize = isMaxPayloadSizeUnlimited()
-    ? Number.MAX_SAFE_INTEGER
-    : getEntitledMaxPayloadSize() ?? 3000
+  const { getEntitlementMax: getEntitledMaxPayloadSize } = useCheckEntitlements(
+    'realtime.max_payload_size_in_kb'
+  )
+  const entitledMaxPayloadSize = getEntitledMaxPayloadSize() ?? 3000
 
-  const {
-    getEntitlementNumericValue: getEntitledMaxConcurrentUsers,
-    isEntitlementUnlimited: isMaxConcurrentUsersUnlimited,
-  } = useCheckEntitlements('realtime.max_concurrent_users')
-  const entitledMaxConcurrentUsers = isMaxConcurrentUsersUnlimited()
-    ? Number.MAX_SAFE_INTEGER
-    : getEntitledMaxConcurrentUsers() ?? 50000
+  const { getEntitlementMax: getEntitledMaxConcurrentUsers } = useCheckEntitlements(
+    'realtime.max_concurrent_users'
+  )
+  const entitledMaxConcurrentUsers = getEntitledMaxConcurrentUsers() ?? 50000
 
-  const {
-    getEntitlementNumericValue: getEntitledMaxEventsPerSecond,
-    isEntitlementUnlimited: isMaxEventsPerSecondUnlimited,
-  } = useCheckEntitlements('realtime.max_events_per_second')
-  const entitledMaxEventsPerSecond = isMaxEventsPerSecondUnlimited()
-    ? Number.MAX_SAFE_INTEGER
-    : getEntitledMaxEventsPerSecond() ?? 10000
+  const { getEntitlementMax: getEntitledMaxEventsPerSecond } = useCheckEntitlements(
+    'realtime.max_events_per_second'
+  )
+  const entitledMaxEventsPerSecond = getEntitledMaxEventsPerSecond() ?? 10000
 
-  const {
-    getEntitlementNumericValue: getEntitledMaxPresenceEventsPerSecond,
-    isEntitlementUnlimited: isMaxPresenceEventsPerSecondUnlimited,
-  } = useCheckEntitlements('realtime.max_presence_events_per_second')
-  const entitledMaxPresenceEventsPerSecond = isMaxPresenceEventsPerSecondUnlimited()
-    ? Number.MAX_SAFE_INTEGER
-    : getEntitledMaxPresenceEventsPerSecond() ?? 10000
+  const { getEntitlementMax: getEntitledMaxPresenceEventsPerSecond } = useCheckEntitlements(
+    'realtime.max_presence_events_per_second'
+  )
+  const entitledMaxPresenceEventsPerSecond = getEntitledMaxPresenceEventsPerSecond() ?? 10000
 
   const FormSchema = z.object({
     connection_pool: z.coerce
