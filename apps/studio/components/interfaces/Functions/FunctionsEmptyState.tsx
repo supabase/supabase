@@ -321,10 +321,9 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
         <ScaffoldSectionTitle className="text-xl mt-12">Explore our templates</ScaffoldSectionTitle>
         <ResourceList>
           {templates.map((template) => (
-            <Dialog>
+            <Dialog key={template.name}>
               <DialogTrigger asChild>
                 <ResourceItem
-                  key={template.name}
                   media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
                 >
                   <div>
