@@ -125,7 +125,7 @@ export const CreateIcebergWrapperSheet = ({
     }
 
     if (values.target_schema.length === 0) {
-      errors.target_schema = 'Please provide an unique target schema'
+      errors.target_schema = 'Please provide a unique target schema'
     }
     const foundSchema = schemas?.find((s) => s.name === values.target_schema)
     if (foundSchema) {
