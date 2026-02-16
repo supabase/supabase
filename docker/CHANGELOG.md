@@ -42,7 +42,7 @@ Check updates for each service to learn more.
 
 - Updated to `v1.37.8` - [Release](https://github.com/supabase/storage/releases/tag/v1.37.8)
 - ⚠️ Added configuration to access buckets via `/storage/v1/s3` endpoint (requires `docker-compose.s3.yml` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185)
-- ⚠️ Changed environment variable configuration for Storage (required `.env.example` and `.env` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185), PR [#42862](https://github.com/supabase/supabase/pull/42862)
+- ⚠️ Changed environment variable configuration for Storage (requires `.env.example` and `.env` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185), PR [#42862](https://github.com/supabase/supabase/pull/42862)
 
 ### Edge Runtime
 
@@ -57,7 +57,7 @@ Check updates for each service to learn more.
 ### Vector
 
 - Updated to `0.53.0-alpine` - [Changelog](https://vector.dev/releases/0.53.0/) | [Release](https://github.com/vectordotdev/vector/releases/tag/v0.53.0) - PR #42525
-- ⚠️ Major version jump from `0.28.1` (requires `volumes/logs/vector.yml` update) - PR #42525
+- ⚠️ Major version jump from `0.28.1` (requires `volumes/logs/vector.yml` update) - PR [#42525]((https://github.com/supabase/supabase/pull/42525)
 - ⚠️ Changed Postgres sink configuration to bypass Kong (requires `volumes/logs/vector.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
 - ⚠️ Changed retry settings for all sinks to increase timeouts (requires `volumes/logs/vector.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
 
