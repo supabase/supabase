@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 
-import { WithMonitor } from './WithMonitor/WithMonitor'
 import { WithStatements } from './WithStatements/WithStatements'
 import { WithSupamonitor } from './WithSupamonitor/WithSupamonitor'
 import { useParams } from 'common'
@@ -12,7 +11,6 @@ interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
   queryPerformanceQuery: DbQueryHook<any>
   queryMetrics: PresetHookResult
-  isPgStatMonitorEnabled: boolean
   isSupamonitorEnabled: boolean
   dateRange?: {
     period_start: { date: string; time_period: string }
@@ -26,7 +24,6 @@ export const QueryPerformance = ({
   queryHitRate,
   queryPerformanceQuery,
   queryMetrics,
-  isPgStatMonitorEnabled,
   isSupamonitorEnabled,
   dateRange,
   onDateRangeChange,
@@ -41,10 +38,6 @@ export const QueryPerformance = ({
 
   if (isSupamonitorEnabled) {
     return <WithSupamonitor dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
-  }
-
-  if (isPgStatMonitorEnabled) {
-    return <WithMonitor dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
   }
 
   return (

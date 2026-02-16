@@ -78,8 +78,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     filterIndexAdvisor: indexAdvisor === 'true',
   })
 
-  const isPgStatMonitorEnabled = project?.dbVersion === '17.4.1.076-psml-1'
-
   if (!isLoadingProject && !project) {
     return (
       <div className="h-full flex flex-col p-6">
@@ -101,26 +99,24 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
             href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
           />
           <DatabaseSelector />
-          {isPgStatMonitorEnabled ||
-            (isSupamonitorEnabled && (
-              <LogsDatePicker
-                value={datePickerValue}
-                helpers={datePickerHelpers.filter(
-                  (h) =>
-                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
-                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
-                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
-                )}
-                onSubmit={handleDatePickerChange}
-              />
-            ))}
+          {isSupamonitorEnabled && (
+            <LogsDatePicker
+              value={datePickerValue}
+              helpers={datePickerHelpers.filter(
+                (h) =>
+                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
+                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
+                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
+              )}
+              onSubmit={handleDatePickerChange}
+            />
+          )}
         </div>
       </div>
       <QueryPerformance
         queryHitRate={queryHitRate}
         queryPerformanceQuery={queryPerformanceQuery}
         queryMetrics={queryMetrics}
-        isPgStatMonitorEnabled={isPgStatMonitorEnabled}
         isSupamonitorEnabled={isSupamonitorEnabled}
         dateRange={selectedDateRange}
         onDateRangeChange={updateDateRange}
