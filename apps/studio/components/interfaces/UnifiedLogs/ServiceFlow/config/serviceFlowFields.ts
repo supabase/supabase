@@ -739,8 +739,7 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
     label: 'Session Started',
     getValue: (data, enrichedData) => {
       const startTime = enrichedData?.session_start_time || data?.session_start_time
-      // Convert microseconds to milliseconds for JavaScript Date
-      return startTime ? new Date(startTime / 1000).toLocaleString() : null
+      return startTime ? new Date(startTime).toLocaleString() : null
     },
     requiresEnrichedData: true,
   },
