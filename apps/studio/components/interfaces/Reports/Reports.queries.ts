@@ -60,7 +60,10 @@ export const useQueryPerformanceQuery = ({
     .filter((x) => x.length > 0)
     .join(' AND ')
 
-  const orderBySql = orderBy && `ORDER BY ${orderBy.column} ${orderBy.order}`
+  const orderBySql =
+    orderBy && ['asc', 'desc'].includes(orderBy.order)
+      ? `ORDER BY ${orderBy.column} ${orderBy.order}`
+      : undefined
   const sql = baseSQL.sql(
     [],
     whereSql.length > 0 ? `WHERE ${whereSql}` : undefined,
