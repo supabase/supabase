@@ -81,7 +81,7 @@ export const ServiceHealthCard = ({
         </div>
       </CardHeader>
 
-      <CardContent className="p-[var(--card-padding-x)] pt-4 flex-1 overflow-hidden max-h-[200px]">
+      <CardContent className="p-card pt-4 flex-1 overflow-hidden max-h-[200px]">
         <Loading isFullHeight active={isLoading}>
           <LogsBarChart
             isFullHeight
