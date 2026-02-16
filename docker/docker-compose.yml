@@ -356,7 +356,6 @@ services:
     container_name: supabase-analytics
     image: supabase/logflare:1.30.3
     restart: unless-stopped
-    # Not exposed to host - access analytics dashboard only through Kong
     # ports:
     #   - 4000:4000
     # Uncomment to use Big Query backend for analytics
