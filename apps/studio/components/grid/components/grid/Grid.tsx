@@ -230,29 +230,36 @@ export const Grid = memo(
 
       return (
         <div
+          data-testid="table-editor-grid-container"
           className={cn('flex flex-col relative transition-colors', containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
+          onDragOver={onDragOver}
+          onDragLeave={onDragOver}
+          onDrop={onFileDrop}
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute top-9 p-2 w-full z-[1]',
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
-              onDragOver={onDragOver}
-              onDragLeave={onDragOver}
-              onDrop={onFileDrop}
             >
-              {isLoading && !isDisabled && <GenericSkeletonLoader />}
+              {isLoading && !isDisabled && (
+                <GenericSkeletonLoader className="w-full top-9 absolute p-2" />
+              )}
 
-              {isError && <GridError error={error} />}
+              {isError && (
+                <div className="w-full top-9 absolute p-2 pointer-events-auto">
+                  <GridError error={error} />
+                </div>
+              )}
 
               {isSuccess && (
                 <>
                   {page > 1 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light">This page does not have any data</p>
                       <div className="flex items-center space-x-2 mt-4">
                         <Button
@@ -265,7 +272,7 @@ export const Grid = memo(
                       </div>
                     </div>
                   ) : (filters ?? []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light pointer-events-auto">
                         {isDraggedOver ? (
                           isValidFileDraggedOver ? (
@@ -312,7 +319,7 @@ export const Grid = memo(
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light pointer-events-auto">
                         The filters applied have returned no results from this table
                       </p>

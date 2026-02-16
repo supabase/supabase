@@ -1,29 +1,23 @@
-import { Lightbulb, ChevronsUpDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
-
 import { useFlag } from 'common'
-import { formatSql } from 'lib/formatSql'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  cn,
-  AiIconAnimation,
-} from 'ui'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
+import { formatSql } from 'lib/formatSql'
+import { useTrack } from 'lib/telemetry/track'
+import { ChevronsUpDown, Lightbulb } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
+import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
 import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
-import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
 import { formatDuration } from './QueryPerformance.utils'
-import { useTrack } from 'lib/telemetry/track'
 
 interface QueryDetailProps {
   selectedRow?: QueryPerformanceRow
@@ -82,20 +76,27 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
     onClose?.()
   }
 
+  const buildPromptForCopy = () => {
+    if (!selectedRow?.query) return ''
+
+    const { query, prompt } = buildQueryExplanationPrompt(selectedRow)
+    return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${query}\n\`\`\``
+  }
+
   return (
     <QueryPanelContainer>
       <QueryPanelSection className="pt-2 border-b relative">
         <div className="flex items-center justify-between mb-4">
           <h4>Query pattern</h4>
           {showExplainWithAiInQueryPerformance && (
-            <Button
-              type="default"
+            <AiAssistantDropdown
+              label="Explain with AI"
+              buildPrompt={buildPromptForCopy}
+              onOpenAssistant={handleExplainQuery}
+              telemetrySource="query_performance"
               size="tiny"
-              icon={<AiIconAnimation size={14} />}
-              onClick={handleExplainQuery}
-            >
-              Explain with AI
-            </Button>
+              type="default"
+            />
           )}
         </div>
         <div

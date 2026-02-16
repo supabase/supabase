@@ -1,7 +1,4 @@
 import { PropsWithChildren } from 'react'
-
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 import { DatabaseSelectorStateContextProvider } from 'state/database-selector'
 import { RoleImpersonationStateContextProvider } from 'state/role-impersonation-state'
 import { StorageExplorerStateContextProvider } from 'state/storage-explorer'
@@ -29,9 +26,4 @@ export const ProjectContextProvider = ({
       </TabsStateContextProvider>
     </TableEditorStateContextProvider>
   )
-}
-
-export const useIsProjectActive = () => {
-  const { data: project } = useSelectedProjectQuery()
-  return project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 }

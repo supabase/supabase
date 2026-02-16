@@ -41,6 +41,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { useTrack } from 'lib/telemetry/track'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import {
   buildLogQueryParams,
@@ -68,6 +69,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, q, queryId } = useParams()
+  const track = useTrack()
   const projectRef = ref as string
   const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
 
@@ -201,6 +203,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
+    track('log_explorer_query_run_button_clicked', { is_saved_query: !!queryId })
+
     const query = typeof value === 'string' ? value || editorValue : editorValue
     const resolvedParams = buildLogQueryParams(datePickerValue, query)
 
