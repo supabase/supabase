@@ -17,6 +17,8 @@ import {
   INSTALLATION_INSTALLED_SUFFIX,
   INSTALLATION_STARTED_SUFFIX,
   STRIPE_SCHEMA_COMMENT_PREFIX,
+  UNINSTALLATION_ERROR_SUFFIX,
+  UNINSTALLATION_STARTED_SUFFIX,
 } from 'stripe-experiment-sync/supabase'
 import {
   Button,
@@ -104,13 +106,24 @@ export const StripeSyncInstallationPage = () => {
     stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
     stripeSchema.comment?.includes(INSTALLATION_STARTED_SUFFIX)
 
+  const schemaShowsUninstallInProgress =
+    stripeSchema &&
+    stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
+    stripeSchema.comment?.includes(UNINSTALLATION_STARTED_SUFFIX)
+
   const setupInProgress = schemaShowsInProgress || isInstalling || isInstallInitiated
-  const uninstallInProgress = isUninstalling || isUninstallInitiated
+  const uninstallInProgress =
+    schemaShowsUninstallInProgress || isUninstalling || isUninstallInitiated
 
   const setupError =
     stripeSchema &&
     stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
     stripeSchema.comment?.includes(INSTALLATION_ERROR_SUFFIX)
+
+  const uninstallError =
+    stripeSchema &&
+    stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
+    stripeSchema.comment?.includes(UNINSTALLATION_ERROR_SUFFIX)
 
   useEffect(() => {
     if (!setupError) {
@@ -136,19 +149,23 @@ export const StripeSyncInstallationPage = () => {
   }, [isInstallInitiated, isInstalled, setupError])
 
   useEffect(() => {
-    // Clear the uninstall initiated flag once we detect schema removal
-    if (isUninstallInitiated && !stripeSchema) {
+    // Clear the uninstall initiated flag once we detect schema removal or error
+    if (isUninstallInitiated && (!stripeSchema || uninstallError)) {
       setIsUninstallInitiated(false)
     }
-  }, [isUninstallInitiated, stripeSchema])
+  }, [isUninstallInitiated, stripeSchema, uninstallError])
 
   useEffect(() => {
-    // Clean up the status query parameter after reading it
-    if (router.query.status === 'uninstalling') {
+    // Clean up the status query parameter only after the schema confirms the uninstall status
+    // This ensures refreshing the page still shows the correct "Uninstalling..." status
+    if (
+      router.query.status === 'uninstalling' &&
+      (schemaShowsUninstallInProgress || !stripeSchema || uninstallError)
+    ) {
       const { status, ...rest } = router.query
       router.replace({ query: rest }, undefined, { shallow: true })
     }
-  }, [router])
+  }, [router, schemaShowsUninstallInProgress, stripeSchema, uninstallError])
 
   // Check if there's an existing stripe schema that wasn't created by this integration
   const hasConflictingSchema =
@@ -207,6 +224,27 @@ export const StripeSyncInstallationPage = () => {
   const tableEditorUrl = `/project/${project?.ref}/editor?schema=stripe`
 
   const alert = useMemo(() => {
+    if (uninstallError) {
+      return (
+        <Admonition type="destructive" showIcon={true} title="Uninstallation Error">
+          <div>
+            There was an error during the uninstallation of the Stripe Sync Engine. Please try
+            again. If the problem persists, contact support.
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Button
+              type="warning"
+              onClick={handleUninstall}
+              loading={isUninstalling}
+              disabled={isUninstalling}
+            >
+              Try Again
+            </Button>
+          </div>
+        </Admonition>
+      )
+    }
+
     if (setupError) {
       return (
         <Admonition type="destructive" showIcon={true} title="Installation Error">
@@ -264,6 +302,7 @@ export const StripeSyncInstallationPage = () => {
 
     return null
   }, [
+    uninstallError,
     setupError,
     syncState,
     isSyncing,
@@ -276,6 +315,14 @@ export const StripeSyncInstallationPage = () => {
   ])
 
   const status = useMemo(() => {
+    if (uninstallError) {
+      return (
+        <span className="flex items-center gap-2 text-foreground-light text-sm">
+          <AlertCircle size={14} className="text-destructive" />
+          Uninstallation error
+        </span>
+      )
+    }
     if (uninstallInProgress) {
       return (
         <span className="flex items-center gap-2 text-foreground-light text-sm">
@@ -318,7 +365,7 @@ export const StripeSyncInstallationPage = () => {
     return (
       <span className="flex items-center gap-2 text-foreground-light text-sm">Not installed</span>
     )
-  }, [uninstallInProgress, isInstalled, setupInProgress, syncState, setupError])
+  }, [uninstallError, uninstallInProgress, isInstalled, setupInProgress, syncState, setupError])
 
   return (
     <IntegrationOverviewTab
