@@ -4,12 +4,12 @@ import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
   createContext,
-  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
+  type PropsWithChildren,
 } from 'react'
 
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
@@ -32,6 +32,8 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
   // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
   const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
     switch (feature.key) {
+      case 'supabase-ui-pg-delta-diff':
+        return true
       default:
         return false
     }
@@ -119,6 +121,7 @@ export const useFeaturePreviewModal = () => {
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
 
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
+  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
 
@@ -135,11 +138,18 @@ export const useFeaturePreviewModal = () => {
           return advisorRulesEnabled
         case 'supabase-ui-preview-unified-logs':
           return isUnifiedLogsPreviewAvailable
+        case 'supabase-ui-pg-delta-diff':
+          return pgDeltaDiffEnabled
         default:
           return true
       }
     },
-    [gitlessBranchingEnabled, advisorRulesEnabled, isUnifiedLogsPreviewAvailable]
+    [
+      gitlessBranchingEnabled,
+      advisorRulesEnabled,
+      isUnifiedLogsPreviewAvailable,
+      pgDeltaDiffEnabled,
+    ]
   )
 
   const selectedFeatureKey = (

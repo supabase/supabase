@@ -16,6 +16,13 @@ export const FEATURE_PREVIEWS = [
     isPlatformOnly: true,
   },
   {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF,
+    name: 'PG Delta Diff',
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/42462',
+    isNew: true,
+    isPlatformOnly: true,
+  },
+  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
     name: 'Disable Advisor rules',
     discussionsUrl: undefined,
