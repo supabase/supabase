@@ -219,7 +219,7 @@ export const FunctionsInstructionsLocal = () => {
                 <Code size={20} />
                 <h4 className="text-base text-foreground">Create an Edge Function</h4>
               </div>
-              <p className="text-sm text-foreground-light mt-1 mb-4 prose [&>code]:text-xs text-sm max-w-full">
+              <p className="text-sm text-foreground-light mt-1 mb-4 prose [&>code]:text-xs max-w-full">
                 Create a new edge function called <code>hello-world</code> in your project via the
                 Supabase CLI.
               </p>
@@ -243,7 +243,7 @@ export const FunctionsInstructionsLocal = () => {
                 <Play size={20} />
                 <h4 className="text-base text-foreground">Run Edge Functions locally</h4>
               </div>
-              <p className="text-sm text-foreground-light mt-1 mb-4 prose [&>code]:text-xs text-sm max-w-full">
+              <p className="text-sm text-foreground-light mt-1 mb-4 prose [&>code]:text-xs max-w-full">
                 You can run your Edge Function locally using <code>supabase functions serve</code>.
               </p>
               <div className="mb-4">
