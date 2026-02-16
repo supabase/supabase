@@ -49,10 +49,13 @@ transforms:
           .metadata.request.headers.referer = req.referer
           .metadata.request.headers.user_agent = req.agent
           .metadata.request.headers.cf_connecting_ip = req.client
-          .metadata.request.method = req.method
-          .metadata.request.path = req.path
-          .metadata.request.protocol = req.protocol
           .metadata.response.status_code = req.status
+          url, split_err = split(req.request, " ")
+          if split_err == null {
+              .metadata.request.method = url[0]
+              .metadata.request.path = url[1]
+              .metadata.request.protocol = url[2]
+          }
       }
       if err != null {
         abort
@@ -101,7 +104,7 @@ transforms:
       parsed, err = parse_regex(.event_message, r'^(?P<time>.*): (?P<msg>.*)$')
       if err == null {
           .event_message = parsed.msg
-          .timestamp = to_timestamp!(parsed.time)
+          .timestamp = parse_timestamp!(value: parsed.time,format: "%d/%b/%Y:%H:%M:%S %z")
           .metadata.host = .project
       }
   # Filter out healthcheck logs from Realtime

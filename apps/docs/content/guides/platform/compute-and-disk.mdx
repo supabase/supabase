@@ -49,9 +49,16 @@ Compute sizes can be changed by first selecting your project in the dashboard [h
 
 We charge hourly for additional compute based on your usage. Read more about [usage-based billing for compute](/docs/guides/platform/manage-your-usage/compute).
 
-### Dedicated vs shared CPU
+### Burstable vs guaranteed performance
 
-All Postgres databases on Supabase run in isolated environments. Compute instances smaller than `Large` compute size have CPUs which can burst to higher performance levels for short periods of time. Instances bigger than `Large` have predictable performance levels and do not exhibit the same burst behavior.
+All Postgres databases on Supabase run in isolated environments.
+
+**Nano, Micro, Small, and Medium** compute sizes use burstable performance. These instances accumulate capacity during periods of low utilization and can temporarily exceed their baseline performance during short periods of increased activity.
+Under sustained load, performance returns to their baseline level until capacity is replenished, which may reduce throughput and increase latency.
+
+**Large and above** compute sizes provide guaranteed performance with consistent bandwidth.
+
+We recommend using Large or above compute sizes for production workloads that require guaranteed performance and availability. Smaller sizes are best suited for development, testing, and workloads with intermittent traffic patterns where short spikes in activity can be handled by burst capacity.
 
 ### Compute upgrades [#upgrades]
 
