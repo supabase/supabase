@@ -1,5 +1,5 @@
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStripeSyncUninstallMutation } from 'data/database-integrations/stripe/stripe-sync-uninstall-mutation'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Loader2, Table2 } from 'lucide-react'
 import Link from 'next/link'
@@ -11,9 +11,9 @@ import {
   STRIPE_SCHEMA_COMMENT_PREFIX,
 } from 'stripe-experiment-sync/supabase'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -61,9 +61,11 @@ export const StripeSyncSettingsPage = () => {
         toast.success('Stripe Sync uninstallation started')
         setShowUninstallModal(false)
         setIsUninstallInitiated(true)
-        // Redirect to overview after uninstall
+        // Redirect to overview after uninstall with status query parameter
         if (project?.ref) {
-          router.push(`/project/${project.ref}/integrations/stripe_sync_engine/overview`)
+          router.push(
+            `/project/${project.ref}/integrations/stripe_sync_engine/overview?status=uninstalling`
+          )
         }
       },
     }

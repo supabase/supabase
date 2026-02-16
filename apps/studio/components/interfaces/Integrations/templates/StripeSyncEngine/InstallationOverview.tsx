@@ -8,7 +8,8 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTrack } from 'lib/telemetry/track'
 import { AlertCircle, BadgeCheck, Check, ExternalLink, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -19,9 +20,9 @@ import {
 } from 'stripe-experiment-sync/supabase'
 import {
   Button,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -33,6 +34,7 @@ import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
 
@@ -41,12 +43,16 @@ const installFormSchema = z.object({
 })
 
 export const StripeSyncInstallationPage = () => {
+  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
   const hasTrackedInstallFailed = useRef(false)
 
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
   const [isInstallInitiated, setIsInstallInitiated] = useState(false)
+  const [isUninstallInitiated, setIsUninstallInitiated] = useState(
+    router.query.status === 'uninstalling'
+  )
 
   const formId = 'stripe-sync-install-form'
   const form = useForm<z.infer<typeof installFormSchema>>({
@@ -80,6 +86,7 @@ export const StripeSyncInstallationPage = () => {
     {
       onSuccess: () => {
         toast.success('Stripe Sync uninstallation started')
+        setIsUninstallInitiated(true)
       },
     }
   )
@@ -98,6 +105,7 @@ export const StripeSyncInstallationPage = () => {
     stripeSchema.comment?.includes(INSTALLATION_STARTED_SUFFIX)
 
   const setupInProgress = schemaShowsInProgress || isInstalling || isInstallInitiated
+  const uninstallInProgress = isUninstalling || isUninstallInitiated
 
   const setupError =
     stripeSchema &&
@@ -127,6 +135,21 @@ export const StripeSyncInstallationPage = () => {
     }
   }, [isInstallInitiated, isInstalled, setupError])
 
+  useEffect(() => {
+    // Clear the uninstall initiated flag once we detect schema removal
+    if (isUninstallInitiated && !stripeSchema) {
+      setIsUninstallInitiated(false)
+    }
+  }, [isUninstallInitiated, stripeSchema])
+
+  useEffect(() => {
+    // Clean up the status query parameter after reading it
+    if (router.query.status === 'uninstalling') {
+      const { status, ...rest } = router.query
+      router.replace({ query: rest }, undefined, { shallow: true })
+    }
+  }, [router])
+
   // Check if there's an existing stripe schema that wasn't created by this integration
   const hasConflictingSchema =
     stripeSchema && !stripeSchema.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX)
@@ -145,31 +168,31 @@ export const StripeSyncInstallationPage = () => {
     }
   )
 
-  // Poll for schema changes during installation
+  // Poll for schema changes during installation and uninstallation
   useSchemasQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
     {
-      refetchInterval: setupInProgress ? 5000 : false,
+      refetchInterval: setupInProgress || uninstallInProgress ? 5000 : false,
     }
   )
 
   const isSyncing = !!syncState && !syncState.closed_at && syncState.status === 'running'
 
-  const handleUninstall = () => {
+  const handleUninstall = useCallback(() => {
     if (!project?.ref) return
 
     uninstallStripeSync({
       projectRef: project.ref,
     })
-  }
+  }, [project?.ref, uninstallStripeSync])
 
-  const handleOpenInstallSheet = () => {
+  const handleOpenInstallSheet = useCallback(() => {
     resetInstallError()
     setShouldShowInstallSheet(true)
-  }
+  }, [resetInstallError])
 
   const handleCloseInstallSheet = (isOpen: boolean) => {
     if (isInstalling) return
@@ -206,7 +229,7 @@ export const StripeSyncInstallationPage = () => {
       )
     }
 
-    if (syncState) {
+    if (syncState && isInstalled && !uninstallInProgress) {
       return (
         <Admonition type="default" showIcon={false}>
           <div className="flex items-center justify-between gap-2">
@@ -242,15 +265,25 @@ export const StripeSyncInstallationPage = () => {
     return null
   }, [
     setupError,
-    setupInProgress,
     syncState,
     isSyncing,
+    isInstalled,
     isUninstalling,
+    tableEditorUrl,
+    uninstallInProgress,
     handleOpenInstallSheet,
     handleUninstall,
   ])
 
   const status = useMemo(() => {
+    if (uninstallInProgress) {
+      return (
+        <span className="flex items-center gap-2 text-foreground-light text-sm">
+          <RefreshCwIcon size={14} className="animate-spin text-foreground-lighter" />
+          Uninstalling...
+        </span>
+      )
+    }
     if (isInstalled) {
       return (
         <span className="flex items-center gap-2 text-foreground-light text-sm">
@@ -266,7 +299,7 @@ export const StripeSyncInstallationPage = () => {
         </span>
       )
     }
-    if (syncState) {
+    if (syncState && isInstalled && !uninstallInProgress) {
       return (
         <span className="flex items-center gap-2 text-foreground-light text-sm">
           <RefreshCwIcon size={14} className="animate-spin text-foreground-lighter" />
@@ -285,7 +318,7 @@ export const StripeSyncInstallationPage = () => {
     return (
       <span className="flex items-center gap-2 text-foreground-light text-sm">Not installed</span>
     )
-  }, [isInstalled, setupInProgress, syncState, setupError])
+  }, [uninstallInProgress, isInstalled, setupInProgress, syncState, setupError])
 
   return (
     <IntegrationOverviewTab
