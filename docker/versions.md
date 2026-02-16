@@ -8,6 +8,7 @@
 - supabase/storage-api:v1.37.8 (prev supabase/storage-api:v1.37.1)
 - supabase/edge-runtime:v1.70.3 (prev supabase/edge-runtime:v1.70.0)
 - supabase/logflare:1.31.2 (prev supabase/logflare:1.30.3)
+- timberio/vector:0.53.0-alpine (prev timberio/vector:0.28.1-alpine)
 
 ## 2026-02-05
 - supabase/storage-api:v1.37.1 (prev supabase/storage-api:v1.33.5)
