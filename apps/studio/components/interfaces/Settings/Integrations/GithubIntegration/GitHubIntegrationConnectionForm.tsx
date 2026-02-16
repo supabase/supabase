@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -21,8 +21,12 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
+import { DOCS_URL } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -193,6 +197,9 @@ const GitHubIntegrationConnectionForm = ({
       }
     })
 
+  const defaultBranchLimitForPlan =
+    selectedOrganization?.plan?.id === 'pro' ? '3' : '50'
+
   const githubSettingsForm = useForm<z.infer<typeof GitHubSettingsSchema>>({
     resolver: zodResolver(GitHubSettingsSchema),
     mode: 'onSubmit',
@@ -204,9 +211,24 @@ const GitHubIntegrationConnectionForm = ({
       new_branch_per_pr: true,
       supabaseDirectory: '.',
       supabaseChangesOnly: true,
-      branchLimit: '50',
+      branchLimit: connection
+        ? String(connection.branch_limit)
+        : defaultBranchLimitForPlan,
     },
   })
+
+  const hasAppliedProDefaultRef = useRef(false)
+  useEffect(() => {
+    if (
+      connection ||
+      selectedOrganization?.plan?.id !== 'pro' ||
+      hasAppliedProDefaultRef.current
+    ) {
+      return
+    }
+    hasAppliedProDefaultRef.current = true
+    githubSettingsForm.setValue('branchLimit', '3')
+  }, [connection, selectedOrganization?.plan?.id, githubSettingsForm])
 
   const enableProductionSync = githubSettingsForm.watch('enableProductionSync')
   const newBranchPerPr = githubSettingsForm.watch('new_branch_per_pr')
@@ -336,6 +358,8 @@ const GitHubIntegrationConnectionForm = ({
         connectionId: connection.id,
       })
 
+      const defaultBranchLimit =
+        selectedOrganization?.plan?.id === 'pro' ? '3' : '50'
       githubSettingsForm.reset({
         repositoryId: '',
         enableProductionSync: true,
@@ -343,8 +367,9 @@ const GitHubIntegrationConnectionForm = ({
         new_branch_per_pr: true,
         supabaseDirectory: '.',
         supabaseChangesOnly: true,
-        branchLimit: '50',
+        branchLimit: defaultBranchLimit,
       })
+      hasAppliedProDefaultRef.current = false
     } catch (error) {
       console.error('Error removing integration:', error)
       toast.error('Failed to remove integration')
@@ -626,6 +651,21 @@ const GitHubIntegrationConnectionForm = ({
               </div>
             </CardContent>
             <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
+              <Alert_Shadcn_ variant="warning" className="mb-4">
+                <AlertTitle_Shadcn_>Branching and billing</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Branching Compute is not covered by your organization&apos;s Spend Cap. Costs
+                  should be closely monitored, as they may incur.{' '}
+                  <a
+                    href={`${DOCS_URL}/guides/platform/cost-control#usage-items-not-covered-by-the-spend-cap`}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="underline"
+                  >
+                    Learn more
+                  </a>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
               {/* Automatic Branching Section */}
               <div className="space-y-4">
                 <FormField_Shadcn_
