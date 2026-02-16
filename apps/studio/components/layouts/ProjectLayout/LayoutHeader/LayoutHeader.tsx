@@ -10,6 +10,7 @@ import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationD
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { DevToolbarTrigger } from 'dev-tools'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -25,10 +26,10 @@ import { CommandMenuTriggerInput } from 'ui-patterns'
 
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
-import { HelpPopover } from './HelpPopover'
+import { HelpDropdown } from './HelpDropdown/HelpDropdown'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
-import MergeRequestButton from './MergeRequestButton'
+import { MergeRequestButton } from './MergeRequestButton'
 import { Connect } from '@/components/interfaces/Connect/Connect'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
@@ -215,6 +216,7 @@ export const LayoutHeader = ({
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
+                <DevToolbarTrigger />
                 <FeedbackDropdown />
 
                 <div className="flex items-center gap-2">
@@ -229,7 +231,7 @@ export const LayoutHeader = ({
                       '[&_.command-shortcut>div]:text-foreground-lighter'
                     )}
                   />
-                  <HelpPopover />
+                  <HelpDropdown />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
@@ -255,7 +257,7 @@ export const LayoutHeader = ({
                         [&_.command-shortcut>div]:text-foreground-lighter
                       "
                   />
-                  <HelpPopover />
+                  <HelpDropdown />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
@@ -273,7 +275,7 @@ export const LayoutHeader = ({
         </div>
       </header>
 
-      {isFlagResolved && isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
+      {isFlagResolved ? isConnectSheetEnabled ? <ConnectSheet /> : <Connect /> : null}
     </>
   )
 }

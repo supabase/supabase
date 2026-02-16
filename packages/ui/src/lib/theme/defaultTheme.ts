@@ -867,8 +867,9 @@ export default {
       shadow-xl
     `,
     header: `
+      flex items-center
       space-y-1 py-4 px-4 bg-dash-sidebar sm:px-6
-      border-b
+      border-b h-[var(--header-height)]
     `,
     contents: `
       relative

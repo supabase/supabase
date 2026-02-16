@@ -1,6 +1,3 @@
-import { uniq, uniqBy } from 'lodash'
-import { useMemo } from 'react'
-
 import {
   SUPABASE_TARGET_SCHEMA_OPTION,
   WRAPPERS,
@@ -9,9 +6,12 @@ import {
   convertKVStringArrayToJson,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { QUEUES_SCHEMA } from 'data/database-queues/database-queues-toggle-postgrest-mutation'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { uniq, uniqBy } from 'lodash'
+import { useMemo } from 'react'
+
 import { useSelectedProjectQuery } from './misc/useSelectedProject'
+import { QUEUES_SCHEMA } from '@/data/database-queues/database-queues-toggle-postgrest-mutation'
 
 /**
  * A list of system schemas that users should not interact with
@@ -27,6 +27,7 @@ export const INTERNAL_SCHEMAS = [
   'pgsodium_masks',
   'pgbouncer',
   'pgtle',
+  'pgmq',
   'realtime',
   'storage',
   'supabase_functions',

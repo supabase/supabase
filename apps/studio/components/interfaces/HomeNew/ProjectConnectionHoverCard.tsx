@@ -8,7 +8,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { pluckObjectFields } from 'lib/helpers'
 import { Plug } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { type ReactNode, useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -35,7 +35,7 @@ interface ProjectConnectionHoverCardProps {
 
 export const ProjectConnectionHoverCard = ({ projectRef }: ProjectConnectionHoverCardProps) => {
   const [open, setOpen] = useState(false)
-  const [_, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data: settings, isPending: isLoadingSettings } = useProjectSettingsV2Query(
     { projectRef },

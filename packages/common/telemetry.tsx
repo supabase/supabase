@@ -14,7 +14,7 @@ import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useParams, useTelemetryCookie } from './hooks'
-import { posthogClient } from './posthog-client'
+import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
 import {
   clearTelemetryDataCookie,
@@ -22,7 +22,7 @@ import {
   getTelemetryCookieOptions,
 } from './telemetry-utils'
 
-export { posthogClient }
+export { posthogClient, type ClientTelemetryEvent }
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
