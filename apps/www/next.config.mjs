@@ -100,6 +100,10 @@ const nextConfig = {
                 ? 'max-age=31536000; includeSubDomains; preload'
                 : '',
           },
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
         ],
       },
     ]
