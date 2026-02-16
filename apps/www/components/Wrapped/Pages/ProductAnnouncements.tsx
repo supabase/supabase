@@ -267,7 +267,7 @@ const months: Month[] = [
         url: 'https://supabase.com/blog/login-with-solana-ethereum',
       },
       {
-        title: 'Supabase Javascript Library MonoRepo',
+        title: 'Supabase JavaScript Library MonoRepo',
         url: 'https://github.com/orgs/supabase/discussions/39197',
       },
     ],

@@ -311,7 +311,7 @@ function Database() {
                   <p className="text-foreground-light m-0">Available libraries:</p>
                   <div className="flex gap-1 xl:mb-0.5">
                     <Link href="/docs/reference/javascript/introduction" target="_blank">
-                      <Badge>Javascript</Badge>
+                      <Badge>JavaScript</Badge>
                     </Link>
                     <Link href="/docs/reference/dart/introduction" target="_blank">
                       <Badge>Flutter</Badge>
