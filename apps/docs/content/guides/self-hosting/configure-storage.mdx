@@ -6,10 +6,8 @@ subtitle: 'Set up an S3 backend and enable the S3-compatible client endpoint for
 
 Self-hosted Supabase Storage has two independent S3-related features:
 
-- **S3 backend** — where Storage physically stores files. By default, files are stored on the local filesystem. You can switch to an S3-compatible service (AWS S3, MinIO, Cloudflare R2, etc.) for durability, scalability, or to use existing infrastructure.
-- **S3 protocol endpoint** — an S3-compatible API that Storage exposes at `/storage/v1/s3`. This allows standard S3 tools like `rclone` and the AWS CLI to interact with your Storage instance. It works with both the file backend and the S3 backend.
-
-You can configure either feature independently.
+- **S3 backend** - where Storage keeps data. By default, files are stored on the local filesystem. You can switch to an S3-compatible service (AWS S3, MinIO, etc.) for durability, scalability, or to use existing infrastructure.
+- **S3 protocol endpoint** - an S3-compatible API that Storage exposes at `/storage/v1/s3`. This allows standard S3 tools like `rclone` and the AWS CLI to interact with your Storage instance.
 
 ## Configure an S3 backend
 
@@ -39,7 +37,7 @@ docker compose restart storage --no-deps
 
 The following sections show provider-specific configuration.
 
-### MinIO (local S3-compatible storage)
+### Using MinIO (local S3-compatible storage)
 
 MinIO runs alongside your self-hosted instance and provides an S3-compatible API locally. Add the MinIO service and an init container to your `docker-compose.yml`:
 
@@ -101,11 +99,11 @@ The MinIO console is available at `http://localhost:9001`.
 
 <Admonition type="tip">
 
-A preconfigured `docker-compose.s3.yml` overlay exists in the [self-hosted repository](https://github.com/supabase/supabase/blob/master/docker/docker-compose.s3.yml). You can use it as a reference, but it may not always reflect the latest storage image version.
+A preconfigured `docker-compose.s3.yml` overlay is [included](https://github.com/supabase/supabase/blob/master/docker/docker-compose.s3.yml) in self-hosted Supabase [configuration](https://github.com/supabase/supabase/blob/master/docker/) and can be use to start MinIO.
 
 </Admonition>
 
-### AWS S3
+### Using AWS S3
 
 Create an S3 bucket and an IAM user with access to it. Then configure the storage service:
 
@@ -133,11 +131,6 @@ storage:
     STORAGE_BACKEND: s3
     GLOBAL_S3_BUCKET: your-bucket-name
     GLOBAL_S3_ENDPOINT: https://your-account-id.r2.cloudflarestorage.com
-    GLOBAL_S3_PROTOCOL: https
-    GLOBAL_S3_FORCE_PATH_STYLE: "true"
-    AWS_ACCESS_KEY_ID: your-provider-access-key
-    AWS_SECRET_ACCESS_KEY: your-provider-secret-key
-    REGION: auto
 ```
 
 <Admonition type="caution">
@@ -154,7 +147,7 @@ This may also apply to other S3-compatible providers that don't fully implement 
 
 ## Enable the S3 protocol endpoint
 
-The S3 protocol endpoint at `/storage/v1/s3` lets standard S3 clients interact with your Storage instance. By default, this endpoint rejects all requests because no credentials are configured. The Supabase REST API and SDK are not affected — only the S3 protocol endpoint requires these credentials.
+The S3 protocol endpoint at `/storage/v1/s3` lets standard S3 clients interact with your self-hosted Storage instance. By default, this endpoint rejects all requests because no credentials are configured. The Supabase REST API and SDK are not affected - only the S3 protocol endpoint requires these credentials.
 
 Generate a key pair:
 
