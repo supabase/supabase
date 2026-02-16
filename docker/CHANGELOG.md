@@ -41,8 +41,8 @@ Check updates for each service to learn more.
 ### Storage
 
 - Updated to `v1.37.8` - [Release](https://github.com/supabase/storage/releases/tag/v1.37.8)
-- ⚠️ Added configuration to access buckets via `/storage/v1/s3` endpoint (requires `docker-compose.s3.yml` update) - PR #37185
-- ⚠️ Changed environment variable configuration for Storage (required `.env.example` and `.env` update) - PR #37185, PR #42862
+- ⚠️ Added configuration to access buckets via `/storage/v1/s3` endpoint (requires `docker-compose.s3.yml` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185)
+- ⚠️ Changed environment variable configuration for Storage (required `.env.example` and `.env` update) - PR #37185, PR [#42862](https://github.com/supabase/supabase/pull/42862)
 
 ### Edge Runtime
 
@@ -51,15 +51,15 @@ Check updates for each service to learn more.
 ### Analytics (Logflare)
 
 - Updated to `v1.31.2` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.31.2)
-- ⚠️ Changed default configuration to disable Logflare on `0.0.0.0:4000` to prevent access to `/dashboard` (requires `docker-compose.yml` update) - read more in "Production Recommendations" section of Logflare [documentation](https://supabase.com/docs/reference/self-hosting-analytics/introduction)
-- ⚠️ Changed Kong routes to not include `/analytics/v1` by default (requires `/volumes/api/kong.yml` update)
+- ⚠️ Changed default configuration to disable Logflare on `0.0.0.0:4000` to prevent access to `/dashboard` (requires `docker-compose.yml` update). Read more in "Production Recommendations" section of Logflare [documentation](https://supabase.com/docs/reference/self-hosting-analytics/introduction) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
+- ⚠️ Changed Kong routes to not include `/analytics/v1` by default (requires `/volumes/api/kong.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
 
 ### Vector
 
 - Updated to `0.53.0-alpine` - [Changelog](https://vector.dev/releases/0.53.0/) | [Release](https://github.com/vectordotdev/vector/releases/tag/v0.53.0) - PR #42525
 - ⚠️ Major version jump from `0.28.1` (requires `volumes/logs/vector.yml` update) - PR #42525
-- ⚠️ Changed Postgres sink configuration to bypass Kong (requires `volumes/logs/vector.yml` update) - PR #42857
-- ⚠️ Changed retry settings for all sinks to increase timeouts (requires `volumes/logs/vector.yml` update) - PR #42857
+- ⚠️ Changed Postgres sink configuration to bypass Kong (requires `volumes/logs/vector.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
+- ⚠️ Changed retry settings for all sinks to increase timeouts (requires `volumes/logs/vector.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
 
 ---
 
