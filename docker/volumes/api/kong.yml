@@ -208,7 +208,7 @@ services:
 
   # auth on analytics dashboard
   - name: analytics-v1
-    _comment: 'Analytics: /analytics/v1/* -> http://logflare:4000/*'
+    _comment: 'Analytics: /analytics/v1/* -> http://analytics:4000/*'
     url: http://analytics:4000/
     routes:
       - name: dashboard-v1-all
