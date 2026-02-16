@@ -17,7 +17,7 @@ Check updates for each service to learn more.
 
 ## [2026-02-16]
 
-**Note:** This update includes several breaking changes - please check the details below! Several configuration files have been changed: `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `volumes/api/kong.yml`, and `volumes/logs/vector.yml`. 
+⚠️ **Note:** This update includes several breaking changes - please check the details below! Several configuration files have been changed: `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `volumes/api/kong.yml`, and `volumes/logs/vector.yml`. 
 
 ### Studio
 - Updated to `2026.02.16-sha-26c615c`
