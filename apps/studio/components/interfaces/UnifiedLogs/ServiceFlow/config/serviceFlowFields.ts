@@ -33,7 +33,7 @@ export const originFields: BlockFieldConfig[] = [
       if (!data?.timestamp && !data?.date) return null
       try {
         const timestamp = data?.timestamp || data?.date
-        return new Date(timestamp).toLocaleString()      
+        return new Date(timestamp).toLocaleString()
       } catch {
         return 'Invalid date'
       }
