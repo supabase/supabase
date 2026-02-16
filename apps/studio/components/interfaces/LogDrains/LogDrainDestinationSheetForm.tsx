@@ -47,6 +47,10 @@ import {
   LogDrainType,
   OTLP_PROTOCOLS,
 } from './LogDrains.constants'
+import {
+  getHeadersSectionDescription as getHeadersDescription,
+  validateNewHeader,
+} from './LogDrains.utils'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -261,19 +265,13 @@ export function LogDrainDestinationSheetForm({
   function addHeader() {
     const formHeaders = form.getValues('headers')
     if (!formHeaders) return
-    const headerKeys = Object.keys(formHeaders)
-    if (headerKeys?.length === 20) {
-      toast.error('You can only have 20 custom headers')
+
+    const validation = validateNewHeader(formHeaders, newCustomHeader)
+    if (!validation.valid) {
+      toast.error(validation.error)
       return
     }
-    if (headerKeys?.includes(newCustomHeader.name)) {
-      toast.error('Header name already exists')
-      return
-    }
-    if (!newCustomHeader.name || !newCustomHeader.value) {
-      toast.error('Header name and value are required')
-      return
-    }
+
     form.setValue('headers', { ...formHeaders, [newCustomHeader.name]: newCustomHeader.value })
     setNewCustomHeader({ name: '', value: '' })
   }
@@ -285,19 +283,6 @@ export function LogDrainDestinationSheetForm({
       form.reset()
     }
   }, [mode, open, form])
-
-  function getHeadersSectionDescription() {
-    if (type === 'webhook') {
-      return 'Set custom headers when draining logs to the Endpoint URL'
-    }
-    if (type === 'loki') {
-      return 'Set custom headers when draining logs to the Loki HTTP(S) endpoint'
-    }
-    if (type === 'otlp') {
-      return 'Set custom headers for OTLP authentication (e.g., Authorization, X-API-Key)'
-    }
-    return ''
-  }
 
   return (
     <Sheet
@@ -751,9 +736,7 @@ export function LogDrainDestinationSheetForm({
               <div className="border-t mt-4">
                 <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
                   <h2 className="text-sm">Custom Headers</h2>
-                  <p className="text-xs text-foreground-lighter">
-                    {getHeadersSectionDescription()}
-                  </p>
+                  <p className="text-xs text-foreground-lighter">{getHeadersDescription(type)}</p>
                 </div>
                 <div className="divide-y">
                   {hasHeaders &&
