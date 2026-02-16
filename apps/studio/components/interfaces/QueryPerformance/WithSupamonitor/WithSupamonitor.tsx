@@ -59,34 +59,26 @@ export const WithSupamonitor = ({ dateRange, onDateRangeChange }: WithSupamonito
     )
   }, [effectiveDateRange])
 
-  console.log(queryWithTimeRange)
   const supamonitorLogs = useLogsQuery(ref as string, {
     sql: queryWithTimeRange,
     iso_timestamp_start: effectiveDateRange.iso_timestamp_start,
     iso_timestamp_end: effectiveDateRange.iso_timestamp_end,
   })
-  console.log(supamonitorLogs)
 
   const { logData, isLoading: isLogsLoading, error: logsError } = supamonitorLogs
 
   const parsedLogs = useMemo(() => {
     const result = parseSupamonitorLogs(logData || [])
-    console.log('🔍 logData:', logData)
-    console.log('🔍 parsedLogs:', result)
-    console.log('🔍 First parsed log structure:', result[0])
     return result
   }, [logData])
 
   const chartData = useMemo(() => {
     const result = transformLogsToChartData(parsedLogs)
-    console.log('📊 chartData:', result)
-    console.log('📊 chartData length:', result.length)
     return result
   }, [parsedLogs])
 
   const aggregatedGridData = useMemo(() => {
     const result = aggregateLogsByQuery(parsedLogs)
-    console.log('📋 aggregatedGridData:', result)
     return result
   }, [parsedLogs])
 
