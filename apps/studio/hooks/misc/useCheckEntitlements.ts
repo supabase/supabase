@@ -55,7 +55,7 @@ function getEntitlementSetValues(entitlement: Entitlement | null): string[] {
     : []
 }
 
-function getEntitlementMax(entitlement: Entitlement | null): Number | undefined {
+function getEntitlementMax(entitlement: Entitlement | null): number | undefined {
   return isEntitlementUnlimited(entitlement)
     ? Number.MAX_SAFE_INTEGER
     : getEntitlementNumericValue(entitlement)
