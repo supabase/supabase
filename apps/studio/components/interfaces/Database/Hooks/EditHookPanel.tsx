@@ -3,6 +3,7 @@ import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -13,16 +14,11 @@ import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
+import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
 import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from '@/hooks/ui/useConfirmOnClose'
 import { uuidv4 } from '@/lib/helpers'
-
-export interface EditHookPanelProps {
-  visible: boolean
-  selectedHook?: PostgresTrigger
-  onClose: () => void
-}
 
 export type HTTPArgument = { id: string; name: string; value: string }
 
@@ -80,10 +76,28 @@ const parseParameters = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
   }))
 }
 
-export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
+export const EditHookPanel = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isLoadingTable, setIsLoadingTable] = useState(false)
+
+  const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const [showCreateHookForm, setShowCreateHookForm] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false)
+  )
+
+  const [selectedHookIdToEdit, setSelectedHookIdToEdit] = useQueryState(
+    'edit',
+    parseAsString.withDefault('')
+  )
+  const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToEdit)
+
+  const visible = showCreateHookForm || !!selectedHook
 
   const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
     {
@@ -134,6 +148,18 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       httpParameters: parseParameters(selectedHook),
     },
   })
+
+  const onClose = () => {
+    setShowCreateHookForm(false)
+    setSelectedHookIdToEdit(null)
+  }
+
+  useEffect(() => {
+    if (isSuccess && !!selectedHookIdToEdit && !selectedHook) {
+      toast('Webhook not found')
+      setSelectedHookIdToEdit(null)
+    }
+  }, [isSuccess, selectedHook, selectedHookIdToEdit, setSelectedHookIdToEdit])
 
   // Reset form when panel opens with new selectedHook
   useEffect(() => {

@@ -1,22 +1,31 @@
-import { toast } from 'sonner'
-
 import { useVaultSecretDeleteMutation } from 'data/vault/vault-secret-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { VaultSecret } from 'types'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
 
-interface DeleteSecretModalProps {
-  selectedSecret: VaultSecret | undefined
-  onClose: () => void
-  onDeleteStart?: (secretId: string) => void
-}
+import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 
-const DeleteSecretModal = ({ selectedSecret, onClose, onDeleteStart }: DeleteSecretModalProps) => {
+export const DeleteSecretModal = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { mutate: deleteSecret, isPending: isDeleting } = useVaultSecretDeleteMutation({
+
+  const { data: secrets = [], isSuccess } = useVaultSecretsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const [secretIdToDelete, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
+  const selectedSecret = secrets.find((secret) => secret.id === secretIdToDelete)
+
+  const {
+    mutate: deleteSecret,
+    isPending: isDeleting,
+    isSuccess: isSuccessDelete,
+  } = useVaultSecretDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted secret ${selectedSecret?.name}`)
-      onClose()
+      setSelectedSecretToDelete(null)
     },
     onError: (error) => {
       toast.error(`Failed to delete secret: ${error.message}`)
@@ -27,7 +36,6 @@ const DeleteSecretModal = ({ selectedSecret, onClose, onDeleteStart }: DeleteSec
     if (!project) return console.error('Project is required')
     if (!selectedSecret) return
 
-    onDeleteStart?.(selectedSecret.id)
     deleteSecret({
       projectRef: project.ref,
       connectionString: project?.connectionString,
@@ -35,15 +43,23 @@ const DeleteSecretModal = ({ selectedSecret, onClose, onDeleteStart }: DeleteSec
     })
   }
 
+  useEffect(() => {
+    if (isSuccess && !!secretIdToDelete && !selectedSecret && !isSuccessDelete) {
+      toast('Secret not found')
+      setSelectedSecretToDelete(null)
+    }
+  }, [isSuccess, isSuccessDelete, secretIdToDelete, selectedSecret, setSelectedSecretToDelete])
+
   return (
     <Modal
       size="small"
+      variant="danger"
       alignFooter="right"
-      visible={selectedSecret !== undefined}
-      onCancel={onClose}
-      onConfirm={onConfirmDeleteSecret}
-      loading={isDeleting}
       header="Confirm to delete secret"
+      visible={!!selectedSecret}
+      loading={isDeleting}
+      onCancel={() => setSelectedSecretToDelete(null)}
+      onConfirm={onConfirmDeleteSecret}
     >
       <Modal.Content className="space-y-4">
         <p className="text-sm">
@@ -59,5 +75,3 @@ const DeleteSecretModal = ({ selectedSecret, onClose, onDeleteStart }: DeleteSec
     </Modal>
   )
 }
-
-export default DeleteSecretModal
