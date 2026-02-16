@@ -100,6 +100,11 @@ const nextConfig = {
                 ? 'max-age=31536000; includeSubDomains; preload'
                 : '',
           },
+        ],
+      },
+      {
+        source: '/(docs|blog)/:path*',
+        headers: [
           {
             key: 'X-Robots-Tag',
             value: 'all',
