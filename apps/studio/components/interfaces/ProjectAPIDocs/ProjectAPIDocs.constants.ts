@@ -225,7 +225,7 @@ View all the available [Third Party OAuth providers](https://supabase.com).
 
 After they have logged in, all interactions using the Supabase JS client will be performed as "that user".
 
-Generate your Client ID and secret from: [Google](https://console.developers.google.com/apis/credentials), [Github](https://github.com/settings/applications/new), [Gitlab](https://gitlab.com/oauth/applications), [Facebook](https://developers.facebook.com/apps), and [Bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud).`,
+Generate your Client ID and secret from: [Google](https://console.developers.google.com/apis/credentials), [GitHub](https://github.com/settings/applications/new), [GitLab](https://gitlab.com/oauth/applications), [Facebook](https://developers.facebook.com/apps), and [Bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud).`,
     js: (apikey?: string, endpoint?: string) => `
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'github'

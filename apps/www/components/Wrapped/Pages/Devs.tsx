@@ -68,7 +68,7 @@ const gridStats: GridStat[] = [
     suffix: 'PB',
   },
   {
-    headline: 'One of the top 100 repos on Github',
+    headline: 'One of the top 100 repos on GitHub',
     number: 94_500,
     increment: 0,
     suffix: 'stars',

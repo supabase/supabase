@@ -574,7 +574,7 @@ export const SocialLoginItems: Array<Partial<NavMenuSection>> = [
     hasLightIcon: true,
   },
   {
-    name: 'Gitlab',
+    name: 'GitLab',
     icon: '/docs/img/icons/gitlab-icon',
     url: '/guides/auth/social-login/auth-gitlab',
   },
