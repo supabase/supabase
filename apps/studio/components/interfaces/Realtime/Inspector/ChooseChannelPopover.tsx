@@ -189,7 +189,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                   </span>{' '}
                   channel:
                 </p>
-                <p className="text-xs border border-scale-600  py-0.5 px-1 rounded-md bg-surface-200">
+                <p className="text-xs border border-default py-0.5 px-1 rounded-md bg-surface-200">
                   {config.channelName}
                 </p>
               </div>

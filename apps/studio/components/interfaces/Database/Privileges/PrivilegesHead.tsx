@@ -50,7 +50,7 @@ const PrivilegesHead = ({
           onSelectSchema={onChangeSchema}
         />
         <TablesSelect selectedTable={selectedTable} tables={tables} onChangeTable={onChangeTable} />
-        <div className="h-[20px] w-px border-r border-scale-600"></div>
+        <div className="h-[20px] w-px border-r border-default"></div>
         <RolesSelect selectedRole={selectedRole} roles={roles} onChangeRole={onChangeRole} />
       </div>
 
