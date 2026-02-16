@@ -81,7 +81,7 @@ const Footer = ({ className }: { className?: string }) => (
             href="https://youtube.com/c/supabase"
             className="text-foreground-muted hover:text-foreground transition"
           >
-            <span className="sr-only">Youtube</span>
+            <span className="sr-only">YouTube</span>
             <IconYoutubeSolid size={14} />
           </a>
         </div>

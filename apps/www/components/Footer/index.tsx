@@ -125,7 +125,7 @@ const Footer = (props: Props) => {
                 href="https://youtube.com/c/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
-                <span className="sr-only">Youtube</span>
+                <span className="sr-only">YouTube</span>
                 <IconYoutubeSolid size={22} />
               </a>
             </div>

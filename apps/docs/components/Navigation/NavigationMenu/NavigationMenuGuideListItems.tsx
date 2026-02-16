@@ -55,7 +55,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   useEffect(() => {
     // scroll to active item
     if (activeItem && activeItemRef.current) {
-      // this is a hack, but seems a common one on Stackoverflow
+      // this is a hack, but seems a common one on Stack Overflow
       setTimeout(() => {
         activeItemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
       }, 0)
