@@ -19,8 +19,8 @@ import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 import {
-  type ValidationFailure,
   useValidateDestinationMutation,
+  type ValidationFailure,
 } from 'data/replication/validate-destination-mutation'
 import { useValidatePipelineMutation } from 'data/replication/validate-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
@@ -176,8 +176,7 @@ export const DestinationForm = ({
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? undefined,
       maxSize: pipelineData?.config?.batch?.max_size ?? undefined,
       maxTableSyncWorkers: pipelineData?.config?.max_table_sync_workers ?? undefined,
-      maxCopyConnectionsPerTable:
-        pipelineData?.config?.max_copy_connections_per_table ?? undefined,
+      maxCopyConnectionsPerTable: pipelineData?.config?.max_copy_connections_per_table ?? undefined,
       // BigQuery fields
       projectId: isBigQueryConfig ? config.big_query.project_id : '',
       datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { BatchConfig, DestinationConfig } from './create-destination-pipeline-mutation'
 import { replicationKeys } from './keys'
 
@@ -29,12 +29,7 @@ async function updateDestinationPipeline(
     projectRef,
     destinationName: destinationName,
     destinationConfig,
-    pipelineConfig: {
-      publicationName,
-      batch,
-      maxTableSyncWorkers,
-      maxCopyConnectionsPerTable,
-    },
+    pipelineConfig: { publicationName, batch, maxTableSyncWorkers, maxCopyConnectionsPerTable },
     sourceId,
   }: UpdateDestinationPipelineParams,
   signal?: AbortSignal
