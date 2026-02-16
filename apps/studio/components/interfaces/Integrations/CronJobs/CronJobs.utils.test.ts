@@ -323,6 +323,15 @@ describe('parseCronJobCommand', () => {
     }
   })
 
+  it('should handle escaped single quotes in body values', () => {
+    const command = `select net.http_post( url:='https://example.com/api', headers:=jsonb_build_object('Content-type', 'application/json'), body:='O''Brien''s data', timeout_milliseconds:=3000 );`
+    const result = parseCronJobCommand(command, 'random_project_ref')
+    expect(result.type).toBe('http_request')
+    if (result.type === 'http_request') {
+      expect(result.httpBody).toBe("O''Brien''s data")
+    }
+  })
+
   it('should handle parentheses inside single-quoted header values', () => {
     const command = `select net.http_post( url:='https://example.com/api', headers:=jsonb_build_object('Content-type', 'application/json', 'X-Custom', 'val(with)parens'), body:='{"ok": true}', timeout_milliseconds:=3000 );`
     const result = parseCronJobCommand(command, 'random_project_ref')
