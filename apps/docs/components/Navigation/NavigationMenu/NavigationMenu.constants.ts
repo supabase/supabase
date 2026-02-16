@@ -3031,14 +3031,14 @@ export const reference = {
           enabled: sdkCsharpEnabled,
         },
         {
-          name: 'supbase-python',
+          name: 'supabase-python',
           url: '/reference/python/start',
           level: 'reference_python',
           icon: '/img/icons/menu/reference-python' as `/${string}`,
           enabled: sdkPythonEnabled,
         },
         {
-          name: 'supbase-swift',
+          name: 'supabase-swift',
           url: '/reference/swift/start',
           level: 'reference_swift',
           items: [],
