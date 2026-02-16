@@ -53,9 +53,22 @@ function extractJsonbBuildObjectArgs(command: string): string {
   const argsStart = startIdx + marker.length
   let depth = 1
   let i = argsStart
+  let inSingleQuote = false
   while (i < command.length && depth > 0) {
-    if (command[i] === '(') depth++
-    else if (command[i] === ')') depth--
+    const ch = command[i]
+    if (ch === "'") {
+      if (inSingleQuote && command[i + 1] === "'") {
+        i += 2
+        continue
+      }
+      inSingleQuote = !inSingleQuote
+      i++
+      continue
+    }
+    if (!inSingleQuote) {
+      if (ch === '(') depth++
+      else if (ch === ')') depth--
+    }
     i++
   }
   // i now points one past the closing ')', so the content is [argsStart, i - 1)
