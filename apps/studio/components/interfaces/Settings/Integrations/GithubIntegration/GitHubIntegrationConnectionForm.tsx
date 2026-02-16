@@ -197,8 +197,7 @@ const GitHubIntegrationConnectionForm = ({
       }
     })
 
-  const defaultBranchLimitForPlan =
-    selectedOrganization?.plan?.id === 'pro' ? '3' : '50'
+  const defaultBranchLimitForPlan = selectedOrganization?.plan?.id === 'pro' ? '3' : '50'
 
   const githubSettingsForm = useForm<z.infer<typeof GitHubSettingsSchema>>({
     resolver: zodResolver(GitHubSettingsSchema),
@@ -211,19 +210,13 @@ const GitHubIntegrationConnectionForm = ({
       new_branch_per_pr: true,
       supabaseDirectory: '.',
       supabaseChangesOnly: true,
-      branchLimit: connection
-        ? String(connection.branch_limit)
-        : defaultBranchLimitForPlan,
+      branchLimit: connection ? String(connection.branch_limit) : defaultBranchLimitForPlan,
     },
   })
 
   const hasAppliedProDefaultRef = useRef(false)
   useEffect(() => {
-    if (
-      connection ||
-      selectedOrganization?.plan?.id !== 'pro' ||
-      hasAppliedProDefaultRef.current
-    ) {
+    if (connection || selectedOrganization?.plan?.id !== 'pro' || hasAppliedProDefaultRef.current) {
       return
     }
     hasAppliedProDefaultRef.current = true
@@ -358,8 +351,7 @@ const GitHubIntegrationConnectionForm = ({
         connectionId: connection.id,
       })
 
-      const defaultBranchLimit =
-        selectedOrganization?.plan?.id === 'pro' ? '3' : '50'
+      const defaultBranchLimit = selectedOrganization?.plan?.id === 'pro' ? '3' : '50'
       githubSettingsForm.reset({
         repositoryId: '',
         enableProductionSync: true,
