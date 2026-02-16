@@ -15,8 +15,6 @@ export async function getSupamonitorEnabled({
   projectRef,
   connectionString,
 }: SupamonitorEnabledVariables) {
-  if (!projectRef) throw new Error('Project ref is required')
-
   const { result } = await executeSql<{ libraries: string }[]>({
     projectRef,
     connectionString,
