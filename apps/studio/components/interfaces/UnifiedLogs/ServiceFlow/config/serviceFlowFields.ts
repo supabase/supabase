@@ -33,7 +33,8 @@ export const originFields: BlockFieldConfig[] = [
       if (!data?.timestamp && !data?.date) return null
       try {
         const timestamp = data?.timestamp || data?.date
-        return new Date(timestamp).toLocaleString()
+        // Convert microseconds to milliseconds for JavaScript Date
+        return new Date(timestamp / 1000).toLocaleString()
       } catch {
         return 'Invalid date'
       }
@@ -739,7 +740,8 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
     label: 'Session Started',
     getValue: (data, enrichedData) => {
       const startTime = enrichedData?.session_start_time || data?.session_start_time
-      return startTime ? new Date(startTime).toLocaleString() : null
+      // Convert microseconds to milliseconds for JavaScript Date
+      return startTime ? new Date(startTime / 1000).toLocaleString() : null
     },
     requiresEnrichedData: true,
   },
