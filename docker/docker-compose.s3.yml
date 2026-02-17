@@ -1,7 +1,7 @@
 services:
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     ports:
       - '9000:9000'
       - '9001:9001'
@@ -10,7 +10,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server --console-address ":9001" /data
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://minio:9000/minio/health/live" ]
+      test: [ "CMD", "mc", "ready", "local" ]
       interval: 2s
       timeout: 10s
       retries: 5
@@ -18,7 +18,7 @@ services:
       - ./volumes/storage:/data:z
 
   minio-createbucket:
-    image: minio/mc
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
     depends_on:
       minio:
         condition: service_healthy
@@ -84,9 +84,15 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.8.0
+    image: darthsim/imgproxy:v3.30.1
+    restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "imgproxy", "health" ]
+      test:
+        [
+          "CMD",
+          "imgproxy",
+          "health"
+        ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -94,3 +100,4 @@ services:
       IMGPROXY_BIND: ":5001"
       IMGPROXY_USE_ETAG: "true"
       IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
+      IMGPROXY_MAX_SRC_RESOLUTION: 16.8
