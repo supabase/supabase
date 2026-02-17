@@ -67,17 +67,17 @@ export const StripeSyncInstallationPage = () => {
 
   const isSyncing = isSyncRunning(syncState)
 
-  const isInstalled = installationStatus === 'installed'
-  const setupError = installationStatus === 'install_error'
-  const isUninstalled = installationStatus === 'uninstalled'
+  const installed = installationStatus === 'installed'
+  const installError = installationStatus === 'install_error'
+  const uninstalled = installationStatus === 'uninstalled'
   const uninstallError = installationStatus === 'uninstall_error'
-  const schemaShowsInProgress = installationStatus === 'installing'
-  const schemaShowsUninstallInProgress = installationStatus === 'uninstalling'
+  const installInProgress = installationStatus === 'installing'
+  const uninsallInProgress = installationStatus === 'uninstalling'
 
   const {
     mutate: installStripeSync,
-    isPending: isInstalling,
-    error: installError,
+    isPending: isInstallRequested,
+    error: installRequestError,
     reset: resetInstallError,
   } = useStripeSyncInstallMutation({
     onSuccess: () => {
@@ -88,23 +88,21 @@ export const StripeSyncInstallationPage = () => {
     },
   })
 
-  const { mutate: uninstallStripeSync, isPending: isUninstalling } = useStripeSyncUninstallMutation(
-    {
+  const { mutate: uninstallStripeSync, isPending: isUninstallRequested } =
+    useStripeSyncUninstallMutation({
       onSuccess: () => {
         toast.success('Stripe Sync uninstallation started')
         setIsUninstallInitiated(true)
       },
-    }
-  )
+    })
 
   // Combine schema status with mutation/initiated states for UI
-  const setupInProgress = schemaShowsInProgress || isInstalling || isInstallInitiated
-  const uninstallInProgress =
-    schemaShowsUninstallInProgress || isUninstalling || isUninstallInitiated
+  const setupInProgress = installInProgress || isInstallRequested || isInstallInitiated
+  const uninstallInProgress = uninsallInProgress || isUninstallRequested || isUninstallInitiated
 
   // Track install failures
   useEffect(() => {
-    if (!setupError) {
+    if (!installError) {
       hasTrackedInstallFailed.current = false
       return
     }
@@ -115,34 +113,34 @@ export const StripeSyncInstallationPage = () => {
         integrationName: 'stripe_sync_engine',
       })
     }
-  }, [setupError, track])
+  }, [installError, track])
 
   // Clear install initiated flag once schema reflects completion or error
   useEffect(() => {
-    if (isInstallInitiated && (isInstalled || setupError)) {
+    if (isInstallInitiated && (installed || installError)) {
       setIsInstallInitiated(false)
     }
-  }, [isInstallInitiated, isInstalled, setupError])
+  }, [isInstallInitiated, installed, installError])
 
   // Clear uninstall initiated flag once schema is removed or error
   useEffect(() => {
-    if (isUninstallInitiated && (isUninstalled || uninstallError)) {
+    if (isUninstallInitiated && (uninstalled || uninstallError)) {
       setIsUninstallInitiated(false)
     }
-  }, [isUninstallInitiated, isUninstalled, uninstallError])
+  }, [isUninstallInitiated, uninstalled, uninstallError])
 
   // Clean up the status query parameter after schema confirms uninstall status
   useEffect(() => {
     if (
       router.query.status === 'uninstalling' &&
-      (schemaShowsUninstallInProgress || isUninstalled || uninstallError)
+      (uninsallInProgress || uninstalled || uninstallError)
     ) {
       const { status: _, ...rest } = router.query
       router.replace({ query: rest }, undefined, { shallow: true })
     }
-  }, [router, schemaShowsUninstallInProgress, isUninstalled, uninstallError])
+  }, [router, uninsallInProgress, uninstalled, uninstallError])
 
-  const canInstall = checkCanInstall(installationStatus) && !isInstalled && !setupInProgress
+  const canInstall = checkCanInstall(installationStatus) && !installed && !setupInProgress
 
   // Poll for schema changes during transitions
   useSchemasQuery(
@@ -164,7 +162,7 @@ export const StripeSyncInstallationPage = () => {
   }, [resetInstallError])
 
   const handleCloseInstallSheet = (isOpen: boolean) => {
-    if (isInstalling) return
+    if (isInstallRequested) return
 
     setShouldShowInstallSheet(isOpen)
     if (!isOpen) {
@@ -187,8 +185,8 @@ export const StripeSyncInstallationPage = () => {
             <Button
               type="warning"
               onClick={handleUninstall}
-              loading={isUninstalling}
-              disabled={isUninstalling}
+              loading={isUninstallRequested}
+              disabled={isUninstallRequested}
             >
               Try Again
             </Button>
@@ -197,7 +195,7 @@ export const StripeSyncInstallationPage = () => {
       )
     }
 
-    if (setupError) {
+    if (installError) {
       return (
         <Admonition type="destructive" showIcon={true} title="Installation Error">
           <div>
@@ -209,8 +207,8 @@ export const StripeSyncInstallationPage = () => {
             <Button
               type="warning"
               onClick={handleUninstall}
-              loading={isUninstalling}
-              disabled={isUninstalling}
+              loading={isUninstallRequested}
+              disabled={isUninstallRequested}
             >
               Uninstall
             </Button>
@@ -219,7 +217,7 @@ export const StripeSyncInstallationPage = () => {
       )
     }
 
-    if (syncState && isInstalled && !uninstallInProgress) {
+    if (syncState && installed && !uninstallInProgress) {
       return (
         <Admonition type="default" showIcon={false}>
           <div className="flex items-center justify-between gap-2">
@@ -255,11 +253,11 @@ export const StripeSyncInstallationPage = () => {
     return null
   }, [
     uninstallError,
-    setupError,
+    installError,
     syncState,
     isSyncing,
-    isInstalled,
-    isUninstalling,
+    installed,
+    isUninstallRequested,
     tableEditorUrl,
     uninstallInProgress,
     handleOpenInstallSheet,
@@ -283,7 +281,7 @@ export const StripeSyncInstallationPage = () => {
         </span>
       )
     }
-    if (setupError) {
+    if (installError) {
       return (
         <span className="flex items-center gap-2 text-foreground-light text-sm">
           <AlertCircle size={14} className="text-destructive" />
@@ -299,7 +297,7 @@ export const StripeSyncInstallationPage = () => {
         </span>
       )
     }
-    if (isSyncing && isInstalled) {
+    if (isSyncing && installed) {
       return (
         <span className="flex items-center gap-2 text-foreground-light text-sm">
           <RefreshCwIcon size={14} className="animate-spin text-foreground-lighter" />
@@ -307,7 +305,7 @@ export const StripeSyncInstallationPage = () => {
         </span>
       )
     }
-    if (isInstalled) {
+    if (installed) {
       return (
         <span className="flex items-center gap-2 text-foreground-light text-sm">
           <Check size={14} strokeWidth={1.5} className="text-brand" /> Installed
@@ -317,14 +315,14 @@ export const StripeSyncInstallationPage = () => {
     return (
       <span className="flex items-center gap-2 text-foreground-light text-sm">Not installed</span>
     )
-  }, [uninstallError, uninstallInProgress, setupError, setupInProgress, isSyncing, isInstalled])
+  }, [uninstallError, uninstallInProgress, installError, setupInProgress, isSyncing, installed])
 
   return (
     <IntegrationOverviewTab
       alert={alert}
       status={statusDisplay}
       actions={
-        !isInstalled && !setupInProgress && !setupError ? (
+        !installed && !setupInProgress && !installError ? (
           <StripeSyncChangesCard
             canInstall={canInstall}
             onInstall={() => setShouldShowInstallSheet(true)}
@@ -365,13 +363,13 @@ export const StripeSyncInstallationPage = () => {
                   </p>
                 </Admonition>
                 <h3 className="heading-default mb-4 mt-6">Configuration</h3>
-                {installError && (
+                {installRequestError && (
                   <Admonition type="destructive" className="mb-4">
                     <div className="flex items-start gap-2">
                       <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium">Installation failed</p>
-                        <p className="text-sm">{installError.message}</p>
+                        <p className="text-sm">{installRequestError.message}</p>
                       </div>
                     </div>
                   </Admonition>
@@ -393,7 +391,7 @@ export const StripeSyncInstallationPage = () => {
                           placeholder="Enter your Stripe API key"
                           autoComplete="stripe-api-key"
                           reveal={false}
-                          disabled={isInstalling}
+                          disabled={isInstallRequested}
                           type="password"
                           value={field.value}
                           onChange={(e) => field.onChange(e.target.value)}
@@ -427,7 +425,7 @@ export const StripeSyncInstallationPage = () => {
               <SheetFooter>
                 <Button
                   type="default"
-                  disabled={isInstalling}
+                  disabled={isInstallRequested}
                   onClick={() => handleCloseInstallSheet(false)}
                 >
                   Cancel
@@ -436,10 +434,10 @@ export const StripeSyncInstallationPage = () => {
                   form={formId}
                   htmlType="submit"
                   type="primary"
-                  loading={isInstalling}
-                  disabled={!form.formState.isValid || isInstalling}
+                  loading={isInstallRequested}
+                  disabled={!form.formState.isValid || isInstallRequested}
                 >
-                  {isInstalling ? 'Starting Installation...' : 'Start Installation'}
+                  {isInstallRequested ? 'Starting Installation...' : 'Start Installation'}
                 </Button>
               </SheetFooter>
             </form>
