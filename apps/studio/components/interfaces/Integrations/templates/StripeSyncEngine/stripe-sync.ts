@@ -25,9 +25,8 @@ export interface StripeSyncStatusResult {
   /** Current sync run state (only available when installed) */
   syncState: StripeSyncState | undefined
 
-  /** Whether data is still loading */
+  /** Whether schemas are still loading or status is installed
+   * and sync status is loading
+   */
   isLoading: boolean
-
-  /** Whether polling is active */
-  isPolling: boolean
 }

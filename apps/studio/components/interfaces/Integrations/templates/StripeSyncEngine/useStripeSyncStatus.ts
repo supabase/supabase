@@ -76,6 +76,5 @@ export function useStripeSyncStatus({
     stripeSchema,
     syncState: installed ? syncState : undefined,
     isLoading: isSchemasLoading || (installed && isSyncStateLoading),
-    isPolling: inProgress,
   }
 }
