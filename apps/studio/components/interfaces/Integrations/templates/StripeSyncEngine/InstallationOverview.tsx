@@ -33,9 +33,11 @@ import {
   canInstall as checkCanInstall,
   hasInstallError,
   hasUninstallError,
+  isInstallDone,
   isInstalled,
   isInstalling,
   isSyncRunning,
+  isUninstallDone,
   isUninstalled,
   isUninstalling,
 } from './stripe-sync-status'
@@ -82,6 +84,8 @@ export const StripeSyncInstallationPage = () => {
   const uninstallError = hasUninstallError(installationStatus)
   const installInProgress = isInstalling(installationStatus)
   const uninsallInProgress = isUninstalling(installationStatus)
+  const installDone = isInstallDone(installationStatus)
+  const uninstallDone = isUninstallDone(installationStatus)
 
   const {
     mutate: installStripeSync,
@@ -126,17 +130,17 @@ export const StripeSyncInstallationPage = () => {
 
   // Clear install initiated flag once schema reflects completion or error
   useEffect(() => {
-    if (isInstallInitiated && (installed || installError)) {
+    if (isInstallInitiated && installDone) {
       setIsInstallInitiated(false)
     }
-  }, [isInstallInitiated, installed, installError])
+  }, [isInstallInitiated, installDone])
 
   // Clear uninstall initiated flag once schema is removed or error
   useEffect(() => {
-    if (isUninstallInitiated && (uninstalled || uninstallError)) {
+    if (isUninstallInitiated && uninstallDone) {
       setIsUninstallInitiated(false)
     }
-  }, [isUninstallInitiated, uninstalled, uninstallError])
+  }, [isUninstallInitiated, uninstallDone])
 
   // Clean up the status query parameter after schema confirms uninstall status
   useEffect(() => {
