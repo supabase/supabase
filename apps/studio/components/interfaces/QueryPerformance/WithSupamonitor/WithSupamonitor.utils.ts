@@ -1,6 +1,6 @@
 import { QueryPerformanceRow, ChartDataPoint, ParsedLogEntry } from '../QueryPerformance.types'
 
-export const parseSupamonitorLogs = (logData: any[]): ParsedLogEntry[] => {
+export function parseSupamonitorLogs(logData: any[]): ParsedLogEntry[] {
   if (!logData || logData.length === 0) return []
 
   return logData.map((log) => ({
@@ -26,7 +26,7 @@ export const parseSupamonitorLogs = (logData: any[]): ParsedLogEntry[] => {
   }))
 }
 
-export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDataPoint[] => {
+export function transformLogsToChartData(parsedLogs: ParsedLogEntry[]): ChartDataPoint[] {
   if (!parsedLogs || parsedLogs.length === 0) return []
 
   return parsedLogs
@@ -60,11 +60,11 @@ export const transformLogsToChartData = (parsedLogs: ParsedLogEntry[]): ChartDat
     .sort((a, b) => a.period_start - b.period_start)
 }
 
-const normalizeQuery = (query: string): string => {
+function normalizeQuery(query: string): string {
   return query.replace(/\s+/g, ' ').trim()
 }
 
-export const aggregateLogsByQuery = (parsedLogs: ParsedLogEntry[]): QueryPerformanceRow[] => {
+export function aggregateLogsByQuery(parsedLogs: ParsedLogEntry[]): QueryPerformanceRow[] {
   if (!parsedLogs || parsedLogs.length === 0) return []
 
   const queryGroups = new Map<string, ParsedLogEntry[]>()
