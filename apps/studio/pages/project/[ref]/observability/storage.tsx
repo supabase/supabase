@@ -173,7 +173,11 @@ export const StorageReport: NextPageWithLayout = () => {
                 The number of storage requests that are cached at the edge level. A higher number of
                 hits is better.{' '}
                 <span className="flex items-center gap-1 text-foreground-lighter">
-                  <Link href={`${DOCS_URL}/guides/storage/cdn/fundamentals`} target="_blank">
+                  <Link
+                    href={`${DOCS_URL}/guides/storage/cdn/fundamentals`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Read More
                   </Link>
                   <ExternalLinkIcon className="w-3 h-3" />

@@ -51,6 +51,7 @@ export const BannerMetricsAPI = () => {
             <Link
               href={`${DOCS_URL}/guides/telemetry/metrics`}
               target="_blank"
+              rel="noreferrer"
               onClick={() => track('metrics_api_banner_cta_button_clicked')}
             >
               Get started for free

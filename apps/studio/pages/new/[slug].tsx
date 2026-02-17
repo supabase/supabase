@@ -545,6 +545,7 @@ const Wizard: NextPageWithLayout = () => {
               <Link
                 href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                 target="_blank"
+                rel="noreferrer"
                 className="underline"
               >
                 Compute Costs
