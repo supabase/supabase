@@ -143,7 +143,14 @@ export async function generateAssistantResponse({
       ...(abortSignal && { abortSignal }),
     } satisfies Parameters<typeof ai.streamText>[0]
 
+    const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
+    const lastUserText = lastUserMessage?.parts
+      ?.filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+      .map((p) => p.text)
+      .join('\n')
+
     span?.log({
+      input: lastUserText,
       metadata: { projectRef, chatName, aiOptInLevel, userId, orgId, planId },
       tags: [TRACING_ENVIRONMENT_TAG],
     })
