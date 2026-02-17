@@ -15,7 +15,7 @@ interface EdgeFunctionBlockProps {
   functionName: string
   /** Any other actions specific to the parent to be rendered in the header */
   actions?: ReactNode
-  /** Toggle visiblity of code on render */
+  /** Toggle visibility of code on render */
   showCode?: boolean
   /** Whether function block is draggable */
   draggable?: boolean

@@ -107,7 +107,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
             {
               id: 'nav-auth-mfa',
               name: 'Multi Factor Authentication (MFA)',
-              value: 'Auth: Multi Factor Authenticaiton (MFA)',
+              value: 'Auth: Multi Factor Authentication (MFA)',
               route: `/project/${ref}/auth/mfa`,
               defaultHidden: true,
             } as IRouteCommand,
