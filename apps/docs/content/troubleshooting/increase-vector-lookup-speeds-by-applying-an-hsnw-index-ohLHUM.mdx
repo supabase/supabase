@@ -1,5 +1,5 @@
 ---
-title = "Increase vector lookup speeds by applying an HSNW index"
+title = "Increase vector lookup speeds by applying an HNSW index"
 github_url = "https://github.com/orgs/supabase/discussions/21379"
 date_created = "2024-02-20T05:32:05+00:00"
 topics = [ "database", "ai", "platform" ]
@@ -11,7 +11,7 @@ database_id = "7d755701-747f-4c3a-b8be-236c5518e4eb"
 
 > Building an index without the `CONCURRENTLY` modifier will lock the table, but it will also increase build times. For general advice about indexes, check out this [guide](https://github.com/orgs/supabase/discussions/22449).
 
-### **To speed up queries, it is ideal to create an HSNW index on your embedded column**
+### **To speed up queries, it is ideal to create an HNSW index on your embedded column**
 
 The general structure for creating an HNSW index follows this pattern:
 
@@ -58,7 +58,7 @@ If an address is returned, you should use your direct connection string found on
 
 **3. Increase memory for index creation (optional)**
 
-The `maintance_work_mem` variable limits the maximum amount of memory that can be used by maintenance operations, such as vacuuming, altering, and indexing tables. In your session you should try to set it to a reasonably high value:
+The `maintenance_work_mem` variable limits the maximum amount of memory that can be used by maintenance operations, such as vacuuming, altering, and indexing tables. In your session you should try to set it to a reasonably high value:
 
 ```sql
 set maintenance_work_mem to <several Gb's>; -- '#GB'

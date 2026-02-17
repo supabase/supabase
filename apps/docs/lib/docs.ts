@@ -43,7 +43,7 @@ export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
     )
   }
   if ('subtitle' in obj && typeof obj.subtitle !== 'string') {
-    throw Error(`Invalid guide frontmatter: Subtitle must be a sring. Received: ${obj.subtitle}`)
+    throw Error(`Invalid guide frontmatter: Subtitle must be a string. Received: ${obj.subtitle}`)
   }
   if ('description' in obj && typeof obj.description !== 'string') {
     throw Error(

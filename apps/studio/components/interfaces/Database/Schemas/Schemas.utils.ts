@@ -207,11 +207,11 @@ const getLayoutedElementsViaLocalStorage = (
   // [Joshen] Potentially look into auto fitting new nodes?
   // https://github.com/xyflow/xyflow/issues/1113
 
-  const nodesWithNoSavedPositons = nodes.filter((n) => !(n.id in positions))
+  const nodesWithNoSavedPositions = nodes.filter((n) => !(n.id in positions))
   let newNodeCount = 0
   let basePosition = {
     x: 0,
-    y: -(NODE_SEP + TABLE_NODE_ROW_HEIGHT + nodesWithNoSavedPositons.length * 10),
+    y: -(NODE_SEP + TABLE_NODE_ROW_HEIGHT + nodesWithNoSavedPositions.length * 10),
   }
 
   nodes.forEach((node) => {
