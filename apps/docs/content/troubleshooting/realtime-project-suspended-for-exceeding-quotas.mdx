@@ -29,7 +29,7 @@ In most cases, quota overages are accidental rather than intentional:
 
 - **Reconnection loops**: A client that fails to authenticate or subscribe may retry rapidly, creating thousands of short-lived connections
 - **Uncontrolled channels**: Creating channels without cleaning them up leads to resource exhaustion (see [Fixing the TooManyChannels Error](/docs/troubleshooting/realtime-too-many-channels-error))
-- **Missing cleanup on component teardown**: Single-page applications that don't unsubscribe when components are removed can accumulate connections over time
+- **Missing cleanup on component tear down**: Single-page applications that don't unsubscribe when components are removed can accumulate connections over time
 - **Unexpected traffic spikes**: A viral event or bot traffic can push usage well beyond normal levels
 - **Development or testing misconfiguration**: Load tests or staging environments accidentally pointed at a production project
 
