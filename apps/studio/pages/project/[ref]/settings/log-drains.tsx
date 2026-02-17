@@ -220,6 +220,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                       if (t.value === 'sentry') return sentryEnabled
                       if (t.value === 's3') return s3Enabled
                       if (t.value === 'axiom') return axiomEnabled
+                      if (t.value === 'otlp') return otlpEnabled
                       if (t.value === 'last9') return last9Enabled
                       return true
                     }).map((drainType) => (

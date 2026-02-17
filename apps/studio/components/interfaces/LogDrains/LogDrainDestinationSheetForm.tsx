@@ -204,10 +204,15 @@ export function LogDrainDestinationSheetForm({
   // and it does not include `type` inside the config itself, so it's not trivial to create `discriminatedUnion`
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
   const defaultConfig = (defaultValues?.config || {}) as any
-  const CREATE_DEFAULT_HEADERS = {
-    'Content-Type': 'application/json',
+  const defaultType = defaultValues?.type || 'webhook'
+  const CREATE_DEFAULT_HEADERS_BY_TYPE: Partial<Record<LogDrainType, Record<string, string>>> = {
+    webhook: { 'Content-Type': 'application/json' },
+    otlp: { 'Content-Type': 'application/x-protobuf' },
   }
-  const DEFAULT_HEADERS = mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultConfig?.headers || {}
+  const DEFAULT_HEADERS =
+    mode === 'create'
+      ? CREATE_DEFAULT_HEADERS_BY_TYPE[defaultType] ?? {}
+      : defaultConfig?.headers || {}
 
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
@@ -220,7 +225,6 @@ export function LogDrainDestinationSheetForm({
     ref,
   })
 
-  const defaultType = defaultValues?.type || 'webhook'
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
   const track = useTrack()
 
@@ -355,6 +359,7 @@ export function LogDrainDestinationSheetForm({
                           if (t.value === 'sentry') return sentryEnabled
                           if (t.value === 's3') return s3Enabled
                           if (t.value === 'axiom') return axiomEnabled
+                          if (t.value === 'otlp') return otlpEnabled
                           if (t.value === 'last9') return last9Enabled
                           return true
                         }).map((type) => (

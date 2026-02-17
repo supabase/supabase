@@ -251,20 +251,24 @@ Logs are sent to any OTLP-compatible endpoint using the OpenTelemetry Protocol o
 
 OTLP is an open-standard protocol for telemetry data, making it compatible with many observability platforms including:
 
-- OpenTelemetry Collector
-- Grafana Cloud
-- New Relic
-- Honeycomb
-- Datadog (OTLP ingestion)
-- Elastic
-- And many more
+<ul>
+  <li>OpenTelemetry Collector</li>
+  <li>Grafana Cloud</li>
+  <li>New Relic</li>
+  <li>Honeycomb</li>
+  <li>Datadog (OTLP ingestion)</li>
+  <li>Elastic</li>
+  <li>And many more</li>
+</ul>
 
 Required configuration when creating an OTLP Log Drain:
 
-- Endpoint: The full URL of your OTLP HTTP endpoint (typically ending in `/v1/logs`)
-- Protocol: Currently only `http/protobuf` is supported
-- Gzip: Enable compression to reduce bandwidth (recommended: enabled)
-- Headers: Optional authentication headers (e.g., `Authorization`, `X-API-Key`)
+<ul>
+  <li>Endpoint: The full URL of your OTLP HTTP endpoint (typically ending in `/v1/logs`)</li>
+  <li>Protocol: Currently only `http/protobuf` is supported</li>
+  <li>Gzip: Enable compression to reduce bandwidth (recommended: enabled)</li>
+  <li>Headers: Optional authentication headers (e.g., `Authorization`, `X-API-Key`)</li>
+</ul>
 
 Logs are sent as OTLP LogRecord protobuf messages following the [OpenTelemetry Logs specification](https://opentelemetry.io/docs/specs/otel/logs/).
 
@@ -309,8 +313,10 @@ service:
 
 Then create a log drain in [Supabase dashboard](/dashboard/project/_/settings/log-drains) with:
 
-- Endpoint: `https://your-collector:4318/v1/logs`
-- Add authentication headers as needed for your setup
+<ul>
+  <li>Endpoint: `https://your-collector:4318/v1/logs`</li>
+  <li>Add authentication headers as needed for your setup</li>
+</ul>
 
     </AccordionItem>
 
