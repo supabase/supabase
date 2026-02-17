@@ -7,10 +7,11 @@ import {
 } from 'stripe-experiment-sync/supabase'
 
 import type { StripeInstallationStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync'
+import { StripeSyncStateData } from '@/data/database-integrations/stripe/sync-state-query'
 
 // TODO: The current version of the package 'stripe-experiment-sync' doesn't export
-// these constants, but we plan to export them in future version. For now we 
-// declare the same constants here to deploy this code without waiting for 
+// these constants, but we plan to export them in future version. For now we
+// declare the same constants here to deploy this code without waiting for
 // a new version. We'll import them when we bump 'stripe-experiment-sync' package
 // version.
 const UNINSTALLATION_STARTED_SUFFIX = 'uninstallation:started'
@@ -74,4 +75,8 @@ export function isInProgress(status: StripeInstallationStatus): boolean {
 
 export function canInstall(status: StripeInstallationStatus): boolean {
   return status === 'uninstalled' || status === 'install_error' || status === 'uninstall_error'
+}
+
+export function isSyncRunning(syncState: StripeSyncStateData | undefined): boolean {
+  return !!syncState && !syncState.closed_at && syncState.status === 'running'
 }

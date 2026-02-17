@@ -25,9 +25,6 @@ export interface StripeSyncStatusResult {
   /** Current sync run state (only available when installed) */
   syncState: StripeSyncState | undefined
 
-  /** Whether a sync is currently running */
-  isSyncing: boolean
-
   /** Whether data is still loading */
   isLoading: boolean
 

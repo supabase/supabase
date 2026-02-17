@@ -30,7 +30,10 @@ import * as z from 'zod'
 
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
-import { canInstall as checkCanInstall } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
+import {
+  canInstall as checkCanInstall,
+  isSyncRunning,
+} from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 const installFormSchema = z.object({
@@ -60,10 +63,12 @@ export const StripeSyncInstallationPage = () => {
   })
 
   // Use the unified status hook
-  const { installationStatus, stripeSchema, syncState, isSyncing } = useStripeSyncStatus({
+  const { installationStatus, stripeSchema, syncState } = useStripeSyncStatus({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const isSyncing = isSyncRunning(syncState)
 
   const isInstalled = installationStatus === 'installed'
   const setupError = installationStatus === 'install_error'
