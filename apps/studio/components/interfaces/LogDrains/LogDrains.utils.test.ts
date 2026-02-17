@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
   getHeadersSectionDescription,
-  validateNewHeader,
   HEADER_VALIDATION_ERRORS,
   otlpConfigSchema,
+  validateNewHeader,
 } from './LogDrains.utils'
 
 describe('getHeadersSectionDescription', () => {
@@ -19,7 +20,9 @@ describe('getHeadersSectionDescription', () => {
 
   it('returns otlp description for otlp type', () => {
     const result = getHeadersSectionDescription('otlp')
-    expect(result).toBe('Set custom headers for OTLP authentication (e.g., Authorization, X-API-Key)')
+    expect(result).toBe(
+      'Set custom headers for OTLP authentication (e.g., Authorization, X-API-Key)'
+    )
   })
 
   it('returns empty string for unsupported types', () => {
@@ -42,7 +45,10 @@ describe('validateNewHeader', () => {
         'Content-Type': 'application/json',
         'X-Custom': 'value',
       }
-      const result = validateNewHeader(existingHeaders, { name: 'Authorization', value: 'Bearer token' })
+      const result = validateNewHeader(existingHeaders, {
+        name: 'Authorization',
+        value: 'Bearer token',
+      })
       expect(result.valid).toBe(true)
       expect(result.error).toBeUndefined()
     })
@@ -63,7 +69,10 @@ describe('validateNewHeader', () => {
         'Content-Type': 'application/json',
         Authorization: 'Bearer old-token',
       }
-      const result = validateNewHeader(existingHeaders, { name: 'Authorization', value: 'Bearer new-token' })
+      const result = validateNewHeader(existingHeaders, {
+        name: 'Authorization',
+        value: 'Bearer new-token',
+      })
       expect(result.valid).toBe(false)
       expect(result.error).toBe(HEADER_VALIDATION_ERRORS.DUPLICATE)
     })
@@ -98,7 +107,10 @@ describe('validateNewHeader', () => {
 
     it('is case-sensitive for duplicate checking', () => {
       const existingHeaders = { authorization: 'bearer token' }
-      const result = validateNewHeader(existingHeaders, { name: 'Authorization', value: 'Bearer token' })
+      const result = validateNewHeader(existingHeaders, {
+        name: 'Authorization',
+        value: 'Bearer token',
+      })
       expect(result.valid).toBe(true)
     })
   })
