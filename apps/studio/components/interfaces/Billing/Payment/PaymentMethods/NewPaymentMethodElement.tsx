@@ -288,6 +288,7 @@ export const NewPaymentMethodElement = forwardRef(
                             type="default"
                             role="combobox"
                             size="medium"
+                            aria-expanded={showTaxIDsPopover}
                             aria-controls={taxIdListboxId}
                             className={cn(
                               'w-full justify-between h-[34px]',

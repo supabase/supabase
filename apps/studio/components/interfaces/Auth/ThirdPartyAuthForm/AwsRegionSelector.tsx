@@ -65,6 +65,7 @@ export const AwsRegionSelector = ({
           <Button
             type="default"
             role="combobox"
+            aria-expanded={open}
             aria-controls={listboxId}
             className={cn('w-full justify-between', !value && 'text-muted-foreground')}
             size="small"

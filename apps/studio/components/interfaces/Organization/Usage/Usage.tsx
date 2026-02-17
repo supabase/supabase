@@ -163,13 +163,14 @@ export const Usage = () => {
                     onSelect={(project) => {
                       setSelectedProjectRef(project.ref)
                     }}
-                    renderTrigger={({ listboxId }) => {
+                    renderTrigger={({ listboxId, open }) => {
                       return (
                         <Button
                           block
                           type="default"
                           role="combobox"
                           size="tiny"
+                          aria-expanded={open}
                           aria-controls={listboxId}
                           className="justify-between w-[180px]"
                           iconRight={<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}

@@ -90,13 +90,14 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
               }}
               onSelect={(project) => field.onChange(project.ref)}
-              renderTrigger={({ isLoading, project, listboxId }) => {
+              renderTrigger={({ isLoading, project, listboxId, open }) => {
                 return (
                   <Button
                     block
                     type="default"
                     role="combobox"
                     aria-label="Select a project"
+                    aria-expanded={open}
                     aria-controls={listboxId}
                     size="small"
                     className="justify-between"

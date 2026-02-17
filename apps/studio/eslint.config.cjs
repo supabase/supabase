@@ -1,5 +1,6 @@
 const { defineConfig } = require('eslint/config')
 const barrelFiles = require('eslint-plugin-barrel-files')
+const jsxA11y = require('eslint-plugin-jsx-a11y')
 const supabaseConfig = require('eslint-config-supabase/next')
 
 module.exports = defineConfig([
@@ -8,12 +9,14 @@ module.exports = defineConfig([
   {
     plugins: {
       'barrel-files': barrelFiles,
+      'jsx-a11y': jsxA11y,
     },
     rules: {
       '@next/next/no-img-element': 'off',
       'react/no-unescaped-entities': 'off',
       'react/display-name': 'warn',
       'barrel-files/avoid-re-export-all': 'error',
+      'jsx-a11y/role-has-required-aria-props': 'error',
     },
   },
 ])

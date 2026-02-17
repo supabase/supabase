@@ -138,6 +138,7 @@ export const BillingCustomerDataForm = ({
                       role="combobox"
                       size="medium"
                       disabled={disabled}
+                      aria-expanded={showCountriesPopover}
                       aria-controls={countryListboxId}
                       className={cn(
                         'w-full justify-between h-[34px]',
@@ -254,6 +255,7 @@ export const BillingCustomerDataForm = ({
                       role="combobox"
                       size="medium"
                       disabled={disabled}
+                      aria-expanded={showTaxIDsPopover}
                       aria-controls={taxIdListboxId}
                       className={cn(
                         'w-full justify-between h-[34px] pr-2',

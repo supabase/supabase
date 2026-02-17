@@ -35,10 +35,12 @@ interface OrganizationProjectSelectorSelectorProps {
     isLoading,
     project,
     listboxId,
+    open,
   }: {
     isLoading: boolean
     project?: OrgProject
     listboxId: string
+    open: boolean
   }) => ReactNode
   renderActions?: (setOpen: (value: boolean) => void) => ReactNode
   onSelect?: (project: OrgProject) => void
@@ -137,6 +139,7 @@ export const OrganizationProjectSelector = ({
             isLoading: isLoadingProjects || isFetching,
             project: selectedProject,
             listboxId,
+            open,
           })
         ) : (
           <Button
@@ -144,6 +147,7 @@ export const OrganizationProjectSelector = ({
             type="default"
             role="combobox"
             size="small"
+            aria-expanded={open}
             aria-controls={listboxId}
             className="justify-between"
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
