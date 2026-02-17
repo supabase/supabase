@@ -1,26 +1,21 @@
-import { useRouter } from 'next/router'
-import { forwardRef, useEffect, useRef, useState } from 'react'
-
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
-
-import { motion } from 'framer-motion'
-import { Button, cn } from 'ui'
-
-import { useFlag } from 'common'
 import DefaultLayout from '~/components/Layouts/Default'
+import { StateOfStartupsHeader } from '~/components/SurveyResults/StateOfStartupsHeader'
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
 import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
-import { StateOfStartupsHeader } from '~/components/SurveyResults/StateOfStartupsHeader'
-
-import { useSendTelemetryEvent } from '~/lib/telemetry'
-
 import pageData from '~/data/surveys/state-of-startups-2025'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useFlag } from 'common'
+import { motion } from 'framer-motion'
+import { NextSeo } from 'next-seo'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { forwardRef, useEffect, useRef, useState } from 'react'
+import { Button, cn } from 'ui'
 
 function StateOfStartupsPage() {
   const router = useRouter()
-  const isPageEnabled = useFlag('stateOfStartups')
+  const isPageEnabled = true
 
   const meta_title = pageData.metaTitle || 'State of Startups 2025 | Supabase'
   const meta_description =

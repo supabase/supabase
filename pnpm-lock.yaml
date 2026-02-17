@@ -1660,6 +1660,9 @@ importers:
       markdown-toc:
         specifier: ^1.2.0
         version: 1.2.0
+      marketing:
+        specifier: workspace:*
+        version: link:../../packages/marketing
       mdast-util-from-markdown:
         specifier: ^2.0.2
         version: 2.0.2(supports-color@8.1.1)
@@ -2235,6 +2238,31 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 18.3.3
+
+  packages/marketing:
+    dependencies:
+      '@types/react':
+        specifier: 'catalog:'
+        version: 18.3.3
+      react:
+        specifier: 'catalog:'
+        version: 18.3.1
+      react-markdown:
+        specifier: ^8.0.3
+        version: 8.0.7(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
+      ui:
+        specifier: workspace:*
+        version: link:../ui
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.76
+    devDependencies:
+      tsconfig:
+        specifier: 'workspace:'
+        version: link:../tsconfig
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.2
 
   packages/pg-meta:
     dependencies:

@@ -7,7 +7,7 @@
       // ~/ is deprecated, use @/ instead
       "~/*": ["./*"],
       "@/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"]
+      "@ui/*": ["./../../packages/ui/src/*"],
     },
     "downlevelIteration": true,
     "target": "ES2021",
@@ -26,9 +26,9 @@
     "incremental": true,
     "plugins": [
       {
-        "name": "next"
-      }
-    ]
+        "name": "next",
+      },
+    ],
   },
   "exclude": ["node_modules", "supabase"],
   "include": [
@@ -37,6 +37,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".contentlayer/generated",
-    "./../../packages/ui/src/**/*.d.ts"
-  ]
+    "./../../packages/ui/src/**/*.d.ts",
+  ],
 }
