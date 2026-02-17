@@ -1,12 +1,13 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import LogTable from 'components/interfaces/Settings/Logs/LogTable'
+import { LogTable } from 'components/interfaces/Settings/Logs/LogTable'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { beforeAll, expect, test, vi } from 'vitest'
+
 import { render } from '../../helpers'
 
 dayjs.extend(customParseFormat)

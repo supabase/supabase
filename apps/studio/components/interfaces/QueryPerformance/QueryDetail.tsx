@@ -12,10 +12,7 @@ import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn
 
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
-import {
-  QUERY_PERFORMANCE_COLUMNS,
-  QUERY_PERFORMANCE_REPORT_TYPES,
-} from './QueryPerformance.constants'
+import { QUERY_PERFORMANCE_COLUMNS } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
 

@@ -3160,6 +3160,10 @@ functions:
             isOptional: true
             type: String?
             description: The captcha token when having captcha enabled.
+          - name: channel
+            isOptional: true
+            type: Phone.Channel?
+            description: The channel to send the OTP to when using phone sign-in. Defaults to SMS. Set to `Phone.Channel.WHATSAPP` for WhatsApp delivery.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -3179,6 +3183,17 @@ functions:
           ```kotlin
           supabase.auth.signInWith(OTP) {
               phone = "+4912345679"
+          }
+          ```
+      - id: sign-in-with-whatsapp-otp
+        name: Sign in with WhatsApp OTP
+        isSpotlight: false
+        description: The user will be sent a WhatsApp message which contains an OTP. Requires a Twilio or Twilio Verify provider to be configured.
+        code: |
+          ```kotlin
+          supabase.auth.signInWith(OTP) {
+              phone = "+4912345679"
+              channel = Phone.Channel.WHATSAPP
           }
           ```
   - id: sign-in-with-oauth
@@ -4054,6 +4069,54 @@ functions:
           val (_, active) = supabase.auth.mfa.status
           //flow variant, automatically emitting new values on session changes
           val statusFlow = supabase.auth.mfa.statusFlow
+          ```
+  - id: get-claims
+    title: 'getClaims()'
+    description: |
+      Extracts the JWT claims from the access token by first verifying the JWT against the server's JSON Web Key Set (JWKS) endpoint.
+    notes: |
+      - Prefer this method over `retrieveUser()` as JWKS responses are cached, resulting in significantly faster responses.
+      - If the project is not using an asymmetric JWT signing key (like ECC or RSA), it sends a request to the Auth server (similar to `retrieveUser()`) to verify the JWT.
+      - Returns a `ClaimsResponse` containing `claims` (a `JwtPayload` with typed accessors for standard JWT fields), `header`, and `signature`.
+      - Standard claims available on `JwtPayload`: `iss`, `sub`, `aud`, `exp`, `iat`, `role`, `aal`, `sessionId`, `email`, `phone`, `isAnonymous`, `amr`, `appMetadata`, `userMetadata`.
+      - Use `claims.getClaim<T>(key)` or `claims.getClaimOrNull<T>(key)` for custom claims.
+    params:
+      - name: jwt
+        isOptional: true
+        type: String?
+        description: An optional specific JWT to verify. If not provided, uses the current session's access token.
+      - name: options
+        isOptional: true
+        type: ClaimsRequestBuilder.() -> Unit
+        description: Options to customize the behavior, such as allowing expired tokens.
+        subContent:
+          - name: allowExpired
+            isOptional: true
+            type: Boolean
+            description: Whether to allow expired JWTs. Defaults to `false`.
+    examples:
+      - id: get-claims-basic
+        name: Get claims from current session
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val response = supabase.auth.getClaims()
+          val email = response.claims.email
+          val role = response.claims.role
+          val aal = response.claims.aal
+          ```
+      - id: get-claims-custom
+        name: Get a custom claim
+        code: |
+          ```kotlin
+          val response = supabase.auth.getClaims()
+          val customValue = response.claims.getClaimOrNull<String>("my_custom_claim")
+          ```
+      - id: get-claims-specific-jwt
+        name: Verify a specific JWT
+        code: |
+          ```kotlin
+          val response = supabase.auth.getClaims(jwt = "your-jwt-token")
           ```
   - id: admin-api
     title: 'Overview'
