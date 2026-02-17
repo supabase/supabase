@@ -14,7 +14,7 @@ interface Particle {
   opacity: number
 }
 
-const COLORS = ['#22c55e', '#4ade80', '#86efac', '#bbf7d0', '#dcfce7']
+const COLORS = ['#15803d', '#16a34a', '#22c55e', '#4ade80', '#86efac']
 
 export default function Confetti() {
   const canvasRef = useRef<HTMLCanvasElement>(null)

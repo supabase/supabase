@@ -83,6 +83,22 @@ export const singleColumnSectionSchema = z.object({
   children: z.any().optional(),
 })
 
+export const twoColumnSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('two-column'),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  children: z.any().optional(),
+})
+
+export const threeColumnSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('three-column'),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  children: z.any().optional(),
+})
+
 // ----- Form field schemas -----
 
 const formFieldBase = z.object({
@@ -165,6 +181,8 @@ export const tweetsSectionSchema = z.object({
 
 export const goSectionSchema = z.discriminatedUnion('type', [
   singleColumnSectionSchema,
+  twoColumnSectionSchema,
+  threeColumnSectionSchema,
   formSectionSchema,
   featureGridSectionSchema,
   metricsSectionSchema,
@@ -221,6 +239,8 @@ export type GoContentBlocksSection = z.infer<typeof contentBlocksSectionSchema>
 export type GoSocialProofSection = z.infer<typeof socialProofSectionSchema>
 export type GoTextBodySection = z.infer<typeof textBodySectionSchema>
 export type GoSingleColumnSection = z.infer<typeof singleColumnSectionSchema>
+export type GoTwoColumnSection = z.infer<typeof twoColumnSectionSchema>
+export type GoThreeColumnSection = z.infer<typeof threeColumnSectionSchema>
 export type GoFormField = z.infer<typeof formFieldSchema>
 export type GoFormSection = z.infer<typeof formSectionSchema>
 export type GoFeatureGridItem = z.infer<typeof featureGridItemSchema>

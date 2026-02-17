@@ -5,6 +5,8 @@ import FeatureGridSection from './FeatureGridSection'
 import FormSection from './FormSection'
 import MetricsSection from './MetricsSection'
 import SingleColumnSection from './SingleColumnSection'
+import ThreeColumnSection from './ThreeColumnSection'
+import TwoColumnSection from './TwoColumnSection'
 
 export type CustomSectionRenderers = {
   [K in GoSection['type']]?: React.ComponentType<{
@@ -31,6 +33,12 @@ export default function SectionRenderer({ section, customRenderers }: SectionRen
     switch (section.type) {
       case 'single-column':
         content = <SingleColumnSection section={section} />
+        break
+      case 'two-column':
+        content = <TwoColumnSection section={section} />
+        break
+      case 'three-column':
+        content = <ThreeColumnSection section={section} />
         break
       case 'form':
         content = <FormSection section={section} />
