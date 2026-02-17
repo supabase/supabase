@@ -90,6 +90,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
   let isHipaaEnabled = false
+  let orgId: number | undefined
+  let planId: string | undefined
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -102,6 +104,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         aiOptInLevel: orgAIOptInLevel,
         isLimited: orgAILimited,
         isHipaaEnabled: orgIsHipaaEnabled,
+        orgId: fetchedOrgId,
+        planId: fetchedPlanId,
       } = await getOrgAIDetails({
         orgSlug,
         authorization,
@@ -111,6 +115,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       aiOptInLevel = orgAIOptInLevel
       isLimited = orgAILimited
       isHipaaEnabled = orgIsHipaaEnabled
+      orgId = fetchedOrgId
+      planId = fetchedPlanId
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -181,6 +187,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       projectRef,
       chatName,
       isHipaaEnabled,
+      orgId,
+      planId,
       promptProviderOptions,
       providerOptions,
       abortSignal: abortController.signal,

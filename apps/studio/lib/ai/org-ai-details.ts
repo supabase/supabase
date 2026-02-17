@@ -41,5 +41,7 @@ export const getOrgAIDetails = async ({
     aiOptInLevel,
     isLimited,
     isHipaaEnabled,
+    orgId: selectedOrg?.id,
+    planId: selectedOrg?.plan.id,
   }
 }

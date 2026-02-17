@@ -35,6 +35,8 @@ export async function generateAssistantResponse({
   projectRef,
   chatName,
   isHipaaEnabled,
+  orgId,
+  planId,
   promptProviderOptions,
   providerOptions,
   abortSignal,
@@ -47,6 +49,8 @@ export async function generateAssistantResponse({
   projectRef?: string
   chatName?: string
   isHipaaEnabled?: boolean
+  orgId?: number
+  planId?: string
   promptProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
@@ -139,7 +143,7 @@ export async function generateAssistantResponse({
     return traced(
       async (span) => {
         span.log({
-          metadata: { projectRef, chatName, aiOptInLevel },
+          metadata: { projectRef, chatName, aiOptInLevel, orgId, planId },
           tags: [TRACING_ENVIRONMENT_TAG],
         })
         return streamTextFn(streamTextArgs)
