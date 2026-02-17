@@ -1,5 +1,5 @@
 // This file configures the initialization of Sentry on the client.
-// The config you add here will be used whenever a users loads a page in their browser.
+// The config you add here will be used whenever a user loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
@@ -216,7 +216,7 @@ Sentry.init({
     'NotFoundError: The object can not be found here.',
     // [Joshen] This one sprung up recently and I've no idea where this is coming from
     'r.default.setDefaultLevel is not a function',
-    // [Joshen] Safe to ignore, it an error from the copyToClipboard
+    // [Joshen] Safe to ignore, it's an error from the copyToClipboard
     'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
   ],
 })
