@@ -106,8 +106,8 @@ export const StripeSyncInstallationPage = () => {
     })
 
   // Combine schema status with mutation/initiated states for UI
-  const setupInProgress = installInProgress || isInstallRequested || isInstallInitiated
-  const uninstallInProgress = uninsallInProgress || isUninstallRequested || isUninstallInitiated
+  const installing = installInProgress || isInstallRequested || isInstallInitiated
+  const uninstalling = uninsallInProgress || isUninstallRequested || isUninstallInitiated
 
   // Track install failures
   useEffect(() => {
@@ -149,12 +149,12 @@ export const StripeSyncInstallationPage = () => {
     }
   }, [router, uninsallInProgress, uninstalled, uninstallError])
 
-  const canInstall = checkCanInstall(installationStatus) && !installed && !setupInProgress
+  const canInstall = checkCanInstall(installationStatus) && !installed && !installing
 
   // Poll for schema changes during transitions
   useSchemasQuery(
     { projectRef: project?.ref, connectionString: project?.connectionString },
-    { refetchInterval: setupInProgress || uninstallInProgress ? 5000 : false }
+    { refetchInterval: installing || uninstalling ? 5000 : false }
   )
 
   const handleUninstall = useCallback(() => {
@@ -226,7 +226,7 @@ export const StripeSyncInstallationPage = () => {
       )
     }
 
-    if (syncState && installed && !uninstallInProgress) {
+    if (syncState && installed && !uninstalling) {
       return (
         <Admonition type="default" showIcon={false}>
           <div className="flex items-center justify-between gap-2">
@@ -268,7 +268,7 @@ export const StripeSyncInstallationPage = () => {
     installed,
     isUninstallRequested,
     tableEditorUrl,
-    uninstallInProgress,
+    uninstalling,
     handleOpenInstallSheet,
     handleUninstall,
   ])
@@ -282,7 +282,7 @@ export const StripeSyncInstallationPage = () => {
         </span>
       )
     }
-    if (uninstallInProgress) {
+    if (uninstalling) {
       return (
         <span className="flex items-center gap-2 text-foreground-light text-sm">
           <RefreshCwIcon size={14} className="animate-spin text-foreground-lighter" />
@@ -298,7 +298,7 @@ export const StripeSyncInstallationPage = () => {
         </span>
       )
     }
-    if (setupInProgress) {
+    if (installing) {
       return (
         <span className="flex items-center gap-2 text-foreground-light text-sm">
           <RefreshCwIcon size={14} className="animate-spin text-foreground-lighter" />
@@ -324,14 +324,14 @@ export const StripeSyncInstallationPage = () => {
     return (
       <span className="flex items-center gap-2 text-foreground-light text-sm">Not installed</span>
     )
-  }, [uninstallError, uninstallInProgress, installError, setupInProgress, isSyncing, installed])
+  }, [uninstallError, uninstalling, installError, installing, isSyncing, installed])
 
   return (
     <IntegrationOverviewTab
       alert={alert}
       status={statusDisplay}
       actions={
-        !installed && !setupInProgress && !installError ? (
+        !installed && !installing && !installError ? (
           <StripeSyncChangesCard
             canInstall={canInstall}
             onInstall={() => setShouldShowInstallSheet(true)}
