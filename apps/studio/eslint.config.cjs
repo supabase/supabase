@@ -14,6 +14,7 @@ module.exports = defineConfig([
       'react/no-unescaped-entities': 'off',
       'react/display-name': 'warn',
       'barrel-files/avoid-re-export-all': 'error',
+      'jsx-a11y/alt-text': 'warn',
     },
   },
 ])
