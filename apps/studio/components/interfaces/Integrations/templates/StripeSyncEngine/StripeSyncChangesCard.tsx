@@ -1,21 +1,12 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EdgeFunctions } from 'icons'
 import { Layers, Table } from 'lucide-react'
-import { Card, CardContent, CardFooter, cn } from 'ui'
+import { Card, CardContent, cn } from 'ui'
 
 type StripeSyncChangesCardProps = {
   className?: string
-  canInstall?: boolean
-  onInstall?: () => void
 }
 
-export const StripeSyncChangesCard = ({
-  className,
-  canInstall = true,
-  onInstall,
-}: StripeSyncChangesCardProps) => {
-  const showInstallButton = typeof onInstall === 'function'
-
+export const StripeSyncChangesCard = ({ className }: StripeSyncChangesCardProps) => {
   return (
     <div>
       <h3 className="heading-default mb-4">This integration will modify your Supabase project:</h3>
@@ -48,24 +39,6 @@ export const StripeSyncChangesCard = ({
             </li>
           </ul>
         </CardContent>
-        {showInstallButton && (
-          <CardFooter className="flex justify-end">
-            <ButtonTooltip
-              type="primary"
-              onClick={onInstall}
-              disabled={!canInstall}
-              tooltip={{
-                content: {
-                  text: !canInstall
-                    ? 'Your database already uses a schema named "stripe"'
-                    : undefined,
-                },
-              }}
-            >
-              Install integration
-            </ButtonTooltip>
-          </CardFooter>
-        )}
       </Card>
     </div>
   )
