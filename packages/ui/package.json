@@ -46,7 +46,7 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toggle": "^1.1.10",
     "@radix-ui/react-toggle-group": "^1.1.11",
-    "@radix-ui/react-tooltip": "^1.1.6",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@tailwindcss/forms": "^0.5.0",
     "@tailwindcss/typography": "^0.5.9",
     "class-variance-authority": "^0.6.1",
