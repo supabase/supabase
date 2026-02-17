@@ -1,3 +1,4 @@
+import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { ResponseError, ResponseFailure } from 'types'
@@ -26,11 +27,12 @@ export function isResponseOk<T>(response: T | ResponseFailure | undefined): resp
 export default async function apiWrapper(
   req: NextApiRequest,
   res: NextApiResponse,
-  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<Response | void>,
+  handler: (req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) => Promise<Response | void>,
   options?: { withAuth: boolean }
 ): Promise<Response | void> {
   try {
     const { withAuth } = options || {}
+    let claims: JwtPayload | undefined
 
     if (IS_PLATFORM && withAuth) {
       const response = await apiAuthenticate(req, res)
@@ -41,9 +43,10 @@ export default async function apiWrapper(
           },
         })
       }
+      claims = response
     }
 
-    return handler(req, res)
+    return handler(req, res, claims)
   } catch (error) {
     return res.status(500).json({ error })
   }

@@ -1,5 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
 import { safeValidateUIMessages } from 'ai'
+import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
@@ -12,7 +13,6 @@ import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getTools } from 'lib/ai/tools'
 import { getURL } from 'lib/helpers'
 import apiWrapper from 'lib/api/apiWrapper'
-import { fetchUserClaims } from 'lib/api/apiAuthenticate'
 import { executeQuery } from 'lib/api/self-hosted/query'
 
 export const maxDuration = 120
@@ -25,12 +25,12 @@ export const config = {
   },
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
   const { method } = req
 
   switch (method) {
     case 'POST':
-      return handlePost(req, res)
+      return handlePost(req, res, claims)
     default:
       res.setHeader('Allow', ['POST'])
       res.status(405).json({
@@ -56,13 +56,15 @@ const requestBodySchema = z.object({
   model: z.enum(['gpt-5', 'gpt-5-mini']).optional(),
 })
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
   if (IS_PLATFORM && !accessToken) {
     return res.status(401).json({ error: 'Authorization token is required' })
   }
+
+  const userId = claims?.sub
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   const { data, error: parseError } = requestBodySchema.safeParse(body)
@@ -87,10 +89,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       .json({ error: 'Invalid request body', message: messagesValidation.error.message })
   }
   const messages = messagesValidation.data
-
-  // NOTE: apiWrapper already calls fetchUserClaims for auth, but doesn't pass
-  // claims to the handler. Could optimize later by threading claims through apiWrapper.
-  const userId = IS_PLATFORM ? (await fetchUserClaims(req)).sub : undefined
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
