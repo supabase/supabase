@@ -5,7 +5,7 @@ subtitle: 'Set up an S3 backend and enable the S3-compatible client endpoint for
 ---
 
 Self-hosted Supabase Storage has two independent S3-related features:
-
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 - **S3 backend** - where Storage keeps data. By default, files are stored on the local filesystem. You can switch to an S3-compatible service (AWS S3, MinIO, etc.) for durability, scalability, or to use existing infrastructure.
 - **S3 protocol endpoint** - an S3-compatible API that Storage exposes at `/storage/v1/s3`. This allows standard S3 tools like `rclone` and the AWS CLI to interact with your Storage instance.
 
@@ -27,10 +27,12 @@ storage:
     REGION: your-region
 ```
 
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Depending on your setup, you may need to adjust these values - for example, to use a local S3-compatible service like MinIO or a cloud provider like AWS.
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 ### Using MinIO
-
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 An overlay `docker-compose.s3.yml` configuration can be added to enable MinIO container and provide an S3-compatible API for Storage backend:
 
 ```bash
@@ -57,7 +59,7 @@ storage:
 For AWS S3, you do not need `GLOBAL_S3_ENDPOINT` or `GLOBAL_S3_FORCE_PATH_STYLE` - the Storage S3 client automatically resolves the endpoint from the region and uses virtual-hosted-style URLs, which is what AWS S3 expects. These variables are only needed for non-AWS S3-compatible providers.
 
 ### S3-compatible providers
-
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Use the same configuration as MinIO, but point to your provider's endpoint, e.g.:
 
 ```yaml
@@ -73,7 +75,7 @@ storage:
 
 The S3 protocol endpoint at `/storage/v1/s3` allows standard S3 clients interact with your self-hosted Storage instance. The Supabase REST API and SDK do not use the S3 protocol.
 
-Make sure to check that `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` are properly configured in you `.env` file. Read more about the secrets and passwords in [Configuring and securing Supabase](https://supabase.com/docs/guides/self-hosting/docker#configuring-and-securing-supabase).
+Make sure to check that `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` are properly configured in you `.env` file. Read more about the secrets and passwords in [Configuring and securing Supabase](/docs/guides/self-hosting/docker#configuring-and-securing-supabase).
 
 ```yaml
 storage:
@@ -105,6 +107,7 @@ aws_secret_access_key = your-generated-access-key-secret
 
 1. Open Studio and upload a file to a bucket.
 2. If using an S3 backend: confirm the file appears in your S3 provider's console.
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 3. If you enabled the S3 protocol: list the file using the AWS CLI or rclone to confirm the endpoint works.
 
 ## Troubleshooting

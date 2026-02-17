@@ -4,6 +4,7 @@ description: 'Copy storage objects from a managed Supabase project to a self-hos
 subtitle: 'Copy storage objects from a managed Supabase project to a self-hosted instance using rclone.'
 ---
 
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 This guide walks you through copying storage objects from a managed Supabase platform project to a self-hosted instance using [rclone](https://rclone.org/) with S3-to-S3 copy.
 
 <Admonition type="caution">
@@ -18,8 +19,9 @@ You need:
 
 - A working self-hosted Supabase instance with the S3 protocol endpoint enabled - see [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3#enable-the-s3-protocol-endpoint)
 - Your platform project's S3 credentials - generated from the [S3 Configuration](/dashboard/project/_/storage/s3) page
-- [rclone](https://rclone.org/install/) installed on the machine running the copy
 - Matching buckets created on your self-hosted instance
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+- [rclone](https://rclone.org/install/) installed on the machine running the copy
 
 ## Step 1: Get platform S3 credentials
 
@@ -62,8 +64,9 @@ ON CONFLICT (id) DO NOTHING;
 
 Repeat for each bucket, setting `public` to `true` or `false` as appropriate.
 
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 ## Step 3: Configure rclone
-
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Create or edit your rclone configuration file (`~/.config/rclone/rclone.conf`):
 
 ```ini rclone.conf
@@ -114,7 +117,7 @@ done
 
 <Admonition type="note">
 
-For large migrations, consider adding `--transfers 4` to increase parallelism, or `--checkers 8` to speed up the comparison phase. See the [rclone flags documentation](https://rclone.org/flags/) for all options.
+For large migrations, consider adding `--transfers 4` to increase parallelism, or `--checkers 8` to speed up the comparison phase. See the [flags documentation](https://rclone.org/flags/) for all options.
 
 </Admonition>
 
@@ -136,14 +139,15 @@ Open Studio on your self-hosted instance and browse the storage buckets to confi
 If you see `SignatureDoesNotMatch` when connecting to either remote:
 
 - **Platform**: Regenerate S3 access keys from your project's Storage Settings. Ensure the endpoint URL includes `/storage/v1/s3`.
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 - **Self-hosted**: Verify that `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` in `.env` file match your rclone config. Restart the storage service after any changes.
 
 ### Bucket not found
-
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 If rclone reports that a bucket doesn't exist on the self-hosted side, create it first - see [Step 2](#step-2-create-buckets-on-self-hosted). The S3 protocol does not auto-create buckets on copy.
 
 ### Timeouts on large files
-
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 For very large files, increase rclone's timeout:
 
 ```bash
