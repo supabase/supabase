@@ -245,7 +245,7 @@ Ensure the AWS account tied to the Access Key ID has permissions to write to the
 
 </Admonition>
 
-## OTLP (OpenTelemetry Protocol)
+## OTLP (opentelemetry protocol)
 
 Logs are sent to any OTLP-compatible endpoint using the OpenTelemetry Protocol over HTTP with Protocol Buffers encoding.
 
@@ -270,7 +270,7 @@ Required configuration when creating an OTLP Log Drain:
   <li>Headers: Optional authentication headers (e.g., `Authorization`, `X-API-Key`)</li>
 </ul>
 
-Logs are sent as OTLP LogRecord protobuf messages following the [OpenTelemetry Logs specification](https://opentelemetry.io/docs/specs/otel/logs/).
+Logs are sent as OTLP log record messages using Protocol Buffers encoding, following the [OpenTelemetry Logs specification](https://opentelemetry.io/docs/specs/otel/logs/).
 
 <Admonition type="note">
 
