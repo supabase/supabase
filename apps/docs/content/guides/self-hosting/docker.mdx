@@ -27,7 +27,7 @@ This guide assumes you're comfortable with:
 - Docker and Docker Compose
 - Networking fundamentals (ports, DNS, firewalls)
 
-If you're new to these topics, consider starting with [managed Supabase](/dashboard) for free, or try [local development with the CLI](/docs/guides/local-development).
+If you're new to these topics, consider starting with managed [Supabase platform](/dashboard) for free.
 
 You need the following installed on your system:
 
@@ -147,7 +147,7 @@ sh ./utils/generate-keys.sh
 
 The script is experimental, so review the output before proceeding and also check `.env` after it's updated by the script.
 
-Alternatively, configure all secrets manually as follows.
+**Alternatively, configure all secrets manually as follows.**
 
 ### Configure database password
 
@@ -182,6 +182,10 @@ Edit the following settings in the `.env` file:
 - `PG_META_CRYPTO_KEY`: encryption key for securing connection strings used by Studio against postgres-meta. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 - `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion and querying. Used by Vector and Studio to send and query logs. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 - `LOGFLARE_PRIVATE_ACCESS_TOKEN`: API token for Logflare management operations. Used by Studio for administrative tasks. Never expose client-side. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
+- `S3_PROTOCOL_ACCESS_KEY_ID`: Access key ID (username-like) for authenticating API requests to S3-compatible storage. (Generate with `openssl rand -hex 16`)
+- `S3_PROTOCOL_ACCESS_KEY_SECRET`: Secret key (password-like) used with S3_PROTOCOL_ACCESS_KEY_ID to sign and authorize S3 storage operations. (Generate with `openssl rand -hex 32`)
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+- `MINIO_ROOT_PASSWORD`: Root administrator password for the MinIO server. (Must be 8+ characters; generate with `openssl rand -hex 16`)
 
 Review and change URL environment variables:
 
