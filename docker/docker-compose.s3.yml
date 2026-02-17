@@ -1,7 +1,7 @@
 services:
 
   minio:
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    image: cgr.dev/chainguard/minio
     ports:
       - '9000:9000'
       - '9001:9001'
@@ -18,7 +18,7 @@ services:
       - ./volumes/storage:/data:z
 
   minio-createbucket:
-    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+    image: cgr.dev/chainguard/minio-client:latest-dev
     depends_on:
       minio:
         condition: service_healthy
