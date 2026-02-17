@@ -274,7 +274,7 @@ services:
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
-      # Top-level namespace for all storage operations (always required)
+      # S3 bucket when using S3 backend, directory name when using 'file'
       GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
       # S3 Backend configuration
       #GLOBAL_S3_ENDPOINT: https://your-s3-endpoint
