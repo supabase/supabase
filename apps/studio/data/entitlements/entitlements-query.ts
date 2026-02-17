@@ -32,6 +32,25 @@ export async function getEntitlements({ slug }: EntitlementsVariables, signal?: 
 export type EntitlementsData = Awaited<ReturnType<typeof getEntitlements>>
 export type EntitlementsError = ResponseError
 
+/**
+ * Helper to check a specific entitlement for an organization
+ * For client-side components, please using useCheckEntitlements hook instead
+ */
+export async function checkEntitlement(
+  slug: string,
+  featureKey: string,
+  signal?: AbortSignal
+): Promise<{ hasAccess: boolean; entitlement?: Entitlement }> {
+  const entitlements = await getEntitlements({ slug }, signal)
+
+  const entitlement = entitlements.entitlements.find((e) => e.feature.key === (featureKey as any))
+
+  return {
+    hasAccess: entitlement?.hasAccess ?? false,
+    entitlement,
+  }
+}
+
 export const useEntitlementsQuery = <TData = EntitlementsData>(
   { slug }: EntitlementsVariables,
   {
