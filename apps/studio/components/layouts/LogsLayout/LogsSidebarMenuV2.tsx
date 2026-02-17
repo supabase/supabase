@@ -1,8 +1,3 @@
-import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React, { useState } from 'react'
-
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   useFeaturePreviewModal,
@@ -17,6 +12,10 @@ import { useContentQuery } from 'data/content/content-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
 import {
   Badge,
   Button,
@@ -33,6 +32,7 @@ import {
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
 
 const SupaIcon = ({ className }: { className?: string }) => {
@@ -368,7 +368,7 @@ export function LogsSidebarMenuV2() {
           />
         )}
         {savedQueries.map((query) => (
-          <SavedQueriesItem item={query as any} key={query.id} /> // kemal: i know, i know, temp any fix.
+          <SavedQueriesItem item={query} key={query.id} />
         ))}
       </SidebarCollapsible>
 
@@ -381,7 +381,7 @@ export function LogsSidebarMenuV2() {
         illustration={
           <div className="flex items-center gap-4">
             {LOG_DRAIN_TYPES.map((type) =>
-              React.cloneElement(type.icon, { height: 20, width: 20 })
+              React.cloneElement(type.icon, { key: type.name, height: 20, width: 20 })
             )}
           </div>
         }

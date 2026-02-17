@@ -23,7 +23,8 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "shadcn": "^3.0.0",
+    "@supabase/ssr": "workspace:*",
+    "shadcn": "^3.3.1",
     "tsconfig": "workspace:*",
     "vite": "catalog:"
   }

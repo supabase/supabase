@@ -55,6 +55,12 @@ function getEntitlementSetValues(entitlement: Entitlement | null): string[] {
     : []
 }
 
+function getEntitlementMax(entitlement: Entitlement | null): number | undefined {
+  return isEntitlementUnlimited(entitlement)
+    ? Number.MAX_SAFE_INTEGER
+    : getEntitlementNumericValue(entitlement)
+}
+
 export function useCheckEntitlements(
   featureKey: FeatureKey,
   organizationSlug?: string,
@@ -110,5 +116,6 @@ export function useCheckEntitlements(
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),
     isEntitlementUnlimited: () => isEntitlementUnlimited(entitlement),
     getEntitlementSetValues: () => getEntitlementSetValues(entitlement),
+    getEntitlementMax: () => getEntitlementMax(entitlement),
   }
 }

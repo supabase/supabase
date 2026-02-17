@@ -1,15 +1,13 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toPng, toSvg } from 'html-to-image'
 import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
+
 import 'reactflow/dist/style.css'
-import { toast } from 'sonner'
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -17,22 +15,27 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { tablesToSQL } from 'lib/helpers'
+import { toast } from 'sonner'
 import {
+  Button,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
+
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = () => {
@@ -88,7 +91,7 @@ export const SchemaGraph = () => {
   })
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
-  const [_, setStoredPositions] = useLocalStorage(
+  const [, setStoredPositions] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref as string, schema?.id ?? 0),
     {}
   )
@@ -200,7 +203,7 @@ export const SchemaGraph = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-muted">
+      <div className="flex items-center justify-between p-4 border-b border-muted h-[var(--header-height)]">
         {isLoadingSchemas && (
           <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
         )}
@@ -325,10 +328,6 @@ export const SchemaGraph = () => {
                   type: 'smoothstep',
                   animated: true,
                   deletable: false,
-                  style: {
-                    stroke: 'hsl(var(--border-stronger))',
-                    strokeWidth: 1,
-                  },
                 }}
                 nodeTypes={nodeTypes}
                 fitView

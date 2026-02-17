@@ -6,10 +6,10 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.94.1
-  '@supabase/postgrest-js': 2.94.1
-  '@supabase/realtime-js': 2.94.1
-  '@supabase/supabase-js': 2.94.1
+  '@supabase/auth-js': 2.95.3
+  '@supabase/postgrest-js': 2.95.3
+  '@supabase/realtime-js': 2.95.3
+  '@supabase/supabase-js': 2.95.3
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
@@ -58,30 +58,19 @@ minimumReleaseAgeExclude:
   - diff
   - lodash-es
   - lodash
+  - next-mdx-remote
 
 onlyBuiltDependencies:
   - supabase
 
 overrides:
-  '@eslint/eslintrc>js-yaml': ^4.1.1
-  '@nuxt/devtools-wizard>diff': ^8.0.3
-  '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
-  '@tanstack/directive-functions-plugin>vite': 'catalog:'
-  '@tanstack/react-start-plugin>vite': 'catalog:'
-  '@tanstack/start-server-core>h3': ^1.15.5
-  '@tanstack/react-start-server>h3': ^1.15.5
-  '@smithy/config-resolver': ^4.4.0
   esbuild: ^0.25.2
   nodemailer: ^7.0.11
   lodash-es: 'catalog:'
   lodash: 'catalog:'
   payload>undici: ^7.18.2
-  preact: 10.26.10
   refractor>prismjs: ^1.30.0
-  shadcn>diff: ^8.0.3
   tar: ^7.5.7
   tmp: ^0.2.4
-  vinxi>vite: 'catalog:'
-  vinxi>h3: ^1.15.5
