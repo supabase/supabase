@@ -21,7 +21,7 @@ export const StripeSyncSettingsPage = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
 
-  const { installationStatus } = useStripeSyncStatus({
+  const { installationStatus, isLoading: isLoadingInstallationStatus } = useStripeSyncStatus({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -30,10 +30,10 @@ export const StripeSyncSettingsPage = () => {
 
   // Redirect to overview page when integration is not installed
   useEffect(() => {
-    if (installed || !project?.ref) return
+    if (isLoadingInstallationStatus || installed || !project?.ref) return
 
     router.push(`/project/${project.ref}/integrations/stripe_sync_engine/overview`)
-  }, [installed, project?.ref, router])
+  }, [isLoadingInstallationStatus, installed, project?.ref, router])
 
   const tableEditorUrl = `/project/${project?.ref}/editor?schema=stripe`
 

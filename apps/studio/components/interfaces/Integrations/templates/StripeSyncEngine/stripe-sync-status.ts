@@ -30,6 +30,9 @@ export interface StripeSyncStatusResult {
 
   /** Current sync run state (only available when installationStatus is installed) */
   syncState: StripeSyncState | undefined
+
+  /** Whether the status is still being determined (schemas query is loading) */
+  isLoading: boolean
 }
 
 // TODO: The current version of the package 'stripe-experiment-sync' doesn't export
