@@ -144,7 +144,7 @@ export async function generateAssistantResponse({
         })
         return streamTextFn(streamTextArgs)
       },
-      { name: 'assistant-chat' }
+      { type: 'function', name: 'generate-assistant-response' }
     )
   }
 
