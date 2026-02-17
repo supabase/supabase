@@ -1,5 +1,3 @@
-import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
-
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
 import { generateDatabaseMenu } from 'components/layouts/DatabaseLayout/DatabaseMenu.utils'
@@ -9,6 +7,7 @@ import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -26,9 +25,7 @@ export const generateToolRoutes = (ref?: string, project?: Project, features?: {
       key: 'sql',
       label: 'SQL Editor',
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: !IS_PLATFORM
-        ? `/project/${ref}/sql/1`
-        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
   ]
 }
@@ -104,7 +101,7 @@ export const generateProductRoutes = (
             key: 'functions',
             label: 'Edge Functions',
             icon: <EdgeFunctions size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/functions`),
+            link: ref && `/project/${ref}/functions`,
           },
         ]
       : []),
@@ -124,14 +121,15 @@ export const generateProductRoutes = (
 export const generateOtherRoutes = (
   ref?: string,
   project?: Project,
-  features?: { unifiedLogs?: boolean; showReports?: boolean }
+  features?: { unifiedLogs?: boolean; showReports?: boolean; apiDocsSidePanel?: boolean }
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
-  const { unifiedLogs, showReports } = features ?? {}
+  const { unifiedLogs, showReports, apiDocsSidePanel } = features ?? {}
   const unifiedLogsEnabled = unifiedLogs ?? false
   const reportsEnabled = showReports ?? true
+  const apiDocsSidePanelEnabled = apiDocsSidePanel ?? false
 
   return [
     {
@@ -162,12 +160,18 @@ export const generateOtherRoutes = (
             ? `/project/${ref}/logs`
             : `/project/${ref}/logs/explorer`),
     },
-    {
-      key: 'api',
-      label: 'API Docs',
-      icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
-    },
+    ...(apiDocsSidePanelEnabled
+      ? [
+          {
+            key: 'api',
+            label: 'API Docs',
+            icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link:
+              ref &&
+              (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/data_api/docs`),
+          },
+        ]
+      : []),
     {
       key: 'integrations',
       label: 'Integrations',

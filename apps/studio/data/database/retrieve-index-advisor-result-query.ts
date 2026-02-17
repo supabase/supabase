@@ -35,20 +35,22 @@ export async function getIndexAdvisorResult({
   const { result: results } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from index_advisor('${escapedQuery}');`,
+    sql: `set search_path to public, extensions; select * from index_advisor('${escapedQuery}');`,
   })
 
   if (!results || results.length === 0) {
-    throw new Error('Index advisor returned no results')
+    console.error('[index_advisor > getIndexAdvisorResult] No results from index_advisor')
+    return null
   }
 
   const parsed = IndexAdvisorResultSchema.safeParse(results[0])
   if (!parsed.success) {
     const firstError = parsed.error.errors[0]
     const errorPath = firstError.path.length > 0 ? ` at path: ${firstError.path.join('.')}` : ''
-    throw new Error(
+    console.error(
       `Invalid index advisor response${errorPath}: ${firstError.message}. Received: ${JSON.stringify(results[0])}`
     )
+    return null
   }
 
   return filterProtectedSchemaIndexAdvisorResult(parsed.data)

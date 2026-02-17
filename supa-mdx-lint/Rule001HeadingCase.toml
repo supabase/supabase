@@ -134,6 +134,7 @@ may_uppercase = [
     "Mailpit",
     "Management API",
     "Marketplace",
+    "Inspector",
     "Metrics API",
     "Mixpeek",
     "Mixpeek Embed",

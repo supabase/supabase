@@ -760,8 +760,8 @@
     "author_id": "fady",
     "author": "Fady Abdelmalik",
     "position": "Engineering",
-    "author_url": "https://github.com/issuedat",
-    "author_image_url": "https://github.com/issuedat.png"
+    "author_url": "https://github.com/fadymak",
+    "author_image_url": "https://github.com/fadymak.png"
   },
   {
     "author_id": "danny",
@@ -787,6 +787,15 @@
     "author_image_url": "https://github.com/edgurgel.png"
   },
   {
+    "author_id": "eric_simons",
+    "author": "Eric Simons",
+    "username": "ericsimons",
+    "position": "CEO",
+    "company": "Bolt.new",
+    "author_url": "https://github.com/ericsimons",
+    "author_image_url": "https://github.com/ericsimons.png"
+  },
+  {
     "author_id": "steven_eubank",
     "author": "Steven Eubank",
     "username": "smeubank",
@@ -808,5 +817,21 @@
     "position": "AI Tooling Engineer",
     "author_url": "https://github.com/Rodriguespn",
     "author_image_url": "https://github.com/Rodriguespn.png"
+  },
+  {
+    "author_id": "matt_linkous",
+    "author": "Matt Linkous",
+    "username": "matlin",
+    "position": "Head of Integrations",
+    "author_url": "https://github.com/matlin",
+    "author_image_url": "https://github.com/matlin.png"
+  },
+  {
+    "author_id": "miles_thomas",
+    "author": "Miles Thomas",
+    "username": "myruzuu",
+    "position": "Product Manager",
+    "author_url": "https://www.linkedin.com/in/mairuzu",
+    "author_image_url": "https://github.com/myruzuu.png"
   }
 ]

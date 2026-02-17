@@ -110,7 +110,7 @@ export const SecuritySettings = () => {
         {!isPaidPlan ? (
           <UpgradeToPro
             source="organizationMfa"
-            primaryText="Organization MFA enforcement is not available on Free plan"
+            primaryText="Organization MFA enforcement is not available on Free Plan"
             secondaryText="Upgrade to Pro or above to enforce MFA requirements for your organization."
             featureProposition="enforce MFA requirements"
           />

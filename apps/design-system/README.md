@@ -60,9 +60,9 @@ With that out of the way, there are several parts of this design system that nee
 - `config/docs.ts`: list of components in the sidebar
 - `content/docs`: the actual component documentation
 - `registry/examples.ts`: list of example components
-- `registry/default/example`: the actual example components
-- `registry/charts.ts`: chart components
-- `registry/fragments.ts`: fragment components
+- `registry/fragments.ts`: list of fragment components
+- `registry/charts.ts`: list of chart components
+- `registry/default/example/*`: the actual example components
 
 You will probably need to rebuild the design system’s registry after making new additions. You can do that via:
 

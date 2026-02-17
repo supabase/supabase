@@ -60,6 +60,8 @@ logflare_private_access_token=$(gen_base64 24)
 s3_protocol_access_key_id=$(gen_hex 16)
 s3_protocol_access_key_secret=$(gen_hex 32)
 
+minio_root_password=$(gen_hex 16)
+
 echo ""
 echo "JWT_SECRET=${jwt_secret}"
 echo ""
@@ -75,6 +77,7 @@ echo "LOGFLARE_PUBLIC_ACCESS_TOKEN=${logflare_public_access_token}"
 echo "LOGFLARE_PRIVATE_ACCESS_TOKEN=${logflare_private_access_token}"
 echo "S3_PROTOCOL_ACCESS_KEY_ID=${s3_protocol_access_key_id}"
 echo "S3_PROTOCOL_ACCESS_KEY_SECRET=${s3_protocol_access_key_secret}"
+echo "MINIO_ROOT_PASSWORD=${minio_root_password}"
 echo ""
 
 postgres_password=$(gen_hex 16)
@@ -114,6 +117,7 @@ sed \
     -e "s|^LOGFLARE_PRIVATE_ACCESS_TOKEN=.*$|LOGFLARE_PRIVATE_ACCESS_TOKEN=${logflare_private_access_token}|" \
     -e "s|^S3_PROTOCOL_ACCESS_KEY_ID=.*$|S3_PROTOCOL_ACCESS_KEY_ID=${s3_protocol_access_key_id}|" \
     -e "s|^S3_PROTOCOL_ACCESS_KEY_SECRET=.*$|S3_PROTOCOL_ACCESS_KEY_SECRET=${s3_protocol_access_key_secret}|" \
+    -e "s|^MINIO_ROOT_PASSWORD=.*$|MINIO_ROOT_PASSWORD=${minio_root_password}|" \
     -e "s|^POSTGRES_PASSWORD=.*$|POSTGRES_PASSWORD=${postgres_password}|" \
     -e "s|^DASHBOARD_PASSWORD=.*$|DASHBOARD_PASSWORD=${dashboard_password}|" \
     .env

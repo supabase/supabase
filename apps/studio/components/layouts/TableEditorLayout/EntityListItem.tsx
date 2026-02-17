@@ -1,30 +1,8 @@
+import { useParams } from 'common'
 import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
-
-import { useFlag, useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import { InlineLink } from 'components/ui/InlineLink'
-import { getTableDefinition } from 'data/database/table-definition-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { Entity } from 'data/entity-types/entity-types-infinite-query'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import type { TableApiAccessData, TableApiAccessMap } from 'data/privileges/table-api-access-query'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatSql } from 'lib/formatSql'
-import {
-  useRoleImpersonationStateSnapshot,
-  type RoleImpersonationState,
-} from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Badge,
   Button,
@@ -43,7 +21,32 @@ import {
   TooltipTrigger,
   TreeViewItemVariant,
 } from 'ui'
+
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { getTableDefinition } from '@/data/database/table-definition-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { Entity } from '@/data/entity-types/entity-types-infinite-query'
+import { useProjectLintsQuery } from '@/data/lint/lint-query'
+import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
+import type {
+  TableApiAccessData,
+  TableApiAccessMap,
+} from '@/data/privileges/table-api-access-query'
+import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationState,
+} from '@/state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface EntityListItemProps {
   id: number | string
@@ -79,7 +82,6 @@ export const EntityListItem = ({
   const tabs = useTabsStateSnapshot()
   const isPreview = tabs.previewTabId === tabId
 
-  const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
@@ -104,10 +106,18 @@ export const EntityListItem = ({
     projectRef: project?.ref,
   })
 
-  const tableHasLints: boolean = getEntityLintDetails(
+  const tableHasRlsDisabledLint: boolean = getEntityLintDetails(
     entity.name,
     'rls_disabled_in_public',
     ['ERROR'],
+    lints,
+    selectedSchema
+  ).hasLint
+
+  const tableHasRlsEnabledNoPolicyLint: boolean = getEntityLintDetails(
+    entity.name,
+    'rls_enabled_no_policy',
+    ['ERROR', 'WARN', 'INFO'],
     lints,
     selectedSchema
   ).hasLint
@@ -178,7 +188,6 @@ export const EntityListItem = ({
       className={cn(
         TreeViewItemVariant({
           isSelected: isActive && !isPreview,
-          isOpened: isOpened && !isPreview,
           isPreview,
         }),
         'pl-4 pr-1'
@@ -213,7 +222,8 @@ export const EntityListItem = ({
           </span>
           <EntityTooltipTrigger
             entity={entity}
-            tableHasLints={tableHasLints}
+            tableHasRlsDisabledLint={tableHasRlsDisabledLint}
+            tableHasRlsEnabledNoPolicyLint={tableHasRlsEnabledNoPolicyLint}
             viewHasLints={viewHasLints}
             materializedViewHasLints={materializedViewHasLints}
             foreignTableHasLints={foreignTableHasLints}
@@ -255,23 +265,23 @@ export const EntityListItem = ({
                     e.stopPropagation()
                     const toastId = toast.loading('Getting table schema...')
 
-                    const tableDefinition = await getTableDefinition({
+                    const formattedSchema = getTableDefinition({
                       id: entity.id,
                       projectRef: project?.ref,
                       connectionString: project?.connectionString,
+                    }).then((tableDefinition) => {
+                      if (!tableDefinition) {
+                        throw new Error('Failed to get table schema')
+                      }
+                      return formatSql(tableDefinition)
                     })
-                    if (!tableDefinition) {
-                      return toast.error('Failed to get table schema', { id: toastId })
-                    }
 
                     try {
-                      const formatted = formatSql(tableDefinition)
-                      await copyToClipboard(formatted)
-                      toast.success('Table schema copied to clipboard', { id: toastId })
-                    } catch (err: any) {
-                      toast.error('Failed to copy schema: ' + (err.message || err), {
-                        id: toastId,
+                      await copyToClipboard(formattedSchema, () => {
+                        toast.success('Table schema copied to clipboard', { id: toastId })
                       })
+                    } catch (err: any) {
+                      toast.error('Failed to copy schema: ' + (err.message || err), { id: toastId })
                     }
                   }}
                 >
@@ -381,21 +391,22 @@ export const EntityListItem = ({
 
 const EntityTooltipTrigger = ({
   entity,
-  tableHasLints,
+  tableHasRlsDisabledLint,
+  tableHasRlsEnabledNoPolicyLint,
   viewHasLints,
   materializedViewHasLints,
   foreignTableHasLints,
   apiAccessData,
 }: {
   entity: Entity
-  tableHasLints: boolean
+  tableHasRlsDisabledLint: boolean
+  tableHasRlsEnabledNoPolicyLint: boolean
   viewHasLints: boolean
   materializedViewHasLints: boolean
   foreignTableHasLints: boolean
   apiAccessData?: TableApiAccessData
 }) => {
   const { ref } = useParams()
-  const isDataApiExposedBadgeEnabled = useFlag('dataApiExposedBadge')
 
   let tooltipContent = null
   const accessWarning = 'Data is publicly accessible via API'
@@ -409,10 +420,11 @@ const EntityTooltipTrigger = ({
 
   switch (entity.type) {
     case ENTITY_TYPE.TABLE:
-      if (tableHasLints) {
+      if (tableHasRlsDisabledLint) {
         tooltipContent = (
           <>
-            {accessWarning} as RLS is disabled. {learnMoreCTA}.
+            This table can be accessed by anyone via the Data API as RLS is disabled. {learnMoreCTA}
+            .
           </>
         )
       }
@@ -461,13 +473,33 @@ const EntityTooltipTrigger = ({
     )
   }
 
-  if (isDataApiExposedBadgeEnabled && apiAccessData?.hasApiAccess) {
+  const isRlsEnabledNoPolicies =
+    entity.type === ENTITY_TYPE.TABLE &&
+    apiAccessData?.apiAccessType === 'access' &&
+    tableHasRlsEnabledNoPolicyLint
+  if (isRlsEnabledNoPolicies) {
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
           <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
         </TooltipTrigger>
-        <TooltipContent side="right">This table is exposed via the Data API</TooltipContent>
+        <TooltipContent side="right" className="max-w-52">
+          This table can be accessed via the Data API but no RLS policies exist so no data will be
+          returned
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  const isApiExposedWithRlsAndPolicies =
+    apiAccessData?.apiAccessType === 'access' && !tableHasRlsEnabledNoPolicyLint
+  if (isApiExposedWithRlsAndPolicies) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+        </TooltipTrigger>
+        <TooltipContent side="right">This table can be accessed via the Data API</TooltipContent>
       </Tooltip>
     )
   }

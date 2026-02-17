@@ -1,6 +1,7 @@
-import { expect, test, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, expect, test } from 'vitest'
+
 import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -33,11 +34,12 @@ withTestDatabase('list with system schemas', async ({ executeQuery }) => {
     { id: expect.any(Number) },
     `
     {
+      "comment": "system catalog schema",
       "id": Any<Number>,
       "name": "pg_catalog",
       "owner": "postgres",
     }
-    `
+  `
   )
 })
 
@@ -51,11 +53,12 @@ withTestDatabase('list without system schemas', async ({ executeQuery }) => {
     { id: expect.any(Number) },
     `
     {
+      "comment": "standard public schema",
       "id": Any<Number>,
       "name": "public",
       "owner": "postgres",
     }
-    `
+  `
   )
 })
 
@@ -71,11 +74,12 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
     { id: expect.any(Number) },
     `
     {
+      "comment": null,
       "id": Any<Number>,
       "name": "s",
       "owner": "postgres",
     }
-    `
+  `
   )
 
   // Retrieve schema again to verify
@@ -87,11 +91,12 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
     { id: expect.any(Number) },
     `
     {
+      "comment": null,
       "id": Any<Number>,
       "name": "s",
       "owner": "postgres",
     }
-    `
+  `
   )
 
   // Update schema
@@ -113,11 +118,12 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
     { id: expect.any(Number) },
     `
     {
+      "comment": null,
       "id": Any<Number>,
       "name": "ss",
       "owner": "postgres",
     }
-    `
+  `
   )
 
   // Delete schema

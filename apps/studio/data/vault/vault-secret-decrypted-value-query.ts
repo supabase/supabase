@@ -1,6 +1,7 @@
 import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
 import { UseCustomQueryOptions } from 'types'
+
 import { executeSql } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
 
@@ -27,13 +28,15 @@ const vaultSecretDecryptedValuesQuery = (ids: string[]) => {
 export type VaultSecretsDecryptedValueVariables = {
   projectRef?: string
   connectionString?: string | null
-  id: string
+  id?: string
 }
 
 export const getDecryptedValue = async (
   { projectRef, connectionString, id }: VaultSecretsDecryptedValueVariables,
   signal?: AbortSignal
 ) => {
+  if (!id) throw new Error('ID is required')
+
   const sql = vaultSecretDecryptedValueQuery(id)
   const { result } = await executeSql(
     {
@@ -84,8 +87,14 @@ export const getDecryptedValues = async (
   signal?: AbortSignal
 ) => {
   const sql = vaultSecretDecryptedValuesQuery(ids)
-  const { result } = await executeSql({ projectRef, connectionString, sql }, signal)
-  return result.reduce((a: any, b: any) => {
-    return { ...a, [b.id]: b.decrypted_secret }
-  }, {})
+  const { result } = await executeSql<{ id: string; decrypted_secret: string }[]>(
+    { projectRef, connectionString, sql },
+    signal
+  )
+  return result.reduce(
+    (a, b) => {
+      return { ...a, [b.id]: b.decrypted_secret }
+    },
+    {} as Record<string, string>
+  )
 }

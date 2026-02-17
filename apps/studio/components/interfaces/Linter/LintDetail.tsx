@@ -1,15 +1,16 @@
-import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
-
 import { createLintSummaryPrompt, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { Lint } from 'data/lint/lint-query'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { AiIconAnimation, Button } from 'ui'
+import { Button } from 'ui'
+
+import { Markdown } from '../Markdown'
 import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
 
 interface LintDetailProps {
@@ -39,6 +40,10 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
     })
   }
 
+  const buildPromptForCopy = () => {
+    return createLintSummaryPrompt(lint)
+  }
+
   return (
     <div>
       <h3 className="text-sm mb-2">Entity</h3>
@@ -48,22 +53,22 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
       </div>
 
       <h3 className="text-sm mb-2">Issue</h3>
-      <ReactMarkdown className="leading-6 text-sm text-foreground-light mb-6">
+      <Markdown className="leading-6 text-sm text-foreground-light mb-6">
         {lint.detail.replace(/\\`/g, '`')}
-      </ReactMarkdown>
+      </Markdown>
       <h3 className="text-sm mb-2">Description</h3>
-      <ReactMarkdown className="text-sm text-foreground-light mb-6">
+      <Markdown className="text-sm text-foreground-light mb-6">
         {lint.description.replace(/\\`/g, '`')}
-      </ReactMarkdown>
+      </Markdown>
 
       <h3 className="text-sm mb-2">Resolve</h3>
       <div className="flex items-center gap-2">
-        <Button
-          icon={<AiIconAnimation className="scale-75 w-3 h-3" />}
-          onClick={handleAskAssistant}
-        >
-          Ask Assistant
-        </Button>
+        <AiAssistantDropdown
+          label="Ask Assistant"
+          buildPrompt={buildPromptForCopy}
+          onOpenAssistant={handleAskAssistant}
+          telemetrySource="lint_detail"
+        />
         <LintCTA title={lint.name} projectRef={projectRef} metadata={lint.metadata} />
         <Button asChild type="text">
           <Link

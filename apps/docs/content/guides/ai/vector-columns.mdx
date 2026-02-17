@@ -72,7 +72,7 @@ In general, embeddings with fewer dimensions perform best. See our [analysis on 
 In this example we'll generate a vector using Transformers.js, then store it in the database using the Supabase JavaScript client.
 
 ```js
-import { pipeline } from '@xenova/transformers'
+import { pipeline } from '@huggingface/transformers'
 const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
 
 const title = 'First post!'

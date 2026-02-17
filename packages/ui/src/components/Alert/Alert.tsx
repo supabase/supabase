@@ -1,9 +1,9 @@
 'use client'
 
+import { AlertOctagon, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
 import React, { useState } from 'react'
 
 import styleHandler from '../../lib/theme/styleHandler'
-import { AlertOctagon, CheckCircle, AlertTriangle, Info, X } from 'lucide-react'
 
 export interface AlertProps {
   variant?: AlertVariant
