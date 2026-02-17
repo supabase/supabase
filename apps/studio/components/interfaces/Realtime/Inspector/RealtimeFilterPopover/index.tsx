@@ -135,7 +135,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 }
               />
             </div>
-            <p className="text-xs  text-foreground-light pt-1">
+            <p className="text-xs text-foreground-light pt-1">
               Send any data to any client subscribed to the same channel
             </p>
           </div>
