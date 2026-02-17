@@ -25,6 +25,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { isInstalled, isUninstalling } from './stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 export const StripeSyncSettingsPage = () => {
@@ -37,11 +38,11 @@ export const StripeSyncSettingsPage = () => {
     connectionString: project?.connectionString,
   })
 
-  const isInstalled = installationStatus === 'installed'
-  const uninstallInProgress = installationStatus === 'uninstalling'
+  const installed = isInstalled(installationStatus)
+  const uninstallInProgress = isUninstalling(installationStatus)
 
-  const { mutate: uninstallStripeSync, isPending: isUninstalling } = useStripeSyncUninstallMutation(
-    {
+  const { mutate: uninstallStripeSync, isPending: uninstallRequested } =
+    useStripeSyncUninstallMutation({
       onSuccess: () => {
         toast.success('Stripe Sync uninstallation started')
         setShowUninstallModal(false)
@@ -52,15 +53,16 @@ export const StripeSyncSettingsPage = () => {
           )
         }
       },
-    }
-  )
+    })
 
-  // Redirect to overview if not installed and not uninstalling
+  const uninstalling = uninstallRequested || uninstallInProgress
+
+  // Redirect to overview page when integration is not installed
   useEffect(() => {
-    if (!isInstalled && !uninstallInProgress && !isUninstalling && project?.ref) {
-      router.push(`/project/${project.ref}/integrations/stripe_sync_engine/overview`)
-    }
-  }, [isInstalled, uninstallInProgress, isUninstalling, project?.ref, router])
+    if (installed || !project?.ref) return
+
+    router.push(`/project/${project.ref}/integrations/stripe_sync_engine/overview`)
+  }, [installed, uninstalling, project?.ref, router])
 
   const handleUninstall = () => {
     if (!project?.ref) return
@@ -69,10 +71,7 @@ export const StripeSyncSettingsPage = () => {
 
   const tableEditorUrl = `/project/${project?.ref}/editor?schema=stripe`
 
-  const showLoading = isUninstalling || (!isInstalled && !uninstallInProgress)
-
-  // Show loading state while checking installation status (but not during uninstall)
-  if (showLoading) {
+  if (uninstalling) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="animate-spin text-foreground-muted" size={24} />
@@ -140,12 +139,10 @@ export const StripeSyncSettingsPage = () => {
                   <Button
                     type="default"
                     onClick={() => setShowUninstallModal(true)}
-                    loading={isUninstalling || uninstallInProgress}
-                    disabled={isUninstalling || uninstallInProgress}
+                    loading={uninstalling}
+                    disabled={uninstalling}
                   >
-                    {isUninstalling || uninstallInProgress
-                      ? 'Uninstalling...'
-                      : 'Uninstall Stripe Sync Engine'}
+                    {uninstalling ? 'Uninstalling...' : 'Uninstall Stripe Sync Engine'}
                   </Button>
                 </div>
               </div>
@@ -160,7 +157,7 @@ export const StripeSyncSettingsPage = () => {
         confirmLabel="Uninstall"
         confirmLabelLoading="Uninstalling..."
         variant="destructive"
-        loading={isUninstalling}
+        loading={uninstalling}
         onCancel={() => setShowUninstallModal(false)}
         onConfirm={handleUninstall}
       >

@@ -92,8 +92,16 @@ export function hasError(status: StripeInstallationStatus): boolean {
   return status === 'install_error' || status === 'uninstall_error'
 }
 
+export function isInstalling(status: StripeInstallationStatus): boolean {
+  return status === 'installing'
+}
+
+export function isUninstalling(status: StripeInstallationStatus): boolean {
+  return status === 'uninstalling'
+}
+
 export function isInProgress(status: StripeInstallationStatus): boolean {
-  return status === 'installing' || status === 'uninstalling'
+  return isInstalling(status) || isUninstalling(status)
 }
 
 export function canInstall(status: StripeInstallationStatus): boolean {
