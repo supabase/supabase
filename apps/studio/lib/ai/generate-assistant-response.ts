@@ -2,16 +2,16 @@ import * as ai from 'ai'
 import {
   convertToModelMessages,
   isToolUIPart,
+  stepCountIs,
   type LanguageModel,
   type ModelMessage,
-  stepCountIs,
   type ToolSet,
   type UIMessage,
 } from 'ai'
-import { wrapAISDK } from 'braintrust'
+import { traced, wrapAISDK } from 'braintrust'
 import { source } from 'common-tags'
-
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { IS_TRACING_ENABLED, TRACING_ENVIRONMENT_TAG } from 'lib/ai/braintrust-logger'
 import {
   CHAT_PROMPT,
   EDGE_FUNCTION_PROMPT,
@@ -24,7 +24,7 @@ import {
 } from 'lib/ai/prompts'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 
-const { streamText } = wrapAISDK(ai)
+const { streamText: tracedStreamText } = wrapAISDK(ai)
 
 export async function generateAssistantResponse({
   messages: rawMessages,
@@ -34,6 +34,7 @@ export async function generateAssistantResponse({
   getSchemas,
   projectRef,
   chatName,
+  isHipaaEnabled,
   promptProviderOptions,
   providerOptions,
   abortSignal,
@@ -45,7 +46,6 @@ export async function generateAssistantResponse({
   getSchemas?: () => Promise<string>
   projectRef?: string
   chatName?: string
-  // TODO(mattrossman): use for excluding HIPAA projects from assistant tracing
   isHipaaEnabled?: boolean
   promptProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
@@ -123,12 +123,30 @@ export async function generateAssistantResponse({
     ...convertToModelMessages(messages),
   ]
 
-  return streamText({
+  const shouldTrace = IS_TRACING_ENABLED && !isHipaaEnabled
+  const streamTextFn = shouldTrace ? tracedStreamText : ai.streamText
+
+  const streamTextArgs = {
     model,
     stopWhen: stepCountIs(5),
     messages: coreMessages,
     ...(providerOptions && { providerOptions }),
     tools,
     ...(abortSignal && { abortSignal }),
-  })
+  } satisfies Parameters<typeof ai.streamText>[0]
+
+  if (shouldTrace) {
+    return traced(
+      async (span) => {
+        span.log({
+          metadata: { projectRef, chatName, aiOptInLevel },
+          tags: [TRACING_ENVIRONMENT_TAG],
+        })
+        return streamTextFn(streamTextArgs)
+      },
+      { name: 'assistant-chat' }
+    )
+  }
+
+  return streamTextFn(streamTextArgs)
 }
