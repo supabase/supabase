@@ -74,6 +74,5 @@ export function useStripeSyncStatus({
   return {
     installationStatus,
     syncState: installed ? syncState : undefined,
-    isLoading: isSchemasLoading || (installed && isSyncStateLoading),
   }
 }
