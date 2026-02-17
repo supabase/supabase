@@ -19,9 +19,6 @@ export interface StripeSyncStatusResult {
   /** The installation status */
   installationStatus: StripeInstallationStatus
 
-  /** The stripe schema if it exists */
-  stripeSchema: Schema | undefined
-
   /** Current sync run state (only available when installed) */
   syncState: StripeSyncState | undefined
 

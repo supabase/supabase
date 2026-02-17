@@ -63,7 +63,7 @@ export const StripeSyncInstallationPage = () => {
   })
 
   // Use the unified status hook
-  const { installationStatus, stripeSchema, syncState } = useStripeSyncStatus({
+  const { installationStatus, syncState } = useStripeSyncStatus({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -72,6 +72,7 @@ export const StripeSyncInstallationPage = () => {
 
   const isInstalled = installationStatus === 'installed'
   const setupError = installationStatus === 'install_error'
+  const isUninstalled = installationStatus === 'uninstalled'
   const uninstallError = installationStatus === 'uninstall_error'
   const schemaShowsInProgress = installationStatus === 'installing'
   const schemaShowsUninstallInProgress = installationStatus === 'uninstalling'
@@ -128,21 +129,21 @@ export const StripeSyncInstallationPage = () => {
 
   // Clear uninstall initiated flag once schema is removed or error
   useEffect(() => {
-    if (isUninstallInitiated && (!stripeSchema || uninstallError)) {
+    if (isUninstallInitiated && (isUninstalled || uninstallError)) {
       setIsUninstallInitiated(false)
     }
-  }, [isUninstallInitiated, stripeSchema, uninstallError])
+  }, [isUninstallInitiated, isUninstalled, uninstallError])
 
   // Clean up the status query parameter after schema confirms uninstall status
   useEffect(() => {
     if (
       router.query.status === 'uninstalling' &&
-      (schemaShowsUninstallInProgress || !stripeSchema || uninstallError)
+      (schemaShowsUninstallInProgress || isUninstalled || uninstallError)
     ) {
       const { status: _, ...rest } = router.query
       router.replace({ query: rest }, undefined, { shallow: true })
     }
-  }, [router, schemaShowsUninstallInProgress, stripeSchema, uninstallError])
+  }, [router, schemaShowsUninstallInProgress, isUninstalled, uninstallError])
 
   const canInstall = checkCanInstall(installationStatus) && !isInstalled && !setupInProgress
 
