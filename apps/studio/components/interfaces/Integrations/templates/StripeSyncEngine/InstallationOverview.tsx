@@ -29,7 +29,16 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
-import { canInstall as checkCanInstall, isSyncRunning } from './stripe-sync-status'
+import {
+  canInstall as checkCanInstall,
+  hasInstallError,
+  hasUninstallError,
+  isInstalled,
+  isInstalling,
+  isSyncRunning,
+  isUninstalled,
+  isUninstalling,
+} from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
@@ -67,12 +76,12 @@ export const StripeSyncInstallationPage = () => {
 
   const isSyncing = isSyncRunning(syncState)
 
-  const installed = installationStatus === 'installed'
-  const installError = installationStatus === 'install_error'
-  const uninstalled = installationStatus === 'uninstalled'
-  const uninstallError = installationStatus === 'uninstall_error'
-  const installInProgress = installationStatus === 'installing'
-  const uninsallInProgress = installationStatus === 'uninstalling'
+  const installed = isInstalled(installationStatus)
+  const installError = hasInstallError(installationStatus)
+  const uninstalled = isUninstalled(installationStatus)
+  const uninstallError = hasUninstallError(installationStatus)
+  const installInProgress = isInstalling(installationStatus)
+  const uninsallInProgress = isUninstalling(installationStatus)
 
   const {
     mutate: installStripeSync,
