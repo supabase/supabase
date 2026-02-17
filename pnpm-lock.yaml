@@ -1829,6 +1829,12 @@ importers:
       uuid:
         specifier: ^9.0.1
         version: 9.0.1
+      vite-tsconfig-paths:
+        specifier: ^4.3.2
+        version: 4.3.2(supports-color@8.1.1)(typescript@5.9.2)(vite@7.1.11(@types/node@22.13.14)(jiti@2.5.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1))
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@22.13.14)(@vitest/ui@3.2.4)(jiti@2.5.1)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@5.9.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -12243,16 +12249,16 @@ packages:
 
   glob@7.1.6:
     resolution: {integrity: sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   glob@9.3.5:
     resolution: {integrity: sha512-e1LleDykUz2Iu+MTYdkSsuWX8lvAjAcs0Xef0lNIu0S2wOAzuTxCJtcd9S3cijlwYF18EsU3rzb8jPVobxDh9Q==}
@@ -37945,7 +37951,7 @@ snapshots:
 
   vite-tsconfig-paths@4.3.2(supports-color@8.1.1)(typescript@5.9.2)(vite@7.1.11(@types/node@22.13.14)(jiti@2.5.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1)):
     dependencies:
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@8.1.1)
       globrex: 0.1.2
       tsconfck: 3.0.3(typescript@5.9.2)
     optionalDependencies:

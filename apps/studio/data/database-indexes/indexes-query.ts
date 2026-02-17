@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-
-import { getIndexesSQL } from 'data/sql/queries/get-indexes'
 import { UseCustomQueryOptions } from 'types'
+
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { getIndexesSQL } from './database-indexes.sql'
 import { databaseIndexesKeys } from './keys'
 
 type GetIndexesArgs = {
