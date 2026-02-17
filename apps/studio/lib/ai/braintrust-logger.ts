@@ -3,7 +3,9 @@ import { initLogger } from 'braintrust'
 const BRAINTRUST_API_KEY = process.env.BRAINTRUST_API_KEY
 const BRAINTRUST_PROJECT_ID = process.env.BRAINTRUST_PROJECT_ID
 
-export const IS_TRACING_ENABLED = BRAINTRUST_API_KEY !== undefined
+const IS_PRODUCTION = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+
+export const IS_TRACING_ENABLED = BRAINTRUST_API_KEY !== undefined && !IS_PRODUCTION
 
 export const TRACING_ENVIRONMENT_TAG = process.env.NEXT_PUBLIC_ENVIRONMENT ?? 'unknown'
 
