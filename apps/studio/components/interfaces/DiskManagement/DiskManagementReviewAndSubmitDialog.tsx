@@ -42,10 +42,10 @@ import {
   getAvailableComputeOptions,
   mapAddOnVariantIdToComputeSize,
 } from './DiskManagement.utils'
-import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
+import { DiskManagementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import { DISK_AUTOSCALE_CONFIG_DEFAULTS, DiskType } from './ui/DiskManagement.constants'
-import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
+import { DiskManagementCoolDownSection } from './ui/DiskManagementCoolDownSection'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -286,12 +286,12 @@ export const DiskManagementReviewAndSubmitDialog = ({
         {(hasComputeChanges || hasDiskConfigChanges) && (
           <>
             <div className="flex flex-col gap-2 p-5">
-              <DiskMangementRestartRequiredSection
+              <DiskManagementRestartRequiredSection
                 visible={hasComputeChanges}
                 title="Resizing your Compute will trigger a project restart"
                 description="Project will restart automatically on confirmation."
               />
-              <DiskMangementCoolDownSection visible={hasDiskConfigChanges} />
+              <DiskManagementCoolDownSection visible={hasDiskConfigChanges} />
             </div>
             <DialogSectionSeparator />
           </>

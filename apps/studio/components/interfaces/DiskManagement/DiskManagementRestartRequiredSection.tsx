@@ -3,17 +3,17 @@ import { RotateCcw } from 'lucide-react'
 
 import { DialogSection, WarningIcon } from 'ui'
 
-interface DiskMangementRestartRequiredSectionProps {
+interface DiskManagementRestartRequiredSectionProps {
   visible: boolean
   title: string
   description: string
 }
 
-export const DiskMangementRestartRequiredSection = ({
+export const DiskManagementRestartRequiredSection = ({
   visible,
   title,
   description,
-}: DiskMangementRestartRequiredSectionProps) => {
+}: DiskManagementRestartRequiredSectionProps) => {
   return (
     <AnimatePresence>
       {visible && (
