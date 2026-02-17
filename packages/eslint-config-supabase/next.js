@@ -64,6 +64,17 @@ module.exports = defineConfig([
     rules: {
       '@next/next/no-html-link-for-pages': 'off',
       'react/jsx-key': 'off',
+      'no-restricted-imports': [
+        'warn',
+        {
+          name: 'react-data-grid',
+          message: 'Please use @tanstack/react-table instead.',
+        },
+        {
+          name: 'react-contexify',
+          message: 'Please use ContextMenu from the ui package instead.',
+        },
+      ],
     },
   },
   {
