@@ -12,7 +12,7 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
           Sponsored Projects
         </h2>
         <p className="text-foreground-lighter mb-4 max-w-sm">
-          We don't just live and breath open-source, we also sponsor projects we love.
+          We don't just live and breathe open-source, we also sponsor projects we love.
         </p>
       </div>
       <div className="relative w-full h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -33,7 +33,7 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="fill-foreground-lighter grouopp-hover:fill-foreground"
+                    className="fill-foreground-lighter group-hover:fill-foreground"
                   >
                     <path
                       fillRule="evenodd"
