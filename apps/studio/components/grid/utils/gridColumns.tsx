@@ -19,11 +19,11 @@ import { AddColumn } from '../components/grid/AddColumn'
 import { ColumnHeader } from '../components/grid/ColumnHeader'
 import { SelectColumn } from '../components/grid/SelectColumn'
 import {
+  isPendingAddRow,
   type ColumnType,
   type SupaColumn,
   type SupaRow,
   type SupaTable,
-  isPendingAddRow,
 } from '../types'
 import {
   isArrayColumn,
@@ -72,7 +72,7 @@ export function getGridColumns(
       sortable: true,
       width: columnWidth,
       minWidth: COLUMN_MIN_WIDTH,
-      frozen: x.isPrimaryKey || false,
+      frozen: false,
       isLastFrozenColumn: false,
       renderHeaderCell: (props) => (
         <ColumnHeader

@@ -1,39 +1,10 @@
-import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
-import type PostTypes from 'types/post'
 
-// Extend PostTypes for CMS blog posts
-interface CMSPostTypes extends PostTypes {
-  isCMS?: boolean
-  authors?: Array<{
-    author: string
-    author_id: string
-    position: string
-    author_url: string
-    author_image_url: {
-      url: string
-    }
-    username: string
-  }>
-}
+import authors from '@/lib/authors.json'
+import type PostTypes from '@/types/post'
 
-function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
-  // First check if this is a CMS post
-  if ('isCMS' in blog && blog.isCMS) {
-    // For CMS posts, display author directly from the blog data
-    const cmsBlog = blog as CMSPostTypes
-    const author =
-      cmsBlog.authors?.map((author) => ({
-        author: author.author || 'Unknown Author',
-        author_image_url: author.author_image_url || null,
-        author_url: author.author_url || '#',
-        position: author.position || '',
-      })) || []
-
-    return renderFeaturedThumb(blog, author)
-  }
-
+function FeaturedThumb(blog: PostTypes) {
   // For static posts, look up author info from authors.json
   const authorArray = blog.author?.split(',').map((a) => a.trim()) || []
   const author = []
@@ -56,11 +27,10 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
     return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
   }
 
-  const imageUrl = blog.isCMS
-    ? blog.imgThumb || blog.imgSocial || '/images/blog/blog-placeholder.png'
-    : resolveImagePath(blog.imgThumb) ||
-      resolveImagePath(blog.imgSocial) ||
-      '/images/blog/blog-placeholder.png'
+  const imageUrl =
+    resolveImagePath(blog.imgThumb) ||
+    resolveImagePath(blog.imgSocial) ||
+    '/images/blog/blog-placeholder.png'
 
   return (
     <div key={blog.slug} className="w-full">

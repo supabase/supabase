@@ -22,6 +22,7 @@ export type FilterConditionProps = {
   path: number[]
   isActive: boolean
   isOperatorActive: boolean
+  isHighlighted: boolean
 }
 
 export function FilterCondition({
@@ -29,6 +30,7 @@ export function FilterCondition({
   path,
   isActive,
   isOperatorActive,
+  isHighlighted,
 }: FilterConditionProps) {
   const {
     filters: rootFilters,
@@ -56,19 +58,25 @@ export function FilterCondition({
   const [showValueCustom, setShowValueCustom] = useState(false)
   const [hasTypedOperator, setHasTypedOperator] = useState(false)
   const [hasTypedValue, setHasTypedValue] = useState(false)
+  const [localValue, setLocalValue] = useState((condition.value ?? '').toString())
+
+  const conditionValue = (condition.value ?? '').toString()
 
   // Reset "has typed" state when focus changes
   useEffect(() => {
-    if (!isOperatorActive) {
-      setHasTypedOperator(false)
-    }
-  }, [isOperatorActive, setHasTypedOperator])
+    if (!isOperatorActive) setHasTypedOperator(false)
+  }, [isOperatorActive])
 
   useEffect(() => {
-    if (!isActive) {
-      setHasTypedValue(false)
+    if (!isActive) setHasTypedValue(false)
+  }, [isActive])
+
+  // Sync local value with condition.value when it changes externally (e.g., dropdown selection)
+  useEffect(() => {
+    if (localValue !== conditionValue) {
+      setLocalValue(conditionValue)
     }
-  }, [isActive, setHasTypedValue])
+  }, [conditionValue])
 
   useEffect(() => {
     if (isActive && valueRef.current) {
@@ -106,7 +114,7 @@ export function FilterCondition({
         filterProperties,
         propertyOptionsCache,
         loadingOptions,
-        (condition.value ?? '').toString(),
+        conditionValue,
         hasTypedValue
       ),
     [
@@ -115,7 +123,7 @@ export function FilterCondition({
       filterProperties,
       propertyOptionsCache,
       loadingOptions,
-      condition.value,
+      conditionValue,
       hasTypedValue,
     ]
   )
@@ -194,6 +202,7 @@ export function FilterCondition({
   const onValueChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setHasTypedValue(true)
+      setLocalValue(e.target.value)
       handleInputChange(path, e.target.value)
     },
     [handleInputChange, path]
@@ -210,8 +219,11 @@ export function FilterCondition({
       ref={wrapperRef}
       className={cn(
         'flex items-stretch px-0 bg-muted group shrink-0',
-        variant === 'pill' ? 'rounded border' : 'border-r'
+        variant === 'pill' ? 'rounded border' : 'border-r',
+        isHighlighted && 'ring-2 ring-primary'
       )}
+      data-testid={`filter-condition-${property.name}`}
+      data-highlighted={isHighlighted}
     >
       <span
         className="text-xs pl-2 pr-1 cursor-pointer shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center"
@@ -233,6 +245,7 @@ export function FilterCondition({
               className="h-full border-none bg-transparent py-0 px-1 text-center text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-brand w-full absolute left-0 top-0"
               disabled={isLoading}
               aria-label={`Operator for ${property.label}`}
+              data-testid={`filter-operator-${property.name}`}
             />
             <span className="invisible whitespace-pre text-xs block px-1 shrink-0 px-1">
               {condition.operator || ' '}
@@ -257,6 +270,7 @@ export function FilterCondition({
             highlightedIndex={opHighlightedIndex}
             onSelect={handleSelectMenuItem}
             includeIcon={false}
+            grouped
           />
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
@@ -266,7 +280,7 @@ export function FilterCondition({
             <Input_Shadcn_
               ref={valueRef}
               type="text"
-              value={(condition.value ?? '').toString()}
+              value={localValue}
               onChange={onValueChange}
               onFocus={() => handleInputFocus(path)}
               onBlur={handleValueBlur}
@@ -274,10 +288,9 @@ export function FilterCondition({
               className="h-full border-none bg-transparent py-0 px-1 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
               disabled={isLoading}
               aria-label={`Value for ${property.label}`}
+              data-testid={`filter-value-${property.name}`}
             />
-            <span className="invisible whitespace-pre text-xs block px-1">
-              {(condition.value ?? '').toString() || ' '}
-            </span>
+            <span className="invisible whitespace-pre text-xs block px-1">{localValue || ' '}</span>
           </div>
         </PopoverAnchor_Shadcn_>
         <PopoverContent_Shadcn_
@@ -306,7 +319,7 @@ export function FilterCondition({
                 setShowValueCustom(false)
                 onRemove()
               },
-              search: (condition.value ?? '').toString(),
+              search: conditionValue,
             })
           ) : (
             <DefaultCommandList
@@ -334,6 +347,7 @@ export function FilterCondition({
         className="group hover:text-foreground hover:!bg-surface-600 rounded-none px-1 h-auto py-0"
         aria-label={`Remove ${property.label} filter`}
         tabIndex={-1}
+        data-testid={`filter-remove-${property.name}`}
       />
     </div>
   )

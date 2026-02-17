@@ -97,12 +97,7 @@ export const Grid = memo(
 
       const { mutate: sendEvent } = useSendEventMutation()
 
-      const {
-        isValidFile: isValidFileDraggedOver,
-        isDraggedOver,
-        onDragOver,
-        onFileDrop,
-      } = useCsvFileDrop({
+      const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
         enabled: isTableEmpty && !isForeignTable,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => {
@@ -230,29 +225,34 @@ export const Grid = memo(
 
       return (
         <div
+          data-testid="table-editor-grid-container"
           className={cn('flex flex-col relative transition-colors', containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
+          onDragOver={onDragOver}
+          onDragLeave={onDragOver}
+          onDrop={onFileDrop}
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute top-9 p-2 w-full z-[1]',
-                isTableEmpty && isDraggedOver && 'border-2 border-dashed',
-                isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none'
               )}
-              onDragOver={onDragOver}
-              onDragLeave={onDragOver}
-              onDrop={onFileDrop}
             >
-              {isLoading && !isDisabled && <GenericSkeletonLoader />}
+              {isLoading && !isDisabled && (
+                <GenericSkeletonLoader className="w-full top-9 absolute p-2" />
+              )}
 
-              {isError && <GridError error={error} />}
+              {isError && (
+                <div className="w-full top-9 absolute p-2 pointer-events-auto">
+                  <GridError error={error} />
+                </div>
+              )}
 
               {isSuccess && (
                 <>
                   {page > 1 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light">This page does not have any data</p>
                       <div className="flex items-center space-x-2 mt-4">
                         <Button
@@ -265,18 +265,13 @@ export const Grid = memo(
                       </div>
                     </div>
                   ) : (filters ?? []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light pointer-events-auto">
-                        {isDraggedOver ? (
-                          isValidFileDraggedOver ? (
-                            'Drop your CSV file here'
-                          ) : (
-                            <span className="text-destructive">Only CSV files are accepted</span>
-                          )
-                        ) : (
-                          'This table is empty'
-                        )}
-                      </p>
+                    <div
+                      className={cn(
+                        'flex flex-col items-center justify-center w-full h-full mt-9 transition',
+                        isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand'
+                      )}
+                    >
+                      <p className="text-sm text-light pointer-events-auto">This table is empty</p>
                       {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
                         <div className="flex items-center space-x-2 mt-4">
                           <p className="text-sm text-light pointer-events-auto">
@@ -285,34 +280,32 @@ export const Grid = memo(
                           </p>
                         </div>
                       ) : (
-                        !isDraggedOver && (
-                          <div className="flex flex-col items-center gap-4 mt-4">
-                            <Button
-                              type="default"
-                              className="pointer-events-auto"
-                              onClick={() => {
-                                tableEditorSnap.onImportData()
-                                sendEvent({
-                                  action: 'import_data_button_clicked',
-                                  properties: { tableType: 'Existing Table' },
-                                  groups: {
-                                    project: project?.ref ?? 'Unknown',
-                                    organization: org?.slug ?? 'Unknown',
-                                  },
-                                })
-                              }}
-                            >
-                              Import data from CSV
-                            </Button>
-                            <p className="text-xs text-foreground-light pointer-events-auto">
-                              or drag and drop a CSV file here
-                            </p>
-                          </div>
-                        )
+                        <div className="flex flex-col items-center gap-4 mt-4">
+                          <Button
+                            type="default"
+                            className="pointer-events-auto"
+                            onClick={() => {
+                              tableEditorSnap.onImportData()
+                              sendEvent({
+                                action: 'import_data_button_clicked',
+                                properties: { tableType: 'Existing Table' },
+                                groups: {
+                                  project: project?.ref ?? 'Unknown',
+                                  organization: org?.slug ?? 'Unknown',
+                                },
+                              })
+                            }}
+                          >
+                            Import data from CSV
+                          </Button>
+                          <p className="text-xs text-foreground-light pointer-events-auto">
+                            or drag and drop a CSV file here
+                          </p>
+                        </div>
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light pointer-events-auto">
                         The filters applied have returned no results from this table
                       </p>
