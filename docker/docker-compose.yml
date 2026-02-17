@@ -277,11 +277,11 @@ services:
       # Top-level namespace for all storage operations (always required)
       GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
       # S3 Backend configuration
-      # GLOBAL_S3_ENDPOINT: https://your-s3-endpoint
-      # GLOBAL_S3_PROTOCOL: https
-      # GLOBAL_S3_FORCE_PATH_STYLE: true
-      # AWS_ACCESS_KEY_ID: your-access-key
-      # AWS_SECRET_ACCESS_KEY: your-secret-key
+      #GLOBAL_S3_ENDPOINT: https://your-s3-endpoint
+      #GLOBAL_S3_PROTOCOL: https
+      #GLOBAL_S3_FORCE_PATH_STYLE: true
+      #AWS_ACCESS_KEY_ID: your-access-key
+      #AWS_SECRET_ACCESS_KEY: your-secret-key
       FILE_STORAGE_BACKEND_PATH: /var/lib/storage
       TENANT_ID: ${STORAGE_TENANT_ID}
       # TODO: https://github.com/supabase/storage-api/issues/55

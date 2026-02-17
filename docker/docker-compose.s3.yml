@@ -2,7 +2,7 @@ services:
 
   minio:
     image: cgr.dev/chainguard/minio
-    # ports:
+    #ports:
     #  - '9000:9000'
     #  - '9001:9001'
     environment:
@@ -42,6 +42,8 @@ services:
         condition: service_started
       minio-createbucket:
         condition: service_completed_successfully
+      minio:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -72,7 +74,7 @@ services:
       GLOBAL_S3_FORCE_PATH_STYLE: true
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
-      # FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      #FILE_STORAGE_BACKEND_PATH: /var/lib/storage
       TENANT_ID: ${STORAGE_TENANT_ID}
       # TODO: https://github.com/supabase/storage-api/issues/55
       REGION: ${REGION}
@@ -81,5 +83,5 @@ services:
       # S3 protocol endpoint configuration
       S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID}
       S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET}
-    # volumes:
-    #   - ./volumes/storage:/var/lib/storage:z
+    #volumes:
+    #  - ./volumes/storage:/var/lib/storage:z
