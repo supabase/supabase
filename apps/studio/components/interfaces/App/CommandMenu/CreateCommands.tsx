@@ -325,7 +325,9 @@ export function useCreateCommands(options?: CommandOptions) {
     return sortedIntegrations
       .map((integration) => {
         const route = getIntegrationRoute(integration, ref, installedIntegrationIds)
-        if (!route) return null
+        const isDataApi = integration.id === 'data_api'
+        const isGraphiql = integration.id === 'graphiql'
+        if (!route || isDataApi || isGraphiql) return null
 
         const isWrapper = integration.type === 'wrapper'
 
@@ -350,10 +352,6 @@ export function useCreateCommands(options?: CommandOptions) {
               return <Webhook />
             case 'queues':
               return <Layers />
-            case 'graphiql':
-              return <Graphql />
-            case 'data_api':
-              return <Code2 />
             default:
               // Fallback to integration icon for other Postgres modules
               return integration.icon()
