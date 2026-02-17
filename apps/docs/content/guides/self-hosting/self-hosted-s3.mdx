@@ -54,7 +54,7 @@ storage:
     REGION: your-aws-region
 ```
 
-For AWS S3, you do not need `GLOBAL_S3_ENDPOINT` or `GLOBAL_S3_FORCE_PATH_STYLE` - the defaults work with standard AWS endpoints.
+For AWS S3, you do not need `GLOBAL_S3_ENDPOINT` or `GLOBAL_S3_FORCE_PATH_STYLE` - the Storage S3 client automatically resolves the endpoint from the region and uses virtual-hosted-style URLs, which is what AWS S3 expects. These variables are only needed for non-AWS S3-compatible providers.
 
 ### S3-compatible providers
 
@@ -119,7 +119,7 @@ If resumable (TUS) uploads fail with HTTP 500 and a message about `x-amz-tagging
 
 ### Permission denied on uploads
 
-Setting a bucket to "Public" only allows unauthenticated **downloads**. Uploads are always blocked unless you create an RLS policy on the `storage.objects` table. Go to Storage > Files > Policies in Studio and create a policy that allows `INSERT` for the appropriate roles.
+Setting a bucket to "Public" only allows unauthenticated **downloads**. Uploads are always blocked unless you create an RLS policy on the `storage.objects` table. Go to **Storage** > **Files** > **Policies** in Studio and create a policy that allows `INSERT` for the appropriate roles.
 
 ### Upload URLs point to localhost
 
