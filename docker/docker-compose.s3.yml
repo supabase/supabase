@@ -30,7 +30,8 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.37.1
+    image: supabase/storage-api:v1.37.8
+    restart: unless-stopped
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -54,7 +55,6 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
-    restart: unless-stopped
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
