@@ -170,7 +170,7 @@ export const FRAMEWORKS: ConnectionType[] = [
   },
   {
     key: 'vuejs',
-    label: 'Vue.JS',
+    label: 'Vue.js',
     icon: 'vuejs',
     guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/vue`,
     children: [
@@ -383,7 +383,7 @@ export const CONNECTION_TYPES = [
 ]
 
 export const PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT =
-  'Purchase IPv4 add-on or use Shared Pooler if on a IPv4 network'
+  'Purchase IPv4 add-on or use Shared Pooler if on an IPv4 network'
 export const IPV4_ADDON_TEXT = 'Connections are IPv4 proxied with IPv4 add-on'
 
 export type ConnectionStringMethod = 'direct' | 'transaction' | 'session'
