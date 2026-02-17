@@ -4,29 +4,26 @@ import {
   INSTALLATION_INSTALLED_SUFFIX,
   INSTALLATION_STARTED_SUFFIX,
   STRIPE_SCHEMA_COMMENT_PREFIX,
-  UNINSTALLATION_ERROR_SUFFIX,
-  UNINSTALLATION_STARTED_SUFFIX,
 } from 'stripe-experiment-sync/supabase'
 
 import type { StripeInstallationStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync'
 
-/**
- * Find the stripe schema from a list of schemas
- */
+// TODO: The current version of the package 'stripe-experiment-sync' doesn't export
+// these constants, but we plan to export them in future version. For now we 
+// declare the same constants here to deploy this code without waiting for 
+// a new version. We'll import them when we bump 'stripe-experiment-sync' package
+// version.
+const UNINSTALLATION_STARTED_SUFFIX = 'uninstallation:started'
+const UNINSTALLATION_ERROR_SUFFIX = 'uninstallation:error'
+
 export function findStripeSchema(schemas: Schema[] | undefined): Schema | undefined {
   return schemas?.find((s) => s.name === 'stripe')
 }
 
-/**
- * Check if a schema comment indicates it was created by the Stripe Sync integration
- */
 function isStripeSyncSchema(schema: Schema | undefined): boolean {
   return !!schema?.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX)
 }
 
-/**
- * Check if a schema comment includes a specific status suffix
- */
 function hasStatusSuffix(schema: Schema | undefined, suffix: string): boolean {
   return isStripeSyncSchema(schema) && !!schema?.comment?.endsWith(suffix)
 }
