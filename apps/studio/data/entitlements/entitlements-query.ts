@@ -17,12 +17,17 @@ export type EntitlementConfig =
 export type Entitlement = components['schemas']['ListEntitlementsResponse']['entitlements'][0]
 export type EntitlementType = Entitlement['type']
 
-export async function getEntitlements({ slug }: EntitlementsVariables, signal?: AbortSignal) {
+export async function getEntitlements(
+  { slug }: EntitlementsVariables,
+  signal?: AbortSignal,
+  headers?: HeadersInit
+) {
   if (!slug) throw new Error('slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/entitlements', {
     params: { path: { slug } },
     signal,
+    ...(headers && { headers }),
   })
   if (error) handleError(error)
 
@@ -39,9 +44,10 @@ export type EntitlementsError = ResponseError
 export async function checkEntitlement(
   slug: string,
   featureKey: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ): Promise<{ hasAccess: boolean; entitlement?: Entitlement }> {
-  const entitlements = await getEntitlements({ slug }, signal)
+  const entitlements = await getEntitlements({ slug }, signal, headers)
 
   const entitlement = entitlements.entitlements.find((e) => e.feature.key === (featureKey as any))
 
