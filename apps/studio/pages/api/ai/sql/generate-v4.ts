@@ -12,6 +12,7 @@ import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getTools } from 'lib/ai/tools'
 import { getURL } from 'lib/helpers'
 import apiWrapper from 'lib/api/apiWrapper'
+import { fetchUserClaims } from 'lib/api/apiAuthenticate'
 import { executeQuery } from 'lib/api/self-hosted/query'
 
 export const maxDuration = 120
@@ -86,6 +87,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       .json({ error: 'Invalid request body', message: messagesValidation.error.message })
   }
   const messages = messagesValidation.data
+
+  // NOTE: apiWrapper already calls fetchUserClaims for auth, but doesn't pass
+  // claims to the handler. Could optimize later by threading claims through apiWrapper.
+  const userId = IS_PLATFORM ? (await fetchUserClaims(req)).sub : undefined
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
@@ -187,6 +192,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       projectRef,
       chatName,
       isHipaaEnabled,
+      userId,
       orgId,
       planId,
       promptProviderOptions,
