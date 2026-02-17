@@ -1,3 +1,7 @@
+import type {
+  StripeSyncState,
+  StripeSyncStateData,
+} from 'data/database-integrations/stripe/sync-state-query'
 import type { Schema } from 'data/database/schemas-query'
 import {
   INSTALLATION_ERROR_SUFFIX,
@@ -6,8 +10,27 @@ import {
   STRIPE_SCHEMA_COMMENT_PREFIX,
 } from 'stripe-experiment-sync/supabase'
 
-import type { StripeInstallationStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync'
-import { StripeSyncStateData } from '@/data/database-integrations/stripe/sync-state-query'
+/**
+ * All possible Stripe Sync installation states.
+ */
+export type StripeInstallationStatus =
+  | 'installing'
+  | 'installed'
+  | 'install_error'
+  | 'uninstalling'
+  | 'uninstalled'
+  | 'uninstall_error'
+
+/**
+ * Complete Stripe Sync status including schema, installation state, and sync state
+ */
+export interface StripeSyncStatusResult {
+  /** The installation status */
+  installationStatus: StripeInstallationStatus
+
+  /** Current sync run state (only available when installationStatus is installed) */
+  syncState: StripeSyncState | undefined
+}
 
 // TODO: The current version of the package 'stripe-experiment-sync' doesn't export
 // these constants, but we plan to export them in future version. For now we

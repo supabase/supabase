@@ -29,11 +29,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
+import { canInstall as checkCanInstall, isSyncRunning } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
-import {
-  canInstall as checkCanInstall,
-  isSyncRunning,
-} from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 const installFormSchema = z.object({

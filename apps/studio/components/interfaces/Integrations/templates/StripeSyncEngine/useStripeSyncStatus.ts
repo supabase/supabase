@@ -2,12 +2,12 @@ import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-st
 import { SchemasVariables, useSchemasQuery } from 'data/database/schemas-query'
 import { useEffect } from 'react'
 
-import type { StripeSyncStatusResult } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync'
 import {
   findStripeSchema,
   isInProgress,
   isInstalled,
   parseStripeSchemaStatus,
+  type StripeSyncStatusResult,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 
 /**
