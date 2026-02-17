@@ -325,9 +325,7 @@ export function useCreateCommands(options?: CommandOptions) {
     return sortedIntegrations
       .map((integration) => {
         const route = getIntegrationRoute(integration, ref, installedIntegrationIds)
-        const isDataApi = integration.id === 'data_api'
-        const isGraphiql = integration.id === 'graphiql'
-        if (!route || isDataApi || isGraphiql) return null
+        if (!route) return null
 
         const isWrapper = integration.type === 'wrapper'
 
