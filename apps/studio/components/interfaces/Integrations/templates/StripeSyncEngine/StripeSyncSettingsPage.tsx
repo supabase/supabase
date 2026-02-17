@@ -25,7 +25,6 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { statusIs } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 export const StripeSyncSettingsPage = () => {
@@ -38,9 +37,8 @@ export const StripeSyncSettingsPage = () => {
     connectionString: project?.connectionString,
   })
 
-  const status = installationStatus.status
-  const isInstalled = status === 'installed'
-  const uninstallInProgress = statusIs(installationStatus, 'uninstalling', 'uninstall_error')
+  const isInstalled = installationStatus === 'installed'
+  const uninstallInProgress = installationStatus === 'uninstalling'
 
   const { mutate: uninstallStripeSync, isPending: isUninstalling } = useStripeSyncUninstallMutation(
     {

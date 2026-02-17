@@ -30,10 +30,7 @@ import * as z from 'zod'
 
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
-import {
-  canInstall as checkCanInstall,
-  statusIs,
-} from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
+import { canInstall as checkCanInstall } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 const installFormSchema = z.object({
@@ -68,13 +65,11 @@ export const StripeSyncInstallationPage = () => {
     connectionString: project?.connectionString,
   })
 
-  const status = installationStatus.status
-  const isInstalled = status === 'installed'
-  const setupError = status === 'install_error'
-  const uninstallError = status === 'uninstall_error'
-  const schemaShowsInProgress = status === 'installing'
-  const schemaShowsUninstallInProgress = status === 'uninstalling'
-  const hasConflictingSchema = installationStatus.hasConflictingSchema
+  const isInstalled = installationStatus === 'installed'
+  const setupError = installationStatus === 'install_error'
+  const uninstallError = installationStatus === 'uninstall_error'
+  const schemaShowsInProgress = installationStatus === 'installing'
+  const schemaShowsUninstallInProgress = installationStatus === 'uninstalling'
 
   const {
     mutate: installStripeSync,
