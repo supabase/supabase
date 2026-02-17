@@ -18,7 +18,7 @@ const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => r
 const LW_TABLE = 'lwx_tickets'
 const LW_MATERIALIZED_VIEW = 'lwx_tickets_golden'
 
-const STYLING_CONGIF = {
+const STYLING_CONFIG = {
   regular: {
     BACKGROUND: '#303030',
     FOREGROUND: '#F8F9FA',
@@ -116,8 +116,8 @@ export async function handler(req: Request) {
               width: '1200px',
               height: '628px',
               position: 'relative',
-              backgroundColor: STYLING_CONGIF[ticketType].BACKGROUND,
-              color: STYLING_CONGIF[ticketType].FOREGROUND,
+              backgroundColor: STYLING_CONFIG[ticketType].BACKGROUND,
+              color: STYLING_CONFIG[ticketType].FOREGROUND,
               fontFamily: '"Circular"',
               overflow: 'hidden',
               display: 'flex',
@@ -161,7 +161,7 @@ export async function handler(req: Request) {
             >
               <p
                 style={{
-                  color: STYLING_CONGIF[ticketType].FOREGROUND,
+                  color: STYLING_CONFIG[ticketType].FOREGROUND,
                   margin: '0',
                   padding: '0',
                   fontSize: '44',
@@ -176,7 +176,7 @@ export async function handler(req: Request) {
               {/* Username */}
               <div
                 style={{
-                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                  color: STYLING_CONFIG[ticketType].FOREGROUND_LIGHT,
                   opacity: 0.8,
                   display: 'flex',
                   fontSize: '38',
@@ -211,7 +211,7 @@ export async function handler(req: Request) {
               {/* Ticket No  */}
               <p
                 style={{
-                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                  color: STYLING_CONFIG[ticketType].FOREGROUND_LIGHT,
                   margin: '0',
                   marginBottom: '5',
                   display: 'flex',
