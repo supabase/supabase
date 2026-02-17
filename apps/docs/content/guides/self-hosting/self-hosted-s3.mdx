@@ -1,0 +1,131 @@
+---
+title: 'Configure S3 Storage'
+description: 'Set up an S3 backend and enable the S3-compatible client endpoint for self-hosted Supabase Storage.'
+subtitle: 'Set up an S3 backend and enable the S3-compatible client endpoint for self-hosted Supabase Storage.'
+---
+
+Self-hosted Supabase Storage has two independent S3-related features:
+
+- **S3 backend** - where Storage keeps data. By default, files are stored on the local filesystem. You can switch to an S3-compatible service (AWS S3, MinIO, etc.) for durability, scalability, or to use existing infrastructure.
+- **S3 protocol endpoint** - an S3-compatible API that Storage exposes at `/storage/v1/s3`. This allows standard S3 tools like `rclone` and the AWS CLI to interact with your Storage instance.
+
+## How to configure an S3 backend
+
+In general, the following configuration variables define S3 backend configuration for Storage in `docker-compose.yml`:
+
+```yaml
+storage:
+  environment:
+    # ... existing variables ...
+    STORAGE_BACKEND: s3
+    GLOBAL_S3_BUCKET: your-bucket-name
+    GLOBAL_S3_ENDPOINT: https://your-s3-endpoint
+    GLOBAL_S3_PROTOCOL: https
+    GLOBAL_S3_FORCE_PATH_STYLE: "true"
+    AWS_ACCESS_KEY_ID: your-access-key
+    AWS_SECRET_ACCESS_KEY: your-secret-key
+    REGION: your-region
+```
+
+Depending on your setup, you may need to adjust these values - for example, to use a local S3-compatible service like MinIO or a cloud provider like AWS.
+
+### Using MinIO
+
+An overlay `docker-compose.s3.yml` configuration can be added to enable MinIO container and provide an S3-compatible API for Storage backend:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.s3.yml up -d
+```
+
+Make sure to review the Storage section in your `.env` file for related configuration options.
+
+### Using AWS S3
+
+Create an S3 bucket and an IAM user with access to it. Then configure the storage service:
+
+```yaml docker-compose.yml
+storage:
+  environment:
+    # ... existing variables ...
+    STORAGE_BACKEND: s3
+    GLOBAL_S3_BUCKET: your-aws-bucket-name
+    AWS_ACCESS_KEY_ID: your-aws-access-key
+    AWS_SECRET_ACCESS_KEY: your-aws-secret-key
+    REGION: your-aws-region
+```
+
+For AWS S3, you do not need `GLOBAL_S3_ENDPOINT` or `GLOBAL_S3_FORCE_PATH_STYLE` - the defaults work with standard AWS endpoints.
+
+### S3-compatible providers
+
+Use the same configuration as MinIO, but point to your provider's endpoint, e.g.:
+
+```yaml
+storage:
+  environment:
+    # ... existing variables ...
+    STORAGE_BACKEND: s3
+    GLOBAL_S3_BUCKET: your-bucket-name
+    GLOBAL_S3_ENDPOINT: https://your-account-id.r2.cloudflarestorage.com
+```
+
+## Enable the S3 protocol endpoint
+
+The S3 protocol endpoint at `/storage/v1/s3` allows standard S3 clients interact with your self-hosted Storage instance. The Supabase REST API and SDK do not use the S3 protocol.
+
+Make sure to check that `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` are properly configured in you `.env` file. Read more about the secrets and passwords in [Configuring and securing Supabase](https://supabase.com/docs/guides/self-hosting/docker#configuring-and-securing-supabase).
+
+```yaml
+storage:
+  environment:
+    # ... existing variables ...
+    S3_PROTOCOL_ACCESS_KEY_ID: your-generated-access-key-id
+    S3_PROTOCOL_ACCESS_KEY_SECRET: your-generated-access-key-secret
+```
+
+### Test with the AWS CLI
+
+```bash
+aws s3 ls \
+  --endpoint-url http://localhost:8000/storage/v1/s3 \
+  --region us-east-1 \
+  s3://your-bucket-name \
+  --no-sign-request=false
+```
+
+Use the `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` values when prompted, or configure them in `~/.aws/credentials` (to use with the `--profile` command line option):
+
+```ini ~/.aws/credentials
+[selfhosted]
+aws_access_key_id = your-generated-access-key-id
+aws_secret_access_key = your-generated-access-key-secret
+```
+
+## Verify
+
+1. Open Studio and upload a file to a bucket.
+2. If using an S3 backend: confirm the file appears in your S3 provider's console.
+3. If you enabled the S3 protocol: list the file using the AWS CLI or rclone to confirm the endpoint works.
+
+## Troubleshooting
+
+### Signature mismatch errors
+
+S3 clients sign requests using the access key ID and secret. If you see `SignatureDoesNotMatch`, verify that the `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` in your `.env` file match what your S3 client is using. Restart storage after any changes.
+
+### TUS upload errors on Cloudflare R2
+
+If resumable (TUS) uploads fail with HTTP 500 and a message about `x-amz-tagging`, add `TUS_ALLOW_S3_TAGS: "false"` to the storage service environment. Cloudflare R2 does not implement this S3 feature.
+
+### Permission denied on uploads
+
+Setting a bucket to "Public" only allows unauthenticated **downloads**. Uploads are always blocked unless you create an RLS policy on the `storage.objects` table. Go to Storage > Files > Policies in Studio and create a policy that allows `INSERT` for the appropriate roles.
+
+### Upload URLs point to localhost
+
+If uploads from a browser fail (CORS or mixed content errors), check that `API_EXTERNAL_URL` and `SUPABASE_PUBLIC_URL` in your `.env` file match your actual domain and protocol - not `http://localhost:8000`.
+
+### Additional resources
+
+- [Storage repository `.env.sample`](https://github.com/supabase/storage/blob/master/.env.sample)
+- [S3 Authentication](/docs/guides/storage/s3/authentication)
