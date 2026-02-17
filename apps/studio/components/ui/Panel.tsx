@@ -137,7 +137,7 @@ const PanelNotice = forwardRef<
         {href && (
           <Button size="tiny" type="default" className="text-xs" asChild>
             <a href={href} target="_blank" rel="noreferrer noopener">
-              {buttonText ?? 'Read the accouncement'}
+              {buttonText ?? 'Read the announcement'}
             </a>
           </Button>
         )}
