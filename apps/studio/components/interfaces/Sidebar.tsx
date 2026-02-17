@@ -82,6 +82,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
       {!hideSideBar && (
         <SidebarMotion
           {...props}
+          className={cn('z-50', className)}
           transition={{ delay: 0.4, duration: 0.4 }}
           overflowing={sidebarBehaviour === 'expandable'}
           collapsible="icon"
