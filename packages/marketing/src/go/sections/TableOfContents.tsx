@@ -7,8 +7,8 @@ function slugify(text: string) {
   let slug = text
     .toLowerCase()
     .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+    .replace(/\s/g, '-')
+    .replace(/-{2,}/g, '-')
     .trim()
   if (/^\d/.test(slug)) slug = `section-${slug}`
   return slug

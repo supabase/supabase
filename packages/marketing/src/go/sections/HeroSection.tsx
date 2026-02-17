@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 
 import type { GoHeroSection } from '../schemas'
 import MediaBlock from './MediaBlock'
@@ -16,23 +16,22 @@ export default function HeroSection({
 
   return (
     <header
-      className={
-        compact
-          ? 'flex flex-col items-center justify-center border-b border-muted min-h-[50vh]'
-          : 'flex flex-col border-b border-muted'
-      }
-      style={{
-        background: 'radial-gradient(circle at 50% 280%, hsl(var(--brand-300)), transparent 70%)',
-      }}
+      className={cn(
+        'flex flex-col border-b border-muted',
+        'bg-[radial-gradient(circle_at_50%_240%,hsl(var(--brand-300)),transparent_70%)]',
+        'md:bg-[radial-gradient(circle_at_50%_280%,hsl(var(--brand-300)),transparent_70%)]',
+        compact && 'items-center justify-center min-h-[35vh] lg:min-h-[50vh]'
+      )}
     >
       <div
-        className={
+        className={cn(
+          'max-w-[80rem] mx-auto px-8',
           hasMedia
-            ? 'max-w-[80rem] mx-auto grid grid-cols-1 py-16 md:grid-cols-2 gap-24 items-center md:py-32 px-8'
-            : 'max-w-[80rem] mx-auto flex flex-col items-center py-16 gap-4 sm:gap-8 text-center text-balance py-24 px-8'
-        }
+            ? 'grid grid-cols-1 py-16 md:grid-cols-2 gap-10 md:gap-24 items-center md:py-32'
+            : 'flex flex-col items-center py-16 gap-4 sm:gap-8 text-center text-balance py-24'
+        )}
       >
-        <div className={hasMedia ? 'flex flex-col gap-4 sm:gap-6' : 'contents'}>
+        <div className={cn(hasMedia ? 'flex flex-col gap-4 sm:gap-6' : 'contents')}>
           {section.subtitle && (
             <p className="text-sm text-brand-link uppercase font-mono tracking-wider">
               {section.subtitle}
@@ -43,17 +42,16 @@ export default function HeroSection({
           </h1>
           {section.description && (
             <p
-              className={
-                hasMedia
-                  ? 'text-lg leading-relaxed text-foreground-light text-pretty'
-                  : 'text-lg md:text-xl leading-relaxed text-foreground-light md:text-foreground max-w-2xl text-pretty'
-              }
+              className={cn(
+                'text-lg leading-relaxed text-foreground-light text-pretty',
+                !hasMedia && 'md:text-xl md:text-foreground max-w-2xl'
+              )}
             >
               {section.description}
             </p>
           )}
           {section.ctas && section.ctas.length > 0 && (
-            <div className="flex items-center gap-4 pt-2">
+            <div className="flex flex-wrap items-center gap-4 pt-2">
               {section.ctas.map((cta) => (
                 <Button
                   key={cta.href}

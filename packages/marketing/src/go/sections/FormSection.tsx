@@ -126,7 +126,10 @@ export default function FormSection({ section }: { section: GoFormSection }) {
           className="border border-muted rounded-2xl p-6 sm:p-8 flex flex-col gap-6"
         >
           {rows.map((row, rowIndex) => (
-            <div key={rowIndex} className={row.length > 1 ? 'grid grid-cols-2 gap-4' : undefined}>
+            <div
+              key={rowIndex}
+              className={row.length > 1 ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : undefined}
+            >
               {row.map((field) => (
                 <div key={field.name} className="flex flex-col gap-2">
                   <label className="text-sm text-foreground font-medium">{field.label}</label>
