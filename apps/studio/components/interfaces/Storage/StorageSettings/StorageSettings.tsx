@@ -84,7 +84,7 @@ export const StorageSettings = () => {
   const {
     data: config,
     error,
-    isPending: isLoading,
+    isPending: isLoadingProjectStorageConfig,
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
@@ -104,8 +104,16 @@ export const StorageSettings = () => {
   const shouldAutoValidateBucketLimits = sizeLimitCheckCondition === 'auto'
 
   const { data: organization } = useSelectedOrganizationQuery()
-  const { getEntitlementNumericValue, isEntitlementUnlimited } =
-    useCheckEntitlements('storage.max_file_size')
+  const {
+    getEntitlementNumericValue,
+    isEntitlementUnlimited,
+    isLoading: isLoadingMaxFileSizeEntitlement,
+  } = useCheckEntitlements('storage.max_file_size')
+  const {
+    hasAccess: hasAccessToImageTransformations,
+    isLoading: isLoadingImageTransformationEntitlement,
+  } = useCheckEntitlements('storage.image_transformations')
+
   const isFreeTier = organization?.plan.id === 'free'
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
@@ -114,7 +122,7 @@ export const StorageSettings = () => {
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
     unit: StorageSizeUnits.MB,
-    imageTransformationEnabled: !isFreeTier,
+    imageTransformationEnabled: false,
   })
 
   const maxBytes = useMemo(() => {
@@ -125,6 +133,11 @@ export const StorageSettings = () => {
     }
   }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
 
+  const isLoading =
+    isLoadingProjectStorageConfig ||
+    isLoadingPermissions ||
+    isLoadingMaxFileSizeEntitlement ||
+    isLoadingImageTransformationEntitlement
   const FormSchema = z
     .object({
       fileSizeLimit: z.coerce.number(),
@@ -218,10 +231,16 @@ export const StorageSettings = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && config) {
+    if (
+      isSuccess &&
+      config &&
+      !isLoadingMaxFileSizeEntitlement &&
+      !isLoadingImageTransformationEntitlement
+    ) {
       const { fileSizeLimit, features } = config
       const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-      const imageTransformationEnabled = features?.imageTransformation?.enabled ?? !isFreeTier
+      const imageTransformationEnabled =
+        features?.imageTransformation?.enabled ?? hasAccessToImageTransformations
 
       setInitialValues({
         fileSizeLimit: value,
@@ -237,7 +256,7 @@ export const StorageSettings = () => {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, config])
+  }, [isSuccess, config, isLoadingImageTransformationEntitlement, hasAccessToImageTransformations])
 
   return (
     <PageContainer>
@@ -250,7 +269,7 @@ export const StorageSettings = () => {
                 title="Storage settings are not available for self-hosted projects"
                 description="Storage settings are only available for Supabase Platform projects."
               />
-            ) : isLoading || isLoadingPermissions ? (
+            ) : isLoading ? (
               <GenericSkeletonLoader />
             ) : (
               <>
@@ -296,7 +315,9 @@ export const StorageSettings = () => {
                                 <FormControl_Shadcn_>
                                   <Switch
                                     size="large"
-                                    disabled={isFreeTier}
+                                    disabled={
+                                      !hasAccessToImageTransformations || !canUpdateStorageSettings
+                                    }
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                   />
