@@ -1,6 +1,6 @@
 import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useMemo } from 'react'
+import { SchemasVariables, useSchemasQuery } from 'data/database/schemas-query'
+import { useEffect } from 'react'
 
 import type { StripeSyncStatusResult } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync'
 import {
@@ -9,11 +9,6 @@ import {
   isInstalled,
   parseStripeSchemaStatus,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
-
-interface UseStripeSyncStatusOptions {
-  projectRef: string | undefined
-  connectionString: string | undefined | null
-}
 
 /**
  * Unified hook for Stripe Sync installation status.
@@ -31,9 +26,13 @@ interface UseStripeSyncStatusOptions {
 export function useStripeSyncStatus({
   projectRef,
   connectionString,
-}: UseStripeSyncStatusOptions): StripeSyncStatusResult {
-  // Query schemas with conditional polling during transitions
-  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery(
+}: SchemasVariables): StripeSyncStatusResult {
+  // Query schemas once
+  const {
+    data: schemas,
+    isLoading: isSchemasLoading,
+    refetch,
+  } = useSchemasQuery(
     { projectRef, connectionString },
     {
       enabled: !!projectRef,
@@ -42,19 +41,23 @@ export function useStripeSyncStatus({
 
   // Find and parse stripe schema status
   const stripeSchema = findStripeSchema(schemas)
-  const installationStatus = useMemo(() => parseStripeSchemaStatus(stripeSchema), [stripeSchema])
+  const installationStatus = parseStripeSchemaStatus(stripeSchema)
 
   const installed = isInstalled(installationStatus)
   const inProgress = isInProgress(installationStatus)
 
   // Poll schemas during install/uninstall operations
-  useSchemasQuery(
-    { projectRef, connectionString },
-    {
-      refetchInterval: inProgress ? 5000 : false,
-      enabled: !!projectRef && inProgress,
-    }
-  )
+  useEffect(() => {
+    // Return if installation/uninstallation is not in progress
+    // inProgres is likely to be false during initial render
+    if (!inProgress) return
+
+    const interval = setInterval(() => {
+      refetch()
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [inProgress, refetch])
 
   // Query sync state only when installed
   const { data: syncState, isLoading: isSyncStateLoading } = useStripeSyncingState(
@@ -66,9 +69,7 @@ export function useStripeSyncStatus({
   )
 
   // Determine if a sync is currently running
-  const isSyncing = useMemo(() => {
-    return !!syncState && !syncState.closed_at && syncState.status === 'running'
-  }, [syncState])
+  const isSyncing = !!syncState && !syncState.closed_at && syncState.status === 'running'
 
   return {
     installationStatus,
