@@ -16,12 +16,6 @@ import {
  * This hook consolidates all schema querying, status parsing, and polling logic
  * into a single source of truth. It returns a discriminated union status that
  * makes impossible states unrepresentable.
- *
- * Features:
- * - Automatic polling during install/uninstall operations (5s interval)
- * - Sync state polling when installed (4s interval)
- * - Single status discriminated union instead of multiple boolean flags
- * - Derived sync state
  */
 export function useStripeSyncStatus({
   projectRef,
@@ -67,9 +61,6 @@ export function useStripeSyncStatus({
       enabled: !!projectRef && installed,
     }
   )
-
-  // Determine if a sync is currently running
-  const isSyncing = !!syncState && !syncState.closed_at && syncState.status === 'running'
 
   return {
     installationStatus,
