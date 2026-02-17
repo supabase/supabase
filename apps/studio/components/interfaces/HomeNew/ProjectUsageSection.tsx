@@ -251,7 +251,7 @@ export const ProjectUsageSection = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 pt-4 flex-1 h-full overflow-hidden">
+            <CardContent className="p-card flex-1 h-full overflow-hidden">
               <Loading isFullHeight active={isLoading}>
                 <LogsBarChart
                   isFullHeight

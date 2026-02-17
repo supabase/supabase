@@ -1,4 +1,4 @@
-import { sqlKeys } from '../keys'
+import { sqlKeys } from '../sql/keys'
 
 export const LARGEST_SIZE_LIMIT_BUCKETS_COUNT = 50
 
