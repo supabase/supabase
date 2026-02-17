@@ -14,6 +14,8 @@
     "pretypecheck": "next typegen",
     "typecheck": "pnpm run content:build && tsc --noEmit",
     "content:build": "node scripts/generateStaticContent.mjs",
+    "test": "vitest --run",
+    "test:watch": "vitest watch",
     "postbuild": "node ./internals/generate-sitemap.mjs && ./../../scripts/upload-static-assets.sh"
   },
   "dependencies": {
@@ -111,6 +113,8 @@
     "tsconfig": "workspace:*",
     "unist-util-visit-parents": "5.1.3",
     "uuid": "^9.0.1",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "catalog:",
     "zod": "catalog:"
   },
   "license": "MIT"
