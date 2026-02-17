@@ -2,6 +2,8 @@
 title = "'OTP Verification Failures: 'token has expired' or 'otp_expired' errors'"
 topics = [ "auth", "cli" ]
 keywords = []
+database_id = "25eddb73-3cca-485b-b87f-7279dd46b7a7"
+
 [[errors]]
 http_status_code = 403
 message = "Forbidden"
@@ -9,7 +11,6 @@ message = "Forbidden"
 [[errors]]
 code = "otp_expired"
 message = "OTP expired"
-
 ---
 
 When users attempt to exchange One-Time Passwords (OTPs), they may encounter various errors indicating that the token is no longer valid. These include messages like "token has expired or is invalid," "Email link is invalid or has expired," or they might receive '403 Forbidden' HTTP responses on the verification endpoint. Authentication logs often show specific `otp_expired` error codes.

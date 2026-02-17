@@ -6,12 +6,12 @@ import { useMemo, useState, useEffect } from 'react'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { getPgStatMonitorLogsQuery } from '../QueryPerformance.constants'
+import { getSupamonitorLogsQuery } from '../QueryPerformance.constants'
 import {
-  parsePgStatMonitorLogs,
+  parseSupamonitorLogs,
   transformLogsToChartData,
   aggregateLogsByQuery,
-} from './WithMonitor.utils'
+} from './WithSupamonitor.utils'
 import { useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { captureQueryPerformanceError } from '../QueryPerformance.utils'
@@ -21,7 +21,7 @@ import { getErrorMessage } from 'lib/get-error-message'
 
 dayjs.extend(utc)
 
-interface WithMonitorProps {
+interface WithSupamonitorProps {
   dateRange?: {
     period_start: { date: string; time_period: string }
     period_end: { date: string; time_period: string }
@@ -30,13 +30,12 @@ interface WithMonitorProps {
   onDateRangeChange?: (from: string, to: string) => void
 }
 
-export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) => {
+export const WithSupamonitor = ({ dateRange, onDateRangeChange }: WithSupamonitorProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
   const [selectedQuery, setSelectedQuery] = useState<string | null>(null)
 
-  // [kemal]: Fetch pg_stat_monitor logs. This will need to change when we move to the actual extension.
   const effectiveDateRange = useMemo(() => {
     if (dateRange) {
       return {
@@ -45,7 +44,6 @@ export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) 
       }
     }
 
-    // [kemal]: Fallback to default 24 hours
     const end = dayjs.utc()
     const start = end.subtract(24, 'hours')
     return {
@@ -55,30 +53,33 @@ export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) 
   }, [dateRange])
 
   const queryWithTimeRange = useMemo(() => {
-    return getPgStatMonitorLogsQuery(
+    return getSupamonitorLogsQuery(
       effectiveDateRange.iso_timestamp_start,
       effectiveDateRange.iso_timestamp_end
     )
   }, [effectiveDateRange])
 
-  const pgStatMonitorLogs = useLogsQuery(ref as string, {
+  const supamonitorLogs = useLogsQuery(ref as string, {
     sql: queryWithTimeRange,
     iso_timestamp_start: effectiveDateRange.iso_timestamp_start,
     iso_timestamp_end: effectiveDateRange.iso_timestamp_end,
   })
 
-  const { logData, isLoading: isLogsLoading, error: logsError } = pgStatMonitorLogs
+  const { logData, isLoading: isLogsLoading, error: logsError } = supamonitorLogs
 
   const parsedLogs = useMemo(() => {
-    return parsePgStatMonitorLogs(logData || [])
+    const result = parseSupamonitorLogs(logData || [])
+    return result
   }, [logData])
 
   const chartData = useMemo(() => {
-    return transformLogsToChartData(parsedLogs)
+    const result = transformLogsToChartData(parsedLogs)
+    return result
   }, [parsedLogs])
 
   const aggregatedGridData = useMemo(() => {
-    return aggregateLogsByQuery(parsedLogs)
+    const result = aggregateLogsByQuery(parsedLogs)
+    return result
   }, [parsedLogs])
 
   const handleSelectQuery = (query: string) => {
@@ -86,7 +87,7 @@ export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) 
   }
 
   const handleRetry = () => {
-    pgStatMonitorLogs.runQuery()
+    supamonitorLogs.runQuery()
   }
 
   useEffect(() => {
@@ -95,8 +96,8 @@ export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) 
       captureQueryPerformanceError(logsError, {
         projectRef: ref,
         databaseIdentifier: state.selectedDatabaseId,
-        queryPreset: 'pg_stat_monitor',
-        queryType: 'monitor',
+        queryPreset: 'supamonitor',
+        queryType: 'supamonitor',
         postgresVersion: project?.dbVersion,
         databaseType: state.selectedDatabaseId === ref ? 'primary' : 'read-replica',
         sql: queryWithTimeRange,
@@ -120,7 +121,7 @@ export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) 
         actions={
           <DownloadResultsButton
             results={aggregatedGridData}
-            fileName={`Supabase Query Performance Monitor (${ref})`}
+            fileName={`Supabase Query Performance Supamonitor (${ref})`}
             align="end"
           />
         }

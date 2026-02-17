@@ -74,6 +74,7 @@ module.exports = defineConfig([
       'pages/**/*.tsx',
       'app/**/*.tsx',
       'components/interfaces/**/content/**/content.tsx',
+      'vitest.config.ts',
     ],
     rules: {
       'no-restricted-exports': [
