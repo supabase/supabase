@@ -386,8 +386,8 @@ function CommandItemSuggestions<TData>({ field }: { field: DataTableFilterField<
             ? field.options.map(({ value }) => `[${value}]`).join(' ')
             : getFacetedUniqueValues
               ? Array.from(getFacetedUniqueValues(table, value)?.keys() || [])
-                .map((value) => `[${value}]`)
-                .join(' ')
+                  .map((value) => `[${value}]`)
+                  .join(' ')
               : null}
         </span>
       )
