@@ -68,7 +68,14 @@ module.exports = defineConfig([
   },
   {
     // check for default exports in all files except app and pages folders.
-    ignores: ['pages/**/*.ts', 'app/**/*.ts', 'pages/**/*.tsx', 'app/**/*.tsx'],
+    ignores: [
+      'pages/**/*.ts',
+      'app/**/*.ts',
+      'pages/**/*.tsx',
+      'app/**/*.tsx',
+      'components/interfaces/**/content/**/content.tsx',
+      'vitest.config.ts',
+    ],
     rules: {
       'no-restricted-exports': [
         'warn',

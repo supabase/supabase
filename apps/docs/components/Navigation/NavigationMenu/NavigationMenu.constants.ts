@@ -1499,6 +1499,7 @@ export const api: NavMenuConstant = {
         { name: 'Creating API routes', url: '/guides/api/creating-routes' },
         { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        { name: 'Error Codes', url: '/guides/api/rest/postgrest-error-codes' },
       ],
     },
     {
@@ -2827,8 +2828,11 @@ export const self_hosting: NavMenuConstant = {
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker' },
     {
-      name: 'Configuration',
-      items: [{ name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' }],
+      name: 'How-to Guides',
+      items: [
+        { name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Restore from Platform', url: '/guides/self-hosting/restore-from-platform' },
+      ],
     },
     {
       name: 'Auth Server',

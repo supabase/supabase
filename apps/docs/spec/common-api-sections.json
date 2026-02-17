@@ -269,6 +269,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-jit-access-config",
+        "title": "Get jit access config",
+        "slug": "v1-get-jit-access-config",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-pooler-config",
         "title": "Get pooler config",
         "slug": "v1-get-pooler-config",
@@ -374,6 +380,12 @@
         "id": "v1-update-jit-access",
         "title": "Update jit access",
         "slug": "v1-update-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-jit-access-config",
+        "title": "Update jit access config",
+        "slug": "v1-update-jit-access-config",
         "type": "operation"
       },
       {

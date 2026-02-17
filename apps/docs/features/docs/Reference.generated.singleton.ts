@@ -16,7 +16,7 @@ async function _typeSpecSingleton() {
       'utf-8'
     )
     typeSpec = JSON.parse(rawJson, (key, value) => {
-      if (key === 'methods') {
+      if (key === 'methods' || key === 'variables') {
         return new Map(Object.entries(value))
       } else {
         return value
@@ -39,7 +39,8 @@ export async function getTypeSpec(ref: string) {
   const refMod = normalizedRef.substring(0, delimiter)
 
   const mod = modules.find((mod) => mod.name === refMod)
-  return mod?.methods.get(normalizedRef)
+  // Check methods first, then variables
+  return mod?.methods.get(normalizedRef) ?? mod?.variables.get(normalizedRef)
 }
 
 let cliSpec: Json

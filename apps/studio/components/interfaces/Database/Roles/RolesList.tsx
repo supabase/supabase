@@ -1,10 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition, sortBy } from 'lodash'
-import { Plus, Search, X } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
-
 import type { PostgresRole } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
@@ -13,7 +8,12 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { partition, sortBy } from 'lodash'
+import { Plus, Search, X } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { CreateRolePanel } from './CreateRolePanel'
 import { DeleteRoleModal } from './DeleteRoleModal'
 import { RoleRow } from './RoleRow'
@@ -186,7 +186,7 @@ export const RolesList = () => {
 
       <div className="space-y-4">
         <div>
-          <div className="bg-surface-100 border border-default px-[var(--card-padding-x)] py-3 rounded-t flex items-center space-x-4">
+          <div className="bg-surface-100 border border-default px-card py-3 rounded-t flex items-center space-x-4">
             <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
             <Badge variant="success">Protected</Badge>
           </div>
@@ -204,7 +204,7 @@ export const RolesList = () => {
         </div>
 
         <div>
-          <div className="bg-surface-100 border border-default px-[var(--card-padding-x)] py-3 rounded-t">
+          <div className="bg-surface-100 border border-default px-card py-3 rounded-t">
             <p className="text-sm text-foreground-light">Other database roles</p>
           </div>
 

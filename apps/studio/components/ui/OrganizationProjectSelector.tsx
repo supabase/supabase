@@ -4,7 +4,6 @@ import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-proje
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-
 import {
   Button,
   cn,

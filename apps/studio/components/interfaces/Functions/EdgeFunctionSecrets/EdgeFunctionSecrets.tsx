@@ -1,22 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import AddNewSecretForm from './AddNewSecretForm'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
 import { EditSecretSheet } from './EditSecretSheet'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
 
 export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
@@ -34,12 +36,7 @@ export const EdgeFunctionSecrets = () => {
     isPending: isLoading,
     isSuccess,
     isError,
-  } = useSecretsQuery(
-    {
-      projectRef: projectRef,
-    },
-    { enabled: canReadSecrets }
-  )
+  } = useSecretsQuery({ projectRef: projectRef }, { enabled: canReadSecrets })
 
   const [selectedIdToEdit, setSelectedIdToEdit] = useQueryState(
     'edit',
@@ -163,8 +160,17 @@ export const EdgeFunctionSecrets = () => {
                           <TableRow className="[&>td]:hover:bg-inherit">
                             <TableCell colSpan={headers.length}>
                               <p className="text-sm text-foreground">No secrets created</p>
-                              <p className="text-sm text-foreground-light">
-                                There are no secrets associated with your project yet
+                              <p className="text-sm text-foreground-lighter">
+                                This project has no custom secrets yet.{' '}
+                                <code className="text-code-inline !text-foreground-lighter whitespace-nowrap">
+                                  SUPABASE_*
+                                </code>{' '}
+                                <InlineLink
+                                  href={`${DOCS_URL}/guides/functions/secrets#default-secrets`}
+                                >
+                                  default secrets
+                                </InlineLink>{' '}
+                                are still available.
                               </p>
                             </TableCell>
                           </TableRow>
