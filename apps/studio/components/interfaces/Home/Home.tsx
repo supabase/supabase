@@ -167,7 +167,6 @@ export const Home = () => {
                     )}
                   </div>
 
-                  {IS_PLATFORM && (
                     <div className="flex flex-col gap-y-1">
                       <Link
                         href={`/project/${ref}/functions`}
@@ -181,7 +180,6 @@ export const Home = () => {
                         <p className="text-2xl tabular-nums">{functionsCount}</p>
                       )}
                     </div>
-                  )}
 
                   {IS_PLATFORM && (
                     <div className="flex flex-col gap-y-1">
