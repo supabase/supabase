@@ -261,7 +261,7 @@ Now that we have all the components in place, let's update `App.tsx`:
 <$CodeTabs>
 
 ```jsx name=src/App.tsx
-import { Component, createEffect, createSignal } from 'solid-js'
+import { Component, createEffect, createSignal, onCleanup } from 'solid-js'
 import { supabase } from './supabaseClient'
 import { AuthSession } from '@supabase/supabase-js'
 import Account from './Account'
@@ -271,13 +271,13 @@ const App: Component = () => {
   const [session, setSession] = createSignal<AuthSession | null>(null)
 
   createEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
+    onCleanup(() => subscription.unsubscribe())
   })
 
   return (
