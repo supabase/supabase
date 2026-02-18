@@ -27,7 +27,7 @@ This guide assumes you're comfortable with:
 - Docker and Docker Compose
 - Networking fundamentals (ports, DNS, firewalls)
 
-If you're new to these topics, consider starting with [managed Supabase](/dashboard) for free, or try [local development with the CLI](/docs/guides/local-development).
+If you're new to these topics, consider starting with managed [Supabase platform](/dashboard) for free.
 
 You need the following installed on your system:
 
@@ -147,7 +147,7 @@ sh ./utils/generate-keys.sh
 
 The script is experimental, so review the output before proceeding and also check `.env` after it's updated by the script.
 
-Alternatively, configure all secrets manually as follows.
+**Alternatively, configure all secrets manually as follows.**
 
 ### Configure database password
 
@@ -423,17 +423,10 @@ SMTP_SENDER_NAME=
 We recommend using [AWS SES](https://aws.amazon.com/ses/). It's extremely cheap and reliable. Restart all services to pick up the new configuration.
 
 #### Configuring S3 Storage
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+By default all files are stored locally on the server. You can connect Storage to an S3-compatible backend (AWS S3, MinIO, Cloudflare R2), enable the S3 protocol endpoint for tools like `rclone`, or both. These are independent features.
 
-By default all files are stored locally on the server. You can configure the Storage service to use S3 by updating the following environment variables:
-
-```yaml docker-compose.yml
-storage:
-  environment: STORAGE_BACKEND=s3
-    GLOBAL_S3_BUCKET=name-of-your-s3-bucket
-    REGION=region-of-your-s3-bucket
-```
-
-You can find all the available options in the [storage repository](https://github.com/supabase/storage-api/blob/master/.env.sample). Restart the `storage` service to pick up the changes: `docker compose restart storage --no-deps`
+See the [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3) guide for detailed setup instructions.
 
 #### Configuring Supabase AI Assistant
 

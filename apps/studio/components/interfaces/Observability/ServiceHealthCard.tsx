@@ -1,10 +1,10 @@
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import Link from 'next/link'
-import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle, Loading, cn } from 'ui'
+import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle, cn, Loading } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
-import { type ServiceKey, getHealthStatus } from './ObservabilityOverview.utils'
+import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
 
 const colorClassMap: Record<string, string> = {
   muted: 'bg-muted',
@@ -81,7 +81,7 @@ export const ServiceHealthCard = ({
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 pt-4 flex-1 overflow-hidden max-h-[200px]">
+      <CardContent className="p-card pt-4 flex-1 overflow-hidden max-h-[200px]">
         <Loading isFullHeight active={isLoading}>
           <LogsBarChart
             isFullHeight
@@ -95,7 +95,7 @@ export const ServiceHealthCard = ({
         </Loading>
       </CardContent>
 
-      <CardFooter className="border-t pt-3 pb-4 px-4 flex gap-2">
+      <CardFooter className="border-t pt-3 pb-4 px-card flex gap-2">
         {reportUrl && (
           <Button type="default" size="tiny" asChild className="flex-1">
             <Link href={reportUrl}>View Report</Link>
