@@ -13,7 +13,7 @@ import type { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { getTableEditor, type TableEditorData } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import { fetchAllTableRows, fetchSelectedTableRows } from 'data/table-rows/table-rows-query'
 import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
 import { DOCS_URL } from 'lib/constants'
 import type { RoleImpersonationState } from 'lib/role-impersonation'
@@ -258,6 +258,17 @@ type UseExportAllRowsParams =
           table: SupaTable
           rows: Record<string, unknown>[]
         }
+      | {
+          /**
+           * Specific rows need to be re-fetched from the database without truncation.
+           */
+          type: 'fetch_selected'
+          table: SupaTable
+          selectedRows: Record<string, unknown>[]
+          filters?: Filter[]
+          sorts?: Sort[]
+          roleImpersonationState?: RoleImpersonationState
+        }
     ))
 
 type UseExportAllRowsReturn = {
@@ -287,43 +298,69 @@ export const useExportAllRowsGeneric = (
 
       const { projectRef, connectionString, entity, totalRows } = params
 
-      const exportResult =
-        params.type === 'provided_rows'
-          ? convertAndDownload(formatRowsForExport(params.rows, params.table), params.table, {
-              convertToOutputFormat,
-              convertToBlob,
-              save,
+      let exportResult: FetchAllRowsReturn
+
+      if (params.type === 'provided_rows') {
+        exportResult = convertAndDownload(
+          formatRowsForExport(params.rows, params.table),
+          params.table,
+          { convertToOutputFormat, convertToBlob, save }
+        )
+      } else if (params.type === 'fetch_selected') {
+        try {
+          const rows = await fetchSelectedTableRows({
+            projectRef,
+            connectionString: connectionString ?? undefined,
+            table: params.table,
+            selectedRows: params.selectedRows,
+            filters: params.filters,
+            sorts: params.sorts,
+            roleImpersonationState: params.roleImpersonationState,
+          })
+          if (rows.length === 0) {
+            exportResult = { status: 'error', error: new NoRowsToExportError(entity.name) }
+          } else {
+            exportResult = convertAndDownload(
+              formatRowsForExport(rows, params.table),
+              params.table,
+              { convertToOutputFormat, convertToBlob, save }
+            )
+          }
+        } catch (error: unknown) {
+          exportResult = { status: 'error', error: new FetchRowsError(entity.name, error) }
+        }
+      } else {
+        exportResult = await fetchAllRows({
+          queryClient,
+          projectRef: projectRef,
+          connectionString: connectionString,
+          entity: entity,
+          bypassConfirmation,
+          filters: params.filters,
+          sorts: params.sorts,
+          roleImpersonationState: params.roleImpersonationState,
+          totalRows: params.totalRows,
+          startCallback: () => {
+            startProgressTracker({
+              id: entity.id,
+              name: entity.name,
+              trackPercentage: totalRows !== undefined,
             })
-          : await fetchAllRows({
-              queryClient,
-              projectRef: projectRef,
-              connectionString: connectionString,
-              entity: entity,
-              bypassConfirmation,
-              filters: params.filters,
-              sorts: params.sorts,
-              roleImpersonationState: params.roleImpersonationState,
-              totalRows: params.totalRows,
-              startCallback: () => {
-                startProgressTracker({
+          },
+          progressCallback: totalRows
+            ? (value: number) =>
+                trackPercentageProgress({
                   id: entity.id,
                   name: entity.name,
-                  trackPercentage: totalRows !== undefined,
+                  totalRows: totalRows,
+                  value,
                 })
-              },
-              progressCallback: totalRows
-                ? (value: number) =>
-                    trackPercentageProgress({
-                      id: entity.id,
-                      name: entity.name,
-                      totalRows: totalRows,
-                      value,
-                    })
-                : undefined,
-              convertToOutputFormat,
-              convertToBlob,
-              save,
-            })
+            : undefined,
+          convertToOutputFormat,
+          convertToBlob,
+          save,
+        })
+      }
 
       if (exportResult.status === 'error') {
         const error = exportResult.error

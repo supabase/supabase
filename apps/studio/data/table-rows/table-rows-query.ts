@@ -306,6 +306,81 @@ export const fetchAllTableRows = async ({
   return rows.filter((row) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
 }
 
+/**
+ * Fetches specific rows by primary key WITHOUT truncation.
+ * Used for copy/export operations that need full (untruncated) data.
+ * Falls back to fetchAllTableRows for tables without a primary key.
+ */
+export const fetchSelectedTableRows = async ({
+  projectRef,
+  connectionString,
+  table,
+  selectedRows,
+  filters = [],
+  sorts = [],
+  roleImpersonationState,
+}: {
+  projectRef: string
+  connectionString?: string | null
+  table: SupaTable
+  selectedRows: Record<string, unknown>[]
+  filters?: Filter[]
+  sorts?: Sort[]
+  roleImpersonationState?: RoleImpersonationState
+}): Promise<Record<string, unknown>[]> => {
+  if (IS_PLATFORM && !connectionString) {
+    console.error('Connection string is required')
+    return []
+  }
+
+  if (selectedRows.length === 0) {
+    return []
+  }
+
+  const primaryKey = table.primaryKey
+  if (!primaryKey || primaryKey.length === 0) {
+    return fetchAllTableRows({
+      projectRef,
+      connectionString,
+      table,
+      filters,
+      sorts,
+      roleImpersonationState,
+    })
+  }
+
+  const query = new Query()
+
+  const arrayBasedColumns = table.columns
+    .filter(
+      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    )
+    .map((column) => `"${column.name}"::text[]`)
+
+  let queryChains = query
+    .from(table.name, table.schema ?? undefined)
+    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
+
+  if (primaryKey.length === 1) {
+    const pkCol = primaryKey[0]
+    queryChains = queryChains.filter(
+      pkCol,
+      'in',
+      selectedRows.map((r) => r[pkCol])
+    )
+  } else {
+    queryChains = queryChains.filter(
+      primaryKey,
+      'in',
+      selectedRows.map((r) => primaryKey.map((col) => r[col]))
+    )
+  }
+
+  const sql = wrapWithRoleImpersonation(queryChains.toSql(), roleImpersonationState)
+  const { result } = await executeSql({ projectRef, connectionString, sql })
+  return result.filter((row: any) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
+}
+
 export type TableRows = { rows: SupaRow[] }
 
 export type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
