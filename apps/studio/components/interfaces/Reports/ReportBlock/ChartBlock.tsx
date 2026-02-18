@@ -1,8 +1,3 @@
-import dayjs from 'dayjs'
-import { useRouter } from 'next/router'
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
-
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
@@ -16,20 +11,26 @@ import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
 } from 'data/analytics/project-daily-stats-query'
+import dayjs from 'dayjs'
 import { METRICS } from 'lib/constants/metrics'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
-
-const formatLogTick = (value: number): string => {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`
-  if (value >= 1_000) return `${(value / 1_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}k`
-  return value.toLocaleString()
-}
+import { useRouter } from 'next/router'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
-import { WarningIcon } from 'ui'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
+
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
+
+const formatLogTick = (value: number): string => {
+  if (value >= 1_000_000)
+    return `${(value / 1_000_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`
+  if (value >= 1_000)
+    return `${(value / 1_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}k`
+  return value.toLocaleString()
+}
 
 interface ChartBlockProps {
   label: string
