@@ -37,7 +37,7 @@ AWS_ACCESS_KEY_ID=$S3_PROTOCOL_ACCESS_KEY_ID \
 AWS_SECRET_ACCESS_KEY=$S3_PROTOCOL_ACCESS_KEY_SECRET \
 aws s3 ls \
 --endpoint-url http://localhost:8000/storage/v1/s3 \
---region your-storage-region \
+--region $REGION \
 s3://your-storage-bucket )
 ```
 
@@ -49,7 +49,7 @@ source .env > /dev/null 2>&1 && \
 echo "" && \
 rclone ls \
 --s3-endpoint http://localhost:8000/storage/v1/s3 \
---s3-region your-storage-region \
+--s3-region $REGION \
 --s3-provider Other \
 --s3-access-key-id "$S3_PROTOCOL_ACCESS_KEY_ID" \
 --s3-secret-access-key "$S3_PROTOCOL_ACCESS_KEY_SECRET" \
@@ -131,7 +131,7 @@ storage:
 
 ### Signature mismatch errors
 
-S3 clients sign requests using the access key ID and secret. If you see `SignatureDoesNotMatch`, verify that the `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` in your `.env` file match what your S3 client is using. Restart storage after any changes.
+S3 clients sign requests using the access key ID and secret. If you see `SignatureDoesNotMatch`, verify that the `REGION`, `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` in your `.env` file match what your S3 client is using.
 
 ### TUS upload errors on Cloudflare R2
 
