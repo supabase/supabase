@@ -94,6 +94,7 @@ export const SecretsManagement = () => {
                 actions={[
                   searchValue && (
                     <Button
+                      key="clear"
                       size="tiny"
                       type="text"
                       icon={<X />}

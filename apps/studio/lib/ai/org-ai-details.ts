@@ -1,5 +1,8 @@
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { getProjectSettings } from 'data/config/project-settings-v2-query'
 import { getOrganizations } from 'data/organizations/organizations-query'
 import { getProjectDetail } from 'data/projects/project-detail-query'
+import { getOrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 
 export const getOrgAIDetails = async ({
@@ -16,9 +19,11 @@ export const getOrgAIDetails = async ({
     ...(authorization && { Authorization: authorization }),
   }
 
-  const [organizations, selectedProject] = await Promise.all([
+  const [organizations, selectedProject, subscription, projectSettings] = await Promise.all([
     getOrganizations({ headers }),
     getProjectDetail({ ref: projectRef }, undefined, headers),
+    getOrgSubscription({ orgSlug }, undefined, headers),
+    getProjectSettings({ projectRef }, undefined, headers),
   ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
@@ -30,9 +35,11 @@ export const getOrgAIDetails = async ({
 
   const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
   const isLimited = selectedOrg?.plan.id === 'free'
+  const isHipaaEnabled = subscriptionHasHipaaAddon(subscription) && !!projectSettings?.is_sensitive
 
   return {
     aiOptInLevel,
     isLimited,
+    isHipaaEnabled,
   }
 }

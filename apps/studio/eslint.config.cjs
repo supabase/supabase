@@ -14,6 +14,7 @@ module.exports = defineConfig([
       'react/no-unescaped-entities': 'off',
       'react/display-name': 'warn',
       'react/no-unstable-nested-components': 'warn',
+      'react/jsx-key': 'error',
       'barrel-files/avoid-re-export-all': 'error',
       'jsx-a11y/alt-text': 'warn',
     },
