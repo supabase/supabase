@@ -1,0 +1,71 @@
+---
+title: 'Remove superuser access'
+description: 'Learn how to remove superuser access from studio and migrate from the supabase_admin to postgres role in self-hosted Supabase.'
+subtitle: 'Learn how to remove superuser access from studio and migrate from the supabase_admin to postgres role in self-hosted Supabase.'
+---
+
+## Overview
+
+In late 2022, Supabase introduced a security change in hosted projects that removed superuser access from dashboard SQL editor and shifted ownership of user-created database objects away from `supabase_admin` toward the `postgres` role.
+You can read more about it in the [official announcement](https://github.com/orgs/supabase/discussions/9314).
+
+However, this migration was never automatically applied to self-hosted Supabase instances.
+As a result:
+
+- Objects created via the dashboard may still be owned by `supabase_admin`
+- Behavior differs from hosted Supabase
+- Some migrations may fail when run as postgres
+
+This guide explains how to bring your self-hosted Supabase instance in line with the security enhancements and ownership model used in hosted Supabase.
+
+<Admonition type="tip">
+
+This migration only updates ownership for database objects in the `public` schema. Supabase managed schemas are not affected.
+
+</Admonition>
+
+## Configuration
+
+### Step 1: Run the ownership migration script
+
+Execute the script that reassigns ownership of database objects in the `public` schema from `supabase_admin` to `postgres`
+
+```sh
+sh ./utils/reassign-public-schema-objects-owner-to-postgres.sh
+```
+
+### Step 2: Update environment variables in docker-compose.yml
+
+- Open your `docker-compose.yml` file and locate the `studio` service environment variables.
+  Uncomment the following line so studio uses `postgres` role for read/write operations:
+
+  ```yml
+  studio:
+    environment:
+      POSTGRES_USER_READ_WRITE: postgres
+  ```
+
+- Next, locate the `meta` service environment variables. Change the `PG_META_DB_USER` environment variable from `supabase_admin` to `postgres`:
+
+  ```yml
+  meta:
+    environment:
+      PG_META_DB_USER: postgres
+  ```
+
+- Save the file and exit.
+
+### Step 3: Restart services
+
+```sh
+docker compose down && docker compose up -d
+```
+
+## Verify the configuration
+
+After restarting your services, verify that Supabase Studio is now using the postgres role. Run the following query in the Supabase Studio SQL Editor:
+
+```sql
+select current_user;
+-- expected result: postgres
+```

@@ -2832,6 +2832,7 @@ export const self_hosting: NavMenuConstant = {
       items: [
         { name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' },
         { name: 'Restore from Platform', url: '/guides/self-hosting/restore-from-platform' },
+        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
       ],
     },
     {
