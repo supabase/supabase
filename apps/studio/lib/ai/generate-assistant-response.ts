@@ -151,7 +151,15 @@ export async function generateAssistantResponse({
 
     span?.log({
       input: lastUserText,
-      metadata: { projectRef, chatName, aiOptInLevel, userId, orgId, planId },
+      metadata: {
+        projectRef,
+        chatName,
+        aiOptInLevel,
+        userId,
+        orgId,
+        planId,
+        gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
+      },
       tags: [TRACING_ENVIRONMENT_TAG],
     })
 
