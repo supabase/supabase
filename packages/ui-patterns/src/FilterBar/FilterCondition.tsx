@@ -246,6 +246,7 @@ export function FilterCondition({
               disabled={isLoading}
               aria-label={`Operator for ${property.label}`}
               data-testid={`filter-operator-${property.name}`}
+              tabIndex={-1}
             />
             <span className="invisible whitespace-pre text-xs block px-1 shrink-0 px-1">
               {condition.operator || ' '}
@@ -289,6 +290,7 @@ export function FilterCondition({
               disabled={isLoading}
               aria-label={`Value for ${property.label}`}
               data-testid={`filter-value-${property.name}`}
+              tabIndex={-1}
             />
             <span className="invisible whitespace-pre text-xs block px-1">{localValue || ' '}</span>
           </div>
