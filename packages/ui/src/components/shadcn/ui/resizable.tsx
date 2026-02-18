@@ -1,12 +1,13 @@
 'use client'
 
 import { GripVertical } from 'lucide-react'
-import { useCallback, useLayoutEffect, useRef } from 'react'
 import {
   Group,
   Panel,
   Separator,
   useDefaultLayout,
+  usePanelCallbackRef,
+  usePanelRef,
   type GroupProps,
   type SeparatorProps,
 } from 'react-resizable-panels'
@@ -83,6 +84,7 @@ const ResizableHandle = ({
       'transition-colors',
       className
     )}
+    style={{ cursor: 'auto' }}
     {...props}
   >
     {withHandle && (
@@ -107,5 +109,7 @@ export {
   ResizablePanel,
   ResizablePanelGroup,
   useDefaultLayout,
+  usePanelRef,
+  usePanelCallbackRef,
   type PanelImperativeHandle,
 }
