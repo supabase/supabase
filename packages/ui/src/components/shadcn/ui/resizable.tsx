@@ -8,7 +8,6 @@ import {
   Separator,
   useDefaultLayout,
   type GroupProps,
-  type PanelImperativeHandle,
   type SeparatorProps,
 } from 'react-resizable-panels'
 
