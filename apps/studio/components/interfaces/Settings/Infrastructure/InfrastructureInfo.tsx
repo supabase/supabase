@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import { useFlag, useParams } from 'common'
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import {
@@ -15,9 +13,11 @@ import { useProjectServiceVersionsQuery } from 'data/projects/project-service-ve
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
@@ -154,7 +154,7 @@ export const InfrastructureInfo = () => {
                           label="Postgres version"
                           actions={[
                             isVisibleReleaseChannel && (
-                              <Tooltip>
+                              <Tooltip key="release-channel">
                                 <TooltipTrigger>
                                   <Badge variant="warning" className="mr-1">
                                     {isVisibleReleaseChannel}
@@ -167,7 +167,7 @@ export const InfrastructureInfo = () => {
                               </Tooltip>
                             ),
                             isOrioleDb && (
-                              <Tooltip>
+                              <Tooltip key="orioledb">
                                 <TooltipTrigger>
                                   <Badge variant="default" className="mr-1">
                                     OrioleDB
@@ -179,7 +179,7 @@ export const InfrastructureInfo = () => {
                               </Tooltip>
                             ),
                             isOnLatestVersion && (
-                              <Tooltip>
+                              <Tooltip key="latest-version">
                                 <TooltipTrigger>
                                   <Badge variant="success" className="mr-1">
                                     Latest
