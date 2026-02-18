@@ -1,4 +1,15 @@
-import dynamic from 'next/dynamic'
+import { CubeIcon } from '@heroicons/react/outline'
+import { useBreakpoint } from 'common'
+import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import { frameworks } from 'components/Hero/HeroFrameworks'
+import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
+import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
+import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
+import type { MPCSectionProps } from 'components/Solutions/MPCSection'
+import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
+import { companyStats } from 'data/company-stats'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import {
   ArrowLeftRight,
   Check,
@@ -14,47 +25,85 @@ import {
   ShieldCheck,
   Sparkles,
   Timer,
-  Users,
   UserX,
+  Users,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { Image } from 'ui'
 
 import MainProducts from '../MainProducts'
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
 import {
+  type FeaturesSection,
   FrameworkLink,
   type FrameworkLinkProps,
-  type FeaturesSection,
   type HeroSection,
   type Metadata,
   getEditors,
 } from './solutions.utils'
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { useBreakpoint } from 'common'
-import { useSendTelemetryEvent } from 'lib/telemetry'
-import { companyStats } from 'data/company-stats'
+import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
 const RealtimeVisual = dynamic(() => import('components/Products/RealtimeVisual'))
 
+interface Quote {
+  text: string
+  author: string
+  role: string
+  logo?: string | JSX.Element
+  link?: string
+  avatar?: string | JSX.Element
+}
+
+interface AIBuilderEcosystemSection {
+  id: string
+  heading: React.ReactNode
+  subheading: string
+  builders: Array<{
+    name: string
+    description: string
+  }>
+}
+
+interface CustomerEvidenceSection {
+  id: string
+  heading: React.ReactNode
+  customers: Array<{
+    name: string
+    highlights: string[]
+    cta?: {
+      label: string
+      href: string
+    }
+  }>
+}
+
+interface InnovationEnablementSection {
+  id: string
+  heading: React.ReactNode
+  options: Array<{
+    title: string
+    type: string
+    description: string
+    cta: {
+      label: string
+      href: string
+    }
+  }>
+}
+
 const data: () => {
   metadata: Metadata
   heroSection: HeroSection
+  quote: Quote
+  secondaryQuote?: Quote
+  aiBuilderEcosystem: AIBuilderEcosystemSection
   why: FeaturesSection
+  customerEvidence: CustomerEvidenceSection
   platform: PlatformSectionProps
   developerExperience: DXSectionProps
+  innovationEnablement: InnovationEnablementSection
   platformStarterSection: TwoColumnsSectionProps
   mcp: MPCSectionProps
 } = () => {
@@ -64,48 +113,106 @@ const data: () => {
 
   return {
     metadata: {
-      metaTitle: 'Supabase for Developers',
-      metaDescription: 'Build fast. Scale easily. Trust your tech stack.',
+      metaTitle: 'The Production Backend for AI-Built Applications | Supabase',
+      metaDescription:
+        "Supabase powers every major AI builder. Your prototypes deserve enterprise infrastructure that passes security reviews, scales with success, and doesn't blow up budgets.",
     },
     heroSection: {
       id: 'hero',
-      title: 'Supabase for Innovation Teams',
+      title:
+        'Supabase powers every major AI builder. Your prototypes deserve enterprise infrastructure.',
       h1: (
         <>
           <span className="block text-foreground">
-            Prototype fast, integrate with your data, scale when ready.
+            The Production Backend for AI-Built Applications
           </span>
         </>
       ),
       subheader: [
-        <>Prototype in an afternoon, scale to millions.</>,
         <>
-          You need to move fast without battling red tape, complex infrastructure, or data silos.
-          Supabase gives you a fully managed Postgres backend with everything you need to prove your
-          ideas while maintaining enterprise-grade security and compliance.{' '}
+          Your teams are already building with Lovable, Bolt, v0, and Claude. But prototypes aren't
+          enough. You need production-ready infrastructure that passes security reviews, scales with
+          success, and doesn't blow up budgets.
         </>,
       ],
       image: undefined,
       ctas: [
         {
-          label: 'Start your project',
+          label: 'Start Building',
           href: 'https://supabase.com/dashboard',
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
               action: 'start_project_button_clicked',
-              properties: { buttonLocation: 'Solutions: Developers page hero' },
+              properties: { buttonLocation: 'Solutions: Innovation Teams page hero' },
             }),
         },
         {
-          label: 'Request a demo',
+          label: 'Request a Demo',
           href: 'https://supabase.com/contact/sales',
           type: 'default' as any,
           onClick: () =>
             sendTelemetryEvent({
               action: 'request_demo_button_clicked',
-              properties: { buttonLocation: 'Solutions: Developers page hero' },
+              properties: { buttonLocation: 'Solutions: Innovation Teams page hero' },
             }),
+        },
+      ],
+    },
+    quote: {
+      text: 'We saved over a million dollars eliminating Meta Workplace. Another million replacing our vendor websites. Now our non-technical teams build production apps themselves. Supabase and Lovable made this possible.',
+      author: 'Seth',
+      role: 'Chief Innovation Officer',
+      logo: (
+        <svg
+          className="w-24"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+          id="Logo"
+          viewBox="0 0 277.397 144"
+        >
+          <path d="M20.991 69.484q1.05 9.443 7.345 14.693a23 23 0 0 0 15.22 5.248 25.05 25.05 0 0 0 13.207-3.238 36.6 36.6 0 0 0 9.358-8.133l15.043 11.371a42.6 42.6 0 0 1-16.442 12.943 48.5 48.5 0 0 1-19.067 3.849 50.4 50.4 0 0 1-17.844-3.149 42.8 42.8 0 0 1-14.518-8.922 42.3 42.3 0 0 1-9.708-13.9A44.4 44.4 0 0 1 0 62.136a44.4 44.4 0 0 1 3.585-18.105 42.3 42.3 0 0 1 9.708-13.907A42.8 42.8 0 0 1 27.811 21.2a50.4 50.4 0 0 1 17.844-3.149 40.8 40.8 0 0 1 16 3.061 34.3 34.3 0 0 1 12.425 8.837 40.9 40.9 0 0 1 8.045 14.257 60.5 60.5 0 0 1 2.888 19.5v5.773Zm43.031-15.745q-.176-9.447-5.773-14.693T42.681 33.8q-9.447 0-14.956 5.423t-6.734 14.516ZM186.786 20.155h19.943v12.593h.35a26.24 26.24 0 0 1 12.244-11.282 40.5 40.5 0 0 1 16.617-3.411 42.3 42.3 0 0 1 17.317 3.411 38.8 38.8 0 0 1 13.12 9.358 40.1 40.1 0 0 1 8.223 13.993 52.4 52.4 0 0 1 2.8 17.319 49.6 49.6 0 0 1-2.974 17.317 43 43 0 0 1-8.309 13.993 38.3 38.3 0 0 1-12.857 9.361 39.4 39.4 0 0 1-16.442 3.41 40.8 40.8 0 0 1-10.408-1.225 35.7 35.7 0 0 1-8.134-3.149 32 32 0 0 1-5.948-4.11 29.8 29.8 0 0 1-4.024-4.287h-.524V144h-20.994Zm69.62 41.981a27.3 27.3 0 0 0-1.661-9.445 23.8 23.8 0 0 0-4.9-8.049 24.815 24.815 0 0 0-36.209 0 23.7 23.7 0 0 0-4.9 8.049 27.68 27.68 0 0 0 0 18.89 23.6 23.6 0 0 0 4.9 8.047 24.81 24.81 0 0 0 36.209 0 23.7 23.7 0 0 0 4.9-8.047 27.3 27.3 0 0 0 1.661-9.445"></path>
+          <path d="m144.25 62.13 32.023 41.984h-25.536l-19.279-25.263-19.233 25.263H86.688L166.086 0h25.538zM112.238 20.154h-25.54l25.839 33.92 12.756-16.765zM19.4 119.838a.61.61 0 0 1 .612-.612h9.2a6.97 6.97 0 0 1 7.017 6.919 7.1 7.1 0 0 1-4.763 6.5l4.408 8.174a.609.609 0 0 1-.547.933h-3.38a.55.55 0 0 1-.515-.289l-4.279-8.528h-3.572v8.206a.633.633 0 0 1-.612.611h-2.96a.61.61 0 0 1-.612-.611Zm9.46 9.654a3.277 3.277 0 0 0 3.185-3.283 3.2 3.2 0 0 0-3.185-3.121h-5.247v6.4ZM49.834 119.838a.61.61 0 0 1 .612-.612h13.1a.61.61 0 0 1 .61.612v2.638a.61.61 0 0 1-.61.612h-9.528v5.277h7.948a.633.633 0 0 1 .61.612v2.671a.61.61 0 0 1-.61.611h-7.948v5.632h9.525a.61.61 0 0 1 .61.611v2.639a.61.61 0 0 1-.61.611h-13.1a.61.61 0 0 1-.612-.611ZM72.9 140.916l10.01-21.657a.575.575 0 0 1 .546-.355h.322a.55.55 0 0 1 .547.355l9.911 21.657a.567.567 0 0 1-.547.836h-2.8a.925.925 0 0 1-.934-.643l-1.578-3.476h-9.619l-1.576 3.476a.97.97 0 0 1-.932.643h-2.8a.568.568 0 0 1-.55-.836m13.9-6.855-3.218-7.08h-.1l-3.153 7.08ZM103.6 119.838a.61.61 0 0 1 .61-.612h2.962a.633.633 0 0 1 .61.612v18.053h8.206a.61.61 0 0 1 .612.611v2.639a.61.61 0 0 1-.612.611h-11.779a.61.61 0 0 1-.61-.611ZM130.594 123.088h-4.923a.61.61 0 0 1-.612-.612v-2.638a.61.61 0 0 1 .612-.612h14.061a.61.61 0 0 1 .612.612v2.638a.61.61 0 0 1-.612.612h-4.923v18.053a.633.633 0 0 1-.612.611H131.2a.63.63 0 0 1-.61-.611ZM158.072 130.908l-7.337-10.748a.6.6 0 0 1 .513-.934h3.282a.64.64 0 0 1 .517.29l5.148 7.4 5.148-7.4a.64.64 0 0 1 .515-.29h3.314a.6.6 0 0 1 .517.934l-7.434 10.715v10.266a.633.633 0 0 1-.612.611h-2.96a.61.61 0 0 1-.611-.611ZM276.541 3.21a6.25 6.25 0 0 0-2.365-2.351 6.66 6.66 0 0 0-6.541 0 6.24 6.24 0 0 0-2.37 2.351 6.54 6.54 0 0 0-.023 6.427 6.33 6.33 0 0 0 2.347 2.376 6.6 6.6 0 0 0 6.647-.008 6.3 6.3 0 0 0 2.337-2.386 6.53 6.53 0 0 0-.032-6.409m-.367 3.226a5.25 5.25 0 0 1-.7 2.653 5.16 5.16 0 0 1-1.92 1.918 5.35 5.35 0 0 1-5.286.013 5.15 5.15 0 0 1-1.925-1.92 5.33 5.33 0 0 1 0-5.308 5.1 5.1 0 0 1 1.929-1.909 5.4 5.4 0 0 1 5.29.008 5.1 5.1 0 0 1 1.92 1.905 5.2 5.2 0 0 1 .692 2.64"></path>
+          <path d="M273.341 6.217a2 2 0 0 0 .314-1.157 1.82 1.82 0 0 0-.68-1.513 3.06 3.06 0 0 0-1.932-.535h-2.625V9.79h1.455V7.309h1.161l1.325 2.481h1.563v-.065l-1.529-2.77a2.1 2.1 0 0 0 .948-.738M271.9 5.91a1.24 1.24 0 0 1-.85.267h-1.175V4.143h1.17a1.22 1.22 0 0 1 .872.275 1 1 0 0 1 .284.754.94.94 0 0 1-.301.738"></path>
+        </svg>
+      ),
+      link: '/customers/exprealty',
+      avatar: (
+        <Image
+          draggable={false}
+          src="/images/blog/avatars/seth-siegler.jpg"
+          alt="Seth Siegler"
+          className="object-cover"
+          width={32}
+          height={32}
+        />
+      ),
+    },
+    aiBuilderEcosystem: {
+      id: 'ai-builder-ecosystem',
+      heading: (
+        <>
+          Your AI Tools <span className="text-foreground">Already Choose Supabase</span>
+        </>
+      ),
+      subheading:
+        'Every major AI builder integrates with Supabase by default. One backend, infinite possibilities:',
+      builders: [
+        {
+          name: 'Lovable & Bolt',
+          description: 'Full-stack applications in minutes',
+        },
+        {
+          name: 'Vercel v0',
+          description: 'Component to production pipeline',
+        },
+        {
+          name: 'Claude & Cursor',
+          description: 'AI-powered local development',
+        },
+        {
+          name: 'Figma',
+          description: 'Design to database in hours',
         },
       ],
     },
@@ -114,7 +221,8 @@ const data: () => {
       label: '',
       heading: (
         <>
-          Why <span className="text-foreground">innovation teams</span> choose Supabase
+          Why Enterprises Choose Supabase for{' '}
+          <span className="text-foreground">AI Development</span>
         </>
       ),
       subheading:
@@ -157,9 +265,42 @@ const data: () => {
               />
             </svg>
           ),
-          heading: 'Scalable with confidence',
+          heading: 'Scale with confidence',
           subheading:
             'Go from prototype to production on a single platform. Applications built on Supabase are ready to handle enterprise-level workloads, with features like read replicas and high-availability architecture ensuring performance and reliability as you scale.',
+        },
+      ],
+    },
+    customerEvidence: {
+      id: 'customer-evidence',
+      heading: (
+        <>
+          Real Results From <span className="text-foreground">Real Enterprises</span>
+        </>
+      ),
+      customers: [
+        {
+          name: 'eXp Realty',
+          logo: '/images/customers/logos/exprealty.svg',
+          highlights: [
+            'Saved $3M+ annually across multiple systems',
+            '70+ vibe-coded applications in production',
+            'Non-technical real estate agents building customer-facing apps',
+            'Moved entire international division off legacy systems',
+          ],
+          cta: {
+            label: 'Read the case study',
+            href: '/customers/exprealty',
+          },
+        },
+        {
+          name: 'Accenture Innovation Labs',
+          logo: '/images/customers/logos/accenture.svg',
+          highlights: [
+            'Prototype-to-production in hours, not months',
+            'Avoiding AWS complexity and auto-shutdown policies',
+            'Engineers and non-technical consultants collaborating seamlessly',
+          ],
         },
       ],
     },
@@ -390,68 +531,26 @@ const data: () => {
     },
     developerExperience: {
       id: 'developer-experience',
-      className: '[&_h2]:!max-w-sm',
+      className: '[&_h2]:!max-w-lg',
       title: (
         <>
-          <span className="text-foreground">Build faster</span> with Supabase
+          Built for How <span className="text-foreground">AI Builders</span> Work
         </>
       ),
-      subheading: 'Features that help developers move quickly and focus.',
+      subheading: '',
       features: [
         {
-          id: 'ai-assistant',
-          title: 'AI Assistant',
-          icon: 'M11.8949 2.39344C12.5051 1.78324 13.4944 1.78324 14.1046 2.39344L22.9106 11.1994C23.5208 11.8096 23.5208 12.7989 22.9106 13.4091L14.1046 22.2151C13.4944 22.8253 12.5051 22.8253 11.8949 22.2151L3.08892 13.4091C2.47872 12.7989 2.47872 11.8096 3.08892 11.1994L11.8949 2.39344Z M16.5408 12.3043C16.5408 14.2597 14.9556 15.8449 13.0002 15.8449C11.0448 15.8449 9.45961 14.2597 9.45961 12.3043C9.45961 10.3489 11.0448 8.76371 13.0002 8.76371C14.9556 8.76371 16.5408 10.3489 16.5408 12.3043Z',
-          subheading: (
-            <>
-              A single panel that persists across the Supabase Dashboard and maintains{' '}
-              <span className="text-foreground">context across AI prompts</span>.
-            </>
-          ),
-          image: (
-            <div className="w-full ml-4 md:ml-6 2xl:ml-8 max-w-[430px] rounded-tl-lg border-t border-l bg-default text-foreground">
-              <div className="flex items-center gap-3 p-2 lg:p-4 border-b">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 25 25"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="hover:rotate-12 transition-transform duration-300"
-                >
-                  <path
-                    d="M11.8949 2.39344C12.5051 1.78324 13.4944 1.78324 14.1046 2.39344L22.9106 11.1994C23.5208 11.8096 23.5208 12.7989 22.9106 13.4091L14.1046 22.2151C13.4944 22.8253 12.5051 22.8253 11.8949 22.2151L3.08892 13.4091C2.47872 12.7989 2.47872 11.8096 3.08892 11.1994L11.8949 2.39344Z M16.5408 12.3043C16.5408 14.2597 14.9556 15.8449 13.0002 15.8449C11.0448 15.8449 9.45961 14.2597 9.45961 12.3043C9.45961 10.3489 11.0448 8.76371 13.0002 8.76371C14.9556 8.76371 16.5408 10.3489 16.5408 12.3043Z"
-                    stroke="hsl(var(--brand-default))"
-                    strokeMiterlimit="10"
-                    strokeLinejoin="bevel"
-                    strokeLinecap="square"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-                <div className="flex items-center gap-1">
-                  <h3 className="text-sm font-medium">AI Assistant</h3>
-                  <InfoIcon className="w-3 h-3 text-foreground-lighter" />
-                </div>
-              </div>
-              <div className="space-y-2 p-4 pr-0 2xl:py-8 xl:pl-12 xl:ml-1 text-sm text-[#808080]">
-                <p>Entity: Auth</p>
-                <p>Schema:</p>
-                <p className="text-[#808080]">
-                  Issue: We have detected that you have enabled the email provider with an expiry
-                  time of more than an hour. It is recommended to set this value to less th...
-                </p>
-              </div>
-            </div>
-          ),
-        },
-        {
           id: 'mcp-server',
-          title: 'MCP Server',
+          title: 'MCP Server Integration',
           icon: 'M19 5L22 2M2 22L5 19M7.5 13.5L10 11M10.5 16.5L13 14M6.3 20.3C6.52297 20.5237 6.78791 20.7013 7.07963 20.8224C7.37136 20.9435 7.68413 21.0059 8 21.0059C8.31587 21.0059 8.62864 20.9435 8.92036 20.8224C9.21209 20.7013 9.47703 20.5237 9.7 20.3L12 18L6 12L3.7 14.3C3.47626 14.523 3.29873 14.7879 3.17759 15.0796C3.05646 15.3714 2.99411 15.6841 2.99411 16C2.99411 16.3159 3.05646 16.6286 3.17759 16.9204C3.29873 17.2121 3.47626 17.477 3.7 17.7L6.3 20.3ZM12 6L18 12L20.3 9.7C20.5237 9.47703 20.7013 9.21209 20.8224 8.92036C20.9435 8.62864 21.0059 8.31587 21.0059 8C21.0059 7.68413 20.9435 7.37136 20.8224 7.07963C20.7013 6.78791 20.5237 6.52297 20.3 6.3L17.7 3.7C17.477 3.47626 17.2121 3.29873 16.9204 3.17759C16.6286 3.05646 16.3159 2.99411 16 2.99411C15.6841 2.99411 15.3714 3.05646 15.0796 3.17759C14.7879 3.29873 14.523 3.47626 14.3 3.7L12 6Z',
           subheading: (
             <>
-              Connect your <span className="text-foreground">favorite AI tools</span> such as Cursor
-              or Claude directly with Supabase.
+              Your AI editor understands your entire database schema.{' '}
+              <span className="text-foreground">
+                Claude and Cursor can manage migrations, write Edge Functions, and implement RLS
+                policies
+              </span>
+              —no context switching.
             </>
           ),
           image: (
@@ -461,7 +560,7 @@ const data: () => {
                 dark: '/images/solutions/neon/mcp-server-dark.svg',
                 light: '/images/solutions/neon/mcp-server-light.svg',
               }}
-              alt="Vector embeddings"
+              alt="MCP Server Integration"
               width={100}
               height={100}
               quality={100}
@@ -469,13 +568,16 @@ const data: () => {
           ),
         },
         {
-          id: 'auto-generated-apis',
-          title: 'Auto-generated APIs',
+          id: 'instant-apis',
+          title: 'Instant APIs from Your Schema',
           icon: 'M4.13477 12.8129C4.13477 14.1481 4.43245 15.4138 4.96506 16.5471M12.925 4.02271C11.5644 4.02271 10.276 4.33184 9.12614 4.88371M21.7152 12.8129C21.7152 11.4644 21.4115 10.1867 20.8688 9.0447M12.925 21.6032C14.2829 21.6032 15.5689 21.2952 16.717 20.7454M16.717 20.7454C17.2587 21.5257 18.1612 22.0366 19.1831 22.0366C20.84 22.0366 22.1831 20.6935 22.1831 19.0366C22.1831 17.3798 20.84 16.0366 19.1831 16.0366C17.5263 16.0366 16.1831 17.3798 16.1831 19.0366C16.1831 19.6716 16.3804 20.2605 16.717 20.7454ZM4.96506 16.5471C4.16552 17.086 3.63965 17.9999 3.63965 19.0366C3.63965 20.6935 4.98279 22.0366 6.63965 22.0366C8.2965 22.0366 9.63965 20.6935 9.63965 19.0366C9.63965 17.3798 8.2965 16.0366 6.63965 16.0366C6.01951 16.0366 5.44333 16.2248 4.96506 16.5471ZM9.12614 4.88371C8.58687 4.08666 7.67444 3.56274 6.63965 3.56274C4.98279 3.56274 3.63965 4.90589 3.63965 6.56274C3.63965 8.2196 4.98279 9.56274 6.63965 9.56274C8.2965 9.56274 9.63965 8.2196 9.63965 6.56274C9.63965 5.94069 9.45032 5.36285 9.12614 4.88371ZM20.8688 9.0447C21.6621 8.50486 22.1831 7.59464 22.1831 6.56274C22.1831 4.90589 20.84 3.56274 19.1831 3.56274C17.5263 3.56274 16.1831 4.90589 16.1831 6.56274C16.1831 8.2196 17.5263 9.56274 19.1831 9.56274C19.8081 9.56274 20.3884 9.37165 20.8688 9.0447Z',
           subheading: (
             <>
-              <span className="text-foreground">Learn SQL when you're ready.</span> In the meantime,
-              Supabase generates automatic APIs to make coding a lot easier.
+              AI builders need endpoints immediately.{' '}
+              <span className="text-foreground">
+                Every table gets REST and GraphQL APIs automatically
+              </span>
+              . Your prompts become production APIs.
             </>
           ),
           image: (
@@ -485,7 +587,7 @@ const data: () => {
                 dark: '/images/solutions/neon/auto-generated-apis-dark.png',
                 light: '/images/solutions/neon/auto-generated-apis-light.png',
               }}
-              alt="Auto Generated APIs"
+              alt="Instant APIs"
               width={100}
               height={100}
               quality={100}
@@ -493,41 +595,18 @@ const data: () => {
           ),
         },
         {
-          id: 'foreign-data-wrappers',
-          title: 'Foreign Data Wrappers',
-          icon: 'M10.2805 18.2121C11.2419 18.6711 12.3325 18.8932 13.4711 18.8084C15.2257 18.6776 16.7596 17.843 17.8169 16.6015M8.21496 8.36469C9.27117 7.14237 10.7928 6.322 12.5311 6.19248C13.7196 6.10392 14.8558 6.34979 15.8474 6.85054M17.8169 16.6015L20.5242 19.3223C22.1857 17.5141 23.1562 15.1497 23.1562 12.5005C23.1562 6.89135 18.6091 2.34424 13 2.34424C10.9595 2.34424 9.16199 2.87659 7.57035 3.91232C8.35717 3.56865 9.22613 3.37801 10.1396 3.37801C12.6236 3.37801 14.7783 4.78762 15.8474 6.85054M17.8169 16.6015V16.6015C16.277 15.059 16.3448 12.5527 16.5387 10.3817C16.5557 10.191 16.5644 9.99794 16.5644 9.80282C16.5644 8.73844 16.3056 7.73451 15.8474 6.85054M13 22.6567C7.39086 22.6567 2.84375 18.1096 2.84375 12.5005C2.84375 9.84123 3.8026 7.48969 5.4753 5.67921L8.21496 8.42354V8.42354C9.76942 9.98064 9.69844 12.5133 9.51947 14.7062C9.50526 14.8803 9.49802 15.0564 9.49802 15.2341C9.49802 18.7705 12.3648 21.6373 15.9012 21.6373C16.8116 21.6373 17.6776 21.4473 18.4618 21.1048C16.8609 22.1588 15.06 22.6567 13 22.6567Z',
-          subheading: (
-            <>
-              Connect Supabase to <span className="text-foreground">Redshift, BigQuery, MySQL</span>
-              , and external APIs for seamless integrations.
-            </>
-          ),
-          image: (
-            <Image
-              draggable={false}
-              src={{
-                dark: '/images/solutions/neon/foreign-data-wrappers-dark.png',
-                light: '/images/solutions/neon/foreign-data-wrappers-light.png',
-              }}
-              alt="Foreign Data Wrappers"
-              containerClassName="md:mb-4"
-              width={100}
-              height={100}
-              quality={100}
-            />
-          ),
-        },
-        {
-          id: 'instant-deployment',
-          title: 'Instant and secure deployment',
+          id: 'dev-pipeline',
+          title: 'Development → Staging → Production Pipeline',
           icon: 'M12.5 1.5625C6.45939 1.5625 1.5625 6.45939 1.5625 12.5C1.5625 18.5406 6.45939 23.4375 12.5 23.4375C18.5406 23.4375 23.4375 18.5406 23.4375 12.5C23.4375 9.90692 22.5351 7.52461 21.0273 5.64995L11.6145 15.0627L9.61957 13.0677M12.6068 5.82237C8.92939 5.82237 5.94826 8.80351 5.94826 12.4809C5.94826 16.1583 8.92939 19.1395 12.6068 19.1395C16.2842 19.1395 19.2654 16.1583 19.2654 12.4809C19.2654 11.1095 18.8507 9.83483 18.14 8.77557',
           subheading: (
             <>
-              <span className="text-foreground">No need to set up servers</span>, manage DevOps, or
-              tweak security settings.
+              Start with free prototypes, graduate to production.{' '}
+              <span className="text-foreground">
+                One git push promotes everything: schema, functions, and security rules
+              </span>
+              .
             </>
           ),
-
           image: (
             <>
               <Image
@@ -562,24 +641,6 @@ const data: () => {
                 quality={100}
               />
             </>
-          ),
-        },
-        {
-          id: 'observability',
-          title: 'Observability',
-          icon: 'M11.1404 7.66537C11.1404 5.18146 13.1541 3.16785 15.638 3.16785H17.3775C19.8614 3.16785 21.875 5.18146 21.875 7.66537V17.3776C21.875 19.8615 19.8614 21.8751 17.3775 21.8751H15.638C13.1541 21.8751 11.1404 19.8615 11.1404 17.3776V7.66537Z M3.125 14.7821C3.125 13.4015 4.24419 12.2823 5.62477 12.2823C7.00536 12.2823 8.12454 13.4015 8.12454 14.7821V19.3754C8.12454 20.7559 7.00536 21.8751 5.62477 21.8751C4.24419 21.8751 3.125 20.7559 3.125 19.3754V14.7821Z M3.125 5.58522C3.125 4.20463 4.24419 3.08545 5.62477 3.08545C7.00536 3.08545 8.12454 4.20463 8.12454 5.58522V6.95164C8.12454 8.33223 7.00536 9.45142 5.62477 9.45142C4.24419 9.45142 3.125 8.33223 3.125 6.95164V5.58522Z',
-          subheading: (
-            <>
-              Built-in logs, query performance tools, and security insights for{' '}
-              <span className="text-foreground">easy debugging</span>.
-            </>
-          ),
-          image: (
-            <RealtimeLogs
-              isActive={false}
-              isInView={true}
-              className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:!bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]"
-            />
           ),
         },
       ],
@@ -677,6 +738,44 @@ const data: () => {
             </>
           ),
           icon: 'M22.375 5.7085C22.375 7.43439 18.1777 8.8335 13 8.8335C7.82233 8.8335 3.625 7.43439 3.625 5.7085M22.375 5.7085C22.375 3.98261 18.1777 2.5835 13 2.5835C7.82233 2.5835 3.625 3.98261 3.625 5.7085M22.375 5.7085V10.1877M3.625 5.7085L3.625 20.2918C3.62434 20.9675 4.28075 21.6251 5.49583 22.166C6.71091 22.7069 8.41919 23.1019 10.3646 23.2918M3.625 13.0002C3.6235 13.5826 4.11036 14.1536 5.03066 14.6487C5.95095 15.1438 7.26805 15.5434 8.83334 15.8022M13 13.0002V17.1668M13 17.1668H17.1667M13 17.1668L15.1771 14.9897C16.0833 14.0835 17.3438 13.521 18.7292 13.521C19.9724 13.521 21.1647 14.0149 22.0437 14.8939C22.9228 15.773 23.4167 16.9653 23.4167 18.2085C23.4167 19.3016 23.0727 20.3671 22.4336 21.2539C21.7944 22.1407 20.8924 22.8039 19.8554 23.1496C18.8183 23.4952 17.6988 23.5059 16.6554 23.1799C15.612 22.854 14.6975 22.208 14.0417 21.3335',
+        },
+      ],
+    },
+    innovationEnablement: {
+      id: 'innovation-enablement',
+      heading: (
+        <>
+          From Prototype to Production: <br />{' '}
+          <span className="text-foreground">The Innovation Playbook</span>
+        </>
+      ),
+      options: [
+        {
+          title: 'Prototype Today',
+          type: 'Self-Serve',
+          description: 'Start free with any AI builder + Supabase',
+          cta: {
+            label: 'Create Your First App in 5 Minutes',
+            href: 'https://supabase.com/dashboard',
+          },
+        },
+        {
+          title: 'Innovation Sprint',
+          type: 'Guided',
+          description: '1-day hackathon for your team. Build 3 production-ready prototypes.',
+          cta: {
+            label: 'Contact our Growth Team',
+            href: '/contact/sales',
+          },
+        },
+        {
+          title: 'Enterprise Pilot',
+          type: 'Full Support',
+          description: '30-day program with dedicated success team',
+          cta: {
+            label: 'Talk to Sales',
+            href: '/contact/sales',
+          },
         },
       ],
     },

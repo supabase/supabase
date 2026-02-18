@@ -2,10 +2,10 @@ import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
 import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
-import { parse } from 'libpg-query'
-import { MOCK_TABLES_DATA } from 'lib/ai/tools/mock-tools'
+import { extractUrls } from 'lib/helpers'
 import { extractIdentifiers } from 'lib/sql-identifier-quoting'
 import { isQuotedInSql, needsQuoting } from 'lib/sql-identifier-quoting'
+import { parse } from 'libpg-query'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 
@@ -321,5 +321,43 @@ export const sqlIdentifierQuotingScorer: EvalScorer<Input, Output, Expected> = a
     name: 'SQL Identifier Quoting',
     score,
     metadata: errors.length > 0 ? { errors } : undefined,
+  }
+}
+
+export const urlValidityScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
+  const responseText = extractTextOnly(output.steps)
+  const urls = extractUrls(responseText, { excludeCodeBlocks: true, excludeTemplates: true })
+
+  // Skip if no URLs found
+  if (urls.length === 0) {
+    return null
+  }
+
+  const errors: string[] = []
+  let validUrls = 0
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+      if (response.ok) {
+        validUrls++
+      } else {
+        errors.push(`${url} returned ${response.status}`)
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      errors.push(`${url} failed: ${errorMessage}`)
+    }
+  }
+
+  const metadata = {
+    urls,
+    errors: errors.length > 0 ? errors : undefined,
+  }
+
+  return {
+    name: 'URL Validity',
+    score: validUrls / urls.length,
+    metadata,
   }
 }

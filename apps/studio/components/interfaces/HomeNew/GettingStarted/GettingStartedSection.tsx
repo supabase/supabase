@@ -1,30 +1,22 @@
-import { Code, Table2 } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useCallback, useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
+import { IS_PLATFORM, useParams } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
+import { Code, Table2 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Button, Card, CardContent, ToggleGroup, ToggleGroupItem } from 'ui'
-import { FrameworkSelector } from './FrameworkSelector'
+
 import { GettingStarted } from './GettingStarted'
 import {
   GettingStartedAction,
   GettingStartedState,
   GettingStartedStep,
 } from './GettingStarted.types'
-import {
-  DEFAULT_FRAMEWORK_KEY,
-  getCodeWorkflowSteps,
-  getNoCodeWorkflowSteps,
-} from './GettingStarted.utils'
+import { getCodeWorkflowSteps, getNoCodeWorkflowSteps } from './GettingStarted.utils'
 import { useGettingStartedProgress } from './useGettingStartedProgress'
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 
 interface GettingStartedSectionProps {
   value: GettingStartedState
@@ -32,15 +24,11 @@ interface GettingStartedSectionProps {
 }
 
 export function GettingStartedSection({ value, onChange }: GettingStartedSectionProps) {
-  const router = useRouter()
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const [selectedFramework, setSelectedFramework] = useState<string>(DEFAULT_FRAMEWORK_KEY)
   const workflow: 'no-code' | 'code' | null = value === 'code' || value === 'no-code' ? value : null
   const [previousWorkflow, setPreviousWorkflow] = useState<'no-code' | 'code' | null>(null)
 
@@ -54,68 +42,14 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
     [aiSnap, openSidebar]
   )
 
-  const connectPresetLinks = useMemo(() => {
-    const basePath = router.asPath.split('?')[0]
-    const parent = FRAMEWORKS.find((f) => f.key === selectedFramework)
-    if (!parent) {
-      return [
-        {
-          label: 'Connect',
-          href: `${basePath}?showConnect=true&connectTab=frameworks`,
-        },
-      ]
-    }
-
-    let using: string | undefined
-    let withKey: string | undefined
-    if (parent.children && parent.children.length > 0) {
-      // prefer App Router for Nextjs by default
-      if (parent.key === 'nextjs') {
-        const appChild = parent.children.find((c) => c.key === 'app') || parent.children[0]
-        using = appChild?.key
-        withKey = appChild?.children?.[0]?.key
-      } else {
-        using = parent.children[0]?.key
-        withKey = parent.children[0]?.children?.[0]?.key
-      }
-    }
-
-    const qs = new URLSearchParams({
-      showConnect: 'true',
-      connectTab: 'frameworks',
-      framework: parent.key,
-    })
-    if (using) qs.set('using', using)
-    if (withKey) qs.set('with', withKey)
-
+  const connectActions: GettingStartedAction[] = useMemo(() => {
     return [
       {
         label: 'Connect',
-        href: `${basePath}?${qs.toString()}`,
+        component: <ConnectButton buttonType="primary" />,
       },
     ]
-  }, [router.asPath, selectedFramework])
-
-  const connectActions: GettingStartedAction[] = useMemo(() => {
-    const selector: GettingStartedAction = {
-      label: 'Framework selector',
-      component: (
-        <FrameworkSelector
-          value={selectedFramework}
-          onChange={setSelectedFramework}
-          items={FRAMEWORKS}
-        />
-      ),
-    }
-
-    const linkActions: GettingStartedAction[] = connectPresetLinks.map((lnk) => ({
-      label: 'Connect',
-      href: lnk.href,
-      variant: 'primary',
-    }))
-
-    return [selector, ...linkActions]
-  }, [connectPresetLinks, selectedFramework])
+  }, [])
 
   const codeSteps: GettingStartedStep[] = useMemo(
     () =>
@@ -141,6 +75,19 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
 
   const steps = workflow === 'code' ? codeSteps : workflow === 'no-code' ? noCodeSteps : []
 
+  const hasTrackedExposure = useRef(false)
+
+  useEffect(() => {
+    if (!IS_PLATFORM) return
+    if (hasTrackedExposure.current) return
+
+    hasTrackedExposure.current = true
+
+    track('home_getting_started_section_exposed', {
+      workflow: workflow === 'no-code' ? 'no_code' : workflow === 'code' ? 'code' : null,
+    })
+  }, [workflow, track])
+
   return (
     <section className="w-full">
       <div className="flex justify-between items-center mb-6">
@@ -154,16 +101,9 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
                 const newWorkflow = v as 'no-code' | 'code'
                 setPreviousWorkflow(workflow)
                 onChange(newWorkflow)
-                sendEvent({
-                  action: 'home_getting_started_workflow_clicked',
-                  properties: {
-                    workflow: newWorkflow === 'no-code' ? 'no_code' : 'code',
-                    is_switch: previousWorkflow !== null,
-                  },
-                  groups: {
-                    project: project?.ref || '',
-                    organization: organization?.slug || '',
-                  },
+                track('home_getting_started_workflow_clicked', {
+                  workflow: newWorkflow === 'no-code' ? 'no_code' : 'code',
+                  is_switch: previousWorkflow !== null,
                 })
               }
             }}
@@ -197,17 +137,10 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
                   (step) => step.status === 'complete'
                 ).length
                 const totalSteps = (workflow === 'code' ? codeSteps : noCodeSteps).length
-                sendEvent({
-                  action: 'home_getting_started_closed',
-                  properties: {
-                    workflow: workflow === 'no-code' ? 'no_code' : 'code',
-                    steps_completed: completedSteps,
-                    total_steps: totalSteps,
-                  },
-                  groups: {
-                    project: project?.ref || '',
-                    organization: organization?.slug || '',
-                  },
+                track('home_getting_started_closed', {
+                  workflow: workflow === 'no-code' ? 'no_code' : 'code',
+                  steps_completed: completedSteps,
+                  total_steps: totalSteps,
                 })
               }
             }}
@@ -250,16 +183,9 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
                 onClick={() => {
                   setPreviousWorkflow(workflow)
                   onChange('no-code')
-                  sendEvent({
-                    action: 'home_getting_started_workflow_clicked',
-                    properties: {
-                      workflow: 'no_code',
-                      is_switch: previousWorkflow !== null,
-                    },
-                    groups: {
-                      project: project?.ref || '',
-                      organization: organization?.slug || '',
-                    },
+                  track('home_getting_started_workflow_clicked', {
+                    workflow: 'no_code',
+                    is_switch: previousWorkflow !== null,
                   })
                 }}
                 className="block gap-2 h-auto p-4 md:p-8 max-w-80 text-left justify-start bg-background "
@@ -278,16 +204,9 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
                 onClick={() => {
                   setPreviousWorkflow(workflow)
                   onChange('code')
-                  sendEvent({
-                    action: 'home_getting_started_workflow_clicked',
-                    properties: {
-                      workflow: 'code',
-                      is_switch: previousWorkflow !== null,
-                    },
-                    groups: {
-                      project: project?.ref || '',
-                      organization: organization?.slug || '',
-                    },
+                  track('home_getting_started_workflow_clicked', {
+                    workflow: 'code',
+                    is_switch: previousWorkflow !== null,
                   })
                 }}
                 className="bg-background block gap-2 h-auto p-4 md:p-8 max-w-80 text-left justify-start"
@@ -308,19 +227,12 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
           steps={steps}
           onStepClick={({ stepIndex, stepTitle, actionType, wasCompleted }) => {
             if (workflow) {
-              sendEvent({
-                action: 'home_getting_started_step_clicked',
-                properties: {
-                  workflow: workflow === 'no-code' ? 'no_code' : 'code',
-                  step_number: stepIndex + 1,
-                  step_title: stepTitle,
-                  action_type: actionType,
-                  was_completed: wasCompleted,
-                },
-                groups: {
-                  project: project?.ref || '',
-                  organization: organization?.slug || '',
-                },
+              track('home_getting_started_step_clicked', {
+                workflow: workflow === 'no-code' ? 'no_code' : 'code',
+                step_number: stepIndex + 1,
+                step_title: stepTitle,
+                action_type: actionType,
+                was_completed: wasCompleted,
               })
             }
           }}

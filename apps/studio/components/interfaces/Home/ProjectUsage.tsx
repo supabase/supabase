@@ -1,68 +1,26 @@
-import dayjs from 'dayjs'
-import { Auth, Database, Realtime, Storage } from 'icons'
-import sumBy from 'lodash/sumBy'
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import BarChart from 'components/ui/Charts/BarChart'
-import { InlineLink } from 'components/ui/InlineLink'
+import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
+import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
 import Panel from 'components/ui/Panel'
 import {
   ProjectLogStatsVariables,
   UsageApiCounts,
   useProjectLogStatsQuery,
 } from 'data/analytics/project-log-stats-query'
+import dayjs from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { ChartIntervals } from 'types'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  Loading,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Auth, Database, Realtime, Storage } from 'icons'
+import sumBy from 'lodash/sumBy'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Loading } from 'ui'
 
 type ChartIntervalKey = ProjectLogStatsVariables['interval']
-
-const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
-
-const CHART_INTERVALS: ChartIntervals[] = [
-  {
-    key: '1hr',
-    label: 'Last 60 minutes',
-    startValue: 1,
-    startUnit: 'hour',
-    format: 'MMM D, h:mma',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
-  },
-  {
-    key: '1day',
-    label: 'Last 24 hours',
-    startValue: 24,
-    startUnit: 'hour',
-    format: 'MMM D, ha',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
-  },
-  {
-    key: '7day',
-    label: 'Last 7 days',
-    startValue: 7,
-    startUnit: 'day',
-    format: 'MMM D',
-    availableIn: ['pro', 'team', 'enterprise'],
-  },
-]
 
 const ProjectUsage = () => {
   const router = useRouter()
@@ -88,20 +46,20 @@ const ProjectUsage = () => {
     selectedInterval.startUnit as dayjs.ManipulateType
   )
   const endDateLocal = dayjs()
-  const { data: charts } = useFillTimeseriesSorted(
-    data?.result || [],
-    'timestamp',
-    [
+  const { data: charts } = useFillTimeseriesSorted({
+    data: data?.result ?? [],
+    timestampKey: 'timestamp',
+    valueKey: [
       'total_auth_requests',
       'total_rest_requests',
       'total_storage_requests',
       'total_realtime_requests',
     ],
-    0,
-    startDateLocal.toISOString(),
-    endDateLocal.toISOString(),
-    5
-  )
+    defaultValue: 0,
+    startDate: startDateLocal.toISOString(),
+    endDate: endDateLocal.toISOString(),
+    minPointsToFill: 5,
+  })
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
   const handleBarClick = (
@@ -133,64 +91,15 @@ const ProjectUsage = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-row items-center gap-x-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="default" iconRight={<ChevronDown size={14} />}>
-              <span>{selectedInterval.label}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start" className="w-40">
-            <DropdownMenuRadioGroup
-              value={interval}
-              onValueChange={(interval) =>
-                setInterval(interval as ProjectLogStatsVariables['interval'])
-              }
-            >
-              {CHART_INTERVALS.map((i) => {
-                const disabled = !i.availableIn?.includes(plan?.id || 'free')
-
-                if (disabled) {
-                  const retentionDuration = LOG_RETENTION[plan?.id ?? 'free']
-                  return (
-                    <Tooltip key={i.key}>
-                      <TooltipTrigger asChild>
-                        <DropdownMenuRadioItem
-                          disabled
-                          value={i.key}
-                          className="!pointer-events-auto"
-                        >
-                          {i.label}
-                        </DropdownMenuRadioItem>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        <p>
-                          {plan?.name} plan only includes up to {retentionDuration} day
-                          {retentionDuration > 1 ? 's' : ''} of log retention
-                        </p>
-                        <p className="text-foreground-light">
-                          <InlineLink
-                            className="text-foreground-light hover:text-foreground"
-                            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}
-                          >
-                            Upgrade your plan
-                          </InlineLink>{' '}
-                          to increase log retention and view statistics for the{' '}
-                          {i.label.toLowerCase()}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )
-                } else {
-                  return (
-                    <DropdownMenuRadioItem key={i.key} value={i.key}>
-                      {i.label}
-                    </DropdownMenuRadioItem>
-                  )
-                }
-              })}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ChartIntervalDropdown
+          value={interval || '1day'}
+          onChange={(interval) => setInterval(interval as ProjectLogStatsVariables['interval'])}
+          planId={plan?.id}
+          planName={plan?.name}
+          organizationSlug={organization?.slug}
+          dropdownAlign="start"
+          tooltipSide="right"
+        />
         <span className="text-xs text-foreground-light">
           Statistics for {selectedInterval.label.toLowerCase()}
         </span>

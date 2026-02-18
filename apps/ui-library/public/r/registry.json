@@ -97,10 +97,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -139,10 +139,10 @@
       "dependencies": [
         "@supabase/supabase-js@latest"
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -217,10 +217,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -313,10 +313,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -379,10 +379,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -407,10 +407,10 @@
       "dependencies": [
         "@supabase/supabase-js@latest"
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -468,10 +468,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -530,10 +530,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -573,10 +573,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -607,10 +607,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -646,10 +646,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -685,10 +685,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -729,10 +729,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -764,10 +764,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -804,10 +804,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -844,10 +844,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -889,10 +889,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -925,10 +925,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -966,10 +966,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1007,10 +1007,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1061,10 +1061,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1106,10 +1106,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1156,10 +1156,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1206,10 +1206,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1257,10 +1257,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1299,10 +1299,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1346,10 +1346,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1393,10 +1393,10 @@
           "type": "registry:lib"
         }
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       }
     },
     {
@@ -1428,10 +1428,10 @@
         "@supabase/ssr@latest",
         "@supabase/supabase-js@latest"
       ],
-      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NEXT_PUBLIC_SUPABASE_URL": "",
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
       },
       "files": [
         {
@@ -1458,10 +1458,10 @@
       "dependencies": [
         "@supabase/supabase-js@latest"
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       },
       "files": [
         {
@@ -1481,10 +1481,10 @@
         "@supabase/ssr@latest",
         "@supabase/supabase-js@latest"
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       },
       "files": [
         {
@@ -1508,10 +1508,10 @@
         "@supabase/ssr@latest",
         "@supabase/supabase-js@latest"
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       },
       "files": [
         {
@@ -1712,10 +1712,10 @@
         "@supabase/ssr@latest",
         "@supabase/supabase-js@latest"
       ],
-      "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "NUXT_PUBLIC_SUPABASE_URL": "",
-        "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
       },
       "files": [
         {
@@ -1749,10 +1749,10 @@
       "dependencies": [
         "@supabase/supabase-js@latest"
       ],
-      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "envVars": {
         "VITE_SUPABASE_URL": "",
-        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
       },
       "files": [
         {
@@ -1947,6 +1947,134 @@
       "dependencies": [
         "@supabase/ssr@latest",
         "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "dropzone-nuxtjs",
+      "type": "registry:block",
+      "title": "Dropzone (File Upload) for Nuxt and Supabase",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/components/dropzone.vue",
+          "type": "registry:component",
+          "target": "app/components/dropzone.vue"
+        },
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/components/dropzone-empty-state.vue",
+          "type": "registry:component",
+          "target": "app/components/dropzone-empty-state.vue"
+        },
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/components/dropzone-content.vue",
+          "type": "registry:component",
+          "target": "app/components/dropzone-content.vue"
+        },
+        {
+          "path": "registry/default/dropzone/nuxtjs/app/composables/useSupabaseUpload.ts",
+          "type": "registry:component",
+          "target": "app/composables/useSupabaseUpload.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "dropzone-vue",
+      "type": "registry:block",
+      "title": "Dropzone (File Upload) for Vue and Supabase",
+      "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/default/dropzone/vue/components/dropzone.vue",
+          "type": "registry:component",
+          "target": "components/dropzone.vue"
+        },
+        {
+          "path": "registry/default/dropzone/vue/components/dropzone-empty-state.vue",
+          "type": "registry:component",
+          "target": "components/dropzone-empty-state.vue"
+        },
+        {
+          "path": "registry/default/dropzone/vue/components/dropzone-content.vue",
+          "type": "registry:component",
+          "target": "components/dropzone-content.vue"
+        },
+        {
+          "path": "registry/default/dropzone/vue/composables/useSupabaseUpload.ts",
+          "type": "registry:component",
+          "target": "composables/useSupabaseUpload.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "realtime-cursor-nuxtjs",
+      "type": "registry:component",
+      "title": "Realtime Cursor for Nuxt and Supabase",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "files": [
+        {
+          "path": "registry/default/realtime-cursor/nuxtjs/app/components/cursor.vue",
+          "type": "registry:component",
+          "target": "app/components/cursor.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/nuxtjs/app/components/realtime-cursors.vue",
+          "type": "registry:component",
+          "target": "app/components/realtime-cursors.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/nuxtjs/app/composables/useRealtimeCursors.ts",
+          "type": "registry:component",
+          "target": "app/composables/useRealtimeCursors.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "realtime-cursor-vue",
+      "type": "registry:component",
+      "title": "Realtime Cursor for Vue and Supabase",
+      "description": "Component which renders realtime cursors from other users in a room.",
+      "files": [
+        {
+          "path": "registry/default/realtime-cursor/vue/components/cursor.vue",
+          "type": "registry:component",
+          "target": "components/cursor.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/vue/components/realtime-cursors.vue",
+          "type": "registry:component",
+          "target": "components/realtime-cursors.vue"
+        },
+        {
+          "path": "registry/default/realtime-cursor/vue/composables/useRealtimeCursors.ts",
+          "type": "registry:component",
+          "target": "composables/useRealtimeCursors.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@vueuse/core",
+        "lucide-vue-next"
       ]
     },
     {

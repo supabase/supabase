@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 export const useTableEditorFiltersSort = () => {
   const router = useRouter()
@@ -21,21 +21,29 @@ export const useTableEditorFiltersSort = () => {
     sort?: string[]
   }
 
-  const setParams = (fn: (prevParams: SetParamsArgs) => SetParamsArgs) => {
-    const prevParams = { filter: filters, sort: sorts }
-    const newParams = fn(prevParams)
+  const setParams = useCallback(
+    (fn: (prevParams: SetParamsArgs) => SetParamsArgs) => {
+      const prevParams = { filter: filters, sort: sorts }
+      const newParams = fn(prevParams)
 
-    const hasFilter = newParams.filter !== undefined
-    const hasSort = newParams.sort !== undefined
+      const hasFilter = newParams.filter !== undefined
+      const hasSort = newParams.sort !== undefined
 
-    router.push({
-      query: {
-        ...router.query,
-        ...(hasFilter ? { filter: newParams.filter } : {}),
-        ...(hasSort ? { sort: newParams.sort } : {}),
-      },
-    })
-  }
+      router.push(
+        {
+          query: {
+            ...router.query,
+            ...(hasFilter ? { filter: newParams.filter } : {}),
+            ...(hasSort ? { sort: newParams.sort } : {}),
+          },
+        },
+        undefined,
+        { shallow: true }
+      )
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filters, sorts]
+  )
 
   return {
     filters,

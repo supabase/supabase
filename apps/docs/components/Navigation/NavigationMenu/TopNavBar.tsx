@@ -8,6 +8,7 @@ import { memo, useState } from 'react'
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { isFeatureEnabled } from 'common/enabled-features'
+import { DevToolbarTrigger } from 'dev-tools'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu, CommandMenuTriggerInput } from 'ui-patterns'
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
@@ -43,6 +44,7 @@ const TopNavBar: FC = () => {
             </div>
 
             <div className="flex gap-2 items-center">
+              <DevToolbarTrigger />
               <CommandMenuTriggerInput
                 placeholder={
                   <>

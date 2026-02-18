@@ -1,10 +1,4 @@
 import type { OAuthClient } from '@supabase/supabase-js'
-import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -14,14 +8,18 @@ import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
-  Badge,
   Button,
   Card,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
   Table,
@@ -36,6 +34,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
 import { NewOAuthAppBanner } from './NewOAuthAppBanner'
@@ -62,76 +61,63 @@ type OAuthAppsSortOrder = OAuthAppsSort extends `${string}:${infer Order}` ? Ord
 
 export const OAuthAppsList = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, isPending: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    isPending: isAuthConfigLoading,
+    isSuccess: isSuccessAuthConfig,
+  } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
+
   const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
   const [filteredRegistrationTypes, setFilteredRegistrationTypes] = useState<string[]>([])
   const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
-  const deletingOAuthAppIdRef = useRef<string | null>(null)
+  const [filterString, setFilterString] = useState<string>('')
 
-  const { data, isPending: isLoading, isError, error } = useOAuthServerAppsQuery({ projectRef })
+  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useOAuthServerAppsQuery({ projectRef })
+  const oAuthApps = useMemo(() => data?.clients || [], [data])
 
   const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
       onSuccess: (data) => {
-        if (data) {
-          setNewOAuthApp(data)
-        }
+        if (data) setNewOAuthApp(data)
       },
     })
-
-  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
-
-  const oAuthApps = useMemo(() => data?.clients || [], [data])
-
-  const [showCreateSheet, setShowCreateSheet] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-
-  // Prevent opening the create sheet if OAuth Server is disabled
-  useEffect(() => {
-    if (!isOAuthServerEnabled && showCreateSheet) {
-      setShowCreateSheet(false)
-    }
-  }, [isOAuthServerEnabled, showCreateSheet, setShowCreateSheet])
-
-  const { setValue: setSelectedAppToEdit, value: appToEdit } = useQueryStateWithSelect({
-    urlKey: 'edit',
-    select: (client_id: string) =>
-      client_id ? oAuthApps?.find((app) => app.client_id === client_id) : undefined,
-    enabled: !!oAuthApps?.length,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingOAuthAppIdRef, selectedId, `OAuth App not found`),
-  })
-
-  const { setValue: setSelectedAppToDelete, value: appToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (client_id: string) =>
-      client_id ? oAuthApps?.find((app) => app.client_id === client_id) : undefined,
-    enabled: !!oAuthApps?.length,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingOAuthAppIdRef, selectedId, `OAuth App not found`),
-  })
-
-  const { mutate: deleteOAuthApp, isPending: isDeletingApp } = useOAuthServerAppDeleteMutation({
-    onSuccess: () => {
-      toast.success(`Successfully deleted OAuth app`)
-      setSelectedAppToDelete(null)
-    },
-    onError: () => {
-      deletingOAuthAppIdRef.current = null
-    },
-  })
-
-  const [filterString, setFilterString] = useState<string>('')
 
   const [sort, setSort] = useQueryState(
     'sort',
     parseAsStringLiteral<OAuthAppsSort>(OAUTH_APPS_SORT_VALUES).withDefault('name:asc')
   )
+
+  const [showCreateSheet, setShowCreateSheet] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false)
+  )
+
+  const [selectedAppToEdit, setSelectedAppToEdit] = useQueryState('edit', parseAsString)
+  const appToEdit = oAuthApps?.find((app) => app.client_id === selectedAppToEdit)
+
+  const [selectedAppToDelete, setSelectedAppToDelete] = useQueryState('delete', parseAsString)
+  const appToDelete = oAuthApps?.find((app) => app.client_id === selectedAppToDelete)
+
+  const {
+    mutate: deleteOAuthApp,
+    isPending: isDeletingApp,
+    isSuccess: isSuccessDelete,
+  } = useOAuthServerAppDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted OAuth app`)
+      setSelectedAppToDelete(null)
+    },
+  })
 
   const filteredAndSortedOAuthApps = useMemo(() => {
     const filtered = filterOAuthApps({
@@ -193,6 +179,27 @@ export const OAuthAppsList = () => {
   const isCreateMode = showCreateSheet && isOAuthServerEnabled
   const isEditMode = !!appToEdit
   const isCreateOrUpdateSheetVisible = isCreateMode || isEditMode
+
+  // Prevent opening the create sheet if OAuth Server is disabled
+  useEffect(() => {
+    if (isSuccessAuthConfig && !isOAuthServerEnabled && showCreateSheet) {
+      setShowCreateSheet(false)
+    }
+  }, [isSuccessAuthConfig, isOAuthServerEnabled, showCreateSheet, setShowCreateSheet])
+
+  useEffect(() => {
+    if (isSuccess && !!selectedAppToEdit && !appToEdit) {
+      toast('App not found')
+      setSelectedAppToEdit(null)
+    }
+  }, [appToEdit, isSuccess, selectedAppToEdit, setSelectedAppToEdit])
+
+  useEffect(() => {
+    if (isSuccess && !!selectedAppToDelete && !appToDelete && !isSuccessDelete) {
+      toast('App not found')
+      setSelectedAppToDelete(null)
+    }
+  }, [appToDelete, isSuccess, isSuccessDelete, selectedAppToDelete, setSelectedAppToDelete])
 
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
@@ -291,7 +298,7 @@ export const OAuthAppsList = () => {
             <Table containerProps={{ stickyLastColumn: true }}>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
+                  <TableHead className="w-48 max-w-48 flex">
                     <TableHeadSort column="name" currentSort={sort} onSortChange={handleSortChange}>
                       Name
                     </TableHeadSort>
@@ -340,7 +347,7 @@ export const OAuthAppsList = () => {
                 {filteredAndSortedOAuthApps.length > 0 &&
                   filteredAndSortedOAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
-                      <TableCell className="w-48 max-w-48 flex" title={app.client_name}>
+                      <TableCell title={app.client_name}>
                         <Button
                           type="text"
                           className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
@@ -351,16 +358,16 @@ export const OAuthAppsList = () => {
                         </Button>
                       </TableCell>
                       <TableCell title={app.client_id}>
-                        <Badge className="font-mono">{app.client_id}</Badge>
+                        <code className="text-code-inline">{app.client_id}</code>
                       </TableCell>
-                      <TableCell className="text-xs text-foreground-light max-w-28 capitalize">
-                        {app.client_type}
-                      </TableCell>
-                      <TableCell className="text-xs text-foreground-light max-w-28 capitalize">
-                        {app.registration_type}
-                      </TableCell>
-                      <TableCell className="text-xs text-foreground-light min-w-28 max-w-40 w-1/6">
-                        <TimestampInfo utcTimestamp={app.created_at} labelFormat="D MMM, YYYY" />
+                      <TableCell className="max-w-28 capitalize">{app.client_type}</TableCell>
+                      <TableCell className="max-w-28 capitalize">{app.registration_type}</TableCell>
+                      <TableCell className="min-w-28 max-w-40 w-1/6">
+                        <TimestampInfo
+                          className="text-sm"
+                          utcTimestamp={app.created_at}
+                          labelFormat="D MMM, YYYY"
+                        />
                       </TableCell>
                       <TableCell className="max-w-20 bg-surface-100 @[944px]:hover:bg-surface-200 px-6">
                         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">
@@ -376,7 +383,7 @@ export const OAuthAppsList = () => {
                                 }}
                               >
                                 <Edit size={12} />
-                                <p>Update</p>
+                                <p>Edit OAuth app</p>
                               </DropdownMenuItem>
                               {app.client_type === 'confidential' && (
                                 <DropdownMenuItem
@@ -390,12 +397,13 @@ export const OAuthAppsList = () => {
                                   <p>Regenerate client secret</p>
                                 </DropdownMenuItem>
                               )}
+                              <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => setSelectedAppToDelete(app.client_id)}
                               >
                                 <Trash size={12} />
-                                <p>Delete</p>
+                                <p>Delete OAuth app</p>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -434,7 +442,6 @@ export const OAuthAppsList = () => {
         selectedApp={appToDelete}
         setVisible={setSelectedAppToDelete}
         onDelete={(params: Parameters<typeof deleteOAuthApp>[0]) => {
-          deletingOAuthAppIdRef.current = params.clientId ?? null
           deleteOAuthApp(params)
         }}
         isLoading={isDeletingApp}

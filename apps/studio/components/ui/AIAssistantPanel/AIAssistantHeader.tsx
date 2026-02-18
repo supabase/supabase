@@ -1,8 +1,8 @@
 import { Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
-
 import { AiIconAnimation, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIOptInModal } from './AIOptInModal'
@@ -29,7 +29,7 @@ export const AIAssistantHeader = ({
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
   return (
     <div className="z-30 sticky top-0">
-      <div className="border-b border-b-muted flex items-center bg gap-x-4 pl-4 pr-3 h-[46px]">
+      <div className="border-b border-b-muted flex items-center bg gap-x-4 pl-4 pr-3 min-h-[var(--header-height)]">
         <div className="text-sm flex-1 flex items-center">
           <AiIconAnimation size={20} allowHoverEffect={false} />
           <span className="text-border-stronger dark:text-border-strong ml-3">
