@@ -16,12 +16,13 @@ import { useApiKeysCommands } from './ApiKeys'
 import { useApiUrlCommand } from './ApiUrl'
 import { useContextSearchCommands } from './ContextSearchCommands'
 import { useCreateCommands } from './CreateCommands'
+import { orderCommandSectionsByPriority } from './ordering'
 import { useConfigureOrganizationCommand, useProjectSwitchCommand } from './OrgProjectSwitcher'
 import { useSupportCommands } from './Support'
-import { orderCommandSectionsByPriority } from './ordering'
 import { useConnectCommands } from '@/components/interfaces/ConnectButton/Connect.Commands'
 
 export default function StudioCommandMenu() {
+  useCreateCommands()
   useApiKeysCommands()
   useApiUrlCommand()
   useConnectCommands()
@@ -41,7 +42,6 @@ export default function StudioCommandMenu() {
   useSupportCommands()
   useChangelogCommand({ enabled: IS_PLATFORM })
   useThemeSwitcherCommands()
-  useCreateCommands()
   useContextSearchCommands()
 
   return (

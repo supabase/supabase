@@ -2828,8 +2828,13 @@ export const self_hosting: NavMenuConstant = {
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker' },
     {
-      name: 'Configuration',
-      items: [{ name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' }],
+      name: 'How-to Guides',
+      items: [
+        { name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Restore from Platform', url: '/guides/self-hosting/restore-from-platform' },
+        { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
+        { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+      ],
     },
     {
       name: 'Auth Server',

@@ -1,4 +1,4 @@
-import { getScheduleDeleteCronJobRunDetailsSql } from 'data/sql/queries/delete-cron-job-run-details'
+import { getScheduleDeleteCronJobRunDetailsSql } from 'data/database-cron-jobs/database-cron-jobs.sql'
 import { CheckCircle2, XCircle } from 'lucide-react'
 import {
   Button,
