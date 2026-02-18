@@ -1,17 +1,29 @@
 'use client'
 
 import { GripVertical } from 'lucide-react'
+import { useCallback, useLayoutEffect, useRef } from 'react'
 import {
   Group,
   Panel,
   Separator,
   useDefaultLayout,
-  type PanelImperativeHandle,
   type GroupProps,
+  type PanelImperativeHandle,
   type SeparatorProps,
 } from 'react-resizable-panels'
 
 import { cn } from '../../../lib/utils/cn'
+
+const serverCompatibleLocalStorage = {
+  getItem: (key: string) => {
+    if (typeof window === 'undefined') return null
+    return localStorage.getItem(key)
+  },
+  setItem: (key: string, value: string) => {
+    if (typeof window === 'undefined') return
+    localStorage.setItem(key, value)
+  },
+}
 
 /**
  * Internal component that provides persisted layout via useDefaultLayout hook.
@@ -22,7 +34,10 @@ const ResizablePanelGroupWithPersistence = ({
   onLayoutChanged: onLayoutChangedProp,
   ...props
 }: GroupProps & { autoSaveId: string }) => {
-  const { defaultLayout, onLayoutChanged } = useDefaultLayout({ id: autoSaveId })
+  const { defaultLayout, onLayoutChanged } = useDefaultLayout({
+    id: autoSaveId,
+    storage: serverCompatibleLocalStorage,
+  })
 
   return (
     <Group
