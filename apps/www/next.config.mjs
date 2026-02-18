@@ -102,6 +102,24 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/(docs|blog)/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+        ],
+      },
+      {
+        source: '/dashboard/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {

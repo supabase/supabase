@@ -1,11 +1,11 @@
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import {
   CTID_BATCH_PAGE_SIZE,
   getDeleteOldCronJobRunDetailsByCtidKey,
   getDeleteOldCronJobRunDetailsByCtidSql,
   getJobRunDetailsPageCountKey,
   getJobRunDetailsPageCountSql,
-} from 'data/sql/queries/delete-cron-job-run-details'
+} from 'data/database-cron-jobs/database-cron-jobs.sql'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 

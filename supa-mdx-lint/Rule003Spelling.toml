@@ -398,6 +398,7 @@ allow_list = [
     "pgvector",
     "plpgsql",
     "psql",
+    "safeupdate",
     "scrypt",
     "screencast",
     "sessionStorage",

@@ -1208,9 +1208,12 @@ testRunner('table editor', () => {
     const gridContainer = page.getByTestId('table-editor-grid-container')
 
     await gridContainer.dispatchEvent('dragover', { dataTransfer })
+
+    // After the refactor, the empty state text and import button remain visible during drag
+    // (no more "Drop your CSV file here" overlay), just a dashed border is shown
     await expect(
-      page.getByText('Drop your CSV file here'),
-      'Drag feedback should show when CSV is dragged over'
+      page.getByText('This table is empty'),
+      'Empty table message should remain visible during drag'
     ).toBeVisible()
 
     await gridContainer.dispatchEvent('drop', { dataTransfer })
