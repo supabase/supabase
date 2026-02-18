@@ -104,7 +104,7 @@ describe('LayoutSidebar', () => {
 
   const renderSidebar = () =>
     render(
-      <ResizablePanelGroup direction="horizontal">
+      <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel>
           <div />
         </ResizablePanel>

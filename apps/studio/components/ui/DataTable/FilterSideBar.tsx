@@ -31,9 +31,8 @@ export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
 
   return (
     <ResizablePanel
-      order={1}
-      maxSize={33}
-      defaultSize={1}
+      maxSize="33"
+      defaultSize="1"
       id="panel-left"
       className={cn(
         'flex flex-col w-full',

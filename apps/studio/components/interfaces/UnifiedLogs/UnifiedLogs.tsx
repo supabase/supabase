@@ -330,7 +330,7 @@ export const UnifiedLogs = () => {
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
-        <ResizablePanelGroup direction="horizontal" autoSaveId="logs-layout">
+        <ResizablePanelGroup orientation="horizontal" autoSaveId="logs-layout">
           <FilterSideBar dateRangeDisabled={{ after: new Date() }} />
           <ResizableHandle
             withHandle
@@ -338,7 +338,6 @@ export const UnifiedLogs = () => {
             className="group-data-[expanded=false]/controls:hidden hidden md:flex"
           />
           <ResizablePanel
-            order={2}
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
@@ -375,16 +374,16 @@ export const UnifiedLogs = () => {
               />
             </DataTableHeaderLayout>
             <Separator />
-            <ResizablePanelGroup direction="horizontal" className="w-full h-full">
+            <ResizablePanelGroup orientation="horizontal" className="w-full h-full">
               <ResizablePanel
-                defaultSize={selectedRowKey ? 60 : 100}
-                minSize={30}
+                defaultSize={selectedRowKey ? '60' : '100'}
+                minSize="30"
                 className="h-full"
               >
-                <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
+                <ResizablePanelGroup key="main-logs" orientation="vertical" className="h-full">
                   <ResizablePanel
-                    defaultSize={100}
-                    minSize={30}
+                    defaultSize="100"
+                    minSize="30"
                     className={cn(
                       'bg',
                       isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'

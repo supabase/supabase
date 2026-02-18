@@ -79,25 +79,23 @@ export const DefaultLayout = ({
               {!router.pathname.startsWith('/account') && <Sidebar />}
               {/* Main Content with Layout Sidebar */}
               <ResizablePanelGroup
-                direction="horizontal"
+                orientation="horizontal"
                 className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                 autoSaveId="default-layout-content"
               >
                 <ResizablePanel
                   id="panel-content"
-                  order={1}
                   className="w-full"
-                  minSize={contentMinSizePercentage}
-                  maxSize={contentMaxSizePercentage}
-                  defaultSize={contentMaxSizePercentage}
+                  minSize={`${contentMinSizePercentage}`}
+                  maxSize={`${contentMaxSizePercentage}`}
+                  defaultSize={`${contentMaxSizePercentage}`}
                 >
                   <div className="h-full overflow-y-auto">{children}</div>
                 </ResizablePanel>
                 <LayoutSidebar
-                  order={2}
-                  minSize={100 - contentMaxSizePercentage}
-                  maxSize={100 - contentMinSizePercentage}
-                  defaultSize={100 - contentMaxSizePercentage}
+                  minSize={`${100 - contentMaxSizePercentage}`}
+                  maxSize={`${100 - contentMinSizePercentage}`}
+                  defaultSize={`${100 - contentMaxSizePercentage}`}
                 />
               </ResizablePanelGroup>
             </div>

@@ -299,7 +299,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex-1 overflow-y-auto flex flex-col"
           >
-            <ResizablePanelGroup direction="vertical">
+            <ResizablePanelGroup orientation="vertical">
               <ResizablePanel>
                 <div className="flex flex-col gap-y-4 p-5 h-full overflow-y-auto">
                   <FormField_Shadcn_
@@ -353,7 +353,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={41} minSize={41} maxSize={83}>
+              <ResizablePanel defaultSize="41" minSize="41" maxSize="83">
                 <div className="h-full bg-surface-100 border-t flex-1 flex flex-col overflow-hidden">
                   {response ? (
                     <div className="h-full bg-surface-100 flex flex-col overflow-hidden">

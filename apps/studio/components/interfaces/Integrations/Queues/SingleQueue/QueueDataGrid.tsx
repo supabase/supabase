@@ -211,11 +211,11 @@ export const QueueMessagesDataGrid = ({
         }}
       />
       <ResizablePanelGroup
-        direction="horizontal"
+        orientation="horizontal"
         className="absolute inset-0 z-10 pointer-events-none"
         autoSaveId="queue-messages-layout-v1"
       >
-        <ResizablePanel defaultSize={1} />
+        <ResizablePanel defaultSize="1" />
         {selectedMessage && (
           <>
             <ResizableHandle withHandle className="pointer-events-auto" />

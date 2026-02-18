@@ -133,13 +133,12 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup direction="horizontal">
+          <ResizablePanelGroup orientation="horizontal">
             {productMenu && (
               <ResizablePanel
-                order={1}
-                minSize={sidebarMinSizePercentage}
-                maxSize={sidebarMaxSizePercentage}
-                defaultSize={sidebarDefaultSizePercentage}
+                minSize={`${sidebarMinSizePercentage}`}
+                maxSize={`${sidebarMaxSizePercentage}`}
+                defaultSize={`${sidebarDefaultSizePercentage}`}
                 id="panel-left"
                 className={cn(
                   'hidden md:block',
@@ -182,10 +181,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               />
             )}
             <ResizablePanel
-              order={2}
-              minSize={100 - sidebarMaxSizePercentage}
-              maxSize={100 - sidebarMinSizePercentage}
-              defaultSize={100 - sidebarDefaultSizePercentage}
+              minSize={`${100 - sidebarMaxSizePercentage}`}
+              maxSize={`${100 - sidebarMinSizePercentage}`}
+              defaultSize={`${100 - sidebarDefaultSizePercentage}`}
               id="panel-project-content"
               className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
             >

@@ -117,11 +117,11 @@ const LinterDataGrid = ({
 
   return (
     <ResizablePanelGroup
-      direction="horizontal"
+      orientation="horizontal"
       className="relative flex flex-grow bg-alternative min-h-0"
       autoSaveId="linter-layout-v1"
     >
-      <ResizablePanel defaultSize={1}>
+      <ResizablePanel defaultSize="1">
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
@@ -177,9 +177,9 @@ const LinterDataGrid = ({
         <>
           <ResizableHandle withHandle />
           <ResizablePanel
-            defaultSize={30}
-            maxSize={45}
-            minSize={30}
+            defaultSize="30"
+            maxSize="45"
+            minSize="30"
             className="bg-studio border-t flex flex-col h-full"
           >
             <div className="flex items-center justify-between w-full border-b py-3 px-6">
