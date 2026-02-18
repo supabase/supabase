@@ -295,7 +295,6 @@ export const ChartBlock = ({
                   minTickGap={32}
                 />
                 <YAxis
-                  hide={!effectiveLogScale}
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
@@ -324,7 +323,6 @@ export const ChartBlock = ({
                   minTickGap={32}
                 />
                 <YAxis
-                  hide={!effectiveLogScale}
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
