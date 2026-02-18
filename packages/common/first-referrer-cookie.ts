@@ -1,12 +1,14 @@
 /**
  * Shared utilities for the cross-app first-referrer handoff cookie.
  *
- * The `_sb_first_referrer` cookie is written by edge middleware on `apps/www`
- * and `apps/docs` when a user arrives from an external source. Studio reads
- * it on the first telemetry pageview to recover external attribution context
- * that would otherwise be lost at the app boundary.
+ * The `_sb_first_referrer` cookie is written by edge middleware on `apps/www`,
+ * `apps/docs`, `apps/learn`, and `apps/studio` when a user arrives from an
+ * external source. Studio reads it on the first telemetry pageview to recover
+ * external attribution context that would otherwise be lost at the app boundary.
  *
- * Write-once, 365-day TTL, domain=supabase.com (readable across all subdomains).
+ * The cookie is normally write-once (365-day TTL, domain=supabase.com), but is
+ * refreshed when a returning visitor arrives with paid traffic signals (click IDs
+ * or paid UTM medium values) to ensure paid attribution overrides stale organic data.
  */
 
 // ---------------------------------------------------------------------------
@@ -27,7 +29,7 @@ export interface FirstReferrerData {
   referrer: string
   /** The landing URL on our site when the external referrer was captured */
   landing_url: string
-  /** UTM params parsed from the landing URL (keys without the utm_ prefix) */
+  /** UTM params parsed from the landing URL (e.g. utm_source, utm_medium) */
   utms: Record<string, string>
   /** Ad-network click IDs parsed from the landing URL */
   click_ids: Record<string, string>
@@ -133,6 +135,55 @@ export function buildFirstReferrerData({
 
 export function serializeFirstReferrerCookie(data: FirstReferrerData): string {
   return encodeURIComponent(JSON.stringify(data))
+}
+
+// ---------------------------------------------------------------------------
+// Paid-signal detection
+// ---------------------------------------------------------------------------
+
+const PAID_UTM_MEDIUMS = new Set([
+  'cpc',
+  'ppc',
+  'paid_search',
+  'paidsocial',
+  'paid_social',
+  'display',
+])
+
+/**
+ * Returns true if the URL contains ad-network click IDs or paid UTM medium values.
+ * These indicate the user arrived via a paid campaign, which should override
+ * stale organic attribution.
+ */
+export function hasPaidSignals(url: URL): boolean {
+  for (const key of CLICK_ID_KEYS) {
+    if (url.searchParams.has(key)) return true
+  }
+  const medium = url.searchParams.get('utm_medium')?.toLowerCase()
+  return medium !== undefined && medium !== null && PAID_UTM_MEDIUMS.has(medium)
+}
+
+/**
+ * Decides whether the first-referrer cookie should be (re-)stamped.
+ *
+ * - No cookie + external referrer → stamp (first visit attribution)
+ * - Cookie exists + paid signals in URL → stamp (paid traffic refresh)
+ * - Otherwise → skip
+ */
+export function shouldRefreshCookie(
+  existingCookie: boolean,
+  request: { referrer: string; url: string }
+): { stamp: boolean } {
+  if (!existingCookie) {
+    return { stamp: isExternalReferrer(request.referrer) }
+  }
+
+  try {
+    const url = new URL(request.url)
+    return { stamp: hasPaidSignals(url) }
+  } catch {
+    return { stamp: false }
+  }
 }
 
 export function parseFirstReferrerCookie(cookieHeader: string): FirstReferrerData | null {

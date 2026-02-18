@@ -30,9 +30,6 @@ export function middleware(request: NextRequest) {
     {
       path: '/',
       sameSite: 'lax',
-      // Use a shared domain on *.supabase.com so www/docs -> studio can read it.
-      // On non-supabase hosts (localhost, previews), leave domain unset so the
-      // browser stores a host-only cookie instead of rejecting an invalid domain.
       ...(request.nextUrl.hostname === 'supabase.com' ||
       request.nextUrl.hostname.endsWith('.supabase.com')
         ? { domain: 'supabase.com', secure: true }
@@ -46,7 +43,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all paths except Next.js internals and static files
     '/((?!api|_next/static|_next/image|favicon.ico|__nextjs).*)',
   ],
 }

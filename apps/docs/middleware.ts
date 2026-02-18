@@ -5,8 +5,8 @@ import {
   buildFirstReferrerData,
   FIRST_REFERRER_COOKIE_MAX_AGE,
   FIRST_REFERRER_COOKIE_NAME,
-  isExternalReferrer,
   serializeFirstReferrerCookie,
+  shouldRefreshCookie,
 } from 'common/first-referrer-cookie'
 
 import { clientSdkIds } from '~/content/navigation.references'
@@ -15,10 +15,14 @@ import { BASE_PATH } from '~/lib/constants'
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 
 function maybeStampFirstReferrerCookie(request: NextRequest, response: NextResponse): void {
-  if (request.cookies.has(FIRST_REFERRER_COOKIE_NAME)) return
-
   const referrer = request.headers.get('referer') ?? ''
-  if (!isExternalReferrer(referrer)) return
+
+  const { stamp } = shouldRefreshCookie(request.cookies.has(FIRST_REFERRER_COOKIE_NAME), {
+    referrer,
+    url: request.url,
+  })
+
+  if (!stamp) return
 
   const data = buildFirstReferrerData({
     referrer,
@@ -33,7 +37,7 @@ function maybeStampFirstReferrerCookie(request: NextRequest, response: NextRespo
     // browser stores a host-only cookie instead of rejecting an invalid domain.
     ...(request.nextUrl.hostname === 'supabase.com' ||
     request.nextUrl.hostname.endsWith('.supabase.com')
-      ? { domain: 'supabase.com' }
+      ? { domain: 'supabase.com', secure: true }
       : {}),
     maxAge: FIRST_REFERRER_COOKIE_MAX_AGE,
   })
