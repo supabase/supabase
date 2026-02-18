@@ -23,16 +23,9 @@ Projects must meet these requirements to use Read Replicas:
 
 - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
 
-4. Using [physical backups](/docs/guides/platform/backups#point-in-time-recovery)
+4. Not using [legacy logical backups](/docs/guides/platform/backups#point-in-time-recovery)
 
 - Physical backups are automatically enabled if using [Point in time recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery)
-- If you're not using PITR, you can switch to physical backups as part of the Read Replica setup process.
-
-  <Admonition type="note">
-
-  You can't download physical backups from the dashboard in the same way as logical backups.
-
-  </Admonition>
 
 ## Creating a Read Replica
 
@@ -68,21 +61,6 @@ Projects on an XL compute add-on or larger can create up to five Read Replicas. 
 
 </Admonition>
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
-### An "Init failed" status
-
-The replica status "Init failed" in the dashboard indicates that the Read Replica has failed to deploy. Some possible scenarios as to why a Read Replica deployment may have failed are the following:
-
-- An underlying instance failed to come up.
-- A network issue leading to inability to connect to the Primary database.
-- A possible incompatible database settings between the Primary and Read Replica databases.
-- Platform issues.
-
-It is safe to drop this failed Read Replica, and in the event of a transient issue, attempt to spin up another one. If spinning up Read Replicas for your project consistently fails, check the[status page](https://status.supabase.com) for any ongoing incidents, or [open a support ticket](/dashboard/support/new). To aid the investigation, do not bring down the recently failed Read Replica.
-
-{/* supa-mdx-lint-enable-next-line Rule001HeadingCase */}
-
 ### Deploying a Read Replica
 
 We deploy a Read Replica using a physical backup as a starting point, and a combination of write ahead logging (WAL) file archives and direct replication from the Primary database to catch up. Both components may take significant time to complete.
@@ -105,7 +83,9 @@ To address this, Postgres provides tunable configuration, like `wal_keep_size`, 
 
 ### File-based log shipping
 
-In this replication method, the Primary continuously buffers WAL changes to a local file and then sends the file to the Read Replica. If multiple Read Replicas are present, files could also be sent to an intermediary location accessible by all replicas. The Read Replica then reads the WAL files and applies those changes. There is higher replication lag than streaming replication since the Primary buffers the changes locally first. It also means there is a small chance that WAL changes do not reach Read Replicas if the Primary goes down before the file is transferred. In these cases, if the Primary fails a Replica using streaming replication would (in most cases) be more up-to-date than a Replica using file-based log shipping.
+In this replication method, the Primary continuously buffers WAL changes to a local file and then sends the file to the Read Replica. If multiple Read Replicas are present, files could also be sent to an intermediary location accessible by all replicas.
+
+The Read Replica then reads the WAL files and applies those changes. There is higher replication lag than streaming replication since the Primary buffers the changes locally first. It also means there is a small chance that WAL changes do not reach Read Replicas if the Primary goes down before the file is transferred. In these cases, if the Primary fails a Replica using streaming replication would (in most cases) be more up-to-date than a Replica using file-based log shipping.
 
 ### File-based log shipping meets streaming replication
 
@@ -117,7 +97,7 @@ In this replication method, the Primary continuously buffers WAL changes to a lo
   zoomable
 />
 
-We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the Primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3.
+We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the Primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to off-site, durable cloud storage, such as S3.
 
 We combine it with streaming replication to reduce replication lag. Once WAL-G files have been synced from S3, Read Replicas connect to the Primary and stream the WAL directly.
 
@@ -170,3 +150,21 @@ Some common sources of high replication lag include:
 You can find additional resources on replication lag in [the Google documentation](https://cloud.google.com/sql/docs/postgres/replication/replication-lag), [the AWS documentation](https://repost.aws/knowledge-center/rds-postgresql-replication-lag), and [the several nines blog](https://severalnines.com/blog/what-look-if-your-postgresql-replication-lagging/).
 
 </Admonition>
+
+## Troubleshooting
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+### An "Init failed" status
+
+The replica status "Init failed" in the dashboard indicates that the Read Replica has failed to deploy. Some possible scenarios as to why a Read Replica deployment may have failed are the following:
+
+- An underlying instance failed to come up.
+- A network issue leading to inability to connect to the Primary database.
+- A possible incompatible database settings between the Primary and Read Replica databases.
+- Platform issues.
+- Very high active workloads combined with large (50+ GB) database sizes
+
+It is safe to drop this failed Read Replica, and in the event of a transient issue, attempt to spin up another one. If spinning up Read Replicas for your project consistently fails, check the[status page](https://status.supabase.com) for any ongoing incidents, or [open a support ticket](/dashboard/support/new). To aid the investigation, do not bring down the recently failed Read Replica.
+
+{/* supa-mdx-lint-enable-next-line Rule001HeadingCase */}
