@@ -195,6 +195,7 @@ export const ReportBlock = ({
           attribute={item.attribute}
           provider={item.provider}
           defaultChartStyle={item.chart_type}
+          defaultLogScale={chartConfig?.logScale ?? false}
           maxHeight={176}
           label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
           actions={

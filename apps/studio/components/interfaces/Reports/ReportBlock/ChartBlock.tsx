@@ -18,6 +18,12 @@ import {
 } from 'data/analytics/project-daily-stats-query'
 import { METRICS } from 'lib/constants/metrics'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
+
+const formatLogTick = (value: number): string => {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`
+  if (value >= 1_000) return `${(value / 1_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}k`
+  return value.toLocaleString()
+}
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
@@ -33,6 +39,7 @@ interface ChartBlockProps {
   endDate: string
   interval?: AnalyticsInterval
   defaultChartStyle?: 'bar' | 'line'
+  defaultLogScale?: boolean
   isLoading?: boolean
   actions?: ReactNode
   maxHeight?: number
@@ -53,6 +60,7 @@ export const ChartBlock = ({
   endDate,
   interval = '1d',
   defaultChartStyle = 'bar',
+  defaultLogScale = false,
   isLoading = false,
   actions,
   maxHeight,
@@ -63,6 +71,7 @@ export const ChartBlock = ({
 
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
+  const [logScale, setLogScale] = useState<boolean>(defaultLogScale)
   const [latestValue, setLatestValue] = useState<string | undefined>()
 
   const databaseIdentifier = state.selectedDatabaseId
@@ -179,6 +188,10 @@ export const ChartBlock = ({
   }, [defaultChartStyle])
 
   useEffect(() => {
+    setLogScale(defaultLogScale)
+  }, [defaultLogScale])
+
+  useEffect(() => {
     setLatestValue(getInitialHighlightedValue())
   }, [chartData, getInitialHighlightedValue])
 
@@ -207,6 +220,25 @@ export const ChartBlock = ({
                 side: 'bottom',
                 className: 'max-w-56 text-center',
                 text: `View as ${chartStyle === 'bar' ? 'line chart' : 'bar chart'}`,
+              },
+            }}
+          />
+          <ButtonTooltip
+            type={logScale ? 'default' : 'text'}
+            size="tiny"
+            disabled={loading}
+            className="h-7 px-1.5 font-mono text-[10px]"
+            icon={<span className="font-mono text-[10px] leading-none">Log</span>}
+            onClick={() => {
+              const next = !logScale
+              if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { logScale: next } })
+              setLogScale(next)
+            }}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                className: 'max-w-56 text-center',
+                text: `Switch to ${logScale ? 'linear' : 'logarithmic'} scale`,
               },
             }}
           />
@@ -261,7 +293,14 @@ export const ChartBlock = ({
                   tickMargin={8}
                   minTickGap={32}
                 />
-                <YAxis hide domain={isPercentage ? [0, 100] : undefined} />
+                <YAxis
+                  hide={!logScale}
+                  scale={logScale ? 'log' : 'auto'}
+                  domain={logScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
+                  allowDataOverflow={logScale}
+                  width={logScale ? 52 : undefined}
+                  tickFormatter={logScale ? formatLogTick : undefined}
+                />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
@@ -283,7 +322,14 @@ export const ChartBlock = ({
                   tickMargin={8}
                   minTickGap={32}
                 />
-                <YAxis hide domain={isPercentage ? [0, 100] : undefined} />
+                <YAxis
+                  hide={!logScale}
+                  scale={logScale ? 'log' : 'auto'}
+                  domain={logScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
+                  allowDataOverflow={logScale}
+                  width={logScale ? 52 : undefined}
+                  tickFormatter={logScale ? formatLogTick : undefined}
+                />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent

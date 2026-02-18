@@ -37,6 +37,7 @@ export type ChartConfig = {
   yKey: string
   showLabels?: boolean
   showGrid?: boolean
+  logScale?: boolean
 }
 
 const getCumulativeResults = (results: Results, config: ChartConfig) => {

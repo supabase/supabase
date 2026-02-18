@@ -11,6 +11,12 @@ import { Badge, Button, ChartContainer, ChartTooltipContent, cn, CodeBlock } fro
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
+
+const formatLogTick = (value: number): string => {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`
+  if (value >= 1_000) return `${(value / 1_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}k`
+  return value.toLocaleString()
+}
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
@@ -23,6 +29,7 @@ export const DEFAULT_CHART_CONFIG: ChartConfig = {
   yKey: '',
   showLabels: false,
   showGrid: false,
+  logScale: false,
   view: 'table',
 }
 
@@ -68,7 +75,7 @@ export const QueryBlock = ({
   onDragStart,
 }: QueryBlockProps) => {
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
-  const { xKey, yKey, view = 'table' } = chartSettings
+  const { xKey, yKey, view = 'table', logScale = false } = chartSettings
 
   const [showSql, setShowSql] = useState(!results && !initialHideSql)
   const [focusDataIndex, setFocusDataIndex] = useState<number>()
@@ -277,7 +284,16 @@ export const QueryBlock = ({
                       xKeyDateFormat === 'date' ? dayjs(value).format('MMM D YYYY HH:mm') : value
                     }
                   />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={4} />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={4}
+                    scale={logScale ? 'log' : 'auto'}
+                    domain={logScale ? [1, 'auto'] : undefined}
+                    allowDataOverflow={logScale}
+                    width={logScale ? 52 : undefined}
+                    tickFormatter={logScale ? formatLogTick : undefined}
+                  />
                   <Tooltip content={<ChartTooltipContent className="w-[150px]" />} />
                   <Bar radius={1} dataKey={yKey}>
                     {chartData?.map((_: any, index: number) => (
