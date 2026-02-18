@@ -85,7 +85,7 @@ A connection pool through Supavisor is also available for each Read Replica. Fin
 
 A load balancer automatically balances requests between your Primary database and Read Replicas. Find its endpoint on the [**API Settings page**](/dashboard/project/_/settings/api).
 
-The load balancer enables geo-routing for Data API requests to automatically route `GET` requests to the database closest to your user ensuring the lowest latency. You can also send Non-`GET` requests through this endpoint, and they are routed to the Primary database.
+The load balancer enables geo-routing for Data API requests to automatically route `GET` requests to the database closest to your user ensuring the lowest latency. You can also send Non-`GET` requests through this endpoint, and they are routed to the Primary database automatically.
 
 <Admonition type="note">
 
