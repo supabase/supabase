@@ -75,6 +75,7 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -90,7 +91,11 @@ limit 100`
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const {
+    data: project,
+    isPending: isPendingProject,
+    isError: isProjectError,
+  } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
@@ -283,10 +288,10 @@ export const UsersV2 = () => {
     data,
     error,
     isSuccess,
+    isPending,
     isLoading,
     isRefetching,
     isError,
-    isFetched,
     isFetchingNextPage,
     refetch,
     hasNextPage,
@@ -803,15 +808,11 @@ export const UsersV2 = () => {
                       />
                     )
                   },
-                  noRowsFallback: isLoading ? (
+                  noRowsFallback: isPendingProject ? (
                     <div className="absolute top-14 px-6 w-full">
                       <GenericSkeletonLoader />
                     </div>
-                  ) : isError ? (
-                    <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
-                      <AlertError subject="Failed to retrieve users" error={error} />
-                    </div>
-                  ) : isFetched && !isSuccess ? (
+                  ) : project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY || isProjectError ? (
                     <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
                       <AlertError
                         subject="Unable to load users"
@@ -820,6 +821,14 @@ export const UsersV2 = () => {
                             'Could not connect to the database. Please check your project status.',
                         }}
                       />
+                    </div>
+                  ) : isPending ? (
+                    <div className="absolute top-14 px-6 w-full">
+                      <GenericSkeletonLoader />
+                    </div>
+                  ) : isError ? (
+                    <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
+                      <AlertError subject="Failed to retrieve users" error={error} />
                     </div>
                   ) : isSuccess ? (
                     <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
