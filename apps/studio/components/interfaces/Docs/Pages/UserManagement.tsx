@@ -1,13 +1,14 @@
-import Link from 'next/link'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
-import { makeRandomString } from 'lib/helpers'
 import CodeSnippet from '../CodeSnippet'
+import { DocSection } from '../DocSection'
 import Snippets from '../Snippets'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
+import { makeRandomString } from '@/lib/helpers'
 
 const randomPassword = makeRandomString(20)
 
@@ -31,158 +32,172 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
   const endpoint = `${protocol}://${hostEndpoint ?? ''}`
 
   return (
-    <>
-      <h2 className="doc-heading">User Management</h2>
-      <div className="doc-section">
-        <article className="code-column text-foreground">
-          <p>Supabase makes it easy to manage your users.</p>
-          <p>
-            Supabase assigns each user a unique ID. You can reference this ID anywhere in your
-            database. For example, you might create a <code>profiles</code> table references the
-            user using a <code>user_id</code> field.
-          </p>
-          <p>
-            Supabase already has built in the routes to sign up, login, and log out for managing
-            users in your apps and websites.
-          </p>
-        </article>
-      </div>
+    <div className="flex flex-col flex-1">
+      <DocSection
+        title="User Management"
+        content={
+          <>
+            <p>Supabase makes it easy to manage your users.</p>
+            <p>
+              Supabase assigns each user a unique ID. You can reference this ID anywhere in your
+              database. For example, you might create a <code>profiles</code> table that references
+              the user using a <code>user_id</code> field.
+            </p>
+            <p>
+              Supabase already has built in the routes to sign up, login, and log out for managing
+              users in your apps and websites.
+            </p>
+          </>
+        }
+      />
 
-      <h2 className="doc-heading">Sign up</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
-          <p>Allow your users to sign up and create a new account.</p>
-          <p>
-            After they have signed up, all interactions using the Supabase JS client will be
-            performed as "that user".
-          </p>
-        </article>
-        <article className="code">
+      <DocSection
+        title="Sign up"
+        content={
+          <>
+            <p>Allow your users to sign up and create a new account.</p>
+            <p>
+              After they have signed up, all interactions using the Supabase JS client will be
+              performed as "that user".
+            </p>
+          </>
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authSignup(endpoint, keyToShow, randomPassword)}
           />
-        </article>
-      </div>
+        }
+      />
 
-      <h2 className="doc-heading">Log in with Email/Password</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
-          <p>If an account is created, users can login to your app.</p>
-          <p>
-            After they have logged in, all interactions using the Supabase JS client will be
-            performed as "that user".
-          </p>
-        </article>
-        <article className="code">
+      <DocSection
+        title="Log in with Email/Password"
+        content={
+          <>
+            <p>If an account is created, users can login to your app.</p>
+            <p>
+              After they have logged in, all interactions using the Supabase JS client will be
+              performed as "that user".
+            </p>
+          </>
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authLogin(endpoint, keyToShow, randomPassword)}
           />
-        </article>
-      </div>
+        }
+      />
 
-      <h2 className="doc-heading">Log in with Magic Link via Email</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
-          <p>Send a user a passwordless link which they can use to redeem an access_token.</p>
-          <p>
-            After they have clicked the link, all interactions using the Supabase JS client will be
-            performed as "that user".
-          </p>
-        </article>
-        <article className="code">
+      <DocSection
+        title="Log in with Magic Link via Email"
+        content={
+          <>
+            <p>Send a user a passwordless link which they can use to redeem an access_token.</p>
+            <p>
+              After they have clicked the link, all interactions using the Supabase JS client will
+              be performed as "that user".
+            </p>
+          </>
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authMagicLink(endpoint, keyToShow)}
           />
-        </article>
-      </div>
+        }
+      />
 
-      <h2 className="doc-heading">Sign Up with Phone/Password</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
-          <p>
-            A phone number can be used instead of an email as a primary account confirmation
-            mechanism.
-          </p>
-          <p>
-            The user will receive a mobile OTP via sms with which they can verify that they control
-            the phone number.
-          </p>
-          <p>
-            You must enter your own twilio credentials on the auth settings page to enable sms
-            confirmations.
-          </p>
-        </article>
-        <article className="code">
+      <DocSection
+        title="Sign Up with Phone/Password"
+        content={
+          <>
+            <p>
+              A phone number can be used instead of an email as a primary account confirmation
+              mechanism.
+            </p>
+            <p>
+              The user will receive a mobile OTP via sms with which they can verify that they
+              control the phone number.
+            </p>
+            <p>
+              You must enter your own twilio credentials on the auth settings page to enable sms
+              confirmations.
+            </p>
+          </>
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authPhoneSignUp(endpoint, keyToShow)}
           />
-        </article>
-      </div>
+        }
+      />
 
-      <h2 className="doc-heading">Login via SMS OTP</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
-          <p>
-            SMS OTPs work like magic links, except you have to provide an interface for the user to
-            verify the 6 digit number they receive.
-          </p>
-          <p>
-            You must enter your own twilio credentials on the auth settings page to enable SMS-based
-            Logins.
-          </p>
-        </article>
-        <article className="code">
+      <DocSection
+        title="Login via SMS OTP"
+        content={
+          <>
+            <p>
+              SMS OTPs work like magic links, except you have to provide an interface for the user
+              to verify the 6 digit number they receive.
+            </p>
+            <p>
+              You must enter your own twilio credentials on the auth settings page to enable
+              SMS-based Logins.
+            </p>
+          </>
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authMobileOTPLogin(endpoint, keyToShow)}
           />
-        </article>
-      </div>
+        }
+      />
 
-      <h2 className="doc-heading">Verify an SMS OTP</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
-          <p>
-            Once the user has received the OTP, have them enter it in a form and send it for
-            verification
-          </p>
-          <p>
-            You must enter your own twilio credentials on the auth settings page to enable SMS-based
-            OTP verification.
-          </p>
-        </article>
-        <article className="code">
+      <DocSection
+        title="Verify an SMS OTP"
+        content={
+          <>
+            <p>
+              Once the user has received the OTP, have them enter it in a form and send it for
+              verification
+            </p>
+            <p>
+              You must enter your own twilio credentials on the auth settings page to enable
+              SMS-based OTP verification.
+            </p>
+          </>
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authMobileOTPVerify(endpoint, keyToShow)}
           />
-        </article>
-      </div>
+        }
+      />
 
       {authenticationSignInProviders && (
-        <>
-          <h2 className="doc-heading">Log in with Third Party OAuth</h2>
-          <div className="doc-section ">
-            <article className="code-column text-foreground">
+        <DocSection
+          title="Log in with Third Party OAuth"
+          content={
+            <>
               <p>
                 Users can log in with Third Party OAuth like Google, Facebook, GitHub, and more. You
                 must first enable each of these in the Auth Providers settings{' '}
                 <span className="text-green-500">
-                  <Link key={'AUTH'} href={`/project/${router.query.ref}/auth/providers`}>
+                  <InlineLink key={'AUTH'} href={`/project/${projectRef}/auth/providers`}>
                     here
-                  </Link>
+                  </InlineLink>
                 </span>{' '}
                 .
               </p>
               <p>
                 View all the available{' '}
-                <a href={`${DOCS_URL}/guides/auth#providers`} target="_blank" rel="noreferrer">
+                <InlineLink href={`${DOCS_URL}/guides/auth#providers`}>
                   Third Party OAuth providers
-                </a>
+                </InlineLink>
               </p>
               <p>
                 After they have logged in, all interactions using the Supabase JS client will be
@@ -190,131 +205,111 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
               </p>
               <p>
                 Generate your Client ID and secret from:{` `}
-                <a
-                  href="https://console.developers.google.com/apis/credentials"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <InlineLink href="https://console.developers.google.com/apis/credentials">
                   Google
-                </a>
+                </InlineLink>
                 ,{` `}
-                <a
-                  href="https://github.com/settings/applications/new"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  GitHub
-                </a>
-                ,{` `}
-                <a href="https://gitlab.com/oauth/applications" target="_blank" rel="noreferrer">
-                  GitLab
-                </a>
-                ,{` `}
-                <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">
-                  Facebook
-                </a>
-                ,{` `}
-                <a
-                  href="https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <InlineLink href="https://github.com/settings/applications/new">GitHub</InlineLink>,
+                {` `}
+                <InlineLink href="https://gitlab.com/oauth/applications">GitLab</InlineLink>,{` `}
+                <InlineLink href="https://developers.facebook.com/apps/">Facebook</InlineLink>,{` `}
+                <InlineLink href="https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/">
                   Bitbucket
-                </a>
+                </InlineLink>
                 .
               </p>
-            </article>
-            <article className="code">
-              <CodeSnippet
-                selectedLang={selectedLang}
-                snippet={Snippets.authThirdPartyLogin(endpoint, keyToShow)}
-              />
-            </article>
-          </div>
-        </>
+            </>
+          }
+          snippets={
+            <CodeSnippet
+              selectedLang={selectedLang}
+              snippet={Snippets.authThirdPartyLogin(endpoint, keyToShow)}
+            />
+          }
+        />
       )}
 
-      <h2 className="doc-heading">User</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
-          <p>Get the JSON object for the logged in user.</p>
-        </article>
-        <article className="code">
+      <DocSection
+        title="User"
+        content={<p>Get the JSON object for the logged in user.</p>}
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authUser(endpoint, keyToShow)}
           />
-        </article>
-      </div>
+        }
+      />
 
-      <h2 className="doc-heading">Forgotten Password Email</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
+      <DocSection
+        title="Forgotten Password Email"
+        content={
           <p>
             Sends the user a log in link via email. Once logged in you should direct the user to a
             new password form. And use "Update User" below to save the new password.
           </p>
-        </article>
-        <article className="code">
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authRecover(endpoint, keyToShow)}
           />
-        </article>
-      </div>
+        }
+      />
 
-      <h2 className="doc-heading">Update User</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
+      <DocSection
+        title="Update User"
+        content={
           <p>
             Update the user with a new email or password. Each key (email, password, and data) is
             optional
           </p>
-        </article>
-        <article className="code">
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authUpdate(endpoint, keyToShow)}
           />
-        </article>
-      </div>
+        }
+      />
 
-      <h2 className="doc-heading">Log out</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
+      <DocSection
+        title="Log out"
+        content={
           <p>
             After calling log out, all interactions using the Supabase JS client will be
             "anonymous".
           </p>
-        </article>
-        <article className="code">
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authLogout(endpoint, keyToShow)}
           />
-        </article>
-      </div>
+        }
+      />
 
-      <h2 className="doc-heading">Send a User an Invite over Email</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
-          <p>Send a user a passwordless link which they can use to sign up and log in.</p>
-          <p>
-            After they have clicked the link, all interactions using the Supabase JS client will be
-            performed as "that user".
-          </p>
-          <p>
-            This endpoint requires you use the <code>service_role_key</code> when initializing the
-            client, and should only be invoked from the server, never from the client.
-          </p>
-        </article>
-        <article className="code">
+      <DocSection
+        title="Send a User an Invite over Email"
+        content={
+          <>
+            <p>Send a user a passwordless link which they can use to sign up and log in.</p>
+            <p>
+              After they have clicked the link, all interactions using the Supabase JS client will
+              be performed as "that user".
+            </p>
+            <p>
+              This endpoint requires you use the <code>service_role_key</code> when initializing the
+              client, and should only be invoked from the server, never from the client.
+            </p>
+          </>
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.authInvite(endpoint, keyToShow)}
           />
-        </article>
-      </div>
-    </>
+        }
+      />
+    </div>
   )
 }

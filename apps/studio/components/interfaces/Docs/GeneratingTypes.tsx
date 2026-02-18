@@ -1,21 +1,22 @@
+import { useParams } from 'common'
 import { Download } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { generateTypes } from 'data/projects/project-type-generation-query'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
+
+import { DocSection } from './DocSection'
+import CodeSnippet from '@/components/interfaces/Docs/CodeSnippet'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { generateTypes } from '@/data/projects/project-type-generation-query'
+import { DOCS_URL } from '@/lib/constants'
 
 interface Props {
   selectedLang: 'bash' | 'js'
 }
 
-export default function GeneratingTypes({ selectedLang }: Props) {
+export function GeneratingTypes({ selectedLang }: Props) {
   const { ref } = useParams()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
@@ -41,42 +42,48 @@ export default function GeneratingTypes({ selectedLang }: Props) {
   }
 
   return (
-    <>
-      <h2 className="doc-heading flex items-center justify-between">
-        <span>Generating types</span>
-        <DocsButton href={`${DOCS_URL}/guides/database/api/generating-types`} />
-      </h2>
-      <div className="doc-section">
-        <article className="code-column text-foreground">
+    <DocSection
+      title={
+        <span className="flex items-center justify-between">
+          <span>Generating types</span>
+          <DocsButton href={`${DOCS_URL}/guides/database/api/generating-types`} />
+        </span>
+      }
+      content={
+        <>
           <p>
             Supabase APIs are generated from your database, which means that we can use database
             introspection to generate type-safe API definitions.
           </p>
           <p>
             You can generate types from your database either through the{' '}
-            <Link href={`${DOCS_URL}/guides/database/api/generating-types`}>Supabase CLI</Link>, or
-            by downloading the types file via the button on the right and importing it in your
+            <InlineLink href={`${DOCS_URL}/guides/database/api/generating-types`}>
+              Supabase CLI
+            </InlineLink>
+            , or by downloading the types file via the button on the right and importing it in your
             application within <code>src/index.ts</code>.
           </p>
-        </article>
-        <article
-          className={`code ${selectedLang === 'js' ? 'flex items-center justify-center' : ''}`}
+        </>
+      }
+      snippets={
+        <div
+          className={
+            selectedLang === 'js' ? 'flex flex-col items-center justify-center h-full' : ''
+          }
         >
-          <div className="grid gap-2">
-            <p className="text-center">
-              {selectedLang === 'js' && (
-                <Button
-                  type="default"
-                  disabled={isGeneratingTypes}
-                  loading={isGeneratingTypes}
-                  icon={<Download strokeWidth={1.5} />}
-                  onClick={onClickGenerateTypes}
-                >
-                  Generate and download types
-                </Button>
-              )}
-            </p>
-            <p className="text-xs text-center text-foreground-light bg-studio p-4">
+          <div className="flex flex-col items-center justify-center p-10">
+            {selectedLang === 'js' && (
+              <Button
+                type="default"
+                disabled={isGeneratingTypes}
+                loading={isGeneratingTypes}
+                icon={<Download strokeWidth={1.5} />}
+                onClick={onClickGenerateTypes}
+              >
+                Generate and download types
+              </Button>
+            )}
+            <p className="text-xs text-center text-foreground-light mt-4">
               Remember to re-generate and download this file as you make changes to your tables.
             </p>
           </div>
@@ -85,9 +92,9 @@ export default function GeneratingTypes({ selectedLang }: Props) {
             selectedLang={selectedLang}
             snippet={localSnippets.generateTypes(ref ?? '')}
           />
-        </article>
-      </div>
-    </>
+        </div>
+      }
+    />
   )
 }
 

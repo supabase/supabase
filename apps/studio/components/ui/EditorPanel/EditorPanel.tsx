@@ -16,28 +16,28 @@ import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { Book, Maximize2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
+  cn,
   CodeBlock,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
-  HoverCard_Shadcn_,
   KeyboardShortcut,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   SQL_ICON,
-  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -83,6 +83,7 @@ export const EditorPanel = () => {
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
   const [showResults, setShowResults] = useState(true)
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
+  const templatesListboxId = useId()
 
   const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
   const errorContent =
@@ -155,7 +156,7 @@ export const EditorPanel = () => {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-[46px]">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-[var(--header-height)]">
         <div className="text-xs">{label}</div>
         <div className="flex items-center">
           {templates.length > 0 && (
@@ -167,12 +168,13 @@ export const EditorPanel = () => {
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
+                  aria-controls={templatesListboxId}
                   icon={<Book size={14} />}
                 >
                   Templates
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
+              <PopoverContent_Shadcn_ id={templatesListboxId} align="end" className="w-[300px] p-0">
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Search templates..." />
                   <CommandList_Shadcn_>

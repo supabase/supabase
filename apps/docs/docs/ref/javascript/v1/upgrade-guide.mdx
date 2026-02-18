@@ -250,7 +250,7 @@ const { data, error } = await supabase
   .auth
   .signInWithOtp({ phone })
 
-// After receiving a SMS with a OTP.
+// After receiving an SMS with an OTP.
 const { data, error } = await supabase
 .auth
 .verifyOtp({ phone, token })
