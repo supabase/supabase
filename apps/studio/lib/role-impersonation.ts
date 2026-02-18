@@ -1,5 +1,7 @@
+import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import type { User } from 'data/auth/users-infinite-query'
 import { RoleImpersonationState as ValtioRoleImpersonationState } from 'state/role-impersonation-state'
+
 import { uuidv4 } from './helpers'
 
 type PostgrestImpersonationRole =
@@ -99,8 +101,8 @@ function getPostgrestRoleImpersonationSql(
   const unexpiredClaims = { ...claims, exp: getExp1HourFromNow() }
 
   return `
-select set_config('role', '${role.role}', true),
-set_config('request.jwt.claims', '${JSON.stringify(unexpiredClaims).replaceAll("'", "''")}', true),
+select set_config('role', ${literal(role.role)}, true),
+set_config('request.jwt.claims', ${literal(JSON.stringify(unexpiredClaims))}, true),
 set_config('request.method', 'POST', true),
 set_config('request.path', '/impersonation-example-request-path', true),
 set_config('request.headers', '{"accept": "*/*"}', true);
@@ -113,7 +115,7 @@ export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
 
 function getCustomRoleImpersonationSql(roleName: string) {
   return /* SQL */ `
-    set local role '${roleName}';
+    set local role ${literal(roleName)};
   `.trim()
 }
 
