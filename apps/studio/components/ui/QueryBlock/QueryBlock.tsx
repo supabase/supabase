@@ -105,6 +105,13 @@ export const QueryBlock = ({
     ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
     : formattedQueryResult
 
+  const hasNonPositiveValues = useMemo(() => {
+    if (!logScale || !yKey || !chartData?.length) return false
+    return chartData.some((row: any) => row[yKey] <= 0)
+  }, [logScale, yKey, chartData])
+
+  const effectiveLogScale = logScale && !hasNonPositiveValues
+
   const getDateFormat = (key: any) => {
     const value = chartData?.[0]?.[key] || ''
     if (typeof value === 'number') return 'number'
@@ -250,6 +257,11 @@ export const QueryBlock = ({
             </div>
           ) : (
             <div className="flex-1 w-full">
+              {hasNonPositiveValues && (
+                <p className="px-3 pt-1 text-xs text-foreground-light">
+                  Log scale is unavailable because the data contains zero or negative values.
+                </p>
+              )}
               <ChartContainer
                 className="aspect-auto px-3 py-2"
                 style={{ height: '230px', minHeight: '230px' }}
@@ -281,11 +293,11 @@ export const QueryBlock = ({
                     tickLine={false}
                     axisLine={false}
                     tickMargin={4}
-                    scale={logScale ? 'log' : 'auto'}
-                    domain={logScale ? [1, 'auto'] : undefined}
-                    allowDataOverflow={logScale}
-                    width={logScale ? 52 : undefined}
-                    tickFormatter={logScale ? formatLogTick : undefined}
+                    scale={effectiveLogScale ? 'log' : 'auto'}
+                    domain={effectiveLogScale ? [1, 'auto'] : undefined}
+                    allowDataOverflow={effectiveLogScale}
+                    width={effectiveLogScale ? 52 : undefined}
+                    tickFormatter={effectiveLogScale ? formatLogTick : undefined}
                   />
                   <Tooltip content={<ChartTooltipContent className="w-[150px]" />} />
                   <Bar radius={1} dataKey={yKey}>

@@ -166,6 +166,13 @@ export const ChartBlock = ({
     }
   })
 
+  const hasNonPositiveValues = useMemo(() => {
+    if (!logScale || !data.length) return false
+    return data.some((row: any) => row[metricLabel] <= 0)
+  }, [logScale, data, metricLabel])
+
+  const effectiveLogScale = logScale && !hasNonPositiveValues
+
   const getInitialHighlightedValue = useCallback(() => {
     if (!chartData?.data?.length) return undefined
     const lastDataPoint = chartData.data[chartData.data.length - 1]
@@ -270,6 +277,11 @@ export const ChartBlock = ({
               <p className="text-lg text">{latestValue}</p>
             </div>
           )}
+          {hasNonPositiveValues && (
+            <p className="px-3 pt-1 text-xs text-foreground-light">
+              Log scale is unavailable because the data contains zero or negative values.
+            </p>
+          )}
           <ChartContainer
             className="w-full aspect-auto px-3 py-2"
             style={{
@@ -288,12 +300,12 @@ export const ChartBlock = ({
                   minTickGap={32}
                 />
                 <YAxis
-                  hide={!logScale}
-                  scale={logScale ? 'log' : 'auto'}
-                  domain={logScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
-                  allowDataOverflow={logScale}
-                  width={logScale ? 52 : undefined}
-                  tickFormatter={logScale ? formatLogTick : undefined}
+                  hide={!effectiveLogScale}
+                  scale={effectiveLogScale ? 'log' : 'auto'}
+                  domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
+                  allowDataOverflow={effectiveLogScale}
+                  width={effectiveLogScale ? 52 : undefined}
+                  tickFormatter={effectiveLogScale ? formatLogTick : undefined}
                 />
                 <ChartTooltip
                   content={
@@ -317,12 +329,12 @@ export const ChartBlock = ({
                   minTickGap={32}
                 />
                 <YAxis
-                  hide={!logScale}
-                  scale={logScale ? 'log' : 'auto'}
-                  domain={logScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
-                  allowDataOverflow={logScale}
-                  width={logScale ? 52 : undefined}
-                  tickFormatter={logScale ? formatLogTick : undefined}
+                  hide={!effectiveLogScale}
+                  scale={effectiveLogScale ? 'log' : 'auto'}
+                  domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
+                  allowDataOverflow={effectiveLogScale}
+                  width={effectiveLogScale ? 52 : undefined}
+                  tickFormatter={effectiveLogScale ? formatLogTick : undefined}
                 />
                 <ChartTooltip
                   content={
