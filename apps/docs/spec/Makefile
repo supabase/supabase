@@ -53,16 +53,16 @@ download.analytics.v0:
 transform: dereference.api.v1  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v2
 
 dereference.api.v1:
-	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/api_v1_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/api_v1_openapi.json
 
 dereference.auth.v1:
-	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
 
 dereference.storage.v0:
-	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
 
 dereference.analytics.v0:
-	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
 
 # No longer updated
 # dereference.tsdoc.v1:
