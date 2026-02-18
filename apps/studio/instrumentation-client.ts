@@ -219,11 +219,6 @@ Sentry.init({
     // [Joshen] Safe to ignore, it an error from the copyToClipboard
     'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
 
-    // ===================================================================================
-    // [FE-2582] Migrated from Sentry UI Data Filters to code
-    // These filters were previously configured in Sentry's Project Settings > Filters > Data Filters
-    // ===================================================================================
-
     // API/Network errors - should be handled by API layer, not actionable on frontend
     /502/,
     'upstream request timeout',
