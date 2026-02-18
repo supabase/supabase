@@ -85,7 +85,7 @@ It is safe to drop this failed Read Replica, and in the event of a transient iss
 
 ### Deploying a Read Replica
 
-We deploy a Read Replica using a physical backup as a starting point, and a combination of write ahead logging (WAL) file archives and direct replication from the Primary database to catch up. Both components may take significant time to complete.
+We deploy a Read Replica using a physical backup as a starting point, and a combination of write ahead logging (WAL) file archives and direct replication from the Primary database to catch up. Both components may take significant time to complete, depending on your specific workload.
 
 The time to restore from a physical backup is dependent and directly related to the database size of your project. The time taken to catch up to the primary using WAL archives and direct replication is dependent on the level of activity on the Primary database. A more active database produces a larger number of WAL files that need to be processed.
 
