@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) is een open source Firebase alternatief. We bouwen de functies van Firebase met behulp van enterprise-grade open source tools.
 
-- [x]Gehoste Postgres Database. [Docs](https://supabase.com/docs/guides/database)
+- [x] Gehoste Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authenticatie en Autorisatie. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatisch gegenereerde API's.
   - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -21,7 +21,7 @@
 - [x] Bestandsopslag. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Dashboard
 
-[Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentatie
 
@@ -38,10 +38,10 @@ Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](../DEVELOPERS.md)
 
 ## Status
 
-- [Alpha: We testen Supabase met een gesloten groep klanten
+- [Alpha: We testen Supabase met een gesloten groep klanten]
 - [x] Publieke Alpha: Iedereen kan zich aanmelden op [supabase.com/dashboard](https://supabase.com/dashboard). Maar doe het rustig aan, er zijn een paar kinken
-- [Publieke Beta: Stabiel genoeg voor de meeste niet-bedrijfsmatige toepassingen
-- [Publiek: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [Publieke Beta: Stabiel genoeg voor de meeste niet-bedrijfsmatige toepassingen]
+- [Publiek: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
 
 We zijn momenteel in Openbare Beta. Bekijk "releases" van deze repo om op de hoogte te blijven van belangrijke updates.
 
@@ -224,7 +224,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
 - [Fins / Suomalainen](/i18n/README.fi.md)
 - [Frans / Français](/i18n/README.fr.md)
 - [Duits / Deutsch](/i18n/README.de.md)
-- [Grieks / Ελληνικά](/i18n/README.gr.md)
+- [Grieks / Ελληνικά](/i18n/README.el.md)
 - [Hebreeuws / עברית](/i18n/README.he.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
 - [Hongaars / Magyar](/i18n/README.hu.md)
@@ -234,7 +234,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
 - [Japans / 日本語](/i18n/README.jp.md)
 - [Koreaans / 한어](/i18n/README.ko.md)
 - [Maleis / Bahasa Malaysia](/i18n/README.ms.md)
-- [Noors (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
+- [Noors (Bokmål) / Norsk (Bokmål)](/i18n/README.nb.md)
 - [Perzisch / فارسی](/i18n/README.fa.md)
 - [Pools / Polski](/i18n/README.pl.md)
 - [Portugees / Português](/i18n/README.pt.md)
