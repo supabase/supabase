@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest'
-
 import { formatLogTick, getCumulativeResults } from 'components/ui/QueryBlock/QueryBlock.utils'
+import { describe, expect, it } from 'vitest'
 
 describe('formatLogTick', () => {
   it('formats values below 1,000 as plain locale strings', () => {
@@ -34,16 +33,43 @@ describe('formatLogTick', () => {
 
 describe('getCumulativeResults', () => {
   it('returns empty array when results are empty', () => {
-    expect(getCumulativeResults({ rows: [] }, { type: 'bar', xKey: 'x', yKey: 'y', cumulative: false, showLabels: false, showGrid: false })).toEqual([])
+    expect(
+      getCumulativeResults(
+        { rows: [] },
+        { type: 'bar', xKey: 'x', yKey: 'y', cumulative: false, showLabels: false, showGrid: false }
+      )
+    ).toEqual([])
   })
 
   it('returns empty array when results are undefined', () => {
-    expect(getCumulativeResults(undefined as any, { type: 'bar', xKey: 'x', yKey: 'y', cumulative: false, showLabels: false, showGrid: false })).toEqual([])
+    expect(
+      getCumulativeResults(undefined as any, {
+        type: 'bar',
+        xKey: 'x',
+        yKey: 'y',
+        cumulative: false,
+        showLabels: false,
+        showGrid: false,
+      })
+    ).toEqual([])
   })
 
   it('accumulates yKey values across rows', () => {
-    const results = { rows: [{ x: 'a', y: 10 }, { x: 'b', y: 20 }, { x: 'c', y: 5 }] }
-    const config = { type: 'bar' as const, xKey: 'x', yKey: 'y', cumulative: true, showLabels: false, showGrid: false }
+    const results = {
+      rows: [
+        { x: 'a', y: 10 },
+        { x: 'b', y: 20 },
+        { x: 'c', y: 5 },
+      ],
+    }
+    const config = {
+      type: 'bar' as const,
+      xKey: 'x',
+      yKey: 'y',
+      cumulative: true,
+      showLabels: false,
+      showGrid: false,
+    }
     const output = getCumulativeResults(results, config)
     expect(output).toEqual([
       { x: 'a', y: 10 },
@@ -53,8 +79,20 @@ describe('getCumulativeResults', () => {
   })
 
   it('preserves other keys on each row', () => {
-    const results = { rows: [{ x: 'a', y: 1, label: 'foo' }, { x: 'b', y: 2, label: 'bar' }] }
-    const config = { type: 'bar' as const, xKey: 'x', yKey: 'y', cumulative: true, showLabels: false, showGrid: false }
+    const results = {
+      rows: [
+        { x: 'a', y: 1, label: 'foo' },
+        { x: 'b', y: 2, label: 'bar' },
+      ],
+    }
+    const config = {
+      type: 'bar' as const,
+      xKey: 'x',
+      yKey: 'y',
+      cumulative: true,
+      showLabels: false,
+      showGrid: false,
+    }
     const output = getCumulativeResults(results, config)
     expect(output[0]).toMatchObject({ x: 'a', y: 1, label: 'foo' })
     expect(output[1]).toMatchObject({ x: 'b', y: 3, label: 'bar' })
@@ -62,7 +100,14 @@ describe('getCumulativeResults', () => {
 
   it('handles a single row', () => {
     const results = { rows: [{ x: 'a', y: 42 }] }
-    const config = { type: 'bar' as const, xKey: 'x', yKey: 'y', cumulative: true, showLabels: false, showGrid: false }
+    const config = {
+      type: 'bar' as const,
+      xKey: 'x',
+      yKey: 'y',
+      cumulative: true,
+      showLabels: false,
+      showGrid: false,
+    }
     const output = getCumulativeResults(results, config)
     expect(output).toEqual([{ x: 'a', y: 42 }])
   })

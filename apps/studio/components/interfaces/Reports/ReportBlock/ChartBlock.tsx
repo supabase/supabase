@@ -1,6 +1,7 @@
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import { formatLogTick } from 'components/ui/QueryBlock/QueryBlock.utils'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
@@ -20,8 +21,6 @@ import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'rec
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
-
-import { formatLogTick } from 'components/ui/QueryBlock/QueryBlock.utils'
 
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
