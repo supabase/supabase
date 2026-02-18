@@ -1,18 +1,18 @@
 import { CheckIcon, ChevronsUpDown, Globe } from 'lucide-react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import {
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
-  cn,
 } from 'ui'
 
 import { ALL_TIMEZONES } from './PITR.constants'
@@ -28,6 +28,7 @@ export const TimezoneSelection = ({
   onSelectTimezone,
 }: TimezoneSelectionProps) => {
   const [open, setOpen] = useState(false)
+  const listboxId = useId()
 
   const timezoneOptions = ALL_TIMEZONES.map((option) => option.text)
 
@@ -38,6 +39,7 @@ export const TimezoneSelection = ({
           <Button
             role="combobox"
             aria-expanded={open}
+            aria-controls={listboxId}
             className="w-[350px] justify-between"
             size="small"
             icon={<Globe />}
@@ -48,7 +50,7 @@ export const TimezoneSelection = ({
               : 'Select timezone...'}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-[350px] p-0">
+        <PopoverContent_Shadcn_ id={listboxId} className="w-[350px] p-0">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
             <CommandList_Shadcn_>
