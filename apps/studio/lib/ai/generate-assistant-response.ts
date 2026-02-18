@@ -145,7 +145,7 @@ export async function generateAssistantResponse({
         for (const step of steps) {
           for (const toolCall of step.toolCalls) {
             if (toolCall.toolName === 'rename_chat') {
-              const { newName } = toolCall.args as { newName: string }
+              const { newName } = toolCall.input as { newName: string }
               span?.log({ metadata: { chatName: newName } })
             }
           }
