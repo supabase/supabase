@@ -13,6 +13,7 @@ module.exports = defineConfig([
       '@next/next/no-img-element': 'off',
       'react/no-unescaped-entities': 'off',
       'react/display-name': 'warn',
+      'react/jsx-key': 'error',
       'barrel-files/avoid-re-export-all': 'error',
     },
   },
