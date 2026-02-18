@@ -51,6 +51,7 @@ const requestBodySchema = z.object({
   connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
+  chatId: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
   model: z.enum(['gpt-5', 'gpt-5-mini']).optional(),
@@ -78,6 +79,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     projectRef,
     connectionString,
     orgSlug,
+    chatId,
     chatName,
     model: requestedModel,
   } = data
@@ -188,6 +190,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       aiOptInLevel,
       getSchemas: aiOptInLevel !== 'disabled' ? getSchemas : undefined,
       projectRef,
+      chatId,
       chatName,
       isHipaaEnabled,
       userId,

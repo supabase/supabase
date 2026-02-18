@@ -33,6 +33,7 @@ export async function generateAssistantResponse({
   aiOptInLevel = 'schema',
   getSchemas,
   projectRef,
+  chatId,
   chatName,
   isHipaaEnabled,
   userId,
@@ -48,6 +49,7 @@ export async function generateAssistantResponse({
   aiOptInLevel?: AiOptInLevel
   getSchemas?: () => Promise<string>
   projectRef?: string
+  chatId?: string
   chatName?: string
   isHipaaEnabled?: boolean
   userId?: string
@@ -163,6 +165,7 @@ export async function generateAssistantResponse({
       input: lastUserText,
       metadata: {
         projectRef,
+        chatId,
         chatName,
         aiOptInLevel,
         userId,
