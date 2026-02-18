@@ -2,9 +2,8 @@
 
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
-
 import SVG from 'react-inlinesvg'
-import { RadioGroupLargeItem_Shadcn_, RadioGroup_Shadcn_, Theme, singleThemes } from 'ui'
+import { RadioGroup_Shadcn_, RadioGroupLargeItem_Shadcn_, singleThemes, Theme } from 'ui'
 
 const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
