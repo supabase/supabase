@@ -141,6 +141,16 @@ export async function generateAssistantResponse({
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
+      onFinish: ({ steps }) => {
+        for (const step of steps) {
+          for (const toolCall of step.toolCalls) {
+            if (toolCall.toolName === 'rename_chat') {
+              const { newName } = toolCall.args as { newName: string }
+              span?.log({ metadata: { chatName: newName } })
+            }
+          }
+        }
+      },
     } satisfies Parameters<typeof ai.streamText>[0]
 
     const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
