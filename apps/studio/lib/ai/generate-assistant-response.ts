@@ -11,7 +11,7 @@ import {
 import { traced, wrapAISDK, type Span } from 'braintrust'
 import { source } from 'common-tags'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_TRACING_ENABLED, TRACING_ENVIRONMENT_TAG } from 'lib/ai/braintrust-logger'
+import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
 import {
   CHAT_PROMPT,
   EDGE_FUNCTION_PROMPT,
@@ -159,8 +159,8 @@ export async function generateAssistantResponse({
         orgId,
         planId,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
+        environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
       },
-      tags: [TRACING_ENVIRONMENT_TAG],
     })
 
     return streamTextFn(streamTextArgs)
