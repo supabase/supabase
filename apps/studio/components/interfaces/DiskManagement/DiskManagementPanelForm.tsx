@@ -27,6 +27,7 @@ export function DiskManagementPanelForm() {
       </PageSectionMeta>
       <PageSectionContent>
         <Admonition
+          type="default"
           layout="responsive"
           title="Disk Management has moved"
           description="Disk configuration is now managed alongside Project Compute on the new Compute and Disk page."
