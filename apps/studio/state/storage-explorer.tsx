@@ -1906,15 +1906,14 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const storeAlreadyLoaded = state.projectRef === project?.ref
 
     if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
-      const resumableUploadUrl = endpointData.storageEndpoint
-        ? `${endpointData.storageEndpoint}/v1/upload/resumable`
-        : `${endpointData.endpoint}/storage/v1/upload/resumable`
+      const clientEndpoint = endpointData.storageEndpoint ?? endpointData.endpoint
+      const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
       setState(
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
           connectionString: project.connectionString ?? '',
           resumableUploadUrl,
-          clientEndpoint: endpointData.storageEndpoint ?? endpointData.endpoint,
+          clientEndpoint,
         })
       )
     }
