@@ -2480,7 +2480,17 @@ export const platform: NavMenuConstant = {
         { name: 'Custom Domains', url: '/guides/platform/custom-domains' },
         { name: 'Database Backups', url: '/guides/platform/backups' },
         { name: 'IPv4 Address', url: '/guides/platform/ipv4-address' },
-        { name: 'Read Replicas', url: '/guides/platform/read-replicas' },
+        {
+          name: 'Read Replicas',
+          url: '/guides/platform/read-replicas',
+          items: [
+            { name: 'Overview', url: '/guides/platform/read-replicas' as `/${string}` },
+            {
+              name: 'Getting started',
+              url: '/guides/platform/read-replicas/getting-started' as `/${string}`,
+            },
+          ],
+        },
       ],
     },
     {
@@ -2827,10 +2837,14 @@ export const self_hosting: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker' },
-    { name: 'Restore from Platform', url: '/guides/self-hosting/restore-from-platform' },
     {
-      name: 'Configuration',
-      items: [{ name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' }],
+      name: 'How-to Guides',
+      items: [
+        { name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Restore from Platform', url: '/guides/self-hosting/restore-from-platform' },
+        { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
+        { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+      ],
     },
     {
       name: 'Auth Server',

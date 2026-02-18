@@ -18,6 +18,7 @@ export { default as InsertCode } from './insert-code';
 export { default as Integrations } from './integrations';
 export { default as Last9 } from './last9';
 export { default as Logs } from './logs';
+export { default as Otlp } from './otlp';
 export { default as Postgres } from './postgres';
 export { default as Realtime } from './realtime';
 export { default as ReplaceCode } from './replace-code';

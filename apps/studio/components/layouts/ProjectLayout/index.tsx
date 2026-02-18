@@ -143,7 +143,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 id="panel-left"
                 className={cn(
                   'hidden md:block',
-                  'transition-all duration-[120ms]',
+                  'transition-[max-width,min-width,width] duration-[120ms]',
                   sideBarIsOpen
                     ? resizableSidebar
                       ? 'min-w-64 max-w-[32rem]'
