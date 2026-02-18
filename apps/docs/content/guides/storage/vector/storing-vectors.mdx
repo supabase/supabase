@@ -65,6 +65,43 @@ if (error) {
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+
+supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+
+# Get bucket and index
+bucket = supabase.storage.vectors().from_('embeddings')
+index = bucket.index('documents-openai')
+
+# Insert vectors
+index.put([
+    {
+        'key': 'doc-1',
+        'data': {'float32': [0.1, 0.2, 0.3]},  # ... rest of embedding
+        'metadata': {
+            'title': 'Getting Started with Vector Buckets',
+            'source': 'documentation',
+        },
+    },
+    {
+        'key': 'doc-2',
+        'data': {'float32': [0.4, 0.5, 0.6]},  # ... rest of embedding
+        'metadata': {
+            'title': 'Advanced Vector Search',
+            'source': 'blog',
+        },
+    },
+])
+
+print('✓ Vectors stored successfully')
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -160,6 +197,56 @@ for (let i = 0; i < vectors.length; i += 500) {
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+from openai import OpenAI
+from datetime import datetime
+
+supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+openai = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+
+# Documents to embed and store
+documents = [
+    {'id': '1', 'title': 'How to Train Your AI', 'content': 'Guide for training models...'},
+    {'id': '2', 'title': 'Vector Search Best Practices', 'content': 'Tips for semantic search...'},
+    {'id': '3', 'title': 'Building RAG Systems', 'content': 'Implementing retrieval-augmented generation...'},
+]
+
+# Generate embeddings
+embeddings_response = openai.embeddings.create(
+    model='text-embedding-3-small',
+    input=[doc['content'] for doc in documents]
+)
+
+# Prepare vectors for storage
+vectors = []
+for doc, embedding_data in zip(documents, embeddings_response.data):
+    vectors.append({
+        'key': doc['id'],
+        'data': {'float32': embedding_data.embedding},
+        'metadata': {
+            'title': doc['title'],
+            'source': 'knowledge_base',
+            'created_at': datetime.now().isoformat(),
+        },
+    })
+
+# Store vectors in batches (max 500 per request)
+bucket = supabase.storage.vectors().from_('embeddings')
+vector_index = bucket.index('documents-openai')
+
+batch_size = 500
+for i in range(0, len(vectors), batch_size):
+    batch = vectors[i:i + batch_size]
+    vector_index.put(batch)
+    print(f'✓ Stored batch {i // batch_size + 1} ({len(batch)} vectors)')
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -223,6 +310,29 @@ if (!error) {
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+index = bucket.index('documents-openai')
+
+# Update a vector (same key)
+index.put([
+    {
+        'key': 'doc-1',
+        'data': {'float32': [0.15, 0.25, 0.35]},  # ... updated embedding
+        'metadata': {
+            'title': 'Getting Started with Vector Buckets - Updated',
+            'updated_at': datetime.now().isoformat(),
+        },
+    },
+])
+
+print('✓ Vector updated successfully')
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -266,6 +376,20 @@ if (!error) {
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+index = bucket.index('documents-openai')
+
+# Delete specific vectors
+index.delete(['doc-1', 'doc-2'])
+
+print('✓ Vectors deleted successfully')
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -324,6 +448,15 @@ const { error } = await index.putVectors({ vectors })
 
 For storing large numbers of vectors efficiently:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
+
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
@@ -369,11 +502,66 @@ for (let i = 0; i < vectors.length; i += BATCH_SIZE) {
 console.log('✓ All vectors stored successfully')
 ```
 
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+import json
+
+supabase = create_client(...)
+index = supabase.storage.vectors().from_('embeddings').index('documents-openai')
+
+# Read embeddings from file
+with open('embeddings.jsonl', 'r') as f:
+    lines = [line.strip() for line in f if line.strip()]
+
+vectors = []
+for line in lines:
+    data = json.loads(line)
+    vectors.append({
+        'key': data['key'],
+        'data': {'float32': data['embedding']},
+        'metadata': data.get('metadata', {})
+    })
+
+# Process in batches
+BATCH_SIZE = 500
+processed = 0
+
+for i in range(0, len(vectors), BATCH_SIZE):
+    batch = vectors[i:i + BATCH_SIZE]
+
+    try:
+        index.put(batch)
+        processed += len(batch)
+        print(f'Progress: {processed}/{len(vectors)}')
+    except Exception as e:
+        print(f'Batch failed at offset {i}: {e}')
+        # Optionally implement retry logic
+
+print('✓ All vectors stored successfully')
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ## Performance optimization
 
 ### Batch operations
 
 Always use batch operations for better performance:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 // ❌ Inefficient - Multiple requests
@@ -384,6 +572,23 @@ for (const vector of vectors) {
 // ✅ Efficient - Single batch operation
 await index.putVectors({ vectors })
 ```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+# ❌ Inefficient - Multiple requests
+for vector in vectors:
+    index.put([vector])
+
+# ✅ Efficient - Single batch operation
+index.put(vectors)
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
 
 ### Metadata considerations
 

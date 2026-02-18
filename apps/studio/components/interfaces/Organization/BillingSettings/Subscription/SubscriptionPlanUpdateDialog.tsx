@@ -1,18 +1,13 @@
-import { Check, InfoIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import type { PaymentMethodElementRef } from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import {
   billingPartnerLabel,
   getPlanChangeType,
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
 import { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
@@ -26,19 +21,24 @@ import {
   STRIPE_PUBLIC_KEY,
 } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import { Check, InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
+import { toast } from 'sonner'
 import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import type { PaymentMethodElementRef } from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import PaymentMethodSelection from './PaymentMethodSelection'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const PLAN_HEADINGS = {
   tier_pro:
-    'the Pro plan to unlock unlimited projects, daily backups, and email support whenever you need it',
+    'the Pro plan to unlock more compute resources, daily backups, no project pausing, and email support whenever you need it',
   tier_team: 'the Team plan for SOC2, SSO, priority support and greater data and log retention',
   default: 'to a new plan',
 } as const

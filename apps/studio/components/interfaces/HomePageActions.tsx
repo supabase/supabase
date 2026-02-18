@@ -1,20 +1,20 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { Filter, Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Filter, Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import {
   Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
@@ -49,7 +49,7 @@ export const HomePageActions = ({
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
 
   return (
@@ -65,6 +65,7 @@ export const HomePageActions = ({
           actions={[
             search && (
               <Button
+                key="clear"
                 size="tiny"
                 type="text"
                 icon={<X />}
@@ -83,13 +84,7 @@ export const HomePageActions = ({
               icon={<Filter />}
             />
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_
-            className="p-0 w-56"
-            side="bottom"
-            align="center"
-            sideOffset={6}
-            portal={true}
-          >
+          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" sideOffset={6}>
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
               <p className="text-xs">Filter projects by status</p>
               <div className="flex flex-col">

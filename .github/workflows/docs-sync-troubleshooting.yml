@@ -54,3 +54,4 @@ jobs:
           author: 'github-docs-sync-bot <github-docs-sync-bot@supabase.com>'
           branch: 'bot/docs-sync-troubleshooting'
           branch-suffix: 'random'
+          labels: 'documentation'

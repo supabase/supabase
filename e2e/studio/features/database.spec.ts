@@ -1,5 +1,7 @@
 import { expect, Page } from '@playwright/test'
+
 import { env } from '../env.config.js'
+import { dropTable, query } from '../utils/db/index.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import {
@@ -26,68 +28,30 @@ const databaseFunctionName = 'pw_database_function'
 const databaseFunctionNameUpdated = 'pw_database_function_updated'
 const databaseRoleName = 'pw_database_role'
 
-const createTable = async (page: Page, tableName: string, newColumnName: string) => {
-  await page.getByRole('button', { name: 'New table', exact: true }).click()
-  await page.getByTestId('table-name-input').fill(tableName)
-  await page.getByTestId('created_at-extra-options').click()
-  await page.getByText('Is Nullable').click()
-  await page.getByTestId('created_at-extra-options').click({ force: true })
-
-  await page.getByRole('button', { name: 'Add column' }).click()
-  await page.getByRole('textbox', { name: 'column_name' }).fill(newColumnName)
-  await page.getByText('Choose a column type...').click()
-  await page.getByRole('option', { name: 'text Variable-length' }).click()
-
-  await page.getByRole('button', { name: 'Save' }).click()
-
-  await expect(
-    page.getByText(`Table ${tableName} is good to go!`),
-    'Success toast should be visible after table creation'
-  ).toBeVisible({
-    timeout: 50000,
-  })
-
-  await expect(
-    page.getByRole('button', { name: `View ${tableName}`, exact: true }),
-    'Table should be visible after creation'
-  ).toBeVisible()
-}
-
-const deleteTable = async (page: Page, tableName: string) => {
-  await page.getByLabel(`View ${tableName}`).nth(0).click()
-  await page.getByLabel(`View ${tableName}`).getByRole('button').nth(1).click()
-  await page.getByText('Delete table').click()
-  await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).click()
-  await page.getByRole('button', { name: 'Delete' }).click()
-  await expect(
-    page.getByText(`Successfully deleted table "${tableName}"`),
-    'Delete confirmation toast should be visible'
-  ).toBeVisible({ timeout: 50000 })
-}
-
 test.describe.serial('Database', () => {
   let page: Page
 
   test.beforeAll(async ({ browser, ref }) => {
+    // Create the shared test table via API
+    await dropTable(databaseTableName) // Clean up if exists
+    await query(`
+      CREATE TABLE IF NOT EXISTS ${databaseTableName} (
+        id bigint generated always as identity not null primary key,
+        created_at timestamptz default now(),
+        ${databaseColumnName} text
+      )
+    `)
+
     page = await browser.newPage()
     const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
     await page.goto(toUrl(`/project/${ref}/editor`))
     await wait
-
-    if ((await page.getByRole('button', { name: `View ${databaseTableName}` }).count()) > 0) {
-      await deleteTable(page, databaseTableName)
-    }
-
-    await createTable(page, databaseTableName, databaseColumnName)
   })
 
-  test.afterAll(async ({ ref }) => {
-    const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
-    await page.goto(toUrl(`/project/${ref}/editor`))
-    await wait
-    if ((await page.getByRole('button', { name: `View ${databaseTableName}` }).count()) > 0) {
-      await deleteTable(page, databaseTableName)
-    }
+  test.afterAll(async () => {
+    // Clean up via API
+    await dropTable(databaseTableName)
+    await page.close()
   })
 
   test.describe('Schema Visualizer', () => {
@@ -443,8 +407,9 @@ test.describe.serial('Database', () => {
       // Wait for database triggers to be populated
       await waitForApiResponse(page, 'pg-meta', ref, 'triggers')
 
+      const newTriggerButton = page.getByRole('button', { name: 'New trigger' }).first()
       // create new trigger button to exist in public schema
-      await expect(page.getByRole('button', { name: 'New trigger' })).toBeVisible()
+      await expect(newTriggerButton).toBeVisible()
 
       // change schema -> realtime
       await page.getByTestId('schema-selector').click()
@@ -480,7 +445,7 @@ test.describe.serial('Database', () => {
       }
 
       // create new trigger
-      await page.getByRole('button', { name: 'New trigger' }).click()
+      await page.getByRole('button', { name: 'New trigger' }).first().click()
       await page.getByRole('textbox', { name: 'Name of trigger' }).fill(databaseTriggerName)
       await page.getByRole('combobox').first().click()
       await page.getByRole('option', { name: `public.${databaseTableName}`, exact: true }).click()
@@ -563,15 +528,21 @@ test.describe.serial('Database', () => {
       await page.getByTestId('schema-selector').click()
       await page.getByPlaceholder('Find schema...').fill('auth')
       await page.getByRole('option', { name: 'auth' }).click()
-      await page.waitForTimeout(500)
-      expect(page.getByText('sso_providers_pkey')).toBeVisible()
-      expect(page.getByText('confirmation_token_idx')).toBeVisible()
+      await page.waitForTimeout(2000)
+
+      const ssoProvidersPkeyRow = page.getByRole('row', { name: 'sso_providers_pkey' })
+      const confirmationTokenIdxRow = page.getByRole('row', { name: 'confirmation_token_idx' })
+      const createIndexButton = page.getByRole('button', { name: 'Create index' }).first()
+
+      expect(ssoProvidersPkeyRow).toBeVisible()
+      expect(confirmationTokenIdxRow).toBeVisible()
       // create new index button does not exist in other schemas
-      expect(page.getByRole('button', { name: 'Create index' })).not.toBeVisible()
+      expect(createIndexButton).not.toBeVisible()
 
       // filter by querying
       await page.getByRole('textbox', { name: 'Search for an index' }).fill('users')
-      await page.waitForTimeout(500)
+      await page.waitForTimeout(2000)
+
       expect(page.getByText('sso_providers_pkey')).not.toBeVisible()
       expect(page.getByText('confirmation_token_idx')).toBeVisible()
 
@@ -582,7 +553,7 @@ test.describe.serial('Database', () => {
         .last()
         .click()
       await page.getByText('Index:confirmation_token_idx')
-      await page.waitForTimeout(500) // wait for text content to be visible
+      await page.waitForTimeout(2000) // wait for text content to be visible
       expect(await page.getByRole('presentation').textContent()).toBe(
         `CREATE UNIQUE INDEX confirmation_token_idx ON auth.users USING btree (confirmation_token) WHERE ((confirmation_token)::text !~ '^[0-9 ]*$'::text)`
       )

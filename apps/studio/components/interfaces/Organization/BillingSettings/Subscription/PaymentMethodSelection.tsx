@@ -1,6 +1,19 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
+import { useParams } from 'common'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
+import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Loader, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
@@ -13,22 +26,8 @@ import {
   useState,
 } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Checkbox_Shadcn_, Listbox } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import {
-  NewPaymentMethodElement,
-  type PaymentMethodElementRef,
-} from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -57,13 +56,15 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
-  const { data: customerProfile, isLoading: isCustomerProfileLoading } =
+  const { data: customerProfile, isPending: isCustomerProfileLoading } =
     useOrganizationCustomerProfileQuery({
       slug,
     })
-  const { data: taxId, isLoading: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
+  const { data: taxId, isPending: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
 
-  const { data: allPaymentMethods, isLoading } = useOrganizationPaymentMethodsQuery({ slug })
+  const { data: allPaymentMethods, isPending: isLoading } = useOrganizationPaymentMethodsQuery({
+    slug,
+  })
 
   const paymentMethods = useMemo(() => {
     if (!allPaymentMethods)

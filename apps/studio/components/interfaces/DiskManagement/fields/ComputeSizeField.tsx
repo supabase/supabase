@@ -8,6 +8,7 @@ import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -30,24 +31,15 @@ import { ComputeInstanceAddonVariantId, InfraInstanceSize } from '../DiskManagem
 import {
   calculateComputeSizePrice,
   getAvailableComputeOptions,
-  showMicroUpgrade,
+  ComputeAddonVariant,
 } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 /**
  * to do: this could be a type from api-types
  */
-type ComputeOption = {
-  identifier: ComputeInstanceAddonVariantId
-  name: string
-  price: number
-  price_interval: 'monthly' | 'hourly'
-  meta?: InstanceSpecs
-}
-
 type ComputeSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
   disabled?: boolean
@@ -56,7 +48,7 @@ type ComputeSizeFieldProps = {
 export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
-  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
 
   const { hasAccess: entitledUpdateCompute, isLoading: isEntitlementLoading } =
     useCheckEntitlements('instances.compute_update_available_sizes')
@@ -67,7 +59,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
   const {
     data: addons,
-    isLoading: isAddonsLoading,
+    isPending: isAddonsLoading,
     error: addonsError,
   } = useProjectAddonsQuery({ projectRef: ref })
 
@@ -174,7 +166,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 </FormMessage>
               ) : (
                 <>
-                  {availableOptions.map((compute: ComputeOption) => {
+                  {availableOptions.map((compute) => {
                     const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
 
                     const lockedMicroDueToPITR =
@@ -191,9 +183,20 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       project?.infra_compute_size === 'nano' &&
                       compute.identifier === 'ci_nano'
                         ? availableOptions.find(
-                            (option: ComputeOption) => option.identifier === 'ci_micro'
+                            (option: ComputeAddonVariant) => option.identifier === 'ci_micro'
                           )?.price
                         : compute.price
+
+                    const cpuLabel = (() => {
+                      const cpuCores = compute.meta?.cpu_cores
+                      if (typeof cpuCores === 'number') {
+                        return `${cpuCores}-core ${cpuArchitecture} CPU`
+                      }
+                      if (cpuCores) {
+                        return `${cpuCores} CPU`
+                      }
+                      return 'CPU'
+                    })()
 
                     return (
                       <RadioGroupCardItem
@@ -267,12 +270,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                           size={14}
                                           className="text-foreground-lighter"
                                         />
-                                        <span>
-                                          {compute.meta?.cpu_cores ?? 0}
-                                          {compute.meta?.cpu_cores !== 'Shared' &&
-                                            `-core ${cpuArchitecture}`}{' '}
-                                          CPU
-                                        </span>
+                                        <span>{cpuLabel}</span>
                                       </div>
                                     </div>
                                   </div>

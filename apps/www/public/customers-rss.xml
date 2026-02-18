@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 13 Nov 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 17 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/exprealty</guid>
+  <title>How eXp Realty Unlocked Enterprise Innovation and Cut SaaS Costs with Supabase</title>
+  <link>https://supabase.com/customers/exprealty</link>
+  <description>eXp Realty empowered 2,000+ non-technical employees to build production software using AI coding tools with Supabase, replacing millions in SaaS contracts with bespoke solutions.</description>
+  <pubDate>Wed, 17 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/govsignals</guid>
+  <title>GovSignals builds the AI platform for Government Contractors on Supabase</title>
+  <link>https://supabase.com/customers/govsignals</link>
+  <description>GovSignals builds AI for government contractors, helping them discover federal opportunities, automate RFP responses, and collaborate on proposals within secure, compliant environments powered by Supabase.</description>
+  <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/koodos</guid>
+  <title>Koodos scales its social discovery app Shelf on Supabase</title>
+  <link>https://supabase.com/customers/koodos</link>
+  <description>Koodos built its app Shelf from day one on Supabase, growing to support millions of users and billions of data points without dedicated database staff.</description>
+  <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/phoenix-energy</guid>
   <title>Phoenix Energy completes critical infrastructure migration in six months with Supabase</title>
   <link>https://supabase.com/customers/phoenix-energy</link>

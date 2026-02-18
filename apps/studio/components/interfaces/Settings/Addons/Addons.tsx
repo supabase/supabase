@@ -1,10 +1,3 @@
-import dayjs from 'dayjs'
-import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useMemo } from 'react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import {
@@ -14,7 +7,6 @@ import {
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -24,7 +16,6 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { mapResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -32,15 +23,27 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import dayjs from 'dayjs'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import {
+  useIsOrioleDbInAws,
+  useIsProjectActive,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
+import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useMemo } from 'react'
 import { useAddonsPagePanel } from 'state/addons-page'
-import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert, Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
@@ -58,7 +61,7 @@ export const Addons = () => {
   ])
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const { data: selectedProject, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: selectedProject, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { data: parentProject } = useProjectDetailQuery({
     ref: selectedProject?.parent_project_ref,
   })
@@ -102,7 +105,7 @@ export const Addons = () => {
   const {
     data: addons,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useProjectAddonsQuery({ projectRef })
@@ -250,11 +253,21 @@ export const Addons = () => {
                       title="Compute size has moved"
                       description="Compute size is now managed alongside Disk configuration on the new Compute and Disk page."
                       actions={
-                        <Button type="default" asChild>
-                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                            Go to Compute and Disk
-                          </Link>
-                        </Button>
+                        <ProjectUpdateDisabledTooltip
+                          projectUpdateDisabled={projectUpdateDisabled}
+                          projectNotActive={!isProjectActive}
+                        >
+                          <Button
+                            asChild
+                            type="default"
+                            className="pointer-events-auto"
+                            disabled={projectUpdateDisabled || !isProjectActive}
+                          >
+                            <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                              Go to Compute and Disk
+                            </Link>
+                          </Button>
+                        </ProjectUpdateDisabledTooltip>
                       }
                     />
 
@@ -393,24 +406,21 @@ export const Addons = () => {
                             ? 'Dedicated IPv4 address is enabled'
                             : 'Dedicated IPv4 address is not enabled'}
                         </p>
-                        <ButtonTooltip
-                          type="default"
-                          className="mt-2 pointer-events-auto"
-                          onClick={() => setPanel('ipv4')}
-                          disabled={
-                            !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
-                          }
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: !(canUpdateIPv4 || ipv4)
-                                ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
-                                : undefined,
-                            },
-                          }}
+                        <ProjectUpdateDisabledTooltip
+                          projectUpdateDisabled={projectUpdateDisabled}
+                          projectNotActive={!isProjectActive}
                         >
-                          Change dedicated IPv4 address
-                        </ButtonTooltip>
+                          <Button
+                            type="default"
+                            className="mt-2 pointer-events-auto"
+                            onClick={() => setPanel('ipv4')}
+                            disabled={
+                              !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
+                            }
+                          >
+                            Change dedicated IPv4 address
+                          </Button>
+                        </ProjectUpdateDisabledTooltip>
                       </div>
                     </div>
                   </ScaffoldSectionContent>

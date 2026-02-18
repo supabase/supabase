@@ -6,7 +6,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databasePoliciesKeys } from './keys'
 
-type CreatePolicyBody = {
+export type CreatePolicyBody = {
   name: string
   table: string
   schema?: string

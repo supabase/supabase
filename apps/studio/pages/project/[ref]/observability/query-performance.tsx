@@ -1,7 +1,9 @@
-import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
+import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 
 import { useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { useSupamonitorStatus } from 'components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import {
@@ -12,19 +14,21 @@ import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { Admonition } from 'ui-patterns'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const { isSupamonitorEnabled } = useSupamonitorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
 
   const {
@@ -35,19 +39,33 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const [{ search: searchQuery, roles, minCalls, indexAdvisor }] = useQueryStates({
+  const [
+    { search: searchQuery, roles, minCalls, totalTimeFilter: totalTimeFilterRaw, indexAdvisor },
+  ] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     minCalls: parseAsInteger,
+    totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
+      value === null || value === undefined ? null : (value as NumericFilter)
+    ),
     indexAdvisor: parseAsString.withDefault('false'),
   })
+
+  const totalTimeFilter = totalTimeFilterRaw ?? null
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, ref ?? 'default')
   const queryHitRate = hooks.queryHitRate()
   const queryMetrics = hooks.queryMetrics()
+
+  const minTotalTime =
+    totalTimeFilter && totalTimeFilter.operator === '>'
+      ? totalTimeFilter.value
+      : totalTimeFilter && totalTimeFilter.operator === '>='
+        ? totalTimeFilter.value
+        : undefined
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
@@ -56,10 +74,21 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
     minCalls: minCalls ?? undefined,
+    minTotalTime,
     filterIndexAdvisor: indexAdvisor === 'true',
   })
 
-  const isPgStatMonitorEnabled = project?.dbVersion === '17.4.1.076-psml-1'
+  if (!isLoadingProject && !project) {
+    return (
+      <div className="h-full flex flex-col p-6">
+        <Admonition
+          type="destructive"
+          title="Project not found"
+          description="Unable to load project data. Please check your project reference and try again."
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -70,7 +99,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
             href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
           />
           <DatabaseSelector />
-          {isPgStatMonitorEnabled && (
+          {isSupamonitorEnabled && (
             <LogsDatePicker
               value={datePickerValue}
               helpers={datePickerHelpers.filter(
@@ -88,7 +117,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         queryHitRate={queryHitRate}
         queryPerformanceQuery={queryPerformanceQuery}
         queryMetrics={queryMetrics}
-        isPgStatMonitorEnabled={isPgStatMonitorEnabled}
+        isSupamonitorEnabled={isSupamonitorEnabled}
         dateRange={selectedDateRange}
         onDateRangeChange={updateDateRange}
       />

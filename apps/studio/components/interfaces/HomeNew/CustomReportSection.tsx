@@ -39,6 +39,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
+import { keepPreviousData } from '@tanstack/react-query'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
@@ -56,7 +57,7 @@ export function CustomReportSection() {
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const homeReport = reportsData?.pages?.[0]?.content?.[0] as Content | undefined
   const reportContent = homeReport?.content as Dashboards.Content | undefined
@@ -307,14 +308,12 @@ export function CustomReportSection() {
       const data = e.dataTransfer.getData('application/json')
       if (!data) return
 
-      const { label, sql, config } = JSON.parse(data)
+      const { label, sql } = JSON.parse(data)
       if (!label || !sql) return
 
       const toastId = toast.loading(`Creating new query: ${label}`)
-      const id = uuidv4()
 
       const payload = createSqlSnippetSkeletonV2({
-        id,
         name: label,
         sql,
         owner_id: profile.id,
@@ -325,7 +324,7 @@ export function CustomReportSection() {
 
       // Handle success optimistically
       toast.success(`Successfully created new query: ${label}`, { id: toastId })
-      addSnippetToReport({ id, name: label })
+      addSnippetToReport({ id: payload.id, name: label })
       sendEvent({
         action: 'custom_report_assistant_sql_block_added',
         groups: { project: ref, organization: organization?.slug ?? 'Unknown' },

@@ -13,8 +13,9 @@ import type { CommonChartProps, StackedChartProps } from './Charts.types'
  * numberFormatter(123.123)   // "123.12"
  * numberFormatter(123, 2)    // "123.00"
  */
-export const numberFormatter = (num: number, precision = 2) =>
-  isFloat(num) ? precisionFormatter(num, precision) : num.toLocaleString()
+export const numberFormatter = (num: number, precision = 2) => {
+  return isFloat(num) ? precisionFormatter(num, precision) : num.toLocaleString()
+}
 
 /**
  * Tests if a number is a float.
@@ -31,11 +32,23 @@ export const isFloat = (num: number) => String(num).includes('.')
  * @example
  * precisionFormatter(123, 2)       // "123.00"
  * precisionFormatter(123.123, 2)   // "123.12"
+ * precisionFormatter(0.00123, 2)   // "<0.01"
+ * precisionFormatter(-0.00123, 2)  // ">-0.01"
  */
 export const precisionFormatter = (num: number, precision: number): string => {
   if (precision === 0) {
     return String(Math.round(num))
   }
+
+  // Handle small numbers that would display as 0.00
+  const threshold = 1 / Math.pow(10, precision)
+  if (num > 0 && num < threshold) {
+    return `<${threshold.toFixed(precision)}`
+  }
+  if (num < 0 && num > -threshold) {
+    return `>-${threshold.toFixed(precision)}`
+  }
+
   if (isFloat(num)) {
     const [head, tail] = String(num).split('.')
     return Number(head).toLocaleString() + '.' + tail.slice(0, precision)
@@ -43,6 +56,28 @@ export const precisionFormatter = (num: number, precision: number): string => {
     // pad int with 0
     return num.toLocaleString() + '.' + '0'.repeat(precision)
   }
+}
+
+/**
+ * Formats a percentage, trimming decimals at 100.
+ *
+ * @example
+ * formatPercentage(100, 2) // "100%"
+ * formatPercentage(99.99, 2) // "99.99%"
+ */
+export const formatPercentage = (value: number, precision = 2) => {
+  const isHundred = Math.abs(value - 100) < 1e-6
+  if (isHundred) return '100%'
+  if (Number.isInteger(value)) return `${value}%`
+  const formatted = precisionFormatter(value, precision)
+  if (formatted.startsWith('<') || formatted.startsWith('>')) {
+    return `${formatted}%`
+  }
+  if (formatted.includes('.')) {
+    const [head, tail = ''] = formatted.split('.')
+    return `${head}.${tail.padEnd(precision, '0')}%`
+  }
+  return `${formatted}%`
 }
 
 /**

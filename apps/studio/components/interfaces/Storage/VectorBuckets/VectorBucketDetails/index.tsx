@@ -1,8 +1,8 @@
 import { MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import {
@@ -15,7 +15,6 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { useVectorBucketQuery } from 'data/storage/vector-bucket-query'
 import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { SqlEditor, TableEditor } from 'icons'
 import {
   Button,
@@ -24,6 +23,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -37,10 +37,10 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateVectorTableSheet } from '../CreateVectorTableSheet'
 import { DeleteVectorBucketModal } from '../DeleteVectorBucketModal'
 import { DeleteVectorTableModal } from '../DeleteVectorTableModal'
-import { getVectorBucketFDWSchemaName } from '../VectorBuckets.utils'
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
 import { useSelectedVectorBucket } from '../useSelectedVectorBuckets'
+import { InitializeForeignSchemaDialog } from './InitializeForeignSchemaDialog'
 import {
   ExtensionNeedsUpgrade,
   ExtensionNotInstalled,
@@ -51,16 +51,16 @@ import { VectorBucketTableExamplesSheet } from './VectorBucketTableExamplesSheet
 export const VectorBucketDetails = () => {
   const router = useRouter()
   const { ref: projectRef, bucketId } = useParams()
-  // [Joshen] Use the list buckets to verify that the bucket exists first before fetching bucket details
   const { data: _bucket, isSuccess } = useSelectedVectorBucket()
-
-  // Track the ID being deleted to exclude it from error checking
-  const deletingTableIdRef = useRef<string | null>(null)
 
   const [filterString, setFilterString] = useState('')
   const [showDeleteModal, setShowDeleteModal] = useQueryState(
     'delete',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [_, setSelectedTableIdToDelete] = useQueryState(
+    'deleteTable',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const {
@@ -73,20 +73,11 @@ export const VectorBucketDetails = () => {
     { enabled: isSuccess && !!_bucket }
   )
 
-  const { data, isLoading: isLoadingIndexes } = useVectorBucketsIndexesQuery({
+  const { data, isPending: isLoadingIndexes } = useVectorBucketsIndexesQuery({
     projectRef,
     vectorBucketName: bucket?.vectorBucketName,
   })
   const allIndexes = data?.indexes ?? []
-
-  const { setValue: setSelectedTableToDelete, value: selectedTableToDelete } =
-    useQueryStateWithSelect({
-      urlKey: 'deleteTable',
-      select: (id: string) => (id ? allIndexes.find((index) => index.indexName === id) : undefined),
-      enabled: !!allIndexes.length,
-      onError: (_error, selectedId) =>
-        handleErrorOnDelete(deletingTableIdRef, selectedId, `Table not found`),
-    })
 
   const filteredList =
     filterString.length === 0
@@ -96,15 +87,17 @@ export const VectorBucketDetails = () => {
         )
 
   const { extension: wrappersExtension, state: extensionState } = useS3VectorsWrapperExtension()
+
   const {
     data: wrapperInstance,
     meta: wrapperMeta,
     isLoading: isLoadingWrapper,
-  } = useS3VectorsWrapperInstance({
-    bucketId,
-  })
+  } = useS3VectorsWrapperInstance({ bucketId })
 
   const isLoading = isLoadingIndexes || isLoadingWrapper
+  const hasSetUpForeignSchema = (wrapperInstance?.server_options ?? []).find((x) =>
+    x.startsWith('supabase_target_schema')
+  )
 
   const state = isLoading
     ? 'loading'
@@ -140,7 +133,10 @@ export const VectorBucketDetails = () => {
                 icon={<Search />}
                 className="w-48"
               />
-              <CreateVectorTableSheet bucketName={bucket?.vectorBucketName} />
+              <div className="flex items-center gap-x-2">
+                {!!wrapperInstance && !hasSetUpForeignSchema && <InitializeForeignSchemaDialog />}
+                <CreateVectorTableSheet bucketName={bucket?.vectorBucketName} />
+              </div>
             </div>
 
             {state === 'not-installed' && (
@@ -210,6 +206,10 @@ export const VectorBucketDetails = () => {
                         const id = `index-${idx}`
                         const name = index.indexName
 
+                        const foreignTable = wrapperInstance?.tables?.find(
+                          (x) => x.name === index.indexName
+                        )
+
                         return (
                           <TableRow key={id}>
                             <TableCell>{name}</TableCell>
@@ -232,15 +232,14 @@ export const VectorBucketDetails = () => {
                                     />
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent side="bottom" align="end" className="w-40">
-                                    {wrapperInstance ? (
+                                    {!!foreignTable ? (
                                       <>
                                         <DropdownMenuItem
                                           className="flex items-center space-x-2"
                                           asChild
                                         >
-                                          {/* TODO: Proper URL for sql editor */}
                                           <Link
-                                            href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(`select * from "${getVectorBucketFDWSchemaName(bucketId!)}"."${name}";`)}`}
+                                            href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(`select * from "${foreignTable.schema}"."${foreignTable.name}";`)}`}
                                             onClick={(e) => e.stopPropagation()}
                                           >
                                             <SqlEditor
@@ -254,9 +253,8 @@ export const VectorBucketDetails = () => {
                                           className="flex items-center space-x-2"
                                           asChild
                                         >
-                                          {/* TODO: Proper URL for table editor */}
                                           <Link
-                                            href={`/project/${projectRef}/editor/?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
+                                            href={`/project/${projectRef}/editor/${foreignTable.id}?schema=${foreignTable.schema}`}
                                             onClick={(e) => e.stopPropagation()}
                                           >
                                             <TableEditor
@@ -266,13 +264,14 @@ export const VectorBucketDetails = () => {
                                             <p>View in Table Editor</p>
                                           </Link>
                                         </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
                                       </>
                                     ) : null}
                                     <DropdownMenuItem
                                       className="flex items-center space-x-2"
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        setSelectedTableToDelete(index.indexName)
+                                        setSelectedTableIdToDelete(index.indexName)
                                       }}
                                     >
                                       <Trash2 size={12} className="text-foreground-lighter" />
@@ -318,11 +317,7 @@ export const VectorBucketDetails = () => {
         </ScaffoldContainer>
       )}
 
-      <DeleteVectorTableModal
-        visible={!!selectedTableToDelete}
-        table={selectedTableToDelete}
-        onClose={() => setSelectedTableToDelete(null)}
-      />
+      <DeleteVectorTableModal />
 
       <DeleteVectorBucketModal
         visible={showDeleteModal}

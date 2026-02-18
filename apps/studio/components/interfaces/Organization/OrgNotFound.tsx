@@ -7,7 +7,7 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
   const {
     data: organizations,
     isSuccess: isOrganizationsSuccess,
-    isLoading: isOrganizationsLoading,
+    isPending: isOrganizationsLoading,
     isError: isOrganizationsError,
     error: organizationsError,
   } = useOrganizationsQuery()

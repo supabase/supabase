@@ -1,10 +1,13 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { replicaKeys } from '@/data/read-replicas/keys'
 import { useParams } from 'common'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
 import type { Database } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 
 interface DropReplicaConfirmationModalProps {
   selectedReplica?: Database
@@ -12,16 +15,32 @@ interface DropReplicaConfirmationModalProps {
   onCancel: () => void
 }
 
-const DropReplicaConfirmationModal = ({
+export const DropReplicaConfirmationModal = ({
   selectedReplica,
   onSuccess,
   onCancel,
 }: DropReplicaConfirmationModalProps) => {
   const { ref: projectRef } = useParams()
+  const queryClient = useQueryClient()
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
   const { mutate: removeReadReplica, isPending: isRemoving } = useReadReplicaRemoveMutation({
     onSuccess: () => {
       toast.success(`Tearing down read replica (ID: ${formattedId})`)
+
+      // [Joshen] Temporarily optimistic rendering until API supports immediate status update
+      queryClient.setQueriesData(
+        { queryKey: replicaKeys.list(projectRef) },
+        (old: Database[] | undefined) => {
+          const updatedReplicas = old?.map((x) => {
+            if (x.identifier === selectedReplica?.identifier) {
+              return { ...x, status: REPLICA_STATUS.GOING_DOWN }
+            }
+            return x
+          })
+          return updatedReplicas
+        }
+      )
+
       onSuccess()
       onCancel()
     },
@@ -64,5 +83,3 @@ const DropReplicaConfirmationModal = ({
     </ConfirmationModal>
   )
 }
-
-export default DropReplicaConfirmationModal

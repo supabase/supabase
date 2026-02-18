@@ -61,6 +61,10 @@ description = "The rate of joins per second from your clients has reached the ch
 
 [RealtimeDisabledForTenant]
 description = "Realtime has been disabled for the tenant."
+resolution = "Your project may have been suspended for exceeding usage quotas. Contact support with your project reference ID and a description of your Realtime use case."
+[[RealtimeDisabledForTenant.references]]
+href = "https://supabase.com/docs/troubleshooting/realtime-project-suspended-for-exceeding-quotas"
+description = "Troubleshooting guide for suspended projects"
 
 [UnableToConnectToTenantDatabase]
 description = "Realtime was not able to connect to the tenant's database."

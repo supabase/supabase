@@ -436,7 +436,17 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/settings/auth',
-        destination: '/project/:ref/auth',
+        destination: '/project/:ref/auth/providers',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/api',
+        destination: '/project/:ref/integrations/data_api/overview',
+        permanent: false,
+      },
+      {
+        source: '/project/:ref/api',
+        destination: '/project/:ref/integrations/data_api/docs',
         permanent: false,
       },
 
@@ -523,7 +533,6 @@ const nextConfig = {
     ]
   },
   images: {
-    // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
     dangerouslyAllowSVG: false,
     remotePatterns: [
       {
@@ -564,6 +573,15 @@ const nextConfig = {
   turbopack: {
     rules: {
       '*.md': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      // special case for Deno libs to be loaded as a raw text. They're passed as raw text to the Monaco editor.
+      'edge-runtime.d.ts': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      'lib.deno.d.ts': {
         loaders: ['raw-loader'],
         as: '*.js',
       },

@@ -1,4 +1,4 @@
-export type showApiKey = {
+export type ShowApiKey = {
   key: string
   name: string
 }

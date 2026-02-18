@@ -31,7 +31,7 @@ export interface LogsQueryHook {
   enabled?: boolean
 }
 
-const useLogsQuery = (
+export const useLogsQuery = (
   projectRef: string,
   initialParams: Partial<LogsEndpointParams> = {},
   enabled = true
@@ -67,7 +67,7 @@ const useLogsQuery = (
   const {
     data,
     error: rqError,
-    isLoading,
+    isPending: isLoading,
     isRefetching,
     refetch,
   } = useQuery({

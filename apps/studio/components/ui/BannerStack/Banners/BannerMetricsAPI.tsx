@@ -24,7 +24,7 @@ export const BannerMetricsAPI = () => {
       onDismiss={() => {
         setIsDismissed(true)
         dismissBanner('metrics-api-banner')
-        track('observability_banner_dismiss_button_clicked')
+        track('metrics_api_banner_dismiss_button_clicked')
       }}
     >
       <div className="flex flex-col gap-y-4">
@@ -51,7 +51,7 @@ export const BannerMetricsAPI = () => {
             <Link
               href={`${DOCS_URL}/guides/telemetry/metrics`}
               target="_blank"
-              onClick={() => track('observability_banner_cta_button_clicked')}
+              onClick={() => track('metrics_api_banner_cta_button_clicked')}
             >
               Get started for free
             </Link>

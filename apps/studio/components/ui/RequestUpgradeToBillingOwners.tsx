@@ -1,9 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PropsWithChildren, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import {
@@ -12,6 +7,10 @@ import {
 } from 'data/organizations/request-upgrade-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useTrack } from 'lib/telemetry/track'
+import { PropsWithChildren, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -33,6 +32,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
 
 const FormSchema = z.object({
   note: z.string().optional(),
@@ -46,6 +46,7 @@ interface RequestUpgradeToBillingOwnersProps {
   addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
+  className?: string
 }
 
 export const RequestUpgradeToBillingOwners = ({
@@ -54,12 +55,15 @@ export const RequestUpgradeToBillingOwners = ({
   addon,
   featureProposition,
   children,
+  className,
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const [open, setOpen] = useState(false)
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
-  const isFreePlan = organization?.plan?.id === 'free'
+  const currentPlan = organization?.plan?.id
+  const isFreePlan = currentPlan === 'free'
 
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
   const { data: roles } = useOrganizationRolesV2Query({ slug: organization?.slug })
@@ -67,6 +71,11 @@ export const RequestUpgradeToBillingOwners = ({
 
   const { mutate: sendUpgradeRequest, isPending: isSubmitting } = useSendUpgradeRequestMutation({
     onSuccess: () => {
+      track('request_upgrade_submitted', {
+        requestedPlan: plan,
+        addon,
+        currentPlan,
+      })
       toast.success('Successfully sent request to billing owners!')
       setOpen(false)
     },
@@ -131,10 +140,22 @@ export const RequestUpgradeToBillingOwners = ({
     sendUpgradeRequest({ slug, plan, note: values.note })
   }
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isOpen) {
+      track('request_upgrade_modal_opened', {
+        requestedPlan: plan,
+        addon,
+        currentPlan,
+        featureProposition,
+      })
+    }
+    setOpen(isOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button block={block} type="primary">
+        <Button block={block} type="primary" className={className}>
           {buttonText}
         </Button>
       </DialogTrigger>

@@ -1,9 +1,8 @@
+import { User } from 'data/auth/users-infinite-query'
 import dayjs from 'dayjs'
+import { BASE_PATH } from 'lib/constants'
 import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
-
-import { User } from 'data/auth/users-infinite-query'
-import { BASE_PATH } from 'lib/constants'
 import {
   Checkbox_Shadcn_,
   cn,
@@ -14,6 +13,7 @@ import {
   ContextMenuTrigger_Shadcn_,
   copyToClipboard,
 } from 'ui'
+
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ColumnConfiguration, UsersTableColumn } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'
@@ -82,6 +82,7 @@ const providers = {
     { notion: 'notion-icon' },
     { twitch: 'twitch-icon' },
     { twitter: 'twitter-icon' },
+    { x: 'x-icon-light' },
     { slack_oidc: 'slack-icon' },
     { slack: 'slack-icon' },
     { spotify: 'spotify-icon' },
@@ -149,6 +150,7 @@ export function getDisplayName(user: User, fallback = '-'): string {
     last_name,
     firstName,
     first_name,
+    name,
   } = user.raw_user_meta_data ?? {}
 
   const {
@@ -193,7 +195,8 @@ export function getDisplayName(user: User, fallback = '-'): string {
 
   return (
     toPrettyJsonString(
-      displayName ||
+      name ||
+        displayName ||
         display_name ||
         ccDisplayName ||
         cc_display_name ||
@@ -360,6 +363,7 @@ export const formatUserColumns = ({
                     const provider = row.providers[idx]
                     return (
                       <div
+                        key={`${user?.id}-${provider}-wrapper`}
                         className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
                         style={{
                           marginLeft: idx === 0 ? 0 : `-8px`,
@@ -371,7 +375,9 @@ export const formatUserColumns = ({
                           width={16}
                           src={icon}
                           alt={`${provider} auth icon`}
-                          className={cn(provider === 'github' && 'dark:invert')}
+                          className={cn(
+                            (provider === 'github' || provider === 'x') && 'dark:invert'
+                          )}
                         />
                       </div>
                     )

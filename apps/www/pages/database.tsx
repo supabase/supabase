@@ -23,6 +23,7 @@ import { PRODUCT_NAMES } from 'shared-data/products'
 import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductsNav from '~/components/Products/ProductsNav'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import { ETLVisual } from '~/data/products/database/etl-visual'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -254,6 +255,44 @@ function Database() {
             </SwiperSlide>
           </div>
         </Swiper>
+
+        <SectionContainer>
+          <div className="grid grid-cols-12 lg:gap-16">
+            <div className="col-span-12 mb-8 lg:col-span-6 xl:col-span-5">
+              <h2 className="h2">Supabase ETL</h2>
+              <p className="p text-lg">Stream your Postgres data to external systems.</p>
+              <p className="p">
+                Automatically replicate your database changes to external data warehouses and
+                analytics platforms in real-time, without pipelines.
+              </p>
+
+              <div className="my-8">
+                <FeatureColumn
+                  title="Offload analytics"
+                  text="Keep Postgres focused on transactional workloads."
+                />
+                <FeatureColumn
+                  title="Point and stream setup"
+                  text="Configure in the Supabase Dashboard."
+                />
+                <FeatureColumn title="Open table formats" text="For long term flexibility." />
+              </div>
+
+              <div className="mt-4 flex gap-2">
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/docs/guides/database/etl">Read the docs</Link>
+                </Button>
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/blog/supabase-etl">Read the blog post</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="col-span-12 lg:col-span-6 lg:col-start-7">
+              {/* TODO: Add ETL illustration */}
+              <ETLVisual className="w-full" />
+            </div>
+          </div>
+        </SectionContainer>
 
         <SectionContainer className="-mb-48">
           <APISection

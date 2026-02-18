@@ -1,8 +1,4 @@
 import { type PostgresColumn } from '@supabase/postgres-meta'
-import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
@@ -13,6 +9,9 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useProfile } from 'lib/profile'
+import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useRef } from 'react'
 import {
   cn,
   CodeBlock,
@@ -76,7 +75,7 @@ export function useSnippetCommands() {
     [
       {
         id: 'run-snippet',
-        name: 'Run snippet',
+        name: 'Run snippet...',
         icon: () => <Code />,
         action: () => setPage(SNIPPET_PAGE_NAME),
       },
@@ -93,7 +92,7 @@ function RunSnippetPage() {
   const { ref } = useParams()
   const {
     data: snippetPages,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useSqlSnippetsQuery({
@@ -208,6 +207,7 @@ function SnippetSelector({
           <CommandGroup_Shadcn_ className="flex-grow min-h-0 overflow-auto">
             {snippets.map((snippet) => (
               <CommandItem_Shadcn_
+                key={snippet.id}
                 id={`${snippet.id}-${snippet.name}`}
                 className={generateCommandClassNames(false)}
                 value={snippetValue(snippet)}
@@ -287,7 +287,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
     [
       {
         id: 'query-table',
-        name: 'Query a table',
+        name: 'Query a table...',
         icon: () => <Table2 />,
         action: () => setPage(QUERY_TABLE_PAGE_NAME),
       },
@@ -302,7 +302,7 @@ function TableSelector() {
   const { data: protectedSchemas } = useProtectedSchemas()
   const {
     data: tablesData,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useTablesQuery({

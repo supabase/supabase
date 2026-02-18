@@ -19,6 +19,7 @@ import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -98,7 +99,7 @@ const SqlEditor: NextPageWithLayout = () => {
     tabs.addTab({
       id: tabId,
       type: 'sql',
-      label: snippet?.name || 'Untitled Query',
+      label: snippet?.name || generateSnippetTitle(),
       metadata: {
         sqlId: id,
         name: snippet?.name,

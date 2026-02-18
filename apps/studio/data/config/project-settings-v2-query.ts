@@ -19,13 +19,15 @@ export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] &
 
 export async function getProjectSettings(
   { projectRef }: ProjectSettingsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: Record<string, string>
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get('/platform/projects/{ref}/settings', {
     params: { path: { ref: projectRef } },
     signal,
+    headers,
   })
 
   if (error) handleError(error)
@@ -53,7 +55,7 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
     queryKey: configKeys.settingsV2(projectRef),
     queryFn: ({ signal }) => getProjectSettings({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchInterval: (_, query) => {
+    refetchInterval: (query) => {
       const data = query.state.data
       const apiKeys = data?.service_api_keys ?? []
       const interval =

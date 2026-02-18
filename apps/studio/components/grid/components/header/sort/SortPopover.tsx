@@ -6,11 +6,10 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { SortPopoverPrimitive } from './SortPopoverPrimitive'
 
 export interface SortPopoverProps {
-  portal?: boolean
   tableQueriesEnabled?: boolean
 }
 
-export const SortPopover = ({ portal = true, tableQueriesEnabled }: SortPopoverProps) => {
+export const SortPopover = ({ tableQueriesEnabled }: SortPopoverProps) => {
   const { urlSorts, onApplySorts } = useTableSort()
 
   const snap = useTableEditorTableStateSnapshot()
@@ -23,7 +22,6 @@ export const SortPopover = ({ portal = true, tableQueriesEnabled }: SortPopoverP
 
   return (
     <SortPopoverPrimitive
-      portal={portal}
       sorts={sorts}
       onApplySorts={onApplySorts}
       tableQueriesEnabled={tableQueriesEnabled}

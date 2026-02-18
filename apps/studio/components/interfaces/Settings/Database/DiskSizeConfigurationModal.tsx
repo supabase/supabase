@@ -24,7 +24,7 @@ import {
   Modal,
   WarningIcon,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface DiskSizeConfigurationProps {
   visible: boolean
@@ -39,10 +39,10 @@ const DiskSizeConfigurationModal = ({
 }: DiskSizeConfigurationProps) => {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { lastDatabaseResizeAt } = project ?? {}
 
-  const { data: projectSubscriptionData, isLoading: isLoadingSubscription } =
+  const { data: projectSubscriptionData, isPending: isLoadingSubscription } =
     useOrgSubscriptionQuery({ orgSlug: organization?.slug }, { enabled: visible })
 
   const isLoading = isLoadingProject || isLoadingSubscription
@@ -137,7 +137,7 @@ const DiskSizeConfigurationModal = ({
                   <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
                     <Info size={16} />
                     <AlertTitle_Shadcn_>
-                      This operation is only possible every 6 hours
+                      This operation is only possible every 4 hours
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
                       <div className="mb-4">
