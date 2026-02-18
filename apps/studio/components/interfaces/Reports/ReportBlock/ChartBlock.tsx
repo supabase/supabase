@@ -1,7 +1,7 @@
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import { formatLogTick } from 'components/ui/QueryBlock/QueryBlock.utils'
+import { checkHasNonPositiveValues, formatLogTick } from 'components/ui/QueryBlock/QueryBlock.utils'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
@@ -65,7 +65,7 @@ export const ChartBlock = ({
 
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
-  const [logScale, setLogScale] = useState<boolean>(defaultLogScale)
+  const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
 
   const databaseIdentifier = state.selectedDatabaseId
@@ -168,7 +168,7 @@ export const ChartBlock = ({
 
   const hasNonPositiveValues = useMemo(() => {
     if (!logScale || !data.length) return false
-    return data.some((row: any) => row[metricLabel] <= 0)
+    return checkHasNonPositiveValues(data, metricLabel)
   }, [logScale, data, metricLabel])
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
@@ -187,10 +187,6 @@ export const ChartBlock = ({
   useEffect(() => {
     if (defaultChartStyle) setChartStyle(defaultChartStyle)
   }, [defaultChartStyle])
-
-  useEffect(() => {
-    setLogScale(defaultLogScale)
-  }, [defaultLogScale])
 
   useEffect(() => {
     setLatestValue(getInitialHighlightedValue())
@@ -233,7 +229,6 @@ export const ChartBlock = ({
             onClick={() => {
               const next = !logScale
               if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { logScale: next } })
-              setLogScale(next)
             }}
             tooltip={{
               content: {

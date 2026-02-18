@@ -13,7 +13,7 @@ import { CHART_COLORS } from '../Charts/Charts.constants'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
-import { formatLogTick, getCumulativeResults } from './QueryBlock.utils'
+import { checkHasNonPositiveValues, formatLogTick, getCumulativeResults } from './QueryBlock.utils'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -107,7 +107,7 @@ export const QueryBlock = ({
 
   const hasNonPositiveValues = useMemo(() => {
     if (!logScale || !yKey || !chartData?.length) return false
-    return chartData.some((row: any) => row[yKey] <= 0)
+    return checkHasNonPositiveValues(chartData, yKey)
   }, [logScale, yKey, chartData])
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
