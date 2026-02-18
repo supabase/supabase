@@ -125,7 +125,7 @@ generate.sections.api.v1:
 ###############################################################################
 
 validate.analytics.v0:
-	npx @redocly/cli lint --extends=minimal $(REPO_DIR)/analytics_v0_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly lint --extends=minimal $(REPO_DIR)/analytics_v0_openapi.json
 
 ###############################################################################
 # Format everything - easier for git to track changes.
