@@ -49,6 +49,18 @@ Only ever use the `primary` (green) button `type` on a `default` Admonition. Eve
   className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
 />
 
+## Responsive
+
+{' '}
+<ComponentPreview
+  name="admonition-responsive"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+Reize your browser to see the button(s) change `layout` based on the Admonition’s width.
+
+When `layout="responsive"`, the Alert root gets `@container` so the Admonition is the container-query context. The Admonition stays `vertical` when it’s narrow and switches to `horizontal` when its own width reaches the `@md` container breakpoint, independent of page width.
+
 ### Warning
 
 <ComponentPreview
