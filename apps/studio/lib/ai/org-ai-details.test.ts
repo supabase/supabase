@@ -121,6 +121,8 @@ describe('ai/org-ai-details', () => {
         aiOptInLevel: 'schema_only',
         isLimited: true,
         isHipaaEnabled: false,
+        orgId: 1,
+        planId: 'free',
       })
     })
 
