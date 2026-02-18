@@ -58,7 +58,7 @@ Then create matching buckets on your self-hosted instance. Connect to your self-
 ```sql
 INSERT INTO storage.buckets (id, name, public)
 VALUES
-  ('bucket-name', 'bucket-name', false)
+  ('your-storage-bucket', 'your-storage-bucket', false)
 ON CONFLICT (id) DO NOTHING;
 ```
 
@@ -78,22 +78,22 @@ secret_access_key = your-platform-secret-access-key
 endpoint = https://your-project-ref.supabase.co/storage/v1/s3
 region = your-project-region
 
-[selfhosted]
+[self-hosted]
 type = s3
 provider = Other
-access_key_id = your-s3-protocol-access-key-id
-secret_access_key = your-s3-protocol-access-key-secret
+access_key_id = your-self-hosted-access-key-id
+secret_access_key = your-self-hosted-secret-access-key
 endpoint = http://your-domain:8000/storage/v1/s3
-region = us-east-1
+region = your-self-hosted-region
 ```
 
-Replace the credentials with your actual values. For self-hosted, use the `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` you configured in [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3#enable-the-s3-protocol-endpointt).
+Replace the credentials with your actual values. For self-hosted, use the `REGION`, `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` you configured in [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3#enable-the-s3-protocol-endpoint).
 
 Verify both remotes connect:
 
 ```bash
 rclone lsd platform:
-rclone lsd selfhosted:
+rclone lsd self-hosted:
 ```
 
 Both commands should list your buckets.
@@ -103,7 +103,7 @@ Both commands should list your buckets.
 Copy a single bucket:
 
 ```bash
-rclone copy platform:bucket-name selfhosted:bucket-name --progress
+rclone copy platform:your-storage-bucket self-hosted:your-storage-bucket --progress
 ```
 
 To copy all buckets:
@@ -111,7 +111,7 @@ To copy all buckets:
 ```bash
 for bucket in $(rclone lsf platform: | tr -d '/'); do
   echo "Copying bucket: $bucket"
-  rclone copy "platform:$bucket" "selfhosted:$bucket" --progress
+  rclone copy "platform:$bucket" "self-hosted:$bucket" --progress
 done
 ```
 
@@ -126,8 +126,8 @@ For large migrations, consider adding `--transfers 4` to increase parallelism, o
 Compare object counts between source and destination:
 
 ```bash
-rclone size platform:bucket-name
-rclone size selfhosted:bucket-name
+rclone size platform:your-storage-bucket && \
+rclone size self-hosted:your-storage-bucket
 ```
 
 Open Studio on your self-hosted instance and browse the storage buckets to confirm files are accessible.
@@ -140,7 +140,7 @@ If you see `SignatureDoesNotMatch` when connecting to either remote:
 
 - **Platform**: Regenerate S3 access keys from your project's Storage Settings. Ensure the endpoint URL includes `/storage/v1/s3`.
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-- **Self-hosted**: Verify that `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` in `.env` file match your rclone config. Restart the storage service after any changes.
+- **Self-hosted**: Verify that `REGION`, `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` in `.env` file match your rclone config.
 
 ### Bucket not found
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
@@ -151,7 +151,7 @@ If rclone reports that a bucket doesn't exist on the self-hosted side, create it
 For very large files, increase rclone's timeout:
 
 ```bash
-rclone copy platform:bucket-name selfhosted:bucket-name --timeout 30m
+rclone copy platform:your-storage-bucket self-hosted:your-storage-bucket --timeout 30m
 ```
 
 ### Empty listing on platform
