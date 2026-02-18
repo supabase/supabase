@@ -13,15 +13,7 @@ import { CHART_COLORS } from '../Charts/Charts.constants'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
-import { getCumulativeResults } from './QueryBlock.utils'
-
-const formatLogTick = (value: number): string => {
-  if (value >= 1_000_000)
-    return `${(value / 1_000_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`
-  if (value >= 1_000)
-    return `${(value / 1_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}k`
-  return value.toLocaleString()
-}
+import { formatLogTick, getCumulativeResults } from './QueryBlock.utils'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',

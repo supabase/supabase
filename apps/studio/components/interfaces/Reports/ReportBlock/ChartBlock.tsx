@@ -21,16 +21,10 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
 
+import { formatLogTick } from 'components/ui/QueryBlock/QueryBlock.utils'
+
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
-
-const formatLogTick = (value: number): string => {
-  if (value >= 1_000_000)
-    return `${(value / 1_000_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`
-  if (value >= 1_000)
-    return `${(value / 1_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}k`
-  return value.toLocaleString()
-}
 
 interface ChartBlockProps {
   label: string
