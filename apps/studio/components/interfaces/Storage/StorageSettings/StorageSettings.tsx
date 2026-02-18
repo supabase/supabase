@@ -109,14 +109,17 @@ export const StorageSettings = () => {
     isEntitlementUnlimited,
     isLoading: isLoadingMaxFileSizeEntitlement,
   } = useCheckEntitlements('storage.max_file_size')
+  const { hasAccess: hasAccessToFileSizeConfiguration, isLoading: isLoadingFileSizeConfigurable } =
+    useCheckEntitlements('storage.max_file_size.configurable')
   const {
     hasAccess: hasAccessToImageTransformations,
     isLoading: isLoadingImageTransformationEntitlement,
   } = useCheckEntitlements('storage.image_transformations')
 
-  const isFreeTier = organization?.plan.id === 'free'
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
+  const hasLimitedStorageAccess =
+    !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
   const [isUpdating, setIsUpdating] = useState(false)
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
@@ -137,6 +140,7 @@ export const StorageSettings = () => {
     isLoadingProjectStorageConfig ||
     isLoadingPermissions ||
     isLoadingMaxFileSizeEntitlement ||
+    isLoadingFileSizeConfigurable ||
     isLoadingImageTransformationEntitlement
   const FormSchema = z
     .object({
@@ -231,12 +235,7 @@ export const StorageSettings = () => {
   }
 
   useEffect(() => {
-    if (
-      isSuccess &&
-      config &&
-      !isLoadingMaxFileSizeEntitlement &&
-      !isLoadingImageTransformationEntitlement
-    ) {
+    if (isSuccess && config && !isLoading) {
       const { fileSizeLimit, features } = config
       const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
       const imageTransformationEnabled =
@@ -256,7 +255,7 @@ export const StorageSettings = () => {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, config, isLoadingImageTransformationEntitlement, hasAccessToImageTransformations])
+  }, [isSuccess, config, isLoading, hasAccessToImageTransformations])
 
   return (
     <PageContainer>
@@ -365,7 +364,10 @@ export const StorageSettings = () => {
                                         form.clearErrors('fileSizeLimit')
                                       }}
                                       className="w-32 rounded-r-none border-r-0"
-                                      disabled={isFreeTier || !canUpdateStorageSettings}
+                                      disabled={
+                                        !hasAccessToFileSizeConfiguration ||
+                                        !canUpdateStorageSettings
+                                      }
                                     />
                                     <FormField_Shadcn_
                                       control={form.control}
@@ -377,7 +379,10 @@ export const StorageSettings = () => {
                                             unitField.onChange(val)
                                             form.clearErrors('fileSizeLimit')
                                           }}
-                                          disabled={isFreeTier || !canUpdateStorageSettings}
+                                          disabled={
+                                            !hasAccessToFileSizeConfiguration ||
+                                            !canUpdateStorageSettings
+                                          }
                                         >
                                           <SelectTrigger_Shadcn_ className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
                                             <SelectValue_Shadcn_ placeholder="Choose a prefix">
@@ -388,7 +393,7 @@ export const StorageSettings = () => {
                                             {Object.values(StorageSizeUnits).map((unit: string) => (
                                               <SelectItem_Shadcn_
                                                 key={unit}
-                                                disabled={isFreeTier}
+                                                disabled={!hasAccessToFileSizeConfiguration}
                                                 value={unit}
                                               >
                                                 {unit}
@@ -419,7 +424,7 @@ export const StorageSettings = () => {
                             </FormMessage_Shadcn_>
                           )}
                         </CardContent>
-                        {isFreeTier && (
+                        {hasLimitedStorageAccess && (
                           <UpgradeToPro
                             fullWidth
                             variant="primary"
@@ -468,7 +473,7 @@ export const StorageSettings = () => {
                             </Button>
                           )}
                           <Button
-                            type={isFreeTier ? 'default' : 'primary'}
+                            type={hasLimitedStorageAccess ? 'default' : 'primary'}
                             htmlType="submit"
                             loading={isUpdating}
                             disabled={
