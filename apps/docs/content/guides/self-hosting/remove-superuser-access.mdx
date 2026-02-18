@@ -31,13 +31,13 @@ This migration only updates ownership for database objects in the `public` schem
 Execute the script that reassigns ownership of database objects in the `public` schema from `supabase_admin` to `postgres`
 
 ```sh
-sh ./utils/remove-superuser-access
+sh ./utils/reassign-public-schema-objects-owner-to-postgres.sh
 ```
 
 ### Step 2: Update environment variables in docker-compose.yml
 
-- Open your docker-compose.yml file and locate the `studio` service environment variables.
-  Uncomment the following line so studio uses `postgres` role for read/write access:
+- Open your `docker-compose.yml` file and locate the `studio` service environment variables.
+  Uncomment the following line so studio uses `postgres` role for read/write operations:
 
   ```yml
   studio:
