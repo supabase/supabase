@@ -8,7 +8,7 @@ import {
   type ToolSet,
   type UIMessage,
 } from 'ai'
-import { traced, wrapAISDK } from 'braintrust'
+import { traced, wrapAISDK, type Span } from 'braintrust'
 import { source } from 'common-tags'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED, TRACING_ENVIRONMENT_TAG } from 'lib/ai/braintrust-logger'
@@ -59,7 +59,7 @@ export async function generateAssistantResponse({
 }) {
   const shouldTrace = IS_TRACING_ENABLED && !isHipaaEnabled
 
-  const run = async (span?: { log: (args: any) => void }) => {
+  const run = async (span?: Span) => {
     // Only returns last 7 messages
     // Filters out tools with invalid states
     // Filters out tool outputs based on opt-in level using renderingToolOutputParser
