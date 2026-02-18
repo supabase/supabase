@@ -222,11 +222,11 @@ To filter out parent rows that do not match the related table, use `!inner` on t
 
 ### What `:` and `!` mean in join syntax
 
-| Syntax                             | Meaning                                                                                 | Example                                  |
-| ---------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `alias:relation(columns)`          | Rename the embedded relation in the response.                                           | `start_scan:scans(id, badge_scan_time)` |
-| `relation!inner(columns)`          | Use `inner join` behavior for that embedded relation.                                   | `instruments!inner(id, name)`           |
-| `relation!foreign_key(columns)`    | Choose which foreign key relationship to use when multiple foreign keys match the join. | `scans!scan_id_start(id)`               |
+| Syntax                          | Meaning                                                                                 | Example                                 |
+| ------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------- |
+| `alias:relation(columns)`       | Rename the embedded relation in the response.                                           | `start_scan:scans(id, badge_scan_time)` |
+| `relation!inner(columns)`       | Use `inner join` behavior for that embedded relation.                                   | `instruments!inner(id, name)`           |
+| `relation!foreign_key(columns)` | Choose which foreign key relationship to use when multiple foreign keys match the join. | `scans!scan_id_start(id)`               |
 
 ### Example data for join types
 
@@ -241,11 +241,11 @@ To filter out parent rows that do not match the related table, use `!inner` on t
 
 #### Orchestral sections
 
-| `id` | `name`      |
-| ---- | ----------- |
-| 1    | strings     |
-| 2    | woodwinds   |
-| 3    | percussion  |
+| `id` | `name`     |
+| ---- | ---------- |
+| 1    | strings    |
+| 2    | woodwinds  |
+| 3    | percussion |
 
 #### Instruments
 
@@ -306,11 +306,13 @@ This query filters on a joined field (`instruments.name`) but still returns all 
 ```js
 const { data, error } = await supabase
   .from('orchestral_sections')
-  .select(`
+  .select(
+    `
     id,
     name,
     instruments ( id, name )
-  `)
+  `
+  )
   .eq('instruments.name', 'flute')
 ```
 
@@ -406,9 +408,7 @@ GET https://[REF].supabase.co/rest/v1/orchestral_sections?select=id,name,instrum
   {
     "id": 2,
     "name": "woodwinds",
-    "instruments": [
-      { "id": 3, "name": "flute" }
-    ]
+    "instruments": [{ "id": 3, "name": "flute" }]
   },
   {
     "id": 3,
@@ -434,11 +434,13 @@ Adding `!inner` filters out parent rows that don't match the joined filter:
 ```js
 const { data, error } = await supabase
   .from('orchestral_sections')
-  .select(`
+  .select(
+    `
     id,
     name,
     instruments!inner ( id, name )
-  `)
+  `
+  )
   .eq('instruments.name', 'flute')
 ```
 
@@ -529,9 +531,7 @@ GET https://[REF].supabase.co/rest/v1/orchestral_sections?select=id,name,instrum
   {
     "id": 2,
     "name": "woodwinds",
-    "instruments": [
-      { "id": 3, "name": "flute" }
-    ]
+    "instruments": [{ "id": 3, "name": "flute" }]
   }
 ]
 ```
@@ -552,11 +552,13 @@ Use `joined_table.column` in filters (for example `eq`, `neq`, and `in`):
 ```js
 const { data, error } = await supabase
   .from('instruments')
-  .select(`
+  .select(
+    `
     id,
     name,
     orchestral_sections!inner ( id, name )
-  `)
+  `
+  )
   .eq('orchestral_sections.name', 'woodwinds')
 ```
 

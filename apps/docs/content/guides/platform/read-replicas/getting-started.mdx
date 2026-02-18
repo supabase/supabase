@@ -17,15 +17,15 @@ Projects must meet these requirements to use Read Replicas:
 1. Running on AWS.
 2. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
 
-    - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
+   - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
 
 3. Running on Postgres 15+.
 
-    - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
+   - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
 
 4. Not using [legacy logical backups](/docs/guides/platform/backups#point-in-time-recovery)
 
-    - Physical backups are automatically enabled if using [Point in time recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery)
+   - Physical backups are automatically enabled if using [Point in time recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery)
 
 ## Creating a Read Replica
 
