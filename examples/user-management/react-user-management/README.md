@@ -1,129 +1,343 @@
-# Supabase Vite User Management
+# Build a User Management App with React
 
-This example will set you up for a very common situation: users can sign up with a magic link and then update their account with public profile information, including a profile image.
+This example demonstrates how to build a user management app with React and Supabase. Users can sign up with a magic link and then update their account with public profile information, including a profile image.
 
-This demonstrates how to use:
+![Supabase User Management example](https://supabase.com/docs/img/user-management-demo.png)
 
-- User signups using Supabase [Auth](https://supabase.com/auth).
-- User avatar images using Supabase [Storage](https://supabase.com/storage).
-- Public profiles restricted with [Policies](https://supabase.com/docs/guides/auth#policies).
-- Frontend using [Vite](https://vitejs.dev/).
+## Features
 
-## Technologies used
+This app demonstrates how to use:
 
-- Frontend:
-  - [Vite](https://vitejs.dev/) - a React toolchain.
-  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
-- Backend:
-  - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
+- User signups using Supabase [Auth](https://supabase.com/auth) with Magic Links
+- User avatar images using Supabase [Storage](https://supabase.com/storage)
+- Public profiles restricted with [Row Level Security](https://supabase.com/docs/guides/auth#row-level-security)
+- Frontend using [Vite](https://vitejs.dev/) and React
+- The [`getUser()`](https://supabase.com/docs/reference/javascript/auth-getuser) method to fetch current user details
 
-## Build from scratch
+## Technologies Used
 
-### 1. Create new project
+- **Frontend:**
+  - [Vite](https://vitejs.dev/) - Fast React development toolchain
+  - [Supabase.js](https://supabase.com/docs/library/getting-started) - For user management and data syncing
+- **Backend:**
+  - [Supabase](https://supabase.com/dashboard) - Hosted Postgres database with RESTful API
 
-Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+## Getting Started
 
-### 2. Run "User Management" Quickstart
+### Prerequisites
 
-Once your database has started, head over to your project's `SQL Editor` and run the "User Management Starter" quickstart. On the `SQL editor` page, scroll down until you see `User Management Starter: Sets up a public Profiles table which you can access with your API`. Click that, then click `RUN` to execute that query and create a new `profiles` table. When that's finished, head over to the `Table Editor` and see your new `profiles` table.
+Before you begin, make sure you have:
+- A Supabase account ([sign up here](https://supabase.com/dashboard))
+- Node.js installed on your machine
 
-### 3. Get the URL and Key
+### 1. Create a Supabase Project
 
-Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `anon` key, you'll need these in the next step.
+1. Sign in to [Supabase Dashboard](https://supabase.com/dashboard)
+2. Create a new project
+3. Wait for your database to start
 
-The `anon` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token. This enables row level security for your data. Read more about this [below](#postgres-row-level-security).
+### 2. Set Up the Database
 
-![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
+Once your database has started:
 
-**_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
+1. Go to the **SQL Editor** in your project dashboard
+2. Scroll down to find **"User Management Starter"** quickstart
+3. Click it and then click **RUN** to execute the query
+4. This will create a `profiles` table - verify it in the **Table Editor**
 
-### 4. Env vars
-
-Create a file in this folder `.env.local`
-
-```
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
-```
-
-Populate this file with your URL and Key.
-
-### 5. Run the application
-
-Run the application: `npm run dev`. Open your browser to the url indicated in the CLI (eg `https://localhost:5173/`) and you are ready to go 🚀.
-
-## Supabase details
-
-### Postgres Row level security
-
-This project uses very high-level Authorization using Postgres' Row Level Security.
-When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
-When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
-We can use these details to provide fine-grained control over what each user can and cannot do.
-
-This is a trimmed-down schema, with the policies:
+The quickstart creates the following schema:
 
 ```sql
 -- Create a table for Public Profiles
-create table
-  profiles (
-    id uuid references auth.users not null,
-    updated_at timestamp
-    with
-      time zone,
-      username text unique,
-      avatar_url text,
-      website text,
-      primary key (id),
-      unique (username),
-      constraint username_length check (char_length(username) >= 3)
-  );
+create table profiles (
+  id uuid references auth.users not null,
+  updated_at timestamp with time zone,
+  username text unique,
+  avatar_url text,
+  website text,
+  primary key (id),
+  unique (username),
+  constraint username_length check (char_length(username) >= 3)
+);
 
-alter table
-  profiles enable row level security;
+alter table profiles enable row level security;
 
-create policy "Public profiles are viewable by everyone." on profiles for
-select
-  using (true);
+create policy "Public profiles are viewable by everyone."
+  on profiles for select using (true);
 
-create policy "Users can insert their own profile." on profiles for insert
-with
-  check ((select auth.uid()) = id);
+create policy "Users can insert their own profile."
+  on profiles for insert with check ((select auth.uid()) = id);
 
-create policy "Users can update own profile." on profiles for
-update
-  using ((select auth.uid()) = id);
+create policy "Users can update own profile."
+  on profiles for update using ((select auth.uid()) = id);
 
--- Set up Realtime!
-begin;
+-- Set up Storage for avatars
+insert into storage.buckets (id, name) values ('avatars', 'avatars');
 
-drop
-  publication if exists supabase_realtime;
+create policy "Avatar images are publicly accessible."
+  on storage.objects for select using (bucket_id = 'avatars');
 
-create publication supabase_realtime;
-
-commit;
-
-alter
-  publication supabase_realtime add table profiles;
-
--- Set up Storage!
-insert into
-  storage.buckets (id, name)
-values
-  ('avatars', 'avatars');
-
-create policy "Avatar images are publicly accessible." on storage.objects for
-select
-  using (bucket_id = 'avatars');
-
-create policy "Anyone can upload an avatar." on storage.objects for insert
-with
-  check (bucket_id = 'avatars');
+create policy "Anyone can upload an avatar."
+  on storage.objects for insert with check (bucket_id = 'avatars');
 ```
+
+### 3. Get Your API Credentials
+
+1. Go to **Project Settings** (the cog icon)
+2. Open the **API** tab
+3. Copy your **Project URL** and **anon/public key**
+
+### 4. Configure Environment Variables
+
+Create a `.env.local` file in the project root:
+
+```bash
+VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
+```
+
+Replace the values with your actual Project URL and key.
+
+### 5. Install Dependencies
+
+```bash
+npm install
+```
+
+### 6. Run the Application
+
+```bash
+npm run dev
+```
+
+Open your browser to [http://localhost:5173](http://localhost:5173) 🚀
+
+## Building from Scratch
+
+If you want to build this app from scratch, follow these steps:
+
+### Initialize a React App
+
+Use [Vite](https://vitejs.dev/guide/) to create a new React app:
+
+```bash
+npm create vite@latest supabase-react -- --template react
+cd supabase-react
+```
+
+### Install Supabase
+
+Install the Supabase JavaScript client:
+
+```bash
+npm install @supabase/supabase-js
+```
+
+### Set Up Environment Variables
+
+Create a `.env.local` file with your Supabase credentials (see step 4 above).
+
+### Create the Supabase Client
+
+Create `src/supabaseClient.js`:
+
+```javascript
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+
+export const supabase = createClient(supabaseUrl, supabasePublishableKey)
+```
+
+This initializes the Supabase client with your project credentials. These variables are exposed in the browser, which is fine because Row Level Security protects your data.
+
+### Optional: Add Styling
+
+Update `src/index.css` to style the app. You can find the full CSS file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
+
+## Application Structure
+
+### Authentication Component (`src/Auth.jsx`)
+
+Handles user login with Magic Links - users can sign in with their email without passwords:
+
+```javascript
+import { useState } from 'react'
+import { supabase } from './supabaseClient'
+
+export default function Auth() {
+  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('')
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    setLoading(true)
+
+    const { error } = await supabase.auth.signInWithOtp({ email })
+
+    if (error) {
+      alert(error.error_description || error.message)
+    } else {
+      alert('Check your email for the login link!')
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="row flex flex-center">
+      <div className="col-6 form-widget">
+        <h1 className="header">Supabase + React</h1>
+        <p className="description">Sign in via magic link with your email below</p>
+        <form className="form-widget" onSubmit={handleLogin}>
+          <div>
+            <input
+              className="inputField"
+              type="email"
+              placeholder="Your email"
+              value={email}
+              required={true}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <button className={'button block'} disabled={loading}>
+              {loading ? <span>Loading</span> : <span>Send magic link</span>}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+```
+
+### Avatar Upload Component (`src/Avatar.jsx`)
+
+Manages profile photo uploads using Supabase Storage:
+
+- Downloads existing avatar images
+- Handles file uploads to the `avatars` bucket
+- Provides visual feedback during upload
+
+See the full component in [`src/Avatar.jsx`](src/Avatar.jsx).
+
+### Account Management Component (`src/Account.jsx`)
+
+Allows users to view and edit their profile:
+
+- Fetches user profile data from the `profiles` table
+- Updates profile information (username, website, avatar)
+- Displays the current user's email
+- Provides sign-out functionality
+
+Key features:
+- Uses the `user` prop (not `session`) passed from the parent component
+- Implements proper cleanup with the `ignore` flag to prevent race conditions
+- Updates profile data with `upsert` to handle both inserts and updates
+
+See the full component in [`src/Account.jsx`](src/Account.jsx).
+
+### Main App Component (`src/App.jsx`)
+
+The root component that manages authentication state:
+
+```javascript
+import { useState, useEffect } from 'react'
+import './App.css'
+import { supabase } from './supabaseClient'
+import Auth from './Auth'
+import Account from './Account'
+
+function App() {
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    // Get initial user on mount
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
+    })
+
+    // Listen for auth changes
+    supabase.auth.onAuthStateChange(async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    })
+  }, [])
+
+  return (
+    <div className="container" style={{ padding: '50px 0 100px 0' }}>
+      {!user ? <Auth /> : <Account key={user.id} user={user} />}
+    </div>
+  )
+}
+
+export default App
+```
+
+**Important:** This component uses the [`getUser()`](https://supabase.com/docs/reference/javascript/auth-getuser) method instead of `getSession()`. The `getUser()` method:
+- Performs a network request to the Supabase Auth server
+- Validates the current session on the server side
+- Returns the most up-to-date user information
+- Is more reliable than reading from local storage
+
+## Understanding Row Level Security
+
+This project uses Postgres Row Level Security to provide fine-grained authorization:
+
+- When a user logs in, they receive a JWT with the role `authenticated` and their UUID
+- These details enable precise control over what each user can access
+- The policies ensure:
+  - All profiles are viewable by everyone
+  - Users can only insert their own profile
+  - Users can only update their own profile
+  - Avatar images are publicly accessible
+  - Any authenticated user can upload an avatar
+
+This approach keeps your data secure while maintaining a simple client-side implementation.
+
+## Project Files
+
+```
+react-user-management/
+├── src/
+│   ├── App.jsx              # Main app component with auth state
+│   ├── Auth.jsx             # Login component with Magic Links
+│   ├── Account.jsx          # Profile management component
+│   ├── Avatar.jsx           # Avatar upload component
+│   ├── supabaseClient.js    # Supabase client initialization
+│   ├── App.css              # App styles
+│   └── index.css            # Global styles
+├── .env.local               # Environment variables (create this)
+├── package.json
+└── vite.config.js
+```
+
+## Learn More
+
+- [Supabase Documentation](https://supabase.com/docs)
+- [Supabase Auth](https://supabase.com/docs/guides/auth)
+- [Supabase Storage](https://supabase.com/docs/guides/storage)
+- [Row Level Security](https://supabase.com/docs/guides/auth#row-level-security)
+- [React Documentation](https://react.dev/)
+- [Vite Documentation](https://vitejs.dev/)
+
+## Troubleshooting
+
+**Magic link not working?**
+- Check your email spam folder
+- Verify your site URL is configured correctly in Supabase Dashboard → Authentication → URL Configuration
+
+**Images not uploading?**
+- Ensure the `avatars` bucket exists in Storage
+- Check that storage policies are correctly set up
+
+**Profile not updating?**
+- Verify the `profiles` table exists
+- Check that Row Level Security policies are active
 
 ## Authors
 
 - [Supabase](https://supabase.com)
 
-Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase
+Supabase is open source. We'd love for you to follow along and get involved at [github.com/supabase/supabase](https://github.com/supabase/supabase)

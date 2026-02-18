@@ -1,5 +1,4 @@
 // 'use client'
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/registry/default/components/ui/avatar'
 
 const CurrentUserAvatarPreview = () => {

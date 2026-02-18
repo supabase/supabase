@@ -1,6 +1,5 @@
-import { useFlag } from 'common'
-import { IS_TEST_ENV } from 'lib/constants'
 import { usePHFlag } from '../ui/useFlag'
+import { IS_TEST_ENV } from '@/lib/constants'
 
 /**
  * Determine whether a user has access to Data API grant toggles.
@@ -12,7 +11,6 @@ import { usePHFlag } from '../ui/useFlag'
  * without requiring the feature flag infrastructure.
  */
 export const useDataApiGrantTogglesEnabled = (): boolean => {
-  const isDataApiBadgesEnabled = useFlag('dataApiExposedBadge')
   const isTableEditorApiAccessEnabled = usePHFlag<boolean>('tableEditorApiAccessToggle')
 
   // In test environment, enable the feature for E2E testing
@@ -20,5 +18,5 @@ export const useDataApiGrantTogglesEnabled = (): boolean => {
     return true
   }
 
-  return isDataApiBadgesEnabled && !!isTableEditorApiAccessEnabled
+  return !!isTableEditorApiAccessEnabled
 }

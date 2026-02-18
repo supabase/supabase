@@ -45,6 +45,30 @@ describe('parseInfrastructureMetrics', () => {
       series: {
         avg_cpu_usage: { format: 'percent', total: 150, totalAverage: 50, yAxisLimit: 100 },
         ram_usage: { format: 'bytes', total: 180, totalAverage: 60, yAxisLimit: 100 },
+        disk_fs_used_system: {
+          format: 'bytes',
+          total: 20,
+          totalAverage: 20,
+          yAxisLimit: 100,
+        },
+        disk_fs_used_wal: {
+          format: 'bytes',
+          total: 10,
+          totalAverage: 10,
+          yAxisLimit: 100,
+        },
+        pg_database_size: {
+          format: 'bytes',
+          total: 30,
+          totalAverage: 30,
+          yAxisLimit: 100,
+        },
+        disk_fs_size: {
+          format: 'bytes',
+          total: 200,
+          totalAverage: 200,
+          yAxisLimit: 100,
+        },
         disk_io_consumption: {
           format: 'percent',
           total: 210,
@@ -59,7 +83,8 @@ describe('parseInfrastructureMetrics', () => {
     expect(result).toEqual({
       cpu: { current: 50, max: 100 },
       ram: { current: 60, max: 100 },
-      disk: { current: 70, max: 100 },
+      disk: { current: 30, max: 100 },
+      diskIo: { current: 70, max: 100 },
     })
   })
 
@@ -69,6 +94,30 @@ describe('parseInfrastructureMetrics', () => {
       series: {
         avg_cpu_usage: { format: 'percent', total: 150, totalAverage: '50.5', yAxisLimit: 100 },
         ram_usage: { format: 'bytes', total: 180, totalAverage: '60.8', yAxisLimit: 100 },
+        disk_fs_used_system: {
+          format: 'bytes',
+          total: 20,
+          totalAverage: '20.4',
+          yAxisLimit: 100,
+        },
+        disk_fs_used_wal: {
+          format: 'bytes',
+          total: 10,
+          totalAverage: '10.2',
+          yAxisLimit: 100,
+        },
+        pg_database_size: {
+          format: 'bytes',
+          total: 30,
+          totalAverage: '30.5',
+          yAxisLimit: 100,
+        },
+        disk_fs_size: {
+          format: 'bytes',
+          total: 200,
+          totalAverage: '200.0',
+          yAxisLimit: 100,
+        },
         disk_io_consumption: {
           format: 'percent',
           total: 210,
@@ -83,7 +132,8 @@ describe('parseInfrastructureMetrics', () => {
     expect(result).toEqual({
       cpu: { current: 50.5, max: 100 },
       ram: { current: 60.8, max: 100 },
-      disk: { current: 70.2, max: 100 },
+      disk: { current: 30.55, max: 100 },
+      diskIo: { current: 70.2, max: 100 },
     })
   })
 
@@ -99,6 +149,7 @@ describe('parseInfrastructureMetrics', () => {
       cpu: { current: 0, max: 100 },
       ram: { current: 0, max: 100 },
       disk: { current: 0, max: 100 },
+      diskIo: { current: 0, max: 100 },
     })
   })
 
@@ -116,6 +167,7 @@ describe('parseInfrastructureMetrics', () => {
       cpu: { current: 50, max: 100 },
       ram: { current: 0, max: 100 },
       disk: { current: 0, max: 100 },
+      diskIo: { current: 0, max: 100 },
     })
   })
 
@@ -134,6 +186,7 @@ describe('parseInfrastructureMetrics', () => {
       cpu: { current: 0, max: 100 },
       ram: { current: 0, max: 100 },
       disk: { current: 0, max: 100 },
+      diskIo: { current: 0, max: 100 },
     })
   })
 })

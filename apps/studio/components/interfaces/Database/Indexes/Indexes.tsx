@@ -1,9 +1,3 @@
-import { sortBy } from 'lodash'
-import { AlertCircle, Search, Trash } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useRef } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
@@ -11,10 +5,14 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { sortBy } from 'lodash'
+import { AlertCircle, Search, Trash } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -29,6 +27,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { CreateIndexSidePanel } from './CreateIndexSidePanel'
 
@@ -38,7 +37,6 @@ const Indexes = () => {
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const deletingIndexNameRef = useRef<string | null>(null)
 
   const {
     data: allIndexes,
@@ -54,24 +52,14 @@ const Indexes = () => {
 
   const [showCreateIndex, setShowCreateIndex] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false)
   )
 
-  const { setValue: setSelectedIndexName, value: selectedIndex } = useQueryStateWithSelect({
-    urlKey: 'edit',
-    select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-    enabled: !!allIndexes,
-    onError: () => toast.error(`Index not found`),
-  })
+  const [editIndexId, setEditIndexId] = useQueryState('edit', parseAsString)
+  const selectedIndex = allIndexes?.find((idx) => idx.name === editIndexId)
 
-  const { setValue: setSelectedIndexNameToDelete, value: selectedIndexToDelete } =
-    useQueryStateWithSelect({
-      urlKey: 'delete',
-      select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-      enabled: !!allIndexes,
-      onError: (_error, selectedId) =>
-        handleErrorOnDelete(deletingIndexNameRef, selectedId, `Index not found`),
-    })
+  const [deleteIndexId, setDeleteIndexId] = useQueryState('delete', parseAsString)
+  const selectedIndexToDelete = allIndexes?.find((idx) => idx.name === deleteIndexId)
 
   const {
     data: schemas,
@@ -83,9 +71,13 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const { mutate: deleteIndex, isPending: isExecuting } = useDatabaseIndexDeleteMutation({
+  const {
+    mutate: deleteIndex,
+    isPending: isExecuting,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      setSelectedIndexNameToDelete(null)
+      setDeleteIndexId(null)
       toast.success('Successfully deleted index')
     },
   })
@@ -100,8 +92,6 @@ const Indexes = () => {
 
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
     if (!project) return console.error('Project is required')
-
-    deletingIndexNameRef.current = index.name
     deleteIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,
@@ -120,6 +110,20 @@ const Indexes = () => {
   useEffect(() => {
     if (table !== undefined) setSearch(table)
   }, [table])
+
+  useEffect(() => {
+    if (isSuccessIndexes && !!editIndexId && !selectedIndex) {
+      toast('Index not found')
+      setEditIndexId(null)
+    }
+  }, [isSuccessIndexes, editIndexId, selectedIndex, setEditIndexId])
+
+  useEffect(() => {
+    if (isSuccessIndexes && !!deleteIndexId && !selectedIndexToDelete && !isSuccessDelete) {
+      toast('Index not found')
+      setDeleteIndexId(null)
+    }
+  }, [isSuccessIndexes, deleteIndexId, selectedIndexToDelete, isSuccessDelete, setDeleteIndexId])
 
   return (
     <>
@@ -218,10 +222,7 @@ const Indexes = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end items-center space-x-2">
-                              <Button
-                                type="default"
-                                onClick={() => setSelectedIndexName(index.name)}
-                              >
+                              <Button type="default" onClick={() => setEditIndexId(index.name)}>
                                 View definition
                               </Button>
                               {!isSchemaLocked && (
@@ -230,7 +231,7 @@ const Indexes = () => {
                                   type="text"
                                   className="px-1"
                                   icon={<Trash />}
-                                  onClick={() => setSelectedIndexNameToDelete(index.name)}
+                                  onClick={() => setDeleteIndexId(index.name)}
                                 />
                               )}
                             </div>
@@ -254,7 +255,7 @@ const Indexes = () => {
             <code className="text-sm ml-2">{selectedIndex?.name}</code>
           </>
         }
-        onCancel={() => setSelectedIndexName(null)}
+        onCancel={() => setEditIndexId(null)}
       >
         <div className="h-full">
           <div className="relative h-full">
@@ -285,7 +286,7 @@ const Indexes = () => {
         onConfirm={() =>
           selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
         }
-        onCancel={() => setSelectedIndexNameToDelete(null)}
+        onCancel={() => setDeleteIndexId(null)}
         alert={{
           title: 'This action cannot be undone',
           description:

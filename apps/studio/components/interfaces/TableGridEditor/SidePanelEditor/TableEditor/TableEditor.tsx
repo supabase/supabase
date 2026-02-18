@@ -1,10 +1,4 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { isEmpty, noop } from 'lodash'
-import { useContext, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
-import { checkDataApiPrivilegesNonEmpty } from '@/lib/data-api-types'
 import type { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -14,7 +8,6 @@ import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useChanged } from 'hooks/misc/useChanged'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableCreateGeneratePolicies } from 'hooks/misc/useTableCreateGeneratePolicies'
@@ -23,10 +16,14 @@ import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { type PlainObject } from 'lib/type-helpers'
+import { isEmpty, noop } from 'lodash'
+import { useContext, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -47,6 +44,8 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { checkDataApiPrivilegesNonEmpty } from '@/lib/data-api-types'
 
 type SaveTableParamsFor<Action extends SaveTableParams['action']> = Extract<
   SaveTableParams,
@@ -128,11 +127,6 @@ export const TableEditor = ({
   const isRealtimeEnabled = isNewRecord
     ? false
     : realtimeEnabledTables.some((t) => t.id === table?.id)
-
-  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    isTable: !isNewRecord,
-    isRealtimeEnabled,
-  })
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
@@ -367,6 +361,7 @@ export const TableEditor = ({
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
+          visible={visible}
         />
       }
     >
@@ -456,7 +451,7 @@ export const TableEditor = ({
               </Admonition>
             )}
 
-            {activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON && realtimeEnabled && (
+            {realtimeEnabled && (
               <Checkbox
                 id="enable-realtime"
                 label="Enable Realtime"

@@ -1,29 +1,29 @@
-import { Github, MoreVertical, Trash, Copy } from 'lucide-react'
-import InlineSVG from 'react-inlinesvg'
-import { useState } from 'react'
-
+import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
-import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
+import { OrgProject, getComputeSize } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
-import { inferProjectStatus } from './ProjectCard.utils'
-import { ProjectCardStatus } from './ProjectCardStatus'
-import type { Organization } from 'types'
+import { Copy, Github, MoreVertical, Trash } from 'lucide-react'
+import { useState } from 'react'
+import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
+import type { Organization } from 'types'
 import {
-  copyToClipboard,
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Button,
+  copyToClipboard,
 } from 'ui'
+
+import { inferProjectStatus } from './ProjectCard.utils'
+import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
   slug?: string
@@ -70,8 +70,8 @@ export const ProjectCard = ({
           className="h-44 !px-0 group pt-5 pb-0 overflow-hidden relative"
           hideChevron
           title={
-            <div className="w-full flex flex-col gap-y-4 justify-between px-5 z-10">
-              <div className="flex flex-col gap-y-0.5 relative z-10">
+            <div className="w-full flex flex-col gap-y-4 justify-between px-5">
+              <div className="flex flex-col gap-y-0.5 relative">
                 <div className="flex items-center justify-between">
                   <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
                   <div onClick={(e) => e.preventDefault()}>
@@ -116,7 +116,7 @@ export const ProjectCard = ({
                 </div>
                 <p className="text-sm text-foreground-lighter">{desc}</p>
               </div>
-              <div className="flex items-center gap-x-1.5 relative z-10">
+              <div className="flex items-center gap-x-1.5 relative">
                 <ProjectCardStatus
                   projectStatus={projectStatus}
                   resourceWarnings={resourceWarnings}

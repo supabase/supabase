@@ -172,6 +172,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_read"]
+          },
+          {
+            "fga_permissions": ["branching_development_read"]
           }
         ],
         "summary": "Get database branch config",
@@ -374,6 +380,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Update database branch config",
@@ -449,6 +461,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_delete"]
+          },
+          {
+            "fga_permissions": ["branching_development_delete"]
           }
         ],
         "summary": "Delete a database branch",
@@ -534,6 +552,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Pushes a database branch",
@@ -619,6 +643,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Merges a database branch",
@@ -704,6 +734,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Resets a database branch",
@@ -771,6 +807,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "Restore a scheduled branch deletion",
@@ -839,6 +881,12 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_write"]
+          },
+          {
+            "fga_permissions": ["branching_development_write"]
           }
         ],
         "summary": "[Beta] Diffs a database branch",
@@ -1353,7 +1401,27 @@
                                 "type": "string"
                               },
                               "code": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                  "us-east-1",
+                                  "us-east-2",
+                                  "us-west-1",
+                                  "us-west-2",
+                                  "ap-southeast-1",
+                                  "ap-northeast-1",
+                                  "ap-northeast-2",
+                                  "ap-east-1",
+                                  "ap-southeast-2",
+                                  "eu-west-1",
+                                  "eu-west-2",
+                                  "eu-west-3",
+                                  "eu-north-1",
+                                  "eu-central-1",
+                                  "eu-central-2",
+                                  "ca-central-1",
+                                  "ap-south-1",
+                                  "sa-east-1"
+                                ]
                               },
                               "type": {
                                 "type": "string",
@@ -1406,7 +1474,27 @@
                                 "type": "string"
                               },
                               "code": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                  "us-east-1",
+                                  "us-east-2",
+                                  "us-west-1",
+                                  "us-west-2",
+                                  "ap-southeast-1",
+                                  "ap-northeast-1",
+                                  "ap-northeast-2",
+                                  "ap-east-1",
+                                  "ap-southeast-2",
+                                  "eu-west-1",
+                                  "eu-west-2",
+                                  "eu-west-3",
+                                  "eu-north-1",
+                                  "eu-central-1",
+                                  "eu-central-2",
+                                  "ca-central-1",
+                                  "ap-south-1",
+                                  "sa-east-1"
+                                ]
                               },
                               "type": {
                                 "type": "string",
@@ -3785,6 +3873,9 @@
             "bearer": []
           },
           {
+            "fga_permissions": ["branching_production_read"]
+          },
+          {
             "fga_permissions": ["branching_development_read"]
           }
         ],
@@ -4022,7 +4113,10 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["branching_development_write"]
+            "fga_permissions": ["branching_production_create"]
+          },
+          {
+            "fga_permissions": ["branching_development_create"]
           }
         ],
         "summary": "Create a database branch",
@@ -4075,7 +4169,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["branching_development_write"]
+            "fga_permissions": ["branching_production_delete"]
           }
         ],
         "summary": "Disables preview branching",
@@ -4242,6 +4336,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["branching_production_read"]
           },
           {
             "fga_permissions": ["branching_development_read"]
@@ -5047,6 +5144,247 @@
         ],
         "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
+      }
+    },
+    "/v1/projects/{ref}/jit-access": {
+      "get": {
+        "operationId": "v1-get-jit-access-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "user_roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "role": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "expires_at": {
+                            "type": "number"
+                          },
+                          "allowed_networks": {
+                            "type": "object",
+                            "properties": {
+                              "allowed_cidrs": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "cidr": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": ["cidr"]
+                                }
+                              },
+                              "allowed_cidrs_v6": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "cidr": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": ["cidr"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "required": ["role"]
+                      }
+                    }
+                  },
+                  "required": ["user_id", "user_roles"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to retrieve project's JIT access config"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_read"]
+          }
+        ],
+        "summary": "[Beta] Get project's just-in-time access configuration.",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["security", "management-api"],
+        "x-oauth-scope": "database:read"
+      },
+      "put": {
+        "operationId": "v1-update-jit-access-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "enum": ["enabled", "disabled", "unavailable"]
+                  }
+                },
+                "required": ["state"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "user_roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "role": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "expires_at": {
+                            "type": "number"
+                          },
+                          "allowed_networks": {
+                            "type": "object",
+                            "properties": {
+                              "allowed_cidrs": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "cidr": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": ["cidr"]
+                                }
+                              },
+                              "allowed_cidrs_v6": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "cidr": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": ["cidr"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "required": ["role"]
+                      }
+                    }
+                  },
+                  "required": ["user_id", "user_roles"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to update project's just-in-time access configuration."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
+          }
+        ],
+        "summary": "[Beta] Update project's just-in-time access configuration.",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["security", "management-api"],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/network-bans/retrieve": {
@@ -9683,6 +10021,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "security_sb_forwarded_for_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -10048,6 +10390,7 @@
                     "saml_enabled",
                     "saml_external_url",
                     "saml_allow_encrypted_assertions",
+                    "security_sb_forwarded_for_enabled",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -10367,6 +10710,10 @@
                   "saml_external_url": {
                     "type": "string",
                     "pattern": "^[^,]+$",
+                    "nullable": true
+                  },
+                  "security_sb_forwarded_for_enabled": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "security_captcha_enabled": {
@@ -11879,6 +12226,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "security_sb_forwarded_for_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -12244,6 +12595,7 @@
                     "saml_enabled",
                     "saml_external_url",
                     "saml_allow_encrypted_assertions",
+                    "security_sb_forwarded_for_enabled",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -15236,6 +15588,9 @@
           },
           {
             "fga_permissions": ["database_write"]
+          },
+          {
+            "fga_permissions": ["database_read"]
           }
         ],
         "summary": "[Beta] Run sql query",
@@ -17415,6 +17770,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_disk_config_read"]
           }
         ],
         "summary": "Get disk utilization",
@@ -17526,7 +17884,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["infra_add_ons_write"]
+            "fga_permissions": ["infra_disk_config_write"]
           }
         ],
         "summary": "Modify database disk",
@@ -17602,6 +17960,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_disk_config_read"]
           }
         ],
         "summary": "Gets project disk autoscale config",
@@ -18862,6 +19223,50 @@
           }
         ],
         "summary": "Updates realtime configuration",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
+      }
+    },
+    "/v1/projects/{ref}/config/realtime/shutdown": {
+      "post": {
+        "operationId": "v1-shutdown-realtime",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Realtime connections shutdown successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "404": {
+            "description": "Tenant not found"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Shutdowns realtime connections for a project",
         "tags": ["Realtime"],
         "x-endpoint-owners": ["realtime"]
       }
@@ -20339,15 +20744,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -21669,7 +22065,27 @@
                       "type": "string"
                     },
                     "code": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": [
+                        "us-east-1",
+                        "us-east-2",
+                        "us-west-1",
+                        "us-west-2",
+                        "ap-southeast-1",
+                        "ap-northeast-1",
+                        "ap-northeast-2",
+                        "ap-east-1",
+                        "ap-southeast-2",
+                        "eu-west-1",
+                        "eu-west-2",
+                        "eu-west-3",
+                        "eu-north-1",
+                        "eu-central-1",
+                        "eu-central-2",
+                        "ca-central-1",
+                        "ap-south-1",
+                        "sa-east-1"
+                      ]
                     },
                     "type": {
                       "type": "string",
@@ -21722,7 +22138,27 @@
                       "type": "string"
                     },
                     "code": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": [
+                        "us-east-1",
+                        "us-east-2",
+                        "us-west-1",
+                        "us-west-2",
+                        "ap-southeast-1",
+                        "ap-northeast-1",
+                        "ap-northeast-2",
+                        "ap-east-1",
+                        "ap-southeast-2",
+                        "eu-west-1",
+                        "eu-west-2",
+                        "eu-west-3",
+                        "eu-north-1",
+                        "eu-central-1",
+                        "eu-central-2",
+                        "ca-central-1",
+                        "ap-south-1",
+                        "sa-east-1"
+                      ]
                     },
                     "type": {
                       "type": "string",
@@ -22530,6 +22966,71 @@
           }
         },
         "required": ["custom_hostname"]
+      },
+      "JitAccessResponse": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expires_at": {
+                  "type": "number"
+                },
+                "allowed_networks": {
+                  "type": "object",
+                  "properties": {
+                    "allowed_cidrs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cidr": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["cidr"]
+                      }
+                    },
+                    "allowed_cidrs_v6": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cidr": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["cidr"]
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["role"]
+            }
+          }
+        },
+        "required": ["user_id", "user_roles"]
+      },
+      "JitAccessRequestRequest": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": ["enabled", "disabled", "unavailable"]
+          }
+        },
+        "required": ["state"]
       },
       "NetworkBanResponse": {
         "type": "object",
@@ -24487,6 +24988,10 @@
             "type": "boolean",
             "nullable": true
           },
+          "security_sb_forwarded_for_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_captcha_enabled": {
             "type": "boolean",
             "nullable": true
@@ -24852,6 +25357,7 @@
           "saml_enabled",
           "saml_external_url",
           "saml_allow_encrypted_assertions",
+          "security_sb_forwarded_for_enabled",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",
@@ -25116,6 +25622,10 @@
           "saml_external_url": {
             "type": "string",
             "pattern": "^[^,]+$",
+            "nullable": true
+          },
+          "security_sb_forwarded_for_enabled": {
+            "type": "boolean",
             "nullable": true
           },
           "security_captcha_enabled": {
@@ -26786,61 +27296,6 @@
           }
         },
         "required": ["message"]
-      },
-      "JitAccessResponse": {
-        "type": "object",
-        "properties": {
-          "user_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "user_roles": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "role": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "expires_at": {
-                  "type": "number"
-                },
-                "allowed_networks": {
-                  "type": "object",
-                  "properties": {
-                    "allowed_cidrs": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "cidr": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["cidr"]
-                      }
-                    },
-                    "allowed_cidrs_v6": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "cidr": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["cidr"]
-                      }
-                    }
-                  }
-                }
-              },
-              "required": ["role"]
-            }
-          }
-        },
-        "required": ["user_id", "user_roles"]
       },
       "AuthorizeJitAccessBody": {
         "type": "object",
