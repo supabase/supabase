@@ -5,7 +5,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL
 const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
   ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
   : ''
-const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
+const SUPABASE_PROJECTS_URL = 'https://*.supabase.co https://*.storage.supabase.co'
 const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
 
 // construct the URL for the Websocket Local URLs
