@@ -10,6 +10,9 @@ export class CustomerIOClient {
   private auth: string
 
   constructor(config: CustomerIOConfig) {
+    if (!config.siteId) throw new Error('CustomerIOClient: siteId is required')
+    if (!config.apiKey) throw new Error('CustomerIOClient: apiKey is required')
+
     this.auth = btoa(`${config.siteId}:${config.apiKey}`)
   }
 

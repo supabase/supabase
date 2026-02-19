@@ -30,6 +30,9 @@ export class HubSpotClient {
   private formGuid: string
 
   constructor(config: HubSpotConfig) {
+    if (!config.portalId) throw new Error('HubSpotClient: portalId is required')
+    if (!config.formGuid) throw new Error('HubSpotClient: formGuid is required')
+
     this.portalId = config.portalId
     this.formGuid = config.formGuid
   }

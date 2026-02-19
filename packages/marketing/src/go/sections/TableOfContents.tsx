@@ -22,9 +22,15 @@ interface Heading {
 
 function extractHeadings(markdown: string): Heading[] {
   const headings: Heading[] = []
-  const regex = /^\s*(#{1,3})\s+(.+)$/gm
+  // Trim each line first to handle indented markdown, then match ATX headings.
+  // Using a literal space (not \s+) after the hashes avoids polynomial backtracking.
+  const regex = /^(#{1,3}) (.+)$/gm
+  const normalized = markdown
+    .split('\n')
+    .map((line) => line.trimStart())
+    .join('\n')
   let match
-  while ((match = regex.exec(markdown)) !== null) {
+  while ((match = regex.exec(normalized)) !== null) {
     const text = match[2].trim()
     headings.push({
       text,
