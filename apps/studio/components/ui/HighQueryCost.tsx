@@ -83,17 +83,30 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
             is high and could place significant load on the database with high disk I/O or CPU
             usage.
           </p>
-          {suggestions.length > 0 && (
-            <div className="flex flex-col gap-y-1">
-              <p>You may check the following to lower the cost of the query</p>
-              <ul className="list-disc pl-6">
-                {suggestions.map((x) => (
-                  <li key={x}>{x}</li>
-                ))}
-              </ul>
-            </div>
-          )}
         </DialogSection>
+
+        {suggestions.length > 0 && (
+          <>
+            <DialogSectionSeparator />
+            <DialogSection className="flex flex-col gap-y-4 text-sm">
+              <p className="font-mono text-foreground-lighter uppercase tracking-tight text-sm">
+                Suggested steps
+              </p>
+
+              {suggestions.length > 0 && (
+                <div className="flex flex-col gap-y-1">
+                  <p>You may check the following to lower the cost of the query</p>
+                  <ul className="list-disc pl-6">
+                    {suggestions.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </DialogSection>
+          </>
+        )}
+
         <DialogFooter>
           <DocsButton
             href={`${DOCS_URL}/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX`}
