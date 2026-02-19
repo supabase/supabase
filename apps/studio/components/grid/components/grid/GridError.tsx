@@ -11,12 +11,18 @@ import { Admonition } from 'ui-patterns'
 
 import { HighCostError } from '@/components/ui/HighQueryCost'
 import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { ResponseError } from '@/types'
 
 export const GridError = ({ error }: { error?: ResponseError | null }) => {
+  const { id: _id } = useParams()
+  const tableId = _id ? Number(_id) : undefined
+
   const { filters } = useTableFilter()
   const { sorts } = useTableSort()
+
   const snap = useTableEditorTableStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
 
   if (!error) return null
 
@@ -42,6 +48,9 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
           'Remove any sorts or filters on unindexed columns, or',
           'Create indexes for columns that you want to filter or sort on',
         ]}
+        onSelectLoadData={() => {
+          if (!!tableId) tableEditorSnap.setTableToIgnorePreflightCheck(tableId)
+        }}
       />
     )
   } else if (isForeignTableMissingVaultKeyError) {

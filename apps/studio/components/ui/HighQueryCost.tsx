@@ -24,17 +24,26 @@ import { ResponseError } from '@/types'
 interface HighQueryCostErrorProps {
   error: ResponseError
   suggestions?: string[]
+  onSelectLoadData?: () => void
 }
 
-export const HighCostError = ({ error, suggestions }: HighQueryCostErrorProps) => {
-  // [Joshen] The CTA could be to use a read replica to query or something?
+export const HighCostError = ({
+  error,
+  suggestions,
+  onSelectLoadData,
+}: HighQueryCostErrorProps) => {
   return (
     <Admonition
       type="default"
       title="Data not loaded to protect database performance"
       description="The query to retrieve the data was not run as it could place heavy load on the database and impact performance"
     >
-      <HighQueryCostDialog error={error} suggestions={suggestions} />
+      <div className="mt-2 flex items-center gap-x-2 items-center">
+        <Button type="default" onClick={() => onSelectLoadData?.()}>
+          Load data
+        </Button>
+        <HighQueryCostDialog error={error} suggestions={suggestions} />
+      </div>
     </Admonition>
   )
 }
@@ -45,9 +54,7 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default" className="mt-2">
-          Learn more
-        </Button>
+        <Button type="outline">Learn more</Button>
       </DialogTrigger>
       <DialogContent onOpenAutoFocus={(event) => event.preventDefault()}>
         <DialogHeader>
