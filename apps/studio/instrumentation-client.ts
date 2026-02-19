@@ -218,6 +218,38 @@ Sentry.init({
     'r.default.setDefaultLevel is not a function',
     // [Joshen] Safe to ignore, it an error from the copyToClipboard
     'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
+
+    // API/Network errors - should be handled by API layer, not actionable on frontend
+    /502/,
+    'upstream request timeout',
+    /upstream connect error or disconnect\/reset before headers/,
+    /Failed to fetch/,
+
+    // Google Translate / browser extension DOM manipulation errors
+    /Failed to execute 'removeChild' on 'Node'/,
+
+    // Monaco editor errors - already filtering ResizeObserver, adding general monaco errors
+    /monaco-editor/,
+
+    // JWT/Auth errors - expected during session expiry, handled by auth flow
+    'jwt expired',
+    /InvalidJWTToken: Invalid value for JWT claim "exp"/,
+
+    // User cancellation - intentional user action
+    'Canceled: Canceled',
+
+    // Third-party/extension errors
+    'html2canvas is not defined',
+    '[object Event]',
+    'ConnectorClass.onMessage(extensionPageScript)',
+    "Cannot destructure property 'address' of '(intermediate value)' as it is undefined.",
+
+    // Expected user flow errors
+    'Profile already exists: User already exists',
+
+    // JSON parse errors from invalid responses
+    '"undefined" is not valid JSON',
+    'SyntaxError: "undefined" is not valid JSON',
   ],
 })
 
