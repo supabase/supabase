@@ -168,7 +168,7 @@ Your authorization UI should:
 4. **Display consent screen** - Show the user what app is requesting access and what scopes/permissions are being requested
 5. **Handle user decision** - Call either `approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)` based on user choice
 
-The authorization details include a `scopes` field that contains the scopes requested by the client (e.g., `["openid", "email", "profile"]`). You should display these scopes to the user so they understand what information will be shared.
+The authorization details include a `scope` field (singular) containing a space-separated string of scopes requested by the client (e.g., `"openid email profile"`). You should display these scopes to the user so they understand what information will be shared.
 
 <Admonition type="note">
 
@@ -250,12 +250,12 @@ export default async function ConsentPage({
         <p>
           <strong>Redirect URI:</strong> {authDetails.redirect_uri}
         </p>
-        {authDetails.scopes && authDetails.scopes.length > 0 && (
+        {authDetails.scope && authDetails.scope.trim() && (
           <div>
             <strong>Requested permissions:</strong>
             <ul>
-              {authDetails.scopes.map((scope) => (
-                <li key={scope}>{scope}</li>
+              {authDetails.scope.split(' ').map((scopeItem) => (
+                <li key={scopeItem}>{scopeItem}</li>
               ))}
             </ul>
           </div>
@@ -420,12 +420,12 @@ export function OAuthConsent() {
         <p>
           <strong>Redirect URI:</strong> {authDetails.redirect_uri}
         </p>
-        {authDetails.scopes && authDetails.scopes.length > 0 && (
+        {authDetails.scope && authDetails.scope.trim() && (
           <div>
             <strong>Requested permissions:</strong>
             <ul>
-              {authDetails.scopes.map((scope) => (
-                <li key={scope}>{scope}</li>
+              {authDetails.scope.split(' ').map((scopeItem) => (
+                <li key={scopeItem}>{scopeItem}</li>
               ))}
             </ul>
           </div>

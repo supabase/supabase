@@ -15,7 +15,7 @@ You can change how many database connections Supavisor can manage by altering th
 
 ![Connection Info and Certificate.](/docs/img/database/pool-size.png)
 
-The general rule is that if you are heavily using the PostgREST database API, you should be conscientious about raising your pool size past 40%. Otherwise, you can commit 80% to the pool. This leaves adequate room for the Authentication server and other utilities.
+The general rule is that if you are heavily using the PostgREST database API, you should be conscientious about raising your pool size past 40% of the Database Max Connections. Otherwise, you can commit 80% to the pool. This leaves adequate room for the Authentication server and other utilities.
 
 These numbers are generalizations and depends on other Supabase products that you use and the extent of their usage. The actual values depend on your concurrent peak connection usage. For instance, if you were only using 80 connections in a week period and your database max connections is set to 500, then realistically you could allocate the difference of 420 (minus a reasonable buffer) to service more demand.
 

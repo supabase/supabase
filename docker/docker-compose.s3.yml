@@ -1,16 +1,16 @@
 services:
 
   minio:
-    image: minio/minio
-    ports:
-      - '9000:9000'
-      - '9001:9001'
+    image: cgr.dev/chainguard/minio
+    #ports:
+    #  - '9000:9000'
+    #  - '9001:9001'
     environment:
-      MINIO_ROOT_USER: supa-storage
-      MINIO_ROOT_PASSWORD: secret1234
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server --console-address ":9001" /data
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://minio:9000/minio/health/live" ]
+      test: [ "CMD", "mc", "ready", "local" ]
       interval: 2s
       timeout: 10s
       retries: 5
@@ -18,20 +18,20 @@ services:
       - ./volumes/storage:/data:z
 
   minio-createbucket:
-    image: minio/mc
+    image: cgr.dev/chainguard/minio-client:latest-dev
     depends_on:
       minio:
         condition: service_healthy
     entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc alias set supa-minio http://minio:9000 supa-storage secret1234;
-      /usr/bin/mc mb supa-minio/stub;
-      exit 0;
+      /bin/sh -ec "
+      mc alias set supa-minio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+      mc mb --ignore-existing supa-minio/${GLOBAL_S3_BUCKET}
       "
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.11.13
+    image: supabase/storage-api:v1.37.8
+    restart: unless-stopped
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -40,6 +40,8 @@ services:
         condition: service_started
       imgproxy:
         condition: service_started
+      minio-createbucket:
+        condition: service_completed_successfully
       minio:
         condition: service_healthy
     healthcheck:
@@ -50,45 +52,36 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost:5000/status"
+          "http://storage:5000/status"
         ]
       timeout: 5s
       interval: 5s
       retries: 3
-    restart: unless-stopped
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
       POSTGREST_URL: http://rest:3000
       PGRST_JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: s3
-      GLOBAL_S3_BUCKET: stub
+      # S3 bucket when using S3 backend, directory name when using 'file'
+      GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
+      # S3 Backend configuration
       GLOBAL_S3_ENDPOINT: http://minio:9000
       GLOBAL_S3_PROTOCOL: http
       GLOBAL_S3_FORCE_PATH_STYLE: true
-      AWS_ACCESS_KEY_ID: supa-storage
-      AWS_SECRET_ACCESS_KEY: secret1234
-      AWS_DEFAULT_REGION: stub
-      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
-      TENANT_ID: stub
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      #FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: ${STORAGE_TENANT_ID}
       # TODO: https://github.com/supabase/storage-api/issues/55
-      REGION: stub
+      REGION: ${REGION}
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
-    volumes:
-      - ./volumes/storage:/var/lib/storage:z
-
-  imgproxy:
-    container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.8.0
-    healthcheck:
-      test: [ "CMD", "imgproxy", "health" ]
-      timeout: 5s
-      interval: 5s
-      retries: 3
-    environment:
-      IMGPROXY_BIND: ":5001"
-      IMGPROXY_USE_ETAG: "true"
-      IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
+      # S3 protocol endpoint configuration
+      S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID}
+      S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET}
+    #volumes:
+    #  - ./volumes/storage:/var/lib/storage:z

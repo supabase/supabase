@@ -1,12 +1,8 @@
-import { Check, InfoIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import type { PaymentMethodElementRef } from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import {
   billingPartnerLabel,
   getPlanChangeType,
@@ -25,13 +21,17 @@ import {
   STRIPE_PUBLIC_KEY,
 } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import { Check, InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
+import { toast } from 'sonner'
 import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import type { PaymentMethodElementRef } from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+
 import PaymentMethodSelection from './PaymentMethodSelection'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)

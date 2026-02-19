@@ -1,22 +1,30 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
-import { FilterProperty, FilterOptionObject, AsyncOptionsFunction } from './types'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import {
+  ActiveInputState,
+  AsyncOptionsFunction,
+  ConditionPath,
+  FilterOptionObject,
+  FilterProperty,
+} from './types'
 import { isAsyncOptionsFunction } from './utils'
 
-export type ActiveInput =
-  | { type: 'value'; path: number[] }
-  | { type: 'operator'; path: number[] }
-  | { type: 'group'; path: number[] }
-  | null
+export type HighlightNavigationOptions = {
+  skipEnterWhenFilterHighlighted?: boolean
+}
 
 export function useFilterBarState() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isCommandMenuVisible, setIsCommandMenuVisible] = useState(false)
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const [activeInput, setActiveInput] = useState<ActiveInput>(null)
-  const newPathRef = useRef<number[]>([])
+  const [activeInput, setActiveInput] = useState<ActiveInputState>(null)
+  const newPathRef = useRef<ConditionPath>([])
+  const [highlightedConditionPath, setHighlightedConditionPath] = useState<ConditionPath | null>(
+    null
+  )
 
   return {
     isLoading,
@@ -29,6 +37,8 @@ export function useFilterBarState() {
     activeInput,
     setActiveInput,
     newPathRef,
+    highlightedConditionPath,
+    setHighlightedConditionPath,
   }
 }
 
@@ -121,7 +131,8 @@ export function useDeferredBlur(wrapperRef: React.RefObject<HTMLElement>, onBlur
 export function useHighlightNavigation(
   itemsLength: number,
   onEnter: (index: number) => void,
-  fallbackKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  fallbackKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void,
+  options?: HighlightNavigationOptions
 ) {
   const [highlightedIndex, setHighlightedIndex] = useState(0)
 
@@ -144,13 +155,32 @@ export function useHighlightNavigation(
         return
       }
       if (e.key === 'Enter') {
-        e.preventDefault()
-        onEnter(highlightedIndex)
+        // Edge case: when a filter is highlighted, skip dropdown selection and let fallback handle it
+        if (options?.skipEnterWhenFilterHighlighted) {
+          if (fallbackKeyDown) fallbackKeyDown(e)
+          return
+        }
+        if (itemsLength > 0) {
+          e.preventDefault()
+          onEnter(highlightedIndex)
+          return
+        }
+        if (fallbackKeyDown) fallbackKeyDown(e)
+        return
+      }
+      if (e.key === 'Backspace') {
+        if (fallbackKeyDown) fallbackKeyDown(e)
         return
       }
       if (fallbackKeyDown) fallbackKeyDown(e)
     },
-    [itemsLength, highlightedIndex, onEnter, fallbackKeyDown]
+    [
+      itemsLength,
+      highlightedIndex,
+      onEnter,
+      fallbackKeyDown,
+      options?.skipEnterWhenFilterHighlighted,
+    ]
   )
 
   const reset = useCallback(() => setHighlightedIndex(0), [])

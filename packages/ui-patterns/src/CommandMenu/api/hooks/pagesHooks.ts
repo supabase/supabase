@@ -5,7 +5,7 @@ import { useLatest } from 'react-use'
 import { useSnapshot } from 'valtio'
 
 import { useCommandContext } from '../../internal/Context'
-import { type PageDefinition, isComponentPage } from '../../internal/state/pagesState'
+import { isComponentPage, type PageDefinition } from '../../internal/state/pagesState'
 import { useSetQuery } from './queryHooks'
 
 const useCurrentPage = () => {
