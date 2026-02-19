@@ -5,7 +5,6 @@ services:
     ports:
       - '9000:9000'
       - '9001:9001'
-    # keep minio hostname to share more common ground
     environment:
       RUSTFS_ACCESS_KEY: ${MINIO_ROOT_USER}
       RUSTFS_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
