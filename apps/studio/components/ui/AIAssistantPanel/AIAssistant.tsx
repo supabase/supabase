@@ -224,6 +224,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           projectRef: project.ref,
           orgSlug: selectedOrganization.slug,
           reason,
+          spanId: state.messageSpanIds[messageId],
         })
 
         sendEvent({

@@ -42,6 +42,7 @@ export async function generateAssistantResponse({
   promptProviderOptions,
   providerOptions,
   abortSignal,
+  onSpanCreated,
 }: {
   messages: UIMessage[]
   model: LanguageModel
@@ -58,10 +59,15 @@ export async function generateAssistantResponse({
   promptProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
+  onSpanCreated?: (spanId: string) => void
 }) {
   const shouldTrace = IS_TRACING_ENABLED && !isHipaaEnabled
 
   const run = async (span?: Span) => {
+    if (span) {
+      onSpanCreated?.(span.id)
+    }
+
     // Only returns last 7 messages
     // Filters out tools with invalid states
     // Filters out tool outputs based on opt-in level using renderingToolOutputParser

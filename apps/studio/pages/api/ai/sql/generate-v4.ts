@@ -199,6 +199,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       promptProviderOptions,
       providerOptions,
       abortSignal: abortController.signal,
+      onSpanCreated: (spanId) => {
+        res.setHeader('x-bt-span-id', spanId)
+      },
     })
 
     result.pipeUIMessageStreamToResponse(res, {

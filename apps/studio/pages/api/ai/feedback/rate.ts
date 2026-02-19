@@ -1,14 +1,16 @@
 import { generateObject } from 'ai'
+import { currentLogger } from 'braintrust'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
 import { IS_PLATFORM } from 'common'
+import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
-import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
 
 export const maxDuration = 30
 
@@ -31,6 +33,7 @@ const requestBodySchema = z.object({
   projectRef: z.string(),
   orgSlug: z.string().optional(),
   reason: z.string().optional(),
+  spanId: z.string().optional(),
 })
 
 export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -48,7 +51,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { rating, messages: rawMessages, projectRef, orgSlug, reason } = data
+  const { rating, messages: rawMessages, projectRef, orgSlug, reason, spanId } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
 
@@ -125,6 +128,22 @@ Instructions:
    - other: Anything else
 `,
     })
+
+    // Log feedback to Braintrust if tracing is enabled and span ID is available
+    if (IS_TRACING_ENABLED && spanId) {
+      try {
+        const logger = currentLogger()
+        logger?.logFeedback({
+          id: spanId,
+          scores: { user_rating: rating === 'positive' ? 1 : 0 },
+          comment: reason,
+          metadata: { category: object.category },
+          source: 'external',
+        })
+      } catch (error) {
+        console.error('Failed to log feedback to Braintrust:', error)
+      }
+    }
 
     return res.json({
       category: object.category,
