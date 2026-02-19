@@ -2,8 +2,8 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import {
-  CONSTRAINT_TYPE,
   Constraint,
+  CONSTRAINT_TYPE,
   useTableConstraintsQuery,
 } from 'data/database/constraints-query'
 import {
