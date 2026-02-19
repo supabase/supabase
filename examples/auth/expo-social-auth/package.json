@@ -1,5 +1,5 @@
 {
-  "name": "ff",
+  "name": "expo-social-auth",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
