@@ -37,7 +37,6 @@ import { useEffect, useRef, useState } from 'react'
 import { editorPanelState, useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import type { SqlSnippets } from 'types'
 import {
   Button,
   cn,
@@ -63,6 +62,7 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
+import { formatSqlError } from './EditorPanel.utils'
 import { SaveSnippetDialog } from './SaveSnippetDialog'
 
 export const EditorPanel = () => {
@@ -126,6 +126,12 @@ export const EditorPanel = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const originalSnippetRef = useRef<{ sql: string; name: string } | null>(null)
+
+  const showSaveSuccess = () => {
+    setSaveStatus('success')
+    clearTimeout(saveStatusTimerRef.current)
+    saveStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000)
+  }
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
   const [isSnippetsOpen, setIsSnippetsOpen] = useState(false)
   const [snippetSearch, setSnippetSearch] = useState('')
@@ -152,34 +158,24 @@ export const EditorPanel = () => {
   useEffect(() => {
     if (!snippetById || !activeSnippetId) return
     const sqlSnippet = snippetById as unknown as Extract<Content, { type: 'sql' }>
-    const sql = (sqlSnippet.content as SqlSnippets.Content)?.sql ?? ''
+    const sql = sqlSnippet.content.sql ?? ''
     setValue(sql)
     setActiveSnippet(sqlSnippet)
     originalSnippetRef.current = { sql, name: sqlSnippet.name }
     editorPanelState.setActiveSnippetId(null)
   }, [snippetById, activeSnippetId, setValue, setActiveSnippet])
 
-  const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
-  const errorContent =
-    'formattedError' in (error || {})
-      ? error?.formattedError
-          ?.split('\n')
-          ?.filter((x: string) => x.length > 0)
-          ?.slice(1) ?? []
-      : [error?.message ?? '']
+  const { header: errorHeader, lines: errorContent } = error
+    ? formatSqlError(error)
+    : { header: undefined, lines: [] as string[] }
 
   const { mutate: upsertContent, isPending: isUpserting } = useContentUpsertMutation({
     onSuccess: (_, vars) => {
       if (vars.payload.id && ref) {
         queryClient.invalidateQueries({ queryKey: contentKeys.resource(ref, vars.payload.id) })
       }
-      originalSnippetRef.current = {
-        sql: (vars.payload.content as SqlSnippets.Content)?.sql ?? currentValue,
-        name: vars.payload.name,
-      }
-      setSaveStatus('success')
-      clearTimeout(saveStatusTimerRef.current)
-      saveStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000)
+      originalSnippetRef.current = { sql: currentValue, name: vars.payload.name }
+      showSaveSuccess()
     },
     onError: () => setSaveStatus('error'),
   })
@@ -607,7 +603,7 @@ export const EditorPanel = () => {
                     project_id: project.id,
                     owner_id: profile.id,
                     content: {
-                      ...(activeSnippet.content as SqlSnippets.Content),
+                      ...activeSnippet.content,
                       sql: currentValue,
                     },
                   },
@@ -638,9 +634,7 @@ export const EditorPanel = () => {
           sqlEditorSnap.addNeedsSaving(snippet.id)
           setActiveSnippet(snippet as unknown as Extract<Content, { type: 'sql' }>)
           originalSnippetRef.current = { sql: currentValue, name }
-          setSaveStatus('success')
-          clearTimeout(saveStatusTimerRef.current)
-          saveStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000)
+          showSaveSuccess()
         }}
       />
     </div>

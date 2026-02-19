@@ -6,11 +6,16 @@ type Template = {
   content: string
 }
 
+export type SqlError = {
+  formattedError?: string
+  message?: string
+}
+
 type EditorPanelState = {
   value: string
   templates: Template[]
-  results: any[] | undefined
-  error: any
+  results: Record<string, unknown>[] | undefined
+  error: SqlError | undefined
   initialPrompt: string
   onChange: ((value: string) => void) | undefined
   activeSnippetId: string | null
@@ -39,10 +44,10 @@ export const editorPanelState = proxy({
   setTemplates(templates: Template[]) {
     editorPanelState.templates = templates
   },
-  setResults(results: any[] | undefined) {
+  setResults(results: Record<string, unknown>[] | undefined) {
     editorPanelState.results = results
   },
-  setError(error: any) {
+  setError(error: SqlError | undefined) {
     editorPanelState.error = error
   },
   setInitialPrompt(initialPrompt: string) {
