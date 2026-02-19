@@ -13,13 +13,19 @@ import {
 
 import { cn } from '../../../lib/utils/cn'
 
+// This is to avoid clashes with older versions of react-resizable-panels which have been saved in local storage.
+const transformLayoutKey = (key: string) =>
+  key.replace('react-resizable-panels:', 'react-resizable-panels-v4:')
+
 const serverCompatibleLocalStorage = {
-  getItem: (key: string) => {
+  getItem: (k: string) => {
     if (typeof window === 'undefined') return null
+    const key = transformLayoutKey(k)
     return localStorage.getItem(key)
   },
-  setItem: (key: string, value: string) => {
+  setItem: (k: string, value: string) => {
     if (typeof window === 'undefined') return
+    const key = transformLayoutKey(k)
     localStorage.setItem(key, value)
   },
 }
