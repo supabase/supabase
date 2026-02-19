@@ -20,13 +20,14 @@ export const getOrgAIDetails = async ({
     ...(authorization && { Authorization: authorization }),
   }
 
-  const [organizations, selectedProject, subscription, projectSettings, advanceModelAccess] = await Promise.all([
-    getOrganizations({ headers }),
-    getProjectDetail({ ref: projectRef }, undefined, headers),
-    getOrgSubscription({ orgSlug }, undefined, headers),
-    getProjectSettings({ projectRef }, undefined, headers),
-    checkEntitlement(orgSlug, 'assistant.advance_model'),
-  ])
+  const [organizations, selectedProject, subscription, projectSettings, advanceModelAccess] =
+    await Promise.all([
+      getOrganizations({ headers }),
+      getProjectDetail({ ref: projectRef }, undefined, headers),
+      getOrgSubscription({ orgSlug }, undefined, headers),
+      getProjectSettings({ projectRef }, undefined, headers),
+      checkEntitlement(orgSlug, 'assistant.advance_model'),
+    ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
 
