@@ -1,6 +1,9 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button, Image } from 'ui'
+import Image from 'next/image'
+import { Badge, Button, 
+  // Image 
+} from 'ui'
 import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
@@ -60,7 +63,7 @@ const components = {
   IconCheck: Check,
   IconPanel,
   IconX: X,
-  Image: (props: any) => <Image fill alt="" className="object-contain" {...props} />,
+  Image: (props: any) => <Image alt="" className="rounded-md w-full" {...props} />,
   JwtGenerator,
   JwtGeneratorSimple,
   Link,
