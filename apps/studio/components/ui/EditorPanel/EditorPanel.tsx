@@ -22,10 +22,9 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { Book, FolderOpen, Maximize2, PlusIcon, X } from 'lucide-react'
+import { AlertCircle, Book, CheckCircle2, FolderOpen, Loader2, Maximize2, PlusIcon, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
 import { editorPanelState, useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -115,12 +114,15 @@ export const EditorPanel = () => {
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
   const [showResults, setShowResults] = useState(true)
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const originalSnippetRef = useRef<{ sql: string; name: string } | null>(null)
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
   const [isSnippetsOpen, setIsSnippetsOpen] = useState(false)
   const [snippetSearch, setSnippetSearch] = useState('')
   const debouncedSnippetSearch = useDebounce(snippetSearch, 300)
 
-  const { data: snippetsData } = useContentQuery(
+  const { data: snippetsData, isLoading: isLoadingSnippets } = useContentQuery(
     { projectRef: ref, type: 'sql', name: debouncedSnippetSearch || undefined },
     { enabled: isSnippetsOpen }
   )
@@ -134,15 +136,17 @@ export const EditorPanel = () => {
     if (!pendingReset) return
     setActiveSnippet(null)
     setIsEditingTitle(false)
+    originalSnippetRef.current = null
     editorPanelState.pendingReset = false
   }, [pendingReset])
 
   useEffect(() => {
     if (!snippetById || !activeSnippetId) return
     const sqlSnippet = snippetById as unknown as Extract<Content, { type: 'sql' }>
-    const sql = (sqlSnippet.content as SqlSnippets.Content)?.sql
-    if (sql) setValue(sql)
+    const sql = (sqlSnippet.content as SqlSnippets.Content)?.sql ?? ''
+    setValue(sql)
     setActiveSnippet(sqlSnippet)
+    originalSnippetRef.current = { sql, name: sqlSnippet.name }
     editorPanelState.setActiveSnippetId(null)
   }, [snippetById, activeSnippetId])
 
@@ -155,13 +159,20 @@ export const EditorPanel = () => {
           ?.slice(1) ?? []
       : [error?.message ?? '']
 
-  const { mutate: upsertContent } = useContentUpsertMutation({
+  const { mutate: upsertContent, isPending: isUpserting } = useContentUpsertMutation({
     onSuccess: (_, vars) => {
       if (vars.payload.id && ref) {
         queryClient.invalidateQueries({ queryKey: contentKeys.resource(ref, vars.payload.id) })
       }
+      originalSnippetRef.current = {
+        sql: (vars.payload.content as SqlSnippets.Content)?.sql ?? currentValue,
+        name: vars.payload.name,
+      }
+      setSaveStatus('success')
+      clearTimeout(saveStatusTimerRef.current)
+      saveStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000)
     },
-    onError: () => toast.error('Failed to save snippet'),
+    onError: () => setSaveStatus('error'),
   })
 
   const { mutate: executeSql, isPending: isExecuting } = useExecuteSqlMutation({
@@ -291,7 +302,13 @@ export const EditorPanel = () => {
                   onValueChange={setSnippetSearch}
                 />
                 <CommandList_Shadcn_>
+                  {isLoadingSnippets ? (
+                    <div className="py-6 text-center text-sm text-foreground-light">
+                      Loading snippets...
+                    </div>
+                  ) : (
                   <CommandEmpty_Shadcn_>No snippets found.</CommandEmpty_Shadcn_>
+                  )}
                   <CommandGroup_Shadcn_>
                     {(snippetsData?.content ?? []).map((snippet) => (
                       <CommandItem_Shadcn_
@@ -532,15 +549,44 @@ export const EditorPanel = () => {
           </div>
         )}
 
-        <div className="flex items-center gap-2 justify-end px-5 py-4 w-full border-t shrink-0">
+        <div className="relative shrink-0 flex items-center gap-2 justify-end px-5 py-4 w-full border-t">
+          {(isUpserting || saveStatus !== 'idle') && (
+            <div
+              className={cn(
+                'absolute left-0 flex items-center gap-2 px-5 py-3 text-xs',
+                saveStatus === 'success' && 'text-brand-600',
+                saveStatus === 'error' && 'text-warning',
+                saveStatus === 'idle' && 'text-foreground-light'
+              )}
+            >
+              {isUpserting && <Loader2 size={13} className="animate-spin" />}
+              {saveStatus === 'success' && <CheckCircle2 size={13} />}
+              {saveStatus === 'error' && <AlertCircle size={13} />}
+              <span>
+                {isUpserting
+                  ? 'Saving...'
+                  : saveStatus === 'success'
+                    ? 'Snippet updated'
+                    : 'Failed to save snippet'}
+              </span>
+            </div>
+          )}
           <Button
             type="default"
             size="tiny"
-            disabled={!currentValue || isExecuting}
+            disabled={
+              !currentValue ||
+              isExecuting ||
+              isUpserting ||
+              (!!activeSnippet &&
+                currentValue === originalSnippetRef.current?.sql &&
+                activeSnippet.name === originalSnippetRef.current?.name)
+            }
             onClick={() => {
               if (!ref || !profile || !project) return
 
               if (activeSnippet) {
+                setSaveStatus('idle')
                 upsertContent({
                   projectRef: ref,
                   payload: {
@@ -582,7 +628,10 @@ export const EditorPanel = () => {
           sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
           sqlEditorSnap.addNeedsSaving(snippet.id)
           setActiveSnippet(snippet as unknown as Extract<Content, { type: 'sql' }>)
-          toast.success('Snippet saved')
+          originalSnippetRef.current = { sql: currentValue, name }
+          setSaveStatus('success')
+          clearTimeout(saveStatusTimerRef.current)
+          saveStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000)
         }}
       />
     </div>
