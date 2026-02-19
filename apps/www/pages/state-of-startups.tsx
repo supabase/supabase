@@ -15,7 +15,7 @@ import { Button, cn } from 'ui'
 
 function StateOfStartupsPage() {
   const router = useRouter()
-  const isPageEnabled = true
+  const isPageEnabled = useFlag('stateOfStartups')
 
   const meta_title = pageData.metaTitle || 'State of Startups 2025 | Supabase'
   const meta_description =
