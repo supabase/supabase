@@ -8,6 +8,7 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 import { Button, ToggleGroup, ToggleGroupItem } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -36,6 +37,10 @@ export const HomePageActions = ({
   )
   const [viewMode, setViewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
 
+  const [filterStatusStorage, setFilterStatusStorage, { isSuccess }] = useLocalStorageQuery<
+    string[]
+  >(LOCAL_STORAGE_KEYS.PROJECTS_FILTER, [])
+
   const { isFetching: isFetchingProjects } = useOrgProjectsInfiniteQuery(
     {
       slug,
@@ -44,6 +49,10 @@ export const HomePageActions = ({
     },
     { placeholderData: keepPreviousData }
   )
+
+  useEffect(() => {
+    if (isSuccess && !!urlSlug) setFilterStatus(filterStatusStorage)
+  }, [filterStatusStorage, isSuccess, urlSlug, setFilterStatus])
 
   return (
     <div className="flex items-center justify-between">
@@ -79,7 +88,7 @@ export const HomePageActions = ({
           activeOptions={filterStatus}
           valueKey="key"
           labelKey="label"
-          onSaveFilters={setFilterStatus}
+          onSaveFilters={(options) => setFilterStatusStorage(options)}
         />
 
         {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
