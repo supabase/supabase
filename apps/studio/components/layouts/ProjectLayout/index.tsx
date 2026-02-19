@@ -294,9 +294,19 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
+  // handle redirect to home for building state
+  const shouldRedirectToHomeForBuilding =
+    isProjectBuilding && requiresDbConnection && isHomeNew && !isHomePage
+
   // We won't be showing the building state with the new home page
   const shouldShowBuildingState =
     isProjectBuilding && requiresDbConnection && !(isHomeNew && isHomePage)
+
+  useEffect(() => {
+    if (shouldRedirectToHomeForBuilding && ref) {
+      router.replace(`/project/${ref}`)
+    }
+  }, [shouldRedirectToHomeForBuilding, ref, router])
 
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
@@ -336,6 +346,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (requiresDbConnection && isProjectRestoreFailed) {
     return <RestoreFailedState />
+  }
+
+  if (shouldRedirectToHomeForBuilding) {
+    return <LogoLoader />
   }
 
   if (shouldShowBuildingState) {
