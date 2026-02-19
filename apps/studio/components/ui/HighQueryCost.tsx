@@ -39,9 +39,9 @@ export const HighCostError = ({
       description="The query to retrieve the data was not run as it could place heavy load on the database and impact performance"
     >
       <div className="mt-2 flex items-center gap-x-2 items-center">
-        <Button type="default" onClick={() => onSelectLoadData?.()}>
-          Load data
-        </Button>
+        {!!onSelectLoadData && (
+          <LoadDataWarningDialog error={error} onSelectLoadData={onSelectLoadData} />
+        )}
         <HighQueryCostDialog error={error} suggestions={suggestions} />
       </div>
     </Admonition>
@@ -80,11 +80,12 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
                 </p>
               </TooltipContent>
             </Tooltip>{' '}
-            is high and could place significant load on the database.
+            is high and could place significant load on the database with high disk I/O or CPU
+            usage.
           </p>
           {suggestions.length > 0 && (
             <div className="flex flex-col gap-y-1">
-              <p>You may check the following to ensure that the query cost is lower</p>
+              <p>You may check the following to lower the cost of the query</p>
               <ul className="list-disc pl-6">
                 {suggestions.map((x) => (
                   <li key={x}>{x}</li>
@@ -102,6 +103,64 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
               Understood
             </Button>
           </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const LoadDataWarningDialog = ({
+  error,
+  onSelectLoadData,
+}: {
+  error: ResponseError
+  onSelectLoadData: () => void
+}) => {
+  const metadata = error.metadata
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button type="default">Load data</Button>
+      </DialogTrigger>
+      <DialogContent onOpenAutoFocus={(event) => event.preventDefault()}>
+        <DialogHeader>
+          <DialogTitle>Confirm to proceed loading data</DialogTitle>
+          <DialogDescription>
+            Preventive measure to mitigate impacting the database
+          </DialogDescription>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-y-2 text-sm">
+          <p>
+            The query to load your table's data was initially skipped as its{' '}
+            <Tooltip>
+              <TooltipTrigger className={InlineLinkClassName}>estimated cost</TooltipTrigger>
+              <TooltipContent side="bottom" className="flex flex-col gap-y-1">
+                <p>Estimated cost: {metadata?.cost.toLocaleString()}</p>
+                <p className="text-foreground-light">
+                  Determined via the <code className="text-code-inline">EXPLAIN</code> command
+                </p>
+              </TooltipContent>
+            </Tooltip>{' '}
+            is high and could place significant load on the database with high disk I/O or CPU
+            usage.
+          </p>
+
+          <p>
+            You may proceed to run the query, and we'll suppress this warning for this table for the
+            rest of this browser session.
+          </p>
+        </DialogSection>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="default" className="opacity-100">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button type="warning" onClick={() => onSelectLoadData()}>
+            I understand, proceed
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
