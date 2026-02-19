@@ -1,8 +1,5 @@
 import { generateObject } from 'ai'
 import { currentLogger } from 'braintrust'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-
 import { IS_PLATFORM } from 'common'
 import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -11,6 +8,8 @@ import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 export const maxDuration = 30
 
@@ -63,14 +62,12 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
       // Get organizations and compute opt in level server-side
-      const {
-        aiOptInLevel: orgAIOptInLevel,
-        isHipaaEnabled: orgIsHipaaEnabled,
-      } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-        projectRef,
-      })
+      const { aiOptInLevel: orgAIOptInLevel, isHipaaEnabled: orgIsHipaaEnabled } =
+        await getOrgAIDetails({
+          orgSlug,
+          authorization,
+          projectRef,
+        })
 
       aiOptInLevel = orgAIOptInLevel
       isHipaaEnabled = orgIsHipaaEnabled
