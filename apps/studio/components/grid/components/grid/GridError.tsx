@@ -11,6 +11,7 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import { isFilterRelatedError } from './GridError.utils'
 import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { HighCostError } from '@/components/ui/HighQueryCost'
 import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
@@ -47,15 +48,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
 
   const hasActiveFilters = oldFilters.length > 0 || newFilters.length > 0
 
-  const isFilterRelatedError =
-    hasActiveFilters &&
-    (error?.message?.includes('invalid input syntax') ||
-      error?.message?.includes('operator does not exist') ||
-      error?.message?.includes('could not determine which collation') ||
-      error?.message?.includes('invalid input value for enum') ||
-      error?.message?.includes('malformed array literal') ||
-      error?.message?.includes('invalid byte sequence') ||
-      error?.message?.includes('syntax error'))
+  const hasFilterRelatedError = hasActiveFilters && isFilterRelatedError(error?.message)
 
   const isInvalidOrderingOperatorError =
     sorts.length > 0 && error?.message?.includes('identify an ordering operator')
@@ -77,7 +70,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
     )
   } else if (isForeignTableMissingVaultKeyError) {
     return <ForeignTableMissingVaultKeyError />
-  } else if (isFilterRelatedError) {
+  } else if (hasFilterRelatedError) {
     return <FilterError removeAllFilters={removeAllFilters} />
   } else if (isInvalidOrderingOperatorError) {
     return <InvalidOrderingOperatorError error={error} />
