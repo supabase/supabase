@@ -26,7 +26,7 @@ export const getOrgAIDetails = async ({
       getProjectDetail({ ref: projectRef }, undefined, headers),
       getOrgSubscription({ orgSlug }, undefined, headers),
       getProjectSettings({ projectRef }, undefined, headers),
-      checkEntitlement(orgSlug, 'assistant.advance_model'),
+      checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
     ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
