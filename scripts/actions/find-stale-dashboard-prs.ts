@@ -110,7 +110,7 @@ async function findStalePRs(): Promise<StalePR[]> {
         continue
       }
 
-      console.info(`Checking PR #${pr.number}: ${pr.title}`)
+      console.error(`Checking PR #${pr.number}: ${pr.title}`)
 
       let files: any[]
       try {
