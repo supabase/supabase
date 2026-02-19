@@ -1,14 +1,14 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { constructHeaders } from 'data/fetchers'
 import { AnimatePresence, motion } from 'framer-motion'
+import { detectOS } from 'lib/helpers'
 import { Command } from 'lucide-react'
 import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { constructHeaders } from 'data/fetchers'
-import { detectOS } from 'lib/helpers'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+
 import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
 

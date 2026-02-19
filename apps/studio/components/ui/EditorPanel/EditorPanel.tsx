@@ -1,5 +1,6 @@
-import { useDebounce } from '@uidotdev/usehooks'
+import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
@@ -7,11 +8,12 @@ import {
   createSqlSnippetSkeletonV2,
   suffixWithLimit,
 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { useAddDefinitions } from 'components/interfaces/SQLEditor/useAddDefinitions'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { type Content, useContentQuery } from 'data/content/content-query'
 import { useContentIdQuery } from 'data/content/content-id-query'
+import { useContentQuery, type Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
@@ -20,15 +22,14 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { Book, PlusIcon, FolderOpen, Maximize2, X } from 'lucide-react'
+import { Book, FolderOpen, Maximize2, PlusIcon, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import type { Monaco } from '@monaco-editor/react'
 import { useEffect, useRef, useState } from 'react'
-import type { SqlSnippets } from 'types'
 import { toast } from 'sonner'
 import { editorPanelState, useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import type { SqlSnippets } from 'types'
 import {
   Button,
   cn,
@@ -50,7 +51,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-import { useAddDefinitions } from 'components/interfaces/SQLEditor/useAddDefinitions'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
@@ -77,9 +77,7 @@ export const EditorPanel = () => {
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
   const queryClient = useQueryClient()
 
-  const [activeSnippet, setActiveSnippet] = useState<Extract<Content, { type: 'sql' }> | null>(
-    null
-  )
+  const [activeSnippet, setActiveSnippet] = useState<Extract<Content, { type: 'sql' }> | null>(null)
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [titleInput, setTitleInput] = useState('')
   const titleInputRef = useRef<HTMLInputElement>(null)
@@ -280,11 +278,10 @@ export const EditorPanel = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'Open snippet'
+                    text: 'Open snippet',
                   },
                 }}
-              >
-              </ButtonTooltip>
+              ></ButtonTooltip>
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
               <Command_Shadcn_ shouldFilter={false}>

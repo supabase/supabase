@@ -1,14 +1,13 @@
-import { Edit } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { ComponentProps } from 'react'
-
 import { useParams } from 'common'
 import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
+import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Edit } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { ComponentProps } from 'react'
 import { editorPanelState } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -20,6 +19,7 @@ import {
   DropdownMenuTrigger,
   TooltipContent,
 } from 'ui'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 
 interface EditQueryButtonProps {
