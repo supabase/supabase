@@ -1207,8 +1207,8 @@ importers:
         specifier: ^0.0.131
         version: 0.0.131(encoding@0.1.13)(ws@8.18.3)
       braintrust:
-        specifier: ^1.0.2
-        version: 1.0.2(@aws-sdk/credential-provider-web-identity@3.830.0)(supports-color@8.1.1)(zod@3.25.76)
+        specifier: ^3.0.0
+        version: 3.0.0(@aws-sdk/credential-provider-web-identity@3.830.0)(supports-color@8.1.1)(zod@3.25.76)
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
@@ -9901,11 +9901,11 @@ packages:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
 
-  braintrust@1.0.2:
-    resolution: {integrity: sha512-Zm8WbD18FLv5HN38TyUKw659vJdZALQ5VVVWTncMxZgPtFXeWoC7H0tInw/1EQ1pGq50v7WZtlaFBOXhUaf8DQ==}
+  braintrust@3.0.0:
+    resolution: {integrity: sha512-mhpflunGgPhZC8wJxP6GPPcrFNIDgO0E77Gy/hkxSlIUaLpszfxLgQAIESccdbjH+x+PHUDiJiMIgDxNpagVHg==}
     hasBin: true
     peerDependencies:
-      zod: ^3.25.34
+      zod: ^3.25.34 || ^4.0
 
   browserslist@4.26.2:
     resolution: {integrity: sha512-ECFzp6uFOSB+dcZ5BK/IBaGWssbSYBHvuMeMt3MMFyhI0Z8SqGgEkBLARgpRH3hutIgPVsALcMwbDrJqPxQ65A==}
@@ -27719,11 +27719,12 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
-  braintrust@1.0.2(@aws-sdk/credential-provider-web-identity@3.830.0)(supports-color@8.1.1)(zod@3.25.76):
+  braintrust@3.0.0(@aws-sdk/credential-provider-web-identity@3.830.0)(supports-color@8.1.1)(zod@3.25.76):
     dependencies:
       '@ai-sdk/provider': 1.1.3
       '@next/env': 14.2.35
       '@vercel/functions': 1.6.0(@aws-sdk/credential-provider-web-identity@3.830.0)
+      ajv: 8.17.1
       argparse: 2.0.1
       boxen: 8.0.1
       chalk: 4.1.2
@@ -27740,7 +27741,6 @@ snapshots:
       mustache: 4.2.0
       pluralize: 8.0.0
       simple-git: 3.28.0(supports-color@8.1.1)
-      slugify: 1.6.6
       source-map: 0.7.6
       termi-link: 1.1.0
       uuid: 9.0.1

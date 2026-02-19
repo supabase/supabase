@@ -184,7 +184,7 @@
     "@vitest/ui": "^3.2.0",
     "api-types": "workspace:*",
     "autoevals": "^0.0.131",
-    "braintrust": "^1.0.2",
+    "braintrust": "^3.0.0",
     "common": "workspace:*",
     "config": "workspace:*",
     "date-fns": "^2.30.0",
