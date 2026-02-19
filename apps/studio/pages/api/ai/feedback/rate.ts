@@ -135,7 +135,7 @@ Instructions:
         const logger = currentLogger()
         logger?.logFeedback({
           id: spanId,
-          scores: { user_rating: rating === 'positive' ? 1 : 0 },
+          scores: { 'User Rating': rating === 'positive' ? 1 : 0 },
           comment: reason,
           metadata: { category: object.category },
           source: 'external',
