@@ -1,14 +1,17 @@
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useCallback } from 'react'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { HighCostError } from '@/components/ui/HighQueryCost'
 import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -18,11 +21,21 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
-  const { filters } = useTableFilter()
+  const newFilterBarEnabled = useIsTableFilterBarEnabled()
+  const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
+  const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
   const { sorts } = useTableSort()
 
   const snap = useTableEditorTableStateSnapshot()
   const tableEditorSnap = useTableEditorStateSnapshot()
+
+  const removeAllFilters = useCallback(() => {
+    if (newFilterBarEnabled) {
+      clearNewFilters()
+    } else {
+      clearOldFilters()
+    }
+  }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
 
   if (!error) return null
 
@@ -32,8 +45,17 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
   const isForeignTableMissingVaultKeyError =
     isForeignTable && error?.message?.includes('query vault failed')
 
-  const isInvalidSyntaxError =
-    filters.length > 0 && error?.message?.includes('invalid input syntax')
+  const hasActiveFilters = oldFilters.length > 0 || newFilters.length > 0
+
+  const isFilterRelatedError =
+    hasActiveFilters &&
+    (error?.message?.includes('invalid input syntax') ||
+      error?.message?.includes('operator does not exist') ||
+      error?.message?.includes('could not determine which collation') ||
+      error?.message?.includes('invalid input value for enum') ||
+      error?.message?.includes('malformed array literal') ||
+      error?.message?.includes('invalid byte sequence') ||
+      error?.message?.includes('syntax error'))
 
   const isInvalidOrderingOperatorError =
     sorts.length > 0 && error?.message?.includes('identify an ordering operator')
@@ -55,8 +77,8 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
     )
   } else if (isForeignTableMissingVaultKeyError) {
     return <ForeignTableMissingVaultKeyError />
-  } else if (isInvalidSyntaxError) {
-    return <InvalidSyntaxError error={error} />
+  } else if (isFilterRelatedError) {
+    return <FilterError removeAllFilters={removeAllFilters} />
   } else if (isInvalidOrderingOperatorError) {
     return <InvalidOrderingOperatorError error={error} />
   }
@@ -94,27 +116,18 @@ const ForeignTableMissingVaultKeyError = () => {
   )
 }
 
-const InvalidSyntaxError = ({ error }: { error: ResponseError }) => {
-  const { onApplyFilters } = useTableFilter()
-
+const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => {
   return (
     <Admonition
-      type="warning"
+      type="note"
       className="pointer-events-auto"
-      title="Invalid input syntax provided in filter value(s)"
+      title="No results found — check your filter values"
     >
-      <p className="!mb-0">
-        Unable to retrieve results as the provided value in your filter(s) doesn't match it's column
-        data type.
+      <p className="!mb-4">
+        One or more of your filters may have a value or operator that doesn't match the column's
+        data type. Try updating or removing the filter.
       </p>
-      <p className="!mb-2">
-        Verify that your filter values are correct before applying the filters again.
-      </p>
-      <p className="text-sm text-foreground-lighter prose max-w-full !mb-4">
-        Error: <code className="text-code-inline">{error.message}</code>
-      </p>
-
-      <Button type="default" onClick={() => onApplyFilters([])}>
+      <Button type="default" onClick={removeAllFilters}>
         Remove filters
       </Button>
     </Admonition>
