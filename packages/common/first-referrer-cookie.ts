@@ -2,7 +2,7 @@
  * Shared utilities for the cross-app first-referrer handoff cookie.
  *
  * The `_sb_first_referrer` cookie is written by edge middleware on `apps/www`,
- * `apps/docs`, `apps/learn`, and `apps/studio` when a user arrives from an
+ * `apps/docs`, and `apps/studio` when a user arrives from an
  * external source. Studio reads it on the first telemetry pageview to recover
  * external attribution context that would otherwise be lost at the app boundary.
  *
@@ -10,6 +10,8 @@
  * refreshed when a returning visitor arrives with paid traffic signals (click IDs
  * or paid UTM medium values) to ensure paid attribution overrides stale organic data.
  */
+
+import type { NextRequest, NextResponse } from 'next/server'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -73,7 +75,10 @@ const CLICK_ID_KEYS = [
   'li_fat_id', // LinkedIn Ads
 ] as const
 
-function pickParams(searchParams: URLSearchParams, keys: readonly string[]): Record<string, string> {
+function pickParams(
+  searchParams: URLSearchParams,
+  keys: readonly string[]
+): Record<string, string> {
   const result: Record<string, string> = {}
   for (const key of keys) {
     const value = searchParams.get(key)
@@ -160,7 +165,7 @@ export function hasPaidSignals(url: URL): boolean {
     if (url.searchParams.has(key)) return true
   }
   const medium = url.searchParams.get('utm_medium')?.toLowerCase()
-  return medium !== undefined && medium !== null && PAID_UTM_MEDIUMS.has(medium)
+  return medium !== undefined && PAID_UTM_MEDIUMS.has(medium)
 }
 
 /**
@@ -185,6 +190,50 @@ export function shouldRefreshCookie(
     return { stamp: false }
   }
 }
+
+// ---------------------------------------------------------------------------
+// Middleware helper — shared across apps/www, apps/docs, and apps/studio
+// ---------------------------------------------------------------------------
+
+/**
+ * Stamp the first-referrer cookie on a Next.js middleware response if the
+ * request warrants it. This is the single entry point for all app middleware
+ * files — call it with the incoming request and outgoing response.
+ *
+ * On *.supabase.com the cookie is set with `domain=supabase.com` so it's
+ * readable across all subdomains (www, docs, studio). On other hosts
+ * (localhost, preview deploys) the domain is left unset so the browser
+ * stores a host-only cookie instead of rejecting an invalid domain.
+ */
+export function stampFirstReferrerCookie(request: NextRequest, response: NextResponse): void {
+  const referrer = request.headers.get('referer') ?? ''
+
+  const { stamp } = shouldRefreshCookie(request.cookies.has(FIRST_REFERRER_COOKIE_NAME), {
+    referrer,
+    url: request.url,
+  })
+
+  if (!stamp) return
+
+  const data = buildFirstReferrerData({
+    referrer,
+    landingUrl: request.url,
+  })
+
+  response.cookies.set(FIRST_REFERRER_COOKIE_NAME, serializeFirstReferrerCookie(data), {
+    path: '/',
+    sameSite: 'lax',
+    ...(request.nextUrl.hostname === 'supabase.com' ||
+    request.nextUrl.hostname.endsWith('.supabase.com')
+      ? { domain: 'supabase.com', secure: true }
+      : {}),
+    maxAge: FIRST_REFERRER_COOKIE_MAX_AGE,
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Parse cookie from document.cookie header (client-side)
+// ---------------------------------------------------------------------------
 
 export function parseFirstReferrerCookie(cookieHeader: string): FirstReferrerData | null {
   try {

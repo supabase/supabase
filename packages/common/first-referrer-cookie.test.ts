@@ -211,6 +211,12 @@ describe('first-referrer-cookie', () => {
       ).toEqual({ stamp: true })
     })
 
+    it('skips when no cookie and no referrer (direct navigation)', () => {
+      expect(shouldRefreshCookie(false, { referrer: '', url: 'https://supabase.com/' })).toEqual({
+        stamp: false,
+      })
+    })
+
     it('handles malformed URL gracefully', () => {
       expect(
         shouldRefreshCookie(true, {

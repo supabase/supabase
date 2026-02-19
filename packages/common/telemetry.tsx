@@ -12,12 +12,12 @@ import { hasConsented } from './consent-state'
 import { IS_PLATFORM, IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
+import type { FirstReferrerData } from './first-referrer-cookie'
+import { isExternalReferrer, parseFirstReferrerCookie } from './first-referrer-cookie'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useParams, useTelemetryCookie } from './hooks'
 import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
-import type { FirstReferrerData } from './first-referrer-cookie'
-import { isExternalReferrer, parseFirstReferrerCookie } from './first-referrer-cookie'
 import {
   clearTelemetryDataCookie,
   getSharedTelemetryData,
@@ -98,17 +98,25 @@ function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
   }
 }
 
-function handlePageTelemetry(
-  API_URL: string,
-  pathname?: string,
-  featureFlags?: {
-    [key: string]: unknown
-  },
-  slug?: string,
-  ref?: string,
-  telemetryDataOverride?: SharedTelemetryData,
+interface HandlePageTelemetryOptions {
+  apiUrl: string
+  pathname?: string
+  featureFlags?: Record<string, unknown>
+  slug?: string
+  ref?: string
+  telemetryDataOverride?: SharedTelemetryData
   firstReferrerData?: FirstReferrerData | null
-) {
+}
+
+function handlePageTelemetry({
+  apiUrl: API_URL,
+  pathname,
+  featureFlags,
+  slug,
+  ref,
+  telemetryDataOverride,
+  firstReferrerData,
+}: HandlePageTelemetryOptions) {
   // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
     const livePageData = getSharedTelemetryData(pathname)
@@ -276,13 +284,13 @@ export const PageTelemetry = ({
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(
-      API_URL,
-      pathnameRef.current,
-      featureFlagsRef.current,
+    return handlePageTelemetry({
+      apiUrl: API_URL,
+      pathname: pathnameRef.current,
+      featureFlags: featureFlagsRef.current,
       slug,
-      ref
-    ).catch((e) => {
+      ref,
+    }).catch((e) => {
       console.error('Problem sending telemetry page:', e)
     })
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
@@ -339,41 +347,39 @@ export const PageTelemetry = ({
           const telemetryData = JSON.parse(
             decodeURIComponent(telemetryCookieValue)
           ) as SharedTelemetryData
-          handlePageTelemetry(
-            API_URL,
-            pathnameRef.current,
-            featureFlagsRef.current,
+          handlePageTelemetry({
+            apiUrl: API_URL,
+            pathname: pathnameRef.current,
+            featureFlags: featureFlagsRef.current,
             slug,
             ref,
-            telemetryData,
-            firstReferrerData
-          )
+            telemetryDataOverride: telemetryData,
+            firstReferrerData,
+          })
         } catch (error) {
           if (!IS_PROD) {
             console.warn('Invalid telemetry cookie data:', error)
           }
-          handlePageTelemetry(
-            API_URL,
-            pathnameRef.current,
-            featureFlagsRef.current,
+          handlePageTelemetry({
+            apiUrl: API_URL,
+            pathname: pathnameRef.current,
+            featureFlags: featureFlagsRef.current,
             slug,
             ref,
-            undefined,
-            firstReferrerData
-          )
+            firstReferrerData,
+          })
         } finally {
           clearTelemetryDataCookie()
         }
       } else {
-        handlePageTelemetry(
-          API_URL,
-          pathnameRef.current,
-          featureFlagsRef.current,
+        handlePageTelemetry({
+          apiUrl: API_URL,
+          pathname: pathnameRef.current,
+          featureFlags: featureFlagsRef.current,
           slug,
           ref,
-          undefined,
-          firstReferrerData
-        )
+          firstReferrerData,
+        })
       }
 
       hasSentInitialPageTelemetryRef.current = true
