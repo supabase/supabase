@@ -24,12 +24,16 @@ export class LintWarningsGuideLoader extends BaseLoader {
   }
 
   async load() {
+    if (!appId || !installationId || !privateKey) {
+      throw new Error('Missing DOCS_GITHUB_APP_* environment variables')
+    }
+
     const octokit = new Octokit({
       authStrategy: createAppAuth,
       auth: {
         appId,
         installationId,
-        privateKey: crypto.createPrivateKey(privateKey!).export({ type: 'pkcs8', format: 'pem' }),
+        privateKey: crypto.createPrivateKey(privateKey).export({ type: 'pkcs8', format: 'pem' }),
       },
     })
 
