@@ -75,7 +75,7 @@ export const FirstLevelNav = (): ReactNode => {
 
   return (
     <>
-      <nav aria-labelledby="api-docs-rest-categories" className="px-2 py-4  border-b">
+      <nav aria-labelledby="api-docs-rest-categories" className="px-2 py-4 border-b">
         <h2 id="api-docs-rest-categories" className="sr-only">
           REST API Docs
         </h2>

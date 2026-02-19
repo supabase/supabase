@@ -53,7 +53,7 @@ export const PolicyEditorPanelHeader = ({
               open={showDetails}
               onOpenChange={setShowDetails}
             >
-              <CollapsibleTrigger_Shadcn_ className="group  font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+              <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
                 <div className="flex items-center gap-x-2 w-full">
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     View policy details

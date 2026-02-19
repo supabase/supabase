@@ -102,7 +102,7 @@ export const StripeSyncSettingsPage = () => {
               <CardContent>
                 <div className="flex space-x-4 @container">
                   <Table2 className="w-5 h-5 shrink-0" />
-                  <div className="flex flex-col items-start @lg:flex-row @lg:items-center  gap-4">
+                  <div className="flex flex-col items-start @lg:flex-row @lg:items-center gap-4">
                     <div className="flex flex-col gap-1">
                       <h5 className="text-sm mb-1">Open Stripe schema in Table Editor</h5>
                       <p className="text-sm text-foreground-light">

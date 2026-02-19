@@ -260,7 +260,7 @@ export const CreateWrapperSheet = ({
                           label="Tables"
                           showIndicator={false}
                         >
-                          <div className="flex  gap-x-5">
+                          <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
                                 Create foreign tables to query data from {wrapperMeta.label}.
@@ -285,7 +285,7 @@ export const CreateWrapperSheet = ({
                           label="Schema"
                           showIndicator={false}
                         >
-                          <div className="flex  gap-x-5">
+                          <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
                                 Create all foreign tables from {wrapperMeta.label} in a specified

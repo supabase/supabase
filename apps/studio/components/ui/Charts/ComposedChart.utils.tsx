@@ -321,7 +321,7 @@ export const CustomLabel = ({
     return (
       <button
         key={entry.name}
-        className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg  hover:bg-background-overlay-hover"
+        className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg hover:bg-background-overlay-hover"
         onMouseOver={() => handleMouseEnter(entry.name)}
         onMouseOutCapture={handleMouseLeave}
         onClick={(e) => onToggleAttribute?.(entry.name, { exclusive: e.metaKey || e.ctrlKey })}
