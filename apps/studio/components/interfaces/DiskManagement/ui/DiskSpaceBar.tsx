@@ -191,10 +191,10 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
                     <p>
                       Supabase expands your disk storage automatically when the database reached 90%
                       of the disk size. However, any disk modifications, including auto-scaling, can
-                      only take place once every 6 hours.
+                      only take place once every 4 hours.
                     </p>
                     <p>
-                      If within those 6 hours you reach 95% of the disk space, your project{' '}
+                      If within those 4 hours you reach 95% of the disk space, your project{' '}
                       <span className="text-destructive-600">will enter read-only mode.</span>
                     </p>
                   </TooltipContent>

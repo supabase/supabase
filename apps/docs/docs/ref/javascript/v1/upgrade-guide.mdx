@@ -6,7 +6,7 @@ description: 'Learn how to upgrade to supabase-js v2.'
 
 supabase-js v2 focuses on "quality-of-life" improvements for developers and addresses some of the largest pain points in v1. v2 includes type support, a rebuilt Auth library with async methods, improved errors, and more.
 
-No new features will be added to supabase-js v1 , but we'll continuing merging security fixes to v1, with maintenance patches for the next 3 months.
+No new features will be added to supabase-js v1, but we'll continue merging security fixes to v1, with maintenance patches for the next 3 months.
 
 ## Upgrade the client library
 
@@ -250,7 +250,7 @@ const { data, error } = await supabase
   .auth
   .signInWithOtp({ phone })
 
-// After receiving a SMS with a OTP.
+// After receiving an SMS with an OTP.
 const { data, error } = await supabase
 .auth
 .verifyOtp({ phone, token })
@@ -462,7 +462,7 @@ The cookie-related methods like `setAuthCookie` and `getUserByCookie` have been 
 For Next.js you can use the [Auth Helpers](https://supabase.com/docs/guides/auth/auth-helpers/nextjs) to help you manage cookies.
 If you can't use the Auth Helpers, you can use [server-side rendering](https://supabase.com/docs/guides/auth/server-side-rendering).
 
-Some the [PR](https://github.com/supabase/gotrue-js/pull/340) for additional background information.
+See the [PR](https://github.com/supabase/gotrue-js/pull/340) for additional background information.
 
 ### Data methods
 

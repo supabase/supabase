@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
-import { ActiveInput } from './hooks'
-import { MenuItem } from './menuItems'
-import { FilterGroup, FilterProperty } from './types'
+
+import { ActiveInputState, FilterGroup, FilterProperty, MenuItem } from './types'
 import { addFilterToGroup, addGroupToGroup, findGroupByPath, isCustomOptionObject } from './utils'
 
 export function useCommandHandling({
@@ -17,8 +16,8 @@ export function useCommandHandling({
   newPathRef,
   setIsCommandMenuVisible,
 }: {
-  activeInput: ActiveInput
-  setActiveInput: (input: ActiveInput) => void
+  activeInput: ActiveInputState
+  setActiveInput: (input: ActiveInputState) => void
   activeFilters: FilterGroup
   onFilterChange: (filters: FilterGroup) => void
   filterProperties: FilterProperty[]
@@ -64,7 +63,7 @@ export function useCommandHandling({
 
       const path = activeInput.path
       handleOperatorChange(path, selectedValue)
-      setActiveInput(null)
+      setActiveInput({ type: 'value', path })
     },
     [activeInput, handleOperatorChange, setActiveInput]
   )
@@ -76,7 +75,7 @@ export function useCommandHandling({
       const newPath = [...currentPath, group.conditions.length]
 
       setTimeout(() => {
-        setActiveInput({ type: 'value', path: newPath })
+        setActiveInput({ type: 'operator', path: newPath })
       }, 0)
     },
     [activeFilters, onFilterChange, setActiveInput]

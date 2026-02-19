@@ -65,10 +65,6 @@ For social sharing (Open Graph meta tags):
 - Priority 2: `imgThumb` (if `imgSocial` is missing)
 - Priority 3: No fallback (undefined)
 
-Special case for CMS posts:
-
-- CMS posts may also have a `meta.image` field which takes highest priority for social sharing when available.
-
 What happens if fields are not provided?
 
 - If only `imgThumb` is provided: Site displays the image correctly, social sharing uses `imgThumb` as fallback

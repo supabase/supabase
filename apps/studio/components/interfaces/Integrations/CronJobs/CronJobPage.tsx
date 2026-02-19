@@ -1,14 +1,13 @@
+import { useParams } from 'common'
 import { toString as CronToString } from 'cronstrue'
+import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { type ConfirmOnCloseModalProps, useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Edit3, List } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
@@ -16,13 +15,13 @@ import {
   BreadcrumbPage_Shadcn_ as BreadcrumbPage,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
-  cn,
   CodeBlock,
   Sheet,
   SheetContent,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
@@ -35,6 +34,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { CreateCronJobSheet } from './CreateCronJobSheet/CreateCronJobSheet'
 import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
 import { PreviousRunsTab } from './PreviousRunsTab'
@@ -189,6 +189,7 @@ export const CronJobPage = () => {
           {secondaryActions.length > 0 && <PageHeaderAside>{secondaryActions}</PageHeaderAside>}
         </PageHeaderMeta>
       </PageHeader>
+
       <PreviousRunsTab />
 
       <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>

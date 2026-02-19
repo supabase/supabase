@@ -1,10 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, X } from 'lucide-react'
-import { Fragment, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { useParams } from 'common'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import {
@@ -13,6 +7,10 @@ import {
 } from 'data/storage/iceberg-namespace-table-create-mutation'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
+import { Plus, X } from 'lucide-react'
+import { Fragment, useState } from 'react'
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   DialogSectionSeparator,
@@ -34,6 +32,8 @@ import {
   SheetTitle,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import { COLUMN_TYPE_FIELDS, COLUMN_TYPES } from './CreateTableSheet.constants'
 import { createFormSchema } from './CreateTableSheet.schema'
 
@@ -301,6 +301,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                     <div className="grid grid-cols-2 gap-x-1 w-[85%]">
                                       {additionalFields.map((x, index) => (
                                         <div
+                                          key={x.name}
                                           className="flex items-center"
                                           style={
                                             additionalFields.length % 2 === 1 && index % 2 === 0

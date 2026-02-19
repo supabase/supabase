@@ -10,6 +10,7 @@ import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from 'lib/constants'
 import { Plus, Search, X } from 'lucide-react'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -28,6 +29,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
+import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { EnableReplicationCallout } from './EnableReplicationCallout'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
@@ -44,8 +46,19 @@ export const Destinations = () => {
 
   const prefetchedRef = useRef(false)
   const [filterString, setFilterString] = useState<string>('')
-  const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+
+  const [_, setDestinationType] = useQueryState(
+    'type',
+    parseAsStringEnum<DestinationType>([
+      'Read Replica',
+      'BigQuery',
+      'Analytics Bucket',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
 
   const {
     data: databases = [],
@@ -175,7 +188,7 @@ export const Destinations = () => {
               <Button
                 type="default"
                 icon={<Plus />}
-                onClick={() => setShowNewDestinationPanel(true)}
+                onClick={() => setDestinationType('Read Replica')}
               >
                 Add destination
               </Button>
@@ -229,33 +242,9 @@ export const Destinations = () => {
                       )
                     })}
 
-                  {filteredDestinations.map((destination) => {
-                    const pipeline = pipelinesData?.pipelines.find(
-                      (p) => p.destination_id === destination.id
-                    )
-
-                    const type =
-                      'big_query' in destination.config
-                        ? 'BigQuery'
-                        : 'iceberg' in destination.config
-                          ? 'Analytics Bucket'
-                          : undefined
-
-                    return (
-                      <DestinationRow
-                        key={destination.id}
-                        sourceId={sourceId}
-                        destinationId={destination.id}
-                        destinationName={destination.name}
-                        type={type}
-                        pipeline={pipeline}
-                        error={pipelinesError}
-                        isLoading={isPipelinesLoading}
-                        isError={isPipelinesError}
-                        isSuccess={isPipelinesSuccess}
-                      />
-                    )
-                  })}
+                  {filteredDestinations.map((destination) => (
+                    <DestinationRow key={destination.id} destinationId={destination.id} />
+                  ))}
 
                   {!isLoading &&
                     filteredDestinations.length === 0 &&
@@ -296,7 +285,7 @@ export const Destinations = () => {
               </p>
               <Button
                 icon={<Plus />}
-                onClick={() => setShowNewDestinationPanel(true)}
+                onClick={() => setDestinationType('Read Replica')}
                 className="mt-4"
               >
                 Add destination
@@ -306,11 +295,7 @@ export const Destinations = () => {
         )}
       </div>
 
-      <DestinationPanel
-        visible={showNewDestinationPanel}
-        onClose={() => setShowNewDestinationPanel(false)}
-        onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)}
-      />
+      <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
     </>
   )
 }

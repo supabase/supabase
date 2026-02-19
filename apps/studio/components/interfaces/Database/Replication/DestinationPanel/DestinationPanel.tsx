@@ -1,8 +1,10 @@
-import { useFlag, useParams } from 'common'
+import { useFlag } from 'common'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   DialogSectionSeparator,
@@ -16,52 +18,81 @@ import {
 } from 'ui'
 
 import { EnableReplicationCallout } from '../EnableReplicationCallout'
+import { PipelineStatusName } from '../Replication.constants'
+import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { DestinationForm } from './DestinationForm'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { ReadReplicaForm } from './ReadReplicaForm'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { DOCS_URL } from '@/lib/constants'
 
 interface DestinationPanelProps {
-  visible: boolean
-  type?: DestinationType
-  existingDestination?: {
-    sourceId?: number
-    destinationId: number
-    pipelineId?: number
-    enabled: boolean
-    statusName?: string
-  }
-  onClose: () => void
   onSuccessCreateReadReplica?: () => void
 }
 
-export const DestinationPanel = ({
-  visible,
-  type,
-  existingDestination,
-  onClose,
-  onSuccessCreateReadReplica,
-}: DestinationPanelProps) => {
-  const { ref: projectRef } = useParams()
+export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPanelProps) => {
   const enablePgReplicate = useIsETLPrivateAlpha()
   const unifiedReplication = useFlag('unifiedReplication')
   const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
 
-  const [selectedType, setSelectedType] = useState<DestinationType>(
-    type || (unifiedReplication ? 'Read Replica' : 'BigQuery')
+  const [urlDestinationType, setDestinationType] = useQueryState(
+    'type',
+    parseAsStringEnum<DestinationType>([
+      'Read Replica',
+      'BigQuery',
+      'Analytics Bucket',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
   )
 
-  const editMode = !!existingDestination
+  const [edit, setEdit] = useQueryState(
+    'edit',
+    parseAsInteger.withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
 
-  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
-    projectRef,
-  })
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
-  const replicationNotEnabled = isSourcesSuccess && !sourceId
+  const visible = urlDestinationType !== null || edit !== null
+  const editMode = edit !== null
+
+  const {
+    sourceId,
+    pipeline,
+    statusName,
+    replicationNotEnabled,
+    type: existingDestinationType,
+    destinationFetcher,
+  } = useDestinationInformation({ id: edit })
+  const destinationType = existingDestinationType ?? urlDestinationType
+  const invalidExistingDestination = destinationFetcher.error?.code === 404
+
+  const existingDestination = editMode
+    ? {
+        sourceId,
+        destinationId: edit,
+        pipelineId: pipeline?.id,
+        statusName,
+        enabled:
+          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
+      }
+    : undefined
+
+  const onClose = () => {
+    setDestinationType(null)
+    setEdit(null)
+  }
+
+  useEffect(() => {
+    if (edit !== null && invalidExistingDestination) {
+      toast(`Unable to find destination ID ${edit}`)
+      setEdit(null)
+    }
+  }, [edit, invalidExistingDestination, setEdit])
 
   return (
     <>
@@ -81,15 +112,11 @@ export const DestinationPanel = ({
               </SheetDescription>
             </SheetHeader>
 
-            <DestinationTypeSelection
-              editMode={editMode}
-              selectedType={selectedType}
-              setSelectedType={setSelectedType}
-            />
+            <DestinationTypeSelection />
 
             <DialogSectionSeparator />
 
-            {selectedType === 'Read Replica' ? (
+            {destinationType === 'Read Replica' ? (
               <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
             ) : unifiedReplication && !enablePgReplicate ? (
               <SheetSection>
@@ -124,14 +151,14 @@ export const DestinationPanel = ({
               <SheetSection>
                 <EnableReplicationCallout
                   className="!p-6"
-                  type={selectedType}
+                  type={destinationType}
                   hasAccess={hasETLReplicationAccess}
                 />
               </SheetSection>
             ) : (
               <DestinationForm
                 visible={visible}
-                selectedType={selectedType}
+                selectedType={destinationType ?? 'Read Replica'}
                 existingDestination={existingDestination}
                 onClose={onClose}
               />

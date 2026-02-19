@@ -1,6 +1,6 @@
 import { LazyMotion, m } from 'framer-motion'
 import { PropsWithChildren } from 'react'
-import { SyntaxHighlighterProps, createElement } from 'react-syntax-highlighter'
+import { createElement, SyntaxHighlighterProps } from 'react-syntax-highlighter'
 
 // Make sure to return the specific export containing the feature bundle.
 const loadFramerFeatures = () => import('./framer-features').then((res) => res.default)

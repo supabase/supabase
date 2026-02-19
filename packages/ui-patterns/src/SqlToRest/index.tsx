@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic.js'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
+
 import { Admonition } from '../admonition'
 import { SqlToRestProps } from './sql-to-rest'
 

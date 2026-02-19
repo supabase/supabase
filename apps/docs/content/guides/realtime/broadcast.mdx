@@ -293,7 +293,7 @@ You can use the Supabase client libraries to send Broadcast messages.
 
 
     /**
-     * Sending a message after subscribing will use Websockets
+     * Sending a message after subscribing will use WebSockets
      */
     myChannel.subscribe((status) => {
       if (status !== 'SUBSCRIBED') {
@@ -325,7 +325,7 @@ You can use the Supabase client libraries to send Broadcast messages.
     );
     print(res);
 
-    // Sending a message after subscribing will use Websockets
+    // Sending a message after subscribing will use WebSockets
     myChannel.subscribe((status, error) {
       if (status != RealtimeSubscribeStatus.subscribed) {
         return;
@@ -352,7 +352,7 @@ You can use the Supabase client libraries to send Broadcast messages.
     // Sending a message before subscribing will use HTTP
     await myChannel.broadcast(event: "shout", message: ["message": "HI"])
 
-    // Sending a message after subscribing will use Websockets
+    // Sending a message after subscribing will use WebSockets
     await myChannel.subscribe()
     try await myChannel.broadcast(
         event: "shout",
@@ -376,7 +376,7 @@ You can use the Supabase client libraries to send Broadcast messages.
       put("message", "Hi")
     })
 
-    // Sending a message after subscribing will use Websockets
+    // Sending a message after subscribing will use WebSockets
     myChannel.subscribe(blockUntilSubscribed = true)
     channelB.broadcast(
       event = "shout",
@@ -401,7 +401,7 @@ You can use the Supabase client libraries to send Broadcast messages.
     ```python
     my_channel = supabase.channel('test-channel')
 
-    # Sending a message after subscribing will use Websockets
+    # Sending a message after subscribing will use WebSockets
     def on_subscribe(status, err):
       if status != RealtimeSubscribeStates.SUBSCRIBED:
         return
@@ -909,7 +909,7 @@ SELECT realtime.send (
 
 #### Setup realtime authorization
 
-Realtime Authorization is required and enabled by default. To allow your users to listen to messages from topics, create a RLS (Row Level Security) policy:
+Realtime Authorization is required and enabled by default. To allow your users to listen to messages from topics, create an RLS (Row Level Security) policy:
 
 ```sql
 CREATE POLICY "authenticated can receive broadcasts"
