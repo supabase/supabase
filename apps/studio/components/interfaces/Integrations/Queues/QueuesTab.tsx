@@ -1,16 +1,16 @@
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { useQueuesQuery } from 'data/database-queues/database-queues-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RefreshCw, Search, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useQueuesQuery } from 'data/database-queues/database-queues-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn, LoadingLine } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { CreateQueueSheet } from './CreateQueueSheet'
 import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
 
@@ -72,6 +72,7 @@ export const QueuesTab = () => {
               actions={[
                 search && (
                   <Button
+                    key="clear"
                     size="tiny"
                     type="text"
                     icon={<X />}

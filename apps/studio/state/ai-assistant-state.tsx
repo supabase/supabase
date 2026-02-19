@@ -248,6 +248,7 @@ function createChatInstance(
             messages: cleanedMessages,
             projectRef: state.context.projectRef,
             connectionString: state.context.connectionString,
+            chatId: options.id,
             chatName: chat?.name,
             orgSlug: state.context.orgSlug,
             context: state.context,
