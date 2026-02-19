@@ -13,7 +13,7 @@
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "2.44.0",
     "autoprefixer": "10.4.17",
-    "geist": "^1.2.1",
+    "geist": "^1.7.0",
     "next": "latest",
     "postcss": "8.4.33",
     "react": "18.2.0",
