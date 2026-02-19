@@ -24,8 +24,6 @@ import {
   ResizablePanelGroup,
   Separator,
   useIsMobile,
-  usePanelCallbackRef,
-  usePanelRef,
 } from 'ui'
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'

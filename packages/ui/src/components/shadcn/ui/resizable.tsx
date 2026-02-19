@@ -6,7 +6,6 @@ import {
   Panel,
   Separator,
   useDefaultLayout,
-  usePanelCallbackRef,
   usePanelRef,
   type GroupProps,
   type SeparatorProps,
@@ -104,12 +103,4 @@ const ResizableHandle = ({
   </Separator>
 )
 
-export {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  useDefaultLayout,
-  usePanelRef,
-  usePanelCallbackRef,
-  type PanelImperativeHandle,
-}
+export { ResizableHandle, ResizablePanel, ResizablePanelGroup, useDefaultLayout, usePanelRef }
