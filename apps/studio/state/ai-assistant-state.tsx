@@ -234,6 +234,14 @@ function createChatInstance(
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     transport: new DefaultChatTransport({
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
+      fetch: async (url, init) => {
+        const response = await globalThis.fetch(url as RequestInfo, init)
+        const spanId = response.headers.get('x-braintrust-span-id')
+        if (spanId) {
+          state.pendingSpanIds[options.id] = spanId
+        }
+        return response
+      },
       async prepareSendMessagesRequest({ messages, ...opts }) {
         const cleanedMessages = prepareMessagesForAPI(messages)
         const headerData = await constructHeaders()
@@ -282,6 +290,16 @@ function createChatInstance(
           chat.messages = messages as AssistantMessageType[]
           chat.updatedAt = new Date()
         }
+
+        // Associate pending span ID with the last assistant message
+        const pendingSpanId = state.pendingSpanIds[options.id]
+        if (pendingSpanId) {
+          const lastAssistantMsg = [...messages].reverse().find((m) => m.role === 'assistant')
+          if (lastAssistantMsg) {
+            state.messageSpanIds[lastAssistantMsg.id] = pendingSpanId
+          }
+          delete state.pendingSpanIds[options.id]
+        }
       }
     },
   })
@@ -294,6 +312,8 @@ export const createAiAssistantState = (): AiAssistantState => {
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
     chatInstances: {},
+    pendingSpanIds: {},
+    messageSpanIds: {},
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -511,6 +531,8 @@ export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
   activeChat: ChatSession | undefined
   chatInstances: Record<string, Chat<MessageType>>
+  pendingSpanIds: Record<string, string>
+  messageSpanIds: Record<string, string>
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   newChat: (
