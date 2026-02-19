@@ -236,7 +236,7 @@ function createChatInstance(
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
       fetch: async (url, init) => {
         const response = await globalThis.fetch(url as RequestInfo, init)
-        const spanId = response.headers.get('x-bt-span-id')
+        const spanId = response.headers.get('x-braintrust-span-id')
         if (spanId) {
           state.pendingSpanIds[options.id] = spanId
         }

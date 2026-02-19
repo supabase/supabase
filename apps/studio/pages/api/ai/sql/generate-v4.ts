@@ -200,7 +200,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       providerOptions,
       abortSignal: abortController.signal,
       onSpanCreated: (spanId) => {
-        res.setHeader('x-bt-span-id', spanId)
+        res.setHeader('x-braintrust-span-id', spanId)
       },
     })
 
