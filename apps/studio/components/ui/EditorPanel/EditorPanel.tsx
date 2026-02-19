@@ -16,7 +16,7 @@ import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { Book, Maximize2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -83,6 +83,7 @@ export const EditorPanel = () => {
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
   const [showResults, setShowResults] = useState(true)
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
+  const templatesListboxId = useId()
 
   const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
   const errorContent =
@@ -167,12 +168,13 @@ export const EditorPanel = () => {
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
+                  aria-controls={templatesListboxId}
                   icon={<Book size={14} />}
                 >
                   Templates
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
+              <PopoverContent_Shadcn_ id={templatesListboxId} align="end" className="w-[300px] p-0">
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Search templates..." />
                   <CommandList_Shadcn_>
