@@ -147,7 +147,7 @@ export const EditorPanel = () => {
     setIsEditingTitle(false)
     originalSnippetRef.current = null
     editorPanelState.pendingReset = false
-  }, [pendingReset])
+  }, [pendingReset, setActiveSnippet, setIsEditingTitle])
 
   useEffect(() => {
     if (!snippetById || !activeSnippetId) return
@@ -157,7 +157,7 @@ export const EditorPanel = () => {
     setActiveSnippet(sqlSnippet)
     originalSnippetRef.current = { sql, name: sqlSnippet.name }
     editorPanelState.setActiveSnippetId(null)
-  }, [snippetById, activeSnippetId])
+  }, [snippetById, activeSnippetId, setValue, setActiveSnippet])
 
   const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
   const errorContent =
