@@ -8,10 +8,14 @@ export interface FormSubmitResult {
   errors: string[]
 }
 
-const isDev = process.env.NODE_ENV === 'development'
+// Enable debug logging in local dev and on Vercel preview/development deployments
+const isDebug =
+  process.env.NODE_ENV === 'development' ||
+  process.env.VERCEL_ENV === 'preview' ||
+  process.env.VERCEL_ENV === 'development'
 
 function debug(message: string, data?: unknown) {
-  if (!isDev) return
+  if (!isDebug) return
   if (data !== undefined) {
     console.log(`[go/form] ${message}`, JSON.stringify(data, null, 2))
   } else {
@@ -141,7 +145,7 @@ export async function submitFormAction(
     console.error('[go/form] Unexpected error during form submission:', err)
     return {
       success: false,
-      errors: [isDev ? `Unexpected error: ${err.message}` : 'Something went wrong. Please try again.'],
+      errors: [isDebug ? `Unexpected error: ${err.message}` : 'Something went wrong. Please try again.'],
     }
   }
 }
