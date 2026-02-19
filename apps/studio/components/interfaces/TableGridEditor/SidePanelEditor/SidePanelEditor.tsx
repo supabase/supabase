@@ -444,6 +444,7 @@ export const SidePanelEditor = ({
       primaryKey?: Constraint
       foreignKeyRelations: ForeignKey[]
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      createMore?: boolean
     },
     resolve: any
   ) => {
@@ -506,10 +507,10 @@ export const SidePanelEditor = ({
       })
 
       setIsEdited(false)
-      snap.closeSidePanel()
+      if (!configuration.createMore) snap.closeSidePanel()
     }
 
-    resolve()
+    resolve(response?.error)
   }
 
   /**
