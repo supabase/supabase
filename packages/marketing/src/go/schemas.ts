@@ -134,6 +134,46 @@ export const formFieldSchema = z.discriminatedUnion('type', [
   selectFieldSchema,
 ])
 
+// ----- Form CRM config schemas -----
+
+export const hubspotFormConfigSchema = z.object({
+  /**
+   * HubSpot form GUID. The portal ID is read from HUBSPOT_PORTAL_ID env var.
+   */
+  formGuid: z.string().min(1),
+  /**
+   * Map each form field `name` to a HubSpot field name.
+   * If omitted, the form field name is used as-is.
+   * Example: { workEmail: 'email', companyName: 'company' }
+   */
+  fieldMap: z.record(z.string(), z.string()).optional(),
+  /** Legal consent text for GDPR. */
+  consent: z.string().optional(),
+})
+
+export const customerioFormConfigSchema = z.object({
+  /**
+   * Event name sent to Customer.io on submit.
+   * Credentials are read from CUSTOMERIO_SITE_ID and CUSTOMERIO_API_KEY env vars.
+   */
+  event: z.string().min(1),
+  /**
+   * Map each form field `name` to a Customer.io profile attribute.
+   * Fields listed here are added to the contact profile via `identify`.
+   * Example: { workEmail: 'email', firstName: 'first_name' }
+   */
+  profileMap: z.record(z.string(), z.string()).optional(),
+})
+
+export const formCrmConfigSchema = z
+  .object({
+    hubspot: hubspotFormConfigSchema.optional(),
+    customerio: customerioFormConfigSchema.optional(),
+  })
+  .refine((v) => v.hubspot || v.customerio, {
+    message: 'At least one CRM provider (hubspot or customerio) must be configured',
+  })
+
 export const formSectionSchema = z.object({
   ...sectionBase,
   type: z.literal('form'),
@@ -142,6 +182,10 @@ export const formSectionSchema = z.object({
   fields: z.array(formFieldSchema).min(1),
   submitLabel: z.string().min(1),
   disclaimer: z.string().optional(),
+  /** Message shown after a successful submission. Defaults to a generic thank-you message. */
+  successMessage: z.string().optional(),
+  /** CRM integration config. When provided, form submissions are sent to the configured providers. */
+  crm: formCrmConfigSchema.optional(),
 })
 
 export const featureGridItemSchema = z.object({
@@ -243,6 +287,9 @@ export type GoTwoColumnSection = z.infer<typeof twoColumnSectionSchema>
 export type GoThreeColumnSection = z.infer<typeof threeColumnSectionSchema>
 export type GoFormField = z.infer<typeof formFieldSchema>
 export type GoFormSection = z.infer<typeof formSectionSchema>
+export type GoHubSpotFormConfig = z.infer<typeof hubspotFormConfigSchema>
+export type GoCustomerIOFormConfig = z.infer<typeof customerioFormConfigSchema>
+export type GoFormCrmConfig = z.infer<typeof formCrmConfigSchema>
 export type GoFeatureGridItem = z.infer<typeof featureGridItemSchema>
 export type GoFeatureGridSection = z.infer<typeof featureGridSectionSchema>
 export type GoMetricItem = z.infer<typeof metricItemSchema>

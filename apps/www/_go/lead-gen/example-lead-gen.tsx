@@ -130,6 +130,17 @@ const page: GoPageInput = {
       submitLabel: 'Request a demo',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
+      crm: {
+        hubspot: {
+          formGuid: 'b9abbf77-86ae-4fe7-9147-d15922bf58ca',
+          fieldMap: {
+            firstName: 'firstname',
+            lastName: 'lastname',
+          },
+          consent:
+            'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
+        },
+      },
     },
   ],
 }

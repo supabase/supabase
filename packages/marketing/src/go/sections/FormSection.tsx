@@ -12,6 +12,7 @@ import {
   TextArea_Shadcn_,
 } from 'ui'
 
+import { submitFormAction } from '../actions/submitForm'
 import type { GoFormField, GoFormSection } from '../schemas'
 
 function FormField({
@@ -67,19 +68,50 @@ function FormField({
   }
 }
 
+type SubmitState = 'idle' | 'loading' | 'success' | 'error'
+
 export default function FormSection({ section }: { section: GoFormSection }) {
   const [values, setValues] = useState<Record<string, string>>(() =>
     Object.fromEntries(section.fields.map((f) => [f.name, '']))
   )
+  const [submitState, setSubmitState] = useState<SubmitState>('idle')
+  const [errorMessages, setErrorMessages] = useState<string[]>([])
 
   const handleChange = (name: string, value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: hook up to form submission endpoint
-    console.log('Form submitted:', values)
+
+    if (!section.crm) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[go/form] No CRM configured — form values:', values)
+      }
+      return
+    }
+
+    setSubmitState('loading')
+    setErrorMessages([])
+
+    const pageUri = typeof window !== 'undefined' ? window.location.href : undefined
+    const pageName = typeof document !== 'undefined' ? document.title : undefined
+
+    try {
+      const result = await submitFormAction(section.crm, values, { pageUri, pageName })
+
+      if (result.success) {
+        setSubmitState('success')
+      } else {
+        setSubmitState('error')
+        setErrorMessages(result.errors)
+      }
+    } catch (err: any) {
+      // Unexpected client-side error (network failure, server action crash, etc.)
+      console.error('[go/form] Form submission failed:', err)
+      setSubmitState('error')
+      setErrorMessages(['Something went wrong. Please try again.'])
+    }
   }
 
   // Group fields into rows: half-width fields pair up, full-width fields get their own row
@@ -104,6 +136,21 @@ export default function FormSection({ section }: { section: GoFormSection }) {
   }
   if (pendingHalf) {
     rows.push([pendingHalf])
+  }
+
+  if (submitState === 'success') {
+    return (
+      <section>
+        <div className="max-w-2xl mx-auto px-8">
+          <div className="border border-muted rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-4 text-center">
+            <p className="text-lg font-medium">Thank you!</p>
+            <p className="text-foreground-light">
+              {section.successMessage ?? "We've received your submission and will be in touch soon."}
+            </p>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -143,9 +190,25 @@ export default function FormSection({ section }: { section: GoFormSection }) {
             </div>
           ))}
 
+          {submitState === 'error' && errorMessages.length > 0 && (
+            <div className="flex flex-col gap-1">
+              {errorMessages.map((msg, i) => (
+                <p key={i} className="text-sm text-destructive">
+                  {msg}
+                </p>
+              ))}
+            </div>
+          )}
+
           <hr className="border-muted" />
 
-          <Button htmlType="submit" type="primary" size="large" block>
+          <Button
+            htmlType="submit"
+            type="primary"
+            size="large"
+            block
+            loading={submitState === 'loading'}
+          >
             {section.submitLabel}
           </Button>
 
