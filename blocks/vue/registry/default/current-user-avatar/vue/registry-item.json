@@ -1,0 +1,25 @@
+{
+  "name": "urrent-user-avatar-vue",
+  "type": "registry:block",
+  "title": "Current User Avatar",
+  "description": "Component which renders the current user's avatar.",
+  "registryDependencies": ["avatar"],
+  "files": [
+    {
+      "path": "registry/default/current-user-avatar/vue/components/current-user-avatar.vue",
+      "type": "registry:component",
+      "target": "components/current-user-avatar.vue"
+    },
+    {
+      "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserName.ts",
+      "type": "registry:component",
+      "target": "composables/useCurrentUserName.ts"
+    },
+    {
+      "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserImage.ts",
+      "type": "registry:component",
+      "target": "composables/useCurrentUserImage.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest"]
+}

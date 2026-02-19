@@ -1,0 +1,25 @@
+{
+  "name": "current-user-avatar-nuxtjs",
+  "type": "registry:block",
+  "title": "Current User Avatar",
+  "description": "Component which renders the current user's avatar.",
+  "registryDependencies": ["avatar"],
+  "files": [
+    {
+      "path": "registry/default/current-user-avatar/nuxtjs/app/components/current-user-avatar.vue",
+      "type": "registry:component",
+      "target": "app/components/current-user-avatar.vue"
+    },
+    {
+      "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserName.ts",
+      "type": "registry:component",
+      "target": "app/composables/useCurrentUserName.ts"
+    },
+    {
+      "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserImage.ts",
+      "type": "registry:component",
+      "target": "app/composables/useCurrentUserImage.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest"]
+}
