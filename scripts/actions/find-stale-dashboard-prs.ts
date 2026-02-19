@@ -155,9 +155,6 @@ async function findStalePRs(): Promise<StalePR[]> {
           } else if (states.includes('APPROVED')) {
             reviewStatus = 'approved'
             reviewEmoji = ':heavy_check_mark:'
-          } else {
-            reviewStatus = 'commented'
-            reviewEmoji = ':speech_balloon:'
           }
         }
       } catch (error: any) {
