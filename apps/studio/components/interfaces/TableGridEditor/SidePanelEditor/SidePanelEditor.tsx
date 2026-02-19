@@ -266,7 +266,7 @@ export const SidePanelEditor = ({
   const saveRow = async (
     payload: any,
     isNewRecord: boolean,
-    configuration: { identifiers: any; rowIdx: number },
+    configuration: { identifiers: any; rowIdx: number; createMore?: boolean },
     onComplete: (err?: any) => void
   ) => {
     if (!project || selectedTable === undefined) {
@@ -290,7 +290,7 @@ export const SidePanelEditor = ({
         // Close panel immediately without error
         onComplete()
         setIsEdited(false)
-        snap.closeSidePanel()
+        if (!configuration.createMore) snap.closeSidePanel()
         return
       }
 
@@ -378,7 +378,7 @@ export const SidePanelEditor = ({
     onComplete(saveRowError)
     if (!saveRowError) {
       setIsEdited(false)
-      snap.closeSidePanel()
+      if (!configuration.createMore) snap.closeSidePanel()
     }
   }
 

@@ -70,12 +70,13 @@ export const ActionBar = ({
   useHotKey(handleSave, 'Enter', { enabled: visible })
 
   return (
-    <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
+    <div className="flex w-full items-center gap-3 border-t border-default px-3 py-4">
+      {children}
+
+      <div className="flex items-center gap-3 ml-auto">
       <Button type="default" htmlType="button" onClick={closePanel} disabled={isRunning || loading}>
         {backButtonLabel}
       </Button>
-
-      {children}
 
       {applyFunction !== undefined ? (
         // Old solution, necessary when loading is handled by this component itself
@@ -103,6 +104,7 @@ export const ActionBar = ({
       ) : (
         <div />
       )}
+      </div>
     </div>
   )
 }
