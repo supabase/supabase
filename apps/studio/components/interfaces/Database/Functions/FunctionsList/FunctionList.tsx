@@ -3,13 +3,6 @@ import { includes, noop, sortBy } from 'lodash'
 import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   DropdownMenu,
@@ -20,7 +13,16 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
+
+import { ApiAccessCell, ApiAccessMenuItem } from './ApiAccess'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import type { FunctionApiAccessMap } from '@/data/privileges/function-api-access-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface FunctionListProps {
   schema: string
@@ -32,9 +34,11 @@ interface FunctionListProps {
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
   functions: DatabaseFunction[]
+  functionApiAccessMap?: FunctionApiAccessMap
+  onConfigureApiAccess?: (fn: DatabaseFunction) => void
 }
 
-const FunctionList = ({
+export function FunctionList({
   schema,
   filterString,
   isLocked,
@@ -44,7 +48,9 @@ const FunctionList = ({
   editFunction = noop,
   deleteFunction = noop,
   functions,
-}: FunctionListProps) => {
+  functionApiAccessMap,
+  onConfigureApiAccess = noop,
+}: FunctionListProps) {
   const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -73,7 +79,7 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length === 0) {
     return (
       <TableRow key={schema}>
-        <TableCell colSpan={5}>
+        <TableCell colSpan={6}>
           <p className="text-sm text-foreground">No functions created yet</p>
           <p className="text-sm text-foreground-light">
             There are no functions found in the schema "{schema}"
@@ -86,7 +92,7 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length > 0) {
     return (
       <TableRow key={schema}>
-        <TableCell colSpan={5}>
+        <TableCell colSpan={6}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
@@ -100,6 +106,8 @@ const FunctionList = ({
     <>
       {_functions.map((x) => {
         const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
+        const apiAccessData = functionApiAccessMap?.[x.id]
+        const canConfigureApiAccess = !!apiAccessData && apiAccessData.apiAccessType !== 'none'
 
         return (
           <TableRow key={x.id}>
@@ -142,6 +150,9 @@ const FunctionList = ({
                 {x.security_definer ? 'Definer' : 'Invoker'}
               </p>
             </TableCell>
+            <TableCell className="table-cell">
+              <ApiAccessCell apiAccessData={functionApiAccessMap?.[x.id]} />
+            </TableCell>
             <TableCell className="text-right">
               {!isLocked && (
                 <div className="flex items-center justify-end">
@@ -165,6 +176,10 @@ const FunctionList = ({
                             <p>Client API docs</p>
                           </DropdownMenuItem>
                         )}
+                        <ApiAccessMenuItem
+                          visible={canConfigureApiAccess}
+                          onConfigure={() => onConfigureApiAccess(x)}
+                        />
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
                           <Edit2 size={14} />
@@ -240,5 +255,3 @@ const FunctionList = ({
     </>
   )
 }
-
-export default FunctionList

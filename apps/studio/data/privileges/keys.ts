@@ -3,4 +3,6 @@ export const privilegeKeys = {
     ['projects', projectRef, 'database', 'table-privileges'] as const,
   columnPrivilegesList: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database', 'column-privileges'] as const,
+  functionPrivilegesList: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'database', 'function-privileges'] as const,
 }

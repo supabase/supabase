@@ -1,31 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsJson, useQueryState } from 'nuqs'
-import { useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import {
-  ReportsSelectFilter,
-  selectFilterSchema,
-} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
-import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Card,
@@ -37,13 +16,36 @@ import {
   TableRow,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
-import FunctionList from './FunctionList'
 
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
-import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
-import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
-import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
+import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
+import { FunctionList } from './FunctionList'
+import { ToggleFunctionApiAccessModal } from './ToggleFunctionApiAccessModal'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/InlineEditorSettings'
+import { CreateFunction } from '@/components/interfaces/Database/Functions/CreateFunction'
+import { DeleteFunction } from '@/components/interfaces/Database/Functions/DeleteFunction'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { useDatabaseFunctionDeleteMutation } from '@/data/database-functions/database-functions-delete-mutation'
+import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFunctionApiAccessPrivilegesMutation } from '@/data/privileges/function-api-access-mutation'
+import { useFunctionApiAccessQuery } from '@/data/privileges/function-api-access-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { handleErrorOnDelete, useQueryStateWithSelect } from '@/hooks/misc/useQueryStateWithSelect'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const createFunctionSnippet = `create function function_name()
 returns void
@@ -54,7 +56,7 @@ begin
 end;
 $$;`
 
-const FunctionsList = () => {
+export function FunctionsList() {
   const router = useRouter()
   const { search } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -70,6 +72,9 @@ const FunctionsList = () => {
 
   // Track the ID being deleted to exclude it from error checking
   const deletingFunctionIdRef = useRef<string | null>(null)
+
+  // State for API access configuration modal
+  const [apiAccessConfigFunc, setApiAccessConfigFunc] = useState<DatabaseFunction | null>(null)
 
   const createFunction = () => {
     setSelectedFunctionIdToDuplicate(null)
@@ -157,6 +162,31 @@ const FunctionsList = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  // Get function IDs for the selected schema
+  const schemaFunctionIds = useMemo(() => {
+    return (functions ?? []).filter((fn) => fn.schema === selectedSchema).map((fn) => fn.id)
+  }, [functions, selectedSchema])
+
+  // Query function API access
+  const { data: functionApiAccessMap } = useFunctionApiAccessQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString ?? undefined,
+      schemaName: selectedSchema,
+      functionIds: schemaFunctionIds,
+    },
+    { enabled: Boolean(selectedSchema && schemaFunctionIds.length > 0) }
+  )
+
+  // Mutation for updating API access
+  const { mutate: updateApiAccess, isPending: isUpdatingApiAccess } =
+    useFunctionApiAccessPrivilegesMutation({
+      onSuccess: (_, variables) => {
+        toast.success(`API access updated for function ${variables.functionName}`)
+        setApiAccessConfigFunc(null)
+      },
+    })
 
   // Get unique return types from functions in the selected schema
   const schemaFunctions = (functions ?? []).filter((fn) => fn.schema === selectedSchema)
@@ -339,6 +369,9 @@ const FunctionsList = () => {
                   <TableHead key="security" className="table-cell w-[100px]">
                     Security
                   </TableHead>
+                  <TableHead key="api_access" className="table-cell w-[100px]">
+                    API Access
+                  </TableHead>
                   <TableHead key="buttons" className="w-1/6"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -353,6 +386,8 @@ const FunctionsList = () => {
                   editFunction={editFunction}
                   deleteFunction={deleteFunction}
                   functions={functions ?? []}
+                  functionApiAccessMap={functionApiAccessMap}
+                  onConfigureApiAccess={(func) => setApiAccessConfigFunc(func)}
                 />
               </TableBody>
             </Table>
@@ -389,8 +424,27 @@ const FunctionsList = () => {
         }}
         isLoading={isDeletingFunction}
       />
+
+      <ToggleFunctionApiAccessModal
+        func={apiAccessConfigFunc}
+        apiAccessData={
+          apiAccessConfigFunc ? functionApiAccessMap?.[apiAccessConfigFunc.id] : undefined
+        }
+        projectRef={project?.ref}
+        isLoading={isUpdatingApiAccess}
+        onConfirm={(roles) => {
+          if (!apiAccessConfigFunc || !project) return
+          updateApiAccess({
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            functionSchema: apiAccessConfigFunc.schema,
+            functionName: apiAccessConfigFunc.name,
+            functionArgs: apiAccessConfigFunc.identity_argument_types,
+            roles,
+          })
+        }}
+        onCancel={() => setApiAccessConfigFunc(null)}
+      />
     </>
   )
 }
-
-export default FunctionsList

@@ -60,8 +60,6 @@ export type UseTableApiAccessQueryParams = Prettify<
   }
 >
 
-export type DataApiAccessType = 'none' | 'exposed-schema-no-grants' | 'access'
-
 export type TableApiAccessData =
   | {
       apiAccessType: 'access'
