@@ -66,7 +66,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const state = useAiAssistantState()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
-  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
+  const { hasAccess: hasAccessToAdvanceModel } =
     useCheckEntitlements('assistant.advance_model')
 
   const selectedModel = useMemo<AssistantModel>(() => {
@@ -78,7 +78,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
 
     return model
-  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
+  }, [hasAccessToAdvanceModel, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
