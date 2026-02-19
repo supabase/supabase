@@ -1,12 +1,12 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import { type PropsWithChildren } from 'react'
-
 import { ProfileImage as ProfileImageDisplay } from 'components/ui/ProfileImage'
 import { useProfileNameAndPicture } from 'lib/profile'
+import { type PropsWithChildren } from 'react'
 import { cn } from 'ui'
+
 import { useMessageInfoContext } from './Message.Context'
-import { MessageMarkdown } from './MessageMarkdown'
 import { MessagePartSwitcher } from './Message.Parts'
+import { MessageMarkdown } from './MessageMarkdown'
 
 function MessageDisplayProfileImage() {
   const { username, avatarUrl } = useProfileNameAndPicture()
@@ -54,7 +54,7 @@ function MessageDisplayContent({ message }: { message: VercelMessage }) {
       {messageParts?.length > 0
         ? messageParts.map((part: NonNullable<VercelMessage['parts'][number]>, idx) => {
             const isLastPart = idx === messageParts.length - 1
-            return <MessagePartSwitcher part={part} isLastPart={isLastPart} />
+            return <MessagePartSwitcher key={idx} part={part} isLastPart={isLastPart} />
           })
         : content && (
             <MessageDisplayTextMessage id={id} isLoading={isLoading} readOnly={readOnly}>

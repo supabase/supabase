@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
-import SparkBar from 'components/ui/SparkBar'
+import { SparkBar } from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { CreateRolePanel } from './CreateRolePanel'
 import { RoleRow } from './RoleRow'
@@ -97,7 +97,7 @@ export const RolesList = () => {
 
   useEffect(() => {
     if (isSuccess && !!selectedRoleIdToDelete && !roleToDelete && !isSuccessDelete) {
-      toast('Role cannot be round')
+      toast('Role cannot be found')
       setSelectedRoleIdToDelete(null)
     }
   }, [isSuccess, selectedRoleIdToDelete, roleToDelete, isSuccessDelete, setSelectedRoleIdToDelete])
@@ -212,7 +212,7 @@ export const RolesList = () => {
 
       <div className="space-y-4">
         <div>
-          <div className="bg-surface-100 border border-default px-[var(--card-padding-x)] py-3 rounded-t flex items-center space-x-4">
+          <div className="bg-surface-100 border border-default px-card py-3 rounded-t flex items-center space-x-4">
             <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
             <Badge variant="success">Protected</Badge>
           </div>
@@ -230,7 +230,7 @@ export const RolesList = () => {
         </div>
 
         <div>
-          <div className="bg-surface-100 border border-default px-[var(--card-padding-x)] py-3 rounded-t">
+          <div className="bg-surface-100 border border-default px-card py-3 rounded-t">
             <p className="text-sm text-foreground-light">Other database roles</p>
           </div>
 
