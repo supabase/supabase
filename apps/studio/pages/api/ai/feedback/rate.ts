@@ -1,14 +1,13 @@
 import { generateObject } from 'ai'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-
 import { IS_PLATFORM } from 'common'
+import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
-import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 export const maxDuration = 30
 
@@ -91,7 +90,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   })
 
   try {
-    const { model, error: modelError } = await getModel({
+    const {
+      model,
+      error: modelError,
+      providerOptions,
+    } = await getModel({
       provider: 'openai',
       isLimited: true,
       routingKey: 'feedback',
@@ -103,6 +106,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const { object } = await generateObject({
       model,
+      providerOptions,
       schema: rateMessageResponseSchema,
       prompt: `
 Your job is to look at a Supabase Assistant conversation, which the user has given feedback on, and classify it.
