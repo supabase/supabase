@@ -54,6 +54,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { rating, messages: rawMessages, projectRef, orgSlug, reason, spanId } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
+  let isHipaaEnabled = false
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -62,13 +63,17 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
       // Get organizations and compute opt in level server-side
-      const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
+      const {
+        aiOptInLevel: orgAIOptInLevel,
+        isHipaaEnabled: orgIsHipaaEnabled,
+      } = await getOrgAIDetails({
         orgSlug,
         authorization,
         projectRef,
       })
 
       aiOptInLevel = orgAIOptInLevel
+      isHipaaEnabled = orgIsHipaaEnabled
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -130,7 +135,7 @@ Instructions:
     })
 
     // Log feedback to Braintrust if tracing is enabled and span ID is available
-    if (IS_TRACING_ENABLED && spanId) {
+    if (IS_TRACING_ENABLED && !isHipaaEnabled && spanId) {
       try {
         const logger = currentLogger()
         logger?.logFeedback({
