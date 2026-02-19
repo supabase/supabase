@@ -22,7 +22,16 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { AlertCircle, Book, CheckCircle2, FolderOpen, Loader2, Maximize2, PlusIcon, X } from 'lucide-react'
+import {
+  AlertCircle,
+  Book,
+  CheckCircle2,
+  FolderOpen,
+  Loader2,
+  Maximize2,
+  PlusIcon,
+  X,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { editorPanelState, useEditorPanelStateSnapshot } from 'state/editor-panel-state'
@@ -307,7 +316,7 @@ export const EditorPanel = () => {
                       Loading snippets...
                     </div>
                   ) : (
-                  <CommandEmpty_Shadcn_>No snippets found.</CommandEmpty_Shadcn_>
+                    <CommandEmpty_Shadcn_>No snippets found.</CommandEmpty_Shadcn_>
                   )}
                   <CommandGroup_Shadcn_>
                     {(snippetsData?.content ?? []).map((snippet) => (
