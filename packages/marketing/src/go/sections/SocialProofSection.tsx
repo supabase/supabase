@@ -1,15 +1,9 @@
 import type { GoSocialProofSection } from '../schemas'
 
-export default function SocialProofSection({
-  section,
-}: {
-  section: GoSocialProofSection
-}) {
+export default function SocialProofSection({ section }: { section: GoSocialProofSection }) {
   return (
     <div className="text-center">
-      {section.heading && (
-        <h2 className="text-foreground text-2xl mb-8">{section.heading}</h2>
-      )}
+      {section.heading && <h2 className="text-foreground text-2xl mb-8">{section.heading}</h2>}
       {section.stats && section.stats.length > 0 && (
         <div className="flex items-center justify-center gap-12 mb-8">
           {section.stats.map((stat) => (

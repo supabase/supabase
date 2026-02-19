@@ -66,11 +66,7 @@ export async function submitFormAction(
   try {
     // Detect the email value from common field names
     const email =
-      values['email'] ??
-      values['workEmail'] ??
-      values['work_email'] ??
-      values['emailAddress'] ??
-      ''
+      values['email'] ?? values['workEmail'] ?? values['work_email'] ?? values['emailAddress'] ?? ''
 
     if (!email) {
       debug('Submission rejected: no email field found in values')
@@ -134,7 +130,10 @@ export async function submitFormAction(
     } as any)
 
     if (errors.length > 0) {
-      debug('CRM submission errors', errors.map((e) => e.message))
+      debug(
+        'CRM submission errors',
+        errors.map((e) => e.message)
+      )
       return { success: false, errors: errors.map((e) => e.message) }
     }
 
@@ -145,7 +144,9 @@ export async function submitFormAction(
     console.error('[go/form] Unexpected error during form submission:', err)
     return {
       success: false,
-      errors: [isDebug ? `Unexpected error: ${err.message}` : 'Something went wrong. Please try again.'],
+      errors: [
+        isDebug ? `Unexpected error: ${err.message}` : 'Something went wrong. Please try again.',
+      ],
     }
   }
 }

@@ -1,10 +1,6 @@
 import type { GoContentBlocksSection } from '../schemas'
 
-export default function ContentBlocksSection({
-  section,
-}: {
-  section: GoContentBlocksSection
-}) {
+export default function ContentBlocksSection({ section }: { section: GoContentBlocksSection }) {
   const gridCols = section.columns === '2' ? 'md:grid-cols-2' : 'md:grid-cols-3'
 
   return (

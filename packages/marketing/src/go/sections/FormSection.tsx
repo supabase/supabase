@@ -145,7 +145,8 @@ export default function FormSection({ section }: { section: GoFormSection }) {
           <div className="border border-muted rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-4 text-center">
             <p className="text-lg font-medium">Thank you!</p>
             <p className="text-foreground-light">
-              {section.successMessage ?? "We've received your submission and will be in touch soon."}
+              {section.successMessage ??
+                "We've received your submission and will be in touch soon."}
             </p>
           </div>
         </div>
