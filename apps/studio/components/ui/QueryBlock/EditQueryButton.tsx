@@ -1,5 +1,4 @@
 import { Edit } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps } from 'react'
 
@@ -10,6 +9,7 @@ import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { editorPanelState } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -42,7 +42,7 @@ export const EditQueryButton = ({
   const { newQuery } = useNewQuery()
 
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
-  const { closeSidebar } = useSidebarManagerSnapshot()
+  const { closeSidebar, openSidebar } = useSidebarManagerSnapshot()
 
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
@@ -57,15 +57,16 @@ export const EditQueryButton = ({
   if (id !== undefined) {
     return (
       <ButtonTooltip
-        asChild
         type={type}
         size="tiny"
         className={cn('w-7 h-7', className)}
         icon={<Edit size={14} strokeWidth={1.5} />}
         tooltip={tooltip}
-      >
-        <Link href={`/project/${ref}/sql/${id}`} />
-      </ButtonTooltip>
+        onClick={() => {
+          editorPanelState.setActiveSnippetId(id)
+          openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+        }}
+      />
     )
   }
 

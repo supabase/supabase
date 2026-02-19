@@ -145,7 +145,7 @@ export const SnippetDropdown = ({
                   className="w-full flex items-center gap-2"
                 >
                   <Plus size={14} strokeWidth={1.5} />
-                  <p>Create a report block with SQL</p>
+                  <p>Create snippet</p>
                 </Link>
               </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>

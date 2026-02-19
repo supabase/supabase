@@ -33,6 +33,7 @@ interface AIEditorProps {
   closeShortcutEnabled?: boolean
   openAIAssistantShortcutEnabled?: boolean
   executeQuery?: () => void
+  onMount?: (editor: monacoEditor.IStandaloneCodeEditor, monaco: Monaco) => void
 }
 
 // [Joshen] This has overlap with components/interfaces/SQLEditor/MonacoEditor
@@ -55,6 +56,7 @@ export const AIEditor = ({
   closeShortcutEnabled = true,
   openAIAssistantShortcutEnabled = true,
   executeQuery,
+  onMount,
 }: AIEditorProps) => {
   const os = detectOS()
   const { toggleSidebar } = useSidebarManagerSnapshot()
@@ -179,6 +181,7 @@ export const AIEditor = ({
   ) => {
     editorRef.current = editor
     monacoRef.current = monaco
+    onMount?.(editor, monaco)
     // Set prompt state to open if promptInput exists
     if (promptInput) {
       const model = editor.getModel()

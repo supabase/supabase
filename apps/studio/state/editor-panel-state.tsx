@@ -13,6 +13,8 @@ type EditorPanelState = {
   error: any
   initialPrompt: string
   onChange: ((value: string) => void) | undefined
+  activeSnippetId: string | null
+  pendingReset: boolean
 }
 
 const initialState: EditorPanelState = {
@@ -22,6 +24,8 @@ const initialState: EditorPanelState = {
   error: undefined,
   initialPrompt: '',
   onChange: undefined,
+  activeSnippetId: null,
+  pendingReset: false,
 }
 
 export const editorPanelState = proxy({
@@ -43,6 +47,15 @@ export const editorPanelState = proxy({
   },
   setInitialPrompt(initialPrompt: string) {
     editorPanelState.initialPrompt = initialPrompt
+  },
+  setActiveSnippetId(id: string | null) {
+    editorPanelState.activeSnippetId = id
+  },
+  openAsNew() {
+    editorPanelState.value = ''
+    editorPanelState.results = undefined
+    editorPanelState.error = undefined
+    editorPanelState.pendingReset = true
   },
   reset() {
     Object.assign(editorPanelState, initialState)
