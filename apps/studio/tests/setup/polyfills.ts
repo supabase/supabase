@@ -1,8 +1,8 @@
-import { TextDecoder, TextEncoder } from 'node:util'
 import { ReadableStream, TransformStream } from 'node:stream/web'
-import { vi } from 'vitest'
-import { configMocks } from 'jsdom-testing-mocks'
+import { TextDecoder, TextEncoder } from 'node:util'
 import { act } from '@testing-library/react'
+import { configMocks } from 'jsdom-testing-mocks'
+import { vi } from 'vitest'
 
 configMocks({ act })
 
@@ -37,3 +37,13 @@ Object.defineProperties(globalThis, {
 })
 
 window.HTMLElement.prototype.hasPointerCapture = vi.fn()
+
+// This polyfill is needed for "closes the selection if the selected row's data changes" test in LogTable.test.tsx.
+// The bug is caused by "react-resizable-panels" which accesses a property which is not defined in jsdom. The polyfill
+// is added here to avoid affecting other tests.
+if (!document.adoptedStyleSheets) {
+  Object.defineProperty(document, 'adoptedStyleSheets', {
+    value: [],
+    writable: true,
+  })
+}
