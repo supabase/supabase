@@ -66,10 +66,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const state = useAiAssistantState()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
-  const { hasAccess: hasAccessToAdvanceModel } =
+  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('assistant.advance_model')
 
   const selectedModel = useMemo<AssistantModel>(() => {
+    // While entitlements are loading, use the stored model without enforcing access
+    if (isLoadingEntitlements) {
+      return snap.model ?? 'gpt-5-mini'
+    }
+
     const defaultModel: AssistantModel = hasAccessToAdvanceModel ? 'gpt-5' : 'gpt-5-mini'
     const model = snap.model ?? defaultModel
 
@@ -78,7 +83,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
 
     return model
-  }, [hasAccessToAdvanceModel, snap.model])
+  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
