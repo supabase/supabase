@@ -41,6 +41,7 @@ export async function generateAssistantResponse({
   planId,
   promptProviderOptions,
   providerOptions,
+  requestedModel,
   abortSignal,
   onSpanCreated,
 }: {
@@ -56,6 +57,7 @@ export async function generateAssistantResponse({
   userId?: string
   orgId?: number
   planId?: string
+  requestedModel?: string
   promptProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
@@ -177,6 +179,7 @@ export async function generateAssistantResponse({
         userId,
         orgId,
         planId,
+        requestedModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
         environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
       },
