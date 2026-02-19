@@ -141,7 +141,7 @@ Instructions:
           comment: reason,
           source: 'external',
         })
-        logger?.log({
+        logger?.updateSpan({
           id: spanId,
           metadata: { feedbackCategory: object.category },
         })
