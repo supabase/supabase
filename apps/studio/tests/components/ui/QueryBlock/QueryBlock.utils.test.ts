@@ -1,5 +1,49 @@
-import { formatLogTick, getCumulativeResults } from 'components/ui/QueryBlock/QueryBlock.utils'
+import {
+  checkHasNonPositiveValues,
+  formatLogTick,
+  getCumulativeResults,
+} from 'components/ui/QueryBlock/QueryBlock.utils'
 import { describe, expect, it } from 'vitest'
+
+describe('checkHasNonPositiveValues', () => {
+  it('returns false for an empty array', () => {
+    expect(checkHasNonPositiveValues([], 'value')).toBe(false)
+  })
+
+  it('returns false when all values are positive', () => {
+    const data = [{ value: 1 }, { value: 2 }, { value: 100 }]
+    expect(checkHasNonPositiveValues(data, 'value')).toBe(false)
+  })
+
+  it('returns true when a value is zero', () => {
+    const data = [{ value: 1 }, { value: 0 }, { value: 3 }]
+    expect(checkHasNonPositiveValues(data, 'value')).toBe(true)
+  })
+
+  it('returns true when a value is negative', () => {
+    const data = [{ value: 5 }, { value: -1 }, { value: 3 }]
+    expect(checkHasNonPositiveValues(data, 'value')).toBe(true)
+  })
+
+  it('returns true when all values are non-positive', () => {
+    const data = [{ value: -5 }, { value: 0 }, { value: -1 }]
+    expect(checkHasNonPositiveValues(data, 'value')).toBe(true)
+  })
+
+  it('checks only the specified key', () => {
+    const data = [
+      { x: -1, y: 5 },
+      { x: 2, y: 10 },
+    ]
+    expect(checkHasNonPositiveValues(data, 'y')).toBe(false)
+    expect(checkHasNonPositiveValues(data, 'x')).toBe(true)
+  })
+
+  it('returns false when key is absent (undefined cast to NaN is not <= 0)', () => {
+    const data = [{ value: 1 }, { value: 2 }]
+    expect(checkHasNonPositiveValues(data, 'missing')).toBe(false)
+  })
+})
 
 describe('formatLogTick', () => {
   it('formats values below 1,000 as plain locale strings', () => {
