@@ -137,7 +137,7 @@ const DiskSizeConfigurationModal = ({
                   <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
                     <Info size={16} />
                     <AlertTitle_Shadcn_>
-                      This operation is only possible every 6 hours
+                      This operation is only possible every 4 hours
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
                       <div className="mb-4">

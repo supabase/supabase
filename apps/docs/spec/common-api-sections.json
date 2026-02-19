@@ -851,6 +851,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-shutdown-realtime",
+        "title": "Shutdown realtime",
+        "slug": "v1-shutdown-realtime",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-realtime-config",
         "title": "Update realtime config",
         "slug": "v1-update-realtime-config",

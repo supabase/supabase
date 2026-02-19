@@ -27,6 +27,7 @@ Artur Zakirov
 Artyom Borissov
 Barco Fourie
 Beng Eu
+Benjamin Coenen
 Bo Lu
 Bobbie Soedirgo
 Brendan Stephens
@@ -48,6 +49,7 @@ Chris Ward
 Clayton Kast
 Craig Cannon
 Cuong Do
+Daniel Velázquez Lara
 Danny White
 Darren Cunningham
 Dave Wilson
@@ -94,11 +96,13 @@ Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
+Jamie Boyd
 Jason Farber
 Jean-Paul Argudo
 Jeezy
 Jeff Smick
 Jenny Kibiri
+Jeremias Menichelli
 Jess Shears
 Jim Brodeur
 Jim Chanco Jr
@@ -145,6 +149,7 @@ Matthew Hambright
 Matt Johnston
 Matt Rossman
 Matthias Luft
+Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
 Miles Thomas

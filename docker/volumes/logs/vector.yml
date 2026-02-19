@@ -49,10 +49,13 @@ transforms:
           .metadata.request.headers.referer = req.referer
           .metadata.request.headers.user_agent = req.agent
           .metadata.request.headers.cf_connecting_ip = req.client
-          .metadata.request.method = req.method
-          .metadata.request.path = req.path
-          .metadata.request.protocol = req.protocol
           .metadata.response.status_code = req.status
+          url, split_err = split(req.request, " ")
+          if split_err == null {
+              .metadata.request.method = url[0]
+              .metadata.request.path = url[1]
+              .metadata.request.protocol = url[2]
+          }
       }
       if err != null {
         abort
@@ -101,7 +104,7 @@ transforms:
       parsed, err = parse_regex(.event_message, r'^(?P<time>.*): (?P<msg>.*)$')
       if err == null {
           .event_message = parsed.msg
-          .timestamp = to_timestamp!(parsed.time)
+          .timestamp = parse_timestamp!(value: parsed.time,format: "%d/%b/%Y:%H:%M:%S %z")
           .metadata.host = .project
       }
   # Filter out healthcheck logs from Realtime
@@ -177,7 +180,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=gotrue.logs.prod'
@@ -189,7 +193,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=realtime.logs.prod'
@@ -201,7 +206,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=postgREST.logs.prod'
@@ -213,13 +219,13 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
-    # We must route the sink through kong because ingesting logs before logflare is fully initialised will
-    # lead to broken queries from studio. This works by the assumption that containers are started in the
-    # following order: vector > db > logflare > kong
-    uri: 'http://kong:8000/analytics/v1/api/logs?source_name=postgres.logs'
+    # Route directly to analytics like other sinks. Retry handles the startup
+    # race where analytics may not be ready yet when early DB logs arrive.
+    uri: 'http://analytics:4000/api/logs?source_name=postgres.logs'
   logflare_functions:
     type: 'http'
     inputs:
@@ -228,7 +234,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=deno-relay-logs'
@@ -240,7 +247,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=storage.logs.prod.2'
@@ -253,7 +261,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=cloudflare.logs.prod'

@@ -1,5 +1,5 @@
 ---
-title = "Transferring from cloud to self-host in Supabase"
+title = "Transferring from platform to self-hosted Supabase"
 github_url = "https://github.com/orgs/supabase/discussions/22712"
 date_created = "2024-04-14T15:19:10+00:00"
 topics = [ "database", "self-hosting" ]
@@ -7,10 +7,33 @@ keywords = [ "migrate", "pg_dump", "psql", "self-host" ]
 database_id = "c6b6ae3c-1b5b-4ba8-a40f-5f2ca1f007e2"
 ---
 
-To migrate from cloud to self-hosting, you can use the [pg_dump](https://www.postgresql.org/docs/9.6/app-pgdump.html) command to export your database to an SQL file, which then you can run on any database to load the same data in.
+For a detailed, step-by-step guide on restoring your database from the Supabase platform to a [self-hosted Supabase](/docs/guides/self-hosting) instance, see [Restore a Platform Project to Self-Hosted](/docs/guides/self-hosting/restore-from-platform).
 
-You can then try to import your SQL files using psql from the terminal:
+### Quick reference
 
-`psql -h 127.0.0.1 -p 5432 -d postgres -U postgres -f <dump-file-name>.sql`
+Back up your cloud database:
 
-You can also find some useful information about self-hosting here: https://supabase.com/docs/guides/self-hosting.
+```bash
+supabase db dump --db-url "[CONNECTION_STRING]" -f roles.sql --role-only
+```
+
+```bash
+supabase db dump --db-url "[CONNECTION_STRING]" -f schema.sql
+```
+
+```bash
+supabase db dump --db-url "[CONNECTION_STRING]" -f data.sql --use-copy --data-only
+```
+
+Restore to your self-hosted instance:
+
+```bash
+psql \
+  --single-transaction \
+  --variable ON_ERROR_STOP=1 \
+  --file roles.sql \
+  --file schema.sql \
+  --command 'SET session_replication_role = replica' \
+  --file data.sql \
+  --dbname "postgres://postgres.your-tenant-id:[POSTGRES_PASSWORD]@[your-domain]:5432/postgres"
+```

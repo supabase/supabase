@@ -52,6 +52,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
   const axiomEnabled = useFlag('axiomLogDrain')
+  const otlpEnabled = useFlag('otlpLogDrain')
   const last9Enabled = useFlag('Last9LogDrain')
 
   const { data: logDrains } = useLogDrainsQuery(
@@ -219,6 +220,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                       if (t.value === 'sentry') return sentryEnabled
                       if (t.value === 's3') return s3Enabled
                       if (t.value === 'axiom') return axiomEnabled
+                      if (t.value === 'otlp') return otlpEnabled
                       if (t.value === 'last9') return last9Enabled
                       return true
                     }).map((drainType) => (

@@ -3,8 +3,6 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
-import { match } from 'path-to-regexp'
-
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
@@ -50,6 +48,52 @@ function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
   return !hasAppFrame
 }
 
+// Filter browser wallet extension errors (e.g., Gate.io wallet)
+// These errors come from injected wallet scripts and are not actionable
+// Examples: SUPABASE-APP-AFC, SUPABASE-APP-92A
+export function isBrowserWalletExtensionError(event: Sentry.Event): boolean {
+  const frames = event.exception?.values?.flatMap((e) => e.stacktrace?.frames || []) || []
+  return frames.some((frame) => {
+    const filename = frame.filename || frame.abs_path || ''
+    return filename.includes('gt-window-provider') || filename.includes('wallet-provider')
+  })
+}
+
+// Filter user-aborted operations (intentional cancellations)
+// These are expected when users cancel requests or navigate away
+// Examples: SUPABASE-APP-BG6, SUPABASE-APP-BG7
+export function isUserAbortedOperation(error: unknown, event: Sentry.Event): boolean {
+  const errorMessage = error instanceof Error ? error.message : ''
+  const eventMessage = event.message || ''
+  const message = errorMessage || eventMessage
+
+  return (
+    message.includes('operation was aborted') ||
+    message.includes('signal is aborted') ||
+    message.includes('manually canceled') ||
+    message.includes('AbortError')
+  )
+}
+
+// Filter cancellation promise rejections (e.g., from query cancellation)
+// These occur when operations are intentionally cancelled by the user
+// Example: SUPABASE-APP-353 (~466k events)
+export function isCancellationRejection(event: Sentry.Event): boolean {
+  const serialized = event.extra?.__serialized__ as Record<string, unknown> | undefined
+  return serialized?.type === 'cancelation'
+}
+
+// Filter challenge/captcha expired errors (user timeout)
+// These happen when users don't complete captcha in time - expected behavior
+// Example: SUPABASE-APP-ACC
+export function isChallengeExpiredError(error: unknown, event: Sentry.Event): boolean {
+  const errorMessage = error instanceof Error ? error.message : ''
+  const eventMessage = event.message || ''
+  const message = errorMessage || eventMessage
+
+  return message.includes('challenge-expired')
+}
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   ...(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT && {
@@ -57,6 +101,10 @@ Sentry.init({
   }),
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
+  // Enable performance monitoring - Next.js routes and API calls are automatically instrumented
+  tracesSampleRate: 0.001, // Capture 0.1% of transactions for performance monitoring
+
   // [Ali] Filter out browser extensions and user scripts (FE-2094)
   // Using denyUrls to block known third-party script patterns
   denyUrls: [/userscript/i],
@@ -116,6 +164,19 @@ Sentry.init({
       return null
     }
 
+    if (isBrowserWalletExtensionError(event)) {
+      return null
+    }
+    if (isUserAbortedOperation(hint.originalException, event)) {
+      return null
+    }
+    if (isCancellationRejection(event)) {
+      return null
+    }
+    if (isChallengeExpiredError(hint.originalException, event)) {
+      return null
+    }
+
     if (event.breadcrumbs) {
       event.breadcrumbs = sanitizeArrayOfObjects(event.breadcrumbs) as Sentry.Breadcrumb[]
     }
@@ -126,6 +187,8 @@ Sentry.init({
     'ResizeObserver',
     's.getModifierState is not a function',
     /^Uncaught NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope'/,
+    // Browser wallet extension errors (e.g., Gate.io wallet)
+    'shouldSetTallyForCurrentProvider is not a function',
     // [Joshen] We currently use stripe-js for customers to save their credit card data
     // I'm unable to reproduce this error on local, staging nor prod across chrome, safari or firefox
     // Based on https://github.com/stripe/stripe-js/issues/26, it seems like this error is safe to ignore,
@@ -149,38 +212,14 @@ Sentry.init({
     /504 Gateway Time-out/,
     // [Joshen] This is the one caused by Google translate in the browser + 3rd party extensions
     'Node.insertBefore: Child to insert before is not a child of this node',
+    // [Ali] Google Translate / browser extension DOM manipulation errors
+    'NotFoundError: The object can not be found here.',
     // [Joshen] This one sprung up recently and I've no idea where this is coming from
     'r.default.setDefaultLevel is not a function',
     // [Joshen] Safe to ignore, it an error from the copyToClipboard
     'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
   ],
 })
-
-// Replace dynamic query param with a template text
-// Support grouping sentry transaction
-function standardiseRouterUrl(url: string) {
-  let finalUrl = url
-
-  const orgMatch = match('/org/:slug{/*path}', { decode: decodeURIComponent })
-  const orgMatchResult = orgMatch(finalUrl)
-  if (orgMatchResult) {
-    finalUrl = finalUrl.replace((orgMatchResult.params as any).slug, '[slug]')
-  }
-
-  const newOrgMatch = match('/new/:slug', { decode: decodeURIComponent })
-  const newOrgMatchResult = newOrgMatch(finalUrl)
-  if (newOrgMatchResult) {
-    finalUrl = finalUrl.replace((newOrgMatchResult.params as any).slug, '[slug]')
-  }
-
-  const projectMatch = match('/project/:ref{/*path}', { decode: decodeURIComponent })
-  const projectMatchResult = projectMatch(finalUrl)
-  if (projectMatchResult) {
-    finalUrl = finalUrl.replace((projectMatchResult.params as any).ref, '[ref]')
-  }
-
-  return finalUrl
-}
 
 // This export will instrument router navigations, and is only relevant if you enable tracing.
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
