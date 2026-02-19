@@ -7,6 +7,7 @@ type Template = {
 }
 
 export type SqlError = {
+  error?: string
   formattedError?: string
   message?: string
 }
