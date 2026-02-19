@@ -13,7 +13,7 @@
 		"@sveltejs/adapter-auto": "^6.0.1",
 		"@sveltejs/kit": "^2.5.27",
 		"@sveltejs/vite-plugin-svelte": "^6.1.0",
-		"svelte": "^5.14.4",
+		"svelte": "^5.51.5",
 		"svelte-check": "^4.1.1",
 		"tslib": "^2.6.3",
 		"typescript": "^5.5.3",
