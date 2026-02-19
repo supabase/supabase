@@ -1,5 +1,9 @@
 import styles from './loading-anim.module.css'
 
+/**
+ * A loading component that displays an animated logo.
+ * @returns {React.ReactElement} The logo loader component.
+ */
 const LogoLoader = () => (
   <div className="w-full h-full flex flex-col items-center justify-center">
     <div>
