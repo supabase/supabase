@@ -23,6 +23,9 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
   Separator,
+  useIsMobile,
+  usePanelCallbackRef,
+  usePanelRef,
 } from 'ui'
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
@@ -312,6 +315,17 @@ export const UnifiedLogs = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowSelection, selectedRow, isLoading, isFetching])
 
+  const isMobile = useIsMobile()
+  const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
+
+  useEffect(() => {
+    if (isMobile) {
+      setIsFilterBarOpen(false)
+    } else {
+      setIsFilterBarOpen(true)
+    }
+  }, [isMobile])
+
   return (
     <DataTableProvider
       table={table}
@@ -331,12 +345,12 @@ export const UnifiedLogs = () => {
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
         <ResizablePanelGroup orientation="horizontal" autoSaveId="logs-layout">
-          <FilterSideBar dateRangeDisabled={{ after: new Date() }} />
-          <ResizableHandle
-            withHandle
-            // disabled={resizableSidebar ? false : true}
-            className="group-data-[expanded=false]/controls:hidden hidden md:flex"
+          <FilterSideBar
+            isFilterBarOpen={isFilterBarOpen}
+            setIsFilterBarOpen={setIsFilterBarOpen}
+            dateRangeDisabled={{ after: new Date() }}
           />
+          <ResizableHandle withHandle />
           <ResizablePanel
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
@@ -362,6 +376,8 @@ export const UnifiedLogs = () => {
                     />
                   ) : null,
                 ]}
+                isFilterBarOpen={isFilterBarOpen}
+                setIsFilterBarOpen={setIsFilterBarOpen}
               />
               <TimelineChart
                 data={unifiedLogsChart}
@@ -375,11 +391,7 @@ export const UnifiedLogs = () => {
             </DataTableHeaderLayout>
             <Separator />
             <ResizablePanelGroup orientation="horizontal" className="w-full h-full">
-              <ResizablePanel
-                defaultSize={selectedRowKey ? '60' : '100'}
-                minSize="30"
-                className="h-full"
-              >
+              <ResizablePanel minSize="30" className="h-full">
                 <ResizablePanelGroup key="main-logs" orientation="vertical" className="h-full">
                   <ResizablePanel
                     defaultSize="100"
