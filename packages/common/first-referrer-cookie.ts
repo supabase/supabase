@@ -11,7 +11,35 @@
  * or paid UTM medium values) to ensure paid attribution overrides stale organic data.
  */
 
-import type { NextRequest, NextResponse } from 'next/server'
+// ---------------------------------------------------------------------------
+// Structural types for Next.js middleware request/response
+// ---------------------------------------------------------------------------
+// Using structural interfaces instead of importing NextRequest/NextResponse
+// avoids version conflicts when different apps pin different Next.js versions
+// (e.g. studio on Next 15, docs/www on Next 16).
+
+interface MiddlewareRequest {
+  headers: { get(name: string): string | null }
+  cookies: { has(name: string): boolean }
+  url: string
+  nextUrl: { hostname: string }
+}
+
+interface MiddlewareResponse {
+  cookies: {
+    set(
+      name: string,
+      value: string,
+      options?: {
+        path?: string
+        sameSite?: 'lax' | 'strict' | 'none'
+        secure?: boolean
+        domain?: string
+        maxAge?: number
+      }
+    ): void
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -205,7 +233,7 @@ export function shouldRefreshCookie(
  * (localhost, preview deploys) the domain is left unset so the browser
  * stores a host-only cookie instead of rejecting an invalid domain.
  */
-export function stampFirstReferrerCookie(request: NextRequest, response: NextResponse): void {
+export function stampFirstReferrerCookie(request: MiddlewareRequest, response: MiddlewareResponse): void {
   const referrer = request.headers.get('referer') ?? ''
 
   const { stamp } = shouldRefreshCookie(request.cookies.has(FIRST_REFERRER_COOKIE_NAME), {
