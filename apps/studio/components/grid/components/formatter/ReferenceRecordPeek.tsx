@@ -1,7 +1,4 @@
 import { PostgresTable } from '@supabase/postgres-meta'
-import { Key } from 'lucide-react'
-import DataGrid, { Column } from 'react-data-grid'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
@@ -9,12 +6,19 @@ import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
 } from 'components/grid/utils/gridColumns'
-import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { isArrayColumn, isBinaryColumn, isJsonColumn } from 'components/grid/utils/types'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Key } from 'lucide-react'
+import { useMemo } from 'react'
+import DataGrid, { Column } from 'react-data-grid'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { BinaryFormatter } from './BinaryFormatter'
+import { DefaultFormatter } from './DefaultFormatter'
+import { JsonFormatter } from './JsonFormatter'
 
 interface ReferenceRecordPeekProps {
   table: PostgresTable
@@ -44,59 +48,52 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
     { placeholderData: keepPreviousData }
   )
 
-  const primaryKeys = table.primary_keys.map((x) => x.name)
+  const primaryKeys = useMemo(() => table.primary_keys.map((x) => x.name), [table.primary_keys])
 
-  const columns = (table?.columns ?? []).map((column) => {
-    const columnDefaultWidth = getColumnDefaultWidth({
-      dataType: column.data_type,
-      format: column.format,
-    } as any)
-    const columnWidthBasedOnName =
-      (column.name.length + column.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
-    const columnWidth =
-      columnDefaultWidth < columnWidthBasedOnName ? columnWidthBasedOnName : columnDefaultWidth
-    const isPrimaryKey = primaryKeys.includes(column.name)
+  const columns = useMemo(() => {
+    return (table?.columns ?? []).map((column) => {
+      const columnDefaultWidth = getColumnDefaultWidth({
+        dataType: column.data_type,
+        format: column.format,
+      } as any)
+      const columnWidthBasedOnName =
+        (column.name.length + column.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
+      const columnWidth =
+        columnDefaultWidth < columnWidthBasedOnName ? columnWidthBasedOnName : columnDefaultWidth
+      const isPrimaryKey = primaryKeys.includes(column.name)
 
-    const res: Column<any> = {
-      key: column.name,
-      name: column.name,
-      resizable: false,
-      draggable: false,
-      sortable: false,
-      width: columnWidth,
-      minWidth: COLUMN_MIN_WIDTH,
-      headerCellClass: 'outline-none !shadow-none',
-      renderHeaderCell: () => (
-        <div className="flex h-full items-center justify-center gap-x-2">
-          {isPrimaryKey && (
-            <Tooltip>
-              <TooltipTrigger>
-                <Key size={14} strokeWidth={2} className="text-brand rotate-45" />
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Primary key</TooltipContent>
-            </Tooltip>
-          )}
-          <span className="text-xs truncate">{column.name}</span>
-          <span className="text-xs text-foreground-light font-normal">{column.format}</span>
-        </div>
-      ),
-      renderCell: ({ column: col, row }) => {
-        const value = row[col.name as any]
-        const formattedValue = column.format === 'bytea' ? convertByteaToHex(value) : value
-        return (
-          <div
-            className={cn(
-              'flex items-center h-full w-full whitespace-pre',
-              formattedValue === null && 'text-foreground-lighter'
+      const res: Column<any> = {
+        key: column.name,
+        name: column.name,
+        resizable: false,
+        draggable: false,
+        sortable: false,
+        width: columnWidth,
+        minWidth: COLUMN_MIN_WIDTH,
+        headerCellClass: 'outline-none !shadow-none',
+        renderHeaderCell: () => (
+          <div className="flex h-full items-center justify-center gap-x-2">
+            {isPrimaryKey && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Key size={14} strokeWidth={2} className="text-brand rotate-45" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Primary key</TooltipContent>
+              </Tooltip>
             )}
-          >
-            {formattedValue === null ? 'NULL' : formattedValue}
+            <span className="text-xs truncate">{column.name}</span>
+            <span className="text-xs text-foreground-light font-normal">{column.format}</span>
           </div>
-        )
-      },
-    }
-    return res
-  })
+        ),
+        renderCell: isBinaryColumn(column.data_type)
+          ? BinaryFormatter
+          : isJsonColumn(column.data_type) && !isArrayColumn(column.data_type)
+            ? JsonFormatter
+            : DefaultFormatter,
+      }
+      return res
+    })
+  }, [table?.columns, primaryKeys])
 
   return (
     <>

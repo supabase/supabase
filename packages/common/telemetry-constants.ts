@@ -1769,9 +1769,9 @@ export interface HomeProjectUsageServiceClickedEvent {
      */
     total_requests: number
     /**
-     * Number of errors for this service
+     * Number of errors for this service (optional, only sent when error data is available)
      */
-    error_count: number
+    error_count?: number
   }
   groups: TelemetryGroups
 }
@@ -1860,6 +1860,42 @@ export interface HomeGettingStartedClosedEvent {
      * Total number of steps in the workflow
      */
     total_steps: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Getting Started section was shown to the user in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedSectionExposedEvent {
+  action: 'home_getting_started_section_exposed'
+  properties: {
+    /**
+     * The current workflow shown (null if choosing workflow)
+     */
+    workflow: 'code' | 'no_code' | null
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the HomeV2 experiment (shown the new home page).
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeNewExperimentExposedEvent {
+  action: 'home_new_experiment_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: string
   }
   groups: TelemetryGroups
 }
@@ -2331,6 +2367,8 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'sentry'
       | 's3'
       | 'axiom'
+      | 'last9'
+      | 'otlp'
   }
   groups: TelemetryGroups
 }
@@ -2359,6 +2397,8 @@ export interface LogDrainConfirmButtonSubmittedEvent {
       | 'sentry'
       | 's3'
       | 'axiom'
+      | 'last9'
+      | 'otlp'
   }
   groups: TelemetryGroups
 }
@@ -2445,6 +2485,31 @@ export interface AdvisorAssistantButtonClickedEvent {
  */
 export interface QueryPerformanceAIExplanationButtonClickedEvent {
   action: 'query_performance_explain_with_ai_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User copied an AI prompt to clipboard instead of using the built-in assistant.
+ * This allows users to paste the prompt into external AI tools (Cursor, Claude, etc.)
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiPromptCopiedEvent {
+  action: 'ai_prompt_copied'
+  properties: {
+    /**
+     * Source/location where the prompt was copied from
+     */
+    source:
+      | 'explain_visualizer'
+      | 'query_performance'
+      | 'sql_debug'
+      | 'lint_detail'
+      | 'advisor_section'
+      | 'advisor_widget'
+      | 'branch_review'
+  }
   groups: TelemetryGroups
 }
 
@@ -2611,6 +2676,24 @@ export interface RlsEventTriggerBannerCreateButtonClickedEvent {
 }
 
 /**
+ * User clicked the Run button in the log explorer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/logs/explorer
+ */
+export interface LogExplorerQueryRunButtonClickedEvent {
+  action: 'log_explorer_query_run_button_clicked'
+  properties: {
+    /**
+     * Whether the user is editing a saved query
+     */
+    is_saved_query: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2680,6 +2763,7 @@ export type TelemetryEvent =
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
+  | LogExplorerQueryRunButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
@@ -2718,6 +2802,8 @@ export type TelemetryEvent =
   | HomeGettingStartedWorkflowClickedEvent
   | HomeGettingStartedStepClickedEvent
   | HomeGettingStartedClosedEvent
+  | HomeGettingStartedSectionExposedEvent
+  | HomeNewExperimentExposedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
   | HomeProjectUsageServiceClickedEvent
@@ -2746,6 +2832,7 @@ export type TelemetryEvent =
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
+  | AiPromptCopiedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent

@@ -28,22 +28,11 @@ export const formatDuration = (milliseconds: number) => {
   return parts.length > 0 ? parts.join(' ') : '0s'
 }
 
-export const transformLogsToJSON = (log: string) => {
-  try {
-    let jsonString = log.replace('[pg_stat_monitor] ', '')
-    jsonString = jsonString.replace(/""/g, '","')
-    const jsonObject = JSON.parse(jsonString)
-    return jsonObject
-  } catch (error) {
-    return null
-  }
-}
-
 export type QueryPerformanceErrorContext = {
   projectRef?: string
   databaseIdentifier?: string
   queryPreset?: string
-  queryType?: 'hitRate' | 'metrics' | 'mainQuery' | 'monitor' | 'slowQueriesCount'
+  queryType?: 'hitRate' | 'metrics' | 'mainQuery' | 'slowQueriesCount' | 'supamonitor'
   sql?: string
   errorMessage?: string
   postgresVersion?: string

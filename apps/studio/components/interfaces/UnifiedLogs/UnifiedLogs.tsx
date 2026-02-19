@@ -13,9 +13,6 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
-
 import { useDebounce, useParams } from 'common'
 import { arrSome, inDateRange } from 'components/ui/DataTable/DataTable.utils'
 import { DataTableFilterCommand } from 'components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
@@ -32,6 +29,8 @@ import { useUnifiedLogsChartQuery } from 'data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from 'data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from 'data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useQueryStates } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ChartConfig,
   cn,
@@ -40,6 +39,7 @@ import {
   ResizablePanelGroup,
   Separator,
 } from 'ui'
+
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
@@ -349,8 +349,12 @@ export const UnifiedLogs = () => {
               />
               <DataTableToolbar
                 renderActions={() => [
-                  <DownloadLogsButton searchParameters={searchParameters} />,
-                  <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />,
+                  <DownloadLogsButton key="download" searchParameters={searchParameters} />,
+                  <RefreshButton
+                    key="refresh"
+                    isLoading={isRefetchingData}
+                    onRefresh={refetchAllData}
+                  />,
                   fetchPreviousPage ? (
                     <LiveButton
                       key="live"

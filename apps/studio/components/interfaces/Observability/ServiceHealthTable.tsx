@@ -1,13 +1,11 @@
-import { HelpCircle } from 'lucide-react'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent } from 'ui'
-import { Badge, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, Card, CardContent, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import { ButtonTooltip } from '../../ui/ButtonTooltip'
 import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
-import { type ServiceKey, getHealthStatus } from './ObservabilityOverview.utils'
+import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
 
 type ServiceConfig = {
   key: ServiceKey
@@ -101,7 +99,7 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
   return (
     <Link
       href={reportUrl}
-      className="block group p-4 border-b border-default last:border-b-0 hover:bg-surface-200 transition-colors cursor-pointer"
+      className="block group py-4 px-card border-b border-default last:border-b-0 hover:bg-surface-200 transition-colors cursor-pointer"
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">

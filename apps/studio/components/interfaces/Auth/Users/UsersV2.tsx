@@ -4,8 +4,8 @@ import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { AlertError } from 'components/ui/AlertError'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -39,23 +39,23 @@ import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -75,6 +75,7 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -90,7 +91,11 @@ limit 100`
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const {
+    data: project,
+    isPending: isPendingProject,
+    isError: isProjectError,
+  } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
@@ -283,6 +288,7 @@ export const UsersV2 = () => {
     data,
     error,
     isSuccess,
+    isPending,
     isLoading,
     isRefetching,
     isError,
@@ -482,10 +488,10 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0" title="Users" />
+        <FormHeader className="py-4 px-6 !mb-0 border-b" title="Users" />
 
         {showImprovedSearchOptIn && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t relative">
+          <Alert_Shadcn_ className="rounded-none mb-0 border-0 relative">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setImprovedSearchDismissed(true)}
@@ -535,7 +541,7 @@ export const UsersV2 = () => {
           </Alert_Shadcn_>
         )}
 
-        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2 border-t">
+        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
               <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
@@ -802,7 +808,21 @@ export const UsersV2 = () => {
                       />
                     )
                   },
-                  noRowsFallback: isLoading ? (
+                  noRowsFallback: isPendingProject ? (
+                    <div className="absolute top-14 px-6 w-full">
+                      <GenericSkeletonLoader />
+                    </div>
+                  ) : project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY || isProjectError ? (
+                    <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
+                      <AlertError
+                        subject="Unable to load users"
+                        error={{
+                          message:
+                            'Could not connect to the database. Please check your project status.',
+                        }}
+                      />
+                    </div>
+                  ) : isPending ? (
                     <div className="absolute top-14 px-6 w-full">
                       <GenericSkeletonLoader />
                     </div>
@@ -810,7 +830,7 @@ export const UsersV2 = () => {
                     <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
                       <AlertError subject="Failed to retrieve users" error={error} />
                     </div>
-                  ) : (
+                  ) : isSuccess ? (
                     <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
                       <Users className="text-foreground-lighter" strokeWidth={1} />
                       <div className="text-center">
@@ -826,7 +846,7 @@ export const UsersV2 = () => {
                         </p>
                       </div>
                     </div>
-                  ),
+                  ) : null,
                 }}
               />
             </div>

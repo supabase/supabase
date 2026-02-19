@@ -1,13 +1,12 @@
-import dayjs from 'dayjs'
-import { ArrowUpDown, X } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import dayjs from 'dayjs'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { ArrowUpDown, X } from 'lucide-react'
 import Link from 'next/link'
+import { useMemo } from 'react'
 import {
   Badge,
   Button,
@@ -16,11 +15,11 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Select_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -37,6 +36,7 @@ export type ChartConfig = {
   yKey: string
   showLabels?: boolean
   showGrid?: boolean
+  logScale?: boolean
 }
 
 const getCumulativeResults = (results: Results, config: ChartConfig) => {
