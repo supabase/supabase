@@ -111,7 +111,7 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Realtime Chat',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-chat',
       items: [],
       commandItemLabel: 'Realtime Chat',
