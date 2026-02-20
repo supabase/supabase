@@ -37,7 +37,7 @@ const components: Components = {
 
 export default function TextBodySection({ section }: { section: GoTextBodySection }) {
   return (
-    <article className="prose prose-headings:text-foreground prose-p:text-foreground-light prose-strong:text-foreground prose-li:text-foreground-light prose-a:text-brand-link max-w-none">
+    <article className="prose prose-headings:text-foreground prose-p:text-foreground-light prose-strong:text-foreground prose-li:text-foreground-light prose-a:text-brand-link prose-a:decoration-brand-link max-w-none">
       <ReactMarkdown components={components}>{section.content}</ReactMarkdown>
     </article>
   )
