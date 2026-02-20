@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
   // @ts-ignore
-import AvatarStack from '@/components//AvatarStack.vue'
+import AvatarStack from '@/components/avatar-stack.vue'
 import { useRealtimePresenceRoom } from '../composables/useRealtimePresenceRoom'
 
 const props = defineProps<{

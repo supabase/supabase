@@ -2,7 +2,6 @@ import { ref, watch, onUnmounted } from 'vue'
 import { REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
 
 import { useCurrentUserImage } from './useCurrentUserImage'
-// @ts-ignore
 import { useCurrentUserName } from './useCurrentUserName'
 // @ts-ignore
 import { createClient } from "@/lib/supabase/client"
