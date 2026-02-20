@@ -8,7 +8,6 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTrack } from 'lib/telemetry/track'
 import { AlertCircle, BadgeCheck, Check, ExternalLink, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -40,21 +39,20 @@ import {
   isInstalling,
   isSyncRunning,
   isUninstallDone,
-  isUninstalled,
   isUninstalling,
 } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
 })
 
 export const StripeSyncInstallationPage = () => {
-  const router = useRouter()
-  const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
   const hasTrackedInstallFailed = useRef(false)
+  const { data: project } = useSelectedProjectQuery()
 
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
   const [showUninstallModal, setShowUninstallModal] = useState(false)
@@ -65,9 +63,7 @@ export const StripeSyncInstallationPage = () => {
   const formId = 'stripe-sync-install-form'
   const form = useForm<z.infer<typeof installFormSchema>>({
     resolver: zodResolver(installFormSchema),
-    defaultValues: {
-      stripeSecretKey: '',
-    },
+    defaultValues: { stripeSecretKey: '' },
     mode: 'onSubmit',
   })
 
@@ -81,7 +77,6 @@ export const StripeSyncInstallationPage = () => {
 
   const installed = isInstalled(installationStatus)
   const installError = hasInstallError(installationStatus)
-  const uninstalled = isUninstalled(installationStatus)
   const uninstallError = hasUninstallError(installationStatus)
   const installInProgress = isInstalling(installationStatus)
   const uninsallInProgress = isUninstalling(installationStatus)
@@ -114,36 +109,6 @@ export const StripeSyncInstallationPage = () => {
   // Combine schema status with mutation/initiated states for UI
   const installing = installInProgress || isInstallRequested || isInstallInitiated
   const uninstalling = uninsallInProgress || isUninstallRequested || isUninstallInitiated
-
-  // Track install failures
-  useEffect(() => {
-    if (!installError) {
-      hasTrackedInstallFailed.current = false
-      return
-    }
-
-    if (!hasTrackedInstallFailed.current) {
-      hasTrackedInstallFailed.current = true
-      track('integration_install_failed', {
-        integrationName: 'stripe_sync_engine',
-      })
-    }
-  }, [installError, track])
-
-  // Clear install initiated flag once schema reflects completion or error
-  useEffect(() => {
-    if (isInstallInitiated && installDone) {
-      setIsInstallInitiated(false)
-    }
-  }, [isInstallInitiated, installDone])
-
-  // Clear uninstall initiated flag once schema is removed or error
-  useEffect(() => {
-    if (isUninstallInitiated && uninstallDone) {
-      setIsUninstallInitiated(false)
-    }
-  }, [isUninstallInitiated, uninstallDone])
-
   const canInstall = checkCanInstall(installationStatus) && !installed && !installing
 
   // Poll for schema changes during transitions
@@ -240,7 +205,7 @@ export const StripeSyncInstallationPage = () => {
                 <div className="flex items-center gap-2">
                   <BadgeCheck size={14} className="text-brand" />
                   <div>All up to date</div>
-                  <Button asChild type="link">
+                  <Button asChild type="text">
                     <Link href={tableEditorUrl}>View data</Link>
                   </Button>
                 </div>
@@ -321,6 +286,35 @@ export const StripeSyncInstallationPage = () => {
     )
   }, [uninstallError, uninstalling, installError, installing, isSyncing, installed])
 
+  // Track install failures
+  useEffect(() => {
+    if (!installError) {
+      hasTrackedInstallFailed.current = false
+      return
+    }
+
+    if (!hasTrackedInstallFailed.current) {
+      hasTrackedInstallFailed.current = true
+      track('integration_install_failed', {
+        integrationName: 'stripe_sync_engine',
+      })
+    }
+  }, [installError, track])
+
+  // Clear install initiated flag once schema reflects completion or error
+  useEffect(() => {
+    if (isInstallInitiated && installDone) {
+      setIsInstallInitiated(false)
+    }
+  }, [isInstallInitiated, installDone])
+
+  // Clear uninstall initiated flag once schema is removed or error
+  useEffect(() => {
+    if (isUninstallInitiated && uninstallDone) {
+      setIsUninstallInitiated(false)
+    }
+  }, [isUninstallInitiated, uninstallDone])
+
   return (
     <>
       <IntegrationOverviewTab
@@ -348,13 +342,11 @@ export const StripeSyncInstallationPage = () => {
               </div>
             </>
           ) : installed && !uninstalling ? (
-            <>
-              <div className="flex justify-end mt-4">
-                <Button type="default" onClick={() => setShowUninstallModal(true)}>
-                  Uninstall integration
-                </Button>
-              </div>
-            </>
+            <div className="flex justify-end mt-4">
+              <Button type="default" onClick={() => setShowUninstallModal(true)}>
+                Uninstall integration
+              </Button>
+            </div>
           ) : null
         }
       >
@@ -372,35 +364,31 @@ export const StripeSyncInstallationPage = () => {
                 <SheetHeader>
                   <SheetTitle>Install Stripe Sync Engine</SheetTitle>
                 </SheetHeader>
-                <SheetSection className="flex-1">
+                <SheetSection className="flex-1 flex flex-col gap-y-6">
                   <StripeSyncChangesCard />
-                  <Admonition type="warning" className="mt-6">
-                    <p>
+
+                  <Admonition type="warning">
+                    <h5 className="mb-0.5">
                       This integration currently requires{' '}
-                      <Link
-                        href="https://supabase.com/docs/guides/platform/ssl-enforcement"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline"
-                      >
+                      <InlineLink href="https://supabase.com/docs/guides/platform/ssl-enforcement">
                         SSL Enforcement
-                      </Link>{' '}
-                      to be disabled during initial setup. Support for SSL Enforcement will be added
-                      in a future update. Once installed, all webhook and sync operations use
-                      HTTPS/SSL.
+                      </InlineLink>{' '}
+                      to be disabled during initial setup.
+                    </h5>
+                    <p className="text-foreground-light">
+                      Support for SSL Enforcement will be added in a future update. Once installed,
+                      all webhook and sync operations use HTTPS/SSL.
                     </p>
                   </Admonition>
-                  <h3 className="heading-default mb-4 mt-6">Configuration</h3>
+
+                  <h3 className="heading-default">Configuration</h3>
                   {installRequestError && (
-                    <Admonition type="destructive" className="mb-4">
-                      <div className="flex items-start gap-2">
-                        <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="font-medium">Installation failed</p>
-                          <p className="text-sm">{installRequestError.message}</p>
-                        </div>
-                      </div>
-                    </Admonition>
+                    <Admonition
+                      type="destructive"
+                      className="mb-4"
+                      title="Installation failed"
+                      description={installRequestError.message}
+                    />
                   )}
 
                   <FormField_Shadcn_
@@ -409,7 +397,7 @@ export const StripeSyncInstallationPage = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        label="Stripe API key"
+                        label="Stripe API secret key"
                         description="Your Stripe secret key. Requires write access to Webhook Endpoints and read-only access to all other categories."
                       >
                         <FormControl_Shadcn_ className="col-span-8">
@@ -429,27 +417,28 @@ export const StripeSyncInstallationPage = () => {
                     )}
                   />
 
-                  <div className="flex items-center mt-4 gap-2">
+                  <div className="flex items-center gap-x-2">
                     <Button asChild type="default" icon={<ExternalLink />}>
                       <Link
-                        href="https://dashboard.stripe.com/apikeys"
                         target="_blank"
                         rel="noopener noreferrer"
+                        href="https://dashboard.stripe.com/apikeys"
                       >
                         Get Stripe API key
                       </Link>
                     </Button>
                     <Button asChild type="default" icon={<ExternalLink />}>
                       <Link
-                        href="https://support.stripe.com/questions/what-are-stripe-api-keys-and-how-to-find-them"
                         target="_blank"
                         rel="noopener noreferrer"
+                        href="https://support.stripe.com/questions/what-are-stripe-api-keys-and-how-to-find-them"
                       >
                         What are Stripe API keys?
                       </Link>
                     </Button>
                   </div>
                 </SheetSection>
+
                 <SheetFooter>
                   <Button
                     type="default"
@@ -465,7 +454,7 @@ export const StripeSyncInstallationPage = () => {
                     loading={isInstallRequested}
                     disabled={!form.formState.isValid || isInstallRequested}
                   >
-                    {isInstallRequested ? 'Starting Installation...' : 'Start Installation'}
+                    {isInstallRequested ? 'Installing' : 'Install'}
                   </Button>
                 </SheetFooter>
               </form>
@@ -488,7 +477,7 @@ export const StripeSyncInstallationPage = () => {
           </p>
           <ul className="list-disc pl-5 mt-2 text-sm text-foreground-light space-y-1">
             <li>
-              Remove the <code>stripe</code> schema and all tables
+              Remove the <code className="text-code-inline">stripe</code> schema and all tables
             </li>
             <li>Delete all synced Stripe data</li>
             <li>Remove the associated Edge Functions</li>

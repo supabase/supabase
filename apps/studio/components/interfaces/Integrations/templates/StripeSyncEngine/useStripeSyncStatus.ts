@@ -26,12 +26,7 @@ export function useStripeSyncStatus({
     data: schemas,
     isLoading: isSchemasLoading,
     refetch,
-  } = useSchemasQuery(
-    { projectRef, connectionString },
-    {
-      enabled: !!projectRef,
-    }
-  )
+  } = useSchemasQuery({ projectRef, connectionString }, { enabled: !!projectRef })
 
   // Find and parse stripe schema status
   const stripeSchema = findStripeSchema(schemas)

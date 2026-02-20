@@ -25,7 +25,6 @@ export const StripeSyncSettingsPage = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
   const installed = isInstalled(installationStatus)
 
   // Redirect to overview page when integration is not installed
@@ -35,10 +34,8 @@ export const StripeSyncSettingsPage = () => {
     router.push(`/project/${project.ref}/integrations/stripe_sync_engine/overview`)
   }, [isLoadingInstallationStatus, installed, project?.ref, router])
 
-  const tableEditorUrl = `/project/${project?.ref}/editor?schema=stripe`
-
   return (
-    <PageContainer size="small">
+    <PageContainer>
       <PageSection id="stripe-schema">
         <PageSectionMeta>
           <PageSectionSummary>
@@ -50,21 +47,24 @@ export const StripeSyncSettingsPage = () => {
         </PageSectionMeta>
         <PageSectionContent>
           <Card>
-            <CardContent>
-              <div className="flex space-x-4 @container">
-                <Table2 className="w-5 h-5 shrink-0" />
-                <div className="flex flex-col items-start @lg:flex-row @lg:items-center  gap-4">
+            <CardContent className="@container">
+              <div className="flex flex-col items-start justify-between gap-4 @md:flex-row @md:items-center">
+                <div className="flex gap-x-4">
+                  <Table2 className="w-5 h-5 shrink-0" />
                   <div className="flex flex-col gap-1">
                     <h5 className="text-sm mb-1">Open Stripe schema in Table Editor</h5>
-                    <p className="text-sm text-foreground-light">
-                      The Stripe Sync Engine stores all synced data in the <code>stripe</code>{' '}
-                      schema. You can view and query this data directly in the Table Editor.
+                    <p className="text-sm text-foreground-light text-balance">
+                      The Stripe Sync Engine stores all synced data in the{' '}
+                      <code className="text-code-inline !break-keep">stripe</code> schema. You can
+                      view and query this data directly in the Table Editor.
                     </p>
                   </div>
-                  <Button asChild type="default">
-                    <Link href={tableEditorUrl}>Open Table Editor</Link>
-                  </Button>
                 </div>
+                <Button asChild type="default" className="ml-8 @md:ml-0">
+                  <Link href={`/project/${project?.ref}/editor?schema=stripe`}>
+                    Open Table Editor
+                  </Link>
+                </Button>
               </div>
             </CardContent>
           </Card>
