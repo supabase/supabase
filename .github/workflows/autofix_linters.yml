@@ -52,7 +52,7 @@ jobs:
         run: pnpm run format
 
       - name: Commit changes and push to existing branch
-        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9  # v7.1.0
         with:
           commit_message: 'ci: Autofix updates from GitHub workflow'
           commit_user_name: 'kevcodez'
