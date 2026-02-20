@@ -560,6 +560,7 @@ export const TableEditor = ({
                 tableName={
                   isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
                 }
+                isNewRecord={isNewRecord || isDuplicating}
                 handler={apiAccessToggleHandler}
               />
             )}
