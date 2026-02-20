@@ -117,7 +117,7 @@ const PITR = () => {
               secondaryText={
                 !hasAccessToPitr
                   ? 'Roll back your database to a specific second. Starts at $100/month. Pro Plan already includes daily backups at no extra cost.'
-                  : 'Please enable the add-on to enable point in time recovery for your project.'
+                  : 'Enable the add-on to add point in time recovery for your project.'
               }
             />
           ) : !isActiveHealthy ? (
