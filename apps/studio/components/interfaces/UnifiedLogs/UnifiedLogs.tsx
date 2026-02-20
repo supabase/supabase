@@ -13,25 +13,9 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
+import { useDebounce, useParams } from 'common'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
-
-import { useDebounce, useParams } from 'common'
-import { arrSome, inDateRange } from 'components/ui/DataTable/DataTable.utils'
-import { DataTableFilterCommand } from 'components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
-import { DataTableHeaderLayout } from 'components/ui/DataTable/DataTableHeaderLayout'
-import { DataTableInfinite } from 'components/ui/DataTable/DataTableInfinite'
-import { DataTableSideBarLayout } from 'components/ui/DataTable/DataTableSideBarLayout'
-import { DataTableToolbar } from 'components/ui/DataTable/DataTableToolbar'
-import { FilterSideBar } from 'components/ui/DataTable/FilterSideBar'
-import { LiveButton } from 'components/ui/DataTable/LiveButton'
-import { LiveRow } from 'components/ui/DataTable/LiveRow'
-import { DataTableProvider } from 'components/ui/DataTable/providers/DataTableProvider'
-import { TimelineChart } from 'components/ui/DataTable/TimelineChart'
-import { useUnifiedLogsChartQuery } from 'data/logs/unified-logs-chart-query'
-import { useUnifiedLogsCountQuery } from 'data/logs/unified-logs-count-query'
-import { useUnifiedLogsInfiniteQuery } from 'data/logs/unified-logs-infinite-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import {
   ChartConfig,
   cn,
@@ -40,6 +24,7 @@ import {
   ResizablePanelGroup,
   Separator,
 } from 'ui'
+
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
@@ -51,6 +36,21 @@ import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
+import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
+import { DataTableFilterCommand } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
+import { DataTableHeaderLayout } from '@/components/ui/DataTable/DataTableHeaderLayout'
+import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
+import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideBarLayout'
+import { DataTableToolbar } from '@/components/ui/DataTable/DataTableToolbar'
+import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
+import { LiveButton } from '@/components/ui/DataTable/LiveButton'
+import { LiveRow } from '@/components/ui/DataTable/LiveRow'
+import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
+import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
+import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
+import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 export const CHART_CONFIG = {
   success: {
@@ -349,8 +349,12 @@ export const UnifiedLogs = () => {
               />
               <DataTableToolbar
                 renderActions={() => [
-                  <DownloadLogsButton searchParameters={searchParameters} />,
-                  <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />,
+                  <DownloadLogsButton key="download" searchParameters={searchParameters} />,
+                  <RefreshButton
+                    key="refresh"
+                    isLoading={isRefetchingData}
+                    onRefresh={refetchAllData}
+                  />,
                   fetchPreviousPage ? (
                     <LiveButton
                       key="live"

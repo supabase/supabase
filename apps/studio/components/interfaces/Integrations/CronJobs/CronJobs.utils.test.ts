@@ -85,7 +85,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it("should return a HTTP request config when there's a query parameter or hash in the URL (also handles edge function)", () => {
+  it("should return an HTTP request config when there's a query parameter or hash in the URL (also handles edge function)", () => {
     const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_?first=1#second=2', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 )`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://random_project_ref.supabase.co/functions/v1/_?first=1#second=2',
@@ -103,7 +103,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config when the command posts to another supabase.co project', () => {
+  it('should return an HTTP request config when the command posts to another supabase.co project', () => {
     const command = `select net.http_post( url:='https://another_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object(), body:='', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://another_project_ref.supabase.co/functions/v1/_',
@@ -116,7 +116,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method, empty headers and a body as string', () => {
+  it('should return an HTTP request config with POST method, empty headers and a body as string', () => {
     const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), body:='hello', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -129,7 +129,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method, some headers and empty body', () => {
+  it('should return an HTTP request config with POST method, some headers and empty body', () => {
     const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', '2'), body:='', timeout_milliseconds:=1000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -145,7 +145,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with GET method and empty body', () => {
+  it('should return an HTTP request config with GET method and empty body', () => {
     const command = `select net.http_get( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -158,7 +158,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method and a body as JSON object', () => {
+  it('should return an HTTP request config with POST method and a body as JSON object', () => {
     const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), body:='{"key": "value"}', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -171,7 +171,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method, plain JSON headers and plain JSON body', () => {
+  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body', () => {
     const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"fst": "1", "snd": "2"}',body:='{"key": "value"}',timeout_milliseconds:=5000);`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -187,7 +187,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method, plain JSON headers and plain JSON body with ::jsonb typecasting', () => {
+  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body with ::jsonb typecasting', () => {
     const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"fst": "1", "snd": "2"}'::jsonb,body:='{"key": "value"}'::jsonb,timeout_milliseconds:=5000);`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -203,7 +203,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return SQL snippet type if the command is a HTTP request that cannot be parsed properly due to positional notationa', () => {
+  it('should return SQL snippet type if the command is an HTTP request that cannot be parsed properly due to positional notation', () => {
     const command = `SELECT net.http_post( 'https://webhook.site/dacc2028-a588-462c-9597-c8968e61d0fa', '{"message":"Hello from Supabase"}'::jsonb, '{}'::jsonb, '{"Content-Type":"application/json"}'::jsonb );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       type: 'sql_snippet',

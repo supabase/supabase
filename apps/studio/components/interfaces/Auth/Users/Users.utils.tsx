@@ -1,4 +1,6 @@
+import { User } from 'data/auth/users-infinite-query'
 import dayjs from 'dayjs'
+import { BASE_PATH } from 'lib/constants'
 import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
@@ -362,6 +364,7 @@ export const formatUserColumns = ({
                     const provider = row.providers[idx]
                     return (
                       <div
+                        key={`${user?.id}-${provider}-wrapper`}
                         className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
                         style={{
                           marginLeft: idx === 0 ? 0 : `-8px`,

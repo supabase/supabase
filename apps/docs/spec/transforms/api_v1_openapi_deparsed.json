@@ -1401,7 +1401,27 @@
                                 "type": "string"
                               },
                               "code": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                  "us-east-1",
+                                  "us-east-2",
+                                  "us-west-1",
+                                  "us-west-2",
+                                  "ap-southeast-1",
+                                  "ap-northeast-1",
+                                  "ap-northeast-2",
+                                  "ap-east-1",
+                                  "ap-southeast-2",
+                                  "eu-west-1",
+                                  "eu-west-2",
+                                  "eu-west-3",
+                                  "eu-north-1",
+                                  "eu-central-1",
+                                  "eu-central-2",
+                                  "ca-central-1",
+                                  "ap-south-1",
+                                  "sa-east-1"
+                                ]
                               },
                               "type": {
                                 "type": "string",
@@ -1454,7 +1474,27 @@
                                 "type": "string"
                               },
                               "code": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                  "us-east-1",
+                                  "us-east-2",
+                                  "us-west-1",
+                                  "us-west-2",
+                                  "ap-southeast-1",
+                                  "ap-northeast-1",
+                                  "ap-northeast-2",
+                                  "ap-east-1",
+                                  "ap-southeast-2",
+                                  "eu-west-1",
+                                  "eu-west-2",
+                                  "eu-west-3",
+                                  "eu-north-1",
+                                  "eu-central-1",
+                                  "eu-central-2",
+                                  "ca-central-1",
+                                  "ap-south-1",
+                                  "sa-east-1"
+                                ]
                               },
                               "type": {
                                 "type": "string",
@@ -9981,6 +10021,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "security_sb_forwarded_for_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -10346,6 +10390,7 @@
                     "saml_enabled",
                     "saml_external_url",
                     "saml_allow_encrypted_assertions",
+                    "security_sb_forwarded_for_enabled",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -10665,6 +10710,10 @@
                   "saml_external_url": {
                     "type": "string",
                     "pattern": "^[^,]+$",
+                    "nullable": true
+                  },
+                  "security_sb_forwarded_for_enabled": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "security_captcha_enabled": {
@@ -12177,6 +12226,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "security_sb_forwarded_for_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -12542,6 +12595,7 @@
                     "saml_enabled",
                     "saml_external_url",
                     "saml_allow_encrypted_assertions",
+                    "security_sb_forwarded_for_enabled",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -19173,6 +19227,50 @@
         "x-endpoint-owners": ["realtime"]
       }
     },
+    "/v1/projects/{ref}/config/realtime/shutdown": {
+      "post": {
+        "operationId": "v1-shutdown-realtime",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Realtime connections shutdown successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "404": {
+            "description": "Tenant not found"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Shutdowns realtime connections for a project",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
+      }
+    },
     "/v1/projects/{ref}/config/auth/sso/providers": {
       "post": {
         "operationId": "v1-create-a-sso-provider",
@@ -20651,6 +20749,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["members_read"]
           }
         ],
         "summary": "List members of an organization",
@@ -21964,7 +22065,27 @@
                       "type": "string"
                     },
                     "code": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": [
+                        "us-east-1",
+                        "us-east-2",
+                        "us-west-1",
+                        "us-west-2",
+                        "ap-southeast-1",
+                        "ap-northeast-1",
+                        "ap-northeast-2",
+                        "ap-east-1",
+                        "ap-southeast-2",
+                        "eu-west-1",
+                        "eu-west-2",
+                        "eu-west-3",
+                        "eu-north-1",
+                        "eu-central-1",
+                        "eu-central-2",
+                        "ca-central-1",
+                        "ap-south-1",
+                        "sa-east-1"
+                      ]
                     },
                     "type": {
                       "type": "string",
@@ -22017,7 +22138,27 @@
                       "type": "string"
                     },
                     "code": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": [
+                        "us-east-1",
+                        "us-east-2",
+                        "us-west-1",
+                        "us-west-2",
+                        "ap-southeast-1",
+                        "ap-northeast-1",
+                        "ap-northeast-2",
+                        "ap-east-1",
+                        "ap-southeast-2",
+                        "eu-west-1",
+                        "eu-west-2",
+                        "eu-west-3",
+                        "eu-north-1",
+                        "eu-central-1",
+                        "eu-central-2",
+                        "ca-central-1",
+                        "ap-south-1",
+                        "sa-east-1"
+                      ]
                     },
                     "type": {
                       "type": "string",
@@ -24847,6 +24988,10 @@
             "type": "boolean",
             "nullable": true
           },
+          "security_sb_forwarded_for_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_captcha_enabled": {
             "type": "boolean",
             "nullable": true
@@ -25212,6 +25357,7 @@
           "saml_enabled",
           "saml_external_url",
           "saml_allow_encrypted_assertions",
+          "security_sb_forwarded_for_enabled",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",
@@ -25476,6 +25622,10 @@
           "saml_external_url": {
             "type": "string",
             "pattern": "^[^,]+$",
+            "nullable": true
+          },
+          "security_sb_forwarded_for_enabled": {
+            "type": "boolean",
             "nullable": true
           },
           "security_captcha_enabled": {

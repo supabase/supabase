@@ -1,5 +1,5 @@
 // This file configures the initialization of Sentry on the client.
-// The config you add here will be used whenever a users loads a page in their browser.
+// The config you add here will be used whenever a user loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
@@ -103,7 +103,7 @@ Sentry.init({
   debug: false,
 
   // Enable performance monitoring - Next.js routes and API calls are automatically instrumented
-  tracesSampleRate: 0.1, // Capture 10% of transactions for performance monitoring
+  tracesSampleRate: 0.001, // Capture 0.1% of transactions for performance monitoring
 
   // [Ali] Filter out browser extensions and user scripts (FE-2094)
   // Using denyUrls to block known third-party script patterns
@@ -216,8 +216,40 @@ Sentry.init({
     'NotFoundError: The object can not be found here.',
     // [Joshen] This one sprung up recently and I've no idea where this is coming from
     'r.default.setDefaultLevel is not a function',
-    // [Joshen] Safe to ignore, it an error from the copyToClipboard
+    // [Joshen] Safe to ignore, it's an error from the copyToClipboard
     'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
+
+    // API/Network errors - should be handled by API layer, not actionable on frontend
+    /502/,
+    'upstream request timeout',
+    /upstream connect error or disconnect\/reset before headers/,
+    /Failed to fetch/,
+
+    // Google Translate / browser extension DOM manipulation errors
+    /Failed to execute 'removeChild' on 'Node'/,
+
+    // Monaco editor errors - already filtering ResizeObserver, adding general monaco errors
+    /monaco-editor/,
+
+    // JWT/Auth errors - expected during session expiry, handled by auth flow
+    'jwt expired',
+    /InvalidJWTToken: Invalid value for JWT claim "exp"/,
+
+    // User cancellation - intentional user action
+    'Canceled: Canceled',
+
+    // Third-party/extension errors
+    'html2canvas is not defined',
+    '[object Event]',
+    'ConnectorClass.onMessage(extensionPageScript)',
+    "Cannot destructure property 'address' of '(intermediate value)' as it is undefined.",
+
+    // Expected user flow errors
+    'Profile already exists: User already exists',
+
+    // JSON parse errors from invalid responses
+    '"undefined" is not valid JSON',
+    'SyntaxError: "undefined" is not valid JSON',
   ],
 })
 
