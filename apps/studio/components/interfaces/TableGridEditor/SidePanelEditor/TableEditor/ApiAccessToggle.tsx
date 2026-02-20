@@ -483,7 +483,7 @@ const SchemaExposureOptions = ({
               To enable API access for this table, you need to first expose the{' '}
               <code className="text-xs">{schemaName}</code> schema in your{' '}
               <Link
-                href={`/project/${projectRef}/settings/api`}
+                href={`/project/${projectRef}/integrations/data_api/overview`}
                 className="text-foreground hover:underline"
               >
                 API settings

@@ -1,7 +1,3 @@
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
-
 import { mergeRefs, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -13,10 +9,14 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, LogoLoader, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useSetMainScrollContainer } from '../MainScrollContainerContext'
 import BuildingState from './BuildingState'
@@ -35,27 +35,27 @@ import { UpgradingState } from './UpgradingState'
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
 const routesToIgnoreProjectDetailsRequest = [
+  '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
   '/project/[ref]/settings/general',
   '/project/[ref]/database/settings',
   '/project/[ref]/storage/settings',
-  '/project/[ref]/settings/infrastructure',
-  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnoreDBConnection = [
   '/project/[ref]/branches',
-  '/project/[ref]/database/backups/scheduled',
-  '/project/[ref]/database/backups/pitr',
-  '/project/[ref]/settings/addons',
+  '/project/[ref]/database/backups',
+  '/project/[ref]/settings',
   '/project/[ref]/functions',
+  '/project/[ref]/logs',
 ]
 
 const routesToIgnorePostgrestConnection = [
-  '/project/[ref]/reports',
   '/project/[ref]/settings/general',
-  '/project/[ref]/database/settings',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
+  '/project/[ref]/database/settings',
+  '/project/[ref]/reports',
 ]
 
 export interface ProjectLayoutProps {
@@ -108,7 +108,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const ignorePausedState =
       router.pathname === '/project/[ref]' ||
       router.pathname.includes('/project/[ref]/settings') ||
-      router.pathname.includes('/project/[ref]/functions')
+      router.pathname.includes('/project/[ref]/functions') ||
+      router.pathname.includes('/project/[ref]/logs')
     const showPausedState = isPaused && !ignorePausedState
 
     const sidebarMinSizePercentage = 1
@@ -132,7 +133,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          {/*  autoSaveId="project-layout" */}
           <ResizablePanelGroup direction="horizontal">
             {productMenu && (
               <ResizablePanel
@@ -143,7 +143,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 id="panel-left"
                 className={cn(
                   'hidden md:block',
-                  'transition-all duration-[120ms]',
+                  'transition-[max-width,min-width,width] duration-[120ms]',
                   sideBarIsOpen
                     ? resizableSidebar
                       ? 'min-w-64 max-w-[32rem]'
@@ -275,18 +275,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { data: selectedProject } = useSelectedProjectQuery()
   const isHomeNew = usePHFlag('homeNew') === 'new-home'
 
-  const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
-  const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
-  const isEdgeFunctionPages = router.pathname.includes('/project/[ref]/functions')
-  const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
   const isHomePage = router.pathname === '/project/[ref]'
 
-  const requiresDbConnection: boolean =
-    (!isEdgeFunctionPages &&
-      !isSettingsPages &&
-      !routesToIgnoreDBConnection.includes(router.pathname)) ||
-    isVaultPage
+  const requiresDbConnection = !routesToIgnoreDBConnection.some((x) => router.pathname.includes(x))
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
@@ -304,11 +296,11 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   // handle redirect to home for building state
   const shouldRedirectToHomeForBuilding =
-    isHomeNew && requiresDbConnection && isProjectBuilding && !isBranchesPage && !isHomePage
+    isProjectBuilding && requiresDbConnection && isHomeNew && !isHomePage
 
   // We won't be showing the building state with the new home page
   const shouldShowBuildingState =
-    requiresDbConnection && isProjectBuilding && !isBranchesPage && !(isHomeNew && isHomePage)
+    isProjectBuilding && requiresDbConnection && !(isHomeNew && isHomePage)
 
   useEffect(() => {
     if (shouldRedirectToHomeForBuilding && ref) {
@@ -352,7 +344,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoringState />
   }
 
-  if (isProjectRestoreFailed && !isBackupsPage && !isEdgeFunctionPages) {
+  if (requiresDbConnection && isProjectRestoreFailed) {
     return <RestoreFailedState />
   }
 

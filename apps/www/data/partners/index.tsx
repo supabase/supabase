@@ -51,7 +51,7 @@ export default {
       },
       {
         title: 'Add OAuth2 Support',
-        text: 'Use the OAuth2 protocol to access a users organization or project',
+        text: "Use the OAuth2 protocol to access a user's organization or project",
       },
       {
         title: 'Receive Tokens',

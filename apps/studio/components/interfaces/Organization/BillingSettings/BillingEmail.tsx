@@ -1,10 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { Form, FormControl, FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import {
@@ -20,6 +15,9 @@ import { useOrganizationCustomerProfileQuery } from 'data/organizations/organiza
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { FormMessage_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -29,6 +27,7 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import { z } from 'zod'
 
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
@@ -117,7 +116,7 @@ const BillingEmail = () => {
             <form id={FORM_ID} onSubmit={form.handleSubmit(onUpdateOrganizationEmail)}>
               <FormPanel
                 footer={
-                  <div className="flex py-4 px-[var(--card-padding-x)]">
+                  <div className="flex py-4 px-card">
                     <FormActions
                       form={FORM_ID}
                       isSubmitting={isUpdating}

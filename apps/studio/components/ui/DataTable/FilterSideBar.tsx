@@ -1,16 +1,16 @@
-import { useRouter } from 'next/router'
-
 import { useFlag, useParams } from 'common'
-import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React from 'react'
 import { Button, cn, ResizablePanel } from 'ui'
+
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
-import Link from 'next/link'
-import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
-import React from 'react'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 
 interface FilterSideBarProps {
   dateRangeDisabled?: DateRangeDisabled
@@ -69,8 +69,10 @@ export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
           description="Send logs to your preferred observability or storage platform."
           illustration={
             <div className="flex items-center gap-4">
-              {LOG_DRAIN_TYPES.map((type) =>
-                React.cloneElement(type.icon, { height: 20, width: 20 })
+              {LOG_DRAIN_TYPES.filter((t) =>
+                ['datadog', 'sentry', 'webhook', 'loki'].includes(t.value)
+              ).map((type) =>
+                React.cloneElement(type.icon, { height: 20, width: 20, key: type.value })
               )}
             </div>
           }

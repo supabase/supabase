@@ -2,6 +2,8 @@
 title = "PKCE Flow errors: 'cannot parse response' or '#ZgotmplZ' in magic link emails"
 topics = [ "auth", "cli" ]
 keywords = []
+database_id = "f9f9842b-e66c-4ea3-a45b-713895d8b7c6"
+
 [[errors]]
 code = "#ZgotmplZ"
 message = "Go template sanitization of unsafe URL scheme"
@@ -9,7 +11,6 @@ message = "Go template sanitization of unsafe URL scheme"
 [[errors]]
 code = "cannot parse response"
 message = "PKCE flow interrupted by email client or token consumed by link scanner"
-
 ---
 
 When setting up authentication with magic links and mobile deep linking, you might encounter specific errors like `#ZgotmplZ` in your email templates or a 'cannot parse response' error during the login flow. This guide explains the underlying causes and provides a robust solution.

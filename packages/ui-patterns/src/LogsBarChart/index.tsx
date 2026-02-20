@@ -97,7 +97,7 @@ export const LogsBarChart = ({
           />
           <ChartTooltip
             animationDuration={0}
-            position={{ y: 80 }}
+            position={{ y: 16 }}
             content={(props) => {
               if (!props.active || !props.payload || props.payload.length === 0) {
                 return null

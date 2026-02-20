@@ -6,6 +6,7 @@ import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { DevToolbarTrigger } from 'dev-tools'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns'
 
@@ -155,6 +156,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                     isUserLoading ? 'opacity-0' : 'opacity-100'
                   )}
                 >
+                  <DevToolbarTrigger />
                   <GitHubButton />
                   {isLoggedIn ? (
                     <>

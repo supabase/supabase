@@ -1,5 +1,5 @@
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -49,6 +49,7 @@ export const SupabaseGrid = ({
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
@@ -81,6 +82,7 @@ export const SupabaseGrid = ({
       sorts,
       filters,
       page: snap.page,
+      preflightCheck,
       limit: tableEditorSnap.rowsPerPage,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
