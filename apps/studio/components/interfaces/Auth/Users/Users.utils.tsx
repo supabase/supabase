@@ -1,6 +1,4 @@
-import { User } from 'data/auth/users-infinite-query'
 import dayjs from 'dayjs'
-import { BASE_PATH } from 'lib/constants'
 import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
