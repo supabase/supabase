@@ -138,13 +138,13 @@ Pages are defined as TypeScript objects (not MDX files) and validated against Zo
 
 ### Parts
 
-| Location | Purpose |
-|---|---|
-| `apps/www/_go/` | Page definitions. Each file exports a page object. `index.tsx` registers all pages. |
-| `apps/www/app/go/[slug]/page.tsx` | App Router route — renders the page for a given slug, handles 404s and metadata. |
+| Location                                    | Purpose                                                                                              |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `apps/www/_go/`                             | Page definitions. Each file exports a page object. `index.tsx` registers all pages.                  |
+| `apps/www/app/go/[slug]/page.tsx`           | App Router route — renders the page for a given slug, handles 404s and metadata.                     |
 | `apps/www/components/Go/GoPageRenderer.tsx` | www-specific wrapper — adds the Supabase logo header and footer, registers custom section renderers. |
-| `packages/marketing/src/go/` | Framework-agnostic core: schemas, section components, templates, form server action. |
-| `packages/marketing/src/crm/` | CRM client abstraction (HubSpot + Customer.io) used by the form server action. |
+| `packages/marketing/src/go/`                | Framework-agnostic core: schemas, section components, templates, form server action.                 |
+| `packages/marketing/src/crm/`               | CRM client abstraction (HubSpot + Customer.io) used by the form server action.                       |
 
 ### Page structure
 
