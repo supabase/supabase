@@ -1,24 +1,19 @@
-import { noop } from 'lodash'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
-
 import CardButton from 'components/ui/CardButton'
-import { Edit, ExternalLink, FlaskConical, Grid } from 'lucide-react'
+import { noop } from 'lodash'
+import { Edit, Grid } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Modal } from 'ui'
 
 interface PolicySelectionProps {
   description: string
-  showAssistantPreview: boolean
   onViewTemplates: () => void
   onViewEditor: () => void
-  onToggleFeaturePreviewModal?: () => void
 }
 
-const PolicySelection = ({
+export const PolicySelection = ({
   description = '',
-  showAssistantPreview,
   onViewTemplates = noop,
   onViewEditor = noop,
-  onToggleFeaturePreviewModal,
 }: PolicySelectionProps) => {
   const snap = useAppStateSnapshot()
 
@@ -65,32 +60,6 @@ const PolicySelection = ({
           />
         </div>
       </div>
-
-      {showAssistantPreview && onToggleFeaturePreviewModal !== undefined && (
-        <Alert_Shadcn_>
-          <FlaskConical />
-          <AlertTitle_Shadcn_>Try the new Supabase Assistant for RLS policies</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            Create RLS policies for your tables with the help of AI
-          </AlertDescription_Shadcn_>
-          <div className="flex items-center gap-x-2 mt-3">
-            <Button type="default" onClick={onToggleFeaturePreviewModal}>
-              Toggle feature preview
-            </Button>
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <a
-                href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Learn more
-              </a>
-            </Button>
-          </div>
-        </Alert_Shadcn_>
-      )}
     </Modal.Content>
   )
 }
-
-export default PolicySelection

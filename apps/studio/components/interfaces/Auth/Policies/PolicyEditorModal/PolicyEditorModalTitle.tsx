@@ -1,9 +1,8 @@
-import { noop } from 'lodash'
-import { ChevronLeft, FlaskConical } from 'lucide-react'
-
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
-import { Button } from 'ui'
+import { noop } from 'lodash'
+import { ChevronLeft } from 'lucide-react'
+
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 
 interface PolicyEditorModalTitleProps {
@@ -11,19 +10,15 @@ interface PolicyEditorModalTitleProps {
   schema: string
   table: string
   isNewPolicy: boolean
-  showAssistantPreview: boolean
   onSelectBackFromTemplates: () => void
-  onToggleFeaturePreviewModal: () => void
 }
 
-const PolicyEditorModalTitle = ({
+export const PolicyEditorModalTitle = ({
   view,
   schema,
   table,
   isNewPolicy,
-  showAssistantPreview,
   onSelectBackFromTemplates = noop,
-  onToggleFeaturePreviewModal,
 }: PolicyEditorModalTitleProps) => {
   const getTitle = () => {
     if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
@@ -54,16 +49,7 @@ const PolicyEditorModalTitle = ({
       <h4 className="truncate" title={getTitle()}>
         {getTitle()}
       </h4>
-      <div className="flex items-center gap-x-2 pr-6">
-        {showAssistantPreview && view === POLICY_MODAL_VIEWS.EDITOR && (
-          <Button type="default" icon={<FlaskConical />} onClick={onToggleFeaturePreviewModal}>
-            Try Supabase Assistant
-          </Button>
-        )}
-        <DocsButton className="mt-[-4px]" href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
-      </div>
+      <DocsButton className="mt-[-4px]" href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
     </div>
   )
 }
-
-export default PolicyEditorModalTitle

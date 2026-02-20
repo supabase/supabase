@@ -1,14 +1,14 @@
-import { noop, pull } from 'lodash'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies/Policies.constants'
-import PolicySelection from 'components/interfaces/Auth/Policies/PolicySelection'
+import { PolicySelection } from 'components/interfaces/Auth/Policies/PolicySelection'
 import PolicyTemplates from 'components/interfaces/Auth/Policies/PolicyTemplates'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
+import { noop, pull } from 'lodash'
 import { ChevronLeft } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
+
 import {
   applyBucketIdToTemplateDefinition,
   createPayloadsForAddPolicy,
@@ -26,7 +26,7 @@ const newPolicyTemplate: any = {
   allowedOperations: [],
 }
 
-const StoragePoliciesEditPolicyModal = ({
+export const StoragePoliciesEditPolicyModal = ({
   visible = false,
   bucketName = '',
   onSelectCancel = () => {},
@@ -229,7 +229,6 @@ const StoragePoliciesEditPolicyModal = ({
             description="PostgreSQL policies control access to your files and folders"
             onViewTemplates={onViewTemplates}
             onViewEditor={() => onViewEditor('new')}
-            showAssistantPreview={false}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <StoragePoliciesEditor
@@ -260,5 +259,3 @@ const StoragePoliciesEditPolicyModal = ({
     </Modal>
   )
 }
-
-export default StoragePoliciesEditPolicyModal

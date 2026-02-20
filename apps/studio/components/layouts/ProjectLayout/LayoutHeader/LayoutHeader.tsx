@@ -1,5 +1,8 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsBranching2Enabled,
+  useIsSystemStatusBadgeEnabled,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
@@ -9,6 +12,7 @@ import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorBut
 import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { SystemStatusBadge } from 'components/ui/SystemStatus/SystemStatusBadge'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { DevToolbarTrigger } from 'dev-tools'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -74,6 +78,7 @@ export const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
+  const isSystemStatusBadgeEnabled = useIsSystemStatusBadgeEnabled()
 
   const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
   const isFlagResolved = connectSheetFlag !== undefined
@@ -217,6 +222,7 @@ export const LayoutHeader = ({
             {IS_PLATFORM ? (
               <>
                 <DevToolbarTrigger />
+                {isSystemStatusBadgeEnabled && <SystemStatusBadge />}
                 <FeedbackDropdown />
 
                 <div className="flex items-center gap-2">

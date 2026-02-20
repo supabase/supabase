@@ -1,12 +1,12 @@
-import { isEmpty, noop } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import useLatest from 'hooks/misc/useLatest'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { isEmpty, noop } from 'lodash'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
   PolicyFormField,
@@ -20,30 +20,28 @@ import {
 } from '../Policies.utils'
 import PolicyEditor from '../PolicyEditor'
 import PolicyReview from '../PolicyReview'
-import PolicySelection from '../PolicySelection'
+import { PolicySelection } from '../PolicySelection'
 import PolicyTemplates from '../PolicyTemplates'
 import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
-import PolicyEditorModalTitle from './PolicyEditorModalTitle'
+import { PolicyEditorModalTitle } from './PolicyEditorModalTitle'
 
 interface PolicyEditorModalProps {
   visible?: boolean
   schema?: string
   table?: string
   selectedPolicyToEdit: any
-  showAssistantPreview?: boolean
   onSelectCancel: () => void
   onCreatePolicy: (payload: PostgresPolicyCreatePayload) => Promise<boolean>
   onUpdatePolicy: (payload: PostgresPolicyUpdatePayload) => Promise<boolean>
   onSaveSuccess: () => void
 }
 
-const PolicyEditorModal = ({
+export const PolicyEditorModal = ({
   visible = false,
   schema = '',
   table = '',
   selectedPolicyToEdit = {},
-  showAssistantPreview = false,
   onSelectCancel = noop,
   onCreatePolicy,
   onUpdatePolicy,
@@ -112,11 +110,6 @@ const PolicyEditorModal = ({
   ])
 
   /* Methods that are for the UI */
-
-  const onToggleFeaturePreviewModal = () => {
-    toggleFeaturePreviewModal()
-    onSelectCancel()
-  }
 
   const onUseTemplate = (template: PolicyTemplate) => {
     setPolicyFormFields({
@@ -190,9 +183,7 @@ const PolicyEditorModal = ({
           isNewPolicy={isNewPolicy}
           schema={schema}
           table={table}
-          showAssistantPreview={showAssistantPreview}
           onSelectBackFromTemplates={onSelectBackFromTemplates}
-          onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
         />,
       ]}
       onCancel={confirmOnClose}
@@ -204,8 +195,6 @@ const PolicyEditorModal = ({
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
             onViewTemplates={onViewTemplates}
             onViewEditor={onViewEditor}
-            showAssistantPreview={showAssistantPreview}
-            onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <PolicyEditor
@@ -247,5 +236,3 @@ const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseMo
     </p>
   </ConfirmationModal>
 )
-
-export default PolicyEditorModal

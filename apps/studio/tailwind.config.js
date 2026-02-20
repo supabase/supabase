@@ -81,6 +81,7 @@ module.exports = config({
       animation: {
         shimmer: 'shimmer 2s infinite linear',
         sway: 'sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        ellipsis: 'ellipsis 1.5s steps(4, end) infinite',
       },
       keyframes: {
         shimmer: {
@@ -97,6 +98,20 @@ module.exports = config({
           },
           '50%': {
             transform: 'rotate(10deg) scale(1.5) translateY(2rem)',
+          },
+        },
+        ellipsis: {
+          '0%, 25%': {
+            content: '""',
+          },
+          '26%, 50%': {
+            content: '"."',
+          },
+          '51%, 75%': {
+            content: '".."',
+          },
+          '76%, 100%': {
+            content: '"..."',
           },
         },
       },
