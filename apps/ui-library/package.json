@@ -51,7 +51,7 @@
     "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "@tanstack/react-query": "^5.83.0",
     "@supabase/vue-blocks": "workspace:*",
-    "axios": "^1.12.0",
+    "axios": "^1.13.5",
     "class-variance-authority": "*",
     "cmdk": "^1.0.0",
     "common": "workspace:*",
