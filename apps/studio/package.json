@@ -114,7 +114,7 @@
     "react": "catalog:",
     "react-beautiful-dnd": "^13.1.0",
     "react-contexify": "^5.0.0",
-    "react-data-grid": "7.0.0-beta.41",
+    "react-data-grid": "7.0.0-beta.47",
     "react-day-picker": "^9.11.1",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
