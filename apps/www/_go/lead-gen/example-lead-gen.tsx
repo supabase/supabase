@@ -129,7 +129,7 @@ const page: GoPageInput = {
       ],
       submitLabel: 'Request a demo',
       disclaimer:
-        'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
+        'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
         hubspot: {
           formGuid: 'b9abbf77-86ae-4fe7-9147-d15922bf58ca',

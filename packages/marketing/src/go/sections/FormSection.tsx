@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import {
   Button,
   Input_Shadcn_,
@@ -214,7 +215,13 @@ export default function FormSection({ section }: { section: GoFormSection }) {
           </Button>
 
           {section.disclaimer && (
-            <p className="text-xs text-foreground-lighter leading-relaxed">{section.disclaimer}</p>
+            <div className="text-xs text-foreground-lighter leading-relaxed [&_a]:text-brand-link [&_a]:decoration-brand-link">
+              <ReactMarkdown
+                components={{ p: ({ children }) => <p>{children}</p>, a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer">{children}</a> }}
+              >
+                {section.disclaimer}
+              </ReactMarkdown>
+            </div>
           )}
         </form>
       </div>
