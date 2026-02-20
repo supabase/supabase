@@ -1,12 +1,12 @@
-import { isEmpty, noop } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import useLatest from 'hooks/misc/useLatest'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { isEmpty, noop } from 'lodash'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
   PolicyFormField,
@@ -114,7 +114,7 @@ const PolicyEditorModal = ({
   /* Methods that are for the UI */
 
   const onToggleFeaturePreviewModal = () => {
-    toggleFeaturePreviewModal()
+    toggleFeaturePreviewModal(true)
     onSelectCancel()
   }
 

@@ -1,13 +1,20 @@
+import { useParams } from 'common'
 import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+
 export const TableFilterBarPreview = () => {
+  const { ref = '_' } = useParams()
+
   return (
     <div className="flex flex-col gap-2">
       <p className="text-foreground-light text-sm mb-4">
-        An intuitive new way to filter your table data. Build complex filters visually with support
-        for multiple data types (strings, numbers, dates, booleans) and operators. The new interface
-        makes it easier to understand and modify your filters at a glance.
+        An intuitive new way to filter your table data in the{' '}
+        <InlineLink href={`/project/${ref}/editor`}>Table Editor</InlineLink>. Build complex filters
+        visually with support for multiple data types (strings, numbers, dates, booleans) and
+        operators. The new interface makes it easier to understand and modify your filters at a
+        glance.
       </p>
       <Image
         src={`${BASE_PATH}/img/previews/table-filter-bar-preview.png`}
