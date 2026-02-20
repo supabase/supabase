@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "realtime-avatar-stack-vue",
+  "type": "registry:block",
+  "title": "Realtime Avatar Stack",
+  "description": "Component which stack of avatars, tracked by realtime presence.",
+  "dependencies": [
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [
+    "avatar",
+    "tooltip"
+  ],
+  "files": [
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/components/realtime-avatar-stack.vue",
+      "content": "<script setup lang=\"ts\">\nimport { computed } from 'vue'\n\n  // @ts-ignore\nimport AvatarStack from '@/components//AvatarStack.vue'\nimport { useRealtimePresenceRoom } from '../composables/useRealtimePresenceRoom'\n\nconst props = defineProps<{\n  roomName: string\n}>()\n\nconst { users: usersMap } = useRealtimePresenceRoom(props.roomName)\n\nconst avatars = computed(() =>\n  Object.values(usersMap.value).map((user) => ({\n    name: user.name,\n    image: user.image,\n  }))\n)\n</script>\n\n<template>\n  <AvatarStack :avatars=\"avatars\" />\n</template>\n",
+      "type": "registry:component",
+      "target": "components/realtime-avatar-stack.vue"
+    },
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/components/avatar-stack.vue",
+      "content": "<script setup lang=\"ts\">\nimport { computed } from 'vue'\n\nimport Avatar from '@/components/ui/avatar/Avatar.vue'\nimport AvatarImage from '@/components/ui/avatar/AvatarImage.vue'\nimport AvatarFallback from '@/components/ui/avatar/AvatarFallback.vue'\n\nimport Tooltip from '@/components/ui/tooltip/Tooltip.vue'\nimport TooltipContent from '@/components/ui/tooltip/TooltipContent.vue'\nimport TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue'\n\ninterface AvatarItem {\n  name: string\n  image: string\n}\n\nconst props = defineProps<{\n  avatars: AvatarItem[]\n  orientation?: 'vertical' | 'horizontal'\n  maxAvatarsAmount?: number\n  class?: string\n}>()\n\nconst orientation = computed(() => props.orientation ?? 'vertical')\nconst maxAvatarsAmount = computed(() => props.maxAvatarsAmount ?? 3)\n\nconst shownAvatars = computed(() =>\n  props.avatars.slice(0, maxAvatarsAmount.value)\n)\n\nconst hiddenAvatars = computed(() =>\n  props.avatars.slice(maxAvatarsAmount.value)\n)\n\nconst containerClasses = computed(() => [\n  'flex -space-x-4 -space-y-4',\n  orientation.value === 'vertical' ? 'flex-row -space-y-0' : 'flex-col -space-x-0',\n  props.class,\n])\n\nfunction getInitials(name: string) {\n  return name\n    ?.split(' ')\n    ?.map(word => word[0])\n    ?.join('')\n    ?.toUpperCase()\n}\n</script>\n\n<template>\n  <div :class=\"containerClasses\">\n    <!-- Visible avatars -->\n    <Tooltip\n      v-for=\"({ name, image }, index) in shownAvatars\"\n      :key=\"`${name}-${image}-${index}`\"\n    >\n      <TooltipTrigger>\n        <Avatar class=\"hover:z-10\">\n          <AvatarImage :src=\"image\" />\n          <AvatarFallback>\n            {{ getInitials(name) }}\n          </AvatarFallback>\n        </Avatar>\n      </TooltipTrigger>\n\n      <TooltipContent>\n        <p>{{ name }}</p>\n      </TooltipContent>\n    </Tooltip>\n\n    <!-- Hidden avatars -->\n    <Tooltip v-if=\"hiddenAvatars.length\">\n      <TooltipTrigger>\n        <Avatar>\n          <AvatarFallback>\n            +{{ avatars.length - shownAvatars.length }}\n          </AvatarFallback>\n        </Avatar>\n      </TooltipTrigger>\n\n      <TooltipContent>\n        <p\n          v-for=\"({ name }, index) in hiddenAvatars\"\n          :key=\"`${name}-${index}`\"\n        >\n          {{ name }}\n        </p>\n      </TooltipContent>\n    </Tooltip>\n  </div>\n</template>\n",
+      "type": "registry:component",
+      "target": "components/avatar-stack.vue"
+    },
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserImage.ts",
+      "content": "import { ref, onMounted } from 'vue'\n// @ts-ignore\nimport { createClient } from \"@/lib/supabase/client\"\n\nexport function useCurrentUserImage() {\n  const image = ref<string | null>(null)\n\n  const fetchUserImage = async () => {\n    const { data, error } = await createClient().auth.getSession()\n\n    if (error) {\n      console.error(error)\n      return\n    }\n\n    image.value = data.session?.user.user_metadata.avatar_url ?? null\n  }\n\n  onMounted(() => {\n    fetchUserImage()\n  })\n\n  return {\n    image,\n  }\n}\n",
+      "type": "registry:component",
+      "target": "composables/useCurrentUserImage.ts"
+    },
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserName.ts",
+      "content": "import { ref, onMounted } from 'vue'\n// @ts-ignore\nimport { createClient } from \"@/lib/supabase/client\"\n\nexport function useCurrentUserName() {\n  const name = ref<string | null>(null)\n\n  const fetchProfileName = async () => {\n    const { data, error } = await createClient().auth.getSession()\n\n    if (error) {\n      console.error(error)\n      return\n    }\n\n    name.value = data.session?.user.user_metadata.full_name ?? '?'\n  }\n\n  onMounted(() => {\n    fetchProfileName()\n  })\n\n  return {\n    name,\n  }\n}\n",
+      "type": "registry:component",
+      "target": "composables/useCurrentUserName.ts"
+    },
+    {
+      "path": "registry/default/realtime-avatar-stack/vue/composables/useRealtimePresenceRoom.ts",
+      "content": "import { ref, watch, onUnmounted } from 'vue'\nimport { REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'\n\nimport { useCurrentUserImage } from './useCurrentUserImage'\n// @ts-ignore\nimport { useCurrentUserName } from './useCurrentUserName'\n// @ts-ignore\nimport { createClient } from \"@/lib/supabase/client\"\n\nconst supabase = createClient()\n\nexport type RealtimeUser = {\n  id: string\n  name: string\n  image: string\n}\n\nexport function useRealtimePresenceRoom(roomName: string) {\n  const { image: currentUserImage } = useCurrentUserImage()\n  const { name: currentUserName } = useCurrentUserName()\n\n  const users = ref<Record<string, RealtimeUser>>({})\n\n  let room: ReturnType<typeof supabase.channel> | null = null\n\n  function setupRoom() {\n    if (!roomName) return\n\n    room = supabase.channel(roomName)\n\n    room\n      .on('presence', { event: 'sync' }, () => {\n        const newState =\n          room?.presenceState<{ image: string; name: string }>() ?? {}\n\n        const newUsers = Object.fromEntries(\n          Object.entries(newState).map(([key, values]) => {\n            const typedValues = values as Array<{ image: string; name: string }>\n            return [\n              key,\n              {\n                id: key,\n                name: typedValues[0].name,\n                image: typedValues[0].image,\n              },\n            ]\n          })\n        ) as Record<string, RealtimeUser>\n\n        users.value = newUsers\n      })\n      .subscribe(async (status: REALTIME_SUBSCRIBE_STATES) => {\n        if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED && room) {\n          await room.track({\n            name: currentUserName.value,\n            image: currentUserImage.value,\n          })\n        } else {\n          users.value = {}\n        }\n      })\n  }\n\n  function cleanup() {\n    if (room) {\n      room.unsubscribe()\n      room = null\n    }\n  }\n\n  watch(\n    [() => roomName, currentUserName, currentUserImage],\n    () => {\n      cleanup()\n      setupRoom()\n    },\n    { immediate: true }\n  )\n\n  onUnmounted(() => {\n    cleanup()\n  })\n\n  return { users }\n}\n",
+      "type": "registry:component",
+      "target": "composables/useRealtimePresenceRoom.ts"
+    }
+  ]
+}

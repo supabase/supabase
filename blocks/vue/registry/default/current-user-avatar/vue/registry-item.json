@@ -1,5 +1,5 @@
 {
-  "name": "urrent-user-avatar-vue",
+  "name": "current-user-avatar-vue",
   "type": "registry:block",
   "title": "Current User Avatar",
   "description": "Component which renders the current user's avatar.",
