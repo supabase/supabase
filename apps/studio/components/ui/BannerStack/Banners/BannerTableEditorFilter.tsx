@@ -18,7 +18,7 @@ export const BannerTableEditorFilter = () => {
 
   const { dismissBanner } = useBannerStack()
   const [, setIsDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
+    LOCAL_STORAGE_KEYS.TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED(ref ?? ''),
     false
   )
 
