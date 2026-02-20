@@ -2,7 +2,7 @@ import { ProfileImage } from 'components/ui/ProfileImage'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfileNameAndPicture } from 'lib/profile'
-import { Command, FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
+import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -21,7 +21,6 @@ import {
   singleThemes,
   Theme,
 } from 'ui'
-import { useCommandMenuOpenedTelemetry, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
@@ -32,14 +31,7 @@ export function UserDropdown() {
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
-  const setCommandMenuOpen = useSetCommandMenuOpen()
-  const sendTelemetry = useCommandMenuOpenedTelemetry()
-  const { openFeaturePreviewModal } = useFeaturePreviewModal()
-
-  const handleCommandMenuOpen = () => {
-    setCommandMenuOpen(true)
-    sendTelemetry()
-  }
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
 
   return (
     <DropdownMenu>
@@ -95,8 +87,8 @@ export function UserDropdown() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex gap-2"
-                onClick={openFeaturePreviewModal}
-                onSelect={openFeaturePreviewModal}
+                onClick={() => toggleFeaturePreviewModal(true)}
+                // onSelect={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
