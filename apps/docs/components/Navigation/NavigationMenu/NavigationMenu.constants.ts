@@ -381,6 +381,11 @@ export const gettingstarted: NavMenuConstant = {
           enabled: !jsOnly,
         },
         {
+          name: 'Reflex (Python)',
+          url: '/guides/getting-started/quickstarts/reflex' as `/${string}`,
+          enabled: !jsOnly,
+        },
+        {
           name: 'TanStack Start',
           url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
         },
