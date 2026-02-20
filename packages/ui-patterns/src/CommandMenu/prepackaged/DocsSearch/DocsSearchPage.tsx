@@ -25,7 +25,6 @@ import {
   useSetQuery,
 } from '../..'
 import { BASE_PATH } from '../shared/constants'
-import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -84,6 +83,7 @@ const DocsSearchPage = () => {
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
+      case PageType.Troubleshooting:
         if (BASE_PATH === '/docs') {
           router.push(link)
           setIsOpen(false)
