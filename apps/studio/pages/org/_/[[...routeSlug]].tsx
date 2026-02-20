@@ -1,6 +1,3 @@
-import { NextPage } from 'next'
-import { useRouter } from 'next/router'
-
 import {
   Header,
   LoadingCardView,
@@ -8,29 +5,31 @@ import {
 } from 'components/interfaces/Home/ProjectList/EmptyStates'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import CardButton from 'components/ui/CardButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
+import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
-// [Joshen] Thinking we can deprecate this page in favor of /organizations
+import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
+
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
-
-  const { data: organizations, isPending: isLoading } = useOrganizationsQuery()
   const { routeSlug, ...queryParams } = router.query
   const queryString =
     Object.keys(queryParams).length > 0
       ? new URLSearchParams(queryParams as Record<string, string>).toString()
       : ''
 
+  const { data: organizations, isPending: isLoading } = useOrganizationsQuery()
+
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (orgSlug: string) => {
       if (!Array.isArray(slug)) {
-        return `/org/${orgSlug}/general?${queryString}`
+        return `/org/${orgSlug}/general${!!queryString ? `?${queryString}` : ''}`
       } else {
         const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-        return `/org/${orgSlug}/${slugPath}?${queryString}`
+        return `/org/${orgSlug}/${slugPath}${!!queryString ? `?${queryString}` : ''}`
       }
     }
   }
@@ -57,24 +56,12 @@ const GenericOrganizationPage: NextPage = () => {
                       'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'
                     )}
                   >
-                    {organizations?.map((organization) => (
-                      <li key={organization.slug} className="col-span-1">
-                        <CardButton
-                          linkHref={urlRewriterFactory(routeSlug)(organization.slug)}
-                          title={
-                            <div className="flex w-full flex-row justify-between gap-1">
-                              <span className="flex-shrink truncate">{organization.name}</span>
-                            </div>
-                          }
-                          footer={
-                            <div className="flex items-end justify-between">
-                              <span className="text-sm lowercase text-foreground-light">
-                                {organization.slug}
-                              </span>
-                            </div>
-                          }
-                        />
-                      </li>
+                    {organizations?.map((org) => (
+                      <OrganizationCard
+                        key={org.id}
+                        organization={org}
+                        href={urlRewriterFactory(routeSlug)(org.slug)}
+                      />
                     ))}
                   </ul>
                 )}

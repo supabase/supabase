@@ -1,14 +1,16 @@
+import { useParams } from 'common'
 import { Table2 } from 'lucide-react'
 
-import { useParams } from 'common'
-import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
-import Description from 'components/interfaces/Docs/Description'
-import Param from 'components/interfaces/Docs/Param'
-import Snippets from 'components/interfaces/Docs/Snippets'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
+import { DocSection } from './DocSection'
+import CodeSnippet from '@/components/interfaces/Docs/CodeSnippet'
+import Description from '@/components/interfaces/Docs/Description'
+import Param from '@/components/interfaces/Docs/Param'
+import Snippets from '@/components/interfaces/Docs/Snippets'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ResourceContentProps {
   apiEndpoint: string
@@ -55,32 +57,35 @@ export const ResourceContent = ({
   if (!paths || !definitions) return null
 
   return (
-    <>
-      <h2 className="doc-section__table-name text-foreground mt-0 flex items-center px-6 gap-2">
-        <span className="bg-slate-300 p-2 rounded-lg">
-          <Table2 size={18} />
-        </span>
-        <span className="text-2xl font-bold">{resourceId}</span>
-      </h2>
+    <div className="flex flex-col flex-1">
+      <DocSection
+        title={
+          <span className="flex items-center gap-2 text-subTitle">
+            <Table2 size={16} strokeWidth={1.5} />
+            {resourceId}
+          </span>
+        }
+        content={
+          <>
+            <label className="font-mono text-xs uppercase text-foreground-lighter inline-block mb-2">
+              Description
+            </label>
+            <Description
+              content={description}
+              metadata={{ table: resourceId }}
+              onChange={refreshDocs}
+            />
+          </>
+        }
+      />
 
-      <div className="doc-section">
-        <article className="code-column text-foreground">
-          <label className="font-mono text-xs uppercase text-foreground-lighter inline-block mb-2">
-            Description
-          </label>
-          <Description
-            content={description}
-            metadata={{ table: resourceId }}
-            onChange={refreshDocs}
-          />
-        </article>
-        <article className="code"></article>
-      </div>
       {properties.length > 0 && (
-        <div>
+        <div className="flex flex-col flex-1">
           {properties.map((x) => (
-            <div className="doc-section py-4" key={x.id}>
-              <div className="code-column text-foreground">
+            <DocSection
+              key={x.id}
+              title={null}
+              content={
                 <Param
                   key={x.id}
                   name={x.id}
@@ -94,8 +99,8 @@ export const ResourceContent = ({
                   }}
                   onDesciptionUpdated={refreshDocs}
                 />
-              </div>
-              <div className="code">
+              }
+              snippets={
                 <CodeSnippet
                   selectedLang={selectedLang}
                   snippet={Snippets.readColumns({
@@ -106,30 +111,34 @@ export const ResourceContent = ({
                     columnName: x.id,
                   })}
                 />
-              </div>
-            </div>
+              }
+            />
           ))}
         </div>
       )}
+
       {methods.includes('GET') && (
-        <>
-          <h3 className="text-foreground mt-4 px-6">Read rows</h3>
-          <div className="doc-section">
-            <article className="code-column text-foreground">
+        <DocSection
+          title="Read rows"
+          content={
+            <>
               <p>
                 To read rows in <code>{resourceId}</code>, use the <code>select</code> method.
               </p>
               <p>
-                <a
-                  href={`${DOCS_URL}/reference/javascript/select`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Learn more
-                </a>
+                <InlineLink href={`${DOCS_URL}/reference/javascript/select`}>Learn more</InlineLink>
               </p>
-            </article>
-            <article className="code">
+              <h4 className="text-default">Filtering</h4>
+              <p>Supabase provides a wide range of filters.</p>
+              <p>
+                <InlineLink href={`${DOCS_URL}/reference/javascript/using-filters`}>
+                  Learn more
+                </InlineLink>
+              </p>
+            </>
+          }
+          snippets={
+            <>
               <CodeSnippet
                 selectedLang={selectedLang}
                 snippet={Snippets.readAll(resourceId, endpoint, keyToShow)}
@@ -150,36 +159,20 @@ export const ResourceContent = ({
                 selectedLang={selectedLang}
                 snippet={Snippets.readRange(resourceId, endpoint, keyToShow)}
               />
-            </article>
-          </div>
-          <div className="doc-section">
-            <article className="code-column text-foreground">
-              <h4 className="mt-0 text-white">Filtering</h4>
-              <p>Supabase provides a wide range of filters.</p>
-              <p>
-                <a
-                  href={`${DOCS_URL}/reference/javascript/using-filters`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Learn more
-                </a>
-              </p>
-            </article>
-            <article className="code">
               <CodeSnippet
                 selectedLang={selectedLang}
                 snippet={Snippets.readFilters(resourceId, endpoint, keyToShow)}
               />
-            </article>
-          </div>
-        </>
+            </>
+          }
+        />
       )}
+
       {methods.includes('POST') && (
-        <>
-          <h3 className="text-foreground mt-4 px-6">Insert rows</h3>
-          <div className="doc-section">
-            <article className="code-column text-foreground">
+        <DocSection
+          title="Insert rows"
+          content={
+            <>
               <p>
                 <code>insert</code> lets you insert into your tables. You can also insert in bulk
                 and do UPSERT.
@@ -188,16 +181,12 @@ export const ResourceContent = ({
                 <code>insert</code> will also return the replaced values for UPSERT.
               </p>
               <p>
-                <a
-                  href={`${DOCS_URL}/reference/javascript/insert`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Learn more
-                </a>
+                <InlineLink href={`${DOCS_URL}/reference/javascript/insert`}>Learn more</InlineLink>
               </p>
-            </article>
-            <article className="code">
+            </>
+          }
+          snippets={
+            <>
               <CodeSnippet
                 selectedLang={selectedLang}
                 snippet={Snippets.insertSingle(resourceId, endpoint, keyToShow)}
@@ -210,15 +199,16 @@ export const ResourceContent = ({
                 selectedLang={selectedLang}
                 snippet={Snippets.upsert(resourceId, endpoint, keyToShow)}
               />
-            </article>
-          </div>
-        </>
+            </>
+          }
+        />
       )}
+
       {methods.includes('PATCH') && (
-        <>
-          <h3 className="text-foreground mt-4 px-6">Update rows</h3>
-          <div className="doc-section">
-            <article className="code-column text-foreground">
+        <DocSection
+          title="Update rows"
+          content={
+            <>
               <p>
                 <code>update</code> lets you update rows. <code>update</code> will match all rows by
                 default. You can update specific rows using horizontal filters, e.g. <code>eq</code>
@@ -228,73 +218,61 @@ export const ResourceContent = ({
                 <code>update</code> will also return the replaced values for UPDATE.
               </p>
               <p>
-                <a
-                  href={`${DOCS_URL}/reference/javascript/update`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Learn more
-                </a>
+                <InlineLink href={`${DOCS_URL}/reference/javascript/update`}>Learn more</InlineLink>
               </p>
-            </article>
-            <article className="code">
-              <CodeSnippet
-                selectedLang={selectedLang}
-                snippet={Snippets.update(resourceId, endpoint, keyToShow)}
-              />
-            </article>
-          </div>
-        </>
+            </>
+          }
+          snippets={
+            <CodeSnippet
+              selectedLang={selectedLang}
+              snippet={Snippets.update(resourceId, endpoint, keyToShow)}
+            />
+          }
+        />
       )}
+
       {methods.includes('DELETE') && (
-        <>
-          <h3 className="text-foreground mt-4 px-6">Delete rows</h3>
-          <div className="doc-section">
-            <article className="code-column text-foreground">
+        <DocSection
+          title="Delete rows"
+          content={
+            <>
               <p>
                 <code>delete</code> lets you delete rows. <code>delete</code> will match all rows by
                 default, so remember to specify your filters!
               </p>
               <p>
-                <a
-                  href={`${DOCS_URL}/reference/javascript/delete`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Learn more
-                </a>
+                <InlineLink href={`${DOCS_URL}/reference/javascript/delete`}>Learn more</InlineLink>
               </p>
-            </article>
-            <article className="code">
-              <CodeSnippet
-                selectedLang={selectedLang}
-                snippet={Snippets.delete(resourceId, endpoint, keyToShow)}
-              />
-            </article>
-          </div>
-        </>
+            </>
+          }
+          snippets={
+            <CodeSnippet
+              selectedLang={selectedLang}
+              snippet={Snippets.delete(resourceId, endpoint, keyToShow)}
+            />
+          }
+        />
       )}
+
       {realtimeEnabled &&
         (methods.includes('DELETE') || methods.includes('POST') || methods.includes('PATCH')) && (
-          <>
-            <h3 className="text-foreground mt-4 px-6">Subscribe to changes</h3>
-            <div className="doc-section">
-              <article className="code-column text-foreground">
+          <DocSection
+            title="Subscribe to changes"
+            content={
+              <>
                 <p>
                   Supabase provides realtime functionality and broadcasts database changes to
                   authorized users depending on Row Level Security (RLS) policies.
                 </p>
                 <p>
-                  <a
-                    href={`${DOCS_URL}/reference/javascript/subscribe`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <InlineLink href={`${DOCS_URL}/reference/javascript/subscribe`}>
                     Learn more
-                  </a>
+                  </InlineLink>
                 </p>
-              </article>
-              <article className="code">
+              </>
+            }
+            snippets={
+              <>
                 <CodeSnippet
                   selectedLang={selectedLang}
                   snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
@@ -320,10 +298,10 @@ export const ResourceContent = ({
                     'someValue'
                   )}
                 />
-              </article>
-            </div>
-          </>
+              </>
+            }
+          />
         )}
-    </>
+    </div>
   )
 }

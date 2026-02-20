@@ -148,6 +148,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
               <TableHead className={cn(noResults && 'text-foreground-muted')}>Compute</TableHead>
               <TableHead className={cn(noResults && 'text-foreground-muted')}>Region</TableHead>
               <TableHead className={cn(noResults && 'text-foreground-muted')}>Created</TableHead>
+              <TableHead className={cn(noResults && 'text-foreground-muted')} />
             </TableRow>
           </TableHeader>
           <TableBody>

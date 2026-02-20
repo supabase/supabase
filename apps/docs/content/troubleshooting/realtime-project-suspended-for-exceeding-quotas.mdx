@@ -1,0 +1,70 @@
+---
+title = "Realtime: Project suspended for exceeding quotas"
+date_created = "2026-02-06T00:00:00+00:00"
+topics = [ "realtime" ]
+keywords = [ "suspended", "quota", "abuse", "limits", "connections", "messages", "ban", "RealtimeDisabledForTenant", "disabled" ]
+---
+
+If your project has been suspended due to Realtime usage, it means your project exceeded the quotas for your plan and was flagged for unusually high consumption of Realtime resources.
+
+## How to know if your project was suspended
+
+When Realtime is disabled for your project, you will see the error code `RealtimeDisabledForTenant` in your [Realtime logs](/dashboard/project/_/database/realtime-logs). On the client side, connections will fail to establish and existing subscriptions will stop receiving events.
+
+If you encounter this error, it means Realtime has been explicitly disabled for your project and you should [contact support](/dashboard/support/new) to understand why and resolve the issue.
+
+## Why projects get suspended
+
+Supabase monitors Realtime usage across all projects to ensure platform stability for everyone. When a project consistently exceeds its plan limits by a significant margin, it may be manually suspended. This can happen when:
+
+- Your project far exceeds the [concurrent connections limit](/docs/guides/realtime/limits#limits-by-plan) for your plan
+- Your project sends or receives messages well beyond the [messages per second limit](/docs/guides/realtime/limits#limits-by-plan)
+- Usage patterns suggest unintended or runaway behavior, such as a client reconnection loop or uncontrolled channel creation
+
+Suspension is not automatic and is applied after review. The goal is to protect shared infrastructure while giving you the opportunity to explain and resolve the situation.
+
+## Common causes of excessive usage
+
+In most cases, quota overages are accidental rather than intentional:
+
+- **Reconnection loops**: A client that fails to authenticate or subscribe may retry rapidly, creating thousands of short-lived connections
+- **Uncontrolled channels**: Creating channels without cleaning them up leads to resource exhaustion (see [Fixing the TooManyChannels Error](/docs/troubleshooting/realtime-too-many-channels-error))
+- **Missing cleanup on component tear down**: Single-page applications that don't unsubscribe when components are removed can accumulate connections over time
+- **Unexpected traffic spikes**: A viral event or bot traffic can push usage well beyond normal levels
+- **Development or testing misconfiguration**: Load tests or staging environments accidentally pointed at a production project
+
+## What to do if your project is suspended
+
+1. **Open a support ticket**: [Contact support](/dashboard/support/new) and include:
+
+   - Your project reference ID
+   - A description of your Realtime use case (what features use Broadcast, Presence, or Postgres Changes)
+   - An estimate of your expected concurrent connections and message throughput
+   - Any recent changes to your application that may have caused the spike
+
+2. **Review your usage**: While waiting for a response, check the [Realtime reports](/dashboard/project/_/database/realtime-logs) in your project dashboard to understand what drove the elevated usage.
+
+3. **Identify and fix the root cause**: Common fixes include:
+   - Adding proper channel cleanup in your client code
+   - Implementing exponential backoff for reconnection logic
+   - Upgrading your plan to match your actual usage needs
+   - Separating development and production environments
+
+The Supabase team will review your case to understand whether the usage was accidental or expected. If the usage is legitimate, the team can work with you to find the right plan or adjust limits for your project. If it was accidental, once you've resolved the underlying issue, the suspension can be lifted.
+
+## How to avoid suspension
+
+- Monitor your usage regularly through the [Realtime reports](/dashboard/project/_/database/realtime-logs) page
+- Set up alerts if your connections or messages approach your plan limits
+- Follow the [channel management best practices](/docs/troubleshooting/realtime-too-many-channels-error#best-practices-for-channel-management) to avoid resource leaks
+- Review the [Realtime limits](/docs/guides/realtime/limits) for your plan and upgrade before you outgrow them
+- Use the [Realtime Inspector](https://realtime.supabase.com/inspector/new) to test and debug connections before deploying
+
+## Related troubleshooting guides
+
+- [Fixing the TooManyChannels Error](/docs/troubleshooting/realtime-too-many-channels-error) — channel lifecycle management and cleanup best practices
+- [Concurrent Peak Connections quota](/docs/troubleshooting/realtime-concurrent-peak-connections-quota-jdDqcp) — understanding the concurrent connections quota and how to adjust it
+- [Handling Silent Disconnections in Background Applications](/docs/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications-592794) — fixing WebSocket drops caused by browser or OS background mode
+- [TIMED_OUT connection errors](/docs/troubleshooting/realtime-connections-timed_out-status) — resolving Node.js version incompatibilities
+- [Debug Realtime with Logger and Log Levels](/docs/troubleshooting/realtime-debugging-with-logger) — enabling client-side logging to diagnose connection and message issues
+- [Realtime Heartbeat Messages](/docs/troubleshooting/realtime-heartbeat-messages) — monitoring connection health with heartbeat callbacks

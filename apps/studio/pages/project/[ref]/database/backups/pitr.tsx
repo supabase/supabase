@@ -29,6 +29,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   return (
@@ -65,17 +66,18 @@ DatabasePhysicalBackups.getLayout = (page) => (
 const PITR = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { hasAccess: hasAccessToPitr, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('pitr.available_variants')
   const isOrioleDbInAws = useIsOrioleDbInAws()
   const {
     data: backups,
     error,
-    isPending: isLoading,
+    isPending: isLoadingBackups,
     isError,
     isSuccess,
   } = useBackupsQuery({ projectRef })
 
-  const plan = organization?.plan?.id
+  const isLoading = isLoadingBackups || isLoadingEntitlements
   const isEnabled = backups?.pitr_enabled
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -108,13 +110,13 @@ const PITR = () => {
         <>
           {!isEnabled ? (
             <UpgradeToPro
-              addon="pitr"
+              addon={hasAccessToPitr ? 'pitr' : undefined}
               source="pitr"
               featureProposition="enable Point in Time Recovery"
-              primaryText="Point in Time Recovery is a Pro Plan add-on."
+              primaryText="Point in Time Recovery is a Pro Plan add-on"
               secondaryText={
-                plan === 'free'
-                  ? 'With PITR, you can roll back to a specific time (to the second!). PITR starts from $100/mo and is available for Pro Plan customers. Note that the Pro Plan already includes daily backups for no extra charge — PITR is an optional upgrade that starts at $100/month.'
+                !hasAccessToPitr
+                  ? 'Roll back your database to a specific second. Starts at $100/month. Pro Plan already includes daily backups at no extra cost.'
                   : 'Please enable the add-on to enable point in time recovery for your project.'
               }
             />

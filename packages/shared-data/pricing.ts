@@ -37,7 +37,6 @@ export type FeatureKey =
   | 'database.pausing'
   | 'database.branching'
   | 'database.egress'
-  | 'database.cachedEgress'
   | 'auth.totalUsers'
   | 'auth.maus'
   | 'auth.userDataOwnership'
@@ -58,6 +57,7 @@ export type FeatureKey =
   | 'storage.size'
   | 'storage.customAccessControls'
   | 'storage.maxFileSize'
+  | 'storage.cachedEgress'
   | 'storage.cdn'
   | 'storage.transformations'
   | 'storage.byoc'
@@ -190,17 +190,6 @@ export const pricing: Pricing = {
           free: '5 GB included',
           pro: ['250 GB included', 'then $0.09 per GB'],
           team: ['250 GB included', 'then $0.09 per GB'],
-          enterprise: 'Custom',
-        },
-        usage_based: true,
-      },
-      {
-        key: 'database.cachedEgress',
-        title: 'Cached Egress',
-        plans: {
-          free: '5 GB included',
-          pro: ['250 GB included', 'then $0.03 per GB'],
-          team: ['250 GB included', 'then $0.03 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -419,6 +408,17 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
+        key: 'storage.cachedEgress',
+        title: 'Cached Egress',
+        plans: {
+          free: '5 GB included',
+          pro: ['250 GB included', 'then $0.03 per GB'],
+          team: ['250 GB included', 'then $0.03 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
         key: 'storage.customAccessControls',
         title: 'Custom access controls',
         plans: {
@@ -533,7 +533,7 @@ export const pricing: Pricing = {
         key: 'realtime.maxMessageSize',
         title: 'Max Message Size',
         plans: {
-          free: '250 KB',
+          free: '256 KB',
           pro: '3 MB',
           team: '3 MB',
           enterprise: 'Custom',

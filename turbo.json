@@ -6,27 +6,6 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
-    "cms#build": {
-      "dependsOn": ["^build"],
-      "env": [
-        "BLOG_APP_URL",
-        "CRON_SECRET",
-        "DATABASE_URI",
-        "NEXT_PUBLIC_VERCEL_BRANCH_URL",
-        "NEXT_PUBLIC_SERVER_URL",
-        "NEXT_PUBLIC_VERCEL_ENV",
-        "NODE_ENV",
-        "PAYLOAD_SECRET",
-        "PREVIEW_SECRET",
-        "S3_BUCKET",
-        "S3_ACCESS_KEY_ID",
-        "S3_SECRET_ACCESS_KEY",
-        "S3_REGION",
-        "S3_ENDPOINT",
-        "VERCEL_PROJECT_PRODUCTION_URL"
-      ],
-      "outputs": [".next/**", "!.next/cache/**"]
-    },
     "design-system#build": {
       "dependsOn": ["^build"],
       "env": [
@@ -47,6 +26,7 @@
       "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
+        "CI",
         "NEXT_PUBLIC_SUPPORT_API_URL",
         "NEXT_PUBLIC_CONTENT_API_URL",
         "NEXT_PUBLIC_BASE_PATH",
@@ -132,8 +112,10 @@
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
+        "VERCEL_GIT_COMMIT_REF",
         "VERCEL_GIT_COMMIT_SHA",
-        "SNIPPETS_MANAGEMENT_FOLDER"
+        "SNIPPETS_MANAGEMENT_FOLDER",
+        "EDGE_FUNCTIONS_MANAGEMENT_FOLDER"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
@@ -144,9 +126,6 @@
         "CI",
         "CF_ACCESS_CLIENT_ID",
         "CF_ACCESS_CLIENT_SECRET",
-        "CMS_API_KEY",
-        "CMS_PREVIEW_SECRET",
-        "CMS_SITE_ORIGIN",
         "NEXT_PUBLIC_MISC_USE_URL",
         "NEXT_PUBLIC_MISC_USE_ANON_KEY",
         "NEXT_PUBLIC_STUDIO_URL",

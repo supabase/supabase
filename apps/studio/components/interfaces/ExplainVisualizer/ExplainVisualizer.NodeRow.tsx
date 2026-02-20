@@ -36,7 +36,7 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
         {/* Main row */}
         <div
           className={cn(
-            'flex items-stretch border-b-border-muted border-b border-l-4 transition-colors bg-studio group-hover:bg-surface-100/50',
+            'flex items-stretch border-l-4 transition-colors bg-studio group-hover:bg-surface-100/50',
             borderColorClass
           )}
         >
@@ -117,12 +117,12 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
         {isExpanded && detailLines.length > 0 && (
           <div
             className={cn(
-              'border-b-border-muted border-b border-l-4 bg-studio group-hover:bg-surface-100/50',
+              'border-t-border-muted border-t border-l-4 bg-studio group-hover:bg-surface-100/50',
               borderColorClass
             )}
             style={{ paddingLeft: `${16 + indentPx + 32}px` }}
           >
-            <div className="px-4 py-3 space-y-2 font-mono text-xs">
+            <div className="px-0 py-3 space-y-2 font-mono text-xs">
               {detailLines.map((line, idx) => (
                 <div key={idx} className="flex items-start gap-1">
                   {line.label && <span className="text-foreground-muted">{line.label}</span>}

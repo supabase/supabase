@@ -60,7 +60,6 @@ Thumbs.db
 **/node_modules/framer-motion
 
 # Other apps (since we're only deploying www)
-../cms
 ../design-system
 ../docs
 ../studio

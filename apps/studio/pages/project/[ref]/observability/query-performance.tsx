@@ -1,7 +1,9 @@
-import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
+import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 
 import { useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { useSupamonitorStatus } from 'components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import {
@@ -26,6 +28,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const { isSupamonitorEnabled } = useSupamonitorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
 
   const {
@@ -36,19 +39,33 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const [{ search: searchQuery, roles, minCalls, indexAdvisor }] = useQueryStates({
+  const [
+    { search: searchQuery, roles, minCalls, totalTimeFilter: totalTimeFilterRaw, indexAdvisor },
+  ] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     minCalls: parseAsInteger,
+    totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
+      value === null || value === undefined ? null : (value as NumericFilter)
+    ),
     indexAdvisor: parseAsString.withDefault('false'),
   })
+
+  const totalTimeFilter = totalTimeFilterRaw ?? null
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, ref ?? 'default')
   const queryHitRate = hooks.queryHitRate()
   const queryMetrics = hooks.queryMetrics()
+
+  const minTotalTime =
+    totalTimeFilter && totalTimeFilter.operator === '>'
+      ? totalTimeFilter.value
+      : totalTimeFilter && totalTimeFilter.operator === '>='
+        ? totalTimeFilter.value
+        : undefined
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
@@ -57,10 +74,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
     minCalls: minCalls ?? undefined,
+    minTotalTime,
     filterIndexAdvisor: indexAdvisor === 'true',
   })
-
-  const isPgStatMonitorEnabled = project?.dbVersion === '17.4.1.076-psml-1'
 
   if (!isLoadingProject && !project) {
     return (
@@ -83,7 +99,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
             href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
           />
           <DatabaseSelector />
-          {isPgStatMonitorEnabled && (
+          {isSupamonitorEnabled && (
             <LogsDatePicker
               value={datePickerValue}
               helpers={datePickerHelpers.filter(
@@ -101,7 +117,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         queryHitRate={queryHitRate}
         queryPerformanceQuery={queryPerformanceQuery}
         queryMetrics={queryMetrics}
-        isPgStatMonitorEnabled={isPgStatMonitorEnabled}
+        isSupamonitorEnabled={isSupamonitorEnabled}
         dateRange={selectedDateRange}
         onDateRangeChange={updateDateRange}
       />

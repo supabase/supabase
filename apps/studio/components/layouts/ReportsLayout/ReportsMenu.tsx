@@ -18,6 +18,7 @@ import { Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ReportMenuItem } from './ReportMenuItem'
+import { useQueryState, parseAsBoolean } from 'nuqs'
 
 const ReportsMenu = () => {
   const router = useRouter()
@@ -73,7 +74,10 @@ const ReportsMenu = () => {
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [showNewReportModal, setShowNewReportModal] = useState(false)
+  const [showNewReportModal, setShowNewReportModal] = useQueryState(
+    'newReport',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedReportToDelete, setSelectedReportToDelete] = useState<Content>()
   const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<Content>()
 

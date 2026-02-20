@@ -1,11 +1,5 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronUp, Loader2 } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   isExplainQuery,
@@ -20,6 +14,7 @@ import { constructHeaders, isValidConnString } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { wrapWithRollback } from 'data/sql/utils/transaction'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -31,6 +26,11 @@ import { formatSql } from 'lib/formatSql'
 import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { ChevronUp, Loader2 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -55,6 +55,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
@@ -77,7 +78,7 @@ import UtilityPanel from './UtilityPanel/UtilityPanel'
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
 const DiffEditor = dynamic(
-  () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
+  () => import('../../ui/DiffEditor').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
 
@@ -230,7 +231,8 @@ export const SQLEditor = () => {
     async (id: string, sql: string) => {
       try {
         const { title: name } = await generateSqlTitle({ sql })
-        snapV2.renameSnippet({ id, name })
+        snapV2.updateSnippet({ id, snippet: { name } })
+        snapV2.addNeedsSaving(id)
         const tabId = createTabId('sql', { id })
         tabs.updateTab(tabId, { label: name })
       } catch (error) {
@@ -409,10 +411,16 @@ export const SQLEditor = () => {
       // Wrap the query with EXPLAIN ANALYZE only if it's not already an EXPLAIN query
       const explainSql = isExplainSql(sql) ? sql : `EXPLAIN ANALYZE ${sql}`
 
+      // Wrap EXPLAIN queries in a transaction with rollback to prevent data modifications
+      // This ensures EXPLAIN ANALYZE INSERT/UPDATE/DELETE queries don't actually modify data
+      const explainSqlWithTransaction = wrapWithRollback(
+        wrapWithRoleImpersonation(explainSql, impersonatedRoleState)
+      )
+
       executeExplain({
         projectRef: project.ref,
         connectionString: connectionString,
-        sql: wrapWithRoleImpersonation(explainSql, impersonatedRoleState),
+        sql: explainSqlWithTransaction,
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
         handleError: (error) => {
           throw error
@@ -468,6 +476,16 @@ export const SQLEditor = () => {
     }, 20)
     editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
   }
+
+  const buildDebugPrompt = useCallback(() => {
+    const snippet = snapV2.snippets[id]
+    const result = snapV2.results[id]?.[0]
+    const sql = (snippet?.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim()
+    const errorMessage = result?.error?.message ?? 'Unknown error'
+    const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
+
+    return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
+  }, [id, snapV2.results, snapV2.snippets])
 
   const onDebug = useCallback(async () => {
     try {
@@ -780,7 +798,6 @@ export const SQLEditor = () => {
                   {isDiffOpen && (
                     <div className="w-full h-full">
                       <DiffEditor
-                        theme="supabase"
                         language="pgsql"
                         original={defaultSqlDiff.original}
                         modified={defaultSqlDiff.modified}
@@ -788,21 +805,6 @@ export const SQLEditor = () => {
                           diffEditorRef.current = editor
                           setIsDiffEditorMounted(true)
                         }}
-                        options={{
-                          fontSize: 13,
-                          renderSideBySide: false,
-                          minimap: { enabled: false },
-                          wordWrap: 'on',
-                          lineNumbers: 'on',
-                          folding: false,
-                          padding: { top: 4 },
-                          lineNumbersMinChars: 3,
-                        }}
-                        // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
-                        // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
-                        // Error: TextModel got disposed before DiffEditorWidget model got reset
-                        keepCurrentModifiedModel={true}
-                        keepCurrentOriginalModel={true}
                       />
                       {showWidget && (
                         <ResizableAIWidget
@@ -912,6 +914,7 @@ export const SQLEditor = () => {
                 executeQuery={executeQuery}
                 executeExplainQuery={executeExplainQuery}
                 onDebug={onDebug}
+                buildDebugPrompt={buildDebugPrompt}
                 activeTab={activeUtilityTab}
                 onActiveTabChange={setActiveUtilityTab}
               />
