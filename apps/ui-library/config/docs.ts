@@ -97,7 +97,7 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Realtime Avatar Stack',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-avatar-stack',
       items: [],
       commandItemLabel: 'Realtime Avatar Stack',
