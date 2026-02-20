@@ -1242,20 +1242,18 @@ function createStorageExplorerState({
                     }
                     case 400: {
                       const responseBody = error.originalResponse?.getBody()
-                      if (
-                        typeof responseBody === 'string' &&
-                        responseBody.includes('Invalid key:')
-                      ) {
-                        toast.error(`Failed to upload ${file.name}: File name is invalid.`)
-                        break
+                      if (typeof responseBody === 'string') {
+                        if (responseBody.includes('Invalid key:')) {
+                          toast.error(`Failed to upload ${file.name}: File name is invalid.`)
+                          break
+                        }
+
+                        if (responseBody.includes('Invalid Compact JWS')) {
+                          toast.error(`Failed to upload ${file.name}: Invalid Compact JWS.`)
+                          break
+                        }
                       }
-                      if (
-                        typeof responseBody === 'string' &&
-                        responseBody.includes('Invalid Compact JWS')
-                      ) {
-                        toast.error(`Failed to upload ${file.name}: Invalid Compact JWS.`)
-                        break
-                      }
+                      // if it's not handled by the two ifs, fallthrough to the default case which shows the generic error message
                     }
                     default: {
                       toast.error(`Failed to upload ${file.name}: ${error.message}`)
