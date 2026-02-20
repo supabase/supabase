@@ -41,7 +41,9 @@ export async function generateAssistantResponse({
   planId,
   promptProviderOptions,
   providerOptions,
+  requestedModel,
   abortSignal,
+  onSpanCreated,
 }: {
   messages: UIMessage[]
   model: LanguageModel
@@ -55,13 +57,19 @@ export async function generateAssistantResponse({
   userId?: string
   orgId?: number
   planId?: string
+  requestedModel?: string
   promptProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
+  onSpanCreated?: (spanId: string) => void
 }) {
   const shouldTrace = IS_TRACING_ENABLED && !isHipaaEnabled
 
   const run = async (span?: Span) => {
+    if (span) {
+      onSpanCreated?.(span.id)
+    }
+
     // Only returns last 7 messages
     // Filters out tools with invalid states
     // Filters out tool outputs based on opt-in level using renderingToolOutputParser
@@ -171,6 +179,7 @@ export async function generateAssistantResponse({
         userId,
         orgId,
         planId,
+        requestedModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
         environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
       },
