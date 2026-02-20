@@ -382,14 +382,6 @@ export const StripeSyncInstallationPage = () => {
                   </Admonition>
 
                   <h3 className="heading-default">Configuration</h3>
-                  {installRequestError && (
-                    <Admonition
-                      type="destructive"
-                      className="mb-4"
-                      title="Installation failed"
-                      description={installRequestError.message}
-                    />
-                  )}
 
                   <FormField_Shadcn_
                     control={form.control}
@@ -437,6 +429,14 @@ export const StripeSyncInstallationPage = () => {
                       </Link>
                     </Button>
                   </div>
+
+                  {installRequestError && (
+                    <Admonition
+                      type="destructive"
+                      title="Installation failed"
+                      description={installRequestError.message}
+                    />
+                  )}
                 </SheetSection>
 
                 <SheetFooter>
