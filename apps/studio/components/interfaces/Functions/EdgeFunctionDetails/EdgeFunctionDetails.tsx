@@ -150,6 +150,7 @@ export const EdgeFunctionDetails = () => {
       {
         onSuccess: () => {
           toast.success(`Successfully updated edge function`)
+          form.reset({ name: values.name, verify_jwt: values.verify_jwt })
         },
       }
     )
@@ -162,7 +163,7 @@ export const EdgeFunctionDetails = () => {
   }
 
   useEffect(() => {
-    if (selectedFunction) {
+    if (selectedFunction && !form.formState.isDirty) {
       form.reset({
         name: selectedFunction.name,
         verify_jwt: selectedFunction.verify_jwt,
