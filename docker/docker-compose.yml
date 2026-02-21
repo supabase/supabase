@@ -411,9 +411,22 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.8.1.085
+    # Spock-enabled PostgreSQL image with bi-directional replication support
+    # Works as standard PostgreSQL when replication is not configured
+    image: ghcr.io/brainwires/supabase-postgres-spock@sha256:4d8efced503ea177c478927540521aa9910e91b9e01f6493661af79c00d1e2f1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     volumes:
+      # Custom postgresql.conf with spock enabled in shared_preload_libraries
+      - ./volumes/db/postgresql-spock.conf:/etc/postgresql/postgresql.conf:Z
+      # Custom pg_hba.conf with replication access pre-configured
+      - ./volumes/db/pg_hba.conf:/etc/postgresql/pg_hba.conf:Z
+      # Spock/Snowflake init scripts run before upstream migrations (96-98 < 99)
+      # Order: snowflake extension → spock extension → replication user
+      - ./volumes/db/96-snowflake.sql:/docker-entrypoint-initdb.d/migrations/96-snowflake.sql:Z
+      - ./volumes/db/97-spock.sql:/docker-entrypoint-initdb.d/migrations/97-spock.sql:Z
+      - ./volumes/db/98-spock-replication.sh:/docker-entrypoint-initdb.d/migrations/98-spock-replication.sh:Z
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
       - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
@@ -429,6 +442,8 @@ services:
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
       # Changes required for Pooler support
       - ./volumes/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z
+      # Spock setup script for bi-directional replication (run after both nodes are up)
+      - ./volumes/db/spock-setup.sh:/spock-setup.sh:Z
       # Use named volume to persist pgsodium decryption key between restarts
       - db-config:/etc/postgresql-custom
     healthcheck:
@@ -457,14 +472,15 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXP: ${JWT_EXPIRY}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD:-spock_replication_password_change_me}
     command:
-      [
-        "postgres",
-        "-c",
-        "config_file=/etc/postgresql/postgresql.conf",
-        "-c",
-        "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
-      ]
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+      - -c
+      - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
+      - -c
+      - snowflake.node=${SNOWFLAKE_NODE:-1}
 
   vector:
     container_name: supabase-vector
