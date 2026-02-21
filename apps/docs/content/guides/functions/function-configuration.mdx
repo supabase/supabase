@@ -64,6 +64,16 @@ Be careful when using this flag, as it will allow anyone to invoke your Edge Fun
 
 </Admonition>
 
+<Admonition type="important">
+
+**If you are using the new [JWT Signing Keys](/docs/guides/auth/signing-keys) (ES256 or RS256 asymmetric keys), you must set `verify_jwt = false`.**
+
+The built-in `verify_jwt` check only supports the legacy **HS256 symmetric secret**. Tokens signed with ES256 or RS256 keys will be rejected with a `401 Invalid JWT` error before your function code runs, even when the token is valid.
+
+To verify asymmetric JWTs, disable the built-in check and use the JWKS-based verification pattern described in the [Securing Edge Functions](/docs/guides/functions/auth) guide instead.
+
+</Admonition>
+
 ---
 
 ## Custom entrypoints
