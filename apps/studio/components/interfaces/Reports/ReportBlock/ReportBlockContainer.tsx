@@ -53,7 +53,7 @@ export const ReportBlockContainer = ({
             ) : (
               <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
-            <div className={cn('flex items-center gap-2 flex-1 transition-opacity')}>
+            <div className={cn('flex items-center gap-2 flex-1 min-w-0 transition-opacity')}>
               <h3 className="heading-meta truncate">{label}</h3>
               {badge && <div className="flex items-center shrink-0">{badge}</div>}
             </div>
@@ -69,12 +69,12 @@ export const ReportBlockContainer = ({
       <div
         className={cn(
           'relative flex flex-col flex-grow w-full',
-          hasChildren && 'border-t overflow-hidden'
+          hasChildren && 'border-t'
         )}
       >
         <div
           className={cn(
-            'flex flex-col flex-grow items-center overflow-hidden',
+            'flex flex-col flex-grow items-center',
             loading && 'pointer-events-none'
           )}
         >

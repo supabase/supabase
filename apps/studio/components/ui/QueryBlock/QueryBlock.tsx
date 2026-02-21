@@ -222,7 +222,7 @@ export const QueryBlock = ({
 
       {showSql && (
         <div
-          className={cn('shrink-0 grow-1 w-full h-full overflow-y-auto max-h-[min(300px, 100%)]', {
+          className={cn('shrink-0 grow-1 w-full h-full overflow-y-auto overscroll-contain max-h-[min(300px, 100%)]', {
             'border-b': results !== undefined,
           })}
         >
@@ -338,7 +338,7 @@ export const QueryBlock = ({
             </div>
           ) : (
             results && (
-              <div className={cn('flex-1 w-full overflow-auto relative max-h-64')}>
+              <div className={cn('flex-1 w-full overflow-auto overscroll-contain relative max-h-64')}>
                 <Results rows={results} />
               </div>
             )

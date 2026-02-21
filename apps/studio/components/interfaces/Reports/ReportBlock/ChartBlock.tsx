@@ -298,7 +298,7 @@ export const ChartBlock = ({
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
-                  width={effectiveLogScale ? 52 : undefined}
+                  width={effectiveLogScale ? 52 : 60}
                   tickFormatter={effectiveLogScale ? formatLogTick : undefined}
                 />
                 <ChartTooltip
@@ -326,7 +326,7 @@ export const ChartBlock = ({
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
-                  width={effectiveLogScale ? 52 : undefined}
+                  width={effectiveLogScale ? 52 : 60}
                   tickFormatter={effectiveLogScale ? formatLogTick : undefined}
                 />
                 <ChartTooltip
