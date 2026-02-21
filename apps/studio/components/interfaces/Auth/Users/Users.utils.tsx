@@ -1,9 +1,6 @@
 import dayjs from 'dayjs'
 import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
-
-import { User } from 'data/auth/users-infinite-query'
-import { BASE_PATH } from 'lib/constants'
 import {
   Checkbox_Shadcn_,
   cn,
@@ -14,9 +11,12 @@ import {
   ContextMenuTrigger_Shadcn_,
   copyToClipboard,
 } from 'ui'
+
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ColumnConfiguration, UsersTableColumn } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'
+import { User } from '@/data/auth/users-infinite-query'
+import { BASE_PATH } from '@/lib/constants'
 
 const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
@@ -299,7 +299,7 @@ export const formatUserColumns = ({
       renderCell: ({ row }) => {
         // This is actually a valid React component, so we can use hooks here
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [isRowSelected, onRowSelectionChange] = useRowSelection()
+        const { isRowSelected, onRowSelectionChange } = useRowSelection()
 
         const value = row?.[col.id]
         const user = users?.find((u) => u.id === row.id)
@@ -329,7 +329,6 @@ export const formatUserColumns = ({
                   e.stopPropagation()
                   onRowSelectionChange({
                     row,
-                    type: 'ROW',
                     checked: !isRowSelected,
                     isShiftClick: e.shiftKey,
                   })
@@ -363,6 +362,7 @@ export const formatUserColumns = ({
                     const provider = row.providers[idx]
                     return (
                       <div
+                        key={`${user?.id}-${provider}-wrapper`}
                         className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
                         style={{
                           marginLeft: idx === 0 ? 0 : `-8px`,

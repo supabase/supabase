@@ -1,17 +1,17 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
+import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 
-import { ResponseError } from '@/types'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import {
   inverseValidObjectKeyRegex,
   validObjectKeyRegex,
-} from 'components/interfaces/Storage/CreateBucketModal.utils'
+} from '@/components/interfaces/Storage/CreateBucketModal.utils'
 import {
   STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
@@ -19,38 +19,38 @@ import {
   STORAGE_SORT_BY,
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
-} from 'components/interfaces/Storage/Storage.constants'
+} from '@/components/interfaces/Storage/Storage.constants'
 import {
   StorageColumn,
   StorageItem,
   StorageItemMetadata,
   StorageItemWithColumn,
-} from 'components/interfaces/Storage/Storage.types'
+} from '@/components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
-} from 'components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
-import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { InlineLink } from 'components/ui/InlineLink'
-import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
-import { configKeys } from 'data/config/keys'
-import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
-import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
-import { getQueryClient } from 'data/query-client'
-import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
-import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
-import { deleteBucketPrefix } from 'data/storage/bucket-prefix-delete-mutation'
-import { Bucket } from 'data/storage/buckets-query'
-import { moveStorageObject } from 'data/storage/object-move-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { tryParseJson } from 'lib/helpers'
-import { lookupMime } from 'lib/mime'
-import { createProjectSupabaseClient } from 'lib/project-supabase-client'
-import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+} from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
+import { configKeys } from '@/data/config/keys'
+import { useProjectEndpointQuery } from '@/data/config/project-endpoint-query'
+import type { ProjectStorageConfigResponse } from '@/data/config/project-storage-config-query'
+import { getQueryClient } from '@/data/query-client'
+import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation'
+import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
+import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
+import type { Bucket } from '@/data/storage/buckets-query'
+import { moveStorageObject } from '@/data/storage/object-move-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import { tryParseJson } from '@/lib/helpers'
+import { lookupMime } from '@/lib/mime'
+import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
+import { ResponseError } from '@/types'
 
 type UploadProgress = {
   percentage: number
@@ -1159,17 +1159,17 @@ function createStorageExplorerState({
             let chunkSize: number
 
             if (fileSizeInMB < 30) {
-              chunkSize = 6 * 1024 * 1024
+              chunkSize = 6 * 1024 * 1024 // 6MB
             } else if (fileSizeInMB < 100) {
-              chunkSize = Math.floor(file.size / 8)
+              chunkSize = Math.floor(file.size / 8) // maximum 8 chunks, 12,5MB each
             } else if (fileSizeInMB < 500) {
-              chunkSize = Math.floor(file.size / 10)
+              chunkSize = Math.floor(file.size / 10) // maximum 10 chunks, 50MB each
             } else if (fileSizeInMB < 1024) {
-              chunkSize = Math.floor(file.size / 20)
+              chunkSize = Math.floor(file.size / 20) // maximum 20 chunks, 50MB each
             } else if (fileSizeInMB < 10 * 1024) {
-              chunkSize = Math.floor(file.size / 30)
+              chunkSize = Math.floor(file.size / 30) // maximum 30 chunks, 333MB each
             } else {
-              chunkSize = Math.floor(file.size / 50)
+              chunkSize = Math.floor(file.size / 50) // maximum 50 chunks
             }
 
             // Max chunk size is 500MB
@@ -1215,7 +1215,7 @@ function createStorageExplorerState({
                   const status = error.originalResponse?.getStatus()
 
                   switch (status) {
-                    case 415:
+                    case 415: {
                       // Unsupported mime type
                       toast.error(
                         capitalize(
@@ -1227,20 +1227,38 @@ function createStorageExplorerState({
                         }
                       )
                       break
-                    case 413:
+                    }
+                    case 413: {
                       // Payload too large
                       toast.error(
                         `Failed to upload ${file.name}: File size exceeds the bucket file size limit.`
                       )
                       break
-                    case 409:
+                    }
+                    case 409: {
                       // Resource already exists
                       toast.error(`Failed to upload ${file.name}: File name already exists.`)
                       break
-                    case 400:
-                      // Invalid key
-                      toast.error(`Failed to upload ${file.name}: File name is invalid`)
+                    }
+                    case 400: {
+                      const responseBody = error.originalResponse?.getBody()
+                      if (typeof responseBody === 'string') {
+                        if (responseBody.includes('Invalid key:')) {
+                          toast.error(`Failed to upload ${file.name}: File name is invalid.`)
+                          break
+                        }
+
+                        if (responseBody.includes('Invalid Compact JWS')) {
+                          toast.error(`Failed to upload ${file.name}: Invalid Compact JWS.`)
+                          break
+                        }
+                      }
+                      // if it's not handled by the two ifs, fallthrough to the default case which shows the generic error message
+                    }
+                    default: {
+                      toast.error(`Failed to upload ${file.name}: ${error.message}`)
                       break
+                    }
                   }
                 } else {
                   toast.error(`Failed to upload ${file.name}: ${error.message}`)
@@ -1906,7 +1924,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const storeAlreadyLoaded = state.projectRef === project?.ref
 
     if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
-      const clientEndpoint = endpointData.endpoint
+      const clientEndpoint = endpointData.storageEndpoint ?? endpointData.endpoint
       const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
       setState(
         createStorageExplorerState({
@@ -1924,6 +1942,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     stateRef,
     isPaused,
     endpointData?.endpoint,
+    endpointData?.storageEndpoint,
     isSuccessSettings,
   ])
 

@@ -11,35 +11,35 @@ import {
   Type,
 } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useId, useState } from 'react'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Command_Shadcn_,
   CriticalIcon,
   Input,
   Label_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 
 import {
-  POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
+  POSTGRES_DATA_TYPES,
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
@@ -70,6 +70,7 @@ const ColumnType = ({
   error,
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
+  const listboxId = useId()
   const availableTypes = POSTGRES_DATA_TYPES.concat(
     enumTypes.map((type) => type.format.replaceAll('"', ''))
   )
@@ -173,6 +174,7 @@ const ColumnType = ({
             role="combobox"
             size={'small'}
             aria-expanded={open}
+            aria-controls={listboxId}
             className={cn('w-full justify-between', !value && 'text-foreground-lighter')}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
@@ -186,7 +188,12 @@ const ColumnType = ({
             )}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-[460px] p-0" side="bottom" align="center">
+        <PopoverContent_Shadcn_
+          id={listboxId}
+          className="w-[460px] p-0"
+          side="bottom"
+          align="center"
+        >
           <Command_Shadcn_>
             <CommandInput_Shadcn_
               placeholder="Search types..."
