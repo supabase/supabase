@@ -475,13 +475,16 @@ const GitHubIntegrationConnectionForm = ({
                         <Command_Shadcn_>
                           <CommandInput_Shadcn_ placeholder="Search repositories..." />
                           <CommandList_Shadcn_ className="!max-h-[200px]">
-                            <CommandEmpty_Shadcn_>No repositories found.</CommandEmpty_Shadcn_>
+                            <CommandEmpty_Shadcn_>
+                              No repositories found. Use &quot;Add GitHub Repositories&quot; below
+                              to grant the Supabase GitHub App access to more repositories.
+                            </CommandEmpty_Shadcn_>
                             {githubRepos.length > 0 ? (
                               <CommandGroup_Shadcn_>
-                                {githubRepos.map((repo, i) => (
+                                {githubRepos.map((repo) => (
                                   <CommandItem_Shadcn_
                                     key={repo.id}
-                                    value={`${repo.name.replaceAll('"', '')}-${i}`}
+                                    value={`${repo.name}-${repo.id}`}
                                     className="flex gap-2 items-center"
                                     onSelect={() => {
                                       field.onChange(repo.id)
