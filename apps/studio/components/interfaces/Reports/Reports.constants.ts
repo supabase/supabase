@@ -615,7 +615,7 @@ select
 
         -- Count of slow queries (> 1 second average)
         SELECT count(*) as slow_queries_count
-        FROM pg_stat_statements 
+        FROM pg_stat_statements as statements
         WHERE statements.mean_exec_time > 1000;`,
       },
       queryMetrics: {
