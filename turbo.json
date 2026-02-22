@@ -112,6 +112,7 @@
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
+        "VERCEL_GIT_COMMIT_REF",
         "VERCEL_GIT_COMMIT_SHA",
         "SNIPPETS_MANAGEMENT_FOLDER",
         "EDGE_FUNCTIONS_MANAGEMENT_FOLDER"

@@ -1,10 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
 import { isEqual } from 'lodash'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
@@ -34,6 +29,11 @@ import LogSelection from './LogSelection'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useProfile } from '@/lib/profile'
 
 interface Props {
   data?: LogData[]
@@ -394,7 +394,7 @@ export const LogTable = ({
     <section className={'h-full flex w-full flex-col flex-1'}>
       {!queryType && <LogsExplorerTableHeader />}
 
-      <ResizablePanelGroup direction="horizontal">
+      <ResizablePanelGroup direction="horizontal" key="log-table">
         <ResizablePanel
           id="log-table-content"
           order={1}

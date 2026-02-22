@@ -1,31 +1,42 @@
-/**
- * Sends a Slack notification with stale Dashboard PRs
- *
- * @param {Array} stalePRs - Array of stale PRs from find-stale-dashboard-prs.js
- * @param {string} webhookUrl - Slack webhook URL
- */
-module.exports = async (stalePRs, webhookUrl) => {
+const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL
+
+if (!SLACK_WEBHOOK_URL) {
+  console.error('SLACK_WEBHOOK_URL environment variable is required')
+  process.exit(1)
+}
+
+interface StalePR {
+  number: number
+  title: string
+  url: string
+  author: string
+  createdAt: string
+  hoursOld: number
+  daysOld: number
+  fileCount: number
+  reviewStatus: string
+  reviewEmoji: string
+  mergeableStatus: string
+  mergeableEmoji: string
+}
+
+function escapeSlack(text: string) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+async function sendSlackNotification(stalePRs: StalePR[]) {
   const count = stalePRs.length
 
-  // Build PR blocks with proper escaping for Slack mrkdwn
   const prBlocks = stalePRs.map((pr) => {
-    // Format age display
     const remainingHours = pr.hoursOld % 24
     const ageText = pr.daysOld > 0 ? `${pr.daysOld}d ${remainingHours}h` : `${pr.hoursOld}h`
 
-    // Escape special characters for Slack mrkdwn (escape &, <, >)
-    const escapeSlack = (text) => {
-      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    }
-
-    // Truncate title if too long (max 3000 chars for entire text field)
     const maxTitleLength = 200
     const safeTitle =
       pr.title.length > maxTitleLength
         ? escapeSlack(pr.title.substring(0, maxTitleLength) + '...')
         : escapeSlack(pr.title)
 
-    // Format status text
     const reviewStatusText =
       pr.reviewStatus === 'approved'
         ? 'Approved'
@@ -59,13 +70,10 @@ module.exports = async (stalePRs, webhookUrl) => {
     }
   })
 
-  // Slack has a 50 block limit, we use 3 for header/intro/divider
-  // So we can show max 47 PRs
   const MAX_PRS_TO_SHOW = 47
   const prBlocksToShow = prBlocks.slice(0, MAX_PRS_TO_SHOW)
   const hasMorePRs = prBlocks.length > MAX_PRS_TO_SHOW
 
-  // Build complete Slack message
   const slackMessage = {
     text: 'Dashboard PRs needing attention',
     blocks: [
@@ -90,12 +98,9 @@ module.exports = async (stalePRs, webhookUrl) => {
     ],
   }
 
-  // Send to Slack
-  const response = await fetch(webhookUrl, {
+  const response = await fetch(SLACK_WEBHOOK_URL!, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(slackMessage),
   })
 
@@ -106,5 +111,30 @@ module.exports = async (stalePRs, webhookUrl) => {
     )
   }
 
-  console.log('✓ Slack notification sent successfully!')
+  console.error('Slack notification sent successfully!')
 }
+
+// Read JSON from stdin
+async function readStdin(): Promise<string> {
+  const chunks: Buffer[] = []
+  for await (const chunk of process.stdin) {
+    chunks.push(chunk)
+  }
+  return Buffer.concat(chunks).toString('utf-8')
+}
+
+readStdin()
+  .then(async (input) => {
+    const stalePRs: StalePR[] = JSON.parse(input)
+
+    if (stalePRs.length === 0) {
+      console.error('No stale PRs to notify about')
+      return
+    }
+
+    await sendSlackNotification(stalePRs)
+  })
+  .catch((error) => {
+    console.error('Error:', error.message)
+    process.exit(1)
+  })
