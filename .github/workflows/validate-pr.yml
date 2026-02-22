@@ -5,6 +5,8 @@ on:
   pull_request:
     types: [opened, labeled, unlabeled, synchronize, ready_for_review]
 
+permissions: {}
+
 jobs:
   validate-pr:
     runs-on: ubuntu-latest
