@@ -1,8 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -12,8 +8,12 @@ import { useContentIdQuery } from 'data/content/content-id-query'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards, SqlSnippets } from 'types'
+
 import { DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
@@ -195,6 +195,7 @@ export const ReportBlock = ({
           attribute={item.attribute}
           provider={item.provider}
           defaultChartStyle={item.chart_type}
+          defaultLogScale={chartConfig?.logScale ?? false}
           maxHeight={176}
           label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
           actions={
