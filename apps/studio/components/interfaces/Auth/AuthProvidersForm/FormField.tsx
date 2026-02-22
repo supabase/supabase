@@ -150,7 +150,6 @@ const FormField = ({
           id={name}
           name={name}
           disabled={disabled}
-          type={hidden ? 'password' : 'text'}
           label={properties.title}
           labelOptional={
             properties.descriptionOptional ? (
