@@ -10,17 +10,36 @@ const props = defineProps<{
 const open = inject<Ref<boolean>>('tooltipOpen')
 
 const positionClasses = computed(() => {
+  const offset = props.sideOffset ?? 2
   switch (props.side) {
     case 'top':
-      return `bottom-full mb-${props.sideOffset ?? 4}`
+      return 'bottom-full mb-2'
     case 'bottom':
-      return `top-full mt-${props.sideOffset ?? 4}`
+      return 'top-full mt-2'
     case 'left':
-      return `right-full mr-${props.sideOffset ?? 4}`
+      return 'right-full mr-2'
     case 'right':
-      return `left-full ml-${props.sideOffset ?? 4}`
+      return 'left-full ml-2'
     default:
-      return `top-full mt-${props.sideOffset ?? 4}`
+      return 'top-full mt-2'
+  }
+})
+
+const positionStyle = computed(() => {
+  const offset = props.sideOffset ?? 4
+  const allowedOffsets = [2, 4, 8]
+  if (allowedOffsets.includes(offset)) return {}
+  switch (props.side) {
+    case 'top':
+      return { marginBottom: `${offset}px` }
+    case 'bottom':
+      return { marginTop: `${offset}px` }
+    case 'left':
+      return { marginRight: `${offset}px` }
+    case 'right':
+      return { marginLeft: `${offset}px` }
+    default:
+      return { marginTop: `${offset}px` }
   }
 })
 </script>
@@ -35,6 +54,7 @@ const positionClasses = computed(() => {
         positionClasses,
         props.class,
       ]"
+      :style="positionStyle"
     >
       <slot />
     </div>

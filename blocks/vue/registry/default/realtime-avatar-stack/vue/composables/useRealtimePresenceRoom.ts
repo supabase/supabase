@@ -35,14 +35,25 @@ export function useRealtimePresenceRoom(roomName: string) {
         const newUsers = Object.fromEntries(
           Object.entries(newState).map(([key, values]) => {
             const typedValues = values as Array<{ image: string; name: string }>
-            return [
-              key,
-              {
-                id: key,
-                name: typedValues[0].name,
-                image: typedValues[0].image,
-              },
-            ]
+            if (typedValues.length > 0) {
+              return [
+                key,
+                {
+                  id: key,
+                  name: typedValues[0].name,
+                  image: typedValues[0].image,
+                },
+              ]
+            } else {
+              return [
+                key,
+                {
+                  id: key,
+                  name: '',
+                  image: '',
+                },
+              ]
+            }
           })
         ) as Record<string, RealtimeUser>
 
