@@ -12,13 +12,13 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^1.0.1",
+    "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tsconfig/svelte": "^3.0.0",
     "concurrently": "^7.3.0",
-    "svelte": "^3.49.0",
-    "svelte-check": "^2.8.0",
+    "svelte": "^5.53.2",
+    "svelte-check": "^4.4.3",
     "svelte-hcaptcha": "^0.1.1",
-    "svelte-preprocess": "^4.10.7",
+    "svelte-preprocess": "^6.0.3",
     "tailwindcss": "^3.1.8",
     "tslib": "^2.4.0",
     "typescript": "^4.7.4",

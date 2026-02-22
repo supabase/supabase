@@ -82,7 +82,7 @@
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
     "shared-data": "workspace:*",
-    "swiper": "^11.0.7",
+    "swiper": "^12.1.2",
     "typed.js": "^2.0.16",
     "typescript": "catalog:",
     "ui": "workspace:*",

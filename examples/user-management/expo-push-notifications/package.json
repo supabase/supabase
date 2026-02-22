@@ -13,14 +13,14 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@shopify/flash-list": "1.6.4",
     "@supabase/supabase-js": "^2.38.2",
-    "expo": "~51.0.8",
+    "expo": "~54.0.33",
     "expo-constants": "~16.0.1",
-    "expo-dev-client": "~4.0.14",
+    "expo-dev-client": "~6.0.20",
     "expo-device": "~6.0.2",
     "expo-notifications": "~0.28.3",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
-    "react-native": "0.74.1",
+    "react-native": "0.84.0",
     "react-native-url-polyfill": "^2.0.0"
   },
   "devDependencies": {
