@@ -20,7 +20,7 @@ const page: GoPageInput = {
       alt: 'Ebook cover: Building Modern Applications with Supabase',
       width: 400,
       height: 500,
-    },  
+    },
     ctas: [
       {
         label: 'Get in touch',
@@ -32,14 +32,14 @@ const page: GoPageInput = {
         href: 'https://supabase.com/dashboard',
         variant: 'secondary',
       },
-
     ],
   },
   sections: [
     {
       type: 'single-column',
       title: 'Watch the recording',
-      description: 'Join Bolt CEO Eric Simons and learn how enterprise innovation teams are using AI coding tools to build real applications on Supabase.',
+      description:
+        'Join Bolt CEO Eric Simons and learn how enterprise innovation teams are using AI coding tools to build real applications on Supabase.',
       children: <MediaBlock youtubeUrl="https://www.youtube.com/watch?v=YR30uzwWoDM" />,
     },
     {
@@ -82,8 +82,7 @@ const page: GoPageInput = {
     {
       type: 'form',
       title: 'Tell us how we can help',
-      description:
-        'Share your details and we’ll follow up with resources or a conversation.',
+      description: 'Share your details and we’ll follow up with resources or a conversation.',
       fields: [
         {
           type: 'text',

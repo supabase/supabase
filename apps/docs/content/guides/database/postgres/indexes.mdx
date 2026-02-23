@@ -72,12 +72,12 @@ Here is a simplified diagram of the index we just created (note that in practice
 <Image
   alt="B-Tree index example in Postgres"
 
-  src={{
+src={{
     dark: '/docs/img/database/managing-indexes/creating-indexes.png',
     light: '/docs/img/database/managing-indexes/creating-indexes--light.png',
   }}
-  width={1600}
-  height={1091}
+width={1600}
+height={1091}
 />
 
 You can see that in any large data set, traversing the index to locate a given value can be done in much less operations (O(log n)) than compared to scanning the table one value at a time from top to bottom (O(n)).

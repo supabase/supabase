@@ -10,9 +10,8 @@ const page: GoPageInput = {
     description: 'Thanks for getting in touch. We’ll be in touch with resources and next steps.',
   },
   hero: {
-    title: "Thanks for getting in touch",
-    description:
-      "We've received your details. Our team will follow up with you shortly.",
+    title: 'Thanks for getting in touch',
+    description: "We've received your details. Our team will follow up with you shortly.",
   },
   sections: [
     {
