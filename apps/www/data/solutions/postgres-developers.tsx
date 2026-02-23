@@ -113,7 +113,7 @@ const data: () => {
       label: '',
       heading: (
         <>
-          Why <span className="text-foreground">Postrges developers</span> choose Supabase
+          Why <span className="text-foreground">Postgres developers</span> choose Supabase
         </>
       ),
       subheading:
