@@ -15,6 +15,20 @@ Check updates for each service to learn more.
 
 ---
 
+## [2026-02-18]
+
+### Storage
+- Updated `supabase/storage-api` to `v1.37.8` in `docker-compose.s3.yml`
+- Changed MinIO image in `docker-compose.s3.yml` to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Removed `imgproxy` service from `docker-compose.s3.yml` to minimize redundancy - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Fixed inconsistent `storage` service entry ordering in `docker-compose.yml` and `docker-compose.s3.yml` to improve diff readability (requires `docker-compose.yml` and `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+
+### Edge Runtime
+
+- Added a `deno-cache` named volume to to avoid re-downloading dependencies (requires `docker-compose.yml` and `volumes/functions/*` update) - PR [#40822](https://github.com/supabase/supabase/pull/40822)
+
+---
+
 ## [2026-02-16]
 
 ⚠️ **Note:** This update includes several breaking changes, including a security fix for Analytics. Please check the details below. The following configuration files have been updated: `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `volumes/api/kong.yml`, and `volumes/logs/vector.yml`. 

@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
-import { useFlag } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { EdgeFunctionRecentInvocations } from 'components/interfaces/Functions/EdgeFunctionRecentInvocations'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
@@ -22,9 +22,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
@@ -138,6 +138,14 @@ const PageLayout: NextPageWithLayout = () => {
     <PageContainer size="full">
       <PageSection>
         <PageSectionContent>
+          {IS_PLATFORM && id && (
+            <div className="mb-8">
+              <EdgeFunctionRecentInvocations
+                functionId={id}
+                functionSlug={functionSlug as string}
+              />
+            </div>
+          )}
           <div className="flex flex-row items-center gap-2 mb-4">
             <div className="flex items-center">
               {CHART_INTERVALS.map((item, i) => {
