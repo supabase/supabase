@@ -90,9 +90,9 @@ These variables are safe to expose in your Expo app since Supabase has [Row Leve
 Create a `.env` file containing these variables:
 
 <$CodeSample
-  path="/auth/expo-social-auth/.env.template"
-  lines={[[1, -1]]}
-  meta="name=.env"
+path="/auth/expo-social-auth/.env.template"
+lines={[[1, -1]]}
+meta="name=.env"
 />
 
 ### Set up protected navigation
@@ -104,9 +104,9 @@ Next, you need to protect app navigation to prevent unauthenticated users from a
 Create [a React context](https://react.dev/learn/passing-data-deeply-with-context) to manage the authentication session, making it accessible from any component:
 
 <$CodeSample
-  path="/auth/expo-social-auth/hooks/use-auth-context.tsx"
-  lines={[[1, -1]]}
-  meta="name=hooks/use-auth-context.tsx"
+path="/auth/expo-social-auth/hooks/use-auth-context.tsx"
+lines={[[1, -1]]}
+meta="name=hooks/use-auth-context.tsx"
 />
 
 #### Create the `AuthProvider`
@@ -114,9 +114,9 @@ Create [a React context](https://react.dev/learn/passing-data-deeply-with-contex
 Next, create a provider component to manage the authentication session throughout the app:
 
 <$CodeSample
-  path="/auth/expo-social-auth/providers/auth-provider.tsx"
-  lines={[[1, -1]]}
-  meta="name=providers/auth-provider.tsx"
+path="/auth/expo-social-auth/providers/auth-provider.tsx"
+lines={[[1, -1]]}
+meta="name=providers/auth-provider.tsx"
 />
 
 #### Create the `SplashScreenController`
@@ -124,9 +124,9 @@ Next, create a provider component to manage the authentication session throughou
 Create a `SplashScreenController` component to display the [Expo `SplashScreen`](https://docs.expo.dev/versions/latest/sdk/splash-screen/) while the authentication session is loading:
 
 <$CodeSample
-  path="/auth/expo-social-auth/components/splash-screen-controller.tsx"
-  lines={[[1, -1]]}
-  meta="name=components/splash-screen-controller.tsx"
+path="/auth/expo-social-auth/components/splash-screen-controller.tsx"
+lines={[[1, -1]]}
+meta="name=components/splash-screen-controller.tsx"
 />
 
 ### Create a logout component
@@ -134,17 +134,17 @@ Create a `SplashScreenController` component to display the [Expo `SplashScreen`]
 Create a logout button component to handle user sign-out:
 
 <$CodeSample
-  path="/auth/expo-social-auth/components/social-auth-buttons/sign-out-button.tsx"
-  lines={[[1, -1]]}
-  meta="name=components/social-auth-buttons/sign-out-button.tsx"
+path="/auth/expo-social-auth/components/social-auth-buttons/sign-out-button.tsx"
+lines={[[1, -1]]}
+meta="name=components/social-auth-buttons/sign-out-button.tsx"
 />
 
 And add it to the `app/(tabs)/index.tsx` file used to display the user profile data and the logout button:
 
 <$CodeSample
-  path="/auth/expo-social-auth/app/(tabs)/index.tsx"
-  lines={[[1, -1]]}
-  meta="name=app/(tabs)/index.tsx"
+path="/auth/expo-social-auth/app/(tabs)/index.tsx"
+lines={[[1, -1]]}
+meta="name=app/(tabs)/index.tsx"
 />
 
 ### Create a login screen
@@ -152,9 +152,9 @@ And add it to the `app/(tabs)/index.tsx` file used to display the user profile d
 Next, create a basic login screen component:
 
 <$CodeSample
-  path="/auth/expo-social-auth/app/login.tsx"
-  lines={[[1, -1]]}
-  meta="name=app/login.tsx"
+path="/auth/expo-social-auth/app/login.tsx"
+lines={[[1, -1]]}
+meta="name=app/login.tsx"
 />
 
 #### Implement protected routes
@@ -163,10 +163,11 @@ Wrap the navigation with the `AuthProvider` and `SplashScreenController`.
 
 Using [Expo Router's protected routes](https://docs.expo.dev/router/advanced/authentication/#using-protected-routes), you can secure navigation:
 
+{/* prettier-ignore */}
 <$CodeSample
-  path="/auth/expo-social-auth/app/_layout.tsx"
-  lines={[[1, -1]]}
-  meta="name=app/_layout.tsx"
+path="/auth/expo-social-auth/app/_layout.tsx"
+lines={[[1, -1]]}
+meta="name=app/_layout.tsx"
 />
 
 You can now test the app by running:
