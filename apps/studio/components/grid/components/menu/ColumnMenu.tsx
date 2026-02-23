@@ -1,13 +1,13 @@
-import type { Sort } from 'components/grid/types'
-import { ArrowDown, ArrowUp, ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
-import type { CalculatedColumn } from 'react-data-grid'
-
 import { useTableSort } from 'components/grid/hooks/useTableSort'
+import type { Sort } from 'components/grid/types'
+import { ArrowDown, ArrowUp, ChevronDown, Copy, Edit, Lock, Trash, Unlock } from 'lucide-react'
+import type { CalculatedColumn } from 'react-data-grid'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -96,6 +96,16 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         {snap.editable && (
           <>
             <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="space-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                copyToClipboard(columnName)
+              }}
+            >
+              <Copy size={12} />
+              <span>Copy name</span>
+            </DropdownMenuItem>
             <Tooltip>
               <TooltipTrigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
                 <DropdownMenuItem
