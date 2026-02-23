@@ -5,7 +5,7 @@ import GoPageRenderer from '@/components/Go/GoPageRenderer'
 import { SITE_ORIGIN } from '@/lib/constants'
 import { getAllGoSlugs, getGoPageBySlug } from '@/lib/go'
 
-export const revalidate = 30
+export const dynamic = "force-static"
 
 type Params = { slug: string[] }
 
