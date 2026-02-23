@@ -33,7 +33,6 @@ export type IcebergDestinationConfig = {
 
 export type BatchConfig = {
   maxFillMs?: number
-  maxSize?: number
 }
 
 export type CreateDestinationPipelineParams = {
@@ -121,7 +120,6 @@ async function createDestinationPipeline(
           ? {
               batch: {
                 ...(batch.maxFillMs !== undefined ? { max_fill_ms: batch.maxFillMs } : {}),
-                ...(batch.maxSize !== undefined ? { max_size: batch.maxSize } : {}),
               },
             }
           : {}),

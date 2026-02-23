@@ -174,7 +174,6 @@ export const DestinationForm = ({
       name: destinationData?.name ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? undefined,
-      maxSize: pipelineData?.config?.batch?.max_size ?? undefined,
       maxTableSyncWorkers: pipelineData?.config?.max_table_sync_workers ?? undefined,
       maxCopyConnectionsPerTable: pipelineData?.config?.max_copy_connections_per_table ?? undefined,
       // BigQuery fields
@@ -304,7 +303,6 @@ export const DestinationForm = ({
         sourceId,
         publicationName: data.publicationName,
         maxFillMs: data.maxFillMs,
-        maxSize: data.maxSize,
         maxTableSyncWorkers: data.maxTableSyncWorkers,
         maxCopyConnectionsPerTable: data.maxCopyConnectionsPerTable,
       }),
@@ -405,10 +403,9 @@ export const DestinationForm = ({
         }
 
         const batchConfig: BatchConfig | undefined =
-          data.maxFillMs !== undefined || data.maxSize !== undefined
+          data.maxFillMs !== undefined
             ? {
                 ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
-                ...(data.maxSize !== undefined ? { maxSize: data.maxSize } : {}),
               }
             : undefined
         const hasBatchFields = batchConfig !== undefined
@@ -489,10 +486,9 @@ export const DestinationForm = ({
           destinationConfig = { iceberg: icebergConfig }
         }
         const batchConfig: BatchConfig | undefined =
-          data.maxFillMs !== undefined || data.maxSize !== undefined
+          data.maxFillMs !== undefined
             ? {
                 ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
-                ...(data.maxSize !== undefined ? { maxSize: data.maxSize } : {}),
               }
             : undefined
         const hasBatchFields = batchConfig !== undefined

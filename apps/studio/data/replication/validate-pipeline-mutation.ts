@@ -9,7 +9,6 @@ type ValidatePipelineParams = {
   sourceId: number
   publicationName: string
   maxFillMs?: number
-  maxSize?: number
   maxTableSyncWorkers?: number
   maxCopyConnectionsPerTable?: number
 }
@@ -21,7 +20,6 @@ async function validatePipeline(
     sourceId,
     publicationName,
     maxFillMs,
-    maxSize,
     maxTableSyncWorkers,
     maxCopyConnectionsPerTable,
   }: ValidatePipelineParams,
@@ -31,9 +29,7 @@ async function validatePipeline(
   if (!sourceId) throw new Error('sourceId is required')
 
   const batchConfig =
-    maxFillMs !== undefined || maxSize !== undefined
-      ? { max_fill_ms: maxFillMs, max_size: maxSize }
-      : undefined
+    maxFillMs !== undefined ? { max_fill_ms: maxFillMs } : undefined
 
   const { data, error } = await post('/platform/replication/{ref}/pipelines/validate', {
     params: { path: { ref: projectRef } },

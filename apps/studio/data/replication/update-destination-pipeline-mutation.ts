@@ -96,7 +96,6 @@ async function updateDestinationPipeline(
             ? {
                 batch: {
                   ...(batch.maxFillMs !== undefined ? { max_fill_ms: batch.maxFillMs } : {}),
-                  ...(batch.maxSize !== undefined ? { max_size: batch.maxSize } : {}),
                 },
               }
             : {}),

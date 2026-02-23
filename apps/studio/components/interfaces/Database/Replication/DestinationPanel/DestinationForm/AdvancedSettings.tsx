@@ -74,35 +74,6 @@ export const AdvancedSettings = ({
 
             <FormField_Shadcn_
               control={form.control}
-              name="maxSize"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Batch size"
-                  layout="horizontal"
-                  description={
-                    <>
-                      <p>Number of rows to send in a batch.</p>
-                      <p>Larger batches use more memory, with the risk of running out of memory.</p>
-                    </>
-                  }
-                >
-                  <FormControl_Shadcn_>
-                    <PrePostTab postTab="rows">
-                      <Input_Shadcn_
-                        {...field}
-                        type="number"
-                        value={field.value ?? ''}
-                        onChange={handleNumberChange(field)}
-                        placeholder="Default: 100000"
-                      />
-                    </PrePostTab>
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-
-            <FormField_Shadcn_
-              control={form.control}
               name="maxTableSyncWorkers"
               render={({ field }) => (
                 <FormItemLayout
