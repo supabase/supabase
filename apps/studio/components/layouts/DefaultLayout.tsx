@@ -4,7 +4,7 @@ import { Sidebar } from 'components/interfaces/Sidebar'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 
@@ -57,6 +57,18 @@ export const DefaultLayout = ({
 
   const contentMinSizePercentage = 50
   const contentMaxSizePercentage = 70
+
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
+  // to whatever is specified).
+  if (!isMounted) {
+    return null
+  }
 
   return (
     <SidebarProvider defaultOpen={false}>
