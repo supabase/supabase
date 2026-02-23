@@ -133,7 +133,7 @@ const page: GoPageInput = {
             first_name: 'firstname',
             last_name: 'lastname',
             email_address: 'email',
-            company_name: 'name',
+            company_name: 'company',
             message: 'what_are_you_currently_working_on_',
           },
           consent:
