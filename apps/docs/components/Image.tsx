@@ -31,15 +31,15 @@ export interface ImageProps extends Omit<NextImageProps, 'src'> {
 }
 
 /**
- * 
+ *
  * This is a shrunk version of the `ui` package Image component. Because of
  * Cumulative Layout Shift caused by problems stated in this PR
  * https://github.com/supabase/supabase/pull/43026/ that's affecting hash
  * navigation, and the need to support captions and light/dark image versions.
- * 
+ *
  * Ideally we should solve these issues in that component and re-use it again,
  * making sure it doesn't affect other projects consuming the component.
- * 
+ *
  */
 const Image = ({ src, alt = '', ...props }: ImageProps) => {
   const { resolvedTheme } = useTheme()
@@ -48,19 +48,17 @@ const Image = ({ src, alt = '', ...props }: ImageProps) => {
 
   return (
     <figure className={props.containerClassName}>
-        <NextImage
-          key={resolvedTheme}
-          alt={alt}
-          src={source}
-          className={props.className}
-          style={props.style}
-          {...props}
-        />
-      {props.caption && (
-        <figcaption className="text-center">{props.caption}</figcaption>
-      )}
+      <NextImage
+        key={resolvedTheme}
+        alt={alt}
+        src={source}
+        className={props.className}
+        style={props.style}
+        {...props}
+      />
+      {props.caption && <figcaption className="text-center">{props.caption}</figcaption>}
     </figure>
   )
 }
 
-export default Image 
+export default Image
