@@ -15,12 +15,24 @@ const page: GoPageInput = {
     subtitle: 'Vibe Coding, Done Right: AI Development in Production',
     description:
       'You saw how enterprise teams use Bolt and Supabase to build production apps with AI coding tools. Want to learn more, get hands-on, or talk to our team? Share your details below.',
+    image: {
+      src: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=partnerships&layout=icon-only&copy=%5B2.5x+faster%5D%0A%5BPostgres+parser%5D%0Awith+Claude+Code&icon=supabase.svg&icon2=bolt.svg',
+      alt: 'Ebook cover: Building Modern Applications with Supabase',
+      width: 400,
+      height: 500,
+    },  
     ctas: [
       {
         label: 'Get in touch',
         href: '#form',
         variant: 'primary',
       },
+      {
+        label: 'Start your project',
+        href: 'https://supabase.com/dashboard',
+        variant: 'secondary',
+      },
+
     ],
   },
   sections: [
@@ -103,18 +115,27 @@ const page: GoPageInput = {
           placeholder: 'Company name',
           required: false,
         },
+        {
+          type: 'textarea',
+          name: 'message',
+          label: 'Tell us about your project',
+          placeholder: 'I want to build...',
+          required: false,
+        },
       ],
       submitLabel: 'Get in touch',
+      successRedirect: '/bolt-webinar/thank-you',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
         hubspot: {
-          formGuid: 'REPLACE_WITH_HUBSPOT_FORM_GUID',
+          formGuid: 'b110ee65-7caf-4ad1-bbf3-c02c2b5b0550',
           fieldMap: {
             first_name: 'firstname',
             last_name: 'lastname',
             email_address: 'email',
-            company_name: 'company',
+            company_name: 'name',
+            message: 'what_are_you_currently_working_on_',
           },
           consent:
             'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
