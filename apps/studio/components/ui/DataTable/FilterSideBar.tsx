@@ -50,6 +50,7 @@ export function FilterSideBar({
       panelRef={panelRef}
       maxSize={512}
       minSize={256}
+      id="panel-left"
       collapsible
       onResize={(size) => {
         if (size.inPixels === 0) {

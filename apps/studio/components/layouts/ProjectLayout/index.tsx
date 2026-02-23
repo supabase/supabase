@@ -148,6 +148,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 minSize={256}
                 maxSize={resizableSidebar ? 512 : 256}
                 defaultSize={256}
+                id="panel-left"
                 disabled={!resizableSidebar}
               >
                 <AnimatePresence initial={false}>
@@ -180,6 +181,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
             )}
             <ResizablePanel
               className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
+              id="panel-project-content"
             >
               <main
                 className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
