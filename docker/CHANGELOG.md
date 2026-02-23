@@ -15,6 +15,117 @@ Check updates for each service to learn more.
 
 ---
 
+## [2026-02-18]
+
+### Storage
+- Updated `supabase/storage-api` to `v1.37.8` in `docker-compose.s3.yml`
+- Changed MinIO image in `docker-compose.s3.yml` to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Removed `imgproxy` service from `docker-compose.s3.yml` to minimize redundancy - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Fixed inconsistent `storage` service entry ordering in `docker-compose.yml` and `docker-compose.s3.yml` to improve diff readability (requires `docker-compose.yml` and `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+
+### Edge Runtime
+
+- Added a `deno-cache` named volume to to avoid re-downloading dependencies (requires `docker-compose.yml` and `volumes/functions/*` update) - PR [#40822](https://github.com/supabase/supabase/pull/40822)
+
+---
+
+## [2026-02-16]
+
+⚠️ **Note:** This update includes several breaking changes, including a security fix for Analytics. Please check the details below. The following configuration files have been updated: `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `volumes/api/kong.yml`, and `volumes/logs/vector.yml`. 
+
+### Studio
+- Updated to `2026.02.16-sha-26c615c`
+- Added Edge Functions management UI (requires `docker-compose.yml` update) - PR [#40690](https://github.com/supabase/supabase/pull/40690), PR [#42322](https://github.com/supabase/supabase/pull/42322), PR [#42349](https://github.com/supabase/supabase/pull/42349), PR [#42350](https://github.com/supabase/supabase/pull/42350)
+
+### MCP Server
+- Updated to `v0.6.3` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.6.3)
+
+### Auth
+
+- Updated to `v2.186.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.186.0)
+
+### PostgREST
+
+- Updated to `v14.5` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.5)
+
+### Realtime
+
+- Updated to `v2.76.5` - [Release](https://github.com/supabase/realtime/releases/tag/v2.76.5)
+
+### Storage
+
+- Updated to `v1.37.8` - [Release](https://github.com/supabase/storage/releases/tag/v1.37.8)
+- ⚠️ Added configuration to access buckets via `/storage/v1/s3` endpoint (requires `docker-compose.s3.yml` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185)
+- ⚠️ Changed environment variable configuration for Storage (requires `docker-compose.yml`, `.env.example` and `.env` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185), PR [#42862](https://github.com/supabase/supabase/pull/42862)
+
+### Edge Runtime
+
+- Updated to `v1.70.3` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.70.3)
+
+### Analytics (Logflare)
+
+- Updated to `v1.31.2` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.31.2)
+- ⚠️ Changed default configuration to disable Logflare on `0.0.0.0:4000` to prevent access to `/dashboard` (requires `docker-compose.yml` update). Read more in "Production Recommendations" section of Logflare [documentation](https://supabase.com/docs/reference/self-hosting-analytics/introduction) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
+- ⚠️ Changed Kong routes to not include `/analytics/v1` by default (requires `/volumes/api/kong.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
+
+### Vector
+
+- Updated to `0.53.0-alpine` - [Changelog](https://vector.dev/releases/0.53.0/) | [Release](https://github.com/vectordotdev/vector/releases/tag/v0.53.0)
+- ⚠️ Major version jump from `0.28.1` (requires `volumes/logs/vector.yml` update) - PR [#42525](https://github.com/supabase/supabase/pull/42525)
+- ⚠️ Changed Postgres sink configuration to bypass Kong (requires `volumes/logs/vector.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
+- ⚠️ Changed retry settings for all sinks to increase timeouts (requires `volumes/logs/vector.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
+
+---
+
+## [2026-02-05]
+
+### Storage
+- Updated to `v1.37.1` - [Release](https://github.com/supabase/storage/releases/tag/v1.37.1)
+- Fixed an issue with Storage not starting because of an issue with migrations - PR [storage#845](https://github.com/supabase/storage/pull/845)
+
+---
+
+## [2026-01-27]
+
+### Studio
+- Updated to `2026.01.27-sha-6aa59ff`
+- Added SQL snippets (requires `docker-compose.yml` update) - PR [#41112](https://github.com/supabase/supabase/pull/41112), PR [#41557](https://github.com/supabase/supabase/pull/41557)
+- Fixed type generator - PR [#40481](https://github.com/supabase/supabase/pull/40481)
+- Fixed minor UI discrepancies - PR [#40579](https://github.com/supabase/supabase/pull/40579), PR [#41936](https://github.com/supabase/supabase/pull/41936), PR [#41970](https://github.com/supabase/supabase/pull/41970), PR [#41971](https://github.com/supabase/supabase/pull/41971), PR [#41972](https://github.com/supabase/supabase/pull/41972), PR [#42015](https://github.com/supabase/supabase/pull/42015)
+
+### Auth
+- Updated to `v2.185.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.185.0)
+- ⚠️ Fixed security related issues
+
+### PostgREST
+- Updated to `v14.3` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.3)
+
+### Realtime
+- Updated to `v2.72.0` - [Release](https://github.com/supabase/realtime/releases/tag/v2.72.0)
+- Changed healthchecks logging to off by default (requires `docker-compose.yml` update) - PR [realtime#1677](https://github.com/supabase/realtime/pull/1677), PR [#42156](https://github.com/supabase/supabase/pull/42156)
+- Changed logging configuration and healthcheck frequency to reduce log volume (requires `docker-compose.yml` update) - PR [#42112](https://github.com/supabase/supabase/pull/42112)
+
+### Storage
+- Updated to `v1.33.5` - [Release](https://github.com/supabase/storage/releases/tag/v1.33.5)
+
+### imgproxy
+- Updated to `v3.30.1` - [Changelog](https://github.com/imgproxy/imgproxy/blob/master/CHANGELOG.md) | [Release](https://github.com/imgproxy/imgproxy/releases/tag/v3.30.1)
+
+### Postgres Meta
+- Updated to `v0.95.2` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.95.2)
+
+### Edge Runtime
+- Updated to `v1.70.0` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.70.0)
+
+### Analytics (Logflare)
+- Updated to `v1.30.3` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.30.3)
+
+### Postgres
+- No image update
+- Fixed Postgres logging configuration (requires `volumes/logs/vector.yml` update) - PR [#41800](https://github.com/supabase/supabase/pull/41800)
+
+---
+
 ## [2025-12-18]
 
 ### Documentation
@@ -27,7 +138,7 @@ Check updates for each service to learn more.
 
 ### Studio
 - Updated to `2025.12.17-sha-43f4f7f`
-- ⚠️ Fixed additional potential issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
+- ⚠️ Fixed additional issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
 - Fixed an issue with the Users page not being updated on changes - PR [#41254](https://github.com/supabase/supabase/pull/41254)
 
 ### MCP Server
@@ -50,7 +161,7 @@ Check updates for each service to learn more.
 ### Studio
 
 - Updated to `2025.12.09-sha-434634f`
-- ⚠️ Fixed potential issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
+- ⚠️ Fixed security issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
 
 ### MCP Server
 

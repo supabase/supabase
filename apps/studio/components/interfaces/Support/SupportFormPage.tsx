@@ -1,20 +1,18 @@
 import * as Sentry from '@sentry/nextjs'
+import CopyButton from 'components/ui/CopyButton'
+import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useStateTransition } from 'hooks/misc/useStateTransition'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { Loader2, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { type Dispatch, type PropsWithChildren, useCallback, useReducer } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
-// End of third-party imports
-
-import CopyButton from 'components/ui/CopyButton'
-import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
-import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useStateTransition } from 'hooks/misc/useStateTransition'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
 import { IncidentAdmonition } from './IncidentAdmonition'
@@ -22,10 +20,10 @@ import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import {
-  createInitialSupportFormState,
   type SupportFormActions,
-  supportFormReducer,
   type SupportFormState,
+  createInitialSupportFormState,
+  supportFormReducer,
 } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportFormV2 } from './SupportFormV2'
@@ -67,10 +65,11 @@ function SupportFormPageContent() {
   const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch)
 
   const {
-    data: incidents,
+    data: allStatusPageEvents,
     isPending: isIncidentsPending,
     isError: isIncidentsError,
   } = useIncidentStatusQuery()
+  const { incidents = [] } = allStatusPageEvents ?? {}
   const hasActiveIncidents =
     !isIncidentsPending && !isIncidentsError && incidents && incidents.length > 0
 
@@ -129,8 +128,10 @@ function SupportFormWrapper({ children }: PropsWithChildren) {
 }
 
 function SupportFormHeader() {
-  const { data, isPending: isLoading, isError } = usePlatformStatusQuery()
-  const isHealthy = data?.isHealthy
+  const { data: allStatusPageEvents, isPending: isLoading, isError } = useIncidentStatusQuery()
+  const { incidents = [], maintenanceEvents = [] } = allStatusPageEvents ?? {}
+  const isMaintenance = maintenanceEvents.length > 0
+  const isIncident = incidents.length > 0
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
@@ -157,10 +158,10 @@ function SupportFormHeader() {
               icon={
                 isLoading ? (
                   <Loader2 className="animate-spin" />
-                ) : isHealthy ? (
-                  <div className="h-2 w-2 bg-brand rounded-full" />
                 ) : (
-                  <div className="h-2 w-2 bg-yellow-900 rounded-full" />
+                  <div
+                    className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')}
+                  />
                 )
               }
             >
@@ -169,9 +170,11 @@ function SupportFormHeader() {
                   ? 'Checking status'
                   : isError
                     ? 'Failed to check status'
-                    : isHealthy
-                      ? 'All systems operational'
-                      : 'Active incident ongoing'}
+                    : isIncident
+                      ? 'Active incident ongoing'
+                      : isMaintenance
+                        ? 'Scheduled maintenance'
+                        : 'All systems operational'}
               </Link>
             </Button>
           </TooltipTrigger>

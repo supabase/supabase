@@ -113,7 +113,7 @@ functions:
       - The auth methods can be accessed via the `supabase.auth` namespace.
       - By default, the supabase client sets `persist_session` to true and attempts to store the session in memory.
       - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
-      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
+      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/jwt/legacy). A refresh token never expires and can only be used once.
   - id: sign-up
     title: 'sign_up()'
     params:
@@ -290,7 +290,7 @@ functions:
         name: Sign up with a phone number and password (whatsapp)
         isSpotlight: true
         description: |
-          The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+          The user will be sent a WhatsApp message which contains an OTP. By default, a given user can only request an OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
         code: |
           ```python
           response = supabase.auth.sign_up(
@@ -603,10 +603,10 @@ functions:
                   Only for phone signups.
     notes: |
       - Requires either an email or phone number.
-      - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+      - This method is used for passwordless sign-ins where an OTP is sent to the user's email or phone number.
       - If the user doesn't exist, `sign_in_with_otp()` will signup the user instead. To restrict this behavior, you can set `should_create_user` in `SignInWithPasswordlessCredentials.options` to `false`.
-      - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
-      - If you're using phone, you can configure whether you want the user to receive a OTP.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or an OTP.
+      - If you're using phone, you can configure whether you want the user to receive an OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
@@ -614,7 +614,7 @@ functions:
       - id: sign-in-with-email
         name: Sign in with email
         isSpotlight: true
-        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent an email which contains either a magiclink or an OTP or both. By default, a given user can only request an OTP once every 60 seconds.
         code: |
           ```python
           response = supabase.auth.sign_in_with_otp(
@@ -637,7 +637,7 @@ functions:
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
         isSpotlight: false
-        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent an SMS which contains an OTP. By default, a given user can only request an OTP once every 60 seconds.
         code: |
           ```python
           response = supabase.auth.sign_in_with_otp(
@@ -647,7 +647,7 @@ functions:
       - id: sign-in-with-whatsapp-otp
         name: Sign in with WhatsApp OTP
         isSpotlight: false
-        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        description: The user will be sent a WhatsApp message which contains an OTP. By default, a given user can only request an OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
         code: |
           ```python
           response = supabase.auth.sign_in_with_otp(
@@ -1232,6 +1232,7 @@ functions:
     notes: |
       - This method fetches the user object from the database instead of local session.
       - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
+      - The User model includes the following fields (since v2.28.0): `is_sso_user` (bool, defaults to `False`), `deleted_at` (optional string), and `banned_until` (optional string) in addition to the existing fields.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current existing session
@@ -1487,7 +1488,7 @@ functions:
                 type: string
                 description: An object of query params
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `link_identity()`.
       - If the candidate identity is already linked to the existing user or another user, `link_identity()` will fail.
       - If `link_identity` is run on the server, you should handle the redirect.
@@ -1498,7 +1499,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.link_identity(
-              {provider: "github"}
+              {"provider": "github"}
           )
           ```
         response: |
@@ -1540,7 +1541,7 @@ functions:
             isOptional: true
             type: string
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `unlink_identity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
@@ -1555,7 +1556,7 @@ functions:
 
           # find the google identity
           google_identity = list(
-              filter(lambda identity: identity.provider == "google", res.identities)
+              filter(lambda identity: identity.provider == "google", response.identities)
           ).pop()
 
           # unlink the google identity
@@ -1564,9 +1565,9 @@ functions:
   - id: send-password-reauthentication
     title: 'reauthenticate()'
     notes: |
-      - This method is used together with `updateUser()` when a user's password needs to be updated.
+      - This method is used together with `update_user()` when a user's password needs to be updated.
       - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
-      - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
+      - A user is only required to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
       - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
     examples:
       - id: send-reauthentication-nonce
@@ -2248,7 +2249,7 @@ functions:
           ```python
           response = supabase.auth.admin.list_users(
               page=1,
-              per_page=1000,
+              per_page=1000
           )
           ```
   - id: create-user
@@ -4080,7 +4081,7 @@ functions:
               (1, 'Mordor');
             ```
         response: |
-          ```
+          ```json
           {
             "data": [
               {
@@ -4098,7 +4099,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("characters")
               .delete()
               .in_("id", [1, 2, 3])
               .execute()
@@ -5822,7 +5823,7 @@ functions:
         subContent:
           - name: type
             isOptional: true
-            type: '"plain" | "phrase" | "websearch"'
+            type: '"plain" | "phrase" | "web_search"'
             description: Change how the `query` text is interpreted
           - name: config
             isOptional: true
@@ -5883,11 +5884,38 @@ functions:
               .select("catchphrase")
               .text_search(
                   "catchphrase",
-                  "'fat' & 'cat'",
+                  "'the' & 'cat'",
                   options={"type": "plain", "config": "english"},
               )
               .execute()
           )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table quotes (
+              id      bigint
+                      primary key
+                      generated always as identity,
+              catchphrase text
+            );
+
+            insert into quotes (catchphrase) values
+                ('The quick brown fox'),
+                ('The cat sat on the mat'),
+                ('A dog is a loyal friend')
+            ;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "catchphrase": "The cat sat on the mat"
+              }
+            ],
+            "count": null
+          }
           ```
       - id: full-normalization
         name: Full normalization
@@ -5899,11 +5927,38 @@ functions:
               .select("catchphrase")
               .text_search(
                   "catchphrase",
-                  "'fat' & 'cat'",
+                  "'the' & 'cat'",
                   options={"type": "phrase", "config": "english"},
               )
               .execute()
           )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table quotes (
+              id      bigint
+                      primary key
+                      generated always as identity,
+              catchphrase text
+            );
+
+            insert into quotes (catchphrase) values
+                ('The quick brown fox'),
+                ('The cat sat on the mat'),
+                ('A dog is a loyal friend')
+            ;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "catchphrase": "The cat sat on the mat"
+              }
+            ],
+            "count": null
+          }
           ```
       - id: web-search
         name: Websearch
@@ -5924,11 +5979,41 @@ functions:
               .select("catchphrase")
               .text_search(
                   "catchphrase",
-                  "'fat or cat'",
-                  options={"type": "websearch", "config": "english"},
+                  "fox or cat",
+                  options={"type": "web_search", "config": "english"},
               )
               .execute()
           )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table quotes (
+              id      bigint
+                      primary key
+                      generated always as identity,
+              catchphrase text
+            );
+
+            insert into quotes (catchphrase) values
+                ('The quick brown fox'),
+                ('The cat sat on the mat'),
+                ('A dog is a loyal friend')
+            ;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "catchphrase": "The quick brown fox"
+              },
+              {
+                "catchphrase": "The cat sat on the mat"
+              }
+            ],
+            "count": null
+          }
           ```
 
   - id: match
@@ -6128,7 +6213,7 @@ functions:
           response = (
               supabase.table("orchestral_sections")
               .select("name, instruments!inner(name)")
-              .or_("book_id.eq.1,name.eq.guqin", reference_table="instruments")
+              .or_("section_id.eq.1,name.eq.guqin", reference_table="instruments")
               .execute()
           )
           ```
@@ -6525,6 +6610,7 @@ functions:
               supabase.table("instruments")
               .select("name, section:orchestral_sections(name)")
               .order("section(name)", desc=False)
+              .execute()
           )
           ```
         data:
@@ -8391,6 +8477,113 @@ functions:
                   }
               )
           )
+          ```
+
+  - id: from-list-v2
+    title: 'from_.list_v2()'
+    description: |
+      Lists files within a bucket using cursor-based pagination. Returns separate lists for folders and objects along with pagination metadata.
+    notes: |
+      - This method provides cursor-based pagination, which is more efficient for large result sets compared to offset-based pagination in `from_.list()`.
+      - The response separates folders and objects into distinct lists.
+      - Use the `nextCursor` field from the response to paginate through results.
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: options
+        isOptional: true
+        type: SearchV2Options
+        subContent:
+          - name: limit
+            isOptional: true
+            type: number
+            description: The maximum number of results to return.
+          - name: prefix
+            isOptional: true
+            type: string
+            description: Filter results to only objects with keys starting with this prefix.
+          - name: cursor
+            isOptional: true
+            type: string
+            description: The cursor for pagination, obtained from the `nextCursor` field of a previous response.
+          - name: with_delimiter
+            isOptional: true
+            type: bool
+            description: Whether to use delimiter-based folder grouping.
+          - name: sortBy
+            isOptional: true
+            type: SortByV2
+            description: The column to sort by.
+            subContent:
+              - name: column
+                isOptional: true
+                type: '"name" | "updated_at" | "created_at"'
+              - name: order
+                isOptional: true
+                type: '"asc" | "desc"'
+    examples:
+      - id: list-files-v2
+        name: List files with cursor-based pagination
+        code: |
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .list_v2({"limit": 100, "prefix": "folder/"})
+          )
+
+          print(response.objects)  # List of file objects
+          print(response.folders)  # List of folders
+          print(response.hasNext)  # Whether more results exist
+          print(response.nextCursor)  # Use for next page
+          ```
+        response: |
+          ```json
+          {
+            "hasNext": true,
+            "nextCursor": "eyJrZXkiOiJmb2xkZXIvYXZhdGFyMi5wbmcifQ==",
+            "folders": [
+              {
+                "key": "folder/subfolder/",
+                "name": "subfolder"
+              }
+            ],
+            "objects": [
+              {
+                "id": "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
+                "name": "avatar1.png",
+                "key": "folder/avatar1.png",
+                "updated_at": "2024-05-22T23:06:05.580Z",
+                "created_at": "2024-05-22T23:04:34.443Z",
+                "metadata": {
+                  "eTag": "\"c5e8c553235d9af30ef4f6e280790b92\"",
+                  "size": 32175,
+                  "mimetype": "image/png"
+                }
+              }
+            ]
+          }
+          ```
+      - id: paginate-files-v2
+        name: Paginate through all files
+        code: |
+          ```python
+          all_objects = []
+          cursor = None
+
+          while True:
+              options = {"limit": 100}
+              if cursor:
+                  options["cursor"] = cursor
+
+              response = supabase.storage.from_("avatars").list_v2(options)
+              all_objects.extend(response.objects)
+
+              if not response.hasNext:
+                  break
+              cursor = response.nextCursor
           ```
 
   - id: analytics-buckets

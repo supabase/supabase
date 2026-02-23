@@ -1,16 +1,16 @@
-import dayjs from 'dayjs'
-import { Archive, Database, GitBranch } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { useParams } from 'common'
 import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
+import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseMigrationVersion } from 'lib/migration-utils'
+import { Archive, Database, GitBranch } from 'lucide-react'
+import { useMemo } from 'react'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { ServiceStatus } from './ServiceStatus'
 
 export const ActivityStats = () => {
@@ -143,6 +143,7 @@ export const ActivityStats = () => {
                   'truncate',
                   !latestNonDefaultBranch && 'text-foreground-lighter truncate'
                 )}
+                title={latestNonDefaultBranch?.name ?? 'No branches'}
               >
                 {latestNonDefaultBranch?.name ?? 'No branches'}
               </p>

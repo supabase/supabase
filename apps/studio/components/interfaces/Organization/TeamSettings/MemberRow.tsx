@@ -9,7 +9,6 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
 import {
   Badge,
@@ -51,8 +50,8 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
 
-  const profileImageUrl =
-    isInvitedUser || isEmailUser || isFlyUser ? undefined : getGitHubProfileImgUrl(member.username)
+  // Use generic avatar for all team members instead of attempting to fetch from GitHub
+  const profileImageUrl = undefined
 
   return (
     <TableRow>

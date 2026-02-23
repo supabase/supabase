@@ -106,7 +106,7 @@ export const generateDatabaseMenu = (
     {
       title: 'Platform',
       items: [
-        ...(showPgReplicate
+        ...(IS_PLATFORM && showPgReplicate
           ? [
               {
                 name: 'Replication',

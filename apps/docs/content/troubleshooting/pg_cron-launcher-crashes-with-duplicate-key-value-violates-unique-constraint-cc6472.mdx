@@ -1,0 +1,19 @@
+---
+title = "`pg_cron launcher crashes with 'duplicate key value violates unique constraint'`"
+topics = [ "platform" ]
+keywords = []
+database_id = "c000b4ea-23e2-4e19-af54-63ccd00c4904"
+---
+
+The `pg_cron` launcher process crashes approximately every minute, displaying the error `'duplicate key value violates unique constraint "job_run_details_pkey"'`.
+
+## Why does this happen?
+
+This issue occurs when the `cron.runid_seq` sequence is out of sync with the `cron.job_run_details` table. The sequence attempts to generate `runid` values that already exist in the table, leading to a unique key violation. This is typically due to the sequence's last value not being correctly aligned with the maximum `runid` already present in the table.
+
+## How to resolve this
+
+To resolve this, you need to reset the `cron.job_run_details` table. If data preservation is required, ensure you back up its contents before proceeding.
+
+Execute the following SQL command via the [SQL editor](/dashboard/project/_/sql/new):
+`TRUNCATE cron.job_run_details;`

@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM, useParams } from 'common'
 import { isEqual } from 'lodash'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
@@ -6,34 +7,33 @@ import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
-
-import { IS_PLATFORM, useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
 import type { ResponseError } from 'types'
 import {
   Button,
+  cn,
+  copyToClipboard,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  cn,
-  copyToClipboard,
 } from 'ui'
+
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
-import LogSelection from './LogSelection'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
+import LogSelection from './LogSelection'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useProfile } from '@/lib/profile'
 
 interface Props {
   data?: LogData[]
@@ -64,7 +64,7 @@ type LogMap = { [id: string]: LogData }
  *
  * When in custom data display mode, the side panel will not open when focusing on logs.
  */
-const LogTable = ({
+export const LogTable = ({
   data = [],
   queryType,
   onHistogramToggle,
@@ -120,6 +120,9 @@ const LogTable = ({
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
+  const panelContentMinSize = 40
+  const panelContentMaxSize = 60
+
   const LOGS_EXPLORER_CONTEXT_MENU_ID = 'logs-explorer-context-menu'
   const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
     const column = `logs-column-${idx}`
@@ -127,7 +130,7 @@ const LogTable = ({
       key: column,
       name: v as string,
       resizable: true,
-      renderCell: ({ row }: any) => {
+      renderCell: ({ row }) => {
         return (
           <span
             onContextMenu={(e) => {
@@ -140,7 +143,7 @@ const LogTable = ({
           </span>
         )
       },
-      renderHeaderCell: (props) => {
+      renderHeaderCell: () => {
         return <div className="flex items-center">{v}</div>
       },
       minWidth: 128,
@@ -391,8 +394,14 @@ const LogTable = ({
     <section className={'h-full flex w-full flex-col flex-1'}>
       {!queryType && <LogsExplorerTableHeader />}
 
-      <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={selectedLog ? 60 : 100}>
+      <ResizablePanelGroup direction="horizontal" key="log-table">
+        <ResizablePanel
+          id="log-table-content"
+          order={1}
+          minSize={panelContentMinSize}
+          maxSize={panelContentMaxSize}
+          defaultSize={panelContentMaxSize}
+        >
           <DataGrid
             role="table"
             style={{ height: '100%' }}
@@ -445,25 +454,31 @@ const LogTable = ({
             )}
         </ResizablePanel>
 
-        <ResizableHandle withHandle />
-
         {selectionOpen && (
-          <ResizablePanel minSize={40} defaultSize={50}>
-            <LogSelection
-              isLoading={isSelectedLogLoading || false}
-              projectRef={projectRef}
-              onClose={() => {
-                onSelectedLogChange?.(null)
-                setSelectionOpen(false)
-              }}
-              log={selectedLog}
-              error={selectedLogError}
-              queryType={queryType}
-            />
-          </ResizablePanel>
+          <>
+            <ResizableHandle withHandle />
+            <ResizablePanel
+              id="log-table-panel"
+              order={2}
+              minSize={100 - panelContentMaxSize}
+              maxSize={100 - panelContentMinSize}
+              defaultSize={100 - panelContentMaxSize}
+            >
+              <LogSelection
+                isLoading={isSelectedLogLoading || false}
+                projectRef={projectRef}
+                onClose={() => {
+                  onSelectedLogChange?.(null)
+                  setSelectionOpen(false)
+                }}
+                log={selectedLog}
+                error={selectedLogError}
+                queryType={queryType}
+              />
+            </ResizablePanel>
+          </>
         )}
       </ResizablePanelGroup>
     </section>
   )
 }
-export default LogTable

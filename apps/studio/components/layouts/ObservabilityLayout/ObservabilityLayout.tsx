@@ -1,19 +1,17 @@
-import { PropsWithChildren, useEffect } from 'react'
-import { useParams } from 'common'
-import { LOCAL_STORAGE_KEYS, IS_PLATFORM } from 'common'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { withAuth } from 'hooks/misc/withAuth'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BannerMetricsAPI } from 'components/ui/BannerStack/Banners/BannerMetricsAPI'
-import { ProjectLayout } from '../ProjectLayout'
-import ObservabilityMenu from './ObservabilityMenu'
-import { BannerStackProvider, useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
-import { BannerStack } from 'components/ui/BannerStack/BannerStack'
-import { usePathname } from 'next/navigation'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { BannerIndexAdvisor } from 'components/ui/BannerStack/Banners/BannerIndexAdvisor'
-import { useRef } from 'react'
+import { BannerMetricsAPI } from 'components/ui/BannerStack/Banners/BannerMetricsAPI'
+import { useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { withAuth } from 'hooks/misc/withAuth'
+import { usePathname } from 'next/navigation'
+import { PropsWithChildren, useEffect, useRef } from 'react'
+
+import { ProjectLayout } from '../ProjectLayout'
+import ObservabilityMenu from './ObservabilityMenu'
 
 interface ObservabilityLayoutProps {
   title?: string
@@ -105,12 +103,7 @@ const ObservabilityLayout = (props: PropsWithChildren<ObservabilityLayoutProps>)
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
   if (reportsAll) {
-    return (
-      <BannerStackProvider>
-        <ObservabilityLayoutContent {...props} />
-        <BannerStack />
-      </BannerStackProvider>
-    )
+    return <ObservabilityLayoutContent {...props} />
   } else {
     return <UnknownInterface urlBack={`/project/${ref}`} />
   }

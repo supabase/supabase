@@ -275,7 +275,7 @@ const PITRSidePanel = () => {
                   className="mb-4"
                   addon="pitr"
                   primaryText="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
-                  secondaryText="Upgrade your plan to change PITR for your project"
+                  secondaryText="Upgrade your plan to change PITR for your project."
                   featureProposition="enable PITR"
                 />
               ) : !hasSufficientCompute ? (
@@ -283,7 +283,7 @@ const PITRSidePanel = () => {
                   className="mb-4"
                   addon="computeSize"
                   primaryText="Project needs to be at least on a Small compute size to enable PITR"
-                  secondaryText="This ensures enough resources to execute PITR successfully"
+                  secondaryText="This ensures enough resources to execute PITR successfully."
                   featureProposition="enable PITR"
                 />
               ) : null}

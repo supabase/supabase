@@ -436,7 +436,17 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/settings/auth',
-        destination: '/project/:ref/auth',
+        destination: '/project/:ref/auth/providers',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/api',
+        destination: '/project/:ref/integrations/data_api/overview',
+        permanent: false,
+      },
+      {
+        source: '/project/:ref/api',
+        destination: '/project/:ref/integrations/data_api/docs',
         permanent: false,
       },
 

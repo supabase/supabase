@@ -1,17 +1,17 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { boolean, number, object, string } from 'yup'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from 'lib/constants'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -42,7 +42,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { boolean, number, object, string } from 'yup'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -116,9 +116,17 @@ export const MfaAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const { hasAccess: hasAccessToMFA, isLoading: isLoadingEntitlement } =
+  const { hasAccess: hasAccessToMFAEntitlement, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.mfa_phone')
-  const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFA
+  const hasAccessToMFA = !IS_PLATFORM || hasAccessToMFAEntitlement
+  const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFAEntitlement
+
+  const {
+    hasAccess: hasAccessToEnhanceSecurityEntitlement,
+    isLoading: isLoadingEntitlementEnhanceSecurity,
+  } = useCheckEntitlements('auth.mfa_enhanced_security')
+  const hasAccessToEnhanceSecurity = !IS_PLATFORM || hasAccessToEnhanceSecurityEntitlement
+  const promptEnhancedSecurityUpgrade = IS_PLATFORM && !hasAccessToEnhanceSecurityEntitlement
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
   const sendSMSHookIsEnabled =
@@ -282,7 +290,7 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  if (isLoading || isLoadingEntitlement) {
+  if (isLoading || isLoadingEntitlement || isLoadingEntitlementEnhanceSecurity) {
     return (
       <PageSection>
         <PageSectionContent>
@@ -506,7 +514,7 @@ export const MfaAuthSettingsForm = () => {
                     source="authSmsMfa"
                     featureProposition="configure settings for SMS MFA"
                     primaryText="SMS MFA is only available on the Pro Plan and above"
-                    secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA"
+                    secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA."
                   />
                 )}
 
@@ -517,7 +525,7 @@ export const MfaAuthSettingsForm = () => {
                     </Button>
                   )}
                   <Button
-                    type="primary"
+                    type={promptProPlanUpgrade ? 'default' : 'primary'}
                     htmlType="submit"
                     disabled={
                       !canUpdateConfig ||
@@ -580,13 +588,24 @@ export const MfaAuthSettingsForm = () => {
                           <Switch
                             checked={!field.value}
                             onCheckedChange={(value) => field.onChange(!value)}
-                            disabled={!canUpdateConfig}
+                            disabled={!canUpdateConfig || !hasAccessToEnhanceSecurity}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
+
+                {promptEnhancedSecurityUpgrade && (
+                  <UpgradeToPro
+                    fullWidth
+                    source="authEnhancedSecurity"
+                    featureProposition="configure settings for Enhanced MFA Security"
+                    primaryText="Enhanced MFA Security is not available on your plan"
+                    secondaryText="Upgrade your plan to configure settings for Enhanced MFA Security"
+                    buttonText="Upgrade"
+                  />
+                )}
                 <CardFooter className="justify-end space-x-2">
                   {securityForm.formState.isDirty && (
                     <Button type="default" onClick={() => securityForm.reset()}>

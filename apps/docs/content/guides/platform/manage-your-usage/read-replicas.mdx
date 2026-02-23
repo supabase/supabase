@@ -5,7 +5,13 @@ title: 'Manage Read Replica usage'
 
 ## What you are charged for
 
-Each [Read Replica](/docs/guides/platform/read-replicas) is a dedicated database. You are charged for its resources: [Compute](/docs/guides/platform/compute-and-disk#compute), [Disk Size](/docs/guides/platform/database-size#disk-size), provisioned [Disk IOPS](/docs/guides/platform/compute-and-disk#provisioned-disk-throughput-and-iops), provisioned [Disk Throughput](/docs/guides/platform/compute-and-disk#provisioned-disk-throughput-and-iops), and [IPv4](/docs/guides/platform/ipv4-address).
+Each [Read Replica](/docs/guides/platform/read-replicas) is a dedicated database. You are charged for its resources, which are the following, and mirrored from the primary database:
+
+- [Compute](/docs/guides/platform/compute-and-disk#compute)
+- [Disk Size](/docs/guides/platform/database-size#disk-size)
+- Provisioned [Disk IOPS](/docs/guides/platform/compute-and-disk#provisioned-disk-throughput-and-iops)
+- Provisioned [Disk Throughput](/docs/guides/platform/compute-and-disk#provisioned-disk-throughput-and-iops)
+- [IPv4](/docs/guides/platform/ipv4-address).
 
 <Admonition type="note">
 
@@ -13,26 +19,37 @@ Read Replicas are **not** covered by the [Spend Cap](/docs/guides/platform/cost-
 
 </Admonition>
 
-## How charges are calculated
+## How we calculate charges
 
 Read Replica charges are the total of the charges listed below.
 
-**Compute**
+### Compute
+
 Compute is charged by the hour, meaning you are charged for the exact number of hours that a Read Replica is running and, therefore, incurring Compute usage. If a Read Replica runs for part of an hour, you are still charged for the full hour.
 
 Read Replicas run on the same Compute size as the primary database.
 
-**Disk Size**
-Refer to [Manage Disk Size usage](/docs/guides/platform/manage-your-usage/disk-size) for details on how charges are calculated. The disk size of a Read Replica is 1.25x the size of the primary disk to account for WAL archives. With a Read Replica you go beyond your subscription plan's quota for Disk Size.
+### Disk size
 
-**Provisioned Disk IOPS (optional)**
-Read Replicas inherit any additional provisioned Disk IOPS from the primary database. Refer to [Manage Disk IOPS usage](/docs/guides/platform/manage-your-usage/disk-iops) for details on how charges are calculated.
+Read [the Manage Disk Size usage guide](/docs/guides/platform/manage-your-usage/disk-size) for details on how we calculate charges. The disk size of a Read Replica is 1.25x the size of the primary disk to account for WAL archives. With a Read Replica you go beyond your subscription plan's quota for Disk Size.
 
-**Provisioned Disk Throughput (optional)**
-Read Replicas inherit any additional provisioned Disk Throughput from the primary database. Refer to [Manage Disk Throughput usage](/docs/guides/platform/manage-your-usage/disk-throughput) for details on how charges are calculated.
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-**IPv4 (optional)**
-If the primary database has a configured IPv4 address, its Read Replicas are also assigned one, with charges for each. Refer to [Manage IPv4 usage](/docs/guides/platform/manage-your-usage/ipv4) for details on how charges are calculated.
+### Provisioned Disk IOPS (optional)
+
+Read Replicas inherit any additional provisioned Disk IOPS from the primary database. Read the [Manage Disk IOPS usage guide](/docs/guides/platform/manage-your-usage/disk-iops) for details on how we calculate charges.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+### Provisioned Disk Throughput (optional)
+
+Read Replicas inherit any additional provisioned Disk Throughput from the primary database. Read the [Manage Disk Throughput usage guide](/docs/guides/platform/manage-your-usage/disk-throughput) for details on how we calculate charges.
+
+{/* supa-mdx-lint-enable-next-line Rule001HeadingCase */}
+
+### IPv4 (optional)
+
+If the primary database has configured an IPv4 address add-on, its Read Replicas are also assigned one, with charges for each. Read the [Manage IPv4 usage guide](/docs/guides/platform/manage-your-usage/ipv4) for details on how we calculate charges.
 
 ### Usage on your invoice
 
@@ -42,7 +59,7 @@ Compute incurred by Read Replicas is shown as "Replica Compute Hours" on your in
 
 ### No additional resources configured
 
-The project has one Read Replica and no IPv4 and no additional Disk IOPS and Disk Throughput configured.
+The project has one Read Replica, no IPv4, and no additional Disk IOPS and Disk Throughput configured.
 
 | Line Item                     | Units     | Costs                       |
 | ----------------------------- | --------- | --------------------------- |
@@ -60,7 +77,7 @@ The project has one Read Replica and no IPv4 and no additional Disk IOPS and Dis
 
 ### Additional resources configured
 
-The project has two Read Replicas and IPv4 and additional Disk IOPS and Disk Throughput configured.
+The project has two Read Replicas, IPv4, and additional Disk IOPS and Disk Throughput configured.
 
 | Line Item                     | Units     | Costs                        |
 | ----------------------------- | --------- | ---------------------------- |

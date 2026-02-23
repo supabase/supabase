@@ -3,6 +3,7 @@ import type { ExplainNode, QueryPlanRow } from './ExplainVisualizer.types'
 export interface ExplainSummary {
   totalTime: number
   totalCost: number
+  maxCost: number
   hasSeqScan: boolean
   seqScanTables: string[]
   hasIndexScan: boolean
@@ -246,6 +247,7 @@ export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
   const stats: ExplainSummary = {
     totalTime: 0,
     totalCost: 0,
+    maxCost: 0,
     hasSeqScan: false,
     seqScanTables: [],
     hasIndexScan: false,
@@ -256,7 +258,7 @@ export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
       stats.totalTime = Math.max(stats.totalTime, node.actualTime.end)
     }
     if (node.cost) {
-      stats.totalCost = Math.max(stats.totalCost, node.cost.end)
+      stats.maxCost = Math.max(stats.maxCost, node.cost.end)
     }
     const op = node.operation.toLowerCase()
     if (op.includes('seq scan')) {
@@ -270,6 +272,8 @@ export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
     node.children.forEach(traverse)
   }
   tree.forEach(traverse)
+
+  stats.totalCost = tree[0]?.cost?.end ?? 0
   return stats
 }
 

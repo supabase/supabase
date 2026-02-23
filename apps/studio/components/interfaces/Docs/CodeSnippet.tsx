@@ -1,7 +1,8 @@
 import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { SimpleCodeBlock } from 'ui'
+
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface CodeSnippetProps {
   selectedLang: 'bash' | 'js'
@@ -33,11 +34,13 @@ const CodeSnippet = ({ selectedLang, snippet }: CodeSnippetProps) => {
 
   if (!snippet[selectedLang]) return null
   return (
-    <div className="codeblock-container">
-      <h4>{snippet.title}</h4>
-      <SimpleCodeBlock className={snippet[selectedLang]?.language} onCopy={handleCopy}>
-        {snippet[selectedLang]?.code}
-      </SimpleCodeBlock>
+    <div>
+      <h4 className="heading-default mb-2">{snippet.title}</h4>
+      <div className="[&_.codeBlock]:p-0 [&_.token-line]:text-sm">
+        <SimpleCodeBlock className={snippet[selectedLang]?.language} onCopy={handleCopy}>
+          {snippet[selectedLang]?.code}
+        </SimpleCodeBlock>
+      </div>
     </div>
   )
 }

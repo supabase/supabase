@@ -12,12 +12,14 @@ You can read about the initial announcement [here](/blog/log-drains) and vote fo
 
 The following table lists the supported destinations and the required setup configuration:
 
-| Destination           | Transport Method | Configuration                                     |
-| --------------------- | ---------------- | ------------------------------------------------- |
-| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
-| DataDog               | HTTP             | API Key <br /> Region                             |
-| Loki                  | HTTP             | URL <br /> Headers                                |
-| Sentry                | HTTP             | DSN                                               |
+| Destination           | Transport Method | Configuration                                                                          |
+| --------------------- | ---------------- | -------------------------------------------------------------------------------------- |
+| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers                                      |
+| Datadog               | HTTP             | API Key <br /> Region                                                                  |
+| Loki                  | HTTP             | URL <br /> Headers                                                                     |
+| Sentry                | HTTP             | DSN                                                                                    |
+| Amazon S3             | AWS SDK          | S3 Bucket <br/> Region <br/> Access Key ID <br/> Secret Access Key <br/> Batch Timeout |
+| OTLP                  | HTTP             | Endpoint <br /> Protocol <br/> Gzip <br /> Headers                                     |
 
 HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
 
@@ -80,7 +82,7 @@ This will create an infinite loop, as we are generating an additional log event 
 
 2. Configure the HTTP Drain
 
-Create a HTTP drain under the [Project Settings > Log Drains](/dashboard/project/_/settings/log-drains).
+Create an HTTP drain under the [Project Settings > Log Drains](/dashboard/project/_/settings/log-drains).
 
 - Disable the Gzip, as we want to receive the payload without compression.
 - Under URL, set it to your edge function URL `https://[PROJECT REF].supabase.co/functions/v1/hello-world`
@@ -136,13 +138,13 @@ Deno.serve(async (req) => {
 
 </Accordion>
 
-## DataDog logs
+## Datadog logs
 
-Logs sent to DataDog have the name of the log source set on the `service` field of the event and the source set to `Supabase`. Logs are gzipped before they are sent to DataDog.
+Logs sent to Datadog have the name of the log source set on the `service` field of the event and the source set to `Supabase`. Logs are gzipped before they are sent to Datadog.
 
 The payload message is a JSON string of the raw log event, prefixed with the event timestamp.
 
-To setup DataDog log drain, generate a DataDog API key [here](https://app.datadoghq.com/organization-settings/api-keys) and the location of your DataDog site.
+To setup Datadog log drain, generate a Datadog API key [here](https://app.datadoghq.com/organization-settings/api-keys) and the location of your Datadog site.
 
 <Accordion
   type="default"
@@ -153,9 +155,9 @@ To setup DataDog log drain, generate a DataDog API key [here](https://app.datado
       id="walkthrough"
     >
 
-    1. Generate API Key in [DataDog dashboard](https://app.datadoghq.com/organization-settings/api-keys)
+    1. Generate API Key in [Datadog dashboard](https://app.datadoghq.com/organization-settings/api-keys)
     2. Create log drain in [Supabase dashboard](/dashboard/project/_/settings/log-drains)
-    3. Watch for events in the [DataDog Logs page](https://app.datadoghq.com/logs)
+    3. Watch for events in the [Datadog Logs page](https://app.datadoghq.com/logs)
 
     </AccordionItem>
 
@@ -210,6 +212,145 @@ To setup the Sentry log drain, you need to do the following:
 All fields from the log event are attached as attributes to the Sentry log, which can be used for filtering and grouping in the Sentry UI. There are no limits to cardinality or the number of attributes that can be attached to a log.
 
 If you are self-hosting Sentry, Sentry Logs are only supported in self-hosted version [25.9.0](https://github.com/getsentry/self-hosted/releases/tag/25.9.0) and later.
+
+## Axiom
+
+Logs sent to a specified Axiom's dataset as JSON of a raw log event,
+with timestamp modified to be parsed by ingestion endpoint.
+
+To set up the Axiom log drain, you have to:
+
+1. Create a dataset for ingestion in Axiom Console -> Datasets
+2. Generate an Axiom API Token with permission to ingest into the created dataset (see [Axiom docs](https://axiom.co/docs/reference/tokens#create-basic-api-token))
+3. Create log drain in [Supabase dashboard](/dashboard/project/_/settings/log-drains), providing:
+   - Name of the dataset
+   - API token
+4. Watch for events in the Stream panel of Axiom Console
+
+## Amazon S3
+
+Logs are written to an existing S3 bucket that you own.
+
+Required configuration when creating an S3 Log Drain:
+
+- S3 Bucket: the name of an existing S3 bucket.
+- Region: the AWS region where the bucket is located.
+- Access Key ID: used for authentication.
+- Secret Access Key: used for authentication.
+- Batch Timeout (ms): maximum time to wait before flushing a batch. Recommended 2000-5000ms.
+
+<Admonition type="note">
+
+Ensure the AWS account tied to the Access Key ID has permissions to write to the specified S3 bucket.
+
+</Admonition>
+
+## OpenTelemetry protocol (OTLP)
+
+Logs are sent to any OTLP-compatible endpoint using the OpenTelemetry Protocol over HTTP with Protocol Buffers encoding.
+
+OTLP is an open-standard protocol for telemetry data, making it compatible with many observability platforms including:
+
+<ul>
+  <li>OpenTelemetry Collector</li>
+  <li>Grafana Cloud</li>
+  <li>New Relic</li>
+  <li>Honeycomb</li>
+  <li>Datadog (OTLP ingestion)</li>
+  <li>Elastic</li>
+  <li>And many more</li>
+</ul>
+
+Required configuration when creating an OTLP Log Drain:
+
+<ul>
+  <li>Endpoint: The full URL of your OTLP HTTP endpoint (typically ending in `/v1/logs`)</li>
+  <li>Protocol: Currently only `http/protobuf` is supported</li>
+  <li>Gzip: Enable compression to reduce bandwidth (recommended: enabled)</li>
+  <li>Headers: Optional authentication headers (e.g., `Authorization`, `X-API-Key`)</li>
+</ul>
+
+Logs are sent as OTLP log record messages using Protocol Buffers encoding, following the [OpenTelemetry Logs specification](https://opentelemetry.io/docs/specs/otel/logs/).
+
+<Admonition type="note">
+
+Ensure your OTLP endpoint is configured to accept logs at the `/v1/logs` path with `application/x-protobuf` content type.
+
+</Admonition>
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+>
+    <AccordionItem
+      header="OpenTelemetry Collector Example"
+      id="otel-collector"
+    >
+
+To receive Supabase logs with the OpenTelemetry Collector, configure an OTLP HTTP receiver:
+
+```yaml
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+
+exporters:
+  logging:
+    loglevel: debug
+
+service:
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging]
+```
+
+Then create a log drain in [Supabase dashboard](/dashboard/project/_/settings/log-drains) with:
+
+<ul>
+  <li>Endpoint: `https://your-collector:4318/v1/logs`</li>
+  <li>Add authentication headers as needed for your setup</li>
+</ul>
+
+    </AccordionItem>
+
+    <AccordionItem
+    header="Authentication Examples"
+    id="auth"
+
+>
+
+Different OTLP platforms use different authentication methods. Add headers accordingly:
+
+**API Key Authentication:**
+
+```
+X-API-Key: your-api-key
+```
+
+**Bearer Token:**
+
+```
+Authorization: Bearer your-token
+```
+
+**Basic Authentication:**
+
+```
+Authorization: Basic base64(username:password)
+```
+
+Refer to your observability platform's documentation for specific authentication requirements.
+
+    </AccordionItem>
+
+</Accordion>
 
 ## Pricing
 

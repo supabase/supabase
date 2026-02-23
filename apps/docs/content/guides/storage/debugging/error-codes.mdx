@@ -6,6 +6,52 @@ subtitle: 'Learn about the Storage error codes and how to resolve them'
 sidebar_label: 'Debugging'
 ---
 
+## Handling Storage errors in SDKs
+
+When using the Supabase SDKs, storage errors provide detailed information to help you debug issues:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+try {
+  const { data, error } = await supabase.storage.from('avatars').download('avatar.png')
+
+  if (error) {
+    // Access error details
+    console.log('Error code:', error.error)
+    console.log('Error message:', error.message)
+    console.log('HTTP status:', error.status)
+    console.log('Status code:', error.statusCode)
+  }
+} catch (err) {
+  console.error('Unexpected error:', err)
+}
+```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+try:
+    response = supabase.storage.from_('avatars').download('avatar.png')
+except Exception as error:
+    # Access error details
+    print(f'Error: {error}')
+    # The SDK now handles bad responses from the server gracefully
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ## Storage error codes
 
 <Admonition type="note">
@@ -80,7 +126,7 @@ Here's a list of the most common error codes and their potential resolutions:
 Indicates that the resource is not found or you don't have the correct permission to access it
 **Resolution:**
 
-- Add a RLS policy to grant permission to the resource. See our [Access Control docs](/docs/guides/storage/security/access-control) for more information.
+- Add an RLS policy to grant permission to the resource. See our [Access Control docs](/docs/guides/storage/security/access-control) for more information.
 - Ensure you include the user `Authorization` header
 - Verify the object exists
 
