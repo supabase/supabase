@@ -2662,6 +2662,23 @@ export interface paths {
     patch: operations['RealtimeConfigController_updateConfig']
     trace?: never
   }
+  '/platform/projects/{ref}/config/realtime/shutdown': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Shutdowns realtime connections for a project */
+    post: operations['RealtimeConfigController_shutdown']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/config/secrets': {
     parameters: {
       query?: never
@@ -4456,6 +4473,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/telemetry/stream': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Stream telemetry events (local dev only) */
+    get: operations['TelemetryStreamController_streamEvents']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/tos/fly': {
     parameters: {
       query?: never
@@ -5776,7 +5810,6 @@ export interface components {
       amount_cents: number
       /** Format: date-time */
       credits_expire_at: string | null
-      credits_expiry_days: number | null
     }
     CreditsTopUpRequest: {
       address?: {
@@ -6854,6 +6887,7 @@ export interface components {
       SECURITY_CAPTCHA_SECRET: string
       SECURITY_MANUAL_LINKING_ENABLED: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
+      SECURITY_SB_FORWARDED_FOR_ENABLED: boolean
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
       SESSIONS_INACTIVITY_TIMEOUT: number
       SESSIONS_SINGLE_PER_USER: boolean
@@ -7073,8 +7107,10 @@ export interface components {
             | 'instances.compute_update_available_sizes'
             | 'instances.read_replicas'
             | 'instances.disk_modifications'
+            | 'instances.high_availability'
             | 'replication.etl'
             | 'storage.max_file_size'
+            | 'storage.max_file_size.configurable'
             | 'storage.image_transformations'
             | 'storage.vector_buckets'
             | 'storage.iceberg_catalog'
@@ -7115,6 +7151,7 @@ export interface components {
             | 'security.member_roles'
             | 'project_pausing'
             | 'project_cloning'
+            | 'assistant.advance_model'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -8349,7 +8386,26 @@ export interface components {
           type: 'smartGroup'
         }[]
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -8368,7 +8424,26 @@ export interface components {
           type: 'smartGroup'
         }
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -9933,6 +10008,7 @@ export interface components {
       SECURITY_CAPTCHA_SECRET?: string | null
       SECURITY_MANUAL_LINKING_ENABLED?: boolean | null
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number | null
+      SECURITY_SB_FORWARDED_FOR_ENABLED?: boolean | null
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean | null
       SESSIONS_INACTIVITY_TIMEOUT?: number | null
       SESSIONS_SINGLE_PER_USER?: boolean | null
@@ -17046,8 +17122,10 @@ export interface operations {
           | 'instances.compute_update_available_sizes'
           | 'instances.read_replicas'
           | 'instances.disk_modifications'
+          | 'instances.high_availability'
           | 'replication.etl'
           | 'storage.max_file_size'
+          | 'storage.max_file_size.configurable'
           | 'storage.image_transformations'
           | 'storage.vector_buckets'
           | 'storage.iceberg_catalog'
@@ -17088,6 +17166,7 @@ export interface operations {
           | 'security.member_roles'
           | 'project_pausing'
           | 'project_cloning'
+          | 'assistant.advance_model'
       }
       header?: never
       path?: never
@@ -19831,6 +19910,55 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  RealtimeConfigController_shutdown: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Realtime connections shutdown successfully */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Tenant not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -26429,6 +26557,33 @@ export interface operations {
       }
       /** @description Failed to reset analytics */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  TelemetryStreamController_streamEvents: {
+    parameters: {
+      query?: {
+        session_id?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description SSE stream of telemetry events */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Only available in local development */
+      404: {
         headers: {
           [name: string]: unknown
         }
