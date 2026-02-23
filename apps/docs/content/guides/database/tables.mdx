@@ -29,11 +29,13 @@ When creating a table, it's best practice to add columns at the same time.
 
 <Image
   alt="Tables and columns"
-  zoomable
+
   src={{
     dark: '/docs/img/database/managing-tables/creating-tables.png',
     light: '/docs/img/database/managing-tables/creating-tables--light.png',
   }}
+  width={1600}
+  height={1145}
 />
 
 You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table.
@@ -343,11 +345,13 @@ Tables can be "joined" together using Foreign Keys.
 
 <Image
   alt="Foreign Keys"
-  zoomable
+
   src={{
     dark: '/docs/img/database/managing-tables/joining-tables.png',
     light: '/docs/img/database/managing-tables/joining-tables--light.png',
   }}
+  width={1600}
+  height={1145}
 />
 
 This is where the "Relational" naming comes from, as data typically forms some sort of relationship.
@@ -421,11 +425,13 @@ Tables belong to `schemas`. Schemas are a way of organizing your tables, often f
 
 <Image
   alt="Schemas and tables"
-  zoomable
+
   src={{
     dark: '/docs/img/database/managing-tables/schemas.png',
     light: '/docs/img/database/managing-tables/schemas--light.png',
   }}
+  width={1600}
+  height={1145}
 />
 
 If you don't explicitly pass a schema when creating a table, Postgres will assume that you want to create the table in the `public` schema.
