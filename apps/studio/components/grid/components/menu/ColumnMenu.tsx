@@ -93,19 +93,19 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           <ArrowDown size={14} strokeWidth={currentSort && !currentSort.ascending ? 3 : 1.5} />
           <span>Sort Descending</span>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="space-x-2"
+          onClick={(e) => {
+            e.stopPropagation()
+            copyToClipboard(columnName)
+          }}
+        >
+          <Copy size={12} />
+          <span>Copy name</span>
+        </DropdownMenuItem>
         {snap.editable && (
           <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                copyToClipboard(columnName)
-              }}
-            >
-              <Copy size={12} />
-              <span>Copy name</span>
-            </DropdownMenuItem>
             <Tooltip>
               <TooltipTrigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
                 <DropdownMenuItem
