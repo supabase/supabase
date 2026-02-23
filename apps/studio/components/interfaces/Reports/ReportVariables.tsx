@@ -1,5 +1,4 @@
 import { useState } from 'react'
-
 import { Button, Input, Label_Shadcn_ as Label } from 'ui'
 
 interface ReportVariablesProps {
@@ -34,16 +33,15 @@ export const ReportVariables = ({ variables, values, onApply }: ReportVariablesP
         </div>
       ))}
       <div className="flex justify-end">
-
-      <Button
-        type="primary"
-        size="tiny"
-        disabled={!hasChanges}
-        onClick={() => onApply({ ...draft })}
+        <Button
+          type="primary"
+          size="tiny"
+          disabled={!hasChanges}
+          onClick={() => onApply({ ...draft })}
         >
-        Apply
-      </Button>
-        </div>
+          Apply
+        </Button>
+      </div>
     </div>
   )
 }
