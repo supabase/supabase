@@ -54,10 +54,10 @@ The following charts are available for Free and Pro plans:
 
 The following charts provide a more advanced and detailed view of your database performance and are available only for Team, Enterprise, and Platform plans.
 
-### Memory usage
+### Memory breakdown
 
 <Image
-  alt="Memory usage chart"
+  alt="Memory breakdown chart"
   zoomable
   src={{
     dark: '/docs/img/database/reports/memory-usage-chart-dark.png',
@@ -70,14 +70,30 @@ The following charts provide a more advanced and detailed view of your database 
 | **Used**            | RAM actively used by Postgres and the operating system |
 | **Cache + buffers** | Memory used for page cache and Postgres buffers        |
 | **Free**            | Available unallocated memory                           |
+| **Swap**            | Memory swapped to disk (shown in red)                  |
+
+**Understanding Memory Pressure:**
+
+Supabase monitors memory health using a Memory Pressure indicator based on swap usage. Any swap usage indicates your database is running out of physical RAM and resorting to slower disk storage, which significantly impacts performance.
+
+Memory pressure is calculated using hybrid thresholds that adapt to your compute size:
+
+| Pressure Level | Threshold                     | What it means                                       |
+| -------------- | ----------------------------- | --------------------------------------------------- |
+| **Healthy**    | Swap < max(16MB, 0.1% of RAM) | Sufficient RAM - database operating normally        |
+| **Elevated**   | Swap ≥ max(64MB, 1% of RAM)   | Warning - memory pressure building, monitor closely |
+| **Unhealthy**  | Swap ≥ max(256MB, 3% of RAM)  | Critical - severe memory pressure, action needed    |
+
+These thresholds use the maximum of an absolute value (MB) or percentage of total RAM to scale appropriately across different compute sizes. For example, on a 1GB instance, the medium threshold is 64MB (absolute), while on a 16GB instance it's 160MB (1% of RAM).
 
 How it helps debug issues:
 
-| Issue                          | Description                                      |
-| ------------------------------ | ------------------------------------------------ |
-| Memory pressure detection      | Identify when free memory is consistently low    |
-| Cache effectiveness monitoring | Monitor cache performance for query optimization |
-| Memory leak detection          | Detect inefficient memory usage patterns         |
+| Issue                          | Description                                       |
+| ------------------------------ | ------------------------------------------------- |
+| Memory pressure detection      | Identify when free memory is consistently low     |
+| Swap usage monitoring          | Detect performance degradation from disk swapping |
+| Cache effectiveness monitoring | Monitor cache performance for query optimization  |
+| Memory leak detection          | Detect inefficient memory usage patterns          |
 
 Actions you can take:
 

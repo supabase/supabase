@@ -11,9 +11,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { cn } from 'ui'
-import { Badge } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
@@ -183,25 +181,36 @@ export const ChartHeader = ({
         <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
           {title}
         </h3>
-        {titleTooltip && <InfoTooltip>{titleTooltip}</InfoTooltip>}
+        {(titleTooltip || docsUrl) && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InfoIcon className="w-4 h-4 text-foreground-lighter cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              <div className="flex flex-col gap-2">
+                {titleTooltip &&
+                  titleTooltip.split('\n').map(
+                    (line, i) =>
+                      line.trim() && (
+                        <p key={i} className="text-xs">
+                          {line}
+                        </p>
+                      )
+                  )}
+                {docsUrl && (
+                  <Link
+                    href={docsUrl}
+                    target="_blank"
+                    className="text-xs text-brand font-medium hover:underline"
+                  >
+                    Read docs
+                  </Link>
+                )}
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
-      {docsUrl && (
-        <ButtonTooltip
-          type="text"
-          className="px-1"
-          asChild
-          tooltip={{
-            content: {
-              side: 'top',
-              text: 'Read docs',
-            },
-          }}
-        >
-          <Link href={docsUrl} target="_blank">
-            <InfoIcon className="w-4 h-4 text-foreground-lighter" />
-          </Link>
-        </ButtonTooltip>
-      )}
     </div>
   )
 

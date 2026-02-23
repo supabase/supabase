@@ -3,6 +3,7 @@ import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import type { Organization } from 'types'
+
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
 import { Project } from '../projects/project-detail-query'
@@ -21,8 +22,10 @@ export const getReportAttributesV2: (
   return [
     {
       id: 'ram-usage',
-      label: 'Memory usage',
-      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
+      label: 'Memory breakdown',
+      titleTooltip:
+        'Shows how your database uses memory across Used (active Postgres/OS), Cache + Buffers (page cache and buffers), Free (unallocated), and Swap (disk memory).\n\nWatch for high swap usage (red) which indicates memory pressure and performance issues.',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-breakdown`,
       availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
@@ -41,29 +44,42 @@ export const getReportAttributesV2: (
         {
           attribute: 'ram_usage_used',
           provider: 'infra-monitoring',
-          label: 'Used',
+          label: 'RAM Used',
           tooltip:
             'RAM in use by Postgres and the operating system. Sustained high usage may indicate memory pressure',
         },
         {
           attribute: 'ram_usage_cache_and_buffers',
           provider: 'infra-monitoring',
-          label: 'Cache + Buffers',
+          label: 'RAM Cache + Buffers',
           tooltip:
             'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
         },
         {
           attribute: 'ram_usage_free',
           provider: 'infra-monitoring',
-          label: 'Free',
+          label: 'RAM Free',
           tooltip:
             'Unallocated memory available for use. A small portion is always reserved by the operating system',
+        },
+        {
+          attribute: 'swap_usage',
+          provider: 'infra-monitoring',
+          label: 'Swap Used',
+          tooltip:
+            'Memory swapped to disk. Any swap usage indicates memory pressure and can severely impact performance',
+          color: {
+            light: '#dc2626',
+            dark: '#dc2626',
+          }, // Danger red color - makes swap instantly visible
         },
       ],
     },
     {
       id: 'cpu-usage',
       label: 'CPU usage',
+      titleTooltip:
+        'CPU time breakdown by category: User (queries/processes), System (kernel operations), IOWait (waiting for disk/network), IRQs (interrupts), and Other.\n\nHigh User indicates CPU-intensive queries; high IOWait suggests disk bottlenecks.',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#cpu-usage`,
       syncId: 'database-reports',
       format: '%',
@@ -137,6 +153,8 @@ export const getReportAttributesV2: (
     {
       id: 'disk-iops',
       label: 'Disk Input/Output operations per second (IOPS)',
+      titleTooltip:
+        "Read and write operations per second with your compute size's maximum IOPS limit shown as a reference line.\n\nApproaching or hitting the limit indicates disk IO bottlenecks. Distinguish read-heavy vs write-heavy workloads to optimize accordingly.",
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
       syncId: 'database-reports',
       availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
@@ -181,6 +199,8 @@ export const getReportAttributesV2: (
     {
       id: 'disk-throughput',
       label: 'Disk throughput',
+      titleTooltip:
+        "Read and write disk throughput (bytes per second) with your compute size's maximum throughput limit.\n\nSaturating bandwidth indicates performance bottlenecks. Use to identify large sequential reads/writes and optimize query patterns.",
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
       availableIn: ['team', 'enterprise', 'platform'],
@@ -228,11 +248,13 @@ export const getReportAttributesV2: (
       // Client Connections metric for free tier
       id: 'client-connections-basic',
       label: 'Database Connections',
+      titleTooltip:
+        'Total active database connections with maximum connection limit.\n\nMonitor to avoid connection exhaustion and identify applications not properly closing connections.',
       syncId: 'database-reports',
       valuePrecision: 0,
       availableIn: ['free'],
       hide: !isFreePlan,
-      showTooltip: false,
+      showTooltip: true,
       showLegend: false,
       showMaxValue: true,
       hideChartType: false,
@@ -261,6 +283,8 @@ export const getReportAttributesV2: (
       // advanced client connections metric for paid and above
       id: 'client-connections',
       label: 'Database Connections',
+      titleTooltip:
+        'Connection breakdown by source: Postgres (direct), PostgREST (API), Auth, Storage, Reserved (admin), and other roles.\n\nMonitor distribution across services and identify connection leaks when approaching max limits.',
       syncId: 'database-reports',
       valuePrecision: 0,
       availableIn: ['pro', 'team', 'enterprise', 'platform'],
@@ -325,6 +349,8 @@ export const getReportAttributesV2: (
     {
       id: 'pgbouncer-connections',
       label: 'Dedicated Pooler Client Connections',
+      titleTooltip:
+        'Client connections to PgBouncer (dedicated pooler) with maximum pooler connection limit.\n\nMonitor to ensure efficient connection pooling and avoid exhausting pooler capacity.',
       syncId: 'database-reports',
       valuePrecision: 0,
       availableIn: ['pro', 'team', 'enterprise', 'platform'],
@@ -357,11 +383,13 @@ export const getReportAttributesV2: (
     {
       id: 'supavisor-connections-active',
       label: 'Shared Pooler (Supavisor) client connections',
+      titleTooltip:
+        'Active client connections to the shared pooler (Supavisor).\n\nTrack usage patterns of the shared connection pooler across your applications.',
       syncId: 'database-reports',
       valuePrecision: 0,
       availableIn: ['pro', 'team', 'enterprise', 'platform'],
       hide: isFreePlan,
-      showTooltip: false,
+      showTooltip: true,
       showLegend: false,
       showMaxValue: false,
       showGrid: true,
@@ -380,6 +408,8 @@ export const getReportAttributesV2: (
     {
       id: 'disk-size',
       label: 'Disk Usage',
+      titleTooltip:
+        'Disk space breakdown by Database (tables/indexes), WAL (Write-Ahead Logging), and System (reserved space).\n\nTrack storage trends over time and plan capacity upgrades before hitting limits.',
       syncId: 'database-reports',
       valuePrecision: 2,
       availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],

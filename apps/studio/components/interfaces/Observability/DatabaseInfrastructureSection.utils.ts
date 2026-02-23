@@ -27,6 +27,17 @@ type InfrastructureMetrics = {
   diskIo: MetricData
 }
 
+export type MemoryPressureLevel = 'Healthy' | 'Elevated' | 'Unhealthy'
+
+export type MemoryPressureData = {
+  level: MemoryPressureLevel
+  ramUsedPercent: number
+  cachePercent: number
+  swapUsedMB: number
+  totalRamMB: number
+  swapPercent: number
+}
+
 export function parseInfrastructureMetrics(
   infraData: InfraMonitoringResponse | undefined
 ): InfrastructureMetrics | null {
@@ -90,4 +101,70 @@ export function parseConnectionsData(
   const max = maxConnectionsData?.maxConnections || 0
 
   return { current, max }
+}
+
+/**
+ * IMPORTANT: If you change these thresholds, you MUST update the documentation at:
+ * apps/docs/content/guides/telemetry/reports.mdx#memory-breakdown
+ *
+ * Calculates memory pressure based on swap usage with hybrid thresholds
+ * Uses max(absolute MB, % of total RAM) to scale appropriately
+ *
+ * Thresholds:
+ * - Healthy: swap < max(16MB, 0.1% RAM)
+ * - Elevated: swap ≥ max(64MB, 1% RAM)
+ * - Unhealthy: swap ≥ max(256MB, 3% RAM)
+ */
+export function parseMemoryPressure(
+  infraData: InfraMonitoringResponse | undefined
+): MemoryPressureData | null {
+  if (!infraData) {
+    return null
+  }
+
+  const series = 'series' in infraData ? infraData.series : {}
+
+  // Get RAM usage breakdown
+  const ramUsed = parseNumericValue(series.ram_usage_used?.totalAverage)
+  const ramCache = parseNumericValue(series.ram_usage_cache_and_buffers?.totalAverage)
+  const ramFree = parseNumericValue(series.ram_usage_free?.totalAverage)
+  const swapUsedBytes = parseNumericValue(series.swap_usage?.totalAverage)
+
+  const totalRam = ramUsed + ramCache + ramFree
+
+  if (totalRam === 0) {
+    return null
+  }
+
+  // Calculate percentages and swap in MB
+  const ramUsedPercent = (ramUsed / totalRam) * 100
+  const cachePercent = (ramCache / totalRam) * 100
+  const swapUsedMB = swapUsedBytes / (1024 * 1024) // Convert bytes to MB
+  const totalRamMB = totalRam / (1024 * 1024)
+
+  // Hybrid thresholds: max(absolute MB, % of total RAM)
+  const mediumThreshold = Math.max(64, totalRamMB * 0.01) // 64MB or 1% RAM
+  const highThreshold = Math.max(256, totalRamMB * 0.03) // 256MB or 3% RAM
+
+  // Determine pressure level based on swap usage
+  let level: MemoryPressureLevel
+  if (swapUsedMB >= highThreshold) {
+    level = 'Unhealthy'
+  } else if (swapUsedMB >= mediumThreshold) {
+    level = 'Elevated'
+  } else {
+    level = 'Healthy'
+  }
+
+  // Calculate swap as percentage of total RAM
+  const swapPercent = totalRamMB > 0 ? (swapUsedMB / totalRamMB) * 100 : 0
+
+  return {
+    level,
+    ramUsedPercent,
+    cachePercent,
+    swapUsedMB,
+    totalRamMB,
+    swapPercent,
+  }
 }
