@@ -19,6 +19,7 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -32,6 +33,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Input,
+  SonnerProgress,
 } from 'ui'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
@@ -413,6 +415,33 @@ export const FileExplorerHeader = ({
           <div className="hidden">
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
           </div>
+          <Button
+            onClick={() => {
+              toast(
+                <SonnerProgress
+                  progress={50}
+                  message={`Renaming folder to`}
+                  description="Hello world"
+                />,
+                { id: 'abc', closeButton: false, position: 'top-right', duration: Infinity }
+              )
+            }}
+          >
+            Test
+          </Button>
+          <Button
+            onClick={() => {
+              toast(
+                <div className="">
+                  <p>Renamed folder with some errors</p>
+                  <p className="text-foreground-light">asd</p>
+                </div>,
+                { id: 'abc', closeButton: false, position: 'top-right', duration: Infinity }
+              )
+            }}
+          >
+            Test
+          </Button>
           <ButtonTooltip
             icon={<Upload size={16} strokeWidth={2} />}
             type="text"
