@@ -996,6 +996,23 @@ export interface paths {
     patch: operations['v1-update-realtime-config']
     trace?: never
   }
+  '/v1/projects/{ref}/config/realtime/shutdown': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Shutdowns realtime connections for a project */
+    post: operations['v1-shutdown-realtime']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/config/storage': {
     parameters: {
       query?: never
@@ -2275,6 +2292,7 @@ export interface components {
       security_captcha_secret: string | null
       security_manual_linking_enabled: boolean | null
       security_refresh_token_reuse_interval: number | null
+      security_sb_forwarded_for_enabled: boolean | null
       security_update_password_require_reauthentication: boolean | null
       sessions_inactivity_timeout: number | null
       sessions_single_per_user: boolean | null
@@ -3512,7 +3530,26 @@ export interface components {
           type: 'smartGroup'
         }[]
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -3531,7 +3568,26 @@ export interface components {
           type: 'smartGroup'
         }
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -3962,6 +4018,7 @@ export interface components {
       security_captcha_secret?: string | null
       security_manual_linking_enabled?: boolean | null
       security_refresh_token_reuse_interval?: number | null
+      security_sb_forwarded_for_enabled?: boolean | null
       security_update_password_require_reauthentication?: boolean | null
       sessions_inactivity_timeout?: number | null
       sessions_single_per_user?: boolean | null
@@ -8461,6 +8518,55 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-shutdown-realtime': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Realtime connections shutdown successfully */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Tenant not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
