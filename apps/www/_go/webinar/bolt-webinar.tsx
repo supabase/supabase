@@ -123,7 +123,7 @@ const page: GoPageInput = {
         },
       ],
       submitLabel: 'Get in touch',
-      successRedirect: '/bolt-webinar/thank-you',
+      successRedirect: '/go/bolt-webinar/thank-you',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
