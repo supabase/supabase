@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { groupBy, isEqual, isNull } from 'lodash'
-import { ArrowRight, Plus, RefreshCw, Save } from 'lucide-react'
+import { Plus, RefreshCw, Save } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -451,19 +451,6 @@ const Reports = () => {
                 }
               />
 
-              {startDate && endDate && (
-                <div className="hidden items-center space-x-1 lg:flex ">
-                  <span className="text-sm text-foreground-light">
-                    {dayjs(startDate).format('MMM D, YYYY')}
-                  </span>
-                  <span className="text-foreground-lighter">
-                    <ArrowRight size={12} />
-                  </span>
-                  <span className="text-sm text-foreground-light">
-                    {dayjs(endDate).format('MMM D, YYYY')}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
 
