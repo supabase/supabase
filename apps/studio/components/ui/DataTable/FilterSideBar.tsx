@@ -1,6 +1,4 @@
 import { useFlag, useParams } from 'common'
-import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
@@ -11,6 +9,8 @@ import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 
 interface FilterSideBarProps {
   dateRangeDisabled?: DateRangeDisabled
@@ -71,7 +71,9 @@ export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
             <div className="flex items-center gap-4">
               {LOG_DRAIN_TYPES.filter((t) =>
                 ['datadog', 'sentry', 'webhook', 'loki'].includes(t.value)
-              ).map((type) => React.cloneElement(type.icon, { height: 20, width: 20 }))}
+              ).map((type) =>
+                React.cloneElement(type.icon, { height: 20, width: 20, key: type.value })
+              )}
             </div>
           }
           actions={
