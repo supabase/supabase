@@ -195,6 +195,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
                 disabled={isLoading}
+                data-testid="filter-bar-freeform-input"
+                autoComplete="off"
+                data-1p-ignore
+                data-lpignore="true"
+                data-form-type="other"
               />
             ) : (
               <div className="relative inline-block">
@@ -209,6 +214,10 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   className="h-full border-none bg-transparent py-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
                   placeholder="+ Add filter"
                   disabled={isLoading}
+                  autoComplete="off"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-form-type="other"
                 />
                 <span className="invisible whitespace-pre text-xs block">
                   {(isActive ? freeformText : localFreeformValue) || '+'}

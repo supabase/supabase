@@ -18,7 +18,7 @@ import { LoadingLine, Sheet, SheetContent } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { formatCronJobColumns } from './CronJobs.utils'
-import { CronJobRunDetailsOverflowNoticeV2 } from './CronJobsTab.CleanupNotice'
+import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
 import { CronJobsTabDataGrid } from './CronJobsTab.DataGrid'
 import { CronJobsTabHeader } from './CronJobsTab.Header'
 import { useCronJobsData } from './CronJobsTab.useCronJobsData'
@@ -171,7 +171,12 @@ export const CronjobsTab = () => {
             onCreateJob={onOpenCreateJobSheet}
           />
           <LoadingLine loading={grid.isLoading || grid.isRefetching || grid.isFetchingNextPage} />
-          {grid.isMinimal && <CronJobRunDetailsOverflowNoticeV2 refetchJobs={grid.refetch} />}
+          {grid.isMinimal && (
+            <CronJobRunDetailsOverflowNotice
+              queryCost={grid.queryCost}
+              refetchJobs={grid.refetch}
+            />
+          )}
           <CronJobsTabDataGrid
             columns={columns}
             rows={grid.rows}

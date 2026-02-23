@@ -1,8 +1,7 @@
-import { ArrowUpRight } from 'lucide-react'
-
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { ArrowUpRight } from 'lucide-react'
 import type { Organization } from 'types'
 
 export const generateSettingsMenu = (
@@ -37,13 +36,7 @@ export const generateSettingsMenu = (
   }
 
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}`
 
-  const authEnabled = features?.auth ?? true
-  const authProvidersEnabled = features?.authProviders ?? true
-  const edgeFunctionsEnabled = features?.edgeFunctions ?? true
-  const storageEnabled = features?.storage ?? true
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
   const billingEnabled = features?.billing ?? true
 
@@ -67,7 +60,7 @@ export const generateSettingsMenu = (
         {
           name: 'Infrastructure',
           key: 'infrastructure',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
+          url: `/project/${ref}/settings/infrastructure`,
           items: [],
           disabled: !isProjectActive,
         },
@@ -118,14 +111,15 @@ export const generateSettingsMenu = (
         {
           name: 'Data API',
           key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/data_api/overview`,
+          url: `/project/${ref}/integrations/data_api/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          disabled: !isProjectActive,
         },
         {
           name: 'Vault',
           key: 'vault',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
+          url: `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           label: 'Beta',

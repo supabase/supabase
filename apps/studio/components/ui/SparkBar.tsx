@@ -13,7 +13,7 @@ interface SparkBarProps {
   borderClass?: string
 }
 
-const SparkBar = ({
+export const SparkBar = ({
   max = 100,
   value = 0,
   barClass = 'bg-foreground',

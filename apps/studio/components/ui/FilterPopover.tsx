@@ -1,8 +1,7 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { noop } from 'lodash'
-import { X } from 'lucide-react'
+import { ChevronDown, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-
 import {
   Button,
   Checkbox_Shadcn_,
@@ -12,9 +11,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -185,6 +181,7 @@ export const FilterPopover = <T extends Record<string, any>>({
           type={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
           onClick={() => setOpen(false)}
           className={variant === 'rounded' ? 'rounded-full' : ''}
+          iconRight={<ChevronDown />}
         >
           <div>
             <span>{name}</span>
@@ -259,10 +256,12 @@ export const FilterPopover = <T extends Record<string, any>>({
             )}
           </div>
           <div ref={sentinelRef} className="h-1 -mt-1" />
-          {hasNextPage && (
+          {hasNextPage ? (
             <div className="px-3 py-2">
               <ShimmeringLoader className="py-2" />
             </div>
+          ) : (
+            <div className="py-1.5" />
           )}
         </ScrollArea>
         <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">

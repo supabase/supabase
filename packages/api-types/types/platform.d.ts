@@ -7111,8 +7111,10 @@ export interface components {
             | 'instances.compute_update_available_sizes'
             | 'instances.read_replicas'
             | 'instances.disk_modifications'
+            | 'instances.high_availability'
             | 'replication.etl'
             | 'storage.max_file_size'
+            | 'storage.max_file_size.configurable'
             | 'storage.image_transformations'
             | 'storage.vector_buckets'
             | 'storage.iceberg_catalog'
@@ -7153,6 +7155,7 @@ export interface components {
             | 'security.member_roles'
             | 'project_pausing'
             | 'project_cloning'
+            | 'assistant.advance_model'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -17133,8 +17136,10 @@ export interface operations {
           | 'instances.compute_update_available_sizes'
           | 'instances.read_replicas'
           | 'instances.disk_modifications'
+          | 'instances.high_availability'
           | 'replication.etl'
           | 'storage.max_file_size'
+          | 'storage.max_file_size.configurable'
           | 'storage.image_transformations'
           | 'storage.vector_buckets'
           | 'storage.iceberg_catalog'
@@ -17175,6 +17180,7 @@ export interface operations {
           | 'security.member_roles'
           | 'project_pausing'
           | 'project_cloning'
+          | 'assistant.advance_model'
       }
       header?: never
       path?: never

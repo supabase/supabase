@@ -1,14 +1,15 @@
 import { generateObject } from 'ai'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-
+import { currentLogger } from 'braintrust'
 import { IS_PLATFORM } from 'common'
+import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
-import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 export const maxDuration = 30
 
@@ -31,6 +32,7 @@ const requestBodySchema = z.object({
   projectRef: z.string(),
   orgSlug: z.string().optional(),
   reason: z.string().optional(),
+  spanId: z.string().optional(),
 })
 
 export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -48,9 +50,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { rating, messages: rawMessages, projectRef, orgSlug, reason } = data
+  const { rating, messages: rawMessages, projectRef, orgSlug, reason, spanId } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
+  let isHipaaEnabled = false
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -59,13 +62,15 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
       // Get organizations and compute opt in level server-side
-      const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-        projectRef,
-      })
+      const { aiOptInLevel: orgAIOptInLevel, isHipaaEnabled: orgIsHipaaEnabled } =
+        await getOrgAIDetails({
+          orgSlug,
+          authorization,
+          projectRef,
+        })
 
       aiOptInLevel = orgAIOptInLevel
+      isHipaaEnabled = orgIsHipaaEnabled
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -91,7 +96,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   })
 
   try {
-    const { model, error: modelError } = await getModel({
+    const {
+      model,
+      error: modelError,
+      providerOptions,
+    } = await getModel({
       provider: 'openai',
       isLimited: true,
       routingKey: 'feedback',
@@ -103,6 +112,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const { object } = await generateObject({
       model,
+      providerOptions,
       schema: rateMessageResponseSchema,
       prompt: `
 Your job is to look at a Supabase Assistant conversation, which the user has given feedback on, and classify it.
@@ -125,6 +135,25 @@ Instructions:
    - other: Anything else
 `,
     })
+
+    // Log feedback to Braintrust if tracing is enabled and span ID is available
+    if (IS_TRACING_ENABLED && !isHipaaEnabled && spanId) {
+      try {
+        const logger = currentLogger()
+        logger?.logFeedback({
+          id: spanId,
+          scores: { 'User Rating': rating === 'positive' ? 1 : 0 },
+          comment: reason,
+          source: 'external',
+        })
+        logger?.updateSpan({
+          id: spanId,
+          metadata: { feedbackCategory: object.category },
+        })
+      } catch (error) {
+        console.error('Failed to log feedback to Braintrust:', error)
+      }
+    }
 
     return res.json({
       category: object.category,
