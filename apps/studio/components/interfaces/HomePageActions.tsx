@@ -5,7 +5,6 @@ import {
   PROJECT_LIST_SORT_VALUES,
   type ProjectListSort,
 } from 'components/interfaces/Home/ProjectList/ProjectListSort.utils'
-import { ProjectListSortDropdown } from 'components/interfaces/Home/ProjectList/ProjectListSortDropdown'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -18,6 +17,7 @@ import { Button, ToggleGroup, ToggleGroupItem } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { FilterPopover } from '../ui/FilterPopover'
+import { SortDropdown } from '../ui/SortDropdown'
 
 interface HomePageActionsProps {
   slug?: string
@@ -37,7 +37,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
   )
   const [sort, setSort] = useQueryState(
     'sort',
-    parseAsStringLiteral<ProjectListSort>(PROJECT_LIST_SORT_VALUES).withDefault('name_asc')
+    parseAsStringLiteral(PROJECT_LIST_SORT_VALUES).withDefault('name_asc')
   )
   const [viewMode, setViewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
 
@@ -102,7 +102,14 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
           onSaveFilters={(options) => setFilterStatusStorage(options)}
         />
 
-        <ProjectListSortDropdown value={sort} onChange={setSortStorage} />
+        <SortDropdown
+          options={[
+            { label: 'name', value: 'name' },
+            { label: 'creation date', value: 'created' },
+          ]}
+          value={sort}
+          setValue={(val) => setSortStorage(val as ProjectListSort)}
+        />
 
         {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
       </div>

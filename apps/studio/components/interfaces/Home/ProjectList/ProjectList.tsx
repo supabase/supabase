@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
@@ -14,6 +12,7 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useMemo } from 'react'
 import type { Organization } from 'types'
 import {
   Card,
@@ -22,10 +21,11 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableHeadSort,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
+
 import { LoadingCardView, LoadingTableView, NoProjectsState } from './EmptyStates'
 import { LoadMoreRows } from './LoadMoreRow'
 import { ProjectCard } from './ProjectCard'
@@ -33,7 +33,6 @@ import {
   getNextProjectListSortForColumn,
   getProjectListAriaSort,
   PROJECT_LIST_SORT_VALUES,
-  type ProjectListSort,
   toTableHeadSortValue,
 } from './ProjectListSort.utils'
 import { ProjectTableRow } from './ProjectTableRow'
@@ -56,7 +55,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   )
   const [sort, setSort] = useQueryState(
     'sort',
-    parseAsStringLiteral<ProjectListSort>(PROJECT_LIST_SORT_VALUES).withDefault('name_asc')
+    parseAsStringLiteral(PROJECT_LIST_SORT_VALUES).withDefault('name_asc')
   )
   const [viewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
 
@@ -167,13 +166,16 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
             <TableRow>
               <TableHead
                 className={cn(noResults && 'text-foreground-muted')}
-                aria-sort={getProjectListAriaSort(sort, 'name')}
+                aria-sort={getProjectListAriaSort(sort)}
               >
                 <TableHeadSort
                   column="name"
                   currentSort={tableHeadSortValue}
                   onSortChange={() => {
-                    void setSort(getNextProjectListSortForColumn(sort, 'name'))
+                    const sortValue = sort.includes('created')
+                      ? 'name_asc'
+                      : getNextProjectListSortForColumn(sort)
+                    setSort(sortValue)
                   }}
                   className={cn(noResults && 'text-foreground-muted')}
                 >
@@ -185,13 +187,16 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
               <TableHead className={cn(noResults && 'text-foreground-muted')}>Region</TableHead>
               <TableHead
                 className={cn(noResults && 'text-foreground-muted')}
-                aria-sort={getProjectListAriaSort(sort, 'created')}
+                aria-sort={getProjectListAriaSort(sort)}
               >
                 <TableHeadSort
                   column="created"
                   currentSort={tableHeadSortValue}
                   onSortChange={() => {
-                    void setSort(getNextProjectListSortForColumn(sort, 'created'))
+                    const sortValue = sort.includes('name')
+                      ? 'created_asc'
+                      : getNextProjectListSortForColumn(sort)
+                    setSort(sortValue)
                   }}
                   className={cn(noResults && 'text-foreground-muted')}
                 >
