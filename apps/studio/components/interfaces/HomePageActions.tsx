@@ -1,13 +1,18 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import {
+  PROJECT_LIST_SORT_VALUES,
+  type ProjectListSort,
+} from 'components/interfaces/Home/ProjectList/ProjectListSort.utils'
+import { ProjectListSortDropdown } from 'components/interfaces/Home/ProjectList/ProjectListSortDropdown'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
+import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { Button, ToggleGroup, ToggleGroupItem } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -35,6 +40,10 @@ export const HomePageActions = ({
     'status',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringLiteral<ProjectListSort>(PROJECT_LIST_SORT_VALUES).withDefault('name_asc')
+  )
   const [viewMode, setViewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
 
   const [filterStatusStorage, setFilterStatusStorage, { isSuccess }] = useLocalStorageQuery<
@@ -44,6 +53,7 @@ export const HomePageActions = ({
   const { isFetching: isFetchingProjects } = useOrgProjectsInfiniteQuery(
     {
       slug,
+      sort,
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
@@ -90,6 +100,16 @@ export const HomePageActions = ({
           labelKey="label"
           onSaveFilters={(options) => setFilterStatusStorage(options)}
         />
+
+        {showViewToggle && (
+          <ProjectListSortDropdown
+            value={sort}
+            onChange={(value) => {
+              void setSort(value)
+            }}
+          />
+        )}
+
 
         {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
       </div>
