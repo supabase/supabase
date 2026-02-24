@@ -19,21 +19,21 @@ If you need to move your project to a different organization, see [project trans
 
 ## Important to know
 
-- What will be restored to the new project?
+What will be restored to the new project?
 
-  - Database schema (tables, views, procedures)
-  - All data and indexes
-  - Database roles, permissions and users
-  - Auth user data (user accounts, hashed passwords, and authentication records from the auth schema)
+- Database schema (tables, views, procedures)
+- All data and indexes
+- Database roles, permissions and users
+- Auth user data (user accounts, hashed passwords, and authentication records from the auth schema)
 
-- What needs manual reconfiguration?
+What needs manual reconfiguration?
 
-  - Storage objects & settings
-  - Edge Functions
-  - Auth settings & API keys
-  - Realtime settings
-  - Database extensions and settings
-  - Read replicas
+- Storage objects & settings
+- Edge Functions
+- Auth settings & API keys
+- Realtime settings
+- Database extensions and settings
+- Read replicas
 
 ---
 
@@ -49,7 +49,7 @@ If you need to move your project to a different organization, see [project trans
 
         If you do not have your database password, reset the password in the [Database Settings](/dashboard/project/_/settings/database).
 
-    4. Run these commands after replacing ```[CONNECTION_STRING]``` with your updated connection string
+    4. Run these commands after replacing ```[CONNECTION_STRING]``` with your connection string
 
         ```bash
         supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
@@ -84,23 +84,72 @@ If you need to move your project to a different organization, see [project trans
             --dbname [CONNECTION_STRING]
           ```
 
-    Depending on your local configuration, the following parameters may need to be set (example below) :
+    Depending on your local configuration, the following parameters may be needed to avoid connection errors:
 
-    - sslmode
-    - gssencmode
+    - sslmode=require
+    - gssencmode=disable
+
+Example connection string with these parameters:
 
     ```bash
     postgresql://postgres.[REF]:[YOUR-PASSWORD]@[REGION].pooler.supabase.com:5432/postgres?sslmode=require&gssencmode=disable
     ```
 
-## Alternative method
+## Migrate Storage objects
 
-**Disclaimer - This is experimental and you should use at own risk**
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another.
 
-The following operations can be done remotely with no local setup required via the Google Colab notebook below:
+```script
+// npm install @supabase/supabase-js@2
+const { createClient } = require('@supabase/supabase-js')
 
-- Backup database
-- Restore backup
-- Migrate Storage (from active project or zip file with objects)
+const OLD_PROJECT_URL = 'https://xxx.supabase.co'
+const OLD_PROJECT_SECRET_KEY = 'old-project-secret-key-xxx'
 
-[![Supabase Migration notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/Supabase-Migration-Tool/blob/main/Supabase_migrate.ipynb)
+const NEW_PROJECT_URL = 'https://yyy.supabase.co'
+const NEW_PROJECT_SECRET_KEY = 'new-project-secret-key-yyy'
+
+;(async () => {
+  const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SECRET_KEY, {
+    db: {
+      schema: 'storage',
+    },
+  })
+  const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SECRET_KEY)
+  const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SECRET_KEY)
+
+  // make sure you update max_rows in postgrest settings if you have a lot of objects
+  // or paginate here
+  const { data: oldObjects, error } = await oldSupabaseRestClient.from('objects').select()
+  if (error) {
+    console.log('error getting objects from old bucket')
+    throw error
+  }
+
+  for (const objectData of oldObjects) {
+    console.log(`moving ${objectData.id}`)
+    try {
+      const { data, error: downloadObjectError } = await oldSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .download(objectData.name)
+      if (downloadObjectError) {
+        throw downloadObjectError
+      }
+
+      const { _, error: uploadObjectError } = await newSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .upload(objectData.name, data, {
+          upsert: true,
+          contentType: objectData.metadata.mimetype,
+          cacheControl: objectData.metadata.cacheControl,
+        })
+      if (uploadObjectError) {
+        throw uploadObjectError
+      }
+    } catch (err) {
+      console.log('error moving ', objectData)
+      console.log(err)
+    }
+  }
+})()
+```
