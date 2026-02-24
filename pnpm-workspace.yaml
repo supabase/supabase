@@ -59,6 +59,7 @@ minimumReleaseAgeExclude:
   - lodash-es
   - lodash
   - next-mdx-remote
+  - react-resizable-panels
 
 onlyBuiltDependencies:
   - supabase

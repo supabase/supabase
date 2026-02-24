@@ -102,7 +102,11 @@ export default function FormSection({ section }: { section: GoFormSection }) {
       const result = await submitFormAction(section.crm, values, { pageUri, pageName })
 
       if (result.success) {
-        setSubmitState('success')
+        if (section.successRedirect) {
+          window.location.href = section.successRedirect
+        } else {
+          setSubmitState('success')
+        }
       } else {
         setSubmitState('error')
         setErrorMessages(result.errors)
