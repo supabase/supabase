@@ -78,3 +78,5 @@ overrides:
   node-gyp>tar: ^7.5.8
   '@mapbox/node-pre-gyp>tar': ^7.5.8
   tmp: ^0.2.4
+  '@aws-sdk/core>fast-xml-parser': ^5.3.5
+  openapi-sampler>fast-xml-parser: ^5.3.5

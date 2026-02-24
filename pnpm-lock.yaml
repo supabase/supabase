@@ -77,6 +77,8 @@ overrides:
   node-gyp>tar: ^7.5.8
   '@mapbox/node-pre-gyp>tar': ^7.5.8
   tmp: ^0.2.4
+  '@aws-sdk/core>fast-xml-parser': ^5.3.5
+  openapi-sampler>fast-xml-parser: ^5.3.5
 
 importers:
 
@@ -11815,12 +11817,8 @@ packages:
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==}
 
-  fast-xml-parser@4.4.1:
-    resolution: {integrity: sha512-xkjOecfnKGkSsOwtZ5Pz7Us/T6mrbPQrq0nh+aCO5V9nk5NLWmasAHumTKjiPJPWANe+kAZ84Jc8ooJkzZ88Sw==}
-    hasBin: true
-
-  fast-xml-parser@4.5.3:
-    resolution: {integrity: sha512-RKihhV+SHsIUGXObeVy9AXiBbFwkVk7Syp8XgwN5U3JV416+Gwp/GO9i0JYKmikykgz/UHRrrV4ROuZEo/T0ig==}
+  fast-xml-parser@5.3.6:
+    resolution: {integrity: sha512-QNI3sAvSvaOiaMl8FYU4trnEzCwiRr8XMWgAHzlrWpTSj+QaCSvOf1h82OEP1s4hiAXhnbXSyFWCf4ldZzZRVA==}
     hasBin: true
 
   fastest-stable-stringify@2.0.2:
@@ -17179,8 +17177,8 @@ packages:
     resolution: {integrity: sha512-aT2BU9KkizY9SATf14WhhYVv2uOapBWX0OFWF4xvcj1mPaNotlSc2CsxpS4DS46ZueSppmCF5BX1sNYBtwBvfw==}
     engines: {node: '>=12.*'}
 
-  strnum@1.1.2:
-    resolution: {integrity: sha512-vrN+B7DBIoTTZjnPNewwhx6cBA/H+IS7rfW68n7XxC1y7uoiGQBxaKzqucGUgavX15dJgiGztLJ8vxuEzwqBdA==}
+  strnum@2.1.2:
+    resolution: {integrity: sha512-l63NF9y/cLROq/yqKXSLtcMeeyOfnSQlfMSlzFt/K73oIaD8DGaQWd7Z34X9GPiKqP5rbSh84Hl4bOlLcjiSrQ==}
 
   structured-clone-es@1.0.0:
     resolution: {integrity: sha512-FL8EeKFFyNQv5cMnXI31CIMCsFarSVI2bF0U0ImeNE3g/F1IvJQyqzOXxPBRXiwQfyBTlbNe88jh1jFW0O/jiQ==}
@@ -19064,7 +19062,7 @@ snapshots:
       '@smithy/util-body-length-browser': 4.0.0
       '@smithy/util-middleware': 4.2.8
       '@smithy/util-utf8': 4.0.0
-      fast-xml-parser: 4.4.1
+      fast-xml-parser: 5.3.6
       tslib: 2.8.1
 
   '@aws-sdk/core@3.826.0':
@@ -19082,7 +19080,7 @@ snapshots:
       '@smithy/util-body-length-browser': 4.0.0
       '@smithy/util-middleware': 4.2.8
       '@smithy/util-utf8': 4.0.0
-      fast-xml-parser: 4.4.1
+      fast-xml-parser: 5.3.6
       tslib: 2.8.1
 
   '@aws-sdk/credential-provider-cognito-identity@3.830.0':
@@ -29804,13 +29802,9 @@ snapshots:
 
   fast-uri@3.0.6: {}
 
-  fast-xml-parser@4.4.1:
+  fast-xml-parser@5.3.6:
     dependencies:
-      strnum: 1.1.2
-
-  fast-xml-parser@4.5.3:
-    dependencies:
-      strnum: 1.1.2
+      strnum: 2.1.2
 
   fastest-stable-stringify@2.0.2: {}
 
@@ -33976,7 +33970,7 @@ snapshots:
   openapi-sampler@1.6.1:
     dependencies:
       '@types/json-schema': 7.0.15
-      fast-xml-parser: 4.5.3
+      fast-xml-parser: 5.3.6
       json-pointer: 0.6.2
 
   openapi-types@10.0.0: {}
@@ -36690,7 +36684,7 @@ snapshots:
       '@types/node': 22.13.14
       qs: 6.15.0
 
-  strnum@1.1.2: {}
+  strnum@2.1.2: {}
 
   structured-clone-es@1.0.0: {}
 
