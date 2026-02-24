@@ -2,21 +2,6 @@ import pgMeta from '@supabase/pg-meta'
 import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import {
-  ExternalLinkIcon,
-  InfoIcon,
-  RefreshCw,
-  Trash,
-  Users,
-  WandSparklesIcon,
-  X,
-} from 'lucide-react'
-import Link from 'next/link'
-import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
-import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
-import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from 'components/ui/AlertError'
@@ -40,6 +25,20 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
+  ExternalLinkIcon,
+  InfoIcon,
+  RefreshCw,
+  Trash,
+  Users,
+  WandSparklesIcon,
+  X,
+} from 'lucide-react'
+import Link from 'next/link'
+import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
+import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import { toast } from 'sonner'
+import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -60,6 +59,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { SortDropdown } from './SortDropdown'
@@ -69,14 +69,13 @@ import {
   ColumnConfiguration,
   Filter,
   MAX_BULK_DELETE,
-  PHONE_NUMBER_LEFT_PREFIX_REGEX,
   PROVIDER_FILTER_OPTIONS,
   USERS_TABLE_COLUMNS,
-  UUIDV4_LEFT_PREFIX_REGEX,
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -92,7 +91,11 @@ limit 100`
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const {
+    data: project,
+    isPending: isPendingProject,
+    isError: isProjectError,
+  } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
@@ -137,7 +140,7 @@ export const UsersV2 = () => {
     'userType',
     parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
   )
-  const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
+  const [filterKeywords] = useQueryState('keywords', { defaultValue: '' })
   const [sortByValue, setSortByValue] = useQueryState('sortBy', { defaultValue: 'created_at:desc' })
   const [sortColumn, sortOrder] = sortByValue.split(':')
   const [selectedColumns, setSelectedColumns] = useQueryState(
@@ -185,7 +188,6 @@ export const UsersV2 = () => {
   )
 
   const [columns, setColumns] = useState<Column<any>[]>([])
-  const [search, setSearch] = useState(filterKeywords)
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -286,6 +288,7 @@ export const UsersV2 = () => {
     data,
     error,
     isSuccess,
+    isPending,
     isLoading,
     isRefetching,
     isError,
@@ -329,16 +332,6 @@ export const UsersV2 = () => {
 
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
-
-  const searchInvalid =
-    !search ||
-    specificFilterColumn === 'freeform' ||
-    specificFilterColumn === 'email' ||
-    specificFilterColumn === 'name'
-      ? false
-      : specificFilterColumn === 'id'
-        ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
-        : !search.match(PHONE_NUMBER_LEFT_PREFIX_REGEX)
 
   const telemetryProps = {
     sort_column: sortColumn,
@@ -495,10 +488,10 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0" title="Users" />
+        <FormHeader className="py-4 px-6 !mb-0 border-b" title="Users" />
 
         {showImprovedSearchOptIn && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t relative">
+          <Alert_Shadcn_ className="rounded-none mb-0 border-0 relative">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setImprovedSearchDismissed(true)}
@@ -548,7 +541,7 @@ export const UsersV2 = () => {
           </Alert_Shadcn_>
         )}
 
-        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2 border-t">
+        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
               <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
@@ -566,24 +559,10 @@ export const UsersV2 = () => {
             <>
               <div className="flex flex-wrap items-center gap-2">
                 <UsersSearch
-                  search={search}
-                  searchInvalid={searchInvalid}
-                  specificFilterColumn={specificFilterColumn}
-                  setSearch={setSearch}
-                  setFilterKeywords={(s) => {
-                    setFilterKeywords(s)
-                    setSelectedId(null)
-                    sendEvent({
-                      action: 'auth_users_search_submitted',
-                      properties: {
-                        trigger: 'search_input',
-                        ...telemetryProps,
-                        keywords: s,
-                      },
-                      groups: telemetryGroups,
-                    })
-                  }}
-                  setSpecificFilterColumn={(value) => {
+                  improvedSearchEnabled={improvedSearchEnabled}
+                  telemetryProps={telemetryProps}
+                  telemetryGroups={telemetryGroups}
+                  onSelectFilterColumn={(value) => {
                     if (value === 'freeform') {
                       if (isCountWithinThresholdForSortBy) {
                         updateStorageFilter(value)
@@ -594,7 +573,6 @@ export const UsersV2 = () => {
                       updateStorageFilter(value)
                     }
                   }}
-                  improvedSearchEnabled={improvedSearchEnabled}
                 />
 
                 {showUserTypeFilter &&
@@ -773,11 +751,11 @@ export const UsersV2 = () => {
         </div>
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
         <ResizablePanelGroup
-          direction="horizontal"
+          orientation="horizontal"
           className="relative flex flex-grow bg-alternative min-h-0"
           autoSaveId="query-performance-layout-v1"
         >
-          <ResizablePanel defaultSize={1}>
+          <ResizablePanel>
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}
@@ -830,7 +808,21 @@ export const UsersV2 = () => {
                       />
                     )
                   },
-                  noRowsFallback: isLoading ? (
+                  noRowsFallback: isPendingProject ? (
+                    <div className="absolute top-14 px-6 w-full">
+                      <GenericSkeletonLoader />
+                    </div>
+                  ) : project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY || isProjectError ? (
+                    <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
+                      <AlertError
+                        subject="Unable to load users"
+                        error={{
+                          message:
+                            'Could not connect to the database. Please check your project status.',
+                        }}
+                      />
+                    </div>
+                  ) : isPending ? (
                     <div className="absolute top-14 px-6 w-full">
                       <GenericSkeletonLoader />
                     </div>
@@ -838,7 +830,7 @@ export const UsersV2 = () => {
                     <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
                       <AlertError subject="Failed to retrieve users" error={error} />
                     </div>
-                  ) : (
+                  ) : isSuccess ? (
                     <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
                       <Users className="text-foreground-lighter" strokeWidth={1} />
                       <div className="text-center">
@@ -854,7 +846,7 @@ export const UsersV2 = () => {
                         </p>
                       </div>
                     </div>
-                  ),
+                  ) : null,
                 }}
               />
             </div>

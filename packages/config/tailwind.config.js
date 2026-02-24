@@ -414,6 +414,7 @@ const uiConfig = ui({
       },
       padding: {
         content: '21px',
+        card: 'var(--card-padding-x)',
       },
       // borderRadius: {
       //   lg: `var(--radius)`,

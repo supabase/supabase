@@ -331,7 +331,7 @@ By implementing Network Restrictions, you create a more secure environment for y
     slug: 'network-restrictions',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: false,
+      availableOnSelfHosted: true,
     },
   },
   {
@@ -370,33 +370,37 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
     slug: 'ssl-enforcement',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: false,
+      availableOnSelfHosted: true,
     },
   },
   {
     title: 'Branching',
     subtitle: 'Test and preview changes using Supabase Branches.',
     description: `
-Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. This feature works similarly to Git branches, enabling safe experimentation with configurations, database schemas, and new features.
+Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. Branching 2.0 (currently in public alpha) removes the Git requirement—spin up branches directly from the dashboard, CLI, or Management API, with or without GitHub integration.
 
 ## Key features
-1. Git-based workflow: Integrates with GitHub, creating preview branches for each pull request.
-2. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
-3. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
-4. Data seeding: Preview branches can be seeded with sample data using ./supabase/seed.sql.
-5. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
+1. No-Git workflows: Create branches directly from dashboard or CLI without requiring GitHub connection.
+2. Git-based workflow: Optionally integrate with GitHub, creating preview branches for each pull request.
+3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
+4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
+5. Data seeding: Preview branches can be seeded with sample data using ./supabase/seed.sql.
+6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
+7. Merge requests: Review schema diffs and merge changes directly in the dashboard.
 
 ## Benefits:
 - Risk-free experimentation: Test changes without affecting the production environment.
 - Improved collaboration: Multiple team members can work on different features simultaneously.
 - Streamlined reviews: Facilitate thorough checks of database changes before merging.
 - Rapid iteration: Quickly prototype and validate database-driven features.
+- Flexible workflows: Use Git integration, dashboard creation, or combine both approaches.
 
 ## Supabase Branching is valuable for:
 - Agile teams working on multiple features concurrently
 - Projects with complex database schemas requiring careful management
 - Applications undergoing significant refactoring or upgrades
 - CI/CD pipelines integrating database changes
+- Teams preferring no-code or database-first development workflows
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -405,7 +409,7 @@ Supabase Branching allows you to create and test changes in separate, temporary 
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
     },
   },
@@ -451,32 +455,31 @@ By adopting the Supabase Terraform provider, teams can implement GitOps practice
   },
   {
     title: 'Read replicas',
-    subtitle: 'Deploy read-only databases across multiple regions for lower latency.',
+    subtitle: 'Isolate heavy workloads and reduce global latency',
     description: `
-Supabase Read Replicas allow you to deploy additional read-only databases that are kept in sync with your Primary database. This feature enhances performance, improves resource management, and reduces latency for global applications.
+Supabase Read Replicas distribute read traffic across multiple databases. Use them to isolate analytics workloads from production, reduce latency for global users or scale read capacity beyond a single database.
 
 ## Key features
-1. Load balancing: Distribute read operations across multiple databases, reducing load on the Primary.
-2. Global deployment: Deploy replicas closer to users for reduced latency.
-3. Dedicated endpoints: Each replica has its own database and API endpoints.
-4. API load balancer: Automatically balance GET requests across all available endpoints.
+
+1. Workload Isolation: Run heavy read queries (analytics, reports, exports, batch jobs) on dedicated replicas without impacting production response times.
+2. Multi-region deployment: Deploy replicas in regions closer to your users. European users query European databases.
+3. Dedicated endpoints: Each replica provides separate database and API connection strings for direct access.
+4. Automatic routing: API load balancer routes GET requests to the nearest available replica.
 5. Centralized configuration: Settings are propagated across all databases in a project.
-6. Monitoring tools: Track replication lag and resource utilization through the Supabase Dashboard.
+6. Monitoring tools: Track replication lag and resource usage directly in the Supabase Dashboard.
 
-## Benefits:
-- Improved performance: Serve data from the nearest location, reducing response times.
-- Increased availability: Distribute read traffic across multiple replicas for enhanced resilience.
-- Scalability: Handle higher read loads by offloading queries to replicas.
-- Data redundancy: Replicas provide additional copies of your data.
-- Analytics support: Run resource-intensive queries on replicas without impacting production.
+## When to use Read Replicas
 
-## Read Replicas are particularly valuable for:
-- Global applications serving users across different regions
-- High-traffic websites with read-heavy workloads
-- Real-time analytics dashboards requiring low-latency data access
-- Applications needing to scale read capacity independently of write capacity
+- Your analytics team's reports slow down production (workload isolation)
+- Users in Europe or Asia experience 100-150ms latency (geo-distribution)
+- You've reached 16XL and need more read capacity (horizontal scaling)
+- Your workload is 80%+ reads and needs to scale independently of writes
 
-By leveraging Read Replicas, you can achieve consistent low-latency performance globally, improve application responsiveness for read operations, and enhance system reliability through better resource distribution and redundancy.
+## Get Started
+
+Deploy your first Read Replica in minutes from Project Settings > Infrastructure. Choose a region—same region for analytics isolation, different region for geo-distribution. Select a compute size to match your workload.
+
+[Read blog post](https://supabase.com/blog/read-replicas-vs-bigger-compute)
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -529,6 +532,106 @@ By leveraging these extensions, you can implement complex features more easily, 
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Dedicated Poolers',
+    subtitle: 'Co-located connection pooler for maximum performance.',
+    description: `Every project on Micro Compute and above includes a dedicated PgBouncer instance co-located with your database. Dedicated Poolers work alongside Supavisor as an alternative connection pooling option, providing IPv4 compatibility and prepared statement support.
+
+## Key benefits
+1. IPv4 compatibility: Unlike Supavisor's transaction mode, Dedicated Poolers support IPv4 connections.
+2. Prepared statements: Full support for prepared statements, not available in Supavisor transaction mode.
+3. Flexible pooler selection: Swap between Supavisor and PgBouncer pooler types based on your needs.
+4. Independent connection limits: Each pooler has its own client connection limits.
+5. Shared pool sizing: Both poolers share the same pool size setting but operate independently.
+6. Maximum performance: Co-located with your database for minimal latency.
+
+## Dedicated Poolers are valuable for:
+- Applications requiring IPv4 compatibility
+- Workloads using prepared statements
+- Projects needing dedicated connection pooling resources
+- High-performance applications requiring co-located infrastructure
+
+Dedicated Poolers provide an alternative to Supavisor for specific use cases, giving you maximum flexibility in how you manage database connections.`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres#serverside-poolers',
+    slug: 'dedicated-poolers',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Foreign Data Wrappers',
+    subtitle: 'Query external data sources as Postgres tables.',
+    description: `Foreign Data Wrappers allow you to query external data sources—databases, APIs, services—as if they were native Postgres tables. Built on Supabase's open-source Wrappers framework written in Rust, this feature transforms how you integrate external data into your application.
+
+## Key benefits
+1. Query external data as tables: Access Stripe, Firebase, ClickHouse, BigQuery, Airtable, S3, and more using SQL.
+2. No data movement: Data remains in the remote server, eliminating ETL overhead.
+3. WebAssembly support: Easier FDW development with Wasm compatibility.
+4. SQL-native: Just SQL—no new tools to learn.
+5. On-demand data: Always up-to-date without scheduled syncs.
+6. Cost savings: Less infrastructure to manage compared to traditional ETL tools.
+
+## Security considerations
+Foreign Data Wrappers should be stored in private schemas and do not provide Row Level Security. Use Database Functions with security definer if you need to expose data publicly.
+
+## Foreign Data Wrappers are valuable for:
+- Integrating payment data from Stripe
+- Syncing data from Firebase or other databases
+- Querying analytics data from BigQuery or ClickHouse
+- Accessing files from S3
+- Any scenario requiring real-time external data access
+
+Foreign Data Wrappers simplify data integration by bringing external data into your Postgres environment without complex ETL pipelines.`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/overview',
+    slug: 'foreign-data-wrappers',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Supabase ETL',
+    subtitle: 'Real-time data replication to analytical destinations.',
+    description: `Supabase ETL is a change-data-capture pipeline built in Rust that replicates your Postgres tables to analytical destinations in near real-time. Reading directly from the Postgres Write Ahead Log, ETL ensures your analytics data stays synchronized with your production database.
+
+## Key benefits
+1. Real-time replication: Near real-time data synchronization using Postgres logical replication.
+2. Analytics Buckets support: Replicate to Iceberg format for large-scale analytics.
+3. BigQuery integration: Direct replication to Google's data warehouse.
+4. Complete change history: Captures INSERT, UPDATE, DELETE, and TRUNCATE operations.
+5. Optimized for analytics: Faster queries and lower storage costs through compression.
+6. Production isolation: Complete separation of analytics and production workloads.
+
+## How it works
+ETL uses Postgres logical replication to capture changes. Each replicated table includes a \`cdc_operation\` column tracking the type of change. For Analytics Buckets, data is stored in append-only changelog format using Parquet files. For BigQuery, a view is created for each table backed by versioned tables.
+
+## Supabase ETL is valuable for:
+- Data warehousing and business intelligence
+- Historical analysis and audit trails
+- Large-scale analytics requiring separation from production
+- Compliance scenarios requiring complete data history
+
+## Limitations
+Tables require primary keys. DDL support (schema changes) is currently in development.
+
+Supabase ETL provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
+    icon: CloudCog,
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl: 'https://supabase.github.io/etl/',
+    slug: 'supabase-etl',
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -776,6 +879,75 @@ This feature is particularly useful for collaborative applications where knowing
       availableOnSelfHosted: true,
     },
   },
+  {
+    title: 'Realtime - Broadcast from the Database',
+    subtitle: 'Trigger broadcast messages directly from Postgres.',
+    description: `Broadcast from Database allows you to trigger Realtime broadcast messages directly from your database using Postgres triggers. Messages are read from the WAL and stored in the realtime.message table, automatically deleted after 3 days.
+
+## Key benefits
+1. Database-native broadcasting: Trigger broadcasts using Postgres functions and triggers.
+2. WAL-based delivery: Reads from the Write Append Log for reliable message delivery.
+3. Topic-based routing: Define topic patterns to send messages to specific channels.
+4. RLS integration: Messages tested against Row Level Security policies before sending.
+5. Format compatibility: Use realtime.broadcast_changes for Postgres Changes-compatible format.
+
+## How it works
+Create a trigger function using realtime.broadcast_change, set up triggers on your tables for INSERT/UPDATE/DELETE, and define topic patterns. Clients subscribe to specific topics to receive events in real-time.
+
+## Broadcast from Database is valuable for:
+- Notifying users of changes to specific records
+- Real-time collaborative features
+- Activity feeds and live notifications
+- Database-driven real-time updates
+
+## Security
+Supabase Admin role connects to the database and tests messages against RLS policies. Transactions are rolled back after authorization checks.
+
+Broadcast from Database provides a powerful way to trigger real-time events directly from your database logic.`,
+    icon: DatabaseZap,
+    products: [PRODUCT_SHORTNAMES.REALTIME],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-from-database',
+    slug: 'realtime-broadcast-from-database',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Realtime - Broadcast Replay',
+    subtitle: 'Access previously sent messages in private channels.',
+    description: `Broadcast Replay enables private channels to access messages sent earlier, perfect for catching up on missed messages when reconnecting or loading recent history.
+
+## Key benefits
+1. Catch up on missed messages: Retrieve messages sent while disconnected.
+2. Load recent history: Display recent chat messages or activity when joining a channel.
+3. Flexible retrieval: Specify timestamp and limit for precise message fetching.
+4. Private channel only: Works exclusively with private channels for security.
+
+## Configuration
+Requires \`since\` parameter (epoch timestamp in milliseconds) for earliest message retrieval. Optional \`limit\` parameter (max 25, positive integer) controls the number of messages returned.
+
+## Broadcast Replay is valuable for:
+- Chat applications loading recent message history
+- Collaborative tools syncing state after network interruption
+- Real-time dashboards catching up on missed updates
+- Applications requiring recent activity display
+
+## Limitations
+Only available for messages published via Broadcast from Database. Only works in private channels. Available in JavaScript client version 2.37.0 and later.
+
+Broadcast Replay ensures users never miss important real-time updates, even when temporarily disconnected.`,
+    icon: MessageCircle,
+    products: [PRODUCT_SHORTNAMES.REALTIME],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-replay',
+    slug: 'realtime-broadcast-replay',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
   // Auth
   {
     title: 'Email login',
@@ -927,6 +1099,255 @@ Supabase's Magic Links feature offers a secure and user-friendly authentication 
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-email-passwordless',
     slug: 'passwordless-login-via-magicklink',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'SSO with SAML',
+    subtitle: 'Enterprise single sign-on using SAML protocol.',
+    description: `SSO with SAML enables enterprise single sign-on using the Security Assertion Markup Language protocol. Users authenticate using their organization's identity provider—Okta, Azure AD, Google Workspace, and more.
+
+## Key benefits
+1. Enterprise authentication: Support enterprise identity providers for user authentication.
+2. Centralized user management: Manage users through existing identity systems.
+3. Compliance support: Meet enterprise security and compliance requirements.
+4. Single sign-on: Users authenticate once across multiple applications.
+5. Standard protocol: SAML is widely supported by enterprise identity providers.
+
+## SSO with SAML is valuable for:
+- Enterprise applications requiring corporate identity integration
+- B2B SaaS platforms serving enterprise customers
+- Applications needing centralized user management
+- Compliance scenarios requiring specific authentication methods
+
+SSO with SAML provides the enterprise-grade authentication capabilities required for serving corporate customers.`,
+    icon: Lock,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+    slug: 'sso-with-saml',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Third-Party Authentication',
+    subtitle: 'Trust JWTs from external authentication providers.',
+    description: `Third-Party Authentication allows Supabase APIs to trust JWTs issued by external authentication providers. Your existing auth system issues JWTs that Supabase verifies but doesn't create, enabling integration with Firebase Authentication, Auth0, or custom providers.
+
+## Key benefits
+1. Existing auth integration: Use your production auth system with Supabase APIs.
+2. No user migration: Avoid migrating users to Supabase Auth.
+3. Multi-provider support: Authenticate with multiple providers simultaneously.
+4. JWT verification: Supabase verifies tokens against provider signing keys.
+5. Works across Supabase: Compatible with Data APIs, Storage, and Realtime.
+
+## Requirements
+Provider must use asymmetrically signed JWTs exposed as OIDC Issuer Discovery URL. JWTs must include \`kid\` header parameter for key identification.
+
+## Third-Party Authentication is valuable for:
+- Production apps with established auth systems
+- Firebase Authentication users migrating to Supabase
+- Multi-provider authentication strategies
+- Avoiding user migration during platform adoption
+
+## Limitations
+Supabase Auth cannot be disabled. Symmetric keys (HS256) not currently supported. 30-minute delay for key rotation updates.
+
+Third-Party Authentication bridges your existing auth system with Supabase's backend services.`,
+    icon: ShieldCheck,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/third-party/overview',
+    slug: 'third-party-authentication',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Auth Hooks',
+    subtitle: 'Customize authentication flows with serverless functions.',
+    description: `Auth Hooks are customizable serverless functions that run at specific points in the authentication lifecycle. Implement as Postgres functions or HTTP webhooks to add custom logic to authentication flows.
+
+## Key benefits
+1. Custom JWT claims: Add roles, permissions, or metadata to access tokens.
+2. Custom SMS provider: Integrate your preferred SMS service.
+3. Custom email sending: Use external email services for auth emails.
+4. Custom MFA verification: Implement custom multi-factor authentication flows.
+5. Business logic integration: Add custom validation or processing to auth events.
+
+## Hook types
+Custom Access Token Hook modifies JWT claims before issuance. Send SMS Hook customizes SMS sending. Send Email Hook customizes email sending. MFA Verification Hook adds custom MFA verification logic.
+
+## Auth Hooks are valuable for:
+- Adding custom claims for authorization
+- Integrating custom communication providers
+- Implementing custom MFA flows
+- Adding business logic to authentication
+- Customizing auth emails and SMS messages
+
+Auth Hooks provide the flexibility to customize authentication while leveraging Supabase Auth's foundation.`,
+    icon: Puzzle,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/auth-hooks',
+    slug: 'auth-hooks',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'JWT Signing Keys',
+    subtitle: 'Asymmetric key management for enhanced JWT security.',
+    description: `JWT Signing Keys replace the legacy JWT secret with asymmetric key cryptography. Private keys sign tokens on Supabase servers, while public keys verify them anywhere—enabling local JWT verification without calling Supabase servers.
+
+## Key benefits
+1. Faster verification: Verify JWTs locally without server calls.
+2. Independent rotation: Rotate each component independently.
+3. Roll-back capability: Revert to previous keys if needed.
+4. Better mobile support: No forced app updates for key rotation.
+5. Shorter JWT expiry: Default 5-minute expiry improves security.
+6. Smaller JWTs: Less redundant data in tokens.
+
+## Key features
+Asymmetric signing using RSA or Elliptic Curve. Multiple key support with Active, Standby, Previously used, and Revoked states. JWKS endpoint exposes public keys at \`https://<project-ref>.supabase.co/auth/v1/jwks\`.
+
+## Migration
+Legacy JWT secret can be imported into the new system. Gradual migration supported. Both systems can coexist during transition.
+
+## JWT Signing Keys are valuable for:
+- Applications requiring local JWT verification
+- Mobile apps needing flexible key rotation
+- Security-conscious applications requiring shorter token expiry
+- Projects migrating from legacy JWT secrets
+
+JWT Signing Keys provide modern, secure JWT management with the flexibility required for production applications.`,
+    icon: Lock,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/signing-keys',
+    slug: 'jwt-signing-keys',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
+    title: 'OAuth2.1 Server',
+    subtitle: 'Turn your project into an OAuth 2.1 identity provider.',
+    description: `OAuth 2.1 Server transforms your Supabase project into a complete OAuth 2.1 and OpenID Connect identity provider. Authenticate AI agents, mobile apps, third-party services, and more using your existing Supabase Auth users.
+
+## Key benefits
+1. Complete control: Build custom authorization UI for your brand.
+2. AI agent authentication: LLM tools and MCP servers authenticate as existing users.
+3. First-party mobile apps: Issue tokens to your own mobile and desktop apps.
+4. Enterprise SSO: Provide OIDC for enterprise customer integrations.
+5. Multi-service auth: Single identity provider for multiple services.
+6. RLS policy enforcement: Access tokens respect Row Level Security policies.
+
+## Flows supported
+Authorization code flow with PKCE. Refresh token flow. ID tokens when \`openid\` scope requested.
+
+## Endpoints
+Authorization endpoint \`/oauth/authorize\`. Token endpoint \`/oauth/token\`. UserInfo endpoint \`/oauth/userinfo\`. JWKS endpoint \`.well-known/jwks.json\`. Discovery endpoints for OpenID and OAuth.
+
+## OAuth 2.1 Server is valuable for:
+- Authenticating AI agents and MCP servers
+- Building "Login with Your App" for third parties
+- First-party mobile and desktop applications
+- Enterprise customer integrations
+- Multi-service authentication architectures
+
+OAuth 2.1 Server provides enterprise-grade identity provider capabilities built on your Supabase Auth foundation.`,
+    icon: ShieldPlus,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/oauth-server',
+    slug: 'oauth2-1-server',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Web3 Authentication',
+    subtitle: 'Wallet-based authentication for Ethereum and Solana.',
+    description: `Web3 Authentication enables wallet-based sign-in using Ethereum or Solana wallets. Users authenticate by signing a message with their wallet—no email or phone number required.
+
+## Key benefits
+1. Wallet-based identity: Users sign in with MetaMask, Phantom, Solflare, and other wallets.
+2. EIP 4361 standard: Uses Sign-In with Ethereum standard for security.
+3. Ethereum and Solana: Support for major blockchain ecosystems.
+4. Message signing: Secure authentication through cryptographic signatures.
+5. No personal data: No email or phone number associated with accounts.
+
+## Security features
+Application URLs must be registered in Redirect URL settings. Wallets warn if message domain doesn't match current page. Prevents replay attacks from other applications.
+
+## Message format
+Includes wallet address, timestamp, browser location, customizable statement for terms acceptance, and non-transferable security markers.
+
+## Web3 Authentication is valuable for:
+- Web3 applications and DeFi platforms
+- NFT marketplaces and platforms
+- Blockchain-based games
+- Crypto wallets and services
+- Any application requiring wallet-based identity
+
+## Limitations
+Easy to automate account creation. No personal identifying information. Some Solana wallets (Ledger) have known issues with off-chain signing.
+
+Web3 Authentication provides the wallet-based identity infrastructure required for blockchain applications.`,
+    icon: Shield,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/auth-web3',
+    slug: 'web3-authentication',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Email Templates',
+    subtitle: 'Customizable email templates for all authentication flows.',
+    description: `Email Templates allow you to customize all authentication emails using Go Templates with HTML support. Edit via the dashboard, use custom SMTP providers, and create branded email experiences for your users.
+
+## Key benefits
+1. Complete customization: HTML emails with Go template syntax.
+2. Custom SMTP support: Use your preferred email provider.
+3. Multiple template types: Authentication emails and security notifications.
+4. Variable support: Access user data, confirmation URLs, OTP codes, and more.
+5. Conditional rendering: Use Go template logic for dynamic content.
+6. Server-side verification: Custom confirmation pages with TokenHash.
+
+## Template types
+Authentication: Confirm Signup, Invite User, Magic Link, Change Email Address, Reset Password. Security Notifications: Password Changed, Email Changed, Phone Changed, Identity Linked/Unlinked, MFA Factor Enrolled/Unenrolled.
+
+## Available variables
+\`{{ .ConfirmationURL }}\`, \`{{ .Token }}\`, \`{{ .TokenHash }}\`, \`{{ .SiteURL }}\`, \`{{ .Email }}\`, \`{{ .NewEmail }}\`, \`{{ .OldEmail }}\`, \`{{ .Data }}\` for user metadata.
+
+## Email Templates are valuable for:
+- Branded authentication experiences
+- Custom confirmation flows
+- Security notification customization
+- Integration with React Email and Resend
+- Protection against email link prefetching
+
+## Best practices
+Use custom SMTP for production. Disable email tracking in providers. Use OTP for providers that prefetch links. Keep authentication emails simple and separate from marketing.
+
+Email Templates provide complete control over your authentication email experience.`,
+    icon: Mail,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/auth/auth-email-templates',
+    slug: 'email-templates',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
@@ -1092,21 +1513,26 @@ Supabase's Server-side Auth feature allows developers to create more secure and 
     title: 'File storage',
     subtitle: 'Supabase Storage makes it simple to store and serve files.',
     description: `
-Supabase Storage provides a scalable solution for storing and serving files in your applications, allowing easy management of user-generated content and assets within your Supabase project.
+Supabase Storage provides a scalable solution for storing and serving files in your applications, allowing easy management of user-generated content and assets within your Supabase project. Storage supports files up to 500GB on paid plans, offers S3 protocol compatibility for any S3-compatible client, and includes three specialized bucket types: File buckets for traditional storage, Analytics buckets for data warehousing, and Vector buckets for AI embeddings with similarity search.
 
 ## Key features
-1. Global CDN: Serve files quickly from over 285 cities worldwide.
-2. Image optimization: Resize and compress media files on the fly.
-3. Flexible file types: Store images, videos, documents, and any other file type.
-4. Access control: Implement fine-grained access using Postgres RLS policies.
-5. Resumable uploads: Support for protocols like TUS for reliable file transfers.
-6. Organization: Structure files into buckets and folders for efficient management.
+1. 500GB file support: Upload files up to 500GB using the new storage-specific hostname on paid plans.
+2. Three bucket types: File buckets for traditional storage, Analytics buckets (Iceberg format) for data lakes, and Vector buckets for AI embeddings with similarity search.
+3. S3 compatibility: Use any S3-compatible client to interact with Storage—upload with TUS, manage with S3, serve with REST API.
+4. Global CDN: Serve files quickly from over 285 cities worldwide.
+5. Smart CDN: Automatic cache revalidation with changes propagating globally within 60 seconds.
+6. Image optimization: Resize and compress media files on the fly with automatic WebP conversion.
+7. Flexible file types: Store images, videos, documents, and any other file type.
+8. Access control: Implement fine-grained access using Postgres RLS policies.
+9. Resumable uploads: Support for protocols like TUS for reliable file transfers.
+10. Organization: Structure files into buckets and folders for efficient management.
 
 ## Benefits:
 - Seamless integration: Use the same Supabase client for both database and storage operations.
 - Scalability: Handle large numbers of files and high traffic loads without infrastructure management.
-- Performance: Quick file serving with global CDN support.
+- Performance: Quick file serving with global CDN support and Smart CDN optimization.
 - Cost-effectiveness: Pay only for the storage you use, with no upfront costs.
+- Massive file support: Handle files up to 500GB with reliable multipart upload protocols.
 
 ## File storage is valuable for:
 - Social media platforms storing user-uploaded media
@@ -1114,6 +1540,8 @@ Supabase Storage provides a scalable solution for storing and serving files in y
 - Content management systems handling various file types
 - Collaborative tools storing shared assets
 - Mobile apps needing to sync user data and media
+- Data teams requiring SQL-accessible data lakes
+- AI applications storing and searching vector embeddings
 
 Supabase Storage simplifies adding robust file management to your applications, allowing you to focus on building unique features while relying on Supabase for secure, scalable file storage and serving.
 `,
@@ -1126,6 +1554,80 @@ Supabase Storage simplifies adding robust file management to your applications, 
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Analytics Buckets (with Iceberg)',
+    subtitle: 'Large-scale analytics using Apache Iceberg format.',
+    description: `Analytics Buckets provide specialized storage optimized for large-scale analytics using Apache Iceberg open table format. Built on Amazon S3 Tables, Analytics Buckets enable petabyte-scale analytics with automatic compaction and snapshot management.
+
+## Key benefits
+1. Apache Iceberg format: Open standard with Parquet files for broad tool compatibility.
+2. Automatic compaction: S3 Tables merges small files automatically for optimal performance.
+3. Built-in time travel: Query historical data using snapshots.
+4. Schema evolution: Evolve schema over time without breaking queries.
+5. Integrated with ETL: Real-time replication from Postgres via Supabase ETL.
+6. Query from Postgres: Use Iceberg Foreign Data Wrapper to join with operational data.
+
+## Query tools supported
+PyIceberg, Apache Spark, DuckDB, Amazon Athena, and any tool supporting Iceberg REST Catalog API.
+
+## Analytics Buckets are valuable for:
+- Data tiering: Archive cold data from Postgres to Analytics Buckets.
+- Historical analysis: Query complete change history.
+- Cost optimization: S3 pricing for large datasets.
+- Separation of workloads: Analytics queries don't impact production.
+- Bottomless storage: Virtually unlimited capacity.
+
+## Security
+TLS 1.2+ in transit. SSE-S3 or SSE-KMS encryption at rest.
+
+Analytics Buckets provide the scalable, cost-effective storage layer required for modern analytics workflows.`,
+    icon: BarChart,
+    products: [PRODUCT_SHORTNAMES.STORAGE],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/storage/analytics/introduction',
+    slug: 'analytics-buckets-with-iceberg',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
+    title: 'Vector Buckets',
+    subtitle: 'S3-backed storage for vector embeddings with similarity search.',
+    description: `Vector Buckets provide specialized S3-backed storage for vector embeddings with built-in similarity search. Store tens of millions of vectors per index with cosine, Euclidean, or L2 distance metrics.
+
+## Key benefits
+1. Massive scale: Store tens of millions of vectors per index.
+2. Built-in similarity search: Query vectors using cosine, Euclidean, or L2 distance.
+3. Metadata filtering: Filter search results by associated metadata.
+4. Batch operations: Process up to 500 vectors per request.
+5. S3 reliability: Built on S3-compatible storage infrastructure.
+6. Complementary to pgvector: Use both for different use cases.
+
+## When to use Vector Buckets vs pgvector
+Use pgvector for lowest latency, core relational model vectors, transactional guarantees, and small to medium datasets. Use Vector Buckets for millions of vectors, S3-style durability, AI-heavy apps (RAG, semantic search), and separate storage tiers.
+
+## Hybrid approach
+Keep hot vectors in pgvector, archive large collections in Vector Buckets, and query both from Postgres via Foreign Data Wrapper.
+
+## Vector Buckets are valuable for:
+- Semantic search at scale
+- Recommendation systems
+- RAG (Retrieval-Augmented Generation)
+- Image and video similarity search
+- Large-scale embedding archives
+
+Vector Buckets provide the scalable vector storage required for AI-powered applications.`,
+    icon: ChartScatter,
+    products: [PRODUCT_SHORTNAMES.STORAGE],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/storage/vector/introduction',
+    slug: 'vector-buckets',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -1383,10 +1885,11 @@ Supabase's Deno Edge Functions allow you to deploy and run custom TypeScript fun
 1. Global distribution: Edge Functions run close to users, reducing latency.
 2. TypeScript support: Leverage TypeScript's type safety and modern language features.
 3. Deno runtime: Benefit from Deno's security-first approach and modern JavaScript APIs.
-4. Seamless integration: Easy integration with other Supabase services like Auth and Database.
-5. Versatile use cases: Support for webhooks, third-party integrations, and custom API endpoints.
-6. Open-source and portable: Run locally or on any Deno-compatible platform.
-7. Rich ecosystem: Wide range of examples and integrations available.
+4. NPM + Node compatibility: Use NPM modules and Node.js built-in APIs when you need them.
+5. Seamless integration: Easy integration with other Supabase services like Auth and Database.
+6. Versatile use cases: Support for webhooks, third-party integrations, and custom API endpoints.
+7. Open-source and portable: Run locally or on any Deno-compatible platform.
+8. Rich ecosystem: Wide range of examples and integrations available.
 
 ## Benefits:
 - Low-latency responses: Ideal for globally distributed applications.
@@ -1403,13 +1906,52 @@ Supabase's Deno Edge Functions allow you to deploy and run custom TypeScript fun
 - Integration with various services (e.g., Stripe, OpenAI, Hugging Face)
 - Building bots for platforms like Discord and Telegram
 
-Supabase's Deno Edge Functions enable you to build responsive, globally distributed applications with custom server-side logic, supporting a wide range of use cases and integrations.
+Supabase's Deno Edge Functions enable you to build responsive, globally distributed applications with custom server-side logic, supporting a wide range of use cases and integrations. You can also tap into the Node and NPM ecosystem when needed.
 `,
     icon: FileCode2,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: 'https://www.youtube-nocookie.com/embed/5OWH9c4u68M',
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Persistent Storage',
+    subtitle: 'Mount S3 buckets for 97% faster Edge Function cold starts.',
+    description: `Persistent Storage allows you to mount S3-compatible buckets as persistent file storage for Edge Functions. Files survive function invocations and can be accessed via \`/s3/YOUR-BUCKET-NAME\` prefix, enabling up to 97% faster cold starts.
+
+## Key benefits
+1. Dramatically faster cold starts: Up to 97% improvement in cold start times.
+2. Persistent across invocations: Files survive between function executions.
+3. S3 protocol compatibility: Mount any S3-compatible bucket, including Supabase Storage.
+4. POSIX-like file system: Read and write files using standard Deno APIs.
+5. Large file processing: Handle large files without fetching on each invocation.
+
+## Storage types
+Persistent Storage backed by S3 protocol survives invocations. Ephemeral Storage (\`/tmp\` directory) resets on each invocation.
+
+## File operations supported
+\`Deno.readFile()\`, \`Deno.writeFile()\`, \`Deno.readDir()\`, and other standard file operations.
+
+## Persistent Storage is valuable for:
+- Large file processing
+- Caching between invocations
+- Custom image manipulation workflows
+- Processing archives (zip files)
+- Machine learning model storage
+
+## Setup
+Requires S3 credentials as environment variables: \`AWS_ACCESS_KEY_ID\`, \`AWS_SECRET_ACCESS_KEY\`, \`AWS_REGION\`, \`AWS_ENDPOINT_URL_S3\`.
+
+Persistent Storage transforms Edge Functions into stateful, high-performance computing environments.`,
+    icon: UploadCloud,
+    products: [PRODUCT_SHORTNAMES.FUNCTIONS],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/storage',
+    slug: 'persistent-storage',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
@@ -1447,42 +1989,7 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
     slug: 'regional-invocations',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
-    },
-  },
-  {
-    title: 'NPM compatibility',
-    subtitle: 'Edge Functions natively support NPM modules and Node built-in APIs.',
-    description: `
-Supabase's NPM Compatibility feature for Edge Functions allows you to use NPM modules and Node.js built-in APIs directly in your Deno-based Edge Functions. This powerful capability bridges the gap between Deno and the vast Node.js ecosystem, giving you access to a wide range of libraries and familiar APIs.
-
-## Key benefits
-1. Extensive library access: Leverage the vast NPM ecosystem in your Edge Functions.
-2. Familiar Node.js APIs: Use built-in Node.js modules you're already familiar with.
-3. Code reusability: Easily port existing Node.js code to Supabase Edge Functions.
-4. Ecosystem compatibility: Integrate with services and tools designed for Node.js environments.
-5. Simplified development: Reduce the learning curve for developers coming from a Node.js background.
-6. Flexibility: Choose between Deno-native and Node-compatible libraries as needed.
-7. Future-proofing: Adapt existing codebases to edge computing without major rewrites.
-
-## NPM compatibility is particularly valuable for:
-- Projects migrating from Node.js-based serverless platforms to Supabase
-- Developers looking to leverage specific NPM packages in edge computing scenarios
-- Applications requiring Node.js-specific libraries not available in Deno
-- Teams with existing Node.js codebases wanting to adopt edge computing
-- Rapid prototyping using familiar Node.js modules and APIs
-- Any project aiming to balance the benefits of Deno with Node.js ecosystem access
-
-By leveraging NPM Compatibility in Supabase Edge Functions, you can take advantage of the best of both worlds: the modern, secure runtime of Deno and the rich ecosystem of Node.js. This feature allows you to build powerful, efficient edge computing solutions while maintaining access to the tools and libraries you're familiar with, accelerating development and enabling more complex use cases at the edge.
-`,
-    icon: FileCode2,
-    products: [PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: 'https://www.youtube-nocookie.com/embed/eCbiywoDORw',
-    docsUrl: 'https://supabase.com/blog/edge-functions-node-npm',
-    slug: 'npm-compatibility',
-    status: {
-      stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
+      availableOnSelfHosted: false,
     },
   },
   // Vector
@@ -1516,6 +2023,49 @@ By leveraging Supabase's AI Integrations, you can rapidly develop and deploy sop
     heroImage: 'https://www.youtube-nocookie.com/embed/OgnYxRkxEUw',
     docsUrl: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
     slug: 'ai-integrations',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Automatic Embeddings',
+    subtitle: 'Automated embedding generation using triggers and queues.',
+    description: `Automatic Embeddings provides a system to automatically generate and update vector embeddings using Postgres triggers, queues, and Edge Functions. Embeddings are generated asynchronously with built-in retry logic for failed jobs.
+
+## Key benefits
+1. Fully automated: No manual embedding management required.
+2. Asynchronous processing: Using pgmq (Postgres message queue) for reliable delivery.
+3. Retry logic: Built-in error handling for failed embedding jobs.
+4. Generic solution: Works with any table and embedding provider.
+5. Cron-based processing: Periodic queue processing via pg_cron.
+
+## Architecture
+Trigger detects INSERT/UPDATE on table. Queue function queues embedding job to pgmq. Cron job processes queue periodically (every 5 minutes). Edge Function generates embeddings via AI API. Update stores embedding back to table.
+
+## How it works
+1. Create queue using \`pgmq.create('generate_embeddings')\`
+2. Create generic queue function taking content and column name
+3. Set up triggers on tables for automatic queueing
+4. Edge Function calls OpenAI or other providers
+5. Cron job processes queue at regular intervals
+
+## Automatic Embeddings are valuable for:
+- Semantic search implementations
+- Document similarity systems
+- Recommendation engines
+- RAG (Retrieval-Augmented Generation)
+- Content categorization
+
+## Customization
+Custom content preparation functions. Different embedding models per table. Batch processing configuration. Custom error handling strategies.
+
+Automatic Embeddings eliminate the manual work of generating and maintaining vector embeddings.`,
+    icon: Brain,
+    products: [PRODUCT_MODULES_SHORTNAMES.VECTOR],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/ai/automatic-embeddings',
+    slug: 'automatic-embeddings',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
@@ -1591,7 +2141,7 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     slug: 'management-api',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -1746,12 +2296,16 @@ With Supabase AI Assistant, you gain a powerful ally in your development process
     description: `
 The Logs & Analytics feature in Supabase provides users with comprehensive logging and analytics capabilities, powered by Logflare. This tool enables developers to track and analyze log events from various Supabase services, such as the API gateway, Postgres databases, Storage, Edge Functions, and more. By leveraging a multi-node Elixir cluster, Supabase processes billions of log events daily, ensuring that users have access to critical insights for optimizing their applications.
 
+OpenTelemetry integration allows you to export logs, metrics, and traces to any OTel-compatible tool—Datadog, Honeycomb, Grafana, or your preferred monitoring platform. The Metrics API exposes ~200 Prometheus-compatible Postgres metrics, including CPU, IO, WAL, connections, and query statistics.
+
 ## Key benefits
 1. Real-Time Monitoring: Access live data on application performance and user interactions to make informed decisions.
 2. Comprehensive Log Management: Ingest and store logs from multiple sources, allowing for centralized management of application events.
 3. Powerful Querying: Utilize SQL queries through Logflare Endpoints to analyze logs efficiently, enabling users to extract meaningful metrics.
 4. Customizable Dashboards: Create tailored views within Supabase Studio to visualize log data and track key performance indicators (KPIs).
 5. Scalability: Handle large volumes of log data with a robust infrastructure designed for high availability and performance.
+6. OpenTelemetry Support: Export telemetry data to vendor-agnostic monitoring platforms for unified observability.
+7. Metrics API: Stream Postgres performance metrics for CPU, IO, WAL, connections, and query statistics.
 
 This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
 `,
@@ -1962,7 +2516,7 @@ This feature is essential for organizations aiming to maintain high security sta
     docsUrl: 'https://supabase.com/blog/security-performance-advisor',
     slug: 'security-and-performance-advisor',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -2229,6 +2783,48 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Replication',
+    subtitle: 'Replicate database changes to external destinations.',
+    description: `Replication uses Postgres logical replication to replicate database changes to external destinations like Analytics Buckets and BigQuery. Changes are captured from the Write Ahead Log and delivered in near real-time to analytical systems.
+
+## Key benefits
+1. Near real-time sync: Changes replicated as they occur using WAL reading.
+2. Analytics Buckets support: Append-only changelog format in Iceberg.
+3. BigQuery integration: Direct replication to Google's data warehouse.
+4. Complete change capture: INSERT, UPDATE, DELETE, and TRUNCATE operations.
+5. Managed pipeline: Monitor status, lag, and errors in dashboard.
+
+## Destinations
+Analytics Buckets create append-only changelog with \`cdc_operation\` column, preserving complete change history in Iceberg format. BigQuery creates views backed by versioned tables for efficient querying.
+
+## Setup
+Create Postgres publication for tables to replicate. Add destination in Replication section of dashboard. Configure destination-specific settings. Monitor pipeline in dashboard.
+
+## Requirements
+Tables must have primary keys. Logical replication must be enabled.
+
+## Replication is valuable for:
+- Real-time data warehousing
+- Analytics separation from production
+- Historical data archival
+- Multi-destination data sync
+- Compliance and audit trails
+
+## Limitations
+No DDL support yet (ALTER TABLE, ADD COLUMN). Destination-specific constraints may apply.
+
+Replication provides the real-time data pipeline required for modern analytics architectures.`,
+    icon: DatabaseZap,
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/replication-setup',
+    slug: 'replication',
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: false,
     },
   },
   {

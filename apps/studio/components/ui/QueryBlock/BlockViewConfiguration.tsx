@@ -1,6 +1,5 @@
-import { BarChart2, Settings2, Table } from 'lucide-react'
-
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { BarChart2, Settings2, Table } from 'lucide-react'
 import {
   Checkbox_Shadcn_,
   Label_Shadcn_,
@@ -15,6 +14,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 
 interface BlockViewConfigurationProps {
@@ -120,6 +120,19 @@ export const BlockViewConfiguration = ({
                     }
                   />
                   Cumulative
+                </Label_Shadcn_>
+                <Label_Shadcn_ htmlFor="logScale">
+                  <Checkbox_Shadcn_
+                    id="logScale"
+                    checked={chartConfig?.logScale}
+                    onClick={() =>
+                      updateChartConfig({
+                        ...chartConfig,
+                        logScale: !chartConfig?.logScale,
+                      })
+                    }
+                  />
+                  Log scale
                 </Label_Shadcn_>
               </div>
             </>

@@ -1,14 +1,9 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
-import { DocsButton } from '@/components/ui/DocsButton'
-import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
-import { DOCS_URL } from '@/lib/constants'
 import { useParams } from 'common'
 import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -17,8 +12,14 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { DestinationType } from './DestinationPanel/DestinationPanel.types'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { DOCS_URL } from '@/lib/constants'
 
 const EnableReplicationModal = () => {
   const { ref: projectRef } = useParams()
@@ -86,14 +87,14 @@ export const EnableReplicationCallout = ({
   className,
   hasAccess,
 }: {
-  type?: string
+  type?: DestinationType | null
   className?: string
   hasAccess: boolean
 }) => {
   return (
     <div className={cn('border rounded-md p-4 md:p-12 flex flex-col gap-y-4', className)}>
       <div className="flex flex-col gap-y-1">
-        <h3>Replicate data to external destinations in real-time</h3>
+        <h4>Replicate data to external destinations in real-time</h4>
         <p className="text-sm text-foreground-light">
           {hasAccess ? 'Enable replication' : 'Upgrade to the Pro plan'} to start replicating your
           database changes to {type ?? 'data warehouses and analytics platforms'}

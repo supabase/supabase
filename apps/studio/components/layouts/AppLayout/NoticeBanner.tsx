@@ -1,20 +1,23 @@
 import { useRouter } from 'next/router'
 
-import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from 'components/ui/InlineLink'
 import { TimestampInfo } from 'ui-patterns'
 
 /**
  * Used to display urgent notices that apply for all users, such as maintenance windows.
- * This file, like AppBannerWrapperContext.tsx, is meant to be dynamic.
- * Update this as and when we need to use the NoticeBanner.
  */
 export const NoticeBanner = () => {
   const router = useRouter()
-  const { maintenanceWindowBannerAcknowledged, onUpdateAcknowledged } = useAppBannerContext()
 
-  if (router.pathname.includes('sign-in') || maintenanceWindowBannerAcknowledged) {
+  const [bannerAcknowledged, setBannerAcknowledge, { isSuccess }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.MAINTENANCE_WINDOW_BANNER,
+    false
+  )
+
+  if (router.pathname.includes('sign-in') || !isSuccess || bannerAcknowledged) {
     return null
   }
 
@@ -35,7 +38,7 @@ export const NoticeBanner = () => {
           </InlineLink>
         </>
       }
-      onDismiss={() => onUpdateAcknowledged('maintenance-window-banner-2026-01-16')}
+      onDismiss={() => setBannerAcknowledge(true)}
     />
   )
 }

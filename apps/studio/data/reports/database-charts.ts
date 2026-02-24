@@ -76,7 +76,11 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 45,
-        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+        tickFormatter: (value: any) => {
+          // avoid displaying 100.00%
+          if (value === 100) return '100%'
+          return `${numberFormatter(value, 2)}%`
+        },
       },
       hideChartType: false,
       defaultChartStyle: 'bar',

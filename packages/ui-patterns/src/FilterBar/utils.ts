@@ -1,13 +1,18 @@
 import {
-  FilterGroup,
-  FilterCondition,
-  FilterProperty,
-  CustomOptionObject,
-  FilterOptionObject,
-  FilterOperatorObject,
   AsyncOptionsFunction,
-  SyncOptionsFunction,
+  CustomOptionObject,
+  FilterCondition,
+  FilterGroup,
+  FilterOperatorGroup,
+  FilterOperatorObject,
+  FilterOptionObject,
+  FilterProperty,
+  GROUP_ORDER,
+  GroupedMenuItem,
   isGroup,
+  MenuItem,
+  MenuItemGroup,
+  SyncOptionsFunction,
 } from './types'
 
 export function pathsEqual(a: number[], b: number[]): boolean {
@@ -133,17 +138,9 @@ export function addFilterToGroup(
   property: FilterProperty
 ): FilterGroup {
   if (path.length === 0) {
-    const firstOperator = property.operators?.[0] || '='
-    const operatorValue = isFilterOperatorObject(firstOperator)
-      ? firstOperator.value
-      : firstOperator
-
     return {
       ...group,
-      conditions: [
-        ...group.conditions,
-        { propertyName: property.name, value: '', operator: operatorValue },
-      ],
+      conditions: [...group.conditions, { propertyName: property.name, value: '', operator: '' }],
     }
   }
 
@@ -264,4 +261,51 @@ export function updateGroupAtPath(
       index === current ? updateGroupAtPath(condition as FilterGroup, rest, newGroup) : condition
     ),
   }
+}
+
+export function groupMenuItemsByOperator(items: MenuItem[]): MenuItemGroup[] {
+  const grouped = items.reduce<Map<FilterOperatorGroup, GroupedMenuItem[]>>((acc, item, index) => {
+    const group: FilterOperatorGroup = item.group ?? 'uncategorized'
+    const existing = acc.get(group) ?? []
+    acc.set(group, [...existing, { item, index }])
+    return acc
+  }, new Map())
+
+  return GROUP_ORDER.filter((groupKey) => grouped.has(groupKey)).map((groupKey) => ({
+    group: groupKey,
+    items: grouped.get(groupKey) ?? [],
+  }))
+}
+
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text
+  return text.slice(0, maxLength) + '...'
+}
+
+export function getActionItemLabel(item: MenuItem): string {
+  if (item.isAction && item.actionInputValue) {
+    return `Ask AI: "${truncateText(item.actionInputValue, 30)}"`
+  }
+  return item.label
+}
+
+export function buildFilterPlaceholder(
+  filterProperties: FilterProperty[],
+  options: { maxProperties?: number; hasActions?: boolean } = {}
+): string {
+  const { maxProperties = 3, hasActions = false } = options
+
+  if (filterProperties.length === 0) {
+    return hasActions ? 'Add filters or ask AI...' : 'Add filters...'
+  }
+
+  const propertyNames = filterProperties
+    .slice(0, maxProperties)
+    .map((prop) => prop.label)
+    .join(', ')
+
+  const suffix = filterProperties.length > maxProperties ? '...' : ''
+  const aiSuffix = hasActions ? ' or ask AI' : ''
+
+  return `Filter by ${propertyNames}${suffix}${aiSuffix}`
 }

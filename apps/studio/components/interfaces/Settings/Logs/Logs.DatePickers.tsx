@@ -351,7 +351,6 @@ export const LogsDatePicker = ({
         className="flex w-full p-0"
         side="bottom"
         align={align}
-        portal={true}
         {...popoverContentProps}
       >
         <div className="border-r p-2 flex flex-col gap-px">

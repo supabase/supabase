@@ -1,17 +1,17 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import type { UseFormReturn } from 'react-hook-form'
-import { toast } from 'sonner'
 // End of third-party imports
 
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import type { UseFormReturn } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
-  cn,
   Button,
+  cn,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   FormControl_Shadcn_,
@@ -20,6 +20,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
@@ -89,13 +90,15 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
               }}
               onSelect={(project) => field.onChange(project.ref)}
-              renderTrigger={({ isLoading, project }) => {
+              renderTrigger={({ isLoading, project, listboxId, open }) => {
                 return (
                   <Button
                     block
                     type="default"
                     role="combobox"
                     aria-label="Select a project"
+                    aria-expanded={open}
+                    aria-controls={listboxId}
                     size="small"
                     className="justify-between"
                     iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}

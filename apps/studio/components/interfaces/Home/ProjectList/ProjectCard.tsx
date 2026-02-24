@@ -1,6 +1,4 @@
-import { Github } from 'lucide-react'
-import InlineSVG from 'react-inlinesvg'
-
+import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
@@ -10,12 +8,27 @@ import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
+import { Copy, Github, MoreVertical, Trash } from 'lucide-react'
+import { useState } from 'react'
+import InlineSVG from 'react-inlinesvg'
+import { toast } from 'sonner'
+import type { Organization } from 'types'
+import {
+  Button,
+  copyToClipboard,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
+
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
   slug?: string
   project: OrgProject
+  organization?: Organization
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection
@@ -25,12 +38,14 @@ export interface ProjectCardProps {
 export const ProjectCard = ({
   slug,
   project,
+  organization,
   rewriteHref,
   githubIntegration,
   vercelIntegration,
   resourceWarnings,
 }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
   const providerLabel =
@@ -48,52 +63,105 @@ export const ProjectCard = ({
   const projectStatus = inferProjectStatus(project.status)
 
   return (
-    <li className="list-none h-min">
-      <CardButton
-        linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
-        className="h-44 !px-0 group pt-5 pb-0"
-        title={
-          <div className="w-full flex flex-col gap-y-4 justify-between px-5">
-            {/* Text */}
-            <div className="flex flex-col gap-y-0.5">
-              <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
-              <p className="text-sm text-foreground-lighter">{desc}</p>
-            </div>
-            {/* Compute and integrations */}
-            <div className="flex items-center gap-x-1.5">
-              {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
-                <ComputeBadgeWrapper
-                  slug={slug}
-                  projectRef={project.ref}
-                  cloudProvider={project.cloud_provider}
-                  computeSize={getComputeSize(project)}
-                />
-              )}
-              {isVercelIntegrated && (
-                <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center justify-center text-black dark:text-white">
-                  <InlineSVG
-                    src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
-                    title="Vercel Icon"
-                    className="w-3"
-                  />
-                </div>
-              )}
-              {isGithubIntegrated && (
-                <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
-                  <div className="w-5 h-5 p-1 flex items-center justify-center">
-                    <Github size={12} strokeWidth={1.5} />
+    <>
+      <li className="list-none h-min">
+        <CardButton
+          linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
+          className="h-44 !px-0 group pt-5 pb-0 overflow-hidden relative"
+          hideChevron
+          title={
+            <div className="w-full flex flex-col gap-y-4 justify-between px-5">
+              <div className="flex flex-col gap-y-0.5 relative">
+                <div className="flex items-center justify-between">
+                  <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
+                  <div onClick={(e) => e.preventDefault()}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          type="text"
+                          icon={<MoreVertical size={14} />}
+                          className="w-6 h-6 px-0"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            e.preventDefault()
+                          }}
+                          onPointerDown={(e) => e.stopPropagation()}
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem
+                          className="gap-x-2"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            copyToClipboard(projectRef)
+                            toast.success('Copied project ID to clipboard')
+                          }}
+                        >
+                          <Copy size={14} />
+                          <span>Copy project ID</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="gap-x-2"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setIsDeleteModalOpen(true)
+                          }}
+                        >
+                          <Trash size={14} />
+                          <span>Delete project</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
                 </div>
-              )}
+                <p className="text-sm text-foreground-lighter">{desc}</p>
+              </div>
+              <div className="flex items-center gap-x-1.5 relative overflow-hidden">
+                <ProjectCardStatus
+                  projectStatus={projectStatus}
+                  resourceWarnings={resourceWarnings}
+                  renderMode="badge"
+                />
+                {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
+                  <ComputeBadgeWrapper
+                    slug={slug}
+                    projectRef={project.ref}
+                    cloudProvider={project.cloud_provider}
+                    computeSize={getComputeSize(project)}
+                  />
+                )}
+                {isVercelIntegrated && (
+                  <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center justify-center text-black dark:text-white">
+                    <InlineSVG
+                      src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
+                      title="Vercel Icon"
+                      className="w-3"
+                    />
+                  </div>
+                )}
+                {isGithubIntegrated && (
+                  <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md min-w-0">
+                    <div className="w-5 h-5 p-1 flex items-center justify-center shrink-0">
+                      <Github size={12} strokeWidth={1.5} />
+                    </div>
+                    <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        }
-        footer={
-          <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
-        }
-        containerElement={<ProjectIndexPageLink projectRef={projectRef} />}
+          }
+          footer={
+            <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
+          }
+          containerElement={<ProjectIndexPageLink projectRef={projectRef} />}
+        />
+      </li>
+      <DeleteProjectModal
+        visible={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        project={project}
+        organization={organization}
       />
-    </li>
+    </>
   )
 }

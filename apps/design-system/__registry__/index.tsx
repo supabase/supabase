@@ -159,17 +159,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "aspect-ratio-demo": {
-      name: "aspect-ratio-demo",
-      type: "components:example",
-      registryDependencies: ["aspect-ratio"],
-      component: React.lazy(() => import("@/registry/default/example/aspect-ratio-demo")),
-      source: "",
-      files: ["registry/default/example/aspect-ratio-demo.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "alert-dialog-destructive": {
       name: "alert-dialog-destructive",
       type: "components:example",
@@ -188,6 +177,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/alert-dialog-warning")),
       source: "",
       files: ["registry/default/example/alert-dialog-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "aspect-ratio-demo": {
+      name: "aspect-ratio-demo",
+      type: "components:example",
+      registryDependencies: ["aspect-ratio"],
+      component: React.lazy(() => import("@/registry/default/example/aspect-ratio-demo")),
+      source: "",
+      files: ["registry/default/example/aspect-ratio-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2234,6 +2234,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/page-section-horizontal")),
       source: "",
       files: ["registry/default/example/page-section-horizontal.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-section-title-only": {
+      name: "page-section-title-only",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-section-title-only")),
+      source: "",
+      files: ["registry/default/example/page-section-title-only.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

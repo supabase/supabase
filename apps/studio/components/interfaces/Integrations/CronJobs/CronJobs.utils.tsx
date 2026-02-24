@@ -127,7 +127,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     }
   }
 
-  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(\)/g
+  const regexDBFunction = /select\s+[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\s*\(\)/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
       .replace('SELECT ', '')
@@ -228,9 +228,9 @@ export const formatCronJobColumns = ({
 }: {
   onSelectEdit: (job: CronJob) => void
   onSelectDelete: (job: CronJob) => void
-}) => {
+}): Array<Column<CronJob>> => {
   return CRON_TABLE_COLUMNS.map((col) => {
-    const res: Column<any> = {
+    const res: Column<CronJob> = {
       key: col.id,
       name: col.name,
       minWidth: col.minWidth ?? 100,

@@ -21,10 +21,12 @@ We highly recommend creating a `private` schema for storing tables that you do n
 
 If your `public` schema is used by other tools as a default space, you might want to lock down this schema. This helps prevent accidental exposure of data that's automatically added to `public`.
 
-There are two levels of security hardening for the Data API:
+There are several levels of security hardening for the Data API:
 
-- Disabling the Data API entirely. This is recommended if you _never_ need to access your database via Supabase client libraries or the REST and GraphQL endpoints.
-- Removing the `public` schema from the Data API and replacing it with a custom schema (such as `api`).
+- [Disabling the Data API entirely](#disabling-the-data-api). This is recommended if you _never_ need to access your database via Supabase client libraries or the REST and GraphQL endpoints.
+- [Exposing a custom schema](#exposing-a-custom-schema-instead-of-public) instead of `public`, giving you explicit control over what is accessible.
+- [Automatically enabling RLS on new tables](#automatically-enabling-rls-on-new-tables) using an event trigger.
+- [Adjusting table-level grants](#table-level-grants) to control which roles can access specific tables.
 
 ## Disabling the Data API
 
@@ -72,3 +74,64 @@ Any data, views, or functions that should be exposed need to be deliberately put
     grant select on table api.<your_table> to anon;
     grant select, insert, update, delete on table api.<your_table> to authenticated;
     ```
+
+## Automatically enabling RLS on new tables
+
+Tables created via the Supabase Dashboard have RLS enabled by default. However, if you or your team create tables using the SQL editor, migrations, or an external tool, RLS will not be enabled automatically.
+
+You can use an [event trigger](/docs/guides/database/postgres/event-triggers#example-trigger-function---auto-enable-row-level-security) to automatically enable RLS whenever a new table is created in the `public` schema. This ensures that no table is accidentally left exposed without RLS protection.
+
+## Table-level grants
+
+By default, tables in the `public` schema are granted full access (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) to the `anon` and `authenticated` roles. This allows the Data API to query those tables on behalf of users.
+
+You can adjust these privileges on a per-table basis to restrict which operations each role can perform. For example, you might want to:
+
+- Allow `anon` users to only `SELECT` from a table, preventing anonymous writes.
+- Prevent `anon` users from accessing a table entirely, making it available only to authenticated users.
+- Restrict `authenticated` users to `SELECT` and `INSERT` only, preventing updates and deletes.
+
+<Admonition type="tip">
+
+Table-level privileges work alongside [Row Level Security](/docs/guides/database/postgres/row-level-security). Privileges control _which operations_ are possible, while RLS policies control _which rows_ are accessible. For full protection, use both: restrict privileges to limit operation types, and use RLS policies to control row-level access.
+
+</Admonition>
+
+### Adjusting table-level grants via the Dashboard
+
+<Admonition type="note">
+
+Adjusting table-level privileges via the Dashboard is currently in beta and will be available via gradual roll-out.
+
+</Admonition>
+
+1. Go to [**Table Editor**](/dashboard/project/_/editor) in the Supabase Dashboard.
+2. Select the table you want to configure.
+3. Click the vertical dots icon to open the table menu and select "Edit table".
+4. Under **Data API Access**, click the settings icon to open **Adjust API privileges per role**.
+5. For each role (`anon` and `authenticated`), select or deselect the privileges you want to grant.
+6. Click **Save**.
+
+### Adjusting table-level grants via SQL
+
+You can also adjust privileges using SQL. For example, to allow only `SELECT` access for `anon` on a table:
+
+```sql
+-- Revoke all existing privileges
+revoke all on table public.your_table from anon;
+
+-- Grant only SELECT
+grant select on table public.your_table to anon;
+```
+
+To remove all access for `anon` from a table:
+
+```sql
+revoke all on table public.your_table from anon;
+```
+
+To restore full access:
+
+```sql
+grant select, insert, update, delete on table public.your_table to anon;
+```

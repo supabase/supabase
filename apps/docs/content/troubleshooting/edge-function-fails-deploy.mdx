@@ -26,18 +26,13 @@ If you're not able to run the CLI or cannot identify the cause, [open a support 
 
 ```
 $ supabase functions deploy FUNCTION_NAME --project-ref $PROJECT_ID
-...
-unexpected deploy status 500: {"message":"Function deploy failed due to an internal error"}
 ```
 
 **Example output with `--debug`**
 
-- From the details we can see it is exceeding the 20MB [Edge Function size limit](/docs/guides/functions/limits)
+From the details we can see it is exceeding the 20MB [Edge Function size limit](/docs/guides/functions/limits):
 
 ```
 $ supabase functions deploy FUNCTION_NAME --project-ref $PROJECT_ID --debug
-...
 Deploying Function: FUNCTION_NAME (script size: 62.61MB)
-...
-unexpected update function status 413: {"message":"request entity too large"}
 ```

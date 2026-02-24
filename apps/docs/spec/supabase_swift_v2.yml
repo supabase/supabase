@@ -906,7 +906,7 @@ functions:
   - id: link-identity
     title: 'linkIdentity()'
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `linkIdentity()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
     examples:
@@ -934,7 +934,7 @@ functions:
   - id: link-identity-with-id-token
     title: 'linkIdentityWithIdToken()'
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `linkIdentityWithIdToken()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentityWithIdToken()` will fail.
       - This method allows you to link an OIDC identity using an ID token obtained from a provider like Apple, Google, etc.
@@ -970,7 +970,7 @@ functions:
   - id: unlink-identity
     title: 'unlinkIdentity()'
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `unlinkIdentity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
@@ -1286,6 +1286,8 @@ functions:
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
+    notes: |
+      - Since v2.41.1, the unenroll response uses `id` instead of `factorId` to match the server response format. If upgrading from an earlier version, update your code to use `response.id`.
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -1297,6 +1299,7 @@ functions:
               factorId: "34e770dd-9ff9-416c-87fa-43b31d7ef225"
             )
           )
+          print(response.id) // ID of the unenrolled factor
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'

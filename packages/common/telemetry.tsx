@@ -6,22 +6,25 @@ import { usePathname } from 'next/navigation'
 import Script from 'next/script'
 import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
+
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
 import { IS_PLATFORM, IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
+import type { FirstReferrerData } from './first-referrer-cookie'
+import { isExternalReferrer, parseFirstReferrerCookie } from './first-referrer-cookie'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useParams, useTelemetryCookie } from './hooks'
+import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
 import {
   clearTelemetryDataCookie,
   getSharedTelemetryData,
   getTelemetryCookieOptions,
 } from './telemetry-utils'
-import { posthogClient } from './posthog-client'
 
-export { posthogClient }
+export { posthogClient, type ClientTelemetryEvent }
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
@@ -95,25 +98,25 @@ function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
   }
 }
 
-function isExternalReferrer(referrer: string) {
-  try {
-    const hostname = new URL(referrer).hostname
-    return hostname !== 'supabase.com' && !hostname.endsWith('.supabase.com')
-  } catch {
-    return false
-  }
+interface HandlePageTelemetryOptions {
+  apiUrl: string
+  pathname?: string
+  featureFlags?: Record<string, unknown>
+  slug?: string
+  ref?: string
+  telemetryDataOverride?: SharedTelemetryData
+  firstReferrerData?: FirstReferrerData | null
 }
 
-function handlePageTelemetry(
-  API_URL: string,
-  pathname?: string,
-  featureFlags?: {
-    [key: string]: unknown
-  },
-  slug?: string,
-  ref?: string,
-  telemetryDataOverride?: SharedTelemetryData
-) {
+function handlePageTelemetry({
+  apiUrl: API_URL,
+  pathname,
+  featureFlags,
+  slug,
+  ref,
+  telemetryDataOverride,
+  firstReferrerData,
+}: HandlePageTelemetryOptions) {
   // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
     const livePageData = getSharedTelemetryData(pathname)
@@ -132,10 +135,51 @@ function handlePageTelemetry(
             referrer: shouldUseCookieReferrer ? cookieReferrer! : liveReferrer,
           },
         }
-      : livePageData
-    const firstTouchAttributionProps = telemetryDataOverride
-      ? getFirstTouchAttributionProps(telemetryDataOverride)
-      : {}
+      : { ...livePageData, ph: { ...livePageData.ph } }
+    const firstTouchAttributionProps: Record<string, string> = {
+      ...(telemetryDataOverride ? getFirstTouchAttributionProps(telemetryDataOverride) : {}),
+    }
+
+    // --- First-referrer edge cookie handoff ---
+    // If the edge cookie has external context and the current referrer is internal,
+    // override the referrer so PostHog gets the real acquisition source.
+    const firstReferrerCookiePresent = Boolean(firstReferrerData)
+    let firstReferrerCookieConsumed = false
+
+    if (
+      firstReferrerData &&
+      isExternalReferrer(firstReferrerData.referrer) &&
+      !isExternalReferrer(pageData.ph.referrer)
+    ) {
+      pageData.ph.referrer = firstReferrerData.referrer
+      firstReferrerCookieConsumed = true
+
+      // Prefer attribution context captured at the external entry point.
+      const { utms, click_ids, landing_url } = firstReferrerData
+
+      Object.entries(utms).forEach(([key, value]) => {
+        const phKey = key.startsWith('utm_') ? `$${key}` : key
+        firstTouchAttributionProps[phKey] = value
+      })
+
+      Object.entries(click_ids).forEach(([key, value]) => {
+        firstTouchAttributionProps[key] = value
+      })
+
+      try {
+        const url = new URL(landing_url)
+        firstTouchAttributionProps.first_touch_url = url.href
+        firstTouchAttributionProps.first_touch_pathname = url.pathname
+
+        if (url.search) {
+          firstTouchAttributionProps.first_touch_search = url.search
+        } else {
+          delete firstTouchAttributionProps.first_touch_search
+        }
+      } catch {
+        // Skip if landing URL is malformed
+      }
+    }
 
     const $referrer = pageData.ph.referrer
     const $referring_domain = (() => {
@@ -169,6 +213,13 @@ function handlePageTelemetry(
       ...Object.fromEntries(
         Object.entries(featureFlags || {}).map(([k, v]) => [`$feature/${k}`, v])
       ),
+      // Measurement properties for handoff observability
+      // Only included on the initial pageview (when firstReferrerData is explicitly
+      // passed as null or a value — subsequent pageviews leave it as undefined)
+      ...(firstReferrerData !== undefined && {
+        first_referrer_cookie_present: firstReferrerCookiePresent,
+        first_referrer_cookie_consumed: firstReferrerCookieConsumed,
+      }),
     })
   }
 
@@ -233,13 +284,13 @@ export const PageTelemetry = ({
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(
-      API_URL,
-      pathnameRef.current,
-      featureFlagsRef.current,
+    return handlePageTelemetry({
+      apiUrl: API_URL,
+      pathname: pathnameRef.current,
+      featureFlags: featureFlagsRef.current,
       slug,
-      ref
-    ).catch((e) => {
+      ref,
+    }).catch((e) => {
       console.error('Problem sending telemetry page:', e)
     })
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
@@ -282,6 +333,9 @@ export const PageTelemetry = ({
       hasAcceptedConsent &&
       !hasSentInitialPageTelemetryRef.current
     ) {
+      // Read the edge-set first-referrer cookie (cross-app handoff)
+      const firstReferrerData = parseFirstReferrerCookie(document.cookie)
+
       const cookies = document.cookie.split(';')
       const telemetryCookieValue = cookies
         .map((cookie) => cookie.trim())
@@ -293,24 +347,39 @@ export const PageTelemetry = ({
           const telemetryData = JSON.parse(
             decodeURIComponent(telemetryCookieValue)
           ) as SharedTelemetryData
-          handlePageTelemetry(
-            API_URL,
-            pathnameRef.current,
-            featureFlagsRef.current,
+          handlePageTelemetry({
+            apiUrl: API_URL,
+            pathname: pathnameRef.current,
+            featureFlags: featureFlagsRef.current,
             slug,
             ref,
-            telemetryData
-          )
+            telemetryDataOverride: telemetryData,
+            firstReferrerData,
+          })
         } catch (error) {
           if (!IS_PROD) {
             console.warn('Invalid telemetry cookie data:', error)
           }
-          handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, slug, ref)
+          handlePageTelemetry({
+            apiUrl: API_URL,
+            pathname: pathnameRef.current,
+            featureFlags: featureFlagsRef.current,
+            slug,
+            ref,
+            firstReferrerData,
+          })
         } finally {
           clearTelemetryDataCookie()
         }
       } else {
-        handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, slug, ref)
+        handlePageTelemetry({
+          apiUrl: API_URL,
+          pathname: pathnameRef.current,
+          featureFlags: featureFlagsRef.current,
+          slug,
+          ref,
+          firstReferrerData,
+        })
       }
 
       hasSentInitialPageTelemetryRef.current = true
