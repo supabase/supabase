@@ -74,35 +74,6 @@ export const AdvancedSettings = ({
 
             <FormField_Shadcn_
               control={form.control}
-              name="maxSize"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Batch size"
-                  layout="horizontal"
-                  description={
-                    <>
-                      <p>Number of rows to send in a batch.</p>
-                      <p>Larger batches use more memory, with the risk of running out of memory.</p>
-                    </>
-                  }
-                >
-                  <FormControl_Shadcn_>
-                    <PrePostTab postTab="rows">
-                      <Input_Shadcn_
-                        {...field}
-                        type="number"
-                        value={field.value ?? ''}
-                        onChange={handleNumberChange(field)}
-                        placeholder="Default: 100000"
-                      />
-                    </PrePostTab>
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-
-            <FormField_Shadcn_
-              control={form.control}
               name="maxTableSyncWorkers"
               render={({ field }) => (
                 <FormItemLayout
@@ -117,6 +88,37 @@ export const AdvancedSettings = ({
                 >
                   <FormControl_Shadcn_>
                     <PrePostTab postTab="workers">
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder="Default: 4"
+                      />
+                    </PrePostTab>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+
+            <FormField_Shadcn_
+              control={form.control}
+              name="maxCopyConnectionsPerTable"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Copy connections per table"
+                  layout="horizontal"
+                  description={
+                    <>
+                      <p>
+                        Number of copy connections each table sync worker can use in parallel when
+                        copying a table.
+                      </p>
+                    </>
+                  }
+                >
+                  <FormControl_Shadcn_>
+                    <PrePostTab postTab="connections">
                       <Input_Shadcn_
                         {...field}
                         type="number"
