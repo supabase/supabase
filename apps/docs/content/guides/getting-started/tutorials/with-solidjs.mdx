@@ -271,8 +271,12 @@ const App: Component = () => {
   const [session, setSession] = createSignal<AuthSession | null>(null)
 
   createEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (!error && data?.user) {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          setSession(session)
+        })
+      }
     })
 
     supabase.auth.onAuthStateChange((_event, session) => {
