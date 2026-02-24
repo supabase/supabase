@@ -110,7 +110,6 @@ export const HomePageActions = ({
           />
         )}
 
-
         {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
       </div>
 
