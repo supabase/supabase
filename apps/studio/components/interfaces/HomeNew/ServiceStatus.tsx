@@ -291,7 +291,7 @@ export const ServiceStatus = () => {
                     isLoading={service.isLoading}
                     isProjectNew={isProjectNew}
                     status={
-                      project?.status === 'COMING_UP' && service.status === 'UNHEALTHY'
+                      isProjectComingUp && service.status === 'UNHEALTHY'
                         ? 'COMING_UP'
                         : service.status
                     }
