@@ -934,7 +934,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Get database disk attributes */
+    get: operations['v1-get-database-disk']
     put?: never
     /** Modify database disk */
     post: operations['v1-modify-database-disk']
@@ -2805,6 +2806,23 @@ export interface components {
             /** @enum {string} */
             type: 'io2'
           }
+    }
+    DiskResponse: {
+      attributes:
+        | {
+            iops: number
+            size_gb: number
+            throughput_mibps?: number
+            /** @enum {string} */
+            type: 'gp3'
+          }
+        | {
+            iops: number
+            size_gb: number
+            /** @enum {string} */
+            type: 'io2'
+          }
+      last_modified_at?: string
     }
     DiskUtilMetricsResponse: {
       metrics: {
@@ -4821,6 +4839,7 @@ export interface components {
              * @description Deprecated. Use `status` instead.
              */
             healthy: boolean
+            replication_connected: boolean
           }
         | {
             db_schema: string
@@ -8283,6 +8302,56 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update project's Postgres config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-database-disk': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DiskResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get database disk attributes */
       500: {
         headers: {
           [name: string]: unknown

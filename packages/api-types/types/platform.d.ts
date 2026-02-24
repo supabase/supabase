@@ -5451,12 +5451,9 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -5481,12 +5478,9 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -8766,12 +8760,9 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -8828,12 +8819,9 @@ export interface components {
              * @example 200
              */
             max_fill_ms?: number
-            /**
-             * @description Maximum size of the batch
-             * @example 200
-             */
-            max_size?: number
           }
+          /** @description Maximum number of copy connections per table */
+          max_copy_connections_per_table?: number
           /** @description Maximum number of table sync workers */
           max_table_sync_workers?: number
           /**
@@ -10365,12 +10353,9 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -10395,12 +10380,9 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -10806,12 +10788,9 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
