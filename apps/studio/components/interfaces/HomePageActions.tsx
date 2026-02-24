@@ -22,14 +22,9 @@ import { FilterPopover } from '../ui/FilterPopover'
 interface HomePageActionsProps {
   slug?: string
   hideNewProject?: boolean
-  showViewToggle?: boolean
 }
 
-export const HomePageActions = ({
-  slug: _slug,
-  hideNewProject = false,
-  showViewToggle = false,
-}: HomePageActionsProps) => {
+export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePageActionsProps) => {
   const { slug: urlSlug } = useParams()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
@@ -61,11 +56,11 @@ export const HomePageActions = ({
   )
 
   useEffect(() => {
-    if (isSuccess && !!urlSlug) setFilterStatus(filterStatusStorage)
-  }, [filterStatusStorage, isSuccess, urlSlug, setFilterStatus])
+    if (isSuccess) setFilterStatus(filterStatusStorage)
+  }, [filterStatusStorage, isSuccess, setFilterStatus])
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-2">
         <Input
           placeholder="Search for a project"
@@ -101,20 +96,18 @@ export const HomePageActions = ({
           onSaveFilters={(options) => setFilterStatusStorage(options)}
         />
 
-        {showViewToggle && (
-          <ProjectListSortDropdown
-            value={sort}
-            onChange={(value) => {
-              void setSort(value)
-            }}
-          />
-        )}
+        <ProjectListSortDropdown
+          value={sort}
+          onChange={(value) => {
+            void setSort(value)
+          }}
+        />
 
         {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
       </div>
 
       <div className="flex items-center gap-2">
-        {showViewToggle && viewMode && setViewMode && (
+        {viewMode && setViewMode && (
           <ToggleGroup
             type="single"
             size="sm"
