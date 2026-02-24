@@ -11,8 +11,8 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
-import { buildOrgUrl } from './[[...routeSlug]].utils'
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
+import { buildOrgUrl } from 'components/interfaces/Organization/Organization.utils'
 
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()

@@ -1,4 +1,4 @@
-import { buildOrgUrl } from 'pages/org/_/[[...routeSlug]].utils'
+import { buildOrgUrl } from 'components/interfaces/Organization/Organization.utils'
 import { describe, expect, test } from 'vitest'
 
 describe('buildOrgUrl', () => {
