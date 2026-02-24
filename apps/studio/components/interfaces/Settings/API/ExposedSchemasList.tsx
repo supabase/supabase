@@ -1,4 +1,3 @@
-import { Database } from 'lucide-react'
 import { useMemo } from 'react'
 import { Button, Card } from 'ui'
 

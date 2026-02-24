@@ -34,7 +34,9 @@ import {
 } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
+import TableSelector from '../../Realtime/Inspector/RealtimeFilterPopover/TableSelector'
 import { ExposedSchemasList } from './ExposedSchemasList'
+import { ExposedTablesList } from './ExposedTableslist'
 import { HardenAPIModal } from './HardenAPIModal'
 import { EntityListItem } from '@/components/layouts/TableEditorLayout/EntityListItem'
 import { FormActions } from '@/components/ui/Forms/FormActions'
@@ -63,7 +65,9 @@ const formSchema = z.object({
 
   // Fields for expose mode
   exposeMode: z.enum(['schemas', 'specific']),
-  selectedTableIds: z.array(z.string()),
+  // For exposeMode = 'specific
+  tableIdsToAdd: z.array(z.number()),
+  tableIdsToRemove: z.array(z.number()),
 })
 
 export const PostgrestConfig = () => {
@@ -139,7 +143,8 @@ export const PostgrestConfig = () => {
         .filter(Boolean),
       dbPool: config?.db_pool,
       exposeMode: 'schemas' as const,
-      selectedTableIds: [] as string[],
+      tableIdsToAdd: [] as number[],
+      tableIdsToRemove: [] as number[],
     }
   }, [config])
 
@@ -173,6 +178,7 @@ export const PostgrestConfig = () => {
 
   const watchedExposeMode = form.watch('exposeMode')
   const watchedDbSchema = form.watch('dbSchema')
+  const watchedTableIdsToRemove = form.watch('tableIdsToRemove')
 
   const excludedSchemas = useMemo(() => {
     return (
@@ -183,8 +189,6 @@ export const PostgrestConfig = () => {
         .concat(watchedDbSchema)
     )
   }, [watchedDbSchema])
-
-  const tableOptions = []
 
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
@@ -265,40 +269,41 @@ export const PostgrestConfig = () => {
                             control={form.control}
                             name="dbSchema"
                             render={({ field }) => (
-                              <>
-                                <FormItem_Shadcn_>
-                                  <FormItemLayout
-                                    layout="flex-row-reverse"
-                                    label="Exposed schemas"
-                                    description="Select schemas to fully expose through the Data API."
-                                  >
-                                    <SchemaSelector
-                                      excludedSchemas={excludedSchemas}
-                                      size="small"
-                                      onSelectSchema={(name) => {
-                                        field.onChange([name, ...field.value])
-                                      }}
-                                      placeholderLabel="Select schemas to expose..."
-                                      disabled={!canUpdatePostgrestConfig}
-                                    />
-                                  </FormItemLayout>
-                                </FormItem_Shadcn_>
-
-                                <ExposedSchemasList
-                                  schemas={watchedDbSchema}
-                                  onRemoveSchema={(schema) => {
-                                    field.onChange(field.value.filter((x) => x !== schema))
-                                  }}
-                                />
-                              </>
+                              <FormItem_Shadcn_>
+                                <FormItemLayout
+                                  layout="flex-row-reverse"
+                                  label="Exposed schemas"
+                                  description="Select schemas to fully expose through the Data API."
+                                >
+                                  <SchemaSelector
+                                    excludedSchemas={excludedSchemas}
+                                    size="small"
+                                    onSelectSchema={(name) => {
+                                      field.onChange([name, ...field.value])
+                                    }}
+                                    placeholderLabel="Select schemas to expose..."
+                                    disabled={!canUpdatePostgrestConfig}
+                                  />
+                                </FormItemLayout>
+                              </FormItem_Shadcn_>
                             )}
+                          />
+
+                          <ExposedSchemasList
+                            schemas={watchedDbSchema}
+                            onRemoveSchema={(schema) => {
+                              form.setValue(
+                                'dbSchema',
+                                form.getValues('dbSchema').filter((x) => x !== schema)
+                              )
+                            }}
                           />
                         </>
                       ) : (
                         <>
                           <FormField_Shadcn_
                             control={form.control}
-                            name="selectedTableIds"
+                            name="tableIdsToAdd"
                             render={({ field }) => (
                               <FormItem_Shadcn_>
                                 <FormItemLayout
@@ -306,45 +311,32 @@ export const PostgrestConfig = () => {
                                   label="Exposed tables"
                                   description="Grant Data API access to selected tables."
                                 >
-                                  {tableOptions.length === 0 ? (
-                                    <p className="text-sm text-foreground-light">
-                                      No tables available.
-                                    </p>
-                                  ) : (
-                                    <MultiSelector
-                                      onValuesChange={(selectedLabels) => {
-                                        const selectedIds = selectedLabels
-                                          .map((label) => tableByLabel.get(label)?.id)
-                                          .filter((id): id is string => !!id)
-                                        field.onChange(selectedIds)
-                                      }}
-                                      values={field.value
-                                        .map((id) => tableById.get(id)?.label)
-                                        .filter((label): label is string => !!label)}
-                                      size="small"
-                                      disabled={!canUpdatePostgrestConfig}
-                                    >
-                                      <MultiSelectorTrigger
-                                        mode="inline-combobox"
-                                        label="Select tables..."
-                                        badgeLimit="wrap"
-                                        showIcon={false}
-                                        deletableBadge
-                                      />
-                                      <MultiSelectorContent>
-                                        <MultiSelectorList>
-                                          {tableOptions.map((table) => (
-                                            <MultiSelectorItem key={table.id} value={table.label}>
-                                              {table.label}
-                                            </MultiSelectorItem>
-                                          ))}
-                                        </MultiSelectorList>
-                                      </MultiSelectorContent>
-                                    </MultiSelector>
-                                  )}
+                                  <TableSelector
+                                    selectedSchemaName="*"
+                                    onSelectTable={(_name, tableId) => {
+                                      field.onChange([...field.value, tableId])
+                                    }}
+                                  />
                                 </FormItemLayout>
                               </FormItem_Shadcn_>
                             )}
+                          />
+
+                          <ExposedTablesList
+                            tableIdsPendingRemoval={watchedTableIdsToRemove}
+                            onRemoveTable={(tableId) => {
+                              const tableIdsToAdd = form.getValues('tableIdsToAdd')
+                              const tableIdsToRemove = form.getValues('tableIdsToRemove')
+
+                              if (tableIdsToAdd.includes(tableId)) {
+                                form.setValue(
+                                  'tableIdsToAdd',
+                                  tableIdsToAdd.filter((x) => x !== tableId)
+                                )
+                              } else {
+                                form.setValue('tableIdsToRemove', [...tableIdsToRemove, tableId])
+                              }
+                            }}
                           />
                         </>
                       )}
