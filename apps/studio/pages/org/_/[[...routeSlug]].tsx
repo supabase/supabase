@@ -12,6 +12,7 @@ import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
+import { buildOrgUrl } from './[[...routeSlug]].utils'
 
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
@@ -22,17 +23,6 @@ const GenericOrganizationPage: NextPage = () => {
       : ''
 
   const { data: organizations, isPending: isLoading } = useOrganizationsQuery()
-
-  const urlRewriterFactory = (slug: string | string[] | undefined) => {
-    return (orgSlug: string) => {
-      if (!Array.isArray(slug)) {
-        return `/org/${orgSlug}/general${!!queryString ? `?${queryString}` : ''}`
-      } else {
-        const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-        return `/org/${orgSlug}/${slugPath}${!!queryString ? `?${queryString}` : ''}`
-      }
-    }
-  }
 
   return (
     <>
@@ -60,7 +50,7 @@ const GenericOrganizationPage: NextPage = () => {
                       <OrganizationCard
                         key={org.id}
                         organization={org}
-                        href={urlRewriterFactory(routeSlug)(org.slug)}
+                        href={buildOrgUrl(routeSlug, org.slug, queryString)}
                       />
                     ))}
                   </ul>
