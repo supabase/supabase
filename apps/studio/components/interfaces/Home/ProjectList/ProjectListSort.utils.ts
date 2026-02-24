@@ -9,10 +9,15 @@ export type ProjectListSort = (typeof PROJECT_LIST_SORT_VALUES)[number]
 export type ProjectListSortableColumn = 'name' | 'created'
 
 export const PROJECT_LIST_SORT_LABELS: Record<ProjectListSort, string> = {
-  name_asc: 'Project (A–Z)',
-  name_desc: 'Project (Z–A)',
-  created_desc: 'Created (Newest first)',
-  created_asc: 'Created (Oldest first)',
+  name_asc: 'Project name (A–Z)',
+  name_desc: 'Project name (Z–A)',
+  created_desc: 'Creation date (Newest first)',
+  created_asc: 'Creation date (Oldest first)',
+}
+
+export const getProjectListSortButtonLabel = (value: ProjectListSort) => {
+  if (value.startsWith('created')) return 'creation date'
+  return 'name'
 }
 
 export const toTableHeadSortValue = (sort: ProjectListSort) => sort.replace('_', ':')

@@ -9,6 +9,7 @@ import {
 } from 'ui'
 
 import {
+  getProjectListSortButtonLabel,
   PROJECT_LIST_SORT_LABELS,
   PROJECT_LIST_SORT_VALUES,
   type ProjectListSort,
@@ -19,11 +20,7 @@ interface ProjectListSortDropdownProps {
   onChange: (value: ProjectListSort) => void
 }
 
-const getSortColumnLabel = (value: ProjectListSort) => {
-  if (value.startsWith('created')) return 'created'
-  return 'project'
-}
-
+// Friendlier label names for button
 export const ProjectListSortDropdown = ({ value, onChange }: ProjectListSortDropdownProps) => {
   return (
     <DropdownMenu>
@@ -39,7 +36,7 @@ export const ProjectListSortDropdown = ({ value, onChange }: ProjectListSortDrop
             )
           }
         >
-          Sorted by {getSortColumnLabel(value)}
+          Sorted by {getProjectListSortButtonLabel(value)}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
