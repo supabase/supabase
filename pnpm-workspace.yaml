@@ -59,6 +59,7 @@ minimumReleaseAgeExclude:
   - lodash
   - next-mdx-remote
   - react-resizable-panels
+  - swiper@12.1.2
 
 onlyBuiltDependencies:
   - node-pty

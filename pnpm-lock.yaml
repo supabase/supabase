@@ -1750,8 +1750,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared-data
       swiper:
-        specifier: ^11.0.7
-        version: 11.0.7
+        specifier: ^12.1.2
+        version: 12.1.2
       typed.js:
         specifier: ^2.0.16
         version: 2.0.16
@@ -17294,8 +17294,8 @@ packages:
   swap-case@2.0.2:
     resolution: {integrity: sha512-kc6S2YS/2yXbtkSMunBtKdah4VFETZ8Oh6ONSmSd9bRxhqTrtARUCBUiWXH3xVPpvR7tz2CSnkuXVE42EcGnMw==}
 
-  swiper@11.0.7:
-    resolution: {integrity: sha512-cDfglW1B6uSmB6eB6pNmzDTNLmZtu5bWWa1vak0RU7fOI9qHjMzl7gVBvYSl34b0RU2N11HxxETJqQ5LeqI1cA==}
+  swiper@12.1.2:
+    resolution: {integrity: sha512-4gILrI3vXZqoZh71I1PALqukCFgk+gpOwe1tOvz5uE9kHtl2gTDzmYflYCwWvR4LOvCrJi6UEEU+gnuW5BtkgQ==}
     engines: {node: '>= 4.7.0'}
 
   swr@2.2.5:
@@ -36837,7 +36837,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  swiper@11.0.7: {}
+  swiper@12.1.2: {}
 
   swr@2.2.5(react@18.3.1):
     dependencies:
