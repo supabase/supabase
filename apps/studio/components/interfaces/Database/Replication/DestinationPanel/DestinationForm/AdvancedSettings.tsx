@@ -52,8 +52,14 @@ export const AdvancedSettings = ({
                   label="Batch wait time"
                   description={
                     <>
-                      <p>Maximum time the pipeline waits to collect additional changes before flushing a batch.</p>
-                      <p>Lower values reduce replication latency; higher values improve batching efficiency.</p>
+                      <p>
+                        Maximum time the pipeline waits to collect additional changes before
+                        flushing a batch.
+                      </p>
+                      <p>
+                        Lower values reduce replication latency; higher values improve batching
+                        efficiency.
+                      </p>
                     </>
                   }
                 >
@@ -82,7 +88,9 @@ export const AdvancedSettings = ({
                   description={
                     <>
                       <p>Number of tables copied in parallel during the initial snapshot phase.</p>
-                      <p>Each worker uses one replication slot (up to N + 1 total while syncing).</p>
+                      <p>
+                        Each worker uses one replication slot (up to N + 1 total while syncing).
+                      </p>
                     </>
                   }
                 >
@@ -110,8 +118,13 @@ export const AdvancedSettings = ({
                   layout="horizontal"
                   description={
                     <>
-                      <p>Number of parallel connections each table copy can use during initial sync.</p>
-                      <p>Higher values can copy large tables faster, but consume more database connections.</p>
+                      <p>
+                        Number of parallel connections each table copy can use during initial sync.
+                      </p>
+                      <p>
+                        Higher values can copy large tables faster, but consume more database
+                        connections.
+                      </p>
                     </>
                   }
                 >
@@ -147,7 +160,8 @@ export const AdvancedSettings = ({
                     description={
                       <>
                         <p>
-                          Maximum allowed age for BigQuery cached metadata before reading base tables.
+                          Maximum allowed age for BigQuery cached metadata before reading base
+                          tables.
                         </p>
                         <p>
                           Lower values improve freshness; higher values can reduce query cost and
