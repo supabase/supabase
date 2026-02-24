@@ -73,7 +73,9 @@ overrides:
   lodash: ^4.17.23
   payload>undici: ^7.18.2
   refractor>prismjs: ^1.30.0
-  tar: ^7.5.7
+  cacache>tar: ^7.5.8
+  node-gyp>tar: ^7.5.8
+  '@mapbox/node-pre-gyp>tar': ^7.5.8
   tmp: ^0.2.4
 
 importers:
@@ -17337,10 +17339,14 @@ packages:
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
 
-  tar@7.5.7:
-    resolution: {integrity: sha512-fov56fJiRuThVFXD6o6/Q354S7pnWMJIVlDBYijsTNx6jKSE4pvrDTs6lUnmGvNyfJwFQQwWy3owKz1ucIhveQ==}
+  tar@7.5.2:
+    resolution: {integrity: sha512-7NyxrTE4Anh8km8iEy7o0QYPs+0JKBTj5ZaqHg6B39erLg0qYXN3BijtShwbsNSvQ+LN75+KV+C4QR/f6Gwnpg==}
     engines: {node: '>=18'}
     deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+  tar@7.5.9:
+    resolution: {integrity: sha512-BTLcK0xsDh2+PUe9F6c2TlRp4zOOBMTkoQHQIWSIzI0R7KG46uEwq4OPk2W7bZcprBMsuaeFsqwYr7pjh6CuHg==}
+    engines: {node: '>=18'}
 
   termi-link@1.1.0:
     resolution: {integrity: sha512-2qSN6TnomHgVLtk+htSWbaYs4Rd2MH/RU7VpHTy6MBstyNyWbM4yKd1DCYpE3fDg8dmGWojXCngNi/MHCzGuAA==}
@@ -21418,7 +21424,7 @@ snapshots:
       npmlog: 5.0.1
       rimraf: 3.0.2
       semver: 7.7.3
-      tar: 7.5.7
+      tar: 7.5.9
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -21431,7 +21437,7 @@ snapshots:
       node-fetch: 2.7.0(encoding@0.1.13)
       nopt: 8.1.0
       semver: 7.7.3
-      tar: 7.5.7
+      tar: 7.5.9
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -27710,7 +27716,7 @@ snapshots:
       promise-inflight: 1.0.1
       rimraf: 3.0.2
       ssri: 8.0.1
-      tar: 7.5.7
+      tar: 7.5.9
       unique-filename: 1.1.1
     transitivePeerDependencies:
       - bluebird
@@ -27727,7 +27733,7 @@ snapshots:
       minipass-pipeline: 1.2.4
       p-map: 4.0.0
       ssri: 10.0.6
-      tar: 7.5.7
+      tar: 7.5.9
       unique-filename: 3.0.0
 
   call-bind-apply-helpers@1.0.2:
@@ -33483,7 +33489,7 @@ snapshots:
       nopt: 7.2.1
       proc-log: 3.0.0
       semver: 7.7.3
-      tar: 7.5.7
+      tar: 7.5.9
       which: 4.0.0
     transitivePeerDependencies:
       - supports-color
@@ -33498,7 +33504,7 @@ snapshots:
       npmlog: 6.0.2
       rimraf: 3.0.2
       semver: 7.7.3
-      tar: 7.5.7
+      tar: 7.5.9
       which: 2.0.2
     transitivePeerDependencies:
       - bluebird
@@ -36767,7 +36773,7 @@ snapshots:
       bin-links: 6.0.0
       https-proxy-agent: 7.0.6(supports-color@8.1.1)
       node-fetch: 3.3.2
-      tar: 7.5.7
+      tar: 7.5.2
     transitivePeerDependencies:
       - supports-color
 
@@ -36894,7 +36900,15 @@ snapshots:
       fast-fifo: 1.3.2
       streamx: 2.22.0
 
-  tar@7.5.7:
+  tar@7.5.2:
+    dependencies:
+      '@isaacs/fs-minipass': 4.0.1
+      chownr: 3.0.0
+      minipass: 7.1.2
+      minizlib: 3.1.0
+      yallist: 5.0.0
+
+  tar@7.5.9:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0

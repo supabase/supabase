@@ -73,5 +73,7 @@ overrides:
   lodash: 'catalog:'
   payload>undici: ^7.18.2
   refractor>prismjs: ^1.30.0
-  tar: ^7.5.7
+  cacache>tar: ^7.5.8
+  node-gyp>tar: ^7.5.8
+  '@mapbox/node-pre-gyp>tar': ^7.5.8
   tmp: ^0.2.4
