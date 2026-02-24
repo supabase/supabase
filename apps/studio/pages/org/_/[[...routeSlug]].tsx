@@ -50,7 +50,7 @@ const GenericOrganizationPage: NextPage = () => {
                       <OrganizationCard
                         key={org.id}
                         organization={org}
-                        href={buildOrgUrl(routeSlug, org.slug, queryString)}
+                        href={buildOrgUrl({ slug: routeSlug, orgSlug: org.slug, queryString })}
                       />
                     ))}
                   </ul>

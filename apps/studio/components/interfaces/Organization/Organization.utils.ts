@@ -5,11 +5,15 @@
  * /org/<orgSlug>. When `slug` is an array the sub-path is preserved so the
  * user lands on the equivalent page for the chosen org.
  */
-export function buildOrgUrl(
-  slug: string | string[] | undefined,
-  orgSlug: string,
+export function buildOrgUrl({
+  slug,
+  orgSlug,
+  queryString,
+}: {
+  slug: string | string[] | undefined
+  orgSlug: string
   queryString: string
-): string {
+}): string {
   const qs = queryString ? `?${queryString}` : ''
   if (!Array.isArray(slug)) {
     return `/org/${orgSlug}${qs}`
