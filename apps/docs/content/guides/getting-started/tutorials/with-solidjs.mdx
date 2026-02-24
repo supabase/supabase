@@ -39,10 +39,11 @@ All we need are the API URL and the key that you copied [earlier](#get-api-detai
 
 <$CodeTabs>
 
-```bash name=.env
-VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
-```
+<$CodeSample
+  path="/user-management/solid-user-management/.env.example"
+  lines={[[1, -1]]}
+  meta="name=.env"
+/>
 
 </$CodeTabs>
 
@@ -51,14 +52,11 @@ on the browser, and that's completely fine since we have [Row Level Security](/d
 
 <$CodeTabs>
 
-```tsx name=src/supabaseClient.tsx
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-
-export const supabase = createClient(supabaseUrl, supabasePublishableKey)
-```
+<$CodeSample
+  path="/user-management/solid-user-management/src/supabaseClient.tsx"
+  lines={[[1, -1]]}
+  meta="name=src/supabaseClient.tsx"
+/>
 
 </$CodeTabs>
 
@@ -73,59 +71,11 @@ Let's set up a SolidJS component to manage logins and sign ups. We'll use Magic 
 
 <$CodeTabs>
 
-```jsx name=src/Auth.tsx
-import { createSignal } from 'solid-js'
-import { supabase } from './supabaseClient'
-
-export default function Auth() {
-  const [loading, setLoading] = createSignal(false)
-  const [email, setEmail] = createSignal('')
-
-  const handleLogin = async (e: SubmitEvent) => {
-    e.preventDefault()
-
-    try {
-      setLoading(true)
-      const { error } = await supabase.auth.signInWithOtp({ email: email() })
-      if (error) throw error
-      alert('Check your email for the login link!')
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div class="row flex-center flex">
-      <div class="col-6 form-widget" aria-live="polite">
-        <h1 class="header">Supabase + SolidJS</h1>
-        <p class="description">Sign in via magic link with your email below</p>
-        <form class="form-widget" onSubmit={handleLogin}>
-          <div>
-            <label for="email">Email</label>
-            <input
-              id="email"
-              class="inputField"
-              type="email"
-              placeholder="Your email"
-              value={email()}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-            />
-          </div>
-          <div>
-            <button type="submit" class="button block" aria-live="polite">
-              {loading() ? <span>Loading</span> : <span>Send magic link</span>}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  )
-}
-```
+<$CodeSample
+  path="/user-management/solid-user-management/src/Auth.tsx"
+  lines={[[1, -1]]}
+  meta="name=src/Auth.tsx"
+/>
 
 </$CodeTabs>
 
@@ -137,120 +87,11 @@ Let's create a new component for that called `Account.tsx`.
 
 <$CodeTabs>
 
-```tsx name=src/Account.tsx
-import { AuthSession } from '@supabase/supabase-js'
-import { Component, createEffect, createSignal } from 'solid-js'
-import { supabase } from './supabaseClient'
-
-interface Props {
-  session: AuthSession
-}
-
-const Account: Component<Props> = ({ session }) => {
-  const [loading, setLoading] = createSignal(true)
-  const [username, setUsername] = createSignal<string | null>(null)
-  const [website, setWebsite] = createSignal<string | null>(null)
-  const [avatarUrl, setAvatarUrl] = createSignal<string | null>(null)
-
-  createEffect(() => {
-    getProfile()
-  })
-
-  const getProfile = async () => {
-    try {
-      setLoading(true)
-      const { user } = session
-
-      const { data, error, status } = await supabase
-        .from('profiles')
-        .select(`username, website, avatar_url`)
-        .eq('id', user.id)
-        .single()
-
-      if (error && status !== 406) {
-        throw error
-      }
-
-      if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const updateProfile = async (e: Event) => {
-    e.preventDefault()
-
-    try {
-      setLoading(true)
-      const { user } = session
-
-      const updates = {
-        id: user.id,
-        username: username(),
-        website: website(),
-        avatar_url: avatarUrl(),
-        updated_at: new Date().toISOString(),
-      }
-
-      const { error } = await supabase.from('profiles').upsert(updates)
-
-      if (error) {
-        throw error
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div aria-live="polite">
-      <form onSubmit={updateProfile} class="form-widget">
-        <div>Email: {session.user.email}</div>
-        <div>
-          <label for="username">Name</label>
-          <input
-            id="username"
-            type="text"
-            value={username() || ''}
-            onChange={(e) => setUsername(e.currentTarget.value)}
-          />
-        </div>
-        <div>
-          <label for="website">Website</label>
-          <input
-            id="website"
-            type="text"
-            value={website() || ''}
-            onChange={(e) => setWebsite(e.currentTarget.value)}
-          />
-        </div>
-        <div>
-          <button type="submit" class="button primary block" disabled={loading()}>
-            {loading() ? 'Saving ...' : 'Update profile'}
-          </button>
-        </div>
-        <button type="button" class="button block" onClick={() => supabase.auth.signOut()}>
-          Sign Out
-        </button>
-      </form>
-    </div>
-  )
-}
-
-export default Account
-```
+<$CodeSample
+  path="/user-management/solid-user-management/src/Account.tsx"
+  lines={[[1, 1], [3, 78], [87, -1]]}
+  meta="name=src/Account.tsx"
+/>
 
 </$CodeTabs>
 
@@ -260,35 +101,11 @@ Now that we have all the components in place, let's update `App.tsx`:
 
 <$CodeTabs>
 
-```jsx name=src/App.tsx
-import { Component, createEffect, createSignal } from 'solid-js'
-import { supabase } from './supabaseClient'
-import { AuthSession } from '@supabase/supabase-js'
-import Account from './Account'
-import Auth from './Auth'
-
-const App: Component = () => {
-  const [session, setSession] = createSignal<AuthSession | null>(null)
-
-  createEffect(() => {
-    supabase.auth.getClaims().then(({ data: { claims } }) => {
-      setSession(claims)
-    })
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  })
-
-  return (
-    <div class="container" style={{ padding: '50px 0 100px 0' }}>
-      {!session() ? <Auth /> : <Account session={session()!} />}
-    </div>
-  )
-}
-
-export default App
-```
+<$CodeSample
+  path="/user-management/solid-user-management/src/App.tsx"
+  lines={[[1, -1]]}
+  meta="name=src/App.tsx"
+/>
 
 </$CodeTabs>
 
@@ -312,104 +129,11 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 <$CodeTabs>
 
-```jsx name=src/Avatar.tsx
-import { Component, createEffect, createSignal, JSX } from 'solid-js'
-import { supabase } from './supabaseClient'
-
-interface Props {
-  size: number
-  url: string | null
-  onUpload: (event: Event, filePath: string) => void
-}
-
-const Avatar: Component<Props> = (props) => {
-  const [avatarUrl, setAvatarUrl] = createSignal<string | null>(null)
-  const [uploading, setUploading] = createSignal(false)
-
-  createEffect(() => {
-    if (props.url) downloadImage(props.url)
-  })
-
-  const downloadImage = async (path: string) => {
-    try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
-      if (error) {
-        throw error
-      }
-      const url = URL.createObjectURL(data)
-      setAvatarUrl(url)
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log('Error downloading image: ', error.message)
-      }
-    }
-  }
-
-  const uploadAvatar: JSX.EventHandler<HTMLInputElement, Event> = async (event) => {
-    try {
-      setUploading(true)
-
-      const target = event.currentTarget
-      if (!target?.files || target.files.length === 0) {
-        throw new Error('You must select an image to upload.')
-      }
-
-      const file = target.files[0]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random()}.${fileExt}`
-      const filePath = `${fileName}`
-
-      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
-
-      if (uploadError) {
-        throw uploadError
-      }
-
-      props.onUpload(event, filePath)
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message)
-      }
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  return (
-    <div style={{ width: `${props.size}px` }} aria-live="polite">
-      {avatarUrl() ? (
-        <img
-          src={avatarUrl()!}
-          alt={avatarUrl() ? 'Avatar' : 'No image'}
-          class="avatar image"
-          style={{ height: `${props.size}px`, width: `${props.size}px` }}
-        />
-      ) : (
-        <div
-          class="avatar no-image"
-          style={{ height: `${props.size}px`, width: `${props.size}px` }}
-        />
-      )}
-      <div style={{ width: `${props.size}px` }}>
-        <label class="button primary block" for="single">
-          {uploading() ? 'Uploading ...' : 'Upload avatar'}
-        </label>
-        <span style="display:none">
-          <input
-            type="file"
-            id="single"
-            accept="image/*"
-            onChange={uploadAvatar}
-            disabled={uploading()}
-          />
-        </span>
-      </div>
-    </div>
-  )
-}
-
-export default Avatar
-```
+<$CodeSample
+  path="/user-management/solid-user-management/src/Avatar.tsx"
+  lines={[[1, -1]]}
+  meta="name=src/Avatar.tsx"
+/>
 
 </$CodeTabs>
 
@@ -419,27 +143,11 @@ And then we can add the widget to the Account page:
 
 <$CodeTabs>
 
-```jsx name=src/Account.tsx
-// Import the new component
-import Avatar from './Avatar'
-
-// ...
-
-return (
-  <form onSubmit={updateProfile} class="form-widget">
-    {/* Add to the body */}
-    <Avatar
-      url={avatarUrl()}
-      size={150}
-      onUpload={(e: Event, url: string) => {
-        setAvatarUrl(url)
-        updateProfile(e)
-      }}
-    />
-    {/* ... */}
-  </div>
-)
-```
+<$CodeSample
+  path="/user-management/solid-user-management/src/Account.tsx"
+  lines={[[1, 3], [76, 88]]}
+  meta="name=src/Account.tsx"
+/>
 
 </$CodeTabs>
 
