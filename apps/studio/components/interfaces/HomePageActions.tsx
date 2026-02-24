@@ -58,12 +58,12 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
   )
 
   useEffect(() => {
-    if (isSuccessFilterStatusStorage) setFilterStatus(filterStatusStorage)
-  }, [filterStatusStorage, isSuccessFilterStatusStorage, setFilterStatus])
+    if (isSuccessFilterStatusStorage && !!slug) setFilterStatus(filterStatusStorage)
+  }, [filterStatusStorage, isSuccessFilterStatusStorage, setFilterStatus, slug])
 
   useEffect(() => {
-    if (isSuccessSortStorage) setSort(sortStorage)
-  }, [sortStorage, isSuccessSortStorage, setSort])
+    if (isSuccessSortStorage && slug) setSort(sortStorage)
+  }, [sortStorage, isSuccessSortStorage, setSort, slug])
 
   return (
     <div className="flex items-center justify-between w-full">
