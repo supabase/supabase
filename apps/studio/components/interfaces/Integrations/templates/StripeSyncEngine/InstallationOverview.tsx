@@ -342,7 +342,7 @@ export const StripeSyncInstallationPage = () => {
                       text: !canInstall
                         ? 'Your database already uses a schema named "stripe"'
                         : !canManageSecrets
-                          ? 'You need to be an administrator or owner to install the Stripe Sync Engine.'
+                          ? 'You need additional permissions to install the Stripe Sync Engine.'
                           : undefined,
                     },
                   }}
@@ -360,7 +360,7 @@ export const StripeSyncInstallationPage = () => {
                 tooltip={{
                   content: {
                     text: !canManageSecrets
-                      ? 'You need to be an administrator or owner to uninstall the Stripe Sync Engine.'
+                      ? 'You need additional permissions to uninstall the Stripe Sync Engine.'
                       : undefined,
                   },
                 }}
