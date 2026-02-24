@@ -4,7 +4,7 @@ import { Sidebar } from 'components/interfaces/Sidebar'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 
@@ -58,6 +58,18 @@ export const DefaultLayout = ({
   const contentMinSizePercentage = 50
   const contentMaxSizePercentage = 70
 
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
+  // to whatever is specified).
+  if (!isMounted) {
+    return null
+  }
+
   return (
     <SidebarProvider defaultOpen={false}>
       <LayoutSidebarProvider>
@@ -82,25 +94,23 @@ export const DefaultLayout = ({
                 {!router.pathname.startsWith('/account') && <Sidebar />}
                 {/* Main Content with Layout Sidebar */}
                 <ResizablePanelGroup
-                  direction="horizontal"
+                  orientation="horizontal"
                   className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                   autoSaveId="default-layout-content"
                 >
                   <ResizablePanel
                     id="panel-content"
-                    order={1}
                     className="w-full"
-                    minSize={contentMinSizePercentage}
-                    maxSize={contentMaxSizePercentage}
-                    defaultSize={contentMaxSizePercentage}
+                    minSize={`${contentMinSizePercentage}`}
+                    maxSize={`${contentMaxSizePercentage}`}
+                    defaultSize={`${contentMaxSizePercentage}`}
                   >
                     <div className="h-full overflow-y-auto">{children}</div>
                   </ResizablePanel>
                   <LayoutSidebar
-                    order={2}
-                    minSize={100 - contentMaxSizePercentage}
-                    maxSize={100 - contentMinSizePercentage}
-                    defaultSize={100 - contentMaxSizePercentage}
+                    minSize={`${100 - contentMaxSizePercentage}`}
+                    maxSize={`${100 - contentMinSizePercentage}`}
+                    defaultSize={`${100 - contentMaxSizePercentage}`}
                   />
                 </ResizablePanelGroup>
               </div>

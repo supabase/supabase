@@ -184,6 +184,8 @@ export const formSectionSchema = z.object({
   disclaimer: z.string().optional(),
   /** Message shown after a successful submission. Defaults to a generic thank-you message. */
   successMessage: z.string().optional(),
+  /** URL to redirect the user to after a successful submission. When set, overrides successMessage. */
+  successRedirect: z.string().optional(),
   /** CRM integration config. When provided, form submissions are sent to the configured providers. */
   crm: formCrmConfigSchema.optional(),
 })

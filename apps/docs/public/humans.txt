@@ -81,6 +81,7 @@ Firas El Rachidi
 Francesco Sansalvadore
 Garrett Crowell
 Gerardo Estaba
+Gildas Garcia
 Greg Kress
 Greg P
 Greg Richardson
@@ -126,6 +127,7 @@ Katerina Skroumpelou
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kevin Strong-Holte
 Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
@@ -176,6 +178,7 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Rodrigo Esteves
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
@@ -184,6 +187,7 @@ Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Sana Cordeaux
 Sara Read
 Sean Oliver
 Sean Thompson
