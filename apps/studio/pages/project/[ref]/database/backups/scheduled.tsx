@@ -95,8 +95,8 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                         description={
                           <div>
                             Your project uses PITR and full daily backups are no longer taken.
-                            They're not needed, as PITR supports a superset of functionality, in
-                            terms of the granular recovery that can be performed.{' '}
+                            PITR lets you restore to a specific time (down to the second) 
+                            within your selected PITR retention period.{' '}
                             <a
                               className="text-brand transition-colors hover:text-brand-600"
                               href={`${DOCS_URL}/guides/platform/backups`}
