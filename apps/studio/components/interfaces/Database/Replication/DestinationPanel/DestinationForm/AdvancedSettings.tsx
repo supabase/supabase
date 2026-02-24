@@ -52,8 +52,8 @@ export const AdvancedSettings = ({
                   label="Batch wait time"
                   description={
                     <>
-                      <p>Time to wait for additional changes before sending.</p>
-                      <p>Shorter times imply faster updates, but higher overhead.</p>
+                      <p>Maximum time the pipeline waits to collect additional changes before flushing a batch.</p>
+                      <p>Lower values reduce replication latency; higher values improve batching efficiency.</p>
                     </>
                   }
                 >
@@ -81,8 +81,8 @@ export const AdvancedSettings = ({
                   layout="horizontal"
                   description={
                     <>
-                      <p>Number of tables to copy in parallel during the initial sync.</p>
-                      <p>Uses one replication slot per worker (N + 1 total when fully active).</p>
+                      <p>Number of tables copied in parallel during the initial snapshot phase.</p>
+                      <p>Each worker uses one replication slot (up to N + 1 total while syncing).</p>
                     </>
                   }
                 >
@@ -110,10 +110,8 @@ export const AdvancedSettings = ({
                   layout="horizontal"
                   description={
                     <>
-                      <p>
-                        Number of copy connections each table sync worker can use in parallel when
-                        copying a table.
-                      </p>
+                      <p>Number of parallel connections each table copy can use during initial sync.</p>
+                      <p>Higher values can copy large tables faster, but consume more database connections.</p>
                     </>
                   }
                 >
@@ -124,7 +122,7 @@ export const AdvancedSettings = ({
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 4"
+                        placeholder="Default: 2"
                       />
                     </PrePostTab>
                   </FormControl_Shadcn_>
@@ -149,10 +147,12 @@ export const AdvancedSettings = ({
                     description={
                       <>
                         <p>
-                          Maximum age of cached data before BigQuery reads from base tables at query
-                          time.
+                          Maximum allowed age for BigQuery cached metadata before reading base tables.
                         </p>
-                        <p>Lower values return fresher results, but may increase query costs.</p>
+                        <p>
+                          Lower values improve freshness; higher values can reduce query cost and
+                          latency.
+                        </p>
                       </>
                     }
                   >
