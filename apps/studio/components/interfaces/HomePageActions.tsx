@@ -41,9 +41,11 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
   )
   const [viewMode, setViewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
 
-  const [filterStatusStorage, setFilterStatusStorage, { isSuccess }] = useLocalStorageQuery<
-    string[]
-  >(LOCAL_STORAGE_KEYS.PROJECTS_FILTER, [])
+  const [filterStatusStorage, setFilterStatusStorage, { isSuccess: isSuccessFilterStatusStorage }] =
+    useLocalStorageQuery<string[]>(LOCAL_STORAGE_KEYS.PROJECTS_FILTER, [])
+
+  const [sortStorage, setSortStorage, { isSuccess: isSuccessSortStorage }] =
+    useLocalStorageQuery<ProjectListSort>(LOCAL_STORAGE_KEYS.PROJECTS_SORT, 'name_asc')
 
   const { isFetching: isFetchingProjects } = useOrgProjectsInfiniteQuery(
     {
@@ -56,8 +58,12 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
   )
 
   useEffect(() => {
-    if (isSuccess) setFilterStatus(filterStatusStorage)
-  }, [filterStatusStorage, isSuccess, setFilterStatus])
+    if (isSuccessFilterStatusStorage) setFilterStatus(filterStatusStorage)
+  }, [filterStatusStorage, isSuccessFilterStatusStorage, setFilterStatus])
+
+  useEffect(() => {
+    if (isSuccessSortStorage) setSort(sortStorage)
+  }, [sortStorage, isSuccessSortStorage, setSort])
 
   return (
     <div className="flex items-center justify-between w-full">
@@ -96,12 +102,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
           onSaveFilters={(options) => setFilterStatusStorage(options)}
         />
 
-        <ProjectListSortDropdown
-          value={sort}
-          onChange={(value) => {
-            void setSort(value)
-          }}
-        />
+        <ProjectListSortDropdown value={sort} onChange={setSortStorage} />
 
         {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
       </div>
