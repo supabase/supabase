@@ -3,6 +3,7 @@ import {
   LoadingCardView,
   NoOrganizationsState,
 } from 'components/interfaces/Home/ProjectList/EmptyStates'
+import { buildOrgUrl } from 'components/interfaces/Organization/Organization.utils'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -12,7 +13,6 @@ import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
-import { buildOrgUrl } from 'components/interfaces/Organization/Organization.utils'
 
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
