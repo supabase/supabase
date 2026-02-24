@@ -42,7 +42,7 @@ Only ever use the `primary` (green) button `type` on a `default` Admonition. Eve
 
 ## Examples
 
-### With actions
+### Actions
 
 <ComponentPreview
   name="admonition-demo"
@@ -69,3 +69,14 @@ AlertError for example rolls up consistent error handling and support contact me
   name="admonition-destructive"
   className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
 />
+
+### Sandwiched
+
+Some [Card](../components/card) or [Dialog](../components/dialog) instances may need to include callout information in-between core content. Admonition can be used ‘full-bleed’ in these cases by removing borders and radii.
+
+<ComponentPreview
+  name="admonition-sandwiched"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+Depending on the context, you may want to reset borders on the Admonition itself rather than the surrounding elements. The above Admonition is `type` `"warning"` with stark yellow borders which we want to emphasize.
