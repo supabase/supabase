@@ -1,18 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
-import { toast } from 'sonner'
 
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from 'ui'
+import { toast } from 'sonner'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { SupportLink } from '../Support/SupportLink'
 
 interface SessionTimeoutModalProps {
@@ -32,74 +23,60 @@ export const SessionTimeoutModal = ({
     }
   }, [visible])
 
-  const handleClearStorage = () => {
-    try {
-      localStorage.clear()
-      sessionStorage.clear()
-    } catch (e) {
-      toast.error('Failed to clear browser storage')
-    }
-    window.location.reload()
-  }
-
   return (
-    <AlertDialog
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) onClose()
+    <ConfirmationModal
+      visible={visible}
+      title="Session timed out"
+      confirmLabel="Sign in again"
+      onCancel={onClose}
+      onConfirm={redirectToSignIn}
+      alert={{
+        base: { variant: 'warning' },
+        title: 'Your session has timed out',
+        description:
+          'Please try signing in again. If you are not able to sign in again, please contact Support.',
       }}
     >
-      <AlertDialogContent size="small">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Session expired</AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="space-y-3">
-              <p>
-                Your session has expired. Sign in again to continue.
-              </p>
-              <p className="text-foreground-light">
-                If you can't sign in, try:
-              </p>
-              <ul className="list-disc pl-5 space-y-1 text-foreground-light">
-                <li>Use a different browser</li>
-                <li>Disable extensions that block network requests</li>
-                <li>
-                  <button
-                    type="button"
-                    title="Clear site data and reload"
-                    className="underline hover:no-underline"
-                    onClick={handleClearStorage}
-                  >
-                    Clear site data and reload
-                  </button>
-                </li>
-              </ul>
-              <p className="text-foreground-light">
-                Still having trouble?{' '}
-                <SupportLink
-                  className={InlineLinkClassName}
-                  queryParams={{ subject: 'Session expired' }}
-                >
-                  Contact support
-                </SupportLink>
-                {' '}
-                or{' '}
-                <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
-                  generate a HAR file
-                </InlineLink>
-                {' '}
-                from your session to help us debug.
-              </p>
-            </div>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Close</AlertDialogCancel>
-          <AlertDialogAction onClick={redirectToSignIn}>
-            Sign in again
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      <div className="space-y-4 text-sm text-foreground-light">
+        <ul className="list-disc pl-1.5 list-inside space-y-1 text-sm text-foreground-light">
+          <li>Try with a different browser</li>
+          <li>Disable browser extensions that block network requests</li>
+          <li>
+            <button
+              title="Clear storage and reload"
+              className="underline"
+              onClick={() => {
+                try {
+                  localStorage.clear()
+                  sessionStorage.clear()
+                } catch (e) {
+                  toast.error('Failed to clear browser storage')
+                }
+                window.location.reload()
+              }}
+            >
+              Clear your browser storage
+            </button>
+          </li>
+        </ul>
+        <p>
+          If none of these steps work, please{' '}
+          <SupportLink
+            className={InlineLinkClassName}
+            queryParams={{ subject: 'Session timed out' }}
+          >
+            Contact support
+          </SupportLink>
+          .
+        </p>
+        <p>
+          Consider{' '}
+          <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
+            generating a HAR file
+          </InlineLink>{' '}
+          from your session to help Support pinpoint the issue.
+        </p>
+      </div>
+    </ConfirmationModal>
   )
 }
