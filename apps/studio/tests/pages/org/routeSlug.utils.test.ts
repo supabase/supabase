@@ -1,5 +1,5 @@
-import { describe, expect, test } from 'vitest'
 import { buildOrgUrl } from 'pages/org/_/[[...routeSlug]].utils'
+import { describe, expect, test } from 'vitest'
 
 describe('buildOrgUrl', () => {
   describe('when slug is undefined (bare /org/_ route)', () => {
