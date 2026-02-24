@@ -2844,6 +2844,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Restore from Platform', url: '/guides/self-hosting/restore-from-platform' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+        { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
       ],
     },
     {
@@ -2894,6 +2895,11 @@ export const self_hosting: NavMenuConstant = {
         {
           name: 'Reference',
           url: '/reference/self-hosting-functions/introduction',
+          items: [],
+        },
+        {
+          name: 'Guide',
+          url: '/guides/self-hosting/self-hosted-functions',
           items: [],
         },
       ],
