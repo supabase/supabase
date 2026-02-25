@@ -1,7 +1,12 @@
-import { useMemo } from 'react'
-import { Button, Card } from 'ui'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { CSSProperties, useMemo } from 'react'
+import { Button, Card, Skeleton } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
+import AlertError from '@/components/ui/AlertError'
 import { InfiniteListDefault } from '@/components/ui/InfiniteList'
+import { exposedTablesInfiniteQueryOptions } from '@/data/privileges/exposed-tables-infinite-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type TableRowProps = {
   item: {
@@ -26,6 +31,17 @@ const TableRow = ({ item, style, onRemoveTable }: TableRowProps) => {
   )
 }
 
+const TableRowLoader = ({ style }: { style?: CSSProperties }) => (
+  <div className="flex border-b" style={style}>
+    <div className="p-4 align-middle flex-1">
+      <Skeleton className="h-4 w-48" />
+    </div>
+    <div className="p-4 align-middle text-right">
+      <Skeleton className="h-6 w-16" />
+    </div>
+  </div>
+)
+
 const ExposedTablesListEmptyState = () => (
   <div className="flex flex-col gap-1 items-center justify-center py-8 text-center">
     <h3 className="text-foreground">No exposed tables</h3>
@@ -44,19 +60,35 @@ export const ExposedTablesList = ({
   tableIdsPendingRemoval,
   onRemoveTable,
 }: ExposedTablesListProps) => {
+  const { data: project } = useSelectedProjectQuery()
+
   const itemProps = useMemo(() => ({ onRemoveTable }), [onRemoveTable])
   const tableIdsPendingRemovalSet = useMemo(
     () => new Set(tableIdsPendingRemoval),
     [tableIdsPendingRemoval]
   )
 
+  const {
+    data,
+    isError,
+    error,
+    isSuccess,
+    isPending,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(
+    exposedTablesInfiniteQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    })
+  )
+
   const tables = useMemo(() => {
-    return [
-      { id: 1, schema: 'public', name: 'users' },
-      { id: 2, schema: 'public', name: 'posts' },
-      { id: 3, schema: 'public', name: 'comments' },
-    ].filter((table) => !tableIdsPendingRemovalSet.has(table.id))
-  }, [tableIdsPendingRemovalSet])
+    return (data?.pages.flatMap((page) => page.tables) ?? []).filter(
+      (table) => !tableIdsPendingRemovalSet.has(table.id)
+    )
+  }, [data, tableIdsPendingRemovalSet])
 
   return (
     <Card>
@@ -70,19 +102,31 @@ export const ExposedTablesList = ({
           </div>
         </div>
 
-        {tables.length === 0 ? (
-          <ExposedTablesListEmptyState />
-        ) : (
+        {isPending && (
+          <div className="p-4">
+            <GenericSkeletonLoader />
+          </div>
+        )}
+
+        {isError && (
+          <div className="p-4">
+            <AlertError subject="Failed to retrieve exposed tables" error={error} />
+          </div>
+        )}
+
+        {isSuccess && tables.length === 0 && <ExposedTablesListEmptyState />}
+
+        {isSuccess && tables.length > 0 && (
           <InfiniteListDefault
             className="max-h-48"
             items={tables}
             ItemComponent={TableRow}
             itemProps={itemProps}
-            LoaderComponent={() => null}
+            LoaderComponent={TableRowLoader}
             getItemSize={() => 59}
-            hasNextPage={false}
-            isLoadingNextPage={false}
-            onLoadNextPage={() => {}}
+            hasNextPage={!!hasNextPage}
+            isLoadingNextPage={isFetchingNextPage}
+            onLoadNextPage={() => fetchNextPage()}
           />
         )}
       </div>
