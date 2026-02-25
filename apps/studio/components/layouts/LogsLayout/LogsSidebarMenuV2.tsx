@@ -380,7 +380,9 @@ export function LogsSidebarMenuV2() {
         description="Send logs to your preferred observability or storage platform."
         illustration={
           <div className="flex items-center gap-4">
-            {LOG_DRAIN_TYPES.map((type) =>
+            {LOG_DRAIN_TYPES.filter((t) =>
+              ['datadog', 'sentry', 'webhook', 'loki'].includes(t.value)
+            ).map((type) =>
               React.cloneElement(type.icon, { key: type.name, height: 20, width: 20 })
             )}
           </div>

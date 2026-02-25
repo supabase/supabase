@@ -44,23 +44,28 @@ jobs:
       - name: Run tests
         run: pnpm run test:ci
         working-directory: ./packages/ui
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ui-coverage
+          path: ./packages/ui/coverage/lcov.info
+          retention-days: 1
 
+  coveralls:
+    needs: test
+    if: ${{ always() && needs.test.result == 'success' }}
+    continue-on-error: true
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Download coverage artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ui-coverage
+          path: ./coverage
       - name: Upload coverage results to Coveralls
         uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
         with:
-          parallel: true
           flag-name: ui-tests
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ./packages/ui/coverage/lcov.info
+          path-to-lcov: ./coverage/lcov.info
           base-path: './packages/ui'
-
-  finish:
-    needs: test
-    if: ${{ always() }}
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    steps:
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
-        with:
-          parallel-finished: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}

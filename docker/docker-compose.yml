@@ -244,8 +244,14 @@ services:
     container_name: supabase-storage
     image: supabase/storage-api:v1.37.8
     restart: unless-stopped
-    volumes:
-      - ./volumes/storage:/var/lib/storage:z
+    depends_on:
+      db:
+        # Disable this if you are using an external Postgres database
+        condition: service_healthy
+      rest:
+        condition: service_started
+      imgproxy:
+        condition: service_started
     healthcheck:
       test:
         [
@@ -259,14 +265,6 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
-    depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
-      rest:
-        condition: service_started
-      imgproxy:
-        condition: service_started
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
@@ -276,15 +274,25 @@ services:
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
+      # S3 bucket when using S3 backend, directory name when using 'file'
+      GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
+      # S3 Backend configuration
+      #GLOBAL_S3_ENDPOINT: https://your-s3-endpoint
+      #GLOBAL_S3_PROTOCOL: https
+      #GLOBAL_S3_FORCE_PATH_STYLE: true
+      #AWS_ACCESS_KEY_ID: your-access-key-id
+      #AWS_SECRET_ACCESS_KEY: your-secret-access-key
       FILE_STORAGE_BACKEND_PATH: /var/lib/storage
       TENANT_ID: ${STORAGE_TENANT_ID}
       # TODO: https://github.com/supabase/storage-api/issues/55
       REGION: ${REGION}
-      GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
+      # S3 protocol endpoint configuration
       S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID}
       S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET}
+    volumes:
+      - ./volumes/storage:/var/lib/storage:z
 
   imgproxy:
     container_name: supabase-imgproxy
@@ -334,6 +342,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
+      - deno-cache:/root/.cache/deno
     depends_on:
       analytics:
         condition: service_healthy
@@ -543,3 +552,4 @@ services:
 
 volumes:
   db-config:
+  deno-cache:
