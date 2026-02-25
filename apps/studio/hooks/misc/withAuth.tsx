@@ -1,13 +1,12 @@
-import { useRouter } from 'next/router'
-import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useAuth } from 'common'
 import { SessionTimeoutModal } from 'components/interfaces/SignIn/SessionTimeoutModal'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useSignOut } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useRouter } from 'next/router'
+import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { isNextPageWithLayout, type NextPageWithLayout } from 'types'
 
 const MAX_TIMEOUT = 10000 // 10 seconds
@@ -125,12 +124,23 @@ export function withAuth<T>(
 
     const InnerComponent = WrappedComponent as any
 
+    const supportContext =
+      typeof router.query.ref === 'string' && router.pathname.startsWith('/project/')
+        ? {
+            projectRef: router.query.ref,
+            ...(typeof router.query.organizationSlug === 'string' && {
+              orgSlug: router.query.organizationSlug,
+            }),
+          }
+        : undefined
+
     return (
       <>
         <SessionTimeoutModal
           visible={isSessionTimeoutModalOpen}
           onClose={() => setIsSessionTimeoutModalOpen(false)}
           redirectToSignIn={redirectToSignIn}
+          supportContext={supportContext}
         />
         <InnerComponent {...props} />
       </>
