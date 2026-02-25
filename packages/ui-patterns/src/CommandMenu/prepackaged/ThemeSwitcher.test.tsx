@@ -60,17 +60,17 @@ const ThemeSwitcherHarness = () => {
 }
 
 const renderHarness = async () => {
-  act(() => {
-    render(
-      <CommandProvider>
-        <ThemeSwitcherHarness />
-      </CommandProvider>
-    )
-  })
+  const renderResult = render(
+    <CommandProvider>
+      <ThemeSwitcherHarness />
+    </CommandProvider>
+  )
 
   await waitFor(() => {
     expect(getThemeSection()).toBeDefined()
   })
+
+  return renderResult
 }
 
 const getThemeSection = () => captured.commandSections.find((section) => section.name === 'Theme')
@@ -197,6 +197,27 @@ describe('useThemeSwitcherCommands', () => {
     runAction('toggle-theme')
 
     expect(themeMock.setTheme).toHaveBeenCalledWith('dark')
+  })
+
+  it('toggle theme uses the latest resolved theme across rerenders in the same session', async () => {
+    const renderResult = await renderHarness()
+
+    runAction('toggle-theme')
+    expect(themeMock.setTheme).toHaveBeenLastCalledWith('dark')
+
+    themeMock.state.resolvedTheme = 'dark'
+    renderResult.rerender(
+      <CommandProvider>
+        <ThemeSwitcherHarness />
+      </CommandProvider>
+    )
+
+    await waitFor(() => {
+      expect(getThemeSection()).toBeDefined()
+    })
+
+    runAction('toggle-theme')
+    expect(themeMock.setTheme).toHaveBeenLastCalledWith('light')
   })
 
   it('keeps the Switch theme submenu page with System/Dark/Light commands only', async () => {
