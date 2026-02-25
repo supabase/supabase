@@ -289,7 +289,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   <ChartTitle>Auth API Errors</ChartTitle>
                 </ChartHeader>
                 <ChartContent
-                  className="p-0"
+                  className="!p-0"
                   isEmpty={responseErrors.length === 0}
                   emptyState={
                     <div className="p-6">
@@ -372,7 +372,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   <ChartActions actions={errorCodesActions} />
                 </ChartHeader>
                 <ChartContent
-                  className="p-0"
+                  className="!p-0"
                   isEmpty={errorCodes.length === 0}
                   emptyState={
                     <div className="p-6">

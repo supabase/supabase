@@ -1,7 +1,6 @@
-import { useFlag } from 'common'
-
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useStatusPageBannerVisibility } from './useStatusPageBannerVisibility'
 
 const BANNER_DESCRIPTION = (
   <>
@@ -13,18 +12,9 @@ const BANNER_DESCRIPTION = (
  * Used to display ongoing incidents
  */
 export const StatusPageBanner = () => {
-  const showIncidentBanner =
-    useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true'
+  const banner = useStatusPageBannerVisibility()
 
-  if (showIncidentBanner) {
-    return (
-      <HeaderBanner
-        variant="warning"
-        title="We are investigating a technical issue"
-        description={BANNER_DESCRIPTION}
-      />
-    )
-  }
+  if (!banner) return null
 
-  return null
+  return <HeaderBanner variant="warning" title={banner.title} description={BANNER_DESCRIPTION} />
 }
