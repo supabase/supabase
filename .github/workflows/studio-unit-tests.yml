@@ -11,9 +11,6 @@ on:
       - 'pnpm-lock.yaml'
   pull_request:
     branches: [master, studio]
-    paths:
-      - 'apps/studio/**'
-      - 'pnpm-lock.yaml'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -30,6 +27,8 @@ jobs:
     strategy:
       matrix:
         test_number: [1]
+    outputs:
+      tests_ran: ${{ steps.filter.outputs.relevant }}
 
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -37,25 +36,37 @@ jobs:
           sparse-checkout: |
             apps/studio
             packages
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            relevant:
+              - 'apps/studio/**'
+              - 'pnpm-lock.yaml'
       - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        if: steps.filter.outputs.relevant == 'true'
         name: Install pnpm
         with:
           run_install: false
       - name: Use Node.js
+        if: steps.filter.outputs.relevant == 'true'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
       - name: Install deps
+        if: steps.filter.outputs.relevant == 'true'
         run: pnpm install --frozen-lockfile
         working-directory: ./
       - name: Run Tests
+        if: steps.filter.outputs.relevant == 'true'
         env:
           # Default is 2 GB, increase to have less frequent OOM errors
           NODE_OPTIONS: '--max_old_space_size=3072'
         run: pnpm run test:ci
         working-directory: ./apps/studio
       - name: Upload coverage artifact
+        if: steps.filter.outputs.relevant == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: studio-coverage
@@ -64,7 +75,7 @@ jobs:
 
   coveralls:
     needs: test
-    if: ${{ always() && needs.test.result == 'success' }}
+    if: ${{ always() && needs.test.result == 'success' && needs.test.outputs.tests_ran == 'true' }}
     continue-on-error: true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
