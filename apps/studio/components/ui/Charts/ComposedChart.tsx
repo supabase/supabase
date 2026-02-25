@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Area,
   Bar,
@@ -338,6 +338,32 @@ export function ComposedChart({
   )
   const yDomain = [0, yMaxFromVisible]
 
+  // Recharts' ['auto', 'auto'] domain does not correctly include a Line component's values
+  // when stacked Bar components are present in a ComposedChart. This causes the Y-axis to scale
+  // only to the stacked bar max, clipping the reference line (e.g. Max IOPS) and any bars
+  // that exceed it. We explicitly compute the domain when a max reference line is visible.
+  const yAxisDomain = useMemo((): [number, number] | ['auto', 'auto'] => {
+    if (isPercentage && !showMaxValue) return [0, yMaxFromVisible]
+    if (!maxAttribute || !_showMaxValue) return ['auto', 'auto']
+
+    const maxRefValue = data.reduce((max, point) => {
+      const val = point[maxAttribute.attribute]
+      return typeof val === 'number' ? Math.max(max, val) : max
+    }, 0)
+
+    if (maxRefValue <= 0) return ['auto', 'auto']
+
+    const maxStackedTotal = data.reduce((max, point) => {
+      const total = visibleAttributes.reduce((sum, attr) => {
+        const val = point[attr.name]
+        return sum + (typeof val === 'number' ? val : 0)
+      }, 0)
+      return Math.max(max, total)
+    }, 0)
+
+    return [0, Math.max(maxRefValue, maxStackedTotal)]
+  }, [isPercentage, showMaxValue, yMaxFromVisible, maxAttribute, _showMaxValue, data, visibleAttributes])
+
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
@@ -435,7 +461,7 @@ export function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={isPercentage && !showMaxValue ? yDomain : ['auto', 'auto']}
+            domain={yAxisDomain}
             key={yAxisKey}
           />
           <XAxis
