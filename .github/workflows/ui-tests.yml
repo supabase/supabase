@@ -45,6 +45,12 @@ jobs:
         run: pnpm run test:ci
         working-directory: ./packages/ui
 
+  upload-coverage:
+    needs: test
+    if: ${{ always() && needs.test.result == 'success' }}
+    continue-on-error: true
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
       - name: Upload coverage results to Coveralls
         uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
         with:
@@ -53,10 +59,12 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./packages/ui/coverage/lcov.info
           base-path: './packages/ui'
+          fail-on-error: false
 
   finish:
-    needs: test
+    needs: [test, upload-coverage]
     if: ${{ always() }}
+    continue-on-error: true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Coveralls Finished
