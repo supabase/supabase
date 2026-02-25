@@ -36,7 +36,6 @@ ignoredBuiltDependencies:
   - esbuild
   - libpg-query
   - msw
-  - node-pty
   - protobufjs
   - sharp
 
@@ -62,6 +61,7 @@ minimumReleaseAgeExclude:
   - react-resizable-panels
 
 onlyBuiltDependencies:
+  - node-pty
   - supabase
 
 overrides:

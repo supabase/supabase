@@ -3,7 +3,7 @@ import { MediaBlock } from 'marketing'
 
 const page: GoPageInput = {
   template: 'lead-gen',
-  slug: 'bolt-webinar',
+  slug: 'vibe-coding-done-right-webinar',
   metadata: {
     title: 'Vibe Coding, Done Right: Learn More | Supabase + Bolt.new',
     description:
@@ -17,7 +17,7 @@ const page: GoPageInput = {
       'You saw how enterprise teams use Bolt and Supabase to build production apps with AI coding tools. Want to learn more, get hands-on, or talk to our team? Share your details below.',
     image: {
       src: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=partnerships&layout=icon-only&copy=%5B2.5x+faster%5D%0A%5BPostgres+parser%5D%0Awith+Claude+Code&icon=supabase.svg&icon2=bolt.svg',
-      alt: 'Ebook cover: Building Modern Applications with Supabase',
+      alt: 'Building Modern Applications with Supabase and Bolt',
       width: 400,
       height: 500,
     },
@@ -40,7 +40,7 @@ const page: GoPageInput = {
       title: 'Watch the recording',
       description:
         'Join Bolt CEO Eric Simons and learn how enterprise innovation teams are using AI coding tools to build real applications on Supabase.',
-      children: <MediaBlock youtubeUrl="https://www.youtube.com/watch?v=YR30uzwWoDM" />,
+      children: <MediaBlock youtubeUrl="https://www.youtube.com/watch?v=dIyl_7ZlI3Q" />,
     },
     {
       type: 'feature-grid',
@@ -81,6 +81,7 @@ const page: GoPageInput = {
     },
     {
       type: 'form',
+      id: 'form',
       title: 'Tell us how we can help',
       description: 'Share your details and we’ll follow up with resources or a conversation.',
       fields: [
@@ -123,7 +124,7 @@ const page: GoPageInput = {
         },
       ],
       submitLabel: 'Get in touch',
-      successRedirect: '/go/bolt-webinar/thank-you',
+      successRedirect: '/go/vibe-coding-done-right-webinar/thank-you',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
@@ -133,7 +134,7 @@ const page: GoPageInput = {
             first_name: 'firstname',
             last_name: 'lastname',
             email_address: 'email',
-            company_name: 'company',
+            company_name: 'name',
             message: 'what_are_you_currently_working_on_',
           },
           consent:
