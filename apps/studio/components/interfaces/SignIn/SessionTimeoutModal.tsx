@@ -1,3 +1,4 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
@@ -21,12 +22,15 @@ interface SessionTimeoutModalProps {
   visible: boolean
   onClose: () => void
   redirectToSignIn: () => void
+  /** Optional context so the support form can pre-populate when opened from this dialog */
+  supportContext?: { projectRef?: string; orgSlug?: string }
 }
 
 export const SessionTimeoutModal = ({
   visible,
   onClose,
   redirectToSignIn,
+  supportContext,
 }: SessionTimeoutModalProps) => {
   useEffect(() => {
     if (visible) {
@@ -70,7 +74,15 @@ export const SessionTimeoutModal = ({
                     Still stuck?{' '}
                     <SupportLink
                       className={InlineLinkClassName}
-                      queryParams={{ subject: 'Session expired' }}
+                      queryParams={{
+                        subject: 'Session expired',
+                        category: SupportCategories.LOGIN_ISSUES,
+                        ...(supportContext?.projectRef && {
+                          projectRef: supportContext.projectRef,
+                        }),
+                        ...(supportContext?.orgSlug && { orgSlug: supportContext.orgSlug }),
+                      }}
+                      onClick={onClose}
                     >
                       Contact support
                     </SupportLink>{' '}

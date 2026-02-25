@@ -124,12 +124,23 @@ export function withAuth<T>(
 
     const InnerComponent = WrappedComponent as any
 
+    const supportContext =
+      typeof router.query.ref === 'string' && router.pathname.startsWith('/project/')
+        ? {
+            projectRef: router.query.ref,
+            ...(typeof router.query.organizationSlug === 'string' && {
+              orgSlug: router.query.organizationSlug,
+            }),
+          }
+        : undefined
+
     return (
       <>
         <SessionTimeoutModal
           visible={isSessionTimeoutModalOpen}
           onClose={() => setIsSessionTimeoutModalOpen(false)}
           redirectToSignIn={redirectToSignIn}
+          supportContext={supportContext}
         />
         <InnerComponent {...props} />
       </>
