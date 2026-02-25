@@ -4,6 +4,7 @@ import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import { useCallback } from 'react'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { authKeys } from './keys'
 
 export type AuthConfigVariables = {
@@ -40,7 +41,7 @@ export const useAuthConfigQuery = <TData = ProjectAuthConfigData>(
   useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>({
     queryKey: authKeys.authConfig(projectRef),
     queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
-    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && projectRef !== '_',
     ...options,
   })
 
