@@ -5,11 +5,7 @@ import { CommandWrapper, MobileSheetNav } from 'ui-patterns'
 import { useMobileSidebarSheet } from './MobileSidebarSheetContext'
 
 const MobileSheetNavLayout = () => {
-  const {
-    content: mobileSheetContent,
-    setContent: setMobileSheetContent,
-    menuContent,
-  } = useMobileSidebarSheet()
+  const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSidebarSheet()
   const { activeSidebar } = useSidebarManagerSnapshot()
 
   return (
@@ -26,8 +22,6 @@ const MobileSheetNavLayout = () => {
         <CommandWrapper className="h-full flex flex-col bg-background">
           <CommandMenuInnerContent />
         </CommandWrapper>
-      ) : mobileSheetContent === 'menu' ? (
-        menuContent
       ) : (
         activeSidebar?.component?.() ?? null
       )}
