@@ -66,7 +66,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
       } else {
         await router.push({
           pathname: '/reset-password',
-          query: router.query,
+          query: { ...router.query, type: 'recovery' },
         })
       }
     }

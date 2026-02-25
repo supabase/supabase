@@ -20,35 +20,41 @@ import {
 
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
-// Convert the existing yup passwordSchema to Zod
+const passwordValidation = z
+  .string()
+  .min(1, 'Password is required')
+  .max(72, 'Password cannot exceed 72 characters')
+  .refine((password) => {
+    const hasUppercase = /[A-Z]/.test(password)
+    const hasLowercase = /[a-z]/.test(password)
+    const hasNumber = /[0-9]/.test(password)
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};`':"\\|,.<>\/?]/.test(password)
+    const isLongEnough = password.length >= 8
+
+    return hasUppercase && hasLowercase && hasNumber && hasSpecialChar && isLongEnough
+  }, 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character')
+
 const passwordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .max(72, 'Password cannot exceed 72 characters')
-    .refine((password) => {
-      // Basic password validation - you can enhance this based on your requirements
-      const hasUppercase = /[A-Z]/.test(password)
-      const hasLowercase = /[a-z]/.test(password)
-      const hasNumber = /[0-9]/.test(password)
-      const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};`':"\\|,.<>\/?]/.test(password)
-      const isLongEnough = password.length >= 8
+  password: passwordValidation,
+})
 
-      return hasUppercase && hasLowercase && hasNumber && hasSpecialChar && isLongEnough
-    }, 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character'),
+const recoveryPasswordSchema = z.object({
+  currentPassword: z.string().optional(),
+  password: passwordValidation,
 })
 
 type FormData = z.infer<typeof passwordSchema>
 
 const ResetPasswordForm = () => {
   const router = useRouter()
+  const isRecoveryFlow = router.query.type === 'recovery'
   const [showConditions, setShowConditions] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [currentPasswordHidden, setCurrentPasswordHidden] = useState(true)
 
   const form = useForm<FormData>({
-    resolver: zodResolver(passwordSchema),
+    resolver: zodResolver(isRecoveryFlow ? recoveryPasswordSchema : passwordSchema),
     defaultValues: {
       password: '',
       currentPassword: '',
@@ -60,7 +66,7 @@ const ResetPasswordForm = () => {
     const toastId = toast.loading('Saving password...')
     const { error } = await auth.updateUser({
       password: data.password,
-      currentPassword: data.currentPassword,
+      ...(isRecoveryFlow ? {} : { currentPassword: data.currentPassword }),
     })
 
     if (!error) {
@@ -78,35 +84,37 @@ const ResetPasswordForm = () => {
   return (
     <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
-        <FormField_Shadcn_
-          control={form.control}
-          name="currentPassword"
-          render={({ field }) => (
-            <FormItem_Shadcn_>
-              <FormControl_Shadcn_>
-                <div onBlur={() => setCurrentPasswordHidden(true)}>
-                  <Input
-                    id="currentPassword"
-                    type={currentPasswordHidden ? 'password' : 'text'}
-                    label="Current password"
-                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                    disabled={form.formState.isSubmitting}
-                    actions={
-                      <Button
-                        icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
-                        type="default"
-                        className="!mr-1"
-                        onClick={() => setCurrentPasswordHidden((prev) => !prev)}
-                      />
-                    }
-                    {...field}
-                  />
-                </div>
-              </FormControl_Shadcn_>
-              <FormMessage_Shadcn_ />
-            </FormItem_Shadcn_>
-          )}
-        />
+        {!isRecoveryFlow && (
+          <FormField_Shadcn_
+            control={form.control}
+            name="currentPassword"
+            render={({ field }) => (
+              <FormItem_Shadcn_>
+                <FormControl_Shadcn_>
+                  <div onBlur={() => setCurrentPasswordHidden(true)}>
+                    <Input
+                      id="currentPassword"
+                      type={currentPasswordHidden ? 'password' : 'text'}
+                      label="Current password"
+                      placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                      disabled={form.formState.isSubmitting}
+                      actions={
+                        <Button
+                          icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
+                          type="default"
+                          className="!mr-1"
+                          onClick={() => setCurrentPasswordHidden((prev) => !prev)}
+                        />
+                      }
+                      {...field}
+                    />
+                  </div>
+                </FormControl_Shadcn_>
+                <FormMessage_Shadcn_ />
+              </FormItem_Shadcn_>
+            )}
+          />
+        )}
         <FormField_Shadcn_
           control={form.control}
           name="password"
