@@ -183,6 +183,9 @@ const uiConfig = ui({
             p: {
               fontWeight: '400',
             },
+            strong: {
+              fontWeight: '500',
+            },
             pre: {
               background: 'none',
               padding: 0,
