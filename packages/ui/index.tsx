@@ -298,5 +298,6 @@ export * from './src/components/Icon/icons/IconYoutubeSolid'
 
 // Export hooks
 export * from './src/lib/Hooks'
+export * from './src/components/hooks/use-mobile'
 
 export * from './src/components/KeyboardShortcut/KeyboardShortcut'
