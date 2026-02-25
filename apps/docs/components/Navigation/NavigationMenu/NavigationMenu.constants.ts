@@ -2840,11 +2840,11 @@ export const self_hosting: NavMenuConstant = {
     {
       name: 'How-to Guides',
       items: [
-        { name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         { name: 'Restore from Platform', url: '/guides/self-hosting/restore-from-platform' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
-        { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
+        { name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' },
       ],
     },
     {
