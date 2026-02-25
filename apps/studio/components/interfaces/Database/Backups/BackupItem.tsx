@@ -88,8 +88,9 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
 
   return (
     <div
-      className={`flex h-12 items-center justify-between px-6 ${index ? 'border-t border-default' : ''
-        }`}
+      className={`flex h-12 items-center justify-between px-6 ${
+        index ? 'border-t border-default' : ''
+      }`}
     >
       <div className="flex items-center gap-x-2">
         <TimestampInfo
