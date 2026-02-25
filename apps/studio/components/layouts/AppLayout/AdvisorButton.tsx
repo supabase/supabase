@@ -7,33 +7,16 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn } from 'ui'
 
 import { useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
-import { useAdvisorStateSnapshot } from '@/state/advisor-state'
 
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
-  const { notificationFilterStatuses, notificationFilterPriorities } = useAdvisorStateSnapshot()
-
-  const notificationStatus = useMemo(() => {
-    if (notificationFilterStatuses.includes('archived')) {
-      return 'archived'
-    }
-    if (notificationFilterStatuses.includes('unread')) {
-      return 'new'
-    }
-    return undefined
-  }, [notificationFilterStatuses])
-
-  const notificationFilters = useMemo(
-    () => ({ priority: notificationFilterPriorities }),
-    [notificationFilterPriorities]
-  )
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const hasCriticalIssues = Array.isArray(lints) && lints.some((lint) => lint.level === 'ERROR')
 
   const { data: notificationsData } = useNotificationsV2Query({
-    status: notificationStatus,
-    filters: notificationFilters,
+    status: 'new',
+    filters: {},
     limit: 20,
   })
   const notifications = useMemo(() => {
