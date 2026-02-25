@@ -4,6 +4,7 @@ import { getOrganizations } from 'data/organizations/organizations-query'
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { getOrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { checkEntitlement } from 'data/entitlements/entitlements-query'
 
 export const getOrgAIDetails = async ({
   orgSlug,
@@ -19,12 +20,14 @@ export const getOrgAIDetails = async ({
     ...(authorization && { Authorization: authorization }),
   }
 
-  const [organizations, selectedProject, subscription, projectSettings] = await Promise.all([
-    getOrganizations({ headers }),
-    getProjectDetail({ ref: projectRef }, undefined, headers),
-    getOrgSubscription({ orgSlug }, undefined, headers),
-    getProjectSettings({ projectRef }, undefined, headers),
-  ])
+  const [organizations, selectedProject, subscription, projectSettings, advanceModelAccess] =
+    await Promise.all([
+      getOrganizations({ headers }),
+      getProjectDetail({ ref: projectRef }, undefined, headers),
+      getOrgSubscription({ orgSlug }, undefined, headers),
+      getProjectSettings({ projectRef }, undefined, headers),
+      checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
+    ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
 
@@ -34,12 +37,14 @@ export const getOrgAIDetails = async ({
   }
 
   const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
-  const isLimited = selectedOrg?.plan.id === 'free'
+  const isLimited = !advanceModelAccess.hasAccess
   const isHipaaEnabled = subscriptionHasHipaaAddon(subscription) && !!projectSettings?.is_sensitive
 
   return {
     aiOptInLevel,
     isLimited,
     isHipaaEnabled,
+    orgId: selectedOrg?.id,
+    planId: selectedOrg?.plan.id,
   }
 }
