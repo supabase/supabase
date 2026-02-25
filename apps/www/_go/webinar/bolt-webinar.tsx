@@ -81,6 +81,7 @@ const page: GoPageInput = {
     },
     {
       type: 'form',
+      id: 'form',
       title: 'Tell us how we can help',
       description: 'Share your details and we’ll follow up with resources or a conversation.',
       fields: [
@@ -133,7 +134,7 @@ const page: GoPageInput = {
             first_name: 'firstname',
             last_name: 'lastname',
             email_address: 'email',
-            company_name: 'company',
+            company_name: 'name',
             message: 'what_are_you_currently_working_on_',
           },
           consent:

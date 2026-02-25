@@ -36,4 +36,7 @@ export const projectKeys = {
     ['projects', projectRef, 'clone-backups'] as const,
   listCloneStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'clone-status'] as const,
+
+  // Banner-specific: first-page snapshot used by the status page banner hook
+  bannerProjectsByOrg: (slug: string) => ['banner', 'org-projects', slug] as const,
 }
