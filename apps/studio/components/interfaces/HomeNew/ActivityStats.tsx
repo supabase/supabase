@@ -11,6 +11,7 @@ import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
 import { ServiceStatus } from './ServiceStatus'
+import { EMPTY_ARR } from '@/lib/void'
 
 export const ActivityStats = () => {
   const { ref } = useParams()
@@ -36,7 +37,7 @@ export const ActivityStats = () => {
       )[0]
   }, [branchesData])
 
-  const { data: migrationsData = [], isPending: isLoadingMigrations } = useMigrationsQuery({
+  const { data: migrationsData = EMPTY_ARR, isPending: isLoadingMigrations } = useMigrationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
