@@ -69,4 +69,3 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov.info
           base-path: './packages/ui'
-          fail-on-error: false
