@@ -31,7 +31,20 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   }
 }
 
-export const ProjectDropdown = () => {
+interface ProjectDropdownProps {
+  /** When true, render only the project list (no link/trigger). For use inside sheet or popover. */
+  embedded?: boolean
+  /** Applied to the root when embedded. Use e.g. "bg-transparent" to inherit sheet background. */
+  className?: string
+  /** When embedded, called when selection should close the parent (e.g. sheet). */
+  onClose?: () => void
+}
+
+export const ProjectDropdown = ({
+  embedded = false,
+  className,
+  onClose,
+}: ProjectDropdownProps = {}) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
@@ -47,9 +60,87 @@ export const ProjectDropdown = () => {
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const [open, setOpen] = useState(false)
+  const close = embedded ? onClose ?? (() => {}) : () => setOpen(false)
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
-    return <ShimmeringLoader className="w-[90px]" />
+    if (!embedded) return <ShimmeringLoader className="w-[90px]" />
+  }
+
+  const selectorProps = {
+    open,
+    setOpen: embedded ? onClose ?? (() => {}) : setOpen,
+    selectedRef: ref,
+    onSelect: (project: { ref: string }) => {
+      const sanitizedRoute = sanitizeRoute(router.route, router.query)
+      const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+      close()
+      router.push(href)
+    },
+    renderRow: (project: { ref: string; name: string; status?: string }) => {
+      const sanitizedRoute = sanitizeRoute(router.route, router.query)
+      const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+      const isSelected = project.ref === ref
+      const isPaused = project.status === 'INACTIVE'
+
+      return (
+        <Link
+          href={href}
+          className="w-full flex items-center justify-between p-0.5 md:p-0 text-sm md:text-xs"
+        >
+          <span className={cn('truncate', isSelected ? 'md:max-w-60' : 'md:max-w-64')}>
+            {project.name}
+            {isPaused && <Badge className="ml-2">Paused</Badge>}
+          </span>
+          {isSelected && <Check size={16} />}
+        </Link>
+      )
+    },
+    renderActions: (_setOpen: (value: boolean) => void, options?: { embedded?: boolean }) =>
+      projectCreationEnabled ? (
+        options?.embedded ? (
+          <Button
+            type="default"
+            block
+            size="small"
+            asChild
+            icon={<Plus size={14} strokeWidth={1.5} />}
+          >
+            <Link
+              href={`/new/${selectedOrganization?.slug}`}
+              onClick={() => close()}
+              className="text-xs text-foreground-light hover:text-foreground"
+            >
+              New project
+            </Link>
+          </Button>
+        ) : (
+          <CommandGroup_Shadcn_>
+            <CommandItem_Shadcn_
+              className="cursor-pointer w-full"
+              onSelect={() => {
+                close()
+                router.push(`/new/${selectedOrganization?.slug}`)
+              }}
+              onClick={() => close()}
+            >
+              <Link
+                href={`/new/${selectedOrganization?.slug}`}
+                onClick={() => close()}
+                className="w-full flex items-center gap-2"
+              >
+                <Plus size={14} strokeWidth={1.5} />
+                <p>New project</p>
+              </Link>
+            </CommandItem_Shadcn_>
+          </CommandGroup_Shadcn_>
+        )
+      ) : null,
+  }
+
+  if (embedded) {
+    return (
+      <OrganizationProjectSelector {...selectorProps} embedded className={className} fetchOnMount />
+    )
   }
 
   return IS_PLATFORM ? (
@@ -60,22 +151,15 @@ export const ProjectDropdown = () => {
       >
         <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
         <span
-          title={selectedProject.name}
+          title={selectedProject?.name ?? ''}
           className="text-foreground max-w-32 lg:max-w-64 truncate"
         >
-          {selectedProject.name}
+          {selectedProject?.name ?? ''}
         </span>
       </Link>
 
       <OrganizationProjectSelector
-        open={open}
-        setOpen={setOpen}
-        selectedRef={ref}
-        onSelect={(project) => {
-          const sanitizedRoute = sanitizeRoute(router.route, router.query)
-          const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-          router.push(href)
-        }}
+        {...selectorProps}
         renderTrigger={() => (
           <Button
             type="text"
@@ -84,50 +168,6 @@ export const ProjectDropdown = () => {
             iconRight={<ChevronsUpDown strokeWidth={1.5} />}
           />
         )}
-        renderRow={(project) => {
-          // [Joshen] Temp while we're interim between v1 and v2 billing
-          const sanitizedRoute = sanitizeRoute(router.route, router.query)
-          const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-          const isSelected = project.ref === ref
-          const isPaused = project.status === 'INACTIVE'
-
-          return (
-            <Link href={href} className="w-full flex items-center justify-between">
-              <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
-                {project.name}
-                {isPaused && <Badge className="ml-2">Paused</Badge>}
-              </span>
-              {isSelected && <Check size={16} />}
-            </Link>
-          )
-        }}
-        renderActions={() => {
-          return (
-            projectCreationEnabled && (
-              <CommandGroup_Shadcn_>
-                <CommandItem_Shadcn_
-                  className="cursor-pointer w-full"
-                  onSelect={() => {
-                    setOpen(false)
-                    router.push(`/new/${selectedOrganization?.slug}`)
-                  }}
-                  onClick={() => setOpen(false)}
-                >
-                  <Link
-                    href={`/new/${selectedOrganization?.slug}`}
-                    onClick={() => {
-                      setOpen(false)
-                    }}
-                    className="w-full flex items-center gap-2"
-                  >
-                    <Plus size={14} strokeWidth={1.5} />
-                    <p>New project</p>
-                  </Link>
-                </CommandItem_Shadcn_>
-              </CommandGroup_Shadcn_>
-            )
-          )
-        }}
       />
     </>
   ) : (

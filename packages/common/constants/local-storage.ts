@@ -5,6 +5,8 @@ export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
+  /** Mobile: which floating navbar variant to show: 'icons' | 'breadcrumb' | 'menu' */
+  NAVBAR_VARIANT: 'supabase-navbar-variant',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
   PROJECTS_VIEW: 'projects-view',
   PROJECTS_FILTER: 'projects-filter',

@@ -16,7 +16,7 @@ export interface DatabaseLayoutProps {
   title?: string
 }
 
-const DatabaseProductMenu = () => {
+export const DatabaseProductMenu = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const router = useRouter()

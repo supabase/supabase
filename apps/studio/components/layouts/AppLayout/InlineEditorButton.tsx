@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -17,9 +17,11 @@ const InlineEditorKeyboardTooltip = () => {
 
 export const InlineEditorButton = () => {
   const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
+  const isMobile = useBreakpoint('md')
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
 
   const handleClick = () => {
+    if (isMobile && isOpen) return
     toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 

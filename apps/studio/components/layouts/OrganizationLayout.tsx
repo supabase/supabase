@@ -1,6 +1,8 @@
 import { ExternalLink } from 'lucide-react'
-import { type PropsWithChildren } from 'react'
+import { type PropsWithChildren, useLayoutEffect } from 'react'
 
+import { OrgMenuContent } from 'components/layouts/ProjectLayout/MobileMenuContent/OrgMenuContent'
+import { useMobileSidebarSheet } from 'components/layouts/ProjectLayout/LayoutSidebar/MobileSidebarSheetContext'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
@@ -59,6 +61,15 @@ const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
 }
 
 const OrganizationLayout = ({ children }: PropsWithChildren) => {
+  const { setContent: setMobileSheetContent, setMenuContent } = useMobileSidebarSheet()
+
+  useLayoutEffect(() => {
+    setMenuContent(
+      <OrgMenuContent onCloseSheet={() => setMobileSheetContent(null)} />
+    )
+    return () => setMenuContent(null)
+  }, [setMenuContent, setMobileSheetContent])
+
   return <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
 }
 

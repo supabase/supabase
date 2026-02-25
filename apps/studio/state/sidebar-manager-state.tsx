@@ -32,6 +32,8 @@ type SidebarManagerState = SidebarManagerData & {
   closeSidebar: (id: string) => void
   isSidebarOpen: (id: string) => boolean
   closeActive: () => void
+  /** Clear active sidebar without calling the panel's onClose (e.g. when switching sheet content to menu) */
+  clearActiveSidebar: () => void
 }
 
 const INITIAL_SIDEBAR_MANAGER_DATA: SidebarManagerData = {
@@ -143,6 +145,10 @@ const createSidebarManagerState = () => {
     closeActive() {
       if (!state.activeSidebar) return
       state.activeSidebar?.onClose?.()
+      state.activeSidebar = undefined
+    },
+
+    clearActiveSidebar() {
       state.activeSidebar = undefined
     },
   })

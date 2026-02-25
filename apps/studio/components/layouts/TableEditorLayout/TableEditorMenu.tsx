@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Filter, Plus } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
@@ -23,22 +20,25 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { Filter, Plus } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
+  InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-  InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
+
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import { EntityListItem } from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'

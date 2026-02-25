@@ -3,6 +3,7 @@ import { Command, FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -19,14 +20,20 @@ import { useSetCommandMenuOpen } from 'ui-patterns'
 
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
-export const LocalDropdown = () => {
+export const LocalDropdown = ({
+  triggerClassName,
+  contentClassName,
+}: {
+  triggerClassName?: string
+  contentClassName?: string
+}) => {
   const { theme, setTheme } = useTheme()
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="border flex-shrink-0 px-3" asChild>
+      <DropdownMenuTrigger className={cn('border flex-shrink-0 px-3', triggerClassName)} asChild>
         <Button
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
@@ -34,7 +41,7 @@ export const LocalDropdown = () => {
           <ProfileImage className="w-8 h-8 rounded-md" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-44">
+      <DropdownMenuContent side="bottom" align="end" className={cn('w-44', contentClassName)}>
         <DropdownMenuItem
           className="flex gap-2"
           onClick={() => toggleFeaturePreviewModal(true)}

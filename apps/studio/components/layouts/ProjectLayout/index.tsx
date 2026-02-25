@@ -1,8 +1,26 @@
 import { mergeRefs, useParams } from 'common'
+import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
+import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import { usePHFlag } from 'hooks/ui/useFlag'
+import { PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import {
+  forwardRef,
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  type PropsWithChildren,
+  type ReactNode,
+} from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   cn,
   LogoLoader,
@@ -12,13 +30,14 @@ import {
   useIsMobile,
   usePanelRef,
 } from 'ui'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useSetMainScrollContainer } from '../MainScrollContainerContext'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
+import { useMobileSidebarSheet } from './LayoutSidebar/MobileSidebarSheetContext'
 import { LoadingState } from './LoadingState'
+import { getSectionKeyFromPathname, MobileMenuContent } from './MobileMenuContent'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
 import { PausingState } from './PausingState'
@@ -28,17 +47,6 @@ import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
-import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { ResourceExhaustionWarningBanner } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
-import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { withAuth } from '@/hooks/misc/withAuth'
-import { usePHFlag } from '@/hooks/ui/useFlag'
-import { PROJECT_STATUS } from '@/lib/constants'
-import { useAppStateSnapshot } from '@/state/app-state'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -96,7 +104,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const router = useRouter()
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
-    const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
+    const { showSidebar } = useAppStateSnapshot()
+    const { setContent: setMobileSheetContent, setMenuContent } = useMobileSidebarSheet()
+
+    const pathname = router.asPath?.split('?')[0] ?? router.pathname
+    const currentSectionKey = getSectionKeyFromPathname(pathname)
 
     const setMainScrollContainer = useSetMainScrollContainer()
     const combinedRef = mergeRefs(ref, setMainScrollContainer)
@@ -123,6 +135,18 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
     const showPausedState = isPaused && !ignorePausedState
+
+    useLayoutEffect(() => {
+      setMenuContent(
+        <MobileMenuContent
+          currentProductMenu={productMenu ?? null}
+          currentProduct={product}
+          currentSectionKey={currentSectionKey}
+          onCloseSheet={() => setMobileSheetContent(null)}
+        />
+      )
+      return () => setMenuContent(null)
+    }, [productMenu, product, currentSectionKey, setMenuContent, setMobileSheetContent])
 
     return (
       <>
@@ -205,9 +229,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         </div>
         <CreateBranchModal />
         <ProjectAPIDocs />
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          {productMenu}
-        </MobileSheetNav>
       </>
     )
   }

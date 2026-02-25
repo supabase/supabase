@@ -1,3 +1,4 @@
+import { useBreakpoint } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
@@ -10,6 +11,7 @@ import { useNotificationsV2Query } from '@/data/notifications/notifications-v2-q
 
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const isMobile = useBreakpoint('md')
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const hasCriticalIssues = Array.isArray(lints) && lints.some((lint) => lint.level === 'ERROR')
@@ -27,6 +29,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
 
   const handleClick = () => {
+    if (isMobile && isOpen) return
     toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
   }
 

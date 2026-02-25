@@ -6,7 +6,7 @@ import { ProductMenu } from 'components/ui/ProductMenu'
 import { withAuth } from 'hooks/misc/withAuth'
 import { ProjectLayout } from '../ProjectLayout'
 
-const EdgeFunctionsProductMenu = () => {
+export const EdgeFunctionsProductMenu = () => {
   const { ref: projectRef = 'default' } = useParams()
   const router = useRouter()
   const page = router.pathname.split('/')[4]

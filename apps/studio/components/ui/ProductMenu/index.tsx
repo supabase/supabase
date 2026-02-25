@@ -10,12 +10,12 @@ interface ProductMenuProps {
 
 export const ProductMenu = ({ page, menu }: ProductMenuProps) => {
   return (
-    <div className="flex flex-col space-y-8">
+    <div className="flex flex-col space-y-4">
       <Menu type="pills">
         {menu.map((group, idx) => (
           <div key={group.key || group.title}>
-            <div className="my-6 space-y-8">
-              <div className="mx-3">
+            <div className="my-4 space-y-4">
+              <div className="md:mx-3">
                 <Menu.Group
                   title={
                     group.title ? (
@@ -44,7 +44,9 @@ export const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                 </div>
               </div>
             </div>
-            {idx !== menu.length - 1 && <div className="h-px w-full bg-border-overlay" />}
+            {idx !== menu.length - 1 && (
+              <div className="h-px w-[calc(100%-1.5rem)] mx-auto md:w-full bg-border-overlay" />
+            )}
           </div>
         ))}
       </Menu>

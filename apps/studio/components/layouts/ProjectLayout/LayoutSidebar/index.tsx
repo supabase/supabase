@@ -1,5 +1,9 @@
+import { useBreakpoint } from 'common'
+import { useEffect } from 'react'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { ResizableHandle, ResizablePanel, cn } from 'ui'
+import { cn, ResizableHandle, ResizablePanel } from 'ui'
+
+import { useMobileSidebarSheet } from './MobileSidebarSheetContext'
 
 // Having these params as props as otherwise it's quite hard to visually check the sizes in DefaultLayout
 // as react resizeable panels requires all these values to be valid to render correctly
@@ -15,6 +19,21 @@ export const LayoutSidebar = ({
   defaultSize = '30',
 }: LayoutSidebarProps) => {
   const { activeSidebar } = useSidebarManagerSnapshot()
+  const isMobile = useBreakpoint('md')
+  const { setOpen: setMobileSheetOpen } = useMobileSidebarSheet()
+
+  // On mobile the sheet is rendered in MobileNavigationBar; we only sync open state when sidebar is toggled
+  useEffect(() => {
+    if (isMobile) {
+      if (activeSidebar?.component) {
+        setMobileSheetOpen(true)
+      } else {
+        // setMobileSheetOpen(false)
+      }
+    }
+  }, [isMobile, activeSidebar, setMobileSheetOpen])
+
+  if (isMobile) return null
 
   if (!activeSidebar?.component) return null
 

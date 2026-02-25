@@ -92,7 +92,7 @@ function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () => void }
   )
 }
 
-function PageSwitch({ children }: PropsWithChildren) {
+export function PageSwitch({ children }: PropsWithChildren) {
   const PageComponent = usePageComponent()
 
   return PageComponent ? <PageComponent /> : <CommandWrapper>{children}</CommandWrapper>

@@ -53,7 +53,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             setStage('select')
           }}
           type="text"
-          className="rounded-full h-[32px] text-foreground-light hover:text-foreground"
+          className="hidden md:flex rounded-full h-[32px] text-foreground-light hover:text-foreground"
         >
           <span className={className}>Feedback</span>
         </Button>

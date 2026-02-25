@@ -1,12 +1,12 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
+
 import { ProjectLayout } from '../ProjectLayout'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
@@ -14,7 +14,7 @@ interface SettingsLayoutProps {
   title?: string
 }
 
-const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
+export const SettingsProductMenu = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -57,12 +57,16 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     billing: billingAll,
   })
 
+  return <ProductMenu page={page} menu={menuRoutes} />
+}
+
+const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   return (
     <ProjectLayout
       isBlocking={false}
       title={title || 'Settings'}
       product="Settings"
-      productMenu={<ProductMenu page={page} menu={menuRoutes} />}
+      productMenu={<SettingsProductMenu />}
     >
       {children}
     </ProjectLayout>

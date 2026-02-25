@@ -9,7 +9,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { ProjectLayout } from '../ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
 
-const AuthProductMenu = () => {
+export const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
 

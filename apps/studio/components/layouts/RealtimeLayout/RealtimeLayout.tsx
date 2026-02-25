@@ -11,18 +11,16 @@ export interface RealtimeLayoutProps {
   title: string
 }
 
-const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
+export const RealtimeProductMenu = () => {
   const { data: project } = useSelectedProjectQuery()
-
   const router = useRouter()
   const page = router.pathname.split('/')[4]
+  return <ProductMenu page={page} menu={generateRealtimeMenu(project!)} />
+}
 
+const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   return (
-    <ProjectLayout
-      title={title}
-      product="Realtime"
-      productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project!)} />}
-    >
+    <ProjectLayout title={title} product="Realtime" productMenu={<RealtimeProductMenu />}>
       {children}
     </ProjectLayout>
   )
