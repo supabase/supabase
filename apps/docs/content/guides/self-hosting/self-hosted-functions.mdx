@@ -202,7 +202,7 @@ docker compose logs functions
 
 Common causes: syntax errors in your function code, invalid imports, or missing dependencies.
 
-### 401 "Invalid JWT"
+### 401 "invalid JWT"
 
 - Check that `FUNCTIONS_VERIFY_JWT` matches your intent (`true` or `false`) in `.env`
 - If verification is enabled, ensure you're passing a valid token: `Authorization: Bearer <anon_key or service_role_key>`
