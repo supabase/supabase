@@ -1,4 +1,4 @@
-import { numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { compactNumberFormatter, numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
@@ -150,7 +150,7 @@ export const getReportAttributesV2: (
       showMaxValue: true,
       YAxisProps: {
         width: 55,
-        tickFormatter: (value: any) => numberFormatter(value, 0),
+        tickFormatter: (value: any) => compactNumberFormatter(value),
       },
       defaultChartStyle: 'bar',
       attributes: [

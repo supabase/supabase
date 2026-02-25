@@ -59,6 +59,21 @@ export const precisionFormatter = (num: number, precision: number): string => {
 }
 
 /**
+ * Formats a number compactly for Y-axis ticks by abbreviating large values.
+ * Prevents long numbers like 1,000,000 from overflowing the Y-axis width.
+ *
+ * @example
+ * compactNumberFormatter(999)        // "999"
+ * compactNumberFormatter(1000)       // "1K"
+ * compactNumberFormatter(1500)       // "1.5K"
+ * compactNumberFormatter(1000000)    // "1M"
+ * compactNumberFormatter(2500000)    // "2.5M"
+ */
+export const compactNumberFormatter = (num: number): string => {
+  return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(num)
+}
+
+/**
  * Formats a percentage, trimming decimals at 100.
  *
  * @example
