@@ -349,7 +349,15 @@ export function ComposedChart({
         data,
         visibleAttributeNames: visibleAttributes.map((a) => a.name),
       }),
-    [isPercentage, showMaxValue, yMaxFromVisible, maxAttribute, _showMaxValue, data, visibleAttributes]
+    [
+      isPercentage,
+      showMaxValue,
+      yMaxFromVisible,
+      maxAttribute,
+      _showMaxValue,
+      data,
+      visibleAttributes,
+    ]
   )
 
   if (data.length === 0) {
