@@ -7,7 +7,6 @@ import {
 } from 'data/notifications/notifications-v2-query'
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
 import dayjs from 'dayjs'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
@@ -66,7 +65,6 @@ export const AdvisorPanel = () => {
     resetNotificationFilters,
   } = useAdvisorStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
   const isSidebarOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
