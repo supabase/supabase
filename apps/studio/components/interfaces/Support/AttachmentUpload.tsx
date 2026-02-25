@@ -4,7 +4,8 @@ import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachm
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { compact } from 'lodash'
-import { File, Plus, X } from 'lucide-react'
+import { File, FileCode, Plus, X } from 'lucide-react'
+import { InlineLink } from 'components/ui/InlineLink'
 import {
   useCallback,
   useEffect,
@@ -165,10 +166,12 @@ export function AttachmentUploadDisplay({
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col gap-y-1">
-        <p className="text-sm text-foreground-light">Attachments</p>
+        <p className="text-sm text-foreground">Attachments</p>
         <p className="text-sm text-foreground-lighter">
-          Upload up to {MAX_ATTACHMENTS} images or HAR files that might be relevant to the issue
-          that you're facing
+          Optionally upload up to {MAX_ATTACHMENTS} relevant images or{' '}
+          <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
+            HAR files
+          </InlineLink>
         </p>
       </div>
       <input
@@ -189,9 +192,11 @@ export function AttachmentUploadDisplay({
               >
                 <Tooltip>
                   <TooltipTrigger className="cursor-default" onClick={(e) => e.preventDefault()}>
-                    <div className="flex flex-col items-center justify-center gap-y-0.5">
-                      <File className="text-foreground-light" size={16} />
-                      <p className="text-xs font-mono">HAR</p>
+                    <div className="flex flex-col items-center justify-center gap-y-1">
+                      <FileCode className="text-foreground-light" size={16} />
+                      <p className="text-[10px] font-mono text-foreground-light tracking-wide leading-none">
+                        HAR
+                      </p>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">{url}</TooltipContent>
@@ -206,7 +211,7 @@ export function AttachmentUploadDisplay({
                   )}
                   onClick={() => removeFileUpload(idx)}
                 >
-                  <X aria-hidden="true" size={12} strokeWidth={2} />
+                  <X aria-hidden="true" size={10} strokeWidth={3} className="text-contrast" />
                 </button>
               </div>
             )
@@ -226,7 +231,7 @@ export function AttachmentUploadDisplay({
                   )}
                   onClick={() => removeFileUpload(idx)}
                 >
-                  <X aria-hidden="true" size={12} strokeWidth={2} />
+                  <X aria-hidden="true" size={10} strokeWidth={3} className="text-contrast" />
                 </button>
               </div>
             )
