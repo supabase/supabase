@@ -45,7 +45,7 @@
     "@heroicons/react": "^2.1.3",
     "@hookform/resolvers": "^3.1.1",
     "@mjackson/multipart-parser": "^0.10.1",
-    "@modelcontextprotocol/sdk": "^1.25.2",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "@monaco-editor/react": "^4.6.0",
     "@next/bundle-analyzer": "^16.0.3",
     "@number-flow/react": "^0.3.2",
