@@ -6,6 +6,7 @@ import {
   Area,
   Bar,
   CartesianGrid,
+  Customized,
   Label,
   Line,
   ComposedChart as RechartComposedChart,
@@ -14,11 +15,10 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Customized,
 } from 'recharts'
-
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
+
 import { ChartHeader } from './ChartHeader'
 import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
@@ -31,10 +31,10 @@ import {
 import { CommonChartProps, Datum } from './Charts.types'
 import { formatPercentage, numberFormatter, useChartSize } from './Charts.utils'
 import {
+  calculateTotalChartAggregate,
   CustomLabel,
   CustomTooltip,
   MultiAttribute,
-  calculateTotalChartAggregate,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
@@ -362,7 +362,15 @@ export function ComposedChart({
     }, 0)
 
     return [0, Math.max(maxRefValue, maxStackedTotal)]
-  }, [isPercentage, showMaxValue, yMaxFromVisible, maxAttribute, _showMaxValue, data, visibleAttributes])
+  }, [
+    isPercentage,
+    showMaxValue,
+    yMaxFromVisible,
+    maxAttribute,
+    _showMaxValue,
+    data,
+    visibleAttributes,
+  ])
 
   if (data.length === 0) {
     return (
