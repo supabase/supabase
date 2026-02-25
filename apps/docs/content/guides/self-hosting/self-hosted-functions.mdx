@@ -68,7 +68,7 @@ For multiple variables or secrets, create a separate env file, e.g., `.env.funct
 MY_CUSTOM_VAR=some-value
 ```
 
-Add `env_file` to the `functions` service in `docker-compose.yml`:
+Add `env_file` to the `functions` service in `docker-compose.yml` (variables in `env_file` load first, then `environment` values take precedence):
 
 ```yaml
 functions:
@@ -79,12 +79,6 @@ functions:
     SUPABASE_URL: http://kong:8000
 ```
 
-<Admonition type="note">
-
-Variables in `env_file` load first, then `environment:` values take precedence. This means your custom variables from `.env.functions` are available, but you cannot override built-in variables like `SUPABASE_URL` from the env file.
-
-</Admonition>
-
 <Admonition type="caution">
 
 Don't commit `.env.functions` to version control if it contains secrets. Add it to your `.gitignore`.
@@ -94,12 +88,12 @@ Don't commit `.env.functions` to version control if it contains secrets. Add it 
 Restart the functions service:
 
 ```bash
-docker compose restart functions --no-deps
+docker compose up -d --force-recreate --no-deps functions
 ```
 
 ### Using inline environment variables
 
-For one or two variables, you can add them directly under `environment:` in `docker-compose.yml`:
+For one or two variables, you can add them directly under `environment` in `docker-compose.yml`:
 
 ```yaml
 functions:
@@ -123,14 +117,16 @@ const customVar = Deno.env.get('MY_CUSTOM_VAR')
 
 ## Calling Supabase services from functions
 
-The functions service comes with these pre-configured environment variables:
+The functions service is pre-configured with the following environment variables:
 
 | Variable | Value | Purpose |
 | --- | --- | --- |
 | `SUPABASE_URL` | `http://kong:8000` | Internal API gateway URL |
-| `SUPABASE_ANON_KEY` | Your anon key | Public API key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Your service role key | Admin API key (bypasses RLS) |
-| `SUPABASE_DB_URL` | PostgreSQL connection string | Direct database access |
+| `SUPABASE_PUBLIC_URL` | `http://<your-domain>:8000` | Base URL for accessing Supabase from the Internet |
+| `JWT_SECRET` | Your secret key | Legacy symmetric encryption key used to sign and verify JWTs |
+| `SUPABASE_ANON_KEY` | Your anon key | Client-side API key with limited permissions (`anon` role). |
+| `SUPABASE_SERVICE_ROLE_KEY` | Your service role key | Server-side API key with full database access (`service_role` role) |
+| `SUPABASE_DB_URL` | PostgreSQL connection string | Can be used for direct database access |
 
 Here's an example function that queries a table using `@supabase/supabase-js`:
 
@@ -155,23 +151,44 @@ Deno.serve(async () => {
 
 This is a key distinction that affects how you build URLs in your functions:
 
-- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls _from_ your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
+- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
 
-- **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance (e.g., `<your-domain>:8000`). If your function needs to build URLs that clients or browsers can reach — callback URLs, redirect URLs, webhook URLs, or links in emails — you need to add it yourself.
+- **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance (e.g., `<your-domain>:8000`). Use it if your function needs to build URLs that HTTP clients can reach from the outside.
 
 ## Managing functions in Studio
 
-The Studio dashboard mounts the same `volumes/functions` directory as the functions service. Edge Functions appear in the Studio sidebar, and edits made through Studio are written to disk.
+Self-hosted Studio [mounts](https://github.com/supabase/supabase/blob/df8729a82b1847e2989c14ede27965612761d503/docker/docker-compose.yml#L66) the same `volumes/functions` directory as the functions service. You can check what functions are available using **Edge Functions** > **Functions** in Dashboard.
 
-After editing a function through Studio (or directly on disk), restart the functions service to apply changes:
+## Deploying functions to a remote server
+
+To deploy a function to a remote self-hosted server, copy the function directory with `scp`:
 
 ```bash
-docker compose restart functions --no-deps
+scp -r ./my-function user@<your-domain>:/path/to/self-hosted/volumes/functions/
 ```
+
+Then restart the functions service on the remote host:
+
+```bash
+ssh user@<your-domain> 'cd /path/to/self-hosted && docker compose restart functions --no-deps'
+```
+
+## Migrating functions from platform
+
+If you have existing functions on Supabase platform, you can download them and run them on your self-hosted instance. There are two ways to get the function source code:
+
+1. **Dashboard** - open the function details in Dashboard and click **Download**.
+2. **Local development & CLI** - run `supabase functions download <function-name> --project-ref <ref>` to download the source.
+3. Use `scp` to copy the extracted or downloaded function directory into `volumes/functions/<function-name>/` on your self-hosted instance, then restart the functions service.
+
+For more details, see:
+
+- [Quick start - Download edge functions](/docs/guides/functions/quickstart-dashboard#download-edge-functions)
+- [CLI commands - Download a function](/docs/reference/cli/supabase-functions-download)
 
 ## Troubleshooting
 
-### 400 "missing function name"
+### 400 "missing function name in request"
 
 The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello` — not just `/functions/v1/`.
 
@@ -190,7 +207,7 @@ Common causes: syntax errors in your function code, invalid imports, or missing 
 - Check that `FUNCTIONS_VERIFY_JWT` matches your intent (`true` or `false`) in `.env`
 - If verification is enabled, ensure you're passing a valid token: `Authorization: Bearer <anon_key or service_role_key>`
 
-### Changes not reflected after editing a function
+### Changes to function code not reflected after editing
 
 Restart the functions service:
 
@@ -201,8 +218,14 @@ docker compose restart functions --no-deps
 ### Custom env vars not available in functions
 
 - Verify the variable is defined in `docker-compose.yml` (under `env_file` or `environment`)
-- Restart the functions service after changing configuration
+- Recreate the functions container after changing configuration
 - Check that the variable name matches exactly (case-sensitive)
+
+Use the following command to recreate the container, not just `restart`:
+
+```bash
+docker compose up -d --force-recreate --no-deps functions
+```
 
 ### Memory or timeout errors
 
