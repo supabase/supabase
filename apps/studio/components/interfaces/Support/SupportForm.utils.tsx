@@ -37,11 +37,12 @@ export const formatMessage = ({
   const [harFiles, images] = partition(attachments, (x) => x.split('?token')[0].endsWith('.har'))
   const errorString = error != null ? `\n\nError: ${error}` : ''
 
-  const imagesString = images.length > 0 ? `\n\nImage Attachments:\n${images.join('\n\n')}` : ''
+  const imagesString =
+    images.length > 0 ? `\n\nImage Attachments:\n${images.join('\n\n')}` : undefined
   const harFilesString =
     harFiles.length > 0 ? `\n\nHAR Files:\n${harFiles.join('\n\n')}` : undefined
 
-  return `${message}${errorString}${images.length > 0 ? `\n\n${imagesString}` : ''}${harFiles.length > 0 ? `\n\n${harFilesString}` : ''}`
+  return `${message}${errorString}${imagesString}${harFilesString}`
 }
 
 export const formatStudioVersion = (commit: { commitSha: string; commitTime: string }): string => {
