@@ -55,41 +55,28 @@ curl -X POST http://<your-domain>:8000/functions/v1/my-function \
 You should be able to see the response from `my-function`:
 
 ```
-World
+{"message":"Hello, World!"}
 ```
 
 ## Custom environment variables
 
 ### Using an env file (recommended)
 
-For multiple variables or secrets, create a separate env file:
-
-1. Create a file called `.env.functions` in your `docker/` directory:
+For multiple variables or secrets, create a separate env file, e.g., `.env.functions` in your `docker/` directory:
 
 ```bash
-STRIPE_API_KEY=sk_test_...
-RESEND_API_KEY=re_...
 MY_CUSTOM_VAR=some-value
 ```
 
-2. Add `env_file` to the `functions` service in `docker-compose.yml`:
+Add `env_file` to the `functions` service in `docker-compose.yml`:
 
 ```yaml
 functions:
-  container_name: supabase-edge-functions
-  image: supabase/edge-runtime:v1.70.3
   env_file:
     - .env.functions
   environment:
     JWT_SECRET: ${JWT_SECRET}
     SUPABASE_URL: http://kong:8000
-    # ... rest of existing environment variables
-```
-
-3. Restart the functions service:
-
-```bash
-docker compose restart functions --no-deps
 ```
 
 <Admonition type="note">
@@ -104,6 +91,12 @@ Don't commit `.env.functions` to version control if it contains secrets. Add it 
 
 </Admonition>
 
+Restart the functions service:
+
+```bash
+docker compose restart functions --no-deps
+```
+
 ### Using inline environment variables
 
 For one or two variables, you can add them directly under `environment:` in `docker-compose.yml`:
@@ -111,50 +104,22 @@ For one or two variables, you can add them directly under `environment:` in `doc
 ```yaml
 functions:
   environment:
+    # Custom variables
+    MY_CUSTOM_VAR: ${MY_CUSTOM_VAR}
+    # Required variables
     JWT_SECRET: ${JWT_SECRET}
     SUPABASE_URL: http://kong:8000
-    SUPABASE_ANON_KEY: ${ANON_KEY}
-    SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
-    SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-    VERIFY_JWT: "${FUNCTIONS_VERIFY_JWT}"
-    # Custom variables
-    STRIPE_API_KEY: ${STRIPE_API_KEY}
 ```
 
-Then define `STRIPE_API_KEY` in your main `.env` file, or hardcode the value directly.
+Then define `MY_CUSTOM_VAR` in your main `.env` file, or specify the value directly.
 
 ### Accessing variables in functions
 
 All container environment variables are forwarded to function workers by `main/index.ts`. Access them with:
 
 ```typescript
-const stripeKey = Deno.env.get('STRIPE_API_KEY')
+const customVar = Deno.env.get('MY_CUSTOM_VAR')
 ```
-
-<Admonition type="tip">
-
-A common addition is `SUPABASE_PUBLIC_URL` for building externally-reachable URLs. See [Internal vs external URLs](#internal-vs-external-urls) for details.
-
-</Admonition>
-
-## JWT verification
-
-JWT verification is controlled by the `FUNCTIONS_VERIFY_JWT` variable in your `.env` file. This applies globally to all functions.
-
-When enabled (`FUNCTIONS_VERIFY_JWT=true`):
-
-- Every request must include an `Authorization: Bearer <token>` header
-- The token is verified against your `JWT_SECRET`
-- `OPTIONS` requests are excluded (to allow CORS preflight)
-- Invalid or missing tokens return a `401` response
-
-Per-function JWT control is not yet supported at the configuration level. If you need different behavior per function, handle token verification in your function code.
-
-<Admonition type="tip">
-
-Keep JWT verification off during development for easier testing. Enable it for production deployments.
-
-</Admonition>
 
 ## Calling Supabase services from functions
 
@@ -190,37 +155,9 @@ Deno.serve(async () => {
 
 This is a key distinction that affects how you build URLs in your functions:
 
-- **`SUPABASE_URL` (`http://kong:8000`)** is the internal Docker network address. Use it for server-side calls _from_ your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
+- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls _from_ your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
 
-- **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance (e.g., `https://supabase.example.com`). It is **not** passed to the functions container by default. If your function needs to build URLs that clients or browsers can reach — callback URLs, redirect URLs, webhook URLs, or links in emails — you need to add it yourself.
-
-To make `SUPABASE_PUBLIC_URL` available, add it to the `functions` service in `docker-compose.yml`:
-
-```yaml
-functions:
-  environment:
-    # ... existing variables ...
-    SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
-```
-
-Then define it in your `.env` file:
-
-```bash
-SUPABASE_PUBLIC_URL=https://supabase.example.com
-```
-
-Example usage in a function:
-
-```typescript
-const publicUrl = Deno.env.get('SUPABASE_PUBLIC_URL')
-const callbackUrl = `${publicUrl}/functions/v1/my-webhook`
-```
-
-<Admonition type="caution">
-
-Never use `SUPABASE_URL` in URLs returned to clients. `http://kong:8000` is unreachable from outside the Docker network.
-
-</Admonition>
+- **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance (e.g., `<your-domain>:8000`). If your function needs to build URLs that clients or browsers can reach — callback URLs, redirect URLs, webhook URLs, or links in emails — you need to add it yourself.
 
 ## Managing functions in Studio
 
