@@ -8,7 +8,6 @@ import {
 } from '..'
 import { Monitor, MonitorDot, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useRef } from 'react'
 import { themes } from 'ui/src/components/ThemeProvider/themes'
 
 const THEME_SWITCHER_PAGE_NAME = 'Switch theme'
@@ -17,9 +16,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: CommandOptions } = {}
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
 
-  const { resolvedTheme, setTheme } = useTheme()
-  const resolvedThemeRef = useRef(resolvedTheme)
-  resolvedThemeRef.current = resolvedTheme
+  const { theme, setTheme } = useTheme()
 
   const applyTheme = (theme: string) => {
     setTheme(theme)
@@ -59,7 +56,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: CommandOptions } = {}
         name: 'Toggle theme',
         value:
           'Toggle theme, Toggle dark mode, Toggle light mode, Theme toggle, Dark mode, Light mode',
-        action: () => applyTheme(resolvedThemeRef.current === 'dark' ? 'light' : 'dark'),
+        action: () => applyTheme(theme === 'dark' ? 'light' : 'dark'),
         defaultHidden: true,
         icon: () => <MonitorDot />,
       },
@@ -97,7 +94,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: CommandOptions } = {}
         icon: () => <MonitorDot />,
       },
     ],
-    options
+    { ...options, deps: [theme] }
   )
 }
 
