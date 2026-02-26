@@ -2875,7 +2875,7 @@ The MCP Server simplifies the integration of AI tools with Supabase, enabling a 
 2. Standardized tool ecosystem: MCP standardizes how tools interact with Supabase, enabling a plug-and-play experience for AI-powered workflows.
 3. Streamlined workflows: Build faster by offloading repetitive tasks like schema design and configuration management to your AI assistant.
 4. Extensive toolset: Access over 20 tools for database design, data querying, and project management.
-5. Evolving capabilities: MCP continues to evolve, with upcoming support for native OAuth authentication, Edge Function deployment, and advanced schema discovery.
+5. Evolving capabilities: MCP continues to evolve, with support for native OAuth authentication, Edge Function deployment, and advanced schema discovery.
 
 The MCP Server empowers developers to build AI-native applications, accelerating productivity and reducing the complexity of working across multiple tools.
 
@@ -2910,11 +2910,11 @@ MCP is a standard that defines how AI tools and platforms communicate. It enable
 
 ### Do I need a personal access token (PAT) to use the MCP Server?
 
-Yes, you'll need to create a PAT in your Supabase settings to authenticate the MCP Server. Future versions of MCP will support OAuth login flows for simpler authentication.
+No, a PAT is no longer required. The MCP Server now uses OAuth by default via dynamic client registration, so your AI tool authenticates through a browser-based flow. A PAT is only needed for CI/CD or non-interactive scenarios.
 
 ### Can I use the MCP Server with self-hosted Supabase instances?
 
-No, the official Supabase MCP Server connects directly to Supabase Cloud. For local instances, you can use the Postgres MCP Server instead.
+Yes, self-hosted Supabase instances are supported. Follow the [self-hosted MCP guide](/docs/guides/self-hosting/enable-mcp) to configure secure access via SSH tunnel or VPN.
 
 ### Which AI tools are compatible with the MCP Server?
 
