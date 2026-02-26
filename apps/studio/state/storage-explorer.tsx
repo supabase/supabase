@@ -62,7 +62,8 @@ type UploadProgress = {
 
 const LIMIT = 200
 const OFFSET = 0
-const BATCH_SIZE = 2
+const DEFAULT_RETRY_SECONDS = 5
+const RATE_LIMIT_RETRY_SECONDS = 60
 
 const DEFAULT_PREFERENCES = {
   view: STORAGE_VIEWS.COLUMNS,
@@ -660,10 +661,10 @@ function createStorageExplorerState({
         const files = await state.getAllItemsAlongFolder(folder)
 
         let progress = 0
-        let hasErrors = false
+        let failedFiles = 0
+        let retrySeconds = DEFAULT_RETRY_SECONDS
 
-        // Make this batched promises into a reusable function for storage, i think this will be super helpful
-        const promises = files.map((file) => {
+        for (const file of files) {
           const fromPath = `${file.prefix}/${file.name}`
           const pathSegments = fromPath.split('/')
           const toPath = pathSegments
@@ -671,50 +672,86 @@ function createStorageExplorerState({
             .concat(newName)
             .concat(pathSegments.slice(columnIndex + 1))
             .join('/')
-          return () => {
-            return new Promise<void>(async (resolve) => {
-              progress = progress + 1 / files.length
-              try {
-                await moveStorageObject({
-                  projectRef: state.projectRef,
-                  bucketId: state.selectedBucket.id,
-                  from: fromPath,
-                  to: toPath,
+
+          let success = false
+          let isRateLimited = false
+
+          for (let attempt = 0; attempt < 3 && !success; attempt++) {
+            try {
+              if (attempt > 0) {
+                await new Promise<void>((resolve) => {
+                  let seconds = retrySeconds
+                  const interval = setInterval(() => {
+                    toast(
+                      <SonnerProgress
+                        progress={Math.min(progress * 100, 100)}
+                        message={`Renaming folder to ${newName}`}
+                        description={`${isRateLimited ? 'API rate limited' : 'Error moving file'} - retrying in ${seconds} seconds (${attempt}/3)`}
+                      />,
+                      { id: toastId, closeButton: false, position: 'top-right', duration: Infinity }
+                    )
+
+                    seconds--
+                    if (seconds <= 0) {
+                      clearInterval(interval)
+                      resolve()
+                    }
+                  }, 1000)
                 })
-              } catch (error) {
-                hasErrors = true
-                toast.error(`Failed to move ${fromPath} to the new folder`)
               }
-              resolve()
-            })
+
+              await moveStorageObject({
+                projectRef: state.projectRef,
+                bucketId: state.selectedBucket.id,
+                from: fromPath,
+                to: toPath,
+              })
+              success = true
+            } catch (error) {
+              if ((error as ResponseError).code === 429) {
+                isRateLimited = true
+                retrySeconds = RATE_LIMIT_RETRY_SECONDS
+              } else {
+                isRateLimited = false
+                retrySeconds = DEFAULT_RETRY_SECONDS
+              }
+
+              if (attempt === 2) failedFiles += 1
+            }
           }
-        })
 
-        const batchedPromises = chunk(promises, BATCH_SIZE)
-        // [Joshen] I realised this can be simplified with just a vanilla for loop, no need for reduce
-        // Just take note, but if it's working fine, then it's okay
-
-        await batchedPromises.reduce(async (previousPromise, nextBatch) => {
-          await previousPromise
-          await Promise.all(nextBatch.map((batch) => batch()))
+          progress += 1 / files.length
           toast(
-            <SonnerProgress progress={progress * 100} message={`Renaming folder to ${newName}`} />,
-            { id: toastId, closeButton: false, position: 'top-right' }
+            <SonnerProgress
+              progress={Math.min(progress * 100, 100)}
+              message={`Renaming folder to ${newName}`}
+            />,
+            { id: toastId, closeButton: false, position: 'top-right', duration: Infinity }
           )
-        }, Promise.resolve())
+        }
 
-        if (!hasErrors) {
+        if (failedFiles === 0) {
           toast.success(`Successfully renamed folder to ${newName}`, {
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
           })
         } else {
-          toast.error(`Renamed folder to ${newName} with some errors`, {
-            id: toastId,
-            closeButton: true,
-            duration: SONNER_DEFAULT_DURATION,
-          })
+          toast.error(
+            <div>
+              <p>
+                Renamed folder to {newName} with {failedFiles} error{failedFiles > 1 ? 's' : ''}
+              </p>
+              <p className="text-foreground-light">
+                You may try again to rename the folder {originalName} to {newName}
+              </p>
+            </div>,
+            {
+              id: toastId,
+              closeButton: true,
+              duration: Infinity,
+            }
+          )
         }
 
         if (state.openedFolders[columnIndex]?.name === folder.name) {
