@@ -59,7 +59,7 @@ export const ResetPasswordForm = () => {
     const toastId = toast.loading('Saving password...')
     const { error } = await auth.updateUser({
       password: data.password,
-      ...(requireCurrentPassword ? { currentPassword: data.currentPassword } : {}),
+      ...(requireCurrentPassword ? { current_password: data.currentPassword } : {}),
     })
 
     if (!error) {
