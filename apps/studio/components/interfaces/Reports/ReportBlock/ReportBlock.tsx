@@ -151,7 +151,7 @@ export const ReportBlock = ({
                 ? String(executeSqlError)
                 : undefined
           }
-          isExecuting={executeSqlLoading}
+          isExecuting={!contentError && executeSqlLoading}
           isWriteQuery={isWriteQuery}
           actions={
             <ButtonTooltip
