@@ -1,0 +1,239 @@
+---
+title: 'Self-Hosted Functions'
+description: 'Run and manage Edge Functions in your self-hosted Supabase instance.'
+subtitle: 'Run and manage Edge Functions in your self-hosted Supabase instance.'
+---
+
+Edge Functions work out of the box in a self-hosted Supabase setup. The `functions` service, API gateway routing, and a `hello` example function are all [pre-configured](https://github.com/supabase/supabase/tree/master/docker).
+
+<Admonition type="note">
+
+On managed Supabase platform, Edge Functions are deployed across multiple regions. Self-hosted standalone instance configuration resembles a standard serverless setup.
+
+</Admonition>
+
+## Invoke the default function
+
+The default `hello` function is located at `volumes/functions/hello/index.ts`. You can invoke it immediately after starting your stack:
+
+```bash
+curl http://<your-domain>:8000/functions/v1/hello
+```
+
+This returns `"Hello from Edge Functions!"`.
+
+## Create a new function
+
+### Step 1: Create a new directory with an `index.ts` file in `volumes/functions/`:
+
+```
+mkdir -p volumes/functions/my-function &&
+touch volumes/functions/my-function/index.ts
+```
+
+add the following code to `index.ts`:
+
+```typescript
+Deno.serve(async (req: Request) => {
+  const { name } = await req.json()
+  const message = `Hello, ${name}!`
+
+  return new Response(JSON.stringify({ message }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+### Step 2: Restart the functions service to pick up the new function:
+
+```bash
+docker compose restart functions --no-deps
+```
+
+### Step 3: Invoke your function:
+
+```bash
+curl -X POST http://<your-domain>:8000/functions/v1/my-function \
+  -H 'Content-Type: application/json' \
+  -d '{"name": "World"}'
+```
+
+You should be able to see the response from `my-function`:
+
+```
+{"message":"Hello, World!"}
+```
+
+## Custom environment variables
+
+### Using an env file (recommended)
+
+For multiple variables or secrets, create a separate env file, e.g., `.env.functions` in your `docker/` directory:
+
+```bash
+MY_CUSTOM_VAR=some-value
+```
+
+Add `env_file` to the `functions` service in `docker-compose.yml` (variables in `env_file` load first, then `environment` values take precedence):
+
+```yaml
+functions:
+  env_file:
+    - .env.functions
+  environment:
+    JWT_SECRET: ${JWT_SECRET}
+    SUPABASE_URL: http://kong:8000
+```
+
+<Admonition type="caution">
+
+Don't commit `.env.functions` to version control if it contains secrets. Add it to your `.gitignore`.
+
+</Admonition>
+
+Restart the functions service:
+
+```bash
+docker compose up -d --force-recreate --no-deps functions
+```
+
+### Using inline environment variables
+
+For one or two variables, you can add them directly under `environment` in `docker-compose.yml`:
+
+```yaml
+functions:
+  environment:
+    # Custom variables
+    MY_CUSTOM_VAR: ${MY_CUSTOM_VAR}
+    # Required variables
+    JWT_SECRET: ${JWT_SECRET}
+    SUPABASE_URL: http://kong:8000
+```
+
+Then define `MY_CUSTOM_VAR` in your main `.env` file, or specify the value directly.
+
+### Accessing variables in functions
+
+All container environment variables are forwarded to function workers by `main/index.ts`. Access them with:
+
+```typescript
+const customVar = Deno.env.get('MY_CUSTOM_VAR')
+```
+
+## Calling Supabase services from functions
+
+The functions service is pre-configured with the following environment variables:
+
+| Variable | Value | Purpose |
+| --- | --- | --- |
+| `SUPABASE_URL` | `http://kong:8000` | Internal API gateway URL |
+| `SUPABASE_PUBLIC_URL` | `http://<your-domain>:8000` | Base URL for accessing Supabase from the Internet |
+| `JWT_SECRET` | Your secret key | Legacy symmetric encryption key used to sign and verify JWTs |
+| `SUPABASE_ANON_KEY` | Your anon key | Client-side API key with limited permissions (`anon` role). |
+| `SUPABASE_SERVICE_ROLE_KEY` | Your service role key | Server-side API key with full database access (`service_role` role) |
+| `SUPABASE_DB_URL` | Postgres connection string | Can be used for direct database access |
+
+Here's an example function that queries a table using `@supabase/supabase-js`:
+
+```typescript
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+Deno.serve(async () => {
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  )
+
+  const { data, error } = await supabase.from('todos').select('*')
+
+  return new Response(JSON.stringify({ data, error }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+### Internal vs external URLs
+
+This is a key distinction that affects how you build URLs in your functions:
+
+- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
+
+- **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance (e.g., `<your-domain>:8000`). Use it if your function needs to build URLs that HTTP clients can reach from the outside.
+
+## Managing functions via dashboard
+
+Self-hosted Studio [mounts](https://github.com/supabase/supabase/blob/df8729a82b1847e2989c14ede27965612761d503/docker/docker-compose.yml#L66) the same `volumes/functions` directory as the functions service. You can check what functions are available using **Edge Functions** > **Functions** UI.
+
+## Deploying functions to a remote server
+
+To deploy a function to a remote server running self-hosted Supabase, copy the function directory with `scp`:
+
+```bash
+scp -r ./my-function user@<your-domain>:/path/to/self-hosted/volumes/functions/
+```
+
+Then restart the functions service on the remote host:
+
+```bash
+ssh user@<your-domain> 'cd /path/to/self-hosted && docker compose restart functions --no-deps'
+```
+
+## Copying functions from Supabase platform
+
+If you have existing functions on Supabase platform, you can download them and run them on your self-hosted instance. There are two ways to get the function source code:
+
+- **Dashboard** - open the function details in Dashboard and click **Download**.
+- **Local development & CLI** - run `supabase functions download <function-name> --project-ref <ref>` to download the source.
+
+Use `scp` to copy the function into `volumes/functions/<function-name>/` on your self-hosted instance, then restart the functions service.
+
+For more details, see:
+
+- [Quick start - Download edge functions](/docs/guides/functions/quickstart-dashboard#download-edge-functions)
+- [CLI commands - Download a function](/docs/reference/cli/supabase-functions-download)
+
+## Troubleshooting
+
+### 400 "missing function name in request"
+
+The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello` — not just `/functions/v1/`.
+
+### 500 error on invocation
+
+Check the functions service logs:
+
+```bash
+docker compose logs functions
+```
+
+Common causes: syntax errors in your function code, invalid imports, or missing dependencies.
+
+### 401 "invalid JWT"
+
+- Check that `FUNCTIONS_VERIFY_JWT` matches your intent (`true` or `false`) in `.env`
+- If verification is enabled, ensure you're passing a valid token: `Authorization: Bearer <anon_key or service_role_key>`
+
+### Changes to function code not reflected after editing
+
+Restart the functions service:
+
+```bash
+docker compose restart functions --no-deps
+```
+
+### Custom env vars not available in functions
+
+- Verify the variable is defined in `docker-compose.yml` (under `env_file` or `environment`)
+- Recreate the functions container after changing configuration
+- Check that the variable name matches exactly (case-sensitive)
+
+Use the following command to recreate the container, not just `restart`:
+
+```bash
+docker compose up -d --force-recreate --no-deps functions
+```
+
+### Memory or timeout errors
+
+The default limits are 150 MB memory and 60 seconds timeout per function invocation. These are set in `volumes/functions/main/index.ts`. To adjust them, edit the `memoryLimitMb` and `workerTimeoutMs` values and restart the functions service.
