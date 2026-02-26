@@ -154,15 +154,13 @@ export const ReportBlock = ({
           isExecuting={executeSqlLoading}
           isWriteQuery={isWriteQuery}
           actions={
-            !isLoadingContent && (
-              <ButtonTooltip
-                type="text"
-                icon={<X />}
-                className="w-7 h-7"
-                onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
-                tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
-              />
-            )
+            <ButtonTooltip
+              type="text"
+              icon={<X />}
+              className="w-7 h-7"
+              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+            />
           }
           onExecute={(queryType) => {
             refetch()
