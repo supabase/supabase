@@ -214,7 +214,9 @@ describe('sanitizeNameForDuplicateInColumn', () => {
 
     it('uses the explicitly provided columnIndex', () => {
       // col 0 has 'file.txt' → conflict
-      expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', columnIndex: 0 })).toBeNull()
+      expect(
+        sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', columnIndex: 0 })
+      ).toBeNull()
       expect(toast.error).toHaveBeenCalled()
     })
 
@@ -227,9 +229,9 @@ describe('sanitizeNameForDuplicateInColumn', () => {
 
     it('detects a conflict in the first column when columnIndex is 0', () => {
       // col 0 has 'file.txt' → conflict
-      expect(
-        sanitizeNameForDuplicateInColumn(state, { name: 'other.txt', columnIndex: 0 })
-      ).toBe('other.txt') // 'other.txt' is not in col 0
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'other.txt', columnIndex: 0 })).toBe(
+        'other.txt'
+      ) // 'other.txt' is not in col 0
       expect(
         sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', columnIndex: 0 })
       ).toBeNull()

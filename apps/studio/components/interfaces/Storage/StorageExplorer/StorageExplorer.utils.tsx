@@ -2,10 +2,7 @@ import { toast } from 'sonner'
 
 import { StorageObject } from 'data/storage/bucket-objects-list-mutation'
 import { copyToClipboard } from 'ui'
-import {
-  inverseValidObjectKeyRegex,
-  validObjectKeyRegex,
-} from '../CreateBucketModal.utils'
+import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../CreateBucketModal.utils'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
 import type { StorageExplorerState } from '@/state/storage-explorer'
@@ -102,9 +99,7 @@ export function sanitizeNameForDuplicateInColumn(
       const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
       const fileExt = fileNameSegments[fileNameSegments.length - 1]
 
-      const dupeNameRegex = new RegExp(
-        `${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`
-      )
+      const dupeNameRegex = new RegExp(`${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`)
       const itemsWithSameNameInColumn = currentColumnItems.filter((item) =>
         item.name.match(dupeNameRegex)
       )
