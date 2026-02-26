@@ -8,6 +8,7 @@ import {
 } from '../CreateBucketModal.utils'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
+import type { StorageExplorerState } from '@/state/storage-explorer'
 
 type UploadProgress = {
   percentage: number
@@ -19,6 +20,35 @@ type UploadProgress = {
 
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 export const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
+
+/**
+ * Returns the path to the current folder, optionally prefixed with the bucket name.
+ */
+export function getPathAlongOpenedFolders(
+  state: Pick<StorageExplorerState, 'openedFolders' | 'selectedBucket'>,
+  includeBucket = true
+): string {
+  if (includeBucket) {
+    return state.openedFolders.length > 0
+      ? `${state.selectedBucket.name}/${state.openedFolders.map((folder) => folder.name).join('/')}`
+      : state.selectedBucket.name
+  }
+  return state.openedFolders.map((folder) => folder.name).join('/')
+}
+
+/**
+ * Returns the path to the folder at the given index in the openedFolders array,
+ * joining all folders from the root up to (but not including) the given index.
+ */
+export function getPathAlongFoldersToIndex(
+  state: Pick<StorageExplorerState, 'openedFolders'>,
+  index: number
+): string {
+  return state.openedFolders
+    .slice(0, index)
+    .map((folder) => folder.name)
+    .join('/')
+}
 
 /**
  * Returns an error message string if the folder name contains invalid characters,

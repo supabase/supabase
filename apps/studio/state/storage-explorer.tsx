@@ -28,6 +28,8 @@ import {
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
+  getPathAlongFoldersToIndex,
+  getPathAlongOpenedFolders,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
@@ -235,22 +237,6 @@ function createStorageExplorerState({
     },
 
     // ======== Folders CRUD ========
-
-    getPathAlongOpenedFolders: (includeBucket = true) => {
-      if (includeBucket) {
-        return state.openedFolders.length > 0
-          ? `${state.selectedBucket.name}/${state.openedFolders.map((folder) => folder.name).join('/')}`
-          : state.selectedBucket.name
-      }
-      return state.openedFolders.map((folder) => folder.name).join('/')
-    },
-
-    getPathAlongFoldersToIndex: (index: number) => {
-      return state.openedFolders
-        .slice(0, index)
-        .map((folder) => folder.name)
-        .join('/')
-    },
 
     validateFolderName,
 
@@ -1693,7 +1679,7 @@ function createStorageExplorerState({
           columnIndex,
           updatedName: newName,
         })
-        const pathToFile = state.getPathAlongFoldersToIndex(columnIndex)
+        const pathToFile = getPathAlongFoldersToIndex(state, columnIndex)
 
         const fromPath = pathToFile.length > 0 ? `${pathToFile}/${originalName}` : originalName
         const toPath = pathToFile.length > 0 ? `${pathToFile}/${newName}` : newName
@@ -1913,7 +1899,7 @@ function createStorageExplorerState({
   return state
 }
 
-type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
+export type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
 
 const DEFAULT_STATE_CONFIG = {
   projectRef: '',
