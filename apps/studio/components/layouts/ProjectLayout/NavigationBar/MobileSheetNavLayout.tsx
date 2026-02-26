@@ -4,7 +4,7 @@ import { CommandWrapper, MobileSheetNav } from 'ui-patterns'
 
 import { useMobileSheet } from './MobileSheetContext'
 
-const MobileSheetNavLayout = () => {
+export function MobileSheetNavLayout() {
   const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSheet()
   const { activeSidebar } = useSidebarManagerSnapshot()
 
@@ -28,5 +28,3 @@ const MobileSheetNavLayout = () => {
     </MobileSheetNav>
   )
 }
-
-export default MobileSheetNavLayout
