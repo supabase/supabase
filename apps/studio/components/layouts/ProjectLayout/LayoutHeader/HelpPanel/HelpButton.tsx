@@ -22,12 +22,14 @@ export const HelpButton = () => {
       size="tiny"
       className={cn('rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group')}
       onClick={() => {
-        if (isOpen) return // Don't send telemetry event if dropdown is already open
-        sendEvent({
-          action: 'help_button_clicked',
-          groups: { project: project?.ref, organization: org?.slug },
-        })
         toggleSidebar(SIDEBAR_KEYS.HELP_PANEL)
+        // Don't send telemetry event if dropdown is already open
+        if (!isOpen) {
+          sendEvent({
+            action: 'help_button_clicked',
+            groups: { project: project?.ref, organization: org?.slug },
+          })
+        }
       }}
       tooltip={{ content: { side: 'bottom', text: 'Help' } }}
     >
