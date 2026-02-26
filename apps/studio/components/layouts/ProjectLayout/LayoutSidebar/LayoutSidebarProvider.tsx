@@ -22,7 +22,7 @@ const EditorPanel = dynamic(() =>
   import('components/ui/EditorPanel/EditorPanel').then((m) => m.EditorPanel)
 )
 const HelpPanel = dynamic(() =>
-  import('@/components/layouts/ProjectLayout/LayoutHeader/HelpPanel/HelpPanel').then(
+  import('components/layouts/ProjectLayout/LayoutHeader/HelpPanel/HelpPanel').then(
     (m) => m.HelpPanel
   )
 )
