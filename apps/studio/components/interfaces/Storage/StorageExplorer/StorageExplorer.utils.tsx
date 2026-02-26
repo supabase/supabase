@@ -64,6 +64,64 @@ export function validateFolderName(name: string): string | null {
   return null
 }
 
+/**
+ * Checks whether `name` already exists in the column (case-insensitive).
+ * - When `autofix` is false and a duplicate is found, shows an error toast and returns null.
+ * - When `autofix` is true and a duplicate is found, appends a numeric suffix and returns the new name.
+ * - Returns the original name when there is no conflict.
+ *
+ * When `columnIndex` is omitted it defaults to the last column.
+ */
+export function sanitizeNameForDuplicateInColumn(
+  state: Pick<StorageExplorerState, 'columns'>,
+  {
+    name,
+    columnIndex,
+    autofix = false,
+  }: {
+    name: string
+    columnIndex?: number
+    autofix?: boolean
+  }
+): string | null {
+  const columnIndex_ = columnIndex !== undefined ? columnIndex : state.columns.length - 1
+  const currentColumn = state.columns[columnIndex_]
+  const currentColumnItems = currentColumn.items.filter(
+    (item) => item.status !== STORAGE_ROW_STATUS.EDITING
+  )
+  // [Joshen] JFYI storage does support folders of the same name with different casing
+  // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
+  // for folders of the same name with different casing
+  // We should remove this check once all projects are on the List V2 endpoint
+  const hasSameNameInColumn =
+    currentColumnItems.filter((item) => item.name.toLowerCase() === name.toLowerCase()).length > 0
+
+  if (hasSameNameInColumn) {
+    if (autofix) {
+      const fileNameSegments = name.split('.')
+      const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
+      const fileExt = fileNameSegments[fileNameSegments.length - 1]
+
+      const dupeNameRegex = new RegExp(
+        `${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`
+      )
+      const itemsWithSameNameInColumn = currentColumnItems.filter((item) =>
+        item.name.match(dupeNameRegex)
+      )
+
+      const updatedFileName = fileName + ` (${itemsWithSameNameInColumn.length + 1})`
+      return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
+    } else {
+      toast.error(
+        `The name ${name} already exists in the current directory. Please use a different name.`
+      )
+      return null
+    }
+  }
+
+  return name
+}
+
 export const copyPathToFolder = (
   openedFolders: StorageItem[],
   item: StorageItem & { columnIndex: number }
