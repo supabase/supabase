@@ -16,13 +16,13 @@ import { useThemeSwitcherCommands } from './ThemeSwitcher'
 const themeMock = vi.hoisted(() => ({
   setTheme: vi.fn(),
   state: {
-    theme: 'light' as string | undefined,
+    resolvedTheme: 'light' as string | undefined,
   },
 }))
 
 vi.mock('next-themes', () => ({
   useTheme: () => ({
-    theme: themeMock.state.theme,
+    resolvedTheme: themeMock.state.resolvedTheme,
     setTheme: themeMock.setTheme,
   }),
 }))
@@ -94,7 +94,7 @@ const runAction = (id: string) => {
 describe('useThemeSwitcherCommands', () => {
   beforeEach(() => {
     themeMock.setTheme.mockReset()
-    themeMock.state.theme = 'light'
+    themeMock.state.resolvedTheme = 'light'
 
     captured.commandSections = []
     captured.currentPage = undefined
@@ -182,7 +182,7 @@ describe('useThemeSwitcherCommands', () => {
   })
 
   it('toggle theme switches dark to light', async () => {
-    themeMock.state.theme = 'dark'
+    themeMock.state.resolvedTheme = 'dark'
     await renderHarness()
 
     runAction('toggle-theme')
@@ -191,7 +191,7 @@ describe('useThemeSwitcherCommands', () => {
   })
 
   it('toggle theme switches non-dark modes to dark', async () => {
-    themeMock.state.theme = 'light'
+    themeMock.state.resolvedTheme = 'light'
     await renderHarness()
 
     runAction('toggle-theme')
@@ -205,7 +205,7 @@ describe('useThemeSwitcherCommands', () => {
     runAction('toggle-theme')
     expect(themeMock.setTheme).toHaveBeenLastCalledWith('dark')
 
-    themeMock.state.theme = 'dark'
+    themeMock.state.resolvedTheme = 'dark'
     renderResult.rerender(
       <CommandProvider>
         <ThemeSwitcherHarness />

@@ -16,7 +16,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: CommandOptions } = {}
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
 
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
 
   const applyTheme = (theme: string) => {
     setTheme(theme)
@@ -56,7 +56,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: CommandOptions } = {}
         name: 'Toggle theme',
         value:
           'Toggle theme, Toggle dark mode, Toggle light mode, Theme toggle, Dark mode, Light mode',
-        action: () => applyTheme(theme === 'dark' ? 'light' : 'dark'),
+        action: () => applyTheme(resolvedTheme === 'dark' ? 'light' : 'dark'),
         defaultHidden: true,
         icon: () => <MonitorDot />,
       },
@@ -94,7 +94,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: CommandOptions } = {}
         icon: () => <MonitorDot />,
       },
     ],
-    { ...options, deps: [theme] }
+    { ...options, deps: [resolvedTheme] }
   )
 }
 
