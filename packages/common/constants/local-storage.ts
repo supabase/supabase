@@ -8,6 +8,7 @@ export const LOCAL_STORAGE_KEYS = {
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
   PROJECTS_VIEW: 'projects-view',
   PROJECTS_FILTER: 'projects-filter',
+  PROJECTS_SORT: 'projects-sort',
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
   INCIDENT_BANNER_DISMISSED: (id: string) => `incident-banner-dismissed-${id}`,
@@ -100,6 +101,8 @@ export const LOCAL_STORAGE_KEYS = {
 
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
+  TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED: (ref: string) =>
+    `table-editor-new-filter-banner-dismissed-${ref}`,
 
   /**
    * COMMON

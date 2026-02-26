@@ -9,8 +9,8 @@ type ValidatePipelineParams = {
   sourceId: number
   publicationName: string
   maxFillMs?: number
-  maxSize?: number
   maxTableSyncWorkers?: number
+  maxCopyConnectionsPerTable?: number
 }
 type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse']
 
@@ -20,18 +20,15 @@ async function validatePipeline(
     sourceId,
     publicationName,
     maxFillMs,
-    maxSize,
     maxTableSyncWorkers,
+    maxCopyConnectionsPerTable,
   }: ValidatePipelineParams,
   signal?: AbortSignal
 ): Promise<ValidatePipelineResponse> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!sourceId) throw new Error('sourceId is required')
 
-  const batchConfig =
-    maxFillMs !== undefined || maxSize !== undefined
-      ? { max_fill_ms: maxFillMs, max_size: maxSize }
-      : undefined
+  const batchConfig = maxFillMs !== undefined ? { max_fill_ms: maxFillMs } : undefined
 
   const { data, error } = await post('/platform/replication/{ref}/pipelines/validate', {
     params: { path: { ref: projectRef } },
@@ -40,6 +37,7 @@ async function validatePipeline(
       config: {
         publication_name: publicationName,
         max_table_sync_workers: maxTableSyncWorkers,
+        max_copy_connections_per_table: maxCopyConnectionsPerTable,
         batch: batchConfig,
       },
     },

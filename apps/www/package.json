@@ -54,6 +54,7 @@
     "gsap": "^3.13.0",
     "icons": "workspace:*",
     "lucide-react": "*",
+    "marketing": "workspace:*",
     "markdown-toc": "^1.2.0",
     "mdast-util-from-markdown": "^2.0.2",
     "mdast-util-gfm": "^2.0.2",

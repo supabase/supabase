@@ -395,10 +395,13 @@ export const useTableRowsQuery = <TData = TableRowsData>(
 ) => {
   const queryClient = useQueryClient()
 
+  // [Joshen] Exclude preflightCheck from query key
+  const { preflightCheck, ...othersArgs } = args
+
   return useQuery<TableRowsData, TableRowsError, TData>({
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
-      ...args,
+      ...othersArgs,
     }),
     queryFn: ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),

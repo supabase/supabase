@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useStripeSyncInstallMutation } from 'data/database-integrations/stripe/stripe-sync-install-mutation'
 import { useStripeSyncUninstallMutation } from 'data/database-integrations/stripe/stripe-sync-uninstall-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { formatRelative } from 'date-fns'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTrack } from 'lib/telemetry/track'
 import { AlertCircle, BadgeCheck, Check, ExternalLink, RefreshCwIcon } from 'lucide-react'
@@ -72,6 +74,12 @@ export const StripeSyncInstallationPage = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  // Check permissions for managing function secrets
+  const { can: canManageSecrets } = useAsyncCheckPermissions(
+    PermissionAction.FUNCTIONS_SECRET_WRITE,
+    '*'
+  )
 
   const isSyncing = isSyncRunning(syncState)
 
@@ -328,12 +336,14 @@ export const StripeSyncInstallationPage = () => {
                 <ButtonTooltip
                   type="primary"
                   onClick={() => setShouldShowInstallSheet(true)}
-                  disabled={!canInstall}
+                  disabled={!canInstall || !canManageSecrets}
                   tooltip={{
                     content: {
                       text: !canInstall
                         ? 'Your database already uses a schema named "stripe"'
-                        : undefined,
+                        : !canManageSecrets
+                          ? 'You need additional permissions to install the Stripe Sync Engine.'
+                          : undefined,
                     },
                   }}
                 >
@@ -343,9 +353,20 @@ export const StripeSyncInstallationPage = () => {
             </>
           ) : installed && !uninstalling ? (
             <div className="flex justify-end mt-4">
-              <Button type="default" onClick={() => setShowUninstallModal(true)}>
+              <ButtonTooltip
+                type="default"
+                onClick={() => setShowUninstallModal(true)}
+                disabled={!canManageSecrets}
+                tooltip={{
+                  content: {
+                    text: !canManageSecrets
+                      ? 'You need additional permissions to uninstall the Stripe Sync Engine.'
+                      : undefined,
+                  },
+                }}
+              >
                 Uninstall integration
-              </Button>
+              </ButtonTooltip>
             </div>
           ) : null
         }

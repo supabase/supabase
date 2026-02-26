@@ -3,7 +3,7 @@ import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { OrgProject, getComputeSize } from 'data/projects/org-projects-infinite-query'
+import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -15,11 +15,11 @@ import { toast } from 'sonner'
 import type { Organization } from 'types'
 import {
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  copyToClipboard,
 } from 'ui'
 
 import { inferProjectStatus } from './ProjectCard.utils'
@@ -116,7 +116,7 @@ export const ProjectCard = ({
                 </div>
                 <p className="text-sm text-foreground-lighter">{desc}</p>
               </div>
-              <div className="flex items-center gap-x-1.5 relative">
+              <div className="flex items-center gap-x-1.5 relative overflow-hidden">
                 <ProjectCardStatus
                   projectStatus={projectStatus}
                   resourceWarnings={resourceWarnings}
@@ -140,8 +140,8 @@ export const ProjectCard = ({
                   </div>
                 )}
                 {isGithubIntegrated && (
-                  <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
-                    <div className="w-5 h-5 p-1 flex items-center justify-center">
+                  <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md min-w-0">
+                    <div className="w-5 h-5 p-1 flex items-center justify-center shrink-0">
                       <Github size={12} strokeWidth={1.5} />
                     </div>
                     <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
