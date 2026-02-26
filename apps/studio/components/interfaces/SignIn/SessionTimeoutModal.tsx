@@ -1,21 +1,36 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import { toast } from 'sonner'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  AlertCollapsible,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Button,
+} from 'ui'
 import { SupportLink } from '../Support/SupportLink'
 
 interface SessionTimeoutModalProps {
   visible: boolean
   onClose: () => void
   redirectToSignIn: () => void
+  /** Optional context so the support form can pre-populate when opened from this dialog */
+  supportContext?: { projectRef?: string; orgSlug?: string }
 }
 
 export const SessionTimeoutModal = ({
   visible,
   onClose,
   redirectToSignIn,
+  supportContext,
 }: SessionTimeoutModalProps) => {
   useEffect(() => {
     if (visible) {
@@ -23,60 +38,70 @@ export const SessionTimeoutModal = ({
     }
   }, [visible])
 
+  const handleClearStorage = () => {
+    try {
+      localStorage.clear()
+      sessionStorage.clear()
+    } catch (e) {
+      toast.error('Failed to clear browser storage')
+    }
+    window.location.reload()
+  }
+
   return (
-    <ConfirmationModal
-      visible={visible}
-      title="Session timed out"
-      confirmLabel="Sign in again"
-      onCancel={onClose}
-      onConfirm={redirectToSignIn}
-      alert={{
-        base: { variant: 'warning' },
-        title: 'Your session has timed out',
-        description:
-          'Please try signing in again. If you are not able to sign in again, please contact Support.',
+    <AlertDialog
+      open={visible}
+      onOpenChange={(open) => {
+        if (!open) onClose()
       }}
     >
-      <div className="space-y-4 text-sm text-foreground-light">
-        <ul className="list-disc pl-1.5 list-inside space-y-1 text-sm text-foreground-light">
-          <li>Try with a different browser</li>
-          <li>Disable browser extensions that block network requests</li>
-          <li>
-            <button
-              title="Clear storage and reload"
-              className="underline"
-              onClick={() => {
-                try {
-                  localStorage.clear()
-                  sessionStorage.clear()
-                } catch (e) {
-                  toast.error('Failed to clear browser storage')
-                }
-                window.location.reload()
-              }}
-            >
-              Clear your browser storage
-            </button>
-          </li>
-        </ul>
-        <p>
-          If none of these steps work, please{' '}
-          <SupportLink
-            className={InlineLinkClassName}
-            queryParams={{ subject: 'Session timed out' }}
-          >
-            Contact support
-          </SupportLink>
-          .
-        </p>
-        <p>
-          Consider{' '}
-          <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
-            generating a HAR file
-          </InlineLink>{' '}
-          from your session to help Support pinpoint the issue.
-        </p>
-      </div>
-    </ConfirmationModal>
+      <AlertDialogContent size="small">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Session expired</AlertDialogTitle>
+          <AlertDialogDescription asChild>
+            <div className="space-y-4">
+              <p>Please sign in again to continue.</p>
+              <AlertCollapsible trigger="Having trouble?">
+                <div className="space-y-3 text-foreground-light">
+                  <p>
+                    Try a different browser or disable extensions that block network requests. If
+                    the problem persists:
+                  </p>
+                  <Button type="default" size="tiny" onClick={handleClearStorage}>
+                    Clear site data and reload
+                  </Button>
+                  <p>
+                    Still stuck?{' '}
+                    <SupportLink
+                      className={InlineLinkClassName}
+                      queryParams={{
+                        subject: 'Session expired',
+                        category: SupportCategories.LOGIN_ISSUES,
+                        ...(supportContext?.projectRef && {
+                          projectRef: supportContext.projectRef,
+                        }),
+                        ...(supportContext?.orgSlug && { orgSlug: supportContext.orgSlug }),
+                      }}
+                      onClick={onClose}
+                    >
+                      Contact support
+                    </SupportLink>{' '}
+                    and include a{' '}
+                    <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
+                      HAR file
+                    </InlineLink>{' '}
+                    from your session to help us investigate.
+                  </p>
+                </div>
+              </AlertCollapsible>
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Close</AlertDialogCancel>
+          <AlertDialogAction onClick={redirectToSignIn}>Sign in again</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
