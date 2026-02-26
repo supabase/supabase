@@ -94,7 +94,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: CommandOptions } = {}
         icon: () => <MonitorDot />,
       },
     ],
-    { ...options, deps: [resolvedTheme] }
+    { ...options, deps: [...(options?.deps ?? []), resolvedTheme] }
   )
 }
 
