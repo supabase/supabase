@@ -99,7 +99,8 @@ export const useIsBranching2Enabled = () => {
 
 export const useIsPgDeltaDiffEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
+  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
+  return pgDeltaDiffEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
 }
 
 export const useIsAdvisorRulesEnabled = () => {
