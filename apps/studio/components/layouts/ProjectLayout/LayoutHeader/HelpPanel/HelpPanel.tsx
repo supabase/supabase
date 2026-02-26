@@ -1,6 +1,8 @@
 import { IS_PLATFORM } from 'common'
 import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { X } from 'lucide-react'
 import { useRouter } from 'next-router-mock'
 import Image from 'next/image'
 import SVG from 'react-inlinesvg'
@@ -9,10 +11,10 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Button, cn, Separator } from 'ui'
 import styleHandler from 'ui/src/lib/theme/styleHandler'
 
-import { ASSISTANT_SUGGESTIONS } from './HelpDropdown.constants'
+import { ASSISTANT_SUGGESTIONS } from './HelpPanel.constants'
 import { HelpSection } from './HelpSection'
 
-export const HelpContent = ({
+export const HelpPanel = ({
   onClose,
   projectRef,
   supportLinkQueryParams,
@@ -22,15 +24,25 @@ export const HelpContent = ({
   supportLinkQueryParams: Partial<SupportFormUrlKeys> | undefined
 }) => {
   const snap = useAiAssistantStateSnapshot()
-  const { openSidebar } = useSidebarManagerSnapshot()
+  const { openSidebar, closeSidebar } = useSidebarManagerSnapshot()
   const router = useRouter()
 
   const __styles = styleHandler('popover')
 
   return (
-    <>
+    <div className="space-y-4">
+      <div className="flex text-xs items-center justify-between px-4 h-[var(--header-height)] border-b">
+        <span>Help & Support</span>
+        <ButtonTooltip
+          type="text"
+          className="w-7 h-7"
+          onClick={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
+          icon={<X strokeWidth={1.5} />}
+          tooltip={{ content: { side: 'bottom', text: 'Close' } }}
+        />
+      </div>
       <HelpSection
-        className="px-5"
+        className="px-4"
         excludeIds={['discord']}
         isPlatform={IS_PLATFORM}
         projectRef={projectRef}
@@ -44,16 +56,16 @@ export const HelpContent = ({
       />
       <Separator className={cn(__styles.separator, 'my-4')} />
       <div className="flex flex-col gap-4">
-        <div className="px-5 flex flex-col gap-0.5">
+        <div className="px-4 flex flex-col gap-0.5">
           <h5 className="text-foreground">Community support</h5>
           <p className="text-xs text-foreground-lighter text-balance">
             Our Discord community can help with code-related issues. Many questions are answered in
             minutes.
           </p>
         </div>
-        <div className="px-5">
+        <div className="px-4">
           <div
-            className="relative space-y-2 overflow-hidden rounded px-5 py-4 pb-12 shadow-md"
+            className="relative space-y-2 overflow-hidden rounded px-4 py-4 pb-12 shadow-md"
             style={{ background: '#404EED' }}
           >
             <a
@@ -80,6 +92,6 @@ export const HelpContent = ({
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

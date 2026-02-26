@@ -10,7 +10,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, type PropsWithChildren } from 'react'
 import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
-import { getSupportLinkQueryParams } from '../LayoutHeader/HelpDropdown/HelpDropdown.utils'
+import { getSupportLinkQueryParams } from '../LayoutHeader/HelpPanel/HelpPanel.utils'
 
 const AdvisorPanel = dynamic(() =>
   import('components/ui/AdvisorPanel/AdvisorPanel').then((m) => m.AdvisorPanel)
@@ -22,8 +22,8 @@ const EditorPanel = dynamic(() =>
   import('components/ui/EditorPanel/EditorPanel').then((m) => m.EditorPanel)
 )
 const HelpPanel = dynamic(() =>
-  import('components/layouts/ProjectLayout/LayoutHeader/HelpDropdown/HelpContent').then(
-    (m) => m.HelpContent
+  import('@/components/layouts/ProjectLayout/LayoutHeader/HelpPanel/HelpPanel').then(
+    (m) => m.HelpPanel
   )
 )
 
