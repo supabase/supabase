@@ -1,6 +1,3 @@
-import { Search } from 'lucide-react'
-import { useState } from 'react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
@@ -9,6 +6,8 @@ import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { parseMigrationVersion } from 'lib/migration-utils'
+import { Search } from 'lucide-react'
+import { useState } from 'react'
 import {
   Button,
   Card,
@@ -24,9 +23,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { MigrationsEmptyState } from './MigrationsEmptyState'
 
 const Migrations = () => {
@@ -119,9 +119,10 @@ const Migrations = () => {
                       {migrations.length > 0 ? (
                         migrations.map((migration) => {
                           const versionDayjs = parseMigrationVersion(migration.version)
-                          const insertedAt = versionDayjs
+                          const label = versionDayjs
                             ? versionDayjs.format('DD MMM YYYY, HH:mm:ss')
-                            : undefined
+                            : 'Unknown'
+                          const insertedAt = versionDayjs ? versionDayjs.toISOString() : undefined
 
                           return (
                             <TableRow key={migration.version}>
@@ -133,9 +134,19 @@ const Migrations = () => {
                               >
                                 {migration?.name ?? 'Name not available'}
                               </TableCell>
-                              <TableCell className={cn(!insertedAt && 'text-foreground-lighter')}>
+                              <TableCell>
                                 <Tooltip>
-                                  <TooltipTrigger>{insertedAt ?? 'Unknown'}</TooltipTrigger>
+                                  <TooltipTrigger>
+                                    {!!insertedAt ? (
+                                      <TimestampInfo
+                                        className="text-sm"
+                                        label={label}
+                                        utcTimestamp={insertedAt}
+                                      />
+                                    ) : (
+                                      <p className="text-foreground-lighter">Unknown</p>
+                                    )}
+                                  </TooltipTrigger>
                                   {!insertedAt && (
                                     <TooltipContent side="right" className="w-64 text-center">
                                       This migration was not generated via the{' '}

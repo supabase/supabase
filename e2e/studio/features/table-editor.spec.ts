@@ -605,6 +605,33 @@ testRunner('table editor', () => {
     await deleteTable(page, ref, tableName)
   })
 
+  test('column actions works as expected', async ({ page, ref }) => {
+    const tableName = 'pw_table_column_menu'
+    const colName = 'pw_column'
+
+    // Ensure we're on editor
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
+
+    // Create a small table and three rows
+    await createTable(page, ref, tableName)
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Copy the column name
+    await page.getByRole('columnheader', { name: colName }).getByRole('button').nth(1).click()
+    await page.getByRole('menuitem', { name: 'Copy name' }).click()
+
+    await page.waitForTimeout(500)
+    const copiedTableResult = await page.evaluate(() => navigator.clipboard.readText())
+    expect(copiedTableResult).toBe(colName)
+
+    // Cleanup
+    await deleteTable(page, ref, tableName)
+  })
+
   test('importing, pagination and large data actions works as expected', async ({ page, ref }) => {
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     const tableNameDataActions = 'pw_table_data'

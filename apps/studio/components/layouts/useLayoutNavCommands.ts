@@ -2,6 +2,7 @@ import { useIsLoggedIn } from 'common'
 import { useApiDocsGotoCommands } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs.Commands'
 import { useAdvisorsGoToCommands } from './AdvisorsLayout/Advisors.Commands'
 import { useAuthGotoCommands } from './AuthLayout/Auth.Commands'
+import { useBillingGotoCommands } from './BillingLayout/Billing.Commands'
 import { useDatabaseGotoCommands } from './DatabaseLayout/Database.Commands'
 import { useFunctionsGotoCommands } from './EdgeFunctionsLayout/EdgeFunctions.Commands'
 import { useIntegrationsGotoCommands } from './IntegrationsLayout/Integrations.Commands'
@@ -27,4 +28,5 @@ export function useLayoutNavCommands() {
   useApiDocsGotoCommands({ enabled: isLoggedIn })
   useProjectSettingsGotoCommands({ enabled: isLoggedIn })
   useIntegrationsGotoCommands({ enabled: isLoggedIn })
+  useBillingGotoCommands({ enabled: isLoggedIn })
 }
