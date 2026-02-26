@@ -39,7 +39,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
-  const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const { openSidebar, closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   const [sidebarURLParam, setSidebarUrlParam] = useQueryState('sidebar', parseAsString)
   const [sidebarLocalStorage, setSidebarLocalStorage, { isSuccess: isLoadedLocalStorage }] =
@@ -55,7 +55,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     SIDEBAR_KEYS.HELP_PANEL,
     () => (
       <HelpPanel
-        onClose={() => null}
+        onClose={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
         projectRef={project?.ref}
         supportLinkQueryParams={getSupportLinkQueryParams(
           project,
