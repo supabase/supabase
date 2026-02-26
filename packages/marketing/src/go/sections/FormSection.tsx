@@ -221,7 +221,14 @@ export default function FormSection({ section }: { section: GoFormSection }) {
           {section.disclaimer && (
             <div className="text-xs text-foreground-lighter leading-relaxed [&_a]:text-brand-link [&_a]:decoration-brand-link">
               <ReactMarkdown
-                components={{ p: ({ children }) => <p>{children}</p>, a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer">{children}</a> }}
+                components={{
+                  p: ({ children }) => <p>{children}</p>,
+                  a: ({ href, children }) => (
+                    <a href={href} target="_blank" rel="noopener noreferrer">
+                      {children}
+                    </a>
+                  ),
+                }}
               >
                 {section.disclaimer}
               </ReactMarkdown>

@@ -145,9 +145,7 @@ To generate and apply all secrets at once you can run:
 sh ./utils/generate-keys.sh
 ```
 
-The script is experimental, so review the output before proceeding and also check `.env` after it's updated by the script.
-
-**Alternatively, configure all secrets manually as follows.**
+Review the output before proceeding and also check `.env` after it's updated by the script. Alternatively, configure all secrets manually as follows.
 
 ### Configure database password
 
@@ -161,10 +159,9 @@ Follow the [password guidelines](/docs/guides/database/postgres/roles#passwords)
 
 Use the key generator below to obtain and configure the following secure keys in `.env`:
 
-- `JWT_SECRET`: Used by PostgREST and GoTrue to sign and verify JWTs.
+- `JWT_SECRET`: Used by Auth, PostgREST, and other services to sign and verify JWTs.
 - `ANON_KEY`: Client-side API key with limited permissions (`anon` role). Use this in your frontend applications.
-- `SERVICE_ROLE_KEY`: Server-side API key with full database access (`service_role` role). Never expose this in client code.
-
+- `SERVICE_ROLE_KEY`: Server-side API key with full database access (`service_role` role). **Never expose this in client code.**
 <JwtGeneratorSimple />
 
 1. Copy the generated value and update `JWT_SECRET` in the `.env` file. Do not share this secret publicly or commit it to version control.
@@ -182,16 +179,16 @@ Edit the following settings in the `.env` file:
 - `PG_META_CRYPTO_KEY`: encryption key for securing connection strings used by Studio against postgres-meta. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 - `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion and querying. Used by Vector and Studio to send and query logs. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 - `LOGFLARE_PRIVATE_ACCESS_TOKEN`: API token for Logflare management operations. Used by Studio for administrative tasks. Never expose client-side. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
-- `S3_PROTOCOL_ACCESS_KEY_ID`: Access key ID (username-like) for authenticating API requests to S3-compatible storage. (Generate with `openssl rand -hex 16`)
-- `S3_PROTOCOL_ACCESS_KEY_SECRET`: Secret key (password-like) used with S3_PROTOCOL_ACCESS_KEY_ID to sign and authorize S3 storage operations. (Generate with `openssl rand -hex 32`)
+- `S3_PROTOCOL_ACCESS_KEY_ID`: Access key ID (username-like) for [accessing](/docs/guides/self-hosting/self-hosted-s3) the S3 protocol endpoint in Storage. (Generate with `openssl rand -hex 16`)
+- `S3_PROTOCOL_ACCESS_KEY_SECRET`: Secret key (password-like) used with S3_PROTOCOL_ACCESS_KEY_ID. (Generate with `openssl rand -hex 32`)
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-- `MINIO_ROOT_PASSWORD`: Root administrator password for the MinIO server. (Must be 8+ characters; generate with `openssl rand -hex 16`)
+- `MINIO_ROOT_PASSWORD`: Root administrator password for the [MinIO server](/docs/guides/self-hosting/self-hosted-s3#using-minio). (Must be 8+ characters; generate with `openssl rand -hex 16`)
 
 Review and change URL environment variables:
 
-- `SUPABASE_PUBLIC_URL`: the base URL for accessing your Supabase via the Internet, e.g, `http://example.com:8000`
-- `API_EXTERNAL_URL`: the base URL for API requests, e.g., `http://example.com:8000`
-- `SITE_URL`: the base URL of your site, e.g., `http://example.com:3000`
+- `SUPABASE_PUBLIC_URL`: base URL for accessing Supabase from the Internet (Dashboard, API, Storage, etc.), e.g, `http://example.com:8000`
+- `API_EXTERNAL_URL`: base URL of the Auth service as seen externally, e.g., `http://example.com:8000`
+- `SITE_URL`: default [redirect URL](/docs/guides/auth/redirect-urls) for Auth, e.g., `http://example.com:3000`
 
 <Admonition type="tip">
 
@@ -412,7 +409,7 @@ You can configure each Supabase service separately through environment variables
 
 #### Configuring an email server
 
-You will need to use a production-ready SMTP server for sending emails. You can configure the SMTP server by updating the following environment variables:
+You will need to use a production-ready SMTP server for sending emails. You can configure the SMTP server by updating the following environment variables in the `.env` file:
 
 ```sh .env
 SMTP_ADMIN_EMAIL=
@@ -423,7 +420,7 @@ SMTP_PASS=
 SMTP_SENDER_NAME=
 ```
 
-We recommend using [AWS SES](https://aws.amazon.com/ses/). It's extremely cheap and reliable. Restart all services to pick up the new configuration.
+We recommend using [AWS SES](https://aws.amazon.com/ses/). It's affordable and reliable. Restart all services to pick up the new configuration.
 
 #### Configuring S3 Storage
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
@@ -433,35 +430,18 @@ See the [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3) guide f
 
 #### Configuring Supabase AI Assistant
 
-Configuring the Supabase AI Assistant is optional. By adding your own `OPENAI_API_KEY`, you can enable AI services, which help with writing SQL queries, statements, and policies.
-
-<$CodeTabs>
-
-```yaml name=docker-compose.yml
-services:
-  studio:
-    image: supabase/studio
-    environment:
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-```
-
-```bash name=.env
-## Never check your secrets into version control
-`${OPENAI_API_KEY}`
-```
-
-</$CodeTabs>
+Configuring the Supabase AI Assistant is optional. By adding **your own** `OPENAI_API_KEY` to `.env` you can enable AI services, which help with writing SQL queries, statements, and policies.
 
 #### Setting database's `log_min_messages`
 
-By default, `docker compose` sets the database's `log_min_messages` configuration to `fatal` to prevent redundant logs generated by Realtime. You can configure `log_min_messages` using any of the Postgres [Severity Levels](https://www.postgresql.org/docs/current/runtime-config-logging.html#RUNTIME-CONFIG-SEVERITY-LEVELS).
+By default, the database's `log_min_messages` configuration is set to `fatal` in [docker-compose.yml](https://github.com/supabase/supabase/blob/df8729a82b1847e2989c14ede27965612761d503/docker/docker-compose.yml#L466) to prevent redundant logs generated by Realtime. You can configure `log_min_messages` using any of the Postgres [Severity Levels](https://www.postgresql.org/docs/current/runtime-config-logging.html#RUNTIME-CONFIG-SEVERITY-LEVELS).
 
 #### Accessing Postgres through Supavisor
 
 By default, Postgres connections go through the Supavisor connection pooler for efficient connection management. Two ports are available:
 
-- `POSTGRES_PORT` (default: 5432) – Session mode, behaves like a direct Postgres connection
-- `POOLER_PROXY_PORT_TRANSACTION` (default: 6543) – Transaction mode, uses connection pooling
+- `POSTGRES_PORT` (default: 5432) - Session mode, behaves like a direct Postgres connection
+- `POOLER_PROXY_PORT_TRANSACTION` (default: 6543) - Transaction mode, uses connection pooling
 
 For more information on configuring and using Supavisor, see the [Supavisor documentation](https://supabase.github.io/supavisor/).
 
@@ -505,7 +485,7 @@ The script generates a new password, updates all database roles, and modifies yo
 
 #### File storage backend on macOS
 
-By default, Storage backend is set to `file`, which is to use local files as the storage backend. For macOS compatibility, you need to choose `VirtioFS` as the Docker container file sharing implementation (in Docker Desktop -> Preferences -> General).
+By default, Storage backend is set to `file`, which is to use local files as the storage backend. If using Docker Desktop on a Mac, choose `VirtioFS` as the Docker container file sharing implementation (in **Preferences** > **General**).
 
 ## Managing your secrets
 

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { AlertCircle } from 'lucide-react'
-import Link from 'next/link'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
 
 interface DataApiDisabledStateProps {
@@ -17,12 +17,9 @@ export const DataApiDisabledState = ({ description }: DataApiDisabledStateProps)
         <AlertTitle_Shadcn_>Data API is disabled</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
           Enable the Data API in the{' '}
-          <Link
-            href={`/project/${projectRef}/integrations/data_api/overview`}
-            className="text-foreground underline hover:decoration-foreground-muted"
-          >
+          <InlineLink href={`/project/${projectRef}/integrations/data_api/overview`}>
             Overview
-          </Link>{' '}
+          </InlineLink>{' '}
           tab to {description}.
         </AlertDescription_Shadcn_>
       </Alert_Shadcn_>

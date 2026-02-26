@@ -134,8 +134,8 @@ export const ProfileInformation = () => {
                       label="Primary email"
                       description={
                         profile?.is_sso_user
-                          ? 'Primary email is managed by your SSO provider and cannot be changed here.'
-                          : 'Primary email is used for account notifications.'
+                          ? 'Managed by your SSO provider and cannot be changed here'
+                          : 'Used for account notifications'
                       }
                       layout="flex-row-reverse"
                     >
@@ -173,8 +173,8 @@ export const ProfileInformation = () => {
                       label="Username"
                       description={
                         profile?.is_sso_user
-                          ? 'Username is managed by your SSO provider and cannot be changed here.'
-                          : 'Username appears as a display name throughout the dashboard.'
+                          ? 'Managed by your SSO provider and cannot be changed here'
+                          : 'Display name used across dashboard'
                       }
                       layout="flex-row-reverse"
                     >
