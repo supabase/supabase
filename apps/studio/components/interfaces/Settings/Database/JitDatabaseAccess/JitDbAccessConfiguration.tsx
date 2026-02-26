@@ -29,6 +29,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Button,
   Card,
   CardContent,
   Switch,
@@ -43,6 +44,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
@@ -420,16 +422,19 @@ const JitDbAccessConfiguration = () => {
           </Card>
 
           {!hasAccessToJitDbAccess && (
-            <Alert withIcon variant="warning" title="Just-in-time database access is unavailable">
-              This feature requires Postgres version 17 or later. Please{' '}
-              <Link
-                href={`/project/${ref}/settings/infrastructure`}
-                className="font-medium underline"
-              >
-                upgrade your database
-              </Link>{' '}
-              to the latest Postgres version to enable JIT access.
-            </Alert>
+            <Admonition
+              type="note"
+              layout="vertical"
+              title="Postgres upgrade required"
+              description="Just-in-time access requires a newer Postgres version. Upgrade your project to enable JIT access."
+              actions={
+                ref ? (
+                  <Button type="default" asChild>
+                    <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres</Link>
+                  </Button>
+                ) : undefined
+              }
+            />
           )}
 
           {enabled && hasAccessToJitDbAccess && (
