@@ -120,7 +120,7 @@ export const DefaultLayout = ({
               </div>
 
               <BannerStack />
-              <MobileSheetNav />
+              {/* <MobileSheetNav /> */}
             </BannerStackProvider>
           </MobileSidebarSheetProvider>
         </ProjectContextProvider>

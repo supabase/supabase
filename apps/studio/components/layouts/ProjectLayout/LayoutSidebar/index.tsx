@@ -2,6 +2,7 @@ import { useBreakpoint } from 'common'
 import { useEffect } from 'react'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn, ResizableHandle, ResizablePanel } from 'ui'
+import { MobileSheetNav } from 'ui-patterns'
 
 import { useMobileSidebarSheet } from '../NavigationBar/MobileSidebarSheetContext'
 
@@ -18,19 +19,36 @@ export const LayoutSidebar = ({
   maxSize = '50',
   defaultSize = '30',
 }: LayoutSidebarProps) => {
-  const { activeSidebar } = useSidebarManagerSnapshot()
+  const { activeSidebar, closeActive } = useSidebarManagerSnapshot()
   const isMobile = useBreakpoint('md')
   const { setContent: setMobileSheetOpen } = useMobileSidebarSheet()
+  const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSidebarSheet()
 
   // On mobile the sidebar content is rendered in MobileSheetNav
   useEffect(() => {
     if (isMobile && activeSidebar?.component) {
       setMobileSheetOpen(activeSidebar.id)
+    } else {
+      setMobileSheetContent(null)
     }
-  }, [isMobile, activeSidebar, setMobileSheetOpen])
+  }, [isMobile, activeSidebar])
 
-  if (isMobile) return null
   if (!activeSidebar?.component) return null
+
+  if (isMobile)
+    return (
+      <MobileSheetNav
+        open={mobileSheetContent !== null}
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            setMobileSheetContent(null)
+            closeActive()
+          }
+        }}
+      >
+        {activeSidebar?.component?.()}
+      </MobileSheetNav>
+    )
 
   return (
     <>
