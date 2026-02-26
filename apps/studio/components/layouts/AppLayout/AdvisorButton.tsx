@@ -14,7 +14,6 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { data: lints } = useProjectLintsQuery({ projectRef })
 
   const { data: notificationsData } = useNotificationsV2Query({
-    status: 'new',
     filters: {},
     limit: 20,
   })
