@@ -329,7 +329,7 @@ export const gettingstarted: NavMenuConstant = {
   title: 'Start with Supabase',
   url: '/guides/getting-started',
   items: [
-    { name: 'Features', url: '/guides/getting-started/features' },
+    { name: 'Features', url: 'https://supabase.com/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
       name: 'Framework Quickstarts',
