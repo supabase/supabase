@@ -167,7 +167,8 @@ export const QueryBlock = ({
                   chartConfig={chartSettings}
                   columns={Object.keys(results?.[0] ?? {})}
                   changeView={(nextView) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view: nextView } })
+                    if (onUpdateChartConfig)
+                      onUpdateChartConfig({ chartConfig: { view: nextView } })
                     setChartSettings({ ...chartSettings, view: nextView })
                   }}
                   updateChartConfig={(config) => {
