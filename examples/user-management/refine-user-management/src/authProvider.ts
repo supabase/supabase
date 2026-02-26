@@ -1,8 +1,8 @@
 import { AuthProvider } from "@refinedev/core";
 
-import { supabaseClient } from "./supabase-client";
+import { supabaseClient } from "./utility";
 
-export const authProvider: AuthProvider = {
+const authProvider: AuthProvider = {
   login: async ({ email }) => {
     try {
       const { error } = await supabaseClient.auth.signInWithOtp({ email });
@@ -86,3 +86,5 @@ export const authProvider: AuthProvider = {
     return null;
   },
 };
+
+export default authProvider;
