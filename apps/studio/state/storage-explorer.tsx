@@ -9,10 +9,6 @@ import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 
 import {
-  inverseValidObjectKeyRegex,
-  validObjectKeyRegex,
-} from '@/components/interfaces/Storage/CreateBucketModal.utils'
-import {
   STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
@@ -32,6 +28,7 @@ import {
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
+  validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -73,7 +70,7 @@ const DEFAULT_PREFERENCES = {
 }
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
-let abortController: any
+let abortController: AbortController
 if (typeof window !== 'undefined') {
   abortController = new AbortController()
 }
@@ -100,7 +97,6 @@ function createStorageExplorerState({
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
 
-    // abortController,
     abortApiCalls: () => {
       if (abortController) {
         abortController.abort()
@@ -133,7 +129,6 @@ function createStorageExplorerState({
     popOpenedFolders: () => {
       state.openedFolders = state.openedFolders.slice(0, state.openedFolders.length - 1)
     },
-
     popOpenedFoldersAtIndex: (index: number) => {
       state.openedFolders = state.openedFolders.slice(0, index + 1)
     },
@@ -257,16 +252,7 @@ function createStorageExplorerState({
         .join('/')
     },
 
-    validateFolderName: (name: string) => {
-      if (!validObjectKeyRegex.test(name)) {
-        const [match] = name.match(inverseValidObjectKeyRegex) ?? []
-        return !!match
-          ? `Folder name cannot contain the "${match}" character`
-          : 'Folder name contains an invalid special character'
-      }
-
-      return null
-    },
+    validateFolderName,
 
     addNewFolderPlaceholder: (columnIndex: number) => {
       const isPrepend = true

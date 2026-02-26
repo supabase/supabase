@@ -2,6 +2,10 @@ import { toast } from 'sonner'
 
 import { StorageObject } from 'data/storage/bucket-objects-list-mutation'
 import { copyToClipboard } from 'ui'
+import {
+  inverseValidObjectKeyRegex,
+  validObjectKeyRegex,
+} from '../CreateBucketModal.utils'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
 
@@ -15,6 +19,20 @@ type UploadProgress = {
 
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 export const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
+
+/**
+ * Returns an error message string if the folder name contains invalid characters,
+ * or null if the name is valid.
+ */
+export function validateFolderName(name: string): string | null {
+  if (!validObjectKeyRegex.test(name)) {
+    const [match] = name.match(inverseValidObjectKeyRegex) ?? []
+    return !!match
+      ? `Folder name cannot contain the "${match}" character`
+      : 'Folder name contains an invalid special character'
+  }
+  return null
+}
 
 export const copyPathToFolder = (
   openedFolders: StorageItem[],
