@@ -44,10 +44,9 @@ export const authProvider: AuthProvider = {
   },
   check: async () => {
     try {
-      const { data } = await supabaseClient.auth.getSession();
-      const { session } = data;
+      const { data, error } = await supabaseClient.auth.getClaims();
 
-      if (!session) {
+      if (error || !data) {
         return {
           authenticated: false,
           error: {
