@@ -4,7 +4,7 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn, ResizableHandle, ResizablePanel } from 'ui'
 import { MobileSheetNav } from 'ui-patterns'
 
-import { useMobileSidebarSheet } from '../NavigationBar/MobileSidebarSheetContext'
+import { useMobileSheet } from '../NavigationBar/MobileSheetContext'
 
 // Having these params as props as otherwise it's quite hard to visually check the sizes in DefaultLayout
 // as react resizeable panels requires all these values to be valid to render correctly
@@ -21,8 +21,8 @@ export const LayoutSidebar = ({
 }: LayoutSidebarProps) => {
   const { activeSidebar, closeActive } = useSidebarManagerSnapshot()
   const isMobile = useBreakpoint('md')
-  const { setContent: setMobileSheetOpen } = useMobileSidebarSheet()
-  const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSidebarSheet()
+  const { setContent: setMobileSheetOpen } = useMobileSheet()
+  const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSheet()
 
   // On mobile the sidebar content is rendered in MobileSheetNav
   useEffect(() => {

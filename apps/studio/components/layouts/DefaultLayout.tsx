@@ -14,8 +14,7 @@ import { LayoutHeader } from './ProjectLayout/LayoutHeader/LayoutHeader'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
-import MobileSheetNav from './ProjectLayout/NavigationBar/MobileSheetNavLayout'
-import { MobileSidebarSheetProvider } from './ProjectLayout/NavigationBar/MobileSidebarSheetContext'
+import { MobileSheetProvider } from './ProjectLayout/NavigationBar/MobileSheetContext'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
@@ -76,7 +75,7 @@ export const DefaultLayout = ({
     <SidebarProvider defaultOpen={false}>
       <LayoutSidebarProvider>
         <ProjectContextProvider projectRef={ref}>
-          <MobileSidebarSheetProvider>
+          <MobileSheetProvider>
             <BannerStackProvider>
               <div className="flex flex-col h-screen w-screen">
                 {/* Top Banner */}
@@ -120,9 +119,8 @@ export const DefaultLayout = ({
               </div>
 
               <BannerStack />
-              {/* <MobileSheetNav /> */}
             </BannerStackProvider>
-          </MobileSidebarSheetProvider>
+          </MobileSheetProvider>
         </ProjectContextProvider>
       </LayoutSidebarProvider>
     </SidebarProvider>

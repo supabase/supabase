@@ -2,10 +2,10 @@ import { CommandMenuInnerContent } from 'components/interfaces/App/CommandMenu/C
 import { sidebarManagerState, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { CommandWrapper, MobileSheetNav } from 'ui-patterns'
 
-import { useMobileSidebarSheet } from './MobileSidebarSheetContext'
+import { useMobileSheet } from './MobileSheetContext'
 
 const MobileSheetNavLayout = () => {
-  const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSidebarSheet()
+  const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSheet()
   const { activeSidebar } = useSidebarManagerSnapshot()
 
   return (
