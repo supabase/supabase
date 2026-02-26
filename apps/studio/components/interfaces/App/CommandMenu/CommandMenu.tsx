@@ -21,17 +21,6 @@ import { useConfigureOrganizationCommand, useProjectSwitchCommand } from './OrgP
 import { useSupportCommands } from './Support'
 import { useConnectCommands } from '@/components/interfaces/ConnectButton/Connect.Commands'
 
-export function CommandMenuInnerContent() {
-  return (
-    <>
-      <CommandHeader>
-        <CommandInput />
-      </CommandHeader>
-      <CommandList />
-    </>
-  )
-}
-
 export default function StudioCommandMenu() {
   useCreateCommands()
   useApiKeysCommands()
@@ -57,7 +46,10 @@ export default function StudioCommandMenu() {
 
   return (
     <CommandMenu>
-      <CommandMenuInnerContent />
+      <CommandHeader>
+        <CommandInput />
+      </CommandHeader>
+      <CommandList />
     </CommandMenu>
   )
 }

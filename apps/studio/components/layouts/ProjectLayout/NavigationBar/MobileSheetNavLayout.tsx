@@ -1,6 +1,5 @@
-import { CommandMenuInnerContent } from 'components/interfaces/App/CommandMenu/CommandMenu'
 import { sidebarManagerState, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { CommandWrapper, MobileSheetNav } from 'ui-patterns'
+import { MobileSheetNav } from 'ui-patterns'
 
 import { useMobileSheet } from './MobileSheetContext'
 
@@ -18,13 +17,7 @@ export function MobileSheetNavLayout() {
         }
       }}
     >
-      {mobileSheetContent === 'search' ? (
-        <CommandWrapper className="h-full flex flex-col bg-background">
-          <CommandMenuInnerContent />
-        </CommandWrapper>
-      ) : (
-        activeSidebar?.component?.() ?? null
-      )}
+      {activeSidebar?.component?.() ?? null}
     </MobileSheetNav>
   )
 }
