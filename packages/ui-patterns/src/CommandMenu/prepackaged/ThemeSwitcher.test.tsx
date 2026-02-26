@@ -1,7 +1,3 @@
-import { act, render, waitFor } from '@testing-library/react'
-import { useEffect } from 'react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import {
   CommandProvider,
   PageType,
@@ -10,19 +6,23 @@ import {
   useCurrentPage,
   useSetCommandMenuOpen,
 } from '..'
+import { act, render, waitFor } from '@testing-library/react'
+import { useEffect } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import type { ICommand, ICommandSection } from '../internal/types'
 import { useThemeSwitcherCommands } from './ThemeSwitcher'
 
 const themeMock = vi.hoisted(() => ({
   setTheme: vi.fn(),
   state: {
-    resolvedTheme: 'light' as string | undefined,
+    theme: 'light' as string | undefined,
   },
 }))
 
 vi.mock('next-themes', () => ({
   useTheme: () => ({
-    resolvedTheme: themeMock.state.resolvedTheme,
+    theme: themeMock.state.theme,
     setTheme: themeMock.setTheme,
   }),
 }))
@@ -94,7 +94,7 @@ const runAction = (id: string) => {
 describe('useThemeSwitcherCommands', () => {
   beforeEach(() => {
     themeMock.setTheme.mockReset()
-    themeMock.state.resolvedTheme = 'light'
+    themeMock.state.theme = 'light'
 
     captured.commandSections = []
     captured.currentPage = undefined
@@ -182,7 +182,7 @@ describe('useThemeSwitcherCommands', () => {
   })
 
   it('toggle theme switches dark to light', async () => {
-    themeMock.state.resolvedTheme = 'dark'
+    themeMock.state.theme = 'dark'
     await renderHarness()
 
     runAction('toggle-theme')
@@ -191,7 +191,7 @@ describe('useThemeSwitcherCommands', () => {
   })
 
   it('toggle theme switches non-dark modes to dark', async () => {
-    themeMock.state.resolvedTheme = 'light'
+    themeMock.state.theme = 'light'
     await renderHarness()
 
     runAction('toggle-theme')
@@ -205,7 +205,7 @@ describe('useThemeSwitcherCommands', () => {
     runAction('toggle-theme')
     expect(themeMock.setTheme).toHaveBeenLastCalledWith('dark')
 
-    themeMock.state.resolvedTheme = 'dark'
+    themeMock.state.theme = 'dark'
     renderResult.rerender(
       <CommandProvider>
         <ThemeSwitcherHarness />
@@ -231,7 +231,9 @@ describe('useThemeSwitcherCommands', () => {
 
     expect(captured.currentPage?.type).toBe(PageType.Commands)
     const sections =
-      captured.currentPage && 'sections' in captured.currentPage ? captured.currentPage.sections : []
+      captured.currentPage && 'sections' in captured.currentPage
+        ? captured.currentPage.sections
+        : []
 
     expect(sections).toHaveLength(1)
     expect(sections[0].name).toBe('Switch theme')
