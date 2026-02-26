@@ -409,7 +409,7 @@ Supabase Branching allows you to create and test changes in separate, temporary 
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
     status: {
-      stage: PRODUCT_STAGES.GA,
+      stage: PRODUCT_STAGES.BETA,
       availableOnSelfHosted: false,
     },
   },
@@ -681,7 +681,7 @@ This feature is particularly useful for teams looking to enhance their security 
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
     },
   },
@@ -1234,7 +1234,7 @@ JWT Signing Keys provide modern, secure JWT management with the flexibility requ
     slug: 'jwt-signing-keys',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: false,
+      availableOnSelfHosted: true,
     },
   },
   {
@@ -1944,13 +1944,13 @@ Persistent Storage backed by S3 protocol survives invocations. Ephemeral Storage
 - Machine learning model storage
 
 ## Setup
-Requires S3 credentials as environment variables: \`AWS_ACCESS_KEY_ID\`, \`AWS_SECRET_ACCESS_KEY\`, \`AWS_REGION\`, \`AWS_ENDPOINT_URL_S3\`.
+Requires S3 credentials as environment variables: \`S3FS_ACCESS_KEY_ID\`, \`S3FS_SECRET_ACCESS_KEY\`, \`S3FS_REGION\`, \`S3FS_ENDPOINT_URL\`.
 
 Persistent Storage transforms Edge Functions into stateful, high-performance computing environments.`,
     icon: UploadCloud,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/storage',
+    docsUrl: 'https://supabase.com/docs/guides/functions/ephemeral-storage',
     slug: 'persistent-storage',
     status: {
       stage: PRODUCT_STAGES.GA,
