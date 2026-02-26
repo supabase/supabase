@@ -8,7 +8,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 
 import { useUser } from './auth'
-import { hasConsented } from './consent-state'
+import { hasConsented, useConsentState } from './consent-state'
 import { IS_PLATFORM, IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
@@ -30,11 +30,14 @@ const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
 // Reexports GoogleTagManager with the right API key set
 export const TelemetryTagManager = () => {
-  const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
+  // useConsentState is used here to trigger a re-render when consent state changes
+  const { hasAccepted } = useConsentState()
 
-  if (!isGTMEnabled) {
-    return
-  }
+  const isGTMEnabled = Boolean(
+    IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && hasAccepted
+  )
+
+  if (!isGTMEnabled) return null
 
   return (
     <Script
