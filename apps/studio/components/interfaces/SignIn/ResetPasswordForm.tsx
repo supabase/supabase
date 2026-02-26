@@ -1,22 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { captureCriticalError } from 'lib/error-reporting'
+import { auth, getReturnToPath } from 'lib/gotrue'
 import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Button, cn, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Separator } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
-
-import { captureCriticalError } from 'lib/error-reporting'
-import { auth, getReturnToPath } from 'lib/gotrue'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
-  Input,
-} from 'ui'
 
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
@@ -46,19 +40,18 @@ const recoveryPasswordSchema = z.object({
 
 type FormData = z.infer<typeof passwordSchema>
 
-const ResetPasswordForm = () => {
+export const ResetPasswordForm = () => {
   const router = useRouter()
-  const isRecoveryFlow = router.query.type === 'recovery'
+  const { type } = useParams()
+  const requireCurrentPassword = type === 'change'
+
   const [showConditions, setShowConditions] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [currentPasswordHidden, setCurrentPasswordHidden] = useState(true)
 
   const form = useForm<FormData>({
-    resolver: zodResolver(isRecoveryFlow ? recoveryPasswordSchema : passwordSchema),
-    defaultValues: {
-      password: '',
-      currentPassword: '',
-    },
+    resolver: zodResolver(requireCurrentPassword ? passwordSchema : recoveryPasswordSchema),
+    defaultValues: { password: '', currentPassword: '' },
     mode: 'onChange',
   })
 
@@ -66,7 +59,7 @@ const ResetPasswordForm = () => {
     const toastId = toast.loading('Saving password...')
     const { error } = await auth.updateUser({
       password: data.password,
-      ...(isRecoveryFlow ? {} : { currentPassword: data.currentPassword }),
+      ...(requireCurrentPassword ? { currentPassword: data.currentPassword } : {}),
     })
 
     if (!error) {
@@ -84,34 +77,34 @@ const ResetPasswordForm = () => {
   return (
     <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
-        {!isRecoveryFlow && (
+        {requireCurrentPassword && (
           <FormField_Shadcn_
             control={form.control}
             name="currentPassword"
             render={({ field }) => (
-              <FormItem_Shadcn_>
+              <FormItemLayout label="Current password">
                 <FormControl_Shadcn_>
-                  <div onBlur={() => setCurrentPasswordHidden(true)}>
-                    <Input
-                      id="currentPassword"
-                      type={currentPasswordHidden ? 'password' : 'text'}
-                      label="Current password"
-                      placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                      disabled={form.formState.isSubmitting}
-                      actions={
-                        <Button
-                          icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
-                          type="default"
-                          className="!mr-1"
-                          onClick={() => setCurrentPasswordHidden((prev) => !prev)}
-                        />
-                      }
-                      {...field}
-                    />
-                  </div>
+                  <Input
+                    id="currentPassword"
+                    type={currentPasswordHidden ? 'password' : 'text'}
+                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                    disabled={form.formState.isSubmitting}
+                    actions={
+                      <Button
+                        icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
+                        type="default"
+                        className="w-7"
+                        onClick={() => setCurrentPasswordHidden((prev) => !prev)}
+                      />
+                    }
+                    {...field}
+                    onBlur={() => {
+                      field.onBlur()
+                      setCurrentPasswordHidden(true)
+                    }}
+                  />
                 </FormControl_Shadcn_>
-                <FormMessage_Shadcn_ />
-              </FormItem_Shadcn_>
+              </FormItemLayout>
             )}
           />
         )}
@@ -119,43 +112,44 @@ const ResetPasswordForm = () => {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem_Shadcn_>
+            <FormItemLayout label="Password">
               <FormControl_Shadcn_>
-                <div onBlur={() => setPasswordHidden(true)}>
-                  <Input
-                    id="password"
-                    type={passwordHidden ? 'password' : 'text'}
-                    label="Password"
-                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                    disabled={form.formState.isSubmitting}
-                    onFocus={() => setShowConditions(true)}
-                    autoComplete="new-password"
-                    actions={
-                      <Button
-                        icon={passwordHidden ? <Eye /> : <EyeOff />}
-                        type="default"
-                        className="!mr-1"
-                        onClick={() => setPasswordHidden((prev) => !prev)}
-                      />
-                    }
-                    {...field}
-                  />
-                </div>
+                <Input
+                  id="password"
+                  type={passwordHidden ? 'password' : 'text'}
+                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                  disabled={form.formState.isSubmitting}
+                  onFocus={() => setShowConditions(true)}
+                  autoComplete="new-password"
+                  actions={
+                    <Button
+                      icon={passwordHidden ? <Eye /> : <EyeOff />}
+                      type="default"
+                      className="w-7"
+                      onClick={() => setPasswordHidden((prev) => !prev)}
+                    />
+                  }
+                  {...field}
+                  onBlur={() => {
+                    field.onBlur()
+                    setPasswordHidden(true)
+                  }}
+                />
               </FormControl_Shadcn_>
-              <FormMessage_Shadcn_ />
-            </FormItem_Shadcn_>
+            </FormItemLayout>
           )}
         />
 
         <div
-          className={`${
-            showConditions ? 'max-h-[500px]' : 'max-h-[0px]'
-          } transition-all duration-400 overflow-y-hidden`}
+          className={cn(
+            showConditions ? 'max-h-[500px]' : 'max-h-[0px]',
+            'transition-all duration-400 overflow-y-hidden'
+          )}
         >
           <PasswordConditionsHelper password={form.watch('password')} />
         </div>
 
-        <div className="border-overlay-border border-t" />
+        <Separator className="bg-border" />
 
         <Button
           block
@@ -170,5 +164,3 @@ const ResetPasswordForm = () => {
     </Form_Shadcn_>
   )
 }
-
-export default ResetPasswordForm
