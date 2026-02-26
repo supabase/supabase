@@ -147,32 +147,10 @@ async function debuggableNavigatorLock<R>(
       }
 
       console.error(
-        `Waited for over 10s to acquire an Auth client lock, will steal the lock to unblock`,
+        `Waited for over 10s to acquire an Auth client lock`,
         await navigator.locks.query(),
         stackException
       )
-
-      // quickly steal the lock and release it so that others can acquire it,
-      // while leaving the code that was holding it to continue running
-      navigator.locks
-        .request(
-          name,
-          {
-            steal: true,
-          },
-          async () => {
-            await new Promise((accept) => {
-              setTimeout(accept, 0)
-            })
-
-            console.error('Lock was stolen and now released', stackException)
-          }
-        )
-        .catch((e: any) => {
-          if (captureException) {
-            captureException(e)
-          }
-        })
     })()
   }, 10000)
 
