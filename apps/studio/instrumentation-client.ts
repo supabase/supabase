@@ -70,15 +70,15 @@ export function isChallengeExpiredError(error: unknown, event: Sentry.Event): bo
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
+  release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA,
   ...(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT && {
     environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
   }),
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
 
-  // Capture all errors (1 = 100%)
-  sampleRate: 1,
+  // Enable performance monitoring
+  tracesSampleRate: 0.001, // Capture 0.1% of transactions for performance monitoring
 
   integrations: [
     // Drop errors whose stack trace only contains third-party frames (browser extensions,
@@ -89,24 +89,6 @@ Sentry.init({
       behaviour: 'drop-error-if-exclusively-contains-third-party-frames',
     }),
   ],
-
-  // Route-aware performance sampling.
-  // Drop static assets and health checks entirely, capture everything else at 100%.
-  tracesSampler: ({ name }) => {
-    // Drop static assets, health checks, and internal routes entirely
-    if (
-      name?.startsWith('/_next/') ||
-      name === '/api/health' ||
-      name === '/api/ping' ||
-      name === '/monitoring' ||
-      name === '/favicon.ico'
-    ) {
-      return 0
-    }
-
-    // Capture all other routes at 100%
-    return 1
-  },
 
   // Only capture errors originating from our own code.
   // This is a whitelist on the source URL in stack frames — it drops errors from
@@ -138,6 +120,19 @@ Sentry.init({
     }
 
     if (!IS_PLATFORM) {
+      return null
+    }
+
+    // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+    const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
+      `Failed to construct 'URL': Invalid URL`
+    )
+    // [Joshen] Similar behaviour for this error from SessionTimeoutModal to control the quota usage
+    const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
+      'Session error detected'
+    )
+
+    if ((isInvalidUrlEvent || isSessionTimeoutEvent) && Math.random() > 0.01) {
       return null
     }
 
