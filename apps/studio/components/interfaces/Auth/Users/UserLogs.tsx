@@ -62,16 +62,18 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           </p>
         </div>
 
-        <Button asChild type="default" icon={<ExternalLink size={14} />}>
+        <Button asChild type="default" className="w-min">
           <Link
             href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(API_LOGS_QUERY(user.id ?? ''))}`}
           >
             Open in Log Explorer
           </Link>
         </Button>
+      </div>
 
-        <Separator />
+      <Separator />
 
+      <div className={cn('flex flex-col gap-y-3', PANEL_PADDING)}>
         <div>
           <p>Authentication logs</p>
           <p className="text-sm text-foreground-light">
