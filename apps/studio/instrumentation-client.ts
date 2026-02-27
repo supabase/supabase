@@ -77,6 +77,9 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
 
+  // Capture all errors (1 = 100%)
+  sampleRate: 1,
+
   integrations: [
     // Drop errors whose stack trace only contains third-party frames (browser extensions,
     // injected scripts, etc.). This uses build-time code annotation via the applicationKey
@@ -87,9 +90,9 @@ Sentry.init({
     }),
   ],
 
-  // Route-aware performance sampling instead of a flat rate.
-  // High-value flows get full coverage, noise gets dropped entirely.
-  tracesSampler: ({ name, inheritOrSampleWith }) => {
+  // Route-aware performance sampling.
+  // Drop static assets and health checks entirely, capture everything else at 100%.
+  tracesSampler: ({ name }) => {
     // Drop static assets, health checks, and internal routes entirely
     if (
       name?.startsWith('/_next/') ||
@@ -101,18 +104,8 @@ Sentry.init({
       return 0
     }
 
-    // Critical flows: auth, billing, project creation — 100% sampling
-    if (
-      name?.includes('/sign-in') ||
-      name?.includes('/sign-up') ||
-      name?.includes('/billing') ||
-      name?.includes('/new/')
-    ) {
-      return 1.0
-    }
-
-    // Default: inherit parent trace decision or fall back to 10%
-    return inheritOrSampleWith(0.1)
+    // Capture all other routes at 100%
+    return 1
   },
 
   // Only capture errors originating from our own code.
@@ -145,19 +138,6 @@ Sentry.init({
     }
 
     if (!IS_PLATFORM) {
-      return null
-    }
-
-    // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
-    const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
-      `Failed to construct 'URL': Invalid URL`
-    )
-    // [Joshen] Similar behaviour for this error from SessionTimeoutModal to control the quota usage
-    const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
-      'Session error detected'
-    )
-
-    if ((isInvalidUrlEvent || isSessionTimeoutEvent) && Math.random() > 0.01) {
       return null
     }
 
