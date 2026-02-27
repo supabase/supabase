@@ -8,7 +8,7 @@ import { IS_PLATFORM } from 'common/constants/environment'
 import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from 'lib/sanitize'
 
-const FULL_ERROR_SAMPLE_RATE = 1.0
+const DEFAULT_ERROR_SAMPLE_RATE = 1.0
 const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01
 const CHUNK_LOAD_ERROR_PATTERNS = [
   /ChunkLoadError/i,
@@ -141,28 +141,27 @@ Sentry.init({
       return null
     }
 
-    // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+    // Downsample only known high-noise classes; keep all other errors at full rate.
     const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
       `Failed to construct 'URL': Invalid URL`
     )
-    // [Joshen] Similar behaviour for this error from SessionTimeoutModal to control the quota usage
     const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
       'Session error detected'
     )
     const isChunkLoadFailure = isChunkLoadError(hint.originalException, event)
 
-    const sentrySampleRate =
+    const codeSampleRate =
       isInvalidUrlEvent || isSessionTimeoutEvent || isChunkLoadFailure
         ? LOW_PRIORITY_ERROR_SAMPLE_RATE
-        : FULL_ERROR_SAMPLE_RATE
+        : DEFAULT_ERROR_SAMPLE_RATE
 
-    if (Math.random() > sentrySampleRate) {
+    if (Math.random() > codeSampleRate) {
       return null
     }
 
     event.tags = {
       ...event.tags,
-      sentrySampleRate: sentrySampleRate.toString(),
+      codeSampleRate: codeSampleRate.toString(),
     }
 
     if (isHCaptchaRelatedError(event)) {
