@@ -38,9 +38,7 @@ export function captureCriticalError(
   error: ResponseError | Error | { message: string },
   context: string
 ): void {
-  const errorMessage =
-    error instanceof Error ? error.message : (error as { message: string }).message
-  if (!errorMessage) {
+  if (!error.message) {
     return
   }
 
@@ -77,13 +75,12 @@ function handleResponseError(error: ResponseError, context: string) {
 }
 
 function handleError(error: Error, context: string) {
-  const message = error.message
-  if (!message) {
+  if (!error.message) {
     return
   }
 
   captureMessage({
-    message,
+    message: error.message,
     context,
   })
 }
