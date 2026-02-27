@@ -455,32 +455,31 @@ By adopting the Supabase Terraform provider, teams can implement GitOps practice
   },
   {
     title: 'Read replicas',
-    subtitle: 'Deploy read-only databases across multiple regions for lower latency.',
+    subtitle: 'Isolate heavy workloads and reduce global latency',
     description: `
-Supabase Read Replicas allow you to deploy additional read-only databases that are kept in sync with your Primary database. This feature enhances performance, improves resource management, and reduces latency for global applications.
+Supabase Read Replicas distribute read traffic across multiple databases. Use them to isolate analytics workloads from production, reduce latency for global users or scale read capacity beyond a single database.
 
 ## Key features
-1. Load balancing: Distribute read operations across multiple databases, reducing load on the Primary.
-2. Global deployment: Deploy replicas closer to users for reduced latency.
-3. Dedicated endpoints: Each replica has its own database and API endpoints.
-4. API load balancer: Automatically balance GET requests across all available endpoints.
+
+1. Workload Isolation: Run heavy read queries (analytics, reports, exports, batch jobs) on dedicated replicas without impacting production response times.
+2. Multi-region deployment: Deploy replicas in regions closer to your users. European users query European databases.
+3. Dedicated endpoints: Each replica provides separate database and API connection strings for direct access.
+4. Automatic routing: API load balancer routes GET requests to the nearest available replica.
 5. Centralized configuration: Settings are propagated across all databases in a project.
-6. Monitoring tools: Track replication lag and resource utilization through the Supabase Dashboard.
+6. Monitoring tools: Track replication lag and resource usage directly in the Supabase Dashboard.
 
-## Benefits:
-- Improved performance: Serve data from the nearest location, reducing response times.
-- Increased availability: Distribute read traffic across multiple replicas for enhanced resilience.
-- Scalability: Handle higher read loads by offloading queries to replicas.
-- Data redundancy: Replicas provide additional copies of your data.
-- Analytics support: Run resource-intensive queries on replicas without impacting production.
+## When to use Read Replicas
 
-## Read Replicas are particularly valuable for:
-- Global applications serving users across different regions
-- High-traffic websites with read-heavy workloads
-- Real-time analytics dashboards requiring low-latency data access
-- Applications needing to scale read capacity independently of write capacity
+- Your analytics team's reports slow down production (workload isolation)
+- Users in Europe or Asia experience 100-150ms latency (geo-distribution)
+- You've reached 16XL and need more read capacity (horizontal scaling)
+- Your workload is 80%+ reads and needs to scale independently of writes
 
-By leveraging Read Replicas, you can achieve consistent low-latency performance globally, improve application responsiveness for read operations, and enhance system reliability through better resource distribution and redundancy.
+## Get Started
+
+Deploy your first Read Replica in minutes from Project Settings > Infrastructure. Choose a region—same region for analytics isolation, different region for geo-distribution. Select a compute size to match your workload.
+
+[Read blog post](https://supabase.com/blog/read-replicas-vs-bigger-compute)
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -1235,7 +1234,7 @@ JWT Signing Keys provide modern, secure JWT management with the flexibility requ
     slug: 'jwt-signing-keys',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -3006,6 +3005,58 @@ For detailed instructions and best practices, see the [Declarative Schemas docum
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'PrivateLink',
+    subtitle: 'Secure private network connectivity to your Supabase database.',
+    description: `
+Supabase PrivateLink provides enterprise-grade private network connectivity between your AWS VPC and your Supabase database using AWS VPC Lattice. This eliminates exposure to the public internet by creating a secure, private connection that keeps your database traffic within the AWS network backbone.
+
+When enabled, your database connections stay entirely within the AWS network. No public internet exposure. No additional attack surface. From a network perspective, your Supabase database behaves like it's inside your own VPC.
+
+## Key benefits
+1. Enhanced security posture: Database traffic flows through private AWS infrastructure only, minimizing attack vectors by eliminating public exposure.
+2. Compliance ready: Meet strict regulatory requirements for private network connectivity in healthcare, finance, and other industries with high compliance requirements.
+3. Reduced latency: Connection latency is typically lower than public connections because traffic takes a more direct path through AWS networks.
+4. Network isolation: Keep sensitive database connections completely separate from public internet traffic.
+5. Simplified architecture: No need to manage complex VPN configurations or additional networking infrastructure.
+6. Flexible deployment: Connect through a dedicated PrivateLink endpoint or integrate with existing VPC Lattice Service Networks.
+
+## How PrivateLink works
+
+Supabase PrivateLink uses AWS VPC Lattice under the hood. When you enable PrivateLink, Supabase shares a VPC Lattice Resource Configuration with your AWS account. You accept the share and create an endpoint in your VPC.
+
+Your applications connect to the endpoint using a private DNS name. Traffic flows through AWS infrastructure to your Supabase database. The connection supports both direct Postgres connections and PgBouncer for connection pooling.
+
+## When to use PrivateLink
+
+PrivateLink is particularly valuable for:
+
+- **Highly regulated industries**: Healthcare, finance, and other organizations with high compliance requirements often require private network connectivity to meet these standards.
+- **Security-conscious teams**: Minimize your attack surface by disabling public database access entirely once PrivateLink is configured.
+- **AWS-native workloads**: If your applications already run on AWS, setting up PrivateLink is straightforward and keeps all traffic within the same cloud provider.
+- **Enterprise deployments**: Organizations handling sensitive data that need additional layers of network security.
+
+## Current considerations
+
+PrivateLink is currently in Beta with some constraints:
+
+- **AWS environments required**: This initial release supports connections to AWS VPCs via PrivateLink. Your workloads needs to run in AWS to use PrivateLink.
+- **Database connections only**: PrivateLink works for Postgres and PgBouncer connections. It does not cover the Supabase API, Storage, Auth, or Realtime services, which still use public endpoints.
+- **Same region required**: Your AWS VPC must be in the same region as your Supabase project.
+- **Team or Enterprise plan required**: PrivateLink is available on Team and Enterprise plans.
+
+By leveraging PrivateLink, you can satisfy stringent compliance requirements, reduce your security attack surface, and ensure your most sensitive database connections never traverse the public internet.
+`,
+    icon: Shield,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/blog/2026/security-retro/privatelink.png',
+    docsUrl: 'https://supabase.com/docs/guides/platform/privatelink',
+    slug: 'privatelink',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: false,
     },
   },
 ]

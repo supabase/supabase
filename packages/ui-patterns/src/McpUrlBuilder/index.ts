@@ -15,6 +15,7 @@ export { McpConfigPanel, type McpConfigPanelProps } from './McpConfigPanel'
 export type {
   McpClient,
   McpClientBaseConfig as McpClientConfig,
+  McpClientInstructionOptions,
   McpOnCopyCallback,
   McpFeatureGroup,
   McpUrlBuilderConfig,

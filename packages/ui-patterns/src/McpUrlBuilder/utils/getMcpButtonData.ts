@@ -5,6 +5,7 @@ interface GetMcpButtonDataOptions {
   theme?: 'light' | 'dark'
   client: McpClient
   clientConfig: McpClientConfig
+  isPlatform?: boolean
 }
 
 export function getMcpButtonData({
@@ -12,9 +13,10 @@ export function getMcpButtonData({
   theme,
   client,
   clientConfig,
+  isPlatform,
 }: GetMcpButtonDataOptions) {
   if (client.generateDeepLink) {
-    const deepLink = client.generateDeepLink(clientConfig)
+    const deepLink = client.generateDeepLink(clientConfig, { isPlatform })
     if (!deepLink) return null
 
     // If the theme is dark, the button background will be light and vice-versa

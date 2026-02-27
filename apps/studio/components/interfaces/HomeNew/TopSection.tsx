@@ -1,7 +1,5 @@
-import Link from 'next/link'
-import { ReactFlowProvider } from 'reactflow'
-
 import { ActivityStats } from 'components/interfaces/HomeNew/ActivityStats'
+import { ProjectConnectionHoverCard } from 'components/interfaces/HomeNew/ProjectConnectionHoverCard'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -11,7 +9,10 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import Link from 'next/link'
+import { ReactFlowProvider } from 'reactflow'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 
 export const TopSection = () => {
@@ -54,30 +55,33 @@ export const TopSection = () => {
                   {parentProject?.name}
                 </Link>
               )}
-              <h1 className="text-3xl">{projectName}</h1>
-            </div>
-            <div className="flex items-center gap-x-2">
-              {isOrioleDb && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge variant="warning">OrioleDB</Badge>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
-                    This project is using Postgres with OrioleDB which is currently in preview and
-                    not suitable for production workloads. View our{' '}
-                    <InlineLink href={`${DOCS_URL}/guides/database/orioledb`}>
-                      documentation
-                    </InlineLink>{' '}
-                    for all limitations.
-                  </TooltipContent>
-                </Tooltip>
-              )}
-              <ComputeBadgeWrapper
-                projectRef={project?.ref}
-                slug={organization?.slug}
-                cloudProvider={project?.cloud_provider}
-                computeSize={project?.infra_compute_size}
-              />
+              <div className="flex items-center gap-x-2">
+                <h1 className="text-3xl">{projectName}</h1>
+                <div className="flex items-center gap-x-2">
+                  {isOrioleDb && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="warning">OrioleDB</Badge>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
+                        This project is using Postgres with OrioleDB which is currently in preview
+                        and not suitable for production workloads. View our{' '}
+                        <InlineLink href={`${DOCS_URL}/guides/database/orioledb`}>
+                          documentation
+                        </InlineLink>{' '}
+                        for all limitations.
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  <ComputeBadgeWrapper
+                    projectRef={project?.ref}
+                    slug={organization?.slug}
+                    cloudProvider={project?.cloud_provider}
+                    computeSize={project?.infra_compute_size}
+                  />
+                </div>
+              </div>
+              <ProjectConnectionHoverCard projectRef={project?.ref} />
             </div>
           </div>
           <div className="mt-8">

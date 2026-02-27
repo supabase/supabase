@@ -934,7 +934,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Get database disk attributes */
+    get: operations['v1-get-database-disk']
     put?: never
     /** Modify database disk */
     post: operations['v1-modify-database-disk']
@@ -994,6 +995,23 @@ export interface paths {
     head?: never
     /** Updates realtime configuration */
     patch: operations['v1-update-realtime-config']
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/realtime/shutdown': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Shutdowns realtime connections for a project */
+    post: operations['v1-shutdown-realtime']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/v1/projects/{ref}/config/storage': {
@@ -1475,6 +1493,24 @@ export interface paths {
     /** Gets project's service health status */
     get: operations['v1-get-services-health']
     put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Get project's just-in-time access configuration. */
+    get: operations['v1-get-jit-access-config']
+    /** [Beta] Update project's just-in-time access configuration. */
+    put: operations['v1-update-jit-access-config']
     post?: never
     delete?: never
     options?: never
@@ -2257,6 +2293,7 @@ export interface components {
       security_captcha_secret: string | null
       security_manual_linking_enabled: boolean | null
       security_refresh_token_reuse_interval: number | null
+      security_sb_forwarded_for_enabled: boolean | null
       security_update_password_require_reauthentication: boolean | null
       sessions_inactivity_timeout: number | null
       sessions_single_per_user: boolean | null
@@ -2770,6 +2807,23 @@ export interface components {
             type: 'io2'
           }
     }
+    DiskResponse: {
+      attributes:
+        | {
+            iops: number
+            size_gb: number
+            throughput_mibps?: number
+            /** @enum {string} */
+            type: 'gp3'
+          }
+        | {
+            iops: number
+            size_gb: number
+            /** @enum {string} */
+            type: 'io2'
+          }
+      last_modified_at?: string
+    }
     DiskUtilMetricsResponse: {
       metrics: {
         fs_avail_bytes: number
@@ -2875,6 +2929,10 @@ export interface components {
           | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       }
       updated_at?: string
+    }
+    JitAccessRequestRequest: {
+      /** @enum {string} */
+      state: 'enabled' | 'disabled' | 'unavailable'
     }
     JitAccessResponse: {
       /** Format: uuid */
@@ -3490,7 +3548,26 @@ export interface components {
           type: 'smartGroup'
         }[]
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -3509,7 +3586,26 @@ export interface components {
           type: 'smartGroup'
         }
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -3940,6 +4036,7 @@ export interface components {
       security_captcha_secret?: string | null
       security_manual_linking_enabled?: boolean | null
       security_refresh_token_reuse_interval?: number | null
+      security_sb_forwarded_for_enabled?: boolean | null
       security_update_password_require_reauthentication?: boolean | null
       sessions_inactivity_timeout?: number | null
       sessions_single_per_user?: boolean | null
@@ -4742,6 +4839,7 @@ export interface components {
              * @description Deprecated. Use `status` instead.
              */
             healthy: boolean
+            replication_connected: boolean
           }
         | {
             db_schema: string
@@ -4910,6 +5008,7 @@ export interface operations {
     parameters: {
       query?: {
         included_schemas?: string
+        pgdelta?: string
       }
       header?: never
       path: {
@@ -5284,27 +5383,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['V1OrganizationMemberResponse'][]
         }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
     }
   }
@@ -8233,6 +8311,56 @@ export interface operations {
       }
     }
   }
+  'v1-get-database-disk': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DiskResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get database disk attributes */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-modify-database-disk': {
     parameters: {
       query?: never
@@ -8460,6 +8588,55 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-shutdown-realtime': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Realtime connections shutdown successfully */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Tenant not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -10411,6 +10588,110 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve project's service health status */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-jit-access-config': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitAccessResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve project's JIT access config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-update-jit-access-config': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['JitAccessRequestRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitAccessResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project's just-in-time access configuration. */
       500: {
         headers: {
           [name: string]: unknown

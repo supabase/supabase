@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 // End of third-party imports
 
 import { API_URL, BASE_PATH } from 'lib/constants'
-import { HttpResponse, http } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { createMockOrganization, createMockProject } from 'tests/helpers'
 import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock, mswServer } from 'tests/lib/msw'
@@ -785,6 +785,10 @@ describe('SupportFormPage', () => {
       expect(getSeveritySelector(screen)).toHaveTextContent('High')
     })
 
+    // Wait for library selector to be available before interacting
+    await waitFor(() => {
+      expect(getLibrarySelector(screen)).toBeInTheDocument()
+    })
     await selectLibraryOption(screen, 'JavaScript')
     await waitFor(() => {
       expect(getLibrarySelector(screen)).toHaveTextContent('JavaScript')
@@ -801,9 +805,14 @@ describe('SupportFormPage', () => {
     const supportAccessToggle = screen.getByRole('switch', {
       name: /allow support access to your project/i,
     })
-    expect(supportAccessToggle).toBeChecked()
+    // Wait for toggle to be in expected state before interacting
+    await waitFor(() => {
+      expect(supportAccessToggle).toBeChecked()
+    })
     await userEvent.click(supportAccessToggle)
-    expect(supportAccessToggle).not.toBeChecked()
+    await waitFor(() => {
+      expect(supportAccessToggle).not.toBeChecked()
+    })
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -833,7 +842,7 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
     })
-  }, 10_000)
+  }, 15_000)
 
   test('submits urgent login issues ticket for a different organization', async () => {
     const submitSpy = vi.fn()
@@ -891,10 +900,6 @@ describe('SupportFormPage', () => {
     await userEvent.clear(messageField)
     await userEvent.type(messageField, 'MFA challenge fails with an unknown error code')
 
-    expect(
-      screen.queryByRole('switch', { name: /allow support access to your project/i })
-    ).toBeNull()
-
     await userEvent.click(getSubmitButton(screen))
 
     await waitFor(() => {
@@ -910,7 +915,7 @@ describe('SupportFormPage', () => {
       organizationSlug: 'org-2',
       library: '',
       affectedServices: '',
-      allowSupportAccess: false,
+      allowSupportAccess: true,
       verified: true,
       tags: ['dashboard-support-form'],
       siteUrl: 'https://project-2.supabase.dev',

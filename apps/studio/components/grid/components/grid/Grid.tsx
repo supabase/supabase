@@ -1,10 +1,7 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { forwardRef, memo, Ref, useMemo, useRef } from 'react'
-import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { ref as valtioRef } from 'valtio'
-
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
+import { useIsTableFilterBarEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -13,15 +10,21 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
+import { forwardRef, memo, Ref, useCallback, useMemo, useRef } from 'react'
+import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ref as valtioRef } from 'valtio'
+
+import { useTableFilter } from '../../hooks/useTableFilter'
 import type { GridProps, SupaRow } from '../../types'
+import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
-import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -29,7 +32,7 @@ const rowKeyGetter = (row: SupaRow) => {
 
 interface IGrid extends GridProps {
   rows: SupaRow[]
-  error: Error | null
+  error: ResponseError | null
   isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
@@ -55,9 +58,12 @@ export const Grid = memo(
       },
       ref: Ref<DataGridHandle> | undefined
     ) => {
+      const newFilterBarEnabled = useIsTableFilterBarEnabled()
+
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
-      const { filters, onApplyFilters } = useTableFilter()
+      const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
+      const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
 
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
@@ -91,12 +97,7 @@ export const Grid = memo(
 
       const { mutate: sendEvent } = useSendEventMutation()
 
-      const {
-        isValidFile: isValidFileDraggedOver,
-        isDraggedOver,
-        onDragOver,
-        onFileDrop,
-      } = useCsvFileDrop({
+      const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
         enabled: isTableEmpty && !isForeignTable,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => {
@@ -145,7 +146,21 @@ export const Grid = memo(
         }
       }
 
-      const removeAllFilters = () => onApplyFilters([])
+      const removeAllFilters = useCallback(() => {
+        if (newFilterBarEnabled) {
+          clearNewFilters()
+        } else {
+          clearOldFilters()
+        }
+      }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
+
+      const filters = useMemo(() => {
+        if (newFilterBarEnabled) {
+          return newFilters
+        } else {
+          return oldFilters
+        }
+      }, [newFilters, oldFilters, newFilterBarEnabled])
 
       // Compute columns with cellClass for dirty cells
       // This needs to be computed at render time so it reacts to operation queue changes
@@ -174,9 +189,7 @@ export const Grid = memo(
               }
 
               // Check if this cell has pending changes
-              // Since we are checking for cell changes, we need to use the EDIT_CELL_CONTENT type
               const isDirty = tableEditorSnap.hasPendingCellChange(
-                QueuedOperationType.EDIT_CELL_CONTENT,
                 snap.table.id,
                 rowIdentifiers,
                 col.key
@@ -187,32 +200,59 @@ export const Grid = memo(
         })
       }, [snap.gridColumns, snap.originalTable, snap.table.id, tableEditorSnap])
 
+      // Compute rowClass function to style pending add/delete rows
+      const computedRowClass = useMemo(() => {
+        return (row: SupaRow) => {
+          const classes: string[] = ['[&>.rdg-cell]:flex', '[&>.rdg-cell]:items-center']
+
+          // Call the original rowClass if provided
+          if (rowClass) {
+            const originalClass = rowClass(row)
+            if (originalClass) {
+              classes.push(originalClass)
+            }
+          }
+          if (isPendingAddRow(row)) {
+            classes.push('rdg-row--added')
+          }
+          if (isPendingDeleteRow(row)) {
+            classes.push('rdg-row--deleted')
+          }
+
+          return classes.length > 0 ? classes.join(' ') : undefined
+        }
+      }, [rowClass])
+
       return (
         <div
+          data-testid="table-editor-grid-container"
           className={cn('flex flex-col relative transition-colors', containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
+          onDragOver={onDragOver}
+          onDragLeave={onDragOver}
+          onDrop={onFileDrop}
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute top-9 p-2 w-full z-[1] pointer-events-none',
-                isTableEmpty && isDraggedOver && 'border-2 border-dashed',
-                isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none'
               )}
-              style={{ height: `calc(100% - 35px)` }}
-              onDragOver={onDragOver}
-              onDragLeave={onDragOver}
-              onDrop={onFileDrop}
             >
-              {isLoading && !isDisabled && <GenericSkeletonLoader />}
+              {isLoading && !isDisabled && (
+                <GenericSkeletonLoader className="w-full top-9 absolute p-2" />
+              )}
 
-              {isError && <GridError error={error} />}
+              {isError && (
+                <div className="w-full top-9 absolute p-2 pointer-events-auto">
+                  <GridError error={error} />
+                </div>
+              )}
 
               {isSuccess && (
                 <>
                   {page > 1 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light">This page does not have any data</p>
                       <div className="flex items-center space-x-2 mt-4">
                         <Button
@@ -225,18 +265,13 @@ export const Grid = memo(
                       </div>
                     </div>
                   ) : (filters ?? []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light pointer-events-auto">
-                        {isDraggedOver ? (
-                          isValidFileDraggedOver ? (
-                            'Drop your CSV file here'
-                          ) : (
-                            <span className="text-destructive">Only CSV files are accepted</span>
-                          )
-                        ) : (
-                          'This table is empty'
-                        )}
-                      </p>
+                    <div
+                      className={cn(
+                        'flex flex-col items-center justify-center w-full h-full mt-9 transition',
+                        isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand'
+                      )}
+                    >
+                      <p className="text-sm text-light pointer-events-auto">This table is empty</p>
                       {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
                         <div className="flex items-center space-x-2 mt-4">
                           <p className="text-sm text-light pointer-events-auto">
@@ -245,34 +280,32 @@ export const Grid = memo(
                           </p>
                         </div>
                       ) : (
-                        !isDraggedOver && (
-                          <div className="flex flex-col items-center gap-4 mt-4">
-                            <Button
-                              type="default"
-                              className="pointer-events-auto"
-                              onClick={() => {
-                                tableEditorSnap.onImportData()
-                                sendEvent({
-                                  action: 'import_data_button_clicked',
-                                  properties: { tableType: 'Existing Table' },
-                                  groups: {
-                                    project: project?.ref ?? 'Unknown',
-                                    organization: org?.slug ?? 'Unknown',
-                                  },
-                                })
-                              }}
-                            >
-                              Import data from CSV
-                            </Button>
-                            <p className="text-xs text-foreground-light pointer-events-auto">
-                              or drag and drop a CSV file here
-                            </p>
-                          </div>
-                        )
+                        <div className="flex flex-col items-center gap-4 mt-4">
+                          <Button
+                            type="default"
+                            className="pointer-events-auto"
+                            onClick={() => {
+                              tableEditorSnap.onImportData()
+                              sendEvent({
+                                action: 'import_data_button_clicked',
+                                properties: { tableType: 'Existing Table' },
+                                groups: {
+                                  project: project?.ref ?? 'Unknown',
+                                  organization: org?.slug ?? 'Unknown',
+                                },
+                              })
+                            }}
+                          >
+                            Import data from CSV
+                          </Button>
+                          <p className="text-xs text-foreground-light pointer-events-auto">
+                            or drag and drop a CSV file here
+                          </p>
+                        </div>
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                    <div className="flex flex-col items-center justify-center">
                       <p className="text-sm text-light pointer-events-auto">
                         The filters applied have returned no results from this table
                       </p>
@@ -295,7 +328,7 @@ export const Grid = memo(
           <DataGrid
             ref={ref}
             className={`${gridClass} flex-grow`}
-            rowClass={rowClass}
+            rowClass={computedRowClass}
             columns={columnsWithDirtyCellClass}
             rows={rows ?? []}
             renderers={{ renderRow: RowRenderer }}

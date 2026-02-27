@@ -1,37 +1,30 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { Filter, Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import {
+  PROJECT_LIST_SORT_VALUES,
+  type ProjectListSort,
+} from 'components/interfaces/Home/ProjectList/ProjectListSort.utils'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from 'lib/constants'
-import {
-  Button,
-  Checkbox_Shadcn_,
-  Label_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  ToggleGroup,
-  ToggleGroupItem,
-} from 'ui'
+import { Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { Button, ToggleGroup, ToggleGroupItem } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { FilterPopover } from '../ui/FilterPopover'
+import { SortDropdown } from '../ui/SortDropdown'
 
 interface HomePageActionsProps {
   slug?: string
   hideNewProject?: boolean
-  showViewToggle?: boolean
 }
 
-export const HomePageActions = ({
-  slug: _slug,
-  hideNewProject = false,
-  showViewToggle = false,
-}: HomePageActionsProps) => {
+export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePageActionsProps) => {
   const { slug: urlSlug } = useParams()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
@@ -42,19 +35,38 @@ export const HomePageActions = ({
     'status',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringLiteral(PROJECT_LIST_SORT_VALUES).withDefault('name_asc')
+  )
   const [viewMode, setViewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
+
+  const [filterStatusStorage, setFilterStatusStorage, { isSuccess: isSuccessFilterStatusStorage }] =
+    useLocalStorageQuery<string[]>(LOCAL_STORAGE_KEYS.PROJECTS_FILTER, [])
+
+  const [sortStorage, setSortStorage, { isSuccess: isSuccessSortStorage }] =
+    useLocalStorageQuery<ProjectListSort>(LOCAL_STORAGE_KEYS.PROJECTS_SORT, 'name_asc')
 
   const { isFetching: isFetchingProjects } = useOrgProjectsInfiniteQuery(
     {
       slug,
+      sort,
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
     { placeholderData: keepPreviousData }
   )
 
+  useEffect(() => {
+    if (isSuccessFilterStatusStorage && !!slug) setFilterStatus(filterStatusStorage)
+  }, [filterStatusStorage, isSuccessFilterStatusStorage, setFilterStatus, slug])
+
+  useEffect(() => {
+    if (isSuccessSortStorage && slug) setSort(sortStorage)
+  }, [sortStorage, isSuccessSortStorage, setSort, slug])
+
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-2">
         <Input
           placeholder="Search for a project"
@@ -66,6 +78,7 @@ export const HomePageActions = ({
           actions={[
             search && (
               <Button
+                key="clear"
                 size="tiny"
                 type="text"
                 icon={<X />}
@@ -76,50 +89,33 @@ export const HomePageActions = ({
           ]}
         />
 
-        <Popover_Shadcn_>
-          <PopoverTrigger_Shadcn_ asChild>
-            <Button
-              type={filterStatus.length === 0 ? 'dashed' : 'secondary'}
-              className="h-[26px] w-[26px]"
-              icon={<Filter />}
-            />
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" sideOffset={6}>
-            <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
-              <p className="text-xs">Filter projects by status</p>
-              <div className="flex flex-col">
-                {[
-                  { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
-                  { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
-                ].map(({ key, label }) => (
-                  <div className="flex items-center gap-x-2 py-1" key={key}>
-                    <Checkbox_Shadcn_
-                      id={key}
-                      name={key}
-                      checked={filterStatus.includes(key)}
-                      onCheckedChange={() => {
-                        if (filterStatus.includes(key)) {
-                          setFilterStatus(filterStatus.filter((y) => y !== key))
-                        } else {
-                          setFilterStatus(filterStatus.concat([key]))
-                        }
-                      }}
-                    />
-                    <Label_Shadcn_ htmlFor={key} className="capitalize text-xs w-full">
-                      {label}
-                    </Label_Shadcn_>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+        <FilterPopover
+          name="Status"
+          title="Filter projects by status"
+          options={[
+            { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
+            { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
+          ]}
+          activeOptions={filterStatus}
+          valueKey="key"
+          labelKey="label"
+          onSaveFilters={(options) => setFilterStatusStorage(options)}
+        />
+
+        <SortDropdown
+          options={[
+            { label: 'name', value: 'name' },
+            { label: 'creation date', value: 'created' },
+          ]}
+          value={sort}
+          setValue={(val) => setSortStorage(val as ProjectListSort)}
+        />
 
         {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
       </div>
 
       <div className="flex items-center gap-2">
-        {showViewToggle && viewMode && setViewMode && (
+        {viewMode && setViewMode && (
           <ToggleGroup
             type="single"
             size="sm"

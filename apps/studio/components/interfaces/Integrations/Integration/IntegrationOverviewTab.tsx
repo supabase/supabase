@@ -1,9 +1,9 @@
-import { PropsWithChildren, ReactNode } from 'react'
-
 import { useParams } from 'common'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PropsWithChildren, ReactNode } from 'react'
 import { Badge, Card, CardContent, cn, Separator } from 'ui'
+
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
@@ -53,8 +53,8 @@ export const IntegrationOverviewTab = ({
       <MarkdownContent key={integration.id} integrationId={integration.id} />
       <Separator />
       {dependsOnExtension && (
-        <div className="px-4 md:px-10 max-w-4xl">
-          <h3 className="heading-default mb-4">Required extensions</h3>
+        <div className="px-4 md:px-10 max-w-4xl flex flex-col gap-y-4">
+          <h4>Required extensions</h4>
           <Card>
             <CardContent className="p-0">
               <ul className="text-foreground-light text-sm">

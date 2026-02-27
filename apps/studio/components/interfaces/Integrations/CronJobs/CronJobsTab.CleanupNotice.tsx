@@ -1,149 +1,212 @@
-import { CheckCircle2, RefreshCw, XCircle } from 'lucide-react'
-
+import { getScheduleDeleteCronJobRunDetailsSql } from 'data/database-cron-jobs/database-cron-jobs.sql'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import {
   Button,
   CodeBlock,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
   Progress,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import { getScheduleDeleteCronJobRunDetailsSql } from 'data/sql/queries/delete-cron-job-run-details'
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
-import type { BatchDeletionProgress, CleanupState } from './CronJobsTab.useCleanupActions'
+import {
+  useCronJobsCleanupActions,
+  type BatchDeletionProgress,
+} from './CronJobsTab.useCleanupActions'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-export interface CronJobRunDetailsOverflowNoticeProps {
-  estimatedRows?: number
-  mode: 'confirmed' | 'suspected'
-  cleanupState: CleanupState
-  selectedInterval: string
-  onIntervalChange: (interval: string) => void
-  onRunDeleteSql: () => void
-  onRunScheduleSql: () => void
-  onCancelDeletion: () => void
-  onRetryDeletion: () => void
-  onRefresh: () => void
+interface CronJobRunDetailsOverflowNoticeV2Props {
+  queryCost?: number
+  refetchJobs: () => void
 }
 
-export const CronJobRunDetailsOverflowNotice = ({
-  estimatedRows,
-  mode,
-  cleanupState,
-  selectedInterval,
-  onIntervalChange,
-  onRunDeleteSql,
-  onRunScheduleSql,
-  onCancelDeletion,
-  onRetryDeletion,
-  onRefresh,
-}: CronJobRunDetailsOverflowNoticeProps) => {
-  const formattedRowEstimate =
-    typeof estimatedRows === 'number' ? estimatedRows.toLocaleString() : 'unknown'
-  const noticeTitle =
-    mode === 'confirmed'
-      ? 'cron.job_run_details is too large to load'
-      : 'Cron job overview timed out'
-  const noticeDescription =
-    mode === 'confirmed'
-      ? `We detected approximately ${formattedRowEstimate} rows in cron.job_run_details, which prevents the overview from running.`
-      : `Loading the cron job overview timed out. The issue might be caused by your cron.job_run_details table having too many rows.`
+export const CronJobRunDetailsOverflowNotice = (props: CronJobRunDetailsOverflowNoticeV2Props) => {
+  return (
+    <Admonition
+      type="note"
+      className="rounded-none border-x-0 border-t-0 py-2 [&>svg]:top-[0.6rem] [&>svg]:left-10 pl-10 pr-10"
+      layout="horizontal"
+      actions={<CronJobRunDetailsOverflowDialog {...props} />}
+    >
+      <p className="text-xs">Last run for each cron job omitted due to high query cost</p>
+    </Admonition>
+  )
+}
+
+const CronJobRunDetailsOverflowDialog = ({
+  queryCost,
+  refetchJobs,
+}: CronJobRunDetailsOverflowNoticeV2Props) => {
+  const { data: project } = useSelectedProjectQuery()
+
+  const {
+    cleanupInterval,
+    cleanupState,
+    isScheduling,
+    isScheduleSuccess,
+    setCleanupInterval,
+    runBatchedDeletion,
+    scheduleCleanup,
+    cancelDeletion,
+  } = useCronJobsCleanupActions({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const isDeleting = cleanupState.status === 'deleting'
-  const isScheduling = cleanupState.status === 'scheduling'
   const isDeleteSuccess = cleanupState.status === 'delete-success'
   const isDeleteError = cleanupState.status === 'delete-error'
-  const isScheduleSuccess = cleanupState.status === 'schedule-success'
   const isBusy = isDeleting || isScheduling
-
   const canSchedule = isDeleteSuccess || isScheduleSuccess
 
   return (
-    <Admonition
-      type="warning"
-      title={noticeTitle}
-      description={noticeDescription}
-      className="max-w-3xl w-full"
-    >
-      <div className="space-y-4 text-sm">
-        <p>
-          Remove old run history now, then schedule a cron job that keeps trimming{' '}
-          <code>cron.job_run_details</code> automatically so the overview remains responsive.
-        </p>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button type="default">Learn more</Button>
+      </DialogTrigger>
+      <DialogContent
+        aria-describedby={undefined}
+        onOpenAutoFocus={(event) => event.preventDefault()}
+      >
+        <DialogHeader>
+          <DialogTitle>Last run for cron jobs omitted for overview</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-y-2">
+          <p className="text-sm">
+            The dashboard fetches data for the cron jobs overview by running a join between the{' '}
+            <code className="text-code-inline">cron.job</code> and{' '}
+            <code className="text-code-inline !break-keep">cron.job_run_details</code> tables to
+            show each cron job's latest run.
+          </p>
 
-        {/* Step 1: Delete older entries */}
-        <div className="space-y-2">
-          <p className="font-medium text-foreground">Step 1: Delete older entries</p>
+          <p className="text-sm">
+            However, the join was skipped as the{' '}
+            <Tooltip>
+              <TooltipTrigger className={InlineLinkClassName}>estimated query cost</TooltipTrigger>
+              <TooltipContent side="bottom" className="flex flex-col gap-y-1">
+                <p>Estimated cost: {queryCost?.toLocaleString()}</p>
+                <p className="text-foreground-light">
+                  Determined via the <code className="text-code-inline">EXPLAIN</code> command
+                </p>
+              </TooltipContent>
+            </Tooltip>{' '}
+            exceeds safety thresholds, likely due to the size of{' '}
+            <code className="text-code-inline !break-keep">cron.job_run_details</code> table.
+          </p>
+        </DialogSection>
 
-          {isDeleting ? (
-            <DeletionProgress progress={cleanupState.progress} onCancel={onCancelDeletion} />
-          ) : isDeleteSuccess ? (
-            <DeletionSuccess totalRowsDeleted={cleanupState.totalRowsDeleted} />
-          ) : isDeleteError ? (
-            <DeletionError error={cleanupState.error} onRetry={onRetryDeletion} />
-          ) : (
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <div className="sm:w-64">
-                <Select_Shadcn_
-                  value={selectedInterval}
-                  onValueChange={onIntervalChange}
-                  disabled={isBusy}
-                >
-                  <SelectTrigger_Shadcn_ className="w-full">
-                    <SelectValue_Shadcn_ placeholder="Select an interval" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    {CLEANUP_INTERVALS.map((option) => (
-                      <SelectItem_Shadcn_ key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem_Shadcn_>
-                    ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
-              </div>
-              <Button type="default" disabled={isBusy} onClick={onRunDeleteSql}>
-                Delete rows now
-              </Button>
-            </div>
-          )}
-        </div>
+        <DialogSectionSeparator />
 
-        {/* Step 2: Schedule automated cleanup (only available after successful deletion) */}
-        <div className="space-y-2">
-          <p className="font-medium text-foreground">Step 2: Schedule an automated cleanup</p>
+        <DialogSection className="flex flex-col gap-y-4">
+          <p className="font-mono text-foreground-lighter uppercase tracking-tight text-sm">
+            Suggested steps
+          </p>
 
-          {!canSchedule ? (
-            <p className="text-foreground-lighter text-xs">
-              Complete step 1 to enable scheduling a daily cleanup job.
-            </p>
-          ) : isScheduleSuccess ? (
-            <ScheduleSuccess onRefresh={onRefresh} />
-          ) : (
-            <>
-              <CodeBlock
-                hideLineNumbers
-                language="sql"
-                value={getScheduleDeleteCronJobRunDetailsSql(selectedInterval)}
-                className="py-3 px-4 text-xs"
-                wrapperClassName="max-w-full"
+          <p className="text-sm">
+            We recommend removing the old run history now, then scheduling a cron job that keeps
+            trimming the <code className="text-code-inline">cron.job_run_details</code> table
+            automatically. This also prevents unnecessary bloat on the database.
+          </p>
+
+          <div className="flex flex-col gap-y-2 text-sm">
+            <p className="text-foreground">Step 1: Delete older entries</p>
+
+            {isDeleting ? (
+              <DeletionProgress progress={cleanupState.progress} onCancel={cancelDeletion} />
+            ) : isDeleteSuccess ? (
+              <DeletionSuccess totalRowsDeleted={cleanupState.totalRowsDeleted} />
+            ) : isDeleteError ? (
+              <DeletionError
+                error={cleanupState.error}
+                onRetry={() => runBatchedDeletion(cleanupInterval)}
               />
-              <Button
-                type="default"
-                className="mt-1"
-                loading={isScheduling}
-                disabled={isScheduling}
-                onClick={onRunScheduleSql}
-              >
-                Schedule cleanup job
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
-    </Admonition>
+            ) : (
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <div className="sm:w-64">
+                  <Select_Shadcn_
+                    disabled={isBusy}
+                    value={cleanupInterval}
+                    onValueChange={setCleanupInterval}
+                  >
+                    <SelectTrigger_Shadcn_ className="w-full">
+                      <SelectValue_Shadcn_ placeholder="Select an interval" />
+                    </SelectTrigger_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      {CLEANUP_INTERVALS.map((option) => (
+                        <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem_Shadcn_>
+                      ))}
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+                </div>
+                <Button
+                  type="default"
+                  disabled={isBusy}
+                  onClick={() => runBatchedDeletion(cleanupInterval)}
+                >
+                  Delete rows now
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-y-2 text-sm">
+            <p className="text-foreground">Step 2: Schedule an automated cleanup</p>
+
+            {!canSchedule ? (
+              <p className="text-foreground-lighter text-xs">
+                Complete step 1 to enable scheduling a daily cleanup job.
+              </p>
+            ) : isScheduleSuccess ? (
+              <ScheduleSuccess />
+            ) : (
+              <>
+                <CodeBlock
+                  hideLineNumbers
+                  language="sql"
+                  value={getScheduleDeleteCronJobRunDetailsSql(cleanupInterval)}
+                  className="py-3 px-4 text-xs"
+                  wrapperClassName="max-w-full"
+                />
+                <Button
+                  block
+                  size="small"
+                  type="default"
+                  className="mt-1"
+                  loading={isScheduling}
+                  disabled={isScheduling}
+                  onClick={async () => {
+                    await scheduleCleanup({
+                      interval: cleanupInterval,
+                      onSuccess: () => refetchJobs(),
+                    })
+                  }}
+                >
+                  Schedule cleanup job
+                </Button>
+              </>
+            )}
+          </div>
+        </DialogSection>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -205,11 +268,7 @@ const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
   </div>
 )
 
-interface ScheduleSuccessProps {
-  onRefresh: () => void
-}
-
-const ScheduleSuccess = ({ onRefresh }: ScheduleSuccessProps) => (
+const ScheduleSuccess = () => (
   <div className="space-y-2">
     <div className="flex items-center gap-2 text-brand">
       <CheckCircle2 size={16} />
@@ -217,9 +276,8 @@ const ScheduleSuccess = ({ onRefresh }: ScheduleSuccessProps) => (
     </div>
     <div className="flex items-center gap-2">
       <p className="text-foreground-lighter text-xs">
-        Refresh to reload the cron jobs and view the new cleanup job.
+        New cleanup job should now be visible in the cron jobs overview.
       </p>
-      <Button type="default" size="tiny" icon={<RefreshCw size={14} />} onClick={onRefresh} />
     </div>
   </div>
 )

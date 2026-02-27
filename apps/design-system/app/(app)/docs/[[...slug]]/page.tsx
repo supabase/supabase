@@ -5,8 +5,10 @@ import { DashboardTableOfContents } from '@/components/toc'
 import { siteConfig } from '@/config/site'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl } from '@/lib/utils'
+
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
+
 import { allDocs } from 'contentlayer/generated'
 import { ChevronRight } from 'lucide-react'
 import type { Metadata } from 'next'

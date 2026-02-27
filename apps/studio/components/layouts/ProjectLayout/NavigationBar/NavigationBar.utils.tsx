@@ -1,5 +1,3 @@
-import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
-
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
 import { generateDatabaseMenu } from 'components/layouts/DatabaseLayout/DatabaseMenu.utils'
@@ -9,8 +7,10 @@ import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
@@ -18,6 +18,7 @@ export const generateToolRoutes = (ref?: string, project?: Project, features?: {
     {
       key: 'editor',
       label: 'Table Editor',
+      disabled: !isProjectActive,
       icon: <TableEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
       linkElement: <EditorIndexPageLink projectRef={ref} />,
@@ -25,6 +26,7 @@ export const generateToolRoutes = (ref?: string, project?: Project, features?: {
     {
       key: 'sql',
       label: 'SQL Editor',
+      disabled: !isProjectActive,
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
@@ -59,6 +61,7 @@ export const generateProductRoutes = (
     {
       key: 'database',
       label: 'Database',
+      disabled: !isProjectActive,
       icon: <Database size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link:
         ref &&
@@ -74,6 +77,7 @@ export const generateProductRoutes = (
           {
             key: 'auth',
             label: 'Authentication',
+            disabled: !isProjectActive,
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link:
               ref &&
@@ -91,6 +95,7 @@ export const generateProductRoutes = (
           {
             key: 'storage',
             label: 'Storage',
+            disabled: !isProjectActive,
             icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/files`),
           },
@@ -101,8 +106,9 @@ export const generateProductRoutes = (
           {
             key: 'functions',
             label: 'Edge Functions',
+            disabled: false,
             icon: <EdgeFunctions size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/functions`),
+            link: ref && `/project/${ref}/functions`,
           },
         ]
       : []),
@@ -111,6 +117,7 @@ export const generateProductRoutes = (
           {
             key: 'realtime',
             label: 'Realtime',
+            disabled: !isProjectActive,
             icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
           },
@@ -122,19 +129,22 @@ export const generateProductRoutes = (
 export const generateOtherRoutes = (
   ref?: string,
   project?: Project,
-  features?: { unifiedLogs?: boolean; showReports?: boolean }
+  features?: { unifiedLogs?: boolean; showReports?: boolean; apiDocsSidePanel?: boolean }
 ): Route[] => {
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
-  const { unifiedLogs, showReports } = features ?? {}
+  const { unifiedLogs, showReports, apiDocsSidePanel } = features ?? {}
   const unifiedLogsEnabled = unifiedLogs ?? false
   const reportsEnabled = showReports ?? true
+  const apiDocsSidePanelEnabled = apiDocsSidePanel ?? false
 
   return [
     {
       key: 'advisors',
       label: 'Advisors',
+      disabled: !isProjectActive,
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
     },
@@ -143,6 +153,7 @@ export const generateOtherRoutes = (
           {
             key: 'observability',
             label: 'Observability',
+            disabled: !isProjectActive,
             icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
           },
@@ -151,24 +162,27 @@ export const generateOtherRoutes = (
     {
       key: 'logs',
       label: 'Logs',
+      disabled: false,
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link:
-        ref &&
-        (isProjectBuilding
-          ? buildingUrl
-          : unifiedLogsEnabled
-            ? `/project/${ref}/logs`
-            : `/project/${ref}/logs/explorer`),
+      link: ref && (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
     },
-    {
-      key: 'api',
-      label: 'API Docs',
-      icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
-    },
+    ...(apiDocsSidePanelEnabled
+      ? [
+          {
+            key: 'api',
+            label: 'API Docs',
+            disabled: !isProjectActive,
+            icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link:
+              ref &&
+              (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/data_api/docs`),
+          },
+        ]
+      : []),
     {
       key: 'integrations',
       label: 'Integrations',
+      disabled: !isProjectActive,
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations`),
     },
@@ -186,6 +200,7 @@ export const generateSettingsRoutes = (ref?: string, project?: Project): Route[]
         ref &&
         (IS_PLATFORM ? `/project/${ref}/settings/general` : `/project/${ref}/settings/log-drains`),
       items: settingsMenu,
+      disabled: false,
     },
   ]
 }

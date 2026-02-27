@@ -4,9 +4,44 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 27 Jan 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 13 Feb 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-incident-on-february-12-2026</guid>
+  <title>Supabase incident on February 12, 2026</title>
+  <link>https://supabase.com/blog/supabase-incident-on-february-12-2026</link>
+  <description>A detailed account of the February 12 outage in us-east-2, what caused it, and the steps we are taking to prevent it from happening again.</description>
+  <pubDate>Fri, 13 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hydra-joins-supabase</guid>
+  <title>Hydra joins Supabase</title>
+  <link>https://supabase.com/blog/hydra-joins-supabase</link>
+  <description>The Hydra team, maintainers of pg_duckdb, is joining Supabase to focus on Postgres + Analytics and Open Warehouse Architecture.</description>
+  <pubDate>Tue, 10 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/x-twitter-oauth-2-provider</guid>
+  <title>X / Twitter OAuth 2.0 is now available for Supabase Auth</title>
+  <link>https://supabase.com/blog/x-twitter-oauth-2-provider</link>
+  <description>You can now add &quot;Sign in with X&quot; to your application using the new X / Twitter (OAuth 2.0) provider in Supabase Auth.</description>
+  <pubDate>Fri, 06 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/bknd-joins-supabase</guid>
+  <title>BKND joins Supabase</title>
+  <link>https://supabase.com/blog/bknd-joins-supabase</link>
+  <description>Dennis Senn, creator of BKND, is joining Supabase to build a Lite offering for agentic workloads.</description>
+  <pubDate>Tue, 03 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-is-now-an-official-claude-connector</guid>
+  <title>Supabase is now an official Claude connector</title>
+  <link>https://supabase.com/blog/supabase-is-now-an-official-claude-connector</link>
+  <description>Connect your Supabase projects to Claude and manage your entire database infrastructure by telling Claude what you need.</description>
+  <pubDate>Tue, 03 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-privatelink-available</guid>
   <title>Supabase PrivateLink is now available</title>
   <link>https://supabase.com/blog/supabase-privatelink-available</link>
@@ -19,6 +54,13 @@
   <link>https://supabase.com/blog/postgres-best-practices-for-ai-agents</link>
   <description>We are releasing Agent Skills for Postgres Best Practices to help AI coding agents write high quality, correct Postgres code.</description>
   <pubDate>Wed, 21 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/read-replicas-vs-bigger-compute</guid>
+  <title>When to use Read Replicas vs. bigger compute</title>
+  <link>https://supabase.com/blog/read-replicas-vs-bigger-compute</link>
+  <description>A practical guide to diagnosing database slowdowns and choosing between vertical scaling and Read Replicas based on your workload, budget, and performance bottlenecks.</description>
+  <pubDate>Thu, 15 Jan 2026 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/introducing-trae-solo-integration</guid>
@@ -2464,6 +2506,13 @@
   <pubDate>Thu, 25 Mar 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/postgresql-views</guid>
+  <title>Postgres Views</title>
+  <link>https://supabase.com/blog/postgresql-views</link>
+  <description>Creating and using a view in PostgreSQL.</description>
+  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
   <title>Continuous PostgreSQL Backups using WAL-G</title>
   <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
@@ -2497,13 +2546,6 @@
   <link>https://supabase.com/blog/improved-dx</link>
   <description>We&apos;re releasing a new version of our Supabase client with some awesome new improvements.</description>
   <pubDate>Fri, 30 Oct 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/postgresql-views</guid>
-  <title>Postgres Views</title>
-  <link>https://supabase.com/blog/postgresql-views</link>
-  <description>Creating and using a view in PostgreSQL.</description>
-  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/case-study-monitoro</guid>
