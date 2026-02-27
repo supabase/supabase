@@ -8,6 +8,7 @@
  */
 
 import braintrust from 'braintrust'
+
 import {
   completenessScorer,
   concisenessScorer,
@@ -18,7 +19,7 @@ import {
 } from './scorer'
 
 const projectId = process.env.BRAINTRUST_PROJECT_ID
-if (!projectId) throw new Error('BRAINTRUST_PROJECT_ID is not set')
+if (!projectId && process.env.IS_PUSH) throw new Error('BRAINTRUST_PROJECT_ID is not set')
 
 const scorers = [
   { slug: 'goal-completion', name: 'Goal Completion', handler: goalCompletionScorer },
@@ -29,7 +30,9 @@ const scorers = [
   { slug: 'url-validity', name: 'URL Validity', handler: urlValidityScorer },
 ]
 
+// @ts-expect-error - Project ID is only required at build-time
 const project = braintrust.projects.create({ id: projectId })
+
 for (const { slug, name, handler } of scorers) {
   project.scorers.create({ slug, name, handler, ifExists: 'replace' })
 }

@@ -4,7 +4,7 @@ import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { extractUrls } from 'lib/helpers'
 
-const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
+const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2' // NOTE: `gpt-5.2-2025-12-11` snapshot not yet working with online scorers
 
 export type AssistantEvalInput = {
   prompt: string

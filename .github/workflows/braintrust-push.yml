@@ -6,7 +6,6 @@ on:
     paths:
       - "apps/studio/evals/scorer.ts"
       - "apps/studio/evals/scorer-online.ts"
-      - "apps/studio/evals/scorer-wasm.ts"
 
 permissions:
   contents: read
@@ -20,7 +19,7 @@ jobs:
     env:
       BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
       BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_PROJECT_ID }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      IS_PUSH: "true"
 
     steps:
       - name: Checkout

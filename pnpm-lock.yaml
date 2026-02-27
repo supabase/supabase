@@ -1204,8 +1204,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/api-types
       autoevals:
-        specifier: ^0.0.131
-        version: 0.0.131(encoding@0.1.13)(ws@8.18.3)
+        specifier: ^0.0.132
+        version: 0.0.132(ws@8.18.3)
       braintrust:
         specifier: ^3.0.0
         version: 3.0.0(@aws-sdk/credential-provider-web-identity@3.830.0)(supports-color@8.1.1)(zod@3.25.76)
@@ -9670,8 +9670,8 @@ packages:
     resolution: {integrity: sha512-Hdw8qdNiqdJ8LqT0iK0sVzkFbzg6fhnQqqfWhBDxcHZvU75+B+ayzTy8x+k5Ix0Y92XOhOUlx74ps+bA6BeYMQ==}
     engines: {node: '>=8'}
 
-  autoevals@0.0.131:
-    resolution: {integrity: sha512-F+3lraja+Ms7n1M2cpWl65N7AYx4sPocRW454H5HlSGabYMfuFOUxw8IXmEYDkQ38BxtZ0Wd5ZAQj9RF59YJWw==}
+  autoevals@0.0.132:
+    resolution: {integrity: sha512-x033hXLO1Vyggbv68Y1QeoZlrdKHcNexcutPhVaDhDJ4SO6TU1rG6vME77g/zKvH4VWFVBPDWM1pRbPxAFF+sA==}
 
   autolinker@0.28.1:
     resolution: {integrity: sha512-zQAFO1Dlsn69eXaO6+7YZc+v84aquQKbwpzCE3L0stj56ERn9hutFxPopViLjo9G+rWwjozRhgS5KJ25Xy19cQ==}
@@ -14878,6 +14878,18 @@ packages:
     peerDependencies:
       ws: ^8.18.0
       zod: ^3.23.8
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
+  openai@6.22.0:
+    resolution: {integrity: sha512-7Yvy17F33Bi9RutWbsaYt5hJEEJ/krRPOrwan+f9aCPuMat1WVsb2VNSII5W1EksKT6fF69TG/xj4XzodK3JZw==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
     peerDependenciesMeta:
       ws:
         optional: true
@@ -27320,7 +27332,7 @@ snapshots:
 
   auto-bind@4.0.0: {}
 
-  autoevals@0.0.131(encoding@0.1.13)(ws@8.18.3):
+  autoevals@0.0.132(ws@8.18.3):
     dependencies:
       ajv: 8.17.1
       compute-cosine-similarity: 1.1.0
@@ -27328,11 +27340,10 @@ snapshots:
       js-yaml: 4.1.1
       linear-sum-assignment: 1.0.9
       mustache: 4.2.0
-      openai: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
+      openai: 6.22.0(ws@8.18.3)(zod@3.25.76)
       zod: 3.25.76
       zod-to-json-schema: 3.25.0(zod@3.25.76)
     transitivePeerDependencies:
-      - encoding
       - ws
 
   autolinker@0.28.1:
@@ -33852,6 +33863,11 @@ snapshots:
       - encoding
 
   openai@5.9.0(ws@8.18.3)(zod@3.25.76):
+    optionalDependencies:
+      ws: 8.18.3
+      zod: 3.25.76
+
+  openai@6.22.0(ws@8.18.3)(zod@3.25.76):
     optionalDependencies:
       ws: 8.18.3
       zod: 3.25.76
