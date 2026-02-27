@@ -1,6 +1,5 @@
-import { DOCS_URL } from 'lib/constants'
-
 import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   ScrollArea,
@@ -18,8 +17,8 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import type { JitMemberOption, JitUserRule, JitUserRuleDraft, SheetMode } from './JitDbAccess.types'
 import { JitDbAccessRoleGrantFields } from './JitDbAccessRoleGrantFields'
-import type { JitMemberOption, JitUserRule, JitUserRuleDraft, SheetMode } from './jitDbAccess.types'
 
 interface JitDbAccessRuleSheetProps {
   open: boolean

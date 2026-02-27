@@ -1,13 +1,13 @@
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
-import type { JitUserRuleDraft } from './jitDbAccess.types'
+import type { JitUserRuleDraft } from './JitDbAccess.types'
 import {
   computeStatusFromGrants,
   createEmptyGrant,
   getRelativeDatetimeByMode,
   serializeDraftRolesForGrantMutation,
-} from './jitDbAccess.utils'
+} from './JitDbAccess.utils'
 
 describe('jitDbAccess.utils', () => {
   it('returns empty expiry string for never/custom-only fallback modes', () => {

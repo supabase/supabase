@@ -13,7 +13,7 @@ import type {
   JitStatusBadge,
   JitUserRule,
   JitUserRuleDraft,
-} from './jitDbAccess.types'
+} from './JitDbAccess.types'
 
 export function getRelativeDatetimeByMode(mode: JitExpiryMode) {
   if (mode === '1h') return dayjs().add(1, 'hour').toISOString()

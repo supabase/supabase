@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-import type { JitUserRule } from './jitDbAccess.types'
+import type { JitUserRule } from './JitDbAccess.types'
 
 interface JitDbAccessDeleteDialogProps {
   user: JitUserRule | null

@@ -1,7 +1,6 @@
-import dayjs from 'dayjs'
-
 import { DatePicker } from 'components/ui/DatePicker'
 import { InlineLink } from 'components/ui/InlineLink'
+import dayjs from 'dayjs'
 import { DOCS_URL } from 'lib/constants'
 import {
   Checkbox_Shadcn_,
@@ -15,9 +14,9 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import { JIT_EXPIRY_MODE_OPTIONS, JIT_MAX_CUSTOM_EXPIRY_YEARS } from './jitDbAccess.constants'
-import type { JitRoleGrantDraft, JitRoleOption } from './jitDbAccess.types'
-import { getRelativeDatetimeByMode } from './jitDbAccess.utils'
+import { JIT_EXPIRY_MODE_OPTIONS, JIT_MAX_CUSTOM_EXPIRY_YEARS } from './JitDbAccess.constants'
+import type { JitRoleGrantDraft, JitRoleOption } from './JitDbAccess.types'
+import { getRelativeDatetimeByMode } from './JitDbAccess.utils'
 
 interface JitDbAccessRoleGrantFieldsProps {
   role: JitRoleOption

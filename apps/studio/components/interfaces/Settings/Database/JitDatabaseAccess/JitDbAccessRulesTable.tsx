@@ -20,8 +20,8 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import type { JitUserRule } from './jitDbAccess.types'
-import { getJitStatusDisplay } from './jitDbAccess.utils'
+import type { JitUserRule } from './JitDbAccess.types'
+import { getJitStatusDisplay } from './JitDbAccess.utils'
 
 interface JitDbAccessRulesTableProps {
   users: JitUserRule[]

@@ -1,4 +1,4 @@
-import type { JitExpiryMode } from './jitDbAccess.types'
+import type { JitExpiryMode } from './JitDbAccess.types'
 
 export const JIT_EXPIRY_MODE_OPTIONS: Array<{ value: JitExpiryMode; label: string }> = [
   { value: '1h', label: '1 hour' },

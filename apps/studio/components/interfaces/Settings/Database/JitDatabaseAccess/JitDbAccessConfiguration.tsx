@@ -47,7 +47,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-import type { JitUserRule, SheetMode } from './jitDbAccess.types'
+import type { JitUserRule, SheetMode } from './JitDbAccess.types'
 import {
   createDraft,
   draftFromRule,
@@ -55,7 +55,7 @@ import {
   getJitMemberOptions,
   mapJitMembersToUserRules,
   serializeDraftRolesForGrantMutation,
-} from './jitDbAccess.utils'
+} from './JitDbAccess.utils'
 import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
 import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
 import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
