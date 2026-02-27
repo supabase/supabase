@@ -16,7 +16,7 @@ export const ProjectContextProvider = ({
 }: PropsWithChildren<ProjectContextProviderProps>) => {
   return (
     <TableEditorStateContextProvider key={`table-editor-state-${projectRef}`}>
-      <TabsStateContextProvider key={`tabs-state-${projectRef}`} projectRef={projectRef}>
+      <TabsStateContextProvider key={`tabs-state-${projectRef}`}>
         <StorageExplorerStateContextProvider key={`storage-explorer-state-${projectRef}`}>
           <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
             <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>

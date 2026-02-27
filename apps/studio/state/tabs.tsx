@@ -1,5 +1,6 @@
+import { useParams } from 'common'
 import { partition } from 'lodash'
-import { NextRouter } from 'next/router'
+import { type NextRouter } from 'next/router'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 
@@ -387,7 +388,7 @@ function createTabsState(projectRef: string) {
       onClearDashboardHistory()
       router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
     },
-    handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: any) => {
+    handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: NextRouter) => {
       // Make permanent if needed
       const draggedTab = store.tabsMap[tabId]
       if (draggedTab?.isPreview) {
@@ -414,10 +415,8 @@ export type TabsState = ReturnType<typeof createTabsState>
 
 export const TabsStateContext = createContext<TabsState>(createTabsState(''))
 
-export const TabsStateContextProvider = ({
-  projectRef,
-  children,
-}: PropsWithChildren<{ projectRef: string | undefined }>) => {
+export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
+  const { ref: projectRef } = useParams()
   const [state, setState] = useState(createTabsState(projectRef ?? ''))
 
   useEffect(() => {
