@@ -628,10 +628,6 @@ module.exports =
         // https://vercel.com/docs/cron-jobs
         automaticVercelMonitors: true,
 
-        // Route Sentry requests through our own domain so ad blockers
-        // don't prevent error reporting from reaching Sentry.
-        tunnelRoute: '/monitoring',
-
         // Annotate bundles at build time so thirdPartyErrorFilterIntegration can
         // distinguish our code from browser extensions / injected scripts at runtime.
         unstable_sentryWebpackPluginOptions: {
