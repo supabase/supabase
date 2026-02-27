@@ -19,7 +19,12 @@ import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
 import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
 import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
 import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import { FrameworkLink, type FeaturesSection, type HeroSection, type Metadata } from './solutions.utils'
+import {
+  FrameworkLink,
+  type FeaturesSection,
+  type HeroSection,
+  type Metadata,
+} from './solutions.utils'
 import { getSharedSections } from './shared-sections'
 import MainProducts from '../MainProducts'
 import { Image } from 'ui'
@@ -166,7 +171,8 @@ const data: () => {
           you control
         </>
       ),
-      subheading: 'Supabase includes everything you need to build secure, compliant financial applications.',
+      subheading:
+        'Supabase includes everything you need to build secure, compliant financial applications.',
     },
     developerExperience: shared.developerExperience,
     resultsSection: shared.resultsSection,
@@ -176,7 +182,8 @@ const data: () => {
       label: 'Security',
       heading: (
         <>
-          Trusted for <span className="text-foreground">financial solutions and transactions of all types</span>
+          Trusted for{' '}
+          <span className="text-foreground">financial solutions and transactions of all types</span>
         </>
       ),
       subheading:
@@ -224,14 +231,16 @@ const data: () => {
           title: 'Bootstrap Next.js app with Supabase Auth',
           code: 'Set up Supabase Auth with Next.js: install @supabase/supabase-js and @supabase/ssr, configure environment variables, create browser and server clients, and add middleware for token refresh.',
           language: 'markdown',
-          docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
+          docsUrl:
+            'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
         },
         {
           id: 'rls-policies',
           title: 'Create RLS policies',
-          code: "Generate Row Level Security policies for secure access control. Retrieve your schema, then write policies that restrict access to sensitive data based on user roles and auth.uid().",
+          code: 'Generate Row Level Security policies for secure access control. Retrieve your schema, then write policies that restrict access to sensitive data based on user roles and auth.uid().',
           language: 'markdown',
-          docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
+          docsUrl:
+            'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
         },
       ],
     },

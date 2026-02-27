@@ -186,7 +186,8 @@ const data: () => {
       ...shared.platform,
       title: (
         <>
-          Supabase is the Postgres platform <span className="text-foreground">your agents control</span>
+          Supabase is the Postgres platform{' '}
+          <span className="text-foreground">your agents control</span>
         </>
       ),
       subheading: 'Everything your agents need to connect, query, and act on your data.',
@@ -289,7 +290,7 @@ const data: () => {
         {
           id: 'multi-tenant',
           title: 'Configure multi-tenant agent access',
-          code: 'Design a multi-tenant Supabase schema with Row Level Security policies that restrict each agent to its own tenant\'s data.',
+          code: "Design a multi-tenant Supabase schema with Row Level Security policies that restrict each agent to its own tenant's data.",
           language: 'markdown',
           copyable: true,
         },

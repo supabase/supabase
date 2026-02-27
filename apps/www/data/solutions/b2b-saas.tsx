@@ -22,7 +22,12 @@ import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
 import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
 import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
 import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import { FrameworkLink, type FeaturesSection, type HeroSection, type Metadata } from './solutions.utils'
+import {
+  FrameworkLink,
+  type FeaturesSection,
+  type HeroSection,
+  type Metadata,
+} from './solutions.utils'
 import { getSharedSections } from './shared-sections'
 
 import { useBreakpoint } from 'common'
@@ -227,14 +232,16 @@ const data: () => {
           title: 'Bootstrap Next.js app with Supabase Auth',
           code: 'Set up Supabase Auth with Next.js: install @supabase/supabase-js and @supabase/ssr, configure environment variables, create browser and server clients, and add middleware for token refresh.',
           language: 'markdown',
-          docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
+          docsUrl:
+            'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
         },
         {
           id: 'rls-policies',
           title: 'Create RLS policies',
           code: "Generate Row Level Security policies for tenant isolation. Retrieve your schema, then write policies that restrict users to their tenant's data using the auth.uid() or custom claims.",
           language: 'markdown',
-          docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
+          docsUrl:
+            'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
         },
       ],
     },

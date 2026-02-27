@@ -17,12 +17,7 @@ export interface WhatItTakesSectionProps {
   className?: string
 }
 
-const WhatItTakesSection = ({
-  id,
-  heading,
-  items,
-  className = '',
-}: WhatItTakesSectionProps) => (
+const WhatItTakesSection = ({ id, heading, items, className = '' }: WhatItTakesSectionProps) => (
   <SectionContainer id={id} className={`py-16 md:py-24 ${className}`}>
     <div className="flex flex-col gap-8">
       <h2 className="h2 text-foreground-lighter">{heading}</h2>

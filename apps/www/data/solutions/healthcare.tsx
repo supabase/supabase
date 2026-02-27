@@ -82,8 +82,8 @@ const data: () => {
       ),
       subheader: [
         <>
-          Supabase provides a fully managed, HIPAA-compliant Postgres platform with PHI protection, a
-          signed BAA, and audit-ready infrastructure. Build patient-facing applications, clinical
+          Supabase provides a fully managed, HIPAA-compliant Postgres platform with PHI protection,
+          a signed BAA, and audit-ready infrastructure. Build patient-facing applications, clinical
           tools, and health data platforms with compliance built in.
         </>,
       ],
@@ -182,7 +182,8 @@ const data: () => {
       label: 'Security',
       heading: (
         <>
-          Trusted for <span className="text-foreground">medical records and health data of all types</span>
+          Trusted for{' '}
+          <span className="text-foreground">medical records and health data of all types</span>
         </>
       ),
       subheading:
@@ -230,14 +231,16 @@ const data: () => {
           title: 'Bootstrap Next.js app with Supabase Auth',
           code: 'Set up Supabase Auth with Next.js: install @supabase/supabase-js and @supabase/ssr, configure environment variables, create browser and server clients, and add middleware for token refresh.',
           language: 'markdown',
-          docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
+          docsUrl:
+            'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
         },
         {
           id: 'rls-policies',
           title: 'Create RLS policies',
-          code: "Generate Row Level Security policies for healthcare data. Retrieve your schema, then write policies that restrict access to PHI based on user roles, auth.uid(), and organizational boundaries.",
+          code: 'Generate Row Level Security policies for healthcare data. Retrieve your schema, then write policies that restrict access to PHI based on user roles, auth.uid(), and organizational boundaries.',
           language: 'markdown',
-          docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
+          docsUrl:
+            'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
         },
       ],
     },

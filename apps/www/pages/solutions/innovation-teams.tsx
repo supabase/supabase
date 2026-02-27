@@ -196,9 +196,7 @@ const InnovationTeams: NextPage = () => {
           subheading={data.why.subheading}
           features={data.why.features}
         />
-        {data.customerEvidence && (
-          <CustomerEvidenceSection {...data.customerEvidence} />
-        )}
+        {data.customerEvidence && <CustomerEvidenceSection {...data.customerEvidence} />}
         <PlatformSection
           id={data.platform.id}
           title={data.platform.title}

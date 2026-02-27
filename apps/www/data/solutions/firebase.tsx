@@ -600,9 +600,8 @@ const data = {
         title: 'High Availability Architecture',
         description: (
           <>
-            Enterprise plans offer{' '}
-            <span className="text-foreground">failover and redundancy</span> for
-            mission-critical applications.
+            Enterprise plans offer <span className="text-foreground">failover and redundancy</span>{' '}
+            for mission-critical applications.
           </>
         ),
         icon: 'M16.3046 3.24514C15.3004 2.91279 14.2268 2.73291 13.1111 2.73291C7.50197 2.73291 2.95486 7.28002 2.95486 12.8892C2.95486 18.4983 7.50197 23.0454 13.1111 23.0454C18.7203 23.0454 23.2674 18.4983 23.2674 12.8892C23.2674 10.5703 22.4902 8.4329 21.1822 6.72328L12.2253 15.5572L10.2303 13.5622M13.2175 6.31682C9.54013 6.31682 6.55899 9.29795 6.55899 12.4809C6.55899 16.1583 9.54013 19.1395 13.2175 19.1395C16.895 19.1395 19.8761 16.1583 19.8761 12.4809C19.8761 11.1095 19.4615 9.83483 18.7507 8.77557',
