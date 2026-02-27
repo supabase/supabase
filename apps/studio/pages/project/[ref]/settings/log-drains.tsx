@@ -59,6 +59,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     { ref },
     { enabled: !isLoadingEntitlement && hasAccessToLogDrains }
   )
+  const hasLogDrains = Array.isArray(logDrains) && logDrains.length > 0
 
   const { mutate: createLogDrain, isPending: createLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
@@ -192,7 +193,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
         subtitle="Send your project logs to third party destinations"
         primaryActions={
           <>
-            {!(logDrains?.length === 0) && (
+            {hasLogDrains && (
               <div className="flex items-center">
                 <Button
                   disabled={!hasAccessToLogDrains || !canManageLogDrains}
