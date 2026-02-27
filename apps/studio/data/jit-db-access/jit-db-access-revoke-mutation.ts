@@ -1,18 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { del, handleError } from 'data/fetchers'
 import { toast } from 'sonner'
-
 import type { ResponseError } from 'types'
-import { jitDbAccessKeys } from './keys'
-import { handleError, del } from 'data/fetchers'
 
-export type JitDbAccessRevokeVariables = {
+import { jitDbAccessKeys } from './keys'
+
+type JitDbAccessRevokeVariables = {
   projectRef: string
   userId: string
-}
-
-export type JitDbAccessRevokeResponse = {
-  success: boolean
-  error?: any
 }
 
 export async function revokeJitDbAccess({ projectRef, userId }: JitDbAccessRevokeVariables) {

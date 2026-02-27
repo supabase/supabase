@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -19,6 +14,11 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Alert,
   AlertDialog,
@@ -47,9 +47,6 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
-import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
-import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
 import {
   getAssignableJitRoleOptions,
   getJitMemberOptions,
@@ -58,6 +55,9 @@ import {
 } from './jitDbAccess.adapters'
 import type { JitUserRule, SheetMode } from './jitDbAccess.types'
 import { createDraft, draftFromRule } from './jitDbAccess.utils'
+import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
+import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
+import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
 
 const JitDbAccessConfiguration = () => {
   const { ref } = useParams()
@@ -65,9 +65,11 @@ const JitDbAccessConfiguration = () => {
   const { data: organization } = useSelectedOrganizationQuery()
 
   const [enabled, setEnabled] = useState(false)
-  const [sheetOpen, setSheetOpen] = useState(false)
-  const [sheetMode, setSheetMode] = useState<SheetMode>('add')
-  const [editingUserId, setEditingUserId] = useState<string | null>(null)
+  const [showCreateRuleSheet, setShowCreateRuleSheet] = useQueryState(
+    'jit_new',
+    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+  )
+  const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
   const [showInlineValidation, setShowInlineValidation] = useState(false)
   const [showEnableJitDialog, setShowEnableJitDialog] = useState(false)
   const [userPendingDelete, setUserPendingDelete] = useState<JitUserRule | null>(null)
@@ -142,9 +144,12 @@ const JitDbAccessConfiguration = () => {
   )
 
   const editingUser = useMemo(
-    () => users.find((user) => user.id === editingUserId) ?? null,
-    [users, editingUserId]
+    () => users.find((user) => user.id === ruleIdToEdit) ?? null,
+    [users, ruleIdToEdit]
   )
+
+  const sheetOpen = showCreateRuleSheet || !!ruleIdToEdit
+  const sheetMode: SheetMode = ruleIdToEdit ? 'edit' : 'add'
 
   const membersWithRules = useMemo(() => new Set(users.map((user) => user.memberId)), [users])
 
@@ -195,8 +200,8 @@ const JitDbAccessConfiguration = () => {
   )
 
   const resetSheetState = () => {
-    setSheetOpen(false)
-    setEditingUserId(null)
+    void setShowCreateRuleSheet(false)
+    void setRuleIdToEdit(null)
     setShowInlineValidation(false)
   }
 
@@ -260,7 +265,7 @@ const JitDbAccessConfiguration = () => {
       toast.success('Successfully revoked user access')
       setUserPendingDelete(null)
 
-      if (editingUserId === variables.userId) {
+      if (ruleIdToEdit === variables.userId) {
         resetSheetState()
       }
     },
@@ -299,21 +304,19 @@ const JitDbAccessConfiguration = () => {
   const openAddRuleSheet = () => {
     if (!canUpdateJitDbAccess) return
 
-    setSheetMode('add')
-    setEditingUserId(null)
+    void setRuleIdToEdit(null)
     setDraft(createDraft(roleIds))
     setShowInlineValidation(false)
-    setSheetOpen(true)
+    void setShowCreateRuleSheet(true)
   }
 
   const openEditRuleSheet = (user: JitUserRule) => {
     if (!canUpdateJitDbAccess) return
 
-    setSheetMode('edit')
-    setEditingUserId(user.id)
+    void setShowCreateRuleSheet(false)
+    void setRuleIdToEdit(user.id)
     setDraft(draftFromRule(user, roleIds))
     setShowInlineValidation(false)
-    setSheetOpen(true)
   }
 
   const openDeleteDialog = (user: JitUserRule) => {
@@ -363,6 +366,13 @@ const JitDbAccessConfiguration = () => {
     : !hasAccessToJitDbAccess
       ? 'Your project does not have access to JIT database access. Please update to the latest Postgres version.'
       : undefined
+
+  useEffect(() => {
+    if (!ruleIdToEdit || isLoadingJitMembers || isLoadingProjectMembers || editingUser) return
+
+    toast('JIT access rule not found')
+    void setRuleIdToEdit(null)
+  }, [editingUser, isLoadingJitMembers, isLoadingProjectMembers, ruleIdToEdit, setRuleIdToEdit])
 
   return (
     <>

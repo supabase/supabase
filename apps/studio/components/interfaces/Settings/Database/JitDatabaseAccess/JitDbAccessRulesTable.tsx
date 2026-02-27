@@ -1,5 +1,4 @@
 import { EllipsisVertical, Pencil, Plus, Trash2 } from 'lucide-react'
-
 import {
   Badge,
   Button,
@@ -75,16 +74,9 @@ export function JitDbAccessRulesTable({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div>
-                <Button
-                  type="default"
-                  icon={<Plus size={14} />}
-                  onClick={onAddRule}
-                  disabled={addDisabled}
-                >
-                  Add rule
-                </Button>
-              </div>
+              <Button type="default" icon={<Plus />} onClick={onAddRule} disabled={addDisabled}>
+                Add rule
+              </Button>
             </TooltipTrigger>
             {!canUpdate && (
               <TooltipContent side="bottom">
