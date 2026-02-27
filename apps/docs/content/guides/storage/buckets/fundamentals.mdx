@@ -17,7 +17,7 @@ When a bucket is set to **Private** all operations are subject to access control
 
 The only ways to download assets within a private bucket is to:
 
-- Use the [download method](/docs/reference/javascript/storage-from-download) by providing a authorization header containing your user's JWT. The RLS policy you create on the `storage.objects` table will use this user to determine if they have access.
+- Use the [download method](/docs/reference/javascript/storage-from-download) by providing an authorization header containing your user's JWT. The RLS policy you create on the `storage.objects` table will use this user to determine if they have access.
 - Create a signed URL with the [`createSignedUrl` method](/docs/reference/javascript/storage-from-createsignedurl) that can be accessed for a limited time.
 
 #### Example use cases:

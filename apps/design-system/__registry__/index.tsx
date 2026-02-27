@@ -137,6 +137,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-sandwiched": {
+      name: "admonition-sandwiched",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-sandwiched")),
+      source: "",
+      files: ["registry/default/example/admonition-sandwiched.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "alert-demo": {
       name: "alert-demo",
       type: "components:example",

@@ -23,6 +23,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
   UI_PREVIEW_TABLE_FILTER_BAR: 'supabase-ui-table-filter-bar',
+  UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',

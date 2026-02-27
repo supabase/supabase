@@ -4,12 +4,12 @@ import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
   createContext,
-  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
+  type PropsWithChildren,
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
@@ -95,6 +95,12 @@ export const useIsBranching2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   return gitlessBranchingEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+}
+
+export const useIsPgDeltaDiffEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
+  return pgDeltaDiffEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
 }
 
 export const useIsAdvisorRulesEnabled = () => {
