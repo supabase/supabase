@@ -2385,7 +2385,6 @@ export interface components {
       external_google_skip_nonce_check: boolean | null
       external_kakao_client_id: string | null
       external_kakao_enabled: boolean | null
-      external_kakao_secret: string | null
       external_keycloak_client_id: string | null
       external_keycloak_enabled: boolean | null
       external_keycloak_secret: string | null
@@ -2670,7 +2669,6 @@ export interface components {
       external_google_skip_nonce_check?: boolean | null
       external_kakao_enabled?: boolean | null
       external_kakao_client_id?: string | null
-      external_kakao_secret?: string | null
       external_keycloak_enabled?: boolean | null
       external_keycloak_client_id?: string | null
       external_keycloak_secret?: string | null
