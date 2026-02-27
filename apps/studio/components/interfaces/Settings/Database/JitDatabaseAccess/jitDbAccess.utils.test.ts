@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
-import { serializeDraftRolesForGrantMutation } from './jitDbAccess.adapters'
 import type { JitUserRuleDraft } from './jitDbAccess.types'
 import {
   computeStatusFromGrants,
   createEmptyGrant,
   getRelativeDatetimeByMode,
+  serializeDraftRolesForGrantMutation,
 } from './jitDbAccess.utils'
 
 describe('jitDbAccess.utils', () => {
