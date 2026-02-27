@@ -486,7 +486,7 @@ const data: () => {
           icon: 'M10.2805 18.2121C11.2419 18.6711 12.3325 18.8932 13.4711 18.8084C15.2257 18.6776 16.7596 17.843 17.8169 16.6015M8.21496 8.36469C9.27117 7.14237 10.7928 6.322 12.5311 6.19248C13.7196 6.10392 14.8558 6.34979 15.8474 6.85054M17.8169 16.6015L20.5242 19.3223C22.1857 17.5141 23.1562 15.1497 23.1562 12.5005C23.1562 6.89135 18.6091 2.34424 13 2.34424C10.9595 2.34424 9.16199 2.87659 7.57035 3.91232C8.35717 3.56865 9.22613 3.37801 10.1396 3.37801C12.6236 3.37801 14.7783 4.78762 15.8474 6.85054M17.8169 16.6015V16.6015C16.277 15.059 16.3448 12.5527 16.5387 10.3817C16.5557 10.191 16.5644 9.99794 16.5644 9.80282C16.5644 8.73844 16.3056 7.73451 15.8474 6.85054M13 22.6567C7.39086 22.6567 2.84375 18.1096 2.84375 12.5005C2.84375 9.84123 3.8026 7.48969 5.4753 5.67921L8.21496 8.42354V8.42354C9.76942 9.98064 9.69844 12.5133 9.51947 14.7062C9.50526 14.8803 9.49802 15.0564 9.49802 15.2341C9.49802 18.7705 12.3648 21.6373 15.9012 21.6373C16.8116 21.6373 17.6776 21.4473 18.4618 21.1048C16.8609 22.1588 15.06 22.6567 13 22.6567Z',
           subheading: (
             <>
-              Connect Supabase to <span className="text-foreground">Redshift, BigQuery, MySQL</span>
+              Connect Supabase to <span className="text-foreground">BigQuery, Snowflake, ClickHouse</span>
               , and external APIs for seamless integrations.
             </>
           ),
@@ -622,10 +622,10 @@ const data: () => {
         },
         {
           id: 'multi-region',
-          title: 'Multi-region Deployments',
+          title: 'Multi-region Options',
           description: (
             <>
-              Deploy databases across multiple regions for{' '}
+              Deploy in your chosen region with optional read replicas in other regions for{' '}
               <span className="text-foreground">global availability</span>.
             </>
           ),
@@ -638,7 +638,7 @@ const data: () => {
           description: (
             <>
               Enterprise plans offer{' '}
-              <span className="text-foreground">automatic failover and redundancy</span> for
+              <span className="text-foreground">failover and redundancy</span> for
               mission-critical applications.
             </>
           ),

@@ -16,9 +16,9 @@ type LinkProps = {
 
 export const SolutionsDropdown = () => (
   <div className="flex flex-col xl:flex-row">
-    <div className="w-[550px] xl:w-[470px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
-      {/* two first columns */}
-      {DevelopersData['navigation'].slice(0, 2).map((column) => (
+    <div className="w-[550px] xl:w-[600px] py-8 px-8 bg-background grid gap-3 grid-cols-2 xl:grid-cols-3">
+      {/* Skill Level, Who it's for, App Type */}
+      {DevelopersData['navigation'].slice(0, 3).map((column) => (
         <LinksGroup key={column.label} links={column.links} label={column.label} />
       ))}
     </div>
@@ -26,11 +26,11 @@ export const SolutionsDropdown = () => (
     <div className="bg-surface-75 flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
       <div className="flex flex-col gap-6 py-8 px-10">
         <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
-          {DevelopersData['navigation'][2].label}
+          {DevelopersData['navigation'][3].label}
         </label>
 
         <div className="flex flex-col gap-4">
-          {DevelopersData['navigation'][2].links.map((link) => (
+          {DevelopersData['navigation'][3].links.map((link) => (
             <MigrationLinkCard key={link.text} link={link} />
           ))}
         </div>

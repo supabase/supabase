@@ -695,10 +695,10 @@ const data: () => {
         },
         {
           id: 'multi-region',
-          title: 'Multi-region Deployments',
+          title: 'Multi-region Options',
           description: (
             <>
-              Deploy databases across multiple regions for{' '}
+              Deploy in your chosen region with optional read replicas in other regions for{' '}
               <span className="text-foreground">global availability</span>.
             </>
           ),
@@ -711,7 +711,7 @@ const data: () => {
           description: (
             <>
               Enterprise plans offer{' '}
-              <span className="text-foreground">automatic failover and redundancy</span> for
+              <span className="text-foreground">failover and redundancy</span> for
               mission-critical applications.
             </>
           ),
