@@ -31,7 +31,7 @@ export const HelpPanel = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex text-xs items-center justify-between px-4 h-[var(--header-height)] border-b">
+      <div className="flex text-xs items-center justify-between pl-4 pr-3 h-[var(--header-height)] border-b">
         <span>Help & Support</span>
         <ButtonTooltip
           type="text"
