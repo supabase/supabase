@@ -84,6 +84,21 @@ describe('MobileSheetNav', () => {
       })
     })
 
+    it('effectively does NOT close the sheet on route change when shouldCloseOnRouteChange is false', async () => {
+      const { rerender } = render(<MobileSheetNavWithState shouldCloseOnRouteChange={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
+      })
+
+      mockRouter.asPath = '/other-page'
+      act(() => {
+        rerender(<MobileSheetNavWithState shouldCloseOnRouteChange={false} />)
+      })
+
+      expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
+    })
+
     it('does not call onOpenChange when route changes if shouldCloseOnRouteChange is false', () => {
       const onOpenChange = vi.fn()
       const { rerender } = render(
@@ -139,6 +154,21 @@ describe('MobileSheetNav', () => {
       await waitFor(() => {
         expect(screen.getByTestId('sheet-open')).toHaveTextContent('false')
       })
+    })
+
+    it('effectively does NOT close the sheet on viewport resize when shouldCloseOnViewportResize is false', async () => {
+      const { rerender } = render(<MobileSheetNavWithState shouldCloseOnViewportResize={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
+      })
+
+      mockWindowSize.width = 800
+      act(() => {
+        rerender(<MobileSheetNavWithState shouldCloseOnViewportResize={false} />)
+      })
+
+      expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
     })
 
     it('does not call onOpenChange when width changes if shouldCloseOnViewportResize is false', () => {
