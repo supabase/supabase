@@ -38,7 +38,8 @@ export function captureCriticalError(
   error: ResponseError | Error | { message: string },
   context: string
 ): void {
-  const errorMessage = error instanceof Error ? error.message : error.message
+  const errorMessage =
+    error instanceof Error ? error.message : (error as { message: string }).message
   if (!errorMessage) {
     return
   }
