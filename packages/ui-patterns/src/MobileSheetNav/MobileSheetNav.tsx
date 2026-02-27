@@ -1,6 +1,9 @@
 'use client'
 
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useWindowSize } from 'react-use'
 import { CommandEmpty_Shadcn_, Sheet, SheetContent } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 
@@ -9,7 +12,32 @@ const MobileSheetNav: React.FC<{
   open?: boolean
   onOpenChange(open: boolean): void
   className?: string
-}> = ({ children, open = false, onOpenChange, className }) => {
+  shouldCloseOnRouteChange?: boolean
+  shouldCloseOnViewportResize?: boolean
+}> = ({
+  children,
+  open = false,
+  onOpenChange,
+  className,
+  shouldCloseOnRouteChange = true,
+  shouldCloseOnViewportResize = true,
+}) => {
+  const router = useRouter()
+  const { width } = useWindowSize()
+
+  const pathWithoutQuery = router?.asPath?.split('?')?.[0]
+  useEffect(() => {
+    if (shouldCloseOnRouteChange) {
+      onOpenChange(false)
+    }
+  }, [pathWithoutQuery])
+
+  useEffect(() => {
+    if (shouldCloseOnViewportResize) {
+      onOpenChange(false)
+    }
+  }, [width])
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
