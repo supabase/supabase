@@ -98,15 +98,20 @@ Sentry.init({
   // Enable performance monitoring
   tracesSampleRate: 0.001, // Capture 0.1% of transactions for performance monitoring
 
-  integrations: [
+  integrations: (() => {
+    const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
+    if (!thirdPartyErrorFilterIntegration) return []
+
     // Drop errors whose stack trace only contains third-party frames (browser extensions,
     // injected scripts, etc.). This uses build-time code annotation via the applicationKey
     // in next.config.js to reliably distinguish our code from third-party code.
-    Sentry.thirdPartyErrorFilterIntegration({
-      filterKeys: ['supabase-studio'],
-      behaviour: 'drop-error-if-exclusively-contains-third-party-frames',
-    }),
-  ],
+    return [
+      thirdPartyErrorFilterIntegration({
+        filterKeys: ['supabase-studio'],
+        behaviour: 'drop-error-if-exclusively-contains-third-party-frames',
+      }),
+    ]
+  })(),
 
   // Only capture errors originating from our own code.
   // This is a whitelist on the source URL in stack frames — it drops errors from
