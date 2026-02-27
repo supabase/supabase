@@ -8,6 +8,14 @@ import { IS_PLATFORM } from 'common/constants/environment'
 import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from 'lib/sanitize'
 
+const FULL_ERROR_SAMPLE_RATE = 1.0
+const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01
+const CHUNK_LOAD_ERROR_PATTERNS = [
+  /ChunkLoadError/i,
+  /Loading chunk [\d]+ failed/i,
+  /Loading CSS chunk [\d]+ failed/i,
+]
+
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
   const errors = event.exception?.values ?? []
@@ -66,6 +74,17 @@ export function isChallengeExpiredError(error: unknown, event: Sentry.Event): bo
   const message = errorMessage || eventMessage
 
   return message.includes('challenge-expired')
+}
+
+function isChunkLoadError(error: unknown, event: Sentry.Event): boolean {
+  const errorMessage = error instanceof Error ? error.message : ''
+  const eventMessage = event.message || ''
+  const exceptionMessages = event.exception?.values?.map((ex) => ex.value ?? '') ?? []
+  const combinedMessages = [errorMessage, eventMessage, ...exceptionMessages].filter(Boolean)
+
+  return CHUNK_LOAD_ERROR_PATTERNS.some((pattern) =>
+    combinedMessages.some((message) => pattern.test(message))
+  )
 }
 
 Sentry.init({
@@ -130,9 +149,20 @@ Sentry.init({
     const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
       'Session error detected'
     )
+    const isChunkLoadFailure = isChunkLoadError(hint.originalException, event)
 
-    if ((isInvalidUrlEvent || isSessionTimeoutEvent) && Math.random() > 0.01) {
+    const sentrySampleRate =
+      isInvalidUrlEvent || isSessionTimeoutEvent || isChunkLoadFailure
+        ? LOW_PRIORITY_ERROR_SAMPLE_RATE
+        : FULL_ERROR_SAMPLE_RATE
+
+    if (Math.random() > sentrySampleRate) {
       return null
+    }
+
+    event.tags = {
+      ...event.tags,
+      sentrySampleRate: sentrySampleRate.toString(),
     }
 
     if (isHCaptchaRelatedError(event)) {
@@ -211,11 +241,6 @@ Sentry.init({
     'AbortError',
     'TypeError: cancelled',
     'TypeError: Cancelled',
-
-    // === Code-split / chunk loading (transient network issues) ===
-    'ChunkLoadError',
-    /Loading chunk [\d]+ failed/,
-    /Loading CSS chunk [\d]+ failed/,
 
     // === Browser extensions & Google Translate DOM manipulation ===
     'Node.insertBefore: Child to insert before is not a child of this node',
