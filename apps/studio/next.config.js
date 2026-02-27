@@ -628,12 +628,6 @@ module.exports =
         // https://vercel.com/docs/cron-jobs
         automaticVercelMonitors: true,
 
-        // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-        // This can increase your server load as well as your hosting bill.
-        // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-        // side errors will fail.
-        tunnelRoute: '/monitoring',
-
         // Annotate bundles at build time so thirdPartyErrorFilterIntegration can
         // distinguish our code from browser extensions / injected scripts at runtime.
         unstable_sentryWebpackPluginOptions: {
