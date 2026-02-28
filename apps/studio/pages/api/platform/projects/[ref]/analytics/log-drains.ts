@@ -2,7 +2,8 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { PROJECT_ANALYTICS_URL } from 'lib/constants/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+export default (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -54,12 +55,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json(resp)
     case 'POST':
       // create the log drain
+      const { name, description, type, config } = req.body
+      if (!name || !type) {
+        return res
+          .status(400)
+          .json({ error: { message: 'name and type are required fields' } })
+      }
       const postUrl = new URL(baseUrl)
       postUrl.pathname = '/api/backends'
       const postResult = await fetch(postUrl, {
         body: JSON.stringify({
-          ...req.body,
-          config: req.body.config,
+          name,
+          description,
+          type,
+          config,
           metadata: {
             type: 'log-drain',
           },
