@@ -84,64 +84,63 @@ const BannedIPs = () => {
       <PageSection id="banned-ips">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Network Bans</PageSectionTitle>
+            <PageSectionTitle>Network bans</PageSectionTitle>
             <PageSectionDescription>
-              List of IP addresses that are temporarily blocked if their traffic pattern looks
-              abusive
+              IP addresses temporarily blocked due to suspicious traffic
             </PageSectionDescription>
           </PageSectionSummary>
           <DocsButton href={`${DOCS_URL}/reference/cli/supabase-network-bans`} />
         </PageSectionMeta>
-        <PageSectionContent></PageSectionContent>
+        <PageSectionContent>
+          {ipListLoading ? (
+            <Card>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+              </CardContent>
+            </Card>
+          ) : ipListError ? (
+            <AlertError
+              className="border-0 rounded-none"
+              error={ipListError}
+              subject="Failed to retrieve banned IP addresses"
+            />
+          ) : ipList.banned_ipv4_addresses.length > 0 ? (
+            <Card>
+              {ipList.banned_ipv4_addresses.map((ip) => (
+                <CardContent key={ip} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-5">
+                    <Globe size={16} className="text-foreground-lighter" />
+                    <p className="text-sm font-mono">{ip}</p>
+                    {ip === userIPAddress && <Badge>Your IP address</Badge>}
+                  </div>
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canUnbanNetworks}
+                    onClick={() => openConfirmationModal(ip)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canUnbanNetworks
+                          ? 'You need additional permissions to unban networks'
+                          : undefined,
+                      },
+                    }}
+                  >
+                    Unban IP
+                  </ButtonTooltip>
+                </CardContent>
+              ))}
+            </Card>
+          ) : (
+            <Card>
+              <CardContent className="text-foreground text-sm">
+                There are no banned IP addresses for your project
+              </CardContent>
+            </Card>
+          )}
+        </PageSectionContent>
       </PageSection>
-      {/* TODO: Remove mockIpList usage - using mock data for UI testing */}
-      {ipListLoading ? (
-        <Card>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-          </CardContent>
-        </Card>
-      ) : ipListError ? (
-        <AlertError
-          className="border-0 rounded-none"
-          error={ipListError}
-          subject="Failed to retrieve banned IP addresses"
-        />
-      ) : ipList.banned_ipv4_addresses.length > 0 ? (
-        <Card>
-          {ipList.banned_ipv4_addresses.map((ip) => (
-            <CardContent key={ip} className="flex items-center justify-between">
-              <div className="flex items-center space-x-5">
-                <Globe size={16} className="text-foreground-lighter" />
-                <p className="text-sm font-mono">{ip}</p>
-                {ip === userIPAddress && <Badge>Your IP address</Badge>}
-              </div>
-              <ButtonTooltip
-                type="default"
-                disabled={!canUnbanNetworks}
-                onClick={() => openConfirmationModal(ip)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canUnbanNetworks
-                      ? 'You need additional permissions to unban networks'
-                      : undefined,
-                  },
-                }}
-              >
-                Unban IP
-              </ButtonTooltip>
-            </CardContent>
-          ))}
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="text-foreground-light text-sm">
-            There are no banned IP addresses for your project.
-          </CardContent>
-        </Card>
-      )}
 
       <ConfirmationModal
         variant="destructive"

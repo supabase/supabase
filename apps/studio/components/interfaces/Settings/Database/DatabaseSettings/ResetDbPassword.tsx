@@ -10,8 +10,15 @@ import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, Input, Modal } from 'ui'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Modal } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionDescription,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
@@ -84,14 +91,25 @@ const ResetDbPassword = ({ disabled = false }) => {
 
   return (
     <>
-      <Card id="database-password">
-        <CardContent>
-          <FormLayout
-            layout="flex-row-reverse"
-            label="Database password"
-            description="You can use this password to connect directly to your Postgres database."
-          >
-            <div className="flex items-end justify-end">
+      <PageSection id="database-password">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Database password</PageSectionTitle>
+
+            <PageSectionDescription>Used for direct Postgres connections</PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Card>
+            <CardContent className="flex flex-row items-center gap-x-2 justify-between">
+              <div className="space-y-0.5">
+                <h3 className="text-sm text-foreground">Reset database password</h3>
+                <p className="text-sm text-foreground-light text-balance">
+                  The database password isn’t viewable after creation. Resetting it will break any
+                  existing connections.
+                </p>
+              </div>
+
               <ButtonTooltip
                 type="default"
                 disabled={!canResetDbPassword || !isProjectActive || disabled}
@@ -107,15 +125,15 @@ const ResetDbPassword = ({ disabled = false }) => {
                   },
                 }}
               >
-                Reset database password
+                Reset password
               </ButtonTooltip>
-            </div>
-          </FormLayout>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </PageSectionContent>
+      </PageSection>
       <Modal
         hideFooter
-        header={<h5 className="text-foreground">Reset database password</h5>}
+        header="Reset database password"
         confirmText="Reset password"
         size="medium"
         visible={showResetDbPass}

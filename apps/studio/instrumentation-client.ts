@@ -8,6 +8,14 @@ import { IS_PLATFORM } from 'common/constants/environment'
 import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from 'lib/sanitize'
 
+const DEFAULT_ERROR_SAMPLE_RATE = 1.0
+const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01
+const CHUNK_LOAD_ERROR_PATTERNS = [
+  /ChunkLoadError/i,
+  /Loading chunk [\d]+ failed/i,
+  /Loading CSS chunk [\d]+ failed/i,
+]
+
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
   const errors = event.exception?.values ?? []
@@ -20,32 +28,6 @@ function isHCaptchaRelatedError(event: Sentry.Event): boolean {
     }
   }
   return false
-}
-
-// We want to ignore errors not originating from docs app static files
-// (such as errors from browser extensions). Those errors come from files
-// not starting with 'app:///_next'.
-//
-// However, there is a complication because the Sentry code that sends
-// the error shows up in the stack trace, and that _does_ start with
-// 'app:///_next'. It is always the first frame in the stack trace,
-// and has a specific pre_context comment that we can use for filtering.
-// Copied from docs app instrumentation-client.ts
-function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
-  if (!frames || frames.length === 0) return false
-
-  function isSentryFrame(frame: Sentry.StackFrame, index: number) {
-    return index === 0 && frame.pre_context?.some((line) => line.includes('sentry.javascript'))
-  }
-
-  // Check if any frame is from our app (excluding Sentry's own frame)
-  const hasAppFrame = frames.some((frame, index) => {
-    const path = frame.abs_path || frame.filename
-    return path?.startsWith('app:///_next') && !isSentryFrame(frame, index)
-  })
-
-  // If no app frames found, it's a third-party error
-  return !hasAppFrame
 }
 
 // Filter browser wallet extension errors (e.g., Gate.io wallet)
@@ -94,6 +76,17 @@ export function isChallengeExpiredError(error: unknown, event: Sentry.Event): bo
   return message.includes('challenge-expired')
 }
 
+function isChunkLoadError(error: unknown, event: Sentry.Event): boolean {
+  const errorMessage = error instanceof Error ? error.message : ''
+  const eventMessage = event.message || ''
+  const exceptionMessages = event.exception?.values?.map((ex) => ex.value ?? '') ?? []
+  const combinedMessages = [errorMessage, eventMessage, ...exceptionMessages].filter(Boolean)
+
+  return CHUNK_LOAD_ERROR_PATTERNS.some((pattern) =>
+    combinedMessages.some((message) => pattern.test(message))
+  )
+}
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   ...(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT && {
@@ -102,12 +95,31 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
 
-  // Enable performance monitoring - Next.js routes and API calls are automatically instrumented
+  // Enable performance monitoring
   tracesSampleRate: 0.001, // Capture 0.1% of transactions for performance monitoring
 
-  // [Ali] Filter out browser extensions and user scripts (FE-2094)
-  // Using denyUrls to block known third-party script patterns
-  denyUrls: [/userscript/i],
+  integrations: (() => {
+    const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
+    if (!thirdPartyErrorFilterIntegration) return []
+
+    // Drop errors whose stack trace only contains third-party frames (browser extensions,
+    // injected scripts, etc.). This uses build-time code annotation via the applicationKey
+    // in next.config.js to reliably distinguish our code from third-party code.
+    return [
+      thirdPartyErrorFilterIntegration({
+        filterKeys: ['supabase-studio'],
+        behaviour: 'drop-error-if-exclusively-contains-third-party-frames',
+      }),
+    ]
+  })(),
+
+  // Only capture errors originating from our own code.
+  // This is a whitelist on the source URL in stack frames — it drops errors from
+  // browser extensions, injected scripts, third-party widgets, etc. (FE-2094)
+  allowUrls: [
+    /https?:\/\/(.*\.)?supabase\.(com|co|green|io)/,
+    /app:\/\//, // Next.js rewrites source URLs to app:// with source maps
+  ],
   beforeBreadcrumb(breadcrumb, _hint) {
     const cleanedBreadcrumb = { ...breadcrumb }
 
@@ -134,25 +146,36 @@ Sentry.init({
       return null
     }
 
-    // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+    // Downsample only known high-noise classes; keep all other errors at full rate.
     const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
       `Failed to construct 'URL': Invalid URL`
     )
-    // [Joshen] Similar behaviour for this error from SessionTimeoutModal to control the quota usage
     const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
       'Session error detected'
     )
+    const isChunkLoadFailure = isChunkLoadError(hint.originalException, event)
 
-    if ((isInvalidUrlEvent || isSessionTimeoutEvent) && Math.random() > 0.01) {
+    const codeSampleRate =
+      isInvalidUrlEvent || isSessionTimeoutEvent || isChunkLoadFailure
+        ? LOW_PRIORITY_ERROR_SAMPLE_RATE
+        : DEFAULT_ERROR_SAMPLE_RATE
+
+    if (Math.random() > codeSampleRate) {
       return null
+    }
+
+    event.tags = {
+      ...event.tags,
+      codeSampleRate: codeSampleRate.toString(),
     }
 
     if (isHCaptchaRelatedError(event)) {
       return null
     }
 
-    const frames = event.exception?.values?.[0].stacktrace?.frames || []
-    if (isThirdPartyError(frames)) {
+    // Drop events where every exception has no stack trace — these are not debuggable
+    const exceptions = event.exception?.values ?? []
+    if (exceptions.length > 0 && exceptions.every((ex) => !ex.stacktrace?.frames?.length)) {
       return null
     }
 
@@ -183,73 +206,79 @@ Sentry.init({
     return event
   },
   ignoreErrors: [
-    // Used exclusively in Monaco Editor.
+    // === Monaco Editor ===
     'ResizeObserver',
     's.getModifierState is not a function',
     /^Uncaught NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope'/,
-    // Browser wallet extension errors (e.g., Gate.io wallet)
+
+    // === Browser extension errors ===
+    // Gate.io wallet
     'shouldSetTallyForCurrentProvider is not a function',
-    // [Joshen] We currently use stripe-js for customers to save their credit card data
-    // I'm unable to reproduce this error on local, staging nor prod across chrome, safari or firefox
-    // Based on https://github.com/stripe/stripe-js/issues/26, it seems like this error is safe to ignore,
+    // SAP browser extensions (SAP GUI, SAP Companion)
+    'sap is not defined',
+    // Non-Error objects thrown as exceptions (e.g., Event objects)
+    '[object Event]',
+
+    // === Third-party SDK errors ===
+    // stripe-js: https://github.com/stripe/stripe-js/issues/26
     'Failed to load Stripe.js',
-    // [Joshen] This event started occurring after our fix in the org dropdown by reading the slug from
-    // the URL params instead of the store, but we cannot repro locally, staging nor on prod
-    // Safe to ignore since it's not a user-facing issue + we've not received any user feedback/report about it
-    // Ref: https://github.com/supabase/supabase/pull/9729
-    'The provided `href` (/org/[slug]/general) value is missing query values (slug)',
-    'The provided `href` (/org/[slug]/team) value is missing query values (slug)',
-    'The provided `href` (/org/[slug]/billing) value is missing query values (slug)',
-    'The provided `href` (/org/[slug]/invoices) value is missing query values (slug)',
-    // [Joshen] Seems to be from hcaptcha
+    // hCaptcha
     "undefined is not an object (evaluating 'n.chat.setReady')",
     "undefined is not an object (evaluating 'i.chat.setReady')",
-    // [Terry] When users paste in an embedded GitHub Gist
-    // Error thrown by `sql-formatter` lexer when given invalid input
-    // Original format: new Error(`Parse error: Unexpected "${text}" at line ${line} column ${col}`)
+
+    // === Next.js internals ===
+    // Ref: https://github.com/supabase/supabase/pull/9729
+    /The provided `href` \(\/org\/\[slug\]\/.*\) value is missing query values/,
+    // Next.js throws these during navigation, not actual errors
+    'NEXT_NOT_FOUND',
+    'NEXT_REDIRECT',
+
+    // === User input errors (not bugs) ===
+    // sql-formatter lexer on invalid SQL input
     /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
-    // [Joshen] IMO, should be caught on API if there's anything to handle - FE shouldn't dupe this alert
+
+    // === Network / infrastructure (not actionable on FE) ===
     /504 Gateway Time-out/,
-    // [Joshen] This is the one caused by Google translate in the browser + 3rd party extensions
+    'Network request failed',
+    'Failed to fetch',
+    'Load failed',
+    'AbortError',
+    'TypeError: cancelled',
+    'TypeError: Cancelled',
+
+    // === Browser extensions & Google Translate DOM manipulation ===
     'Node.insertBefore: Child to insert before is not a child of this node',
-    // [Ali] Google Translate / browser extension DOM manipulation errors
+    "NotFoundError: Failed to execute 'removeChild' on 'Node'",
+    "NotFoundError: Failed to execute 'insertBefore' on 'Node'",
     'NotFoundError: The object can not be found here.',
-    // [Joshen] This one sprung up recently and I've no idea where this is coming from
+    "Cannot read properties of null (reading 'parentNode')",
+    "Cannot read properties of null (reading 'removeChild')",
+    "TypeError: can't access dead object",
+    /^NS_ERROR_/,
+
+    // === Non-Error throws (extensions, third-party libs throwing strings/objects) ===
+    'Non-Error exception captured',
+    'Non-Error promise rejection captured',
+
+    // === Cross-origin script errors (no useful info) ===
+    'Script error.',
+    'Script error',
+
+    // === React hydration mismatches caused by extensions modifying DOM ===
+    // Note: we only suppress the generic browser messages, NOT "Hydration failed because..."
+    // which can indicate real SSR/client mismatches in our own code.
+    /text content does not match/i,
+    /There was an error while hydrating/i,
+
+    // === Web crawler / bot errors ===
+    'instantSearchSDKJSBridgeClearHighlight',
+
+    // === Misc known noise ===
     'r.default.setDefaultLevel is not a function',
-    // [Joshen] Safe to ignore, it's an error from the copyToClipboard
+    // Clipboard permission denied
     'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
-
-    // API/Network errors - should be handled by API layer, not actionable on frontend
-    /502/,
-    'upstream request timeout',
-    /upstream connect error or disconnect\/reset before headers/,
-    /Failed to fetch/,
-
-    // Google Translate / browser extension DOM manipulation errors
-    /Failed to execute 'removeChild' on 'Node'/,
-
-    // Monaco editor errors - already filtering ResizeObserver, adding general monaco errors
-    /monaco-editor/,
-
-    // JWT/Auth errors - expected during session expiry, handled by auth flow
-    'jwt expired',
-    /InvalidJWTToken: Invalid value for JWT claim "exp"/,
-
-    // User cancellation - intentional user action
-    'Canceled: Canceled',
-
-    // Third-party/extension errors
-    'html2canvas is not defined',
-    '[object Event]',
-    'ConnectorClass.onMessage(extensionPageScript)',
-    "Cannot destructure property 'address' of '(intermediate value)' as it is undefined.",
-
-    // Expected user flow errors
-    'Profile already exists: User already exists',
-
-    // JSON parse errors from invalid responses
-    '"undefined" is not valid JSON',
-    'SyntaxError: "undefined" is not valid JSON',
+    // Facebook pixel
+    'fb_xd_fragment',
   ],
 })
 

@@ -21,7 +21,7 @@ export function DiskManagementPanelForm() {
     <PageSection id="disk-management">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Disk Management</PageSectionTitle>
+          <PageSectionTitle>Disk management</PageSectionTitle>
         </PageSectionSummary>
         <DocsButton href={`${DOCS_URL}/guides/platform/database-size#disk-management`} />
       </PageSectionMeta>
