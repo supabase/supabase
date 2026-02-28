@@ -157,34 +157,7 @@ services:
       GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
 
-      # Uncomment to configure SMS delivery (phone auth and phone MFA).
-      # Also uncomment and fill in the matching variables in .env.
-      # GOTRUE_SMS_PROVIDER: ${SMS_PROVIDER}
-      # GOTRUE_SMS_OTP_EXP: ${SMS_OTP_EXP}
-      # GOTRUE_SMS_OTP_LENGTH: ${SMS_OTP_LENGTH}
-      # GOTRUE_SMS_MAX_FREQUENCY: ${SMS_MAX_FREQUENCY}
-      # GOTRUE_SMS_TEMPLATE: ${SMS_TEMPLATE}
-      ## Twilio credentials (when SMS_PROVIDER=twilio)
-      # GOTRUE_SMS_TWILIO_ACCOUNT_SID: ${SMS_TWILIO_ACCOUNT_SID}
-      # GOTRUE_SMS_TWILIO_AUTH_TOKEN: ${SMS_TWILIO_AUTH_TOKEN}
-      # GOTRUE_SMS_TWILIO_MESSAGE_SERVICE_SID: ${SMS_TWILIO_MESSAGE_SERVICE_SID}
-      ## Test OTP mappings for development
-      # GOTRUE_SMS_TEST_OTP: ${SMS_TEST_OTP}
-
-      # Uncomment to configure multi-factor authentication (MFA).
-      # Also uncomment and fill in the matching variables in .env.
-      # GOTRUE_MFA_TOTP_ENROLL_ENABLED: ${MFA_TOTP_ENROLL_ENABLED}
-      # GOTRUE_MFA_TOTP_VERIFY_ENABLED: ${MFA_TOTP_VERIFY_ENABLED}
-      # GOTRUE_MFA_PHONE_ENROLL_ENABLED: ${MFA_PHONE_ENROLL_ENABLED}
-      # GOTRUE_MFA_PHONE_VERIFY_ENABLED: ${MFA_PHONE_VERIFY_ENABLED}
-      # GOTRUE_MFA_WEB_AUTHN_ENROLL_ENABLED: ${MFA_WEB_AUTHN_ENROLL_ENABLED}
-      # GOTRUE_MFA_WEB_AUTHN_VERIFY_ENABLED: ${MFA_WEB_AUTHN_VERIFY_ENABLED}
-      # GOTRUE_MFA_MAX_ENROLLED_FACTORS: ${MFA_MAX_ENROLLED_FACTORS}
-
       # Uncomment to enable OAuth / social login providers.
-      # Also uncomment and fill in the matching variables in .env.
-      # Documentation: https://supabase.com/docs/guides/self-hosting/docker-oauth
-
       # GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
       # GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       # GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_SECRET}
@@ -195,45 +168,32 @@ services:
       # GOTRUE_EXTERNAL_GITHUB_SECRET: ${GITHUB_SECRET}
       # GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
 
-      # GOTRUE_EXTERNAL_APPLE_ENABLED: ${APPLE_ENABLED}
-      # GOTRUE_EXTERNAL_APPLE_CLIENT_ID: ${APPLE_CLIENT_ID}
-      # GOTRUE_EXTERNAL_APPLE_SECRET: ${APPLE_SECRET}
-      # GOTRUE_EXTERNAL_APPLE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
-
       # GOTRUE_EXTERNAL_AZURE_ENABLED: ${AZURE_ENABLED}
       # GOTRUE_EXTERNAL_AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
       # GOTRUE_EXTERNAL_AZURE_SECRET: ${AZURE_SECRET}
       # GOTRUE_EXTERNAL_AZURE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
-      ## Optional: uncomment for tenant-specific Azure login
-      # GOTRUE_EXTERNAL_AZURE_URL: ${AZURE_URL}
 
-      # Uncomment to enable auth hooks.
-      # Also uncomment and fill in the matching variables in .env.
-      # Documentation: https://supabase.com/docs/guides/self-hosting/docker-auth-hooks
+      # Uncomment to configure SMS delivery (phone auth and phone MFA).
+      # GOTRUE_SMS_PROVIDER: ${SMS_PROVIDER}
+      # GOTRUE_SMS_OTP_EXP: ${SMS_OTP_EXP}
+      # GOTRUE_SMS_OTP_LENGTH: ${SMS_OTP_LENGTH}
+      # GOTRUE_SMS_MAX_FREQUENCY: ${SMS_MAX_FREQUENCY}
+      # GOTRUE_SMS_TEMPLATE: ${SMS_TEMPLATE}
 
-      # GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: "true"
-      # GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI: ${HOOK_CUSTOM_ACCESS_TOKEN_URI}
-      # GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_SECRETS: ${HOOK_CUSTOM_ACCESS_TOKEN_SECRETS}
+      # Twilio credentials (when SMS_PROVIDER=twilio)
+      # GOTRUE_SMS_TWILIO_ACCOUNT_SID: ${SMS_TWILIO_ACCOUNT_SID}
+      # GOTRUE_SMS_TWILIO_AUTH_TOKEN: ${SMS_TWILIO_AUTH_TOKEN}
+      # GOTRUE_SMS_TWILIO_MESSAGE_SERVICE_SID: ${SMS_TWILIO_MESSAGE_SERVICE_SID}
 
-      # GOTRUE_HOOK_SEND_SMS_ENABLED: "true"
-      # GOTRUE_HOOK_SEND_SMS_URI: ${HOOK_SEND_SMS_URI}
-      # GOTRUE_HOOK_SEND_SMS_SECRETS: ${HOOK_SEND_SMS_SECRETS}
+      # Test OTP mappings for development
+      # GOTRUE_SMS_TEST_OTP: ${SMS_TEST_OTP}
 
-      # GOTRUE_HOOK_SEND_EMAIL_ENABLED: "true"
-      # GOTRUE_HOOK_SEND_EMAIL_URI: ${HOOK_SEND_EMAIL_URI}
-      # GOTRUE_HOOK_SEND_EMAIL_SECRETS: ${HOOK_SEND_EMAIL_SECRETS}
-
-      # GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED: "true"
-      # GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_URI: "pg-functions://postgres/public/mfa_verification_attempt"
-
-      # GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED: "true"
-      # GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI: "pg-functions://postgres/public/password_verification_attempt"
-
-      # GOTRUE_HOOK_BEFORE_USER_CREATED_ENABLED: "true"
-      # GOTRUE_HOOK_BEFORE_USER_CREATED_URI: "pg-functions://postgres/public/before_user_created"
-
-      # GOTRUE_HOOK_AFTER_USER_CREATED_ENABLED: "true"
-      # GOTRUE_HOOK_AFTER_USER_CREATED_URI: "pg-functions://postgres/public/after_user_created"
+      # Uncomment to configure multi-factor authentication (MFA).
+      # GOTRUE_MFA_TOTP_ENROLL_ENABLED: ${MFA_TOTP_ENROLL_ENABLED}
+      # GOTRUE_MFA_TOTP_VERIFY_ENABLED: ${MFA_TOTP_VERIFY_ENABLED}
+      # GOTRUE_MFA_PHONE_ENROLL_ENABLED: ${MFA_PHONE_ENROLL_ENABLED}
+      # GOTRUE_MFA_PHONE_VERIFY_ENABLED: ${MFA_PHONE_VERIFY_ENABLED}
+      # GOTRUE_MFA_MAX_ENROLLED_FACTORS: ${MFA_MAX_ENROLLED_FACTORS}
 
   rest:
     container_name: supabase-rest
