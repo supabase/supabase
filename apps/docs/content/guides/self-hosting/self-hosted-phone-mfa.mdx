@@ -213,3 +213,9 @@ docker compose up -d --force-recreate --no-deps auth
 ### Rate limit errors
 
 If users see "rate limit exceeded" errors, check `SMS_MAX_FREQUENCY` (minimum interval between sends) and the global rate limit `GOTRUE_RATE_LIMIT_SMS_SENT` (default: 30 per hour).
+
+### Additional resources
+
+- [Multi-Factor Authentication (Phone)](/docs/guides/auth/auth-mfa/phone)
+- [Multi-Factor Authentication (TOTP)](/docs/guides/auth/auth-mfa/totp)
+- [Auth server on GitHub](https://github.com/supabase/auth) (check README and `example.env`)
