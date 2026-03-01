@@ -4,13 +4,7 @@ description: 'Set up HTTPS for self-hosted Supabase with a reverse proxy or self
 subtitle: 'Set up HTTPS for self-hosted Supabase with a reverse proxy or self-signed certificates.'
 ---
 
-HTTPS is required for production self-hosted Supabase deployments. Without it:
-
-- Most OAuth providers reject `http://` callback URLs (except `localhost`)
-- Secure browser APIs (like `crypto.subtle`) are unavailable
-- Session cookies may not work correctly across domains
-
-This guide covers two production approaches using a reverse proxy in front of Kong, plus a self-signed certificate option for development. All approaches terminate TLS before Kong — internal Docker network traffic stays on HTTP.
+HTTPS is required for production self-hosted Supabase deployments. This guide covers two production approaches using a reverse proxy in front of self-hosted API gateway (Kong), plus a self-signed certificate option for development environment. Internal Docker network traffic stays on HTTP.
 
 ## Before you begin
 
@@ -18,7 +12,7 @@ You need:
 
 - A working self-hosted Supabase installation. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker).
 - A domain name with DNS pointing to your server's public IP address (for Let's Encrypt certificate issuance).
-- Ports 80 and 443 open on your server's firewall.
+- Ports 80 and 443 open.
 
 ## Set up HTTPS
 
@@ -32,27 +26,22 @@ defaultActiveId="caddy"
 
 [Caddy](https://caddyserver.com/) automatically provisions and renews Let's Encrypt TLS certificates with zero configuration. It also handles HTTP-to-HTTPS redirects, WebSocket upgrades, and HTTP/2 and HTTP/3 out of the box.
 
-### Step 1 - Update environment variables
+### Step 1: Update environment variables
 
 Update the following variables in your `.env` file to use your HTTPS domain:
 
-```sh .env
-SITE_URL=https://supabase.example.com
-API_EXTERNAL_URL=https://supabase.example.com
-SUPABASE_PUBLIC_URL=https://supabase.example.com
-DOMAIN=supabase.example.com
+```
+SUPABASE_PUBLIC_URL=https://<your-domain>.example.com
+API_EXTERNAL_URL=https://<your-domain>.example.com
+SITE_URL=https://<your-domain>.example.com
+DOMAIN=<your-domain>.example.com
 ```
 
-- `API_EXTERNAL_URL` is used by the Auth service for OAuth callback URLs and email confirmation links
-- `SUPABASE_PUBLIC_URL` is used by Studio for browser-side API communication
-- `SITE_URL` is the default redirect URL after authentication
-- `DOMAIN` is used by the Caddyfile to configure the server name
-
-### Step 2 - Remove Kong's public port bindings
+### Step 2: Remove public port bindings for API gateway
 
 Comment out Kong's host port mappings in `docker-compose.yml` so that only Caddy is exposed to the internet:
 
-```yaml docker-compose.yml
+```
 kong:
   # ...
   ports:
@@ -62,7 +51,7 @@ kong:
 
 Kong remains accessible to other containers on the internal Docker network.
 
-### Step 3 - Start with the Caddy overlay
+### Step 3: Start with the Caddy overlay
 
 The repository includes a `docker-compose.caddy.yml` overlay that adds a Caddy reverse proxy service. Start your stack with both compose files:
 
@@ -114,12 +103,12 @@ volumes:
 }
 ```
 
-Storage requests are proxied directly to the Storage service, bypassing Kong for better performance with large file uploads. All other requests go through Kong. Caddy automatically handles Let's Encrypt certificate provisioning, HTTPS, HTTP-to-HTTPS redirects, WebSocket upgrades, and certificate renewal.
+Caddy automatically handles Let's Encrypt certificate provisioning, HTTPS, HTTP-to-HTTPS redirects, WebSocket upgrades, and certificate renewal.
 
-### Step 4 - Verify
+### Step 4: Verify
 
 ```bash
-curl https://supabase.example.com/auth/v1/health
+curl https://<your-domain>.example.com/auth/v1/health
 ```
 
 You should receive a JSON response confirming the Auth service is healthy.
@@ -284,9 +273,9 @@ You should receive a JSON response confirming the Auth service is healthy.
 
 **Using a different reverse proxy?** If you already run [Nginx Proxy Manager](https://nginxproxymanager.com/), [Traefik](https://traefik.io/), or another reverse proxy for your infrastructure, you can use it instead of Caddy or Nginx above. The key requirements are:
 
-- Proxy to Kong on port `8000` (or `<server-ip>:8000` if the proxy runs outside the Docker network)
+- Proxy to Kong on port `8000` (or `<your-ip>:8000` if the proxy runs outside the Docker network)
 - Enable WebSocket support (required for Realtime)
-- Update `SITE_URL`, `API_EXTERNAL_URL`, and `SUPABASE_PUBLIC_URL` in `.env` to your HTTPS URL
+- Update `SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, and `SITE_URL` in `.env` to your HTTPS URL
 - Comment out Kong's host port bindings in `docker-compose.yml` if the proxy runs in the same Docker network
 
 </Admonition>
@@ -295,13 +284,13 @@ You should receive a JSON response confirming the Auth service is healthy.
 
 <Admonition type="caution">
 
-Self-signed certificates trigger browser warnings and are rejected by most OAuth providers. Use this approach only for local development or internal networks.
+Self-signed certificates trigger browser warnings and are rejected by most OAuth providers. Use this approach only in development environment or internal networks.
 
 </Admonition>
 
 For development or internal networks where you cannot use Let's Encrypt, you can configure Kong to serve HTTPS directly using self-signed certificates.
 
-### Step 1 - Generate a self-signed certificate
+### Generate a self-signed certificate
 
 ```bash
 mkdir -p volumes/api/tls
@@ -311,7 +300,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -subj "/CN=localhost"
 ```
 
-### Step 2 - Configure Kong for SSL
+### Configure Kong for SSL
 
 Add the certificate volume mount and SSL environment variables to the `kong` service in `docker-compose.yml`:
 
@@ -327,21 +316,21 @@ kong:
     KONG_SSL_CERT_KEY: /etc/kong/tls/server.key
 ```
 
-### Step 3 - Update environment variables
+### Update environment variables
 
 Update your `.env` file to use HTTPS with the Kong HTTPS port:
 
-```sh .env
-SITE_URL=https://localhost:8443
-API_EXTERNAL_URL=https://localhost:8443
-SUPABASE_PUBLIC_URL=https://localhost:8443
+```
+SUPABASE_PUBLIC_URL=https://<your-domain>:8443
+API_EXTERNAL_URL=https://<your-domain>:8443
+SITE_URL=https://<your-domain>:8443
 ```
 
-### Step 4 - Restart and verify
+### Restart and verify
 
-```bash
-docker compose up -d
-curl -k https://localhost:8443/auth/v1/health
+```
+docker compose up -d &&
+curl -k https://<your-domain>:8443/auth/v1/health
 ```
 
 The `-k` flag tells curl to accept the self-signed certificate.
@@ -355,13 +344,13 @@ If Caddy or Certbot fails to obtain a certificate:
 - Verify that ports 80 and 443 are open on your firewall
 - Verify that your domain's DNS A record points to your server's public IP
 - Check Caddy logs (`docker compose logs caddy`) or Certbot logs for specific errors
-- Let's Encrypt has [rate limits](https://letsencrypt.org/docs/rate-limits/) — if you hit them, wait before retrying
+- Let's Encrypt has [rate limits](https://letsencrypt.org/docs/rate-limits/) - if you hit them, wait before retrying
 
 ### WebSocket connection failed
 
 If Realtime subscriptions fail to connect:
 
-- **Caddy** handles WebSocket upgrades automatically — check that Kong is healthy
+- **Caddy** handles WebSocket upgrades automatically - check that Kong is healthy
 - **Nginx** requires explicit `Upgrade` and `Connection` headers on the `/realtime/v1/` location. Verify your `nginx.conf` includes these headers as shown above
 
 ### OAuth callback URL mismatch
@@ -369,7 +358,7 @@ If Realtime subscriptions fail to connect:
 If OAuth redirects fail with a callback URL error:
 
 - Verify `API_EXTERNAL_URL` in `.env` is set to your HTTPS URL
-- Verify the callback URL registered with your OAuth provider matches `{API_EXTERNAL_URL}/auth/v1/callback`
+- Verify the callback URL registered with your OAuth provider matches `API_EXTERNAL_URL/auth/v1/callback`
 - After changing `API_EXTERNAL_URL`, restart all services with `docker compose down && docker compose up -d`
 
 ### Mixed content warnings
