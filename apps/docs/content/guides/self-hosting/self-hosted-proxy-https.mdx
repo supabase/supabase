@@ -1,0 +1,344 @@
+---
+title: 'Configure HTTPS'
+description: 'Set up HTTPS for self-hosted Supabase with a reverse proxy or self-signed certificates.'
+subtitle: 'Set up HTTPS for self-hosted Supabase with a reverse proxy or self-signed certificates.'
+---
+
+HTTPS is required for production self-hosted Supabase deployments. Without it:
+
+- Most OAuth providers reject `http://` callback URLs (except `localhost`)
+- Secure browser APIs (like `crypto.subtle`) are unavailable
+- Session cookies may not work correctly across domains
+
+This guide covers two production approaches using a reverse proxy in front of Kong, plus a self-signed certificate option for development. All approaches terminate TLS before Kong — internal Docker network traffic stays on HTTP.
+
+## Before you begin
+
+You need:
+
+- A working self-hosted Supabase installation. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker).
+- A domain name with DNS pointing to your server's public IP address (for Let's Encrypt certificate issuance).
+- Ports 80 and 443 open on your server's firewall.
+
+## Set up HTTPS
+
+<Tabs
+scrollable
+size="small"
+type="underlined"
+defaultActiveId="caddy"
+
+> <TabPanel id="caddy" label="Caddy (recommended)">
+
+[Caddy](https://caddyserver.com/) automatically provisions and renews Let's Encrypt TLS certificates with zero configuration. It also handles HTTP-to-HTTPS redirects, WebSocket upgrades, and HTTP/2 and HTTP/3 out of the box.
+
+### Step 1 - Update environment variables
+
+Update the following variables in your `.env` file to use your HTTPS domain:
+
+```sh .env
+SITE_URL=https://supabase.example.com
+API_EXTERNAL_URL=https://supabase.example.com
+SUPABASE_PUBLIC_URL=https://supabase.example.com
+DOMAIN=supabase.example.com
+```
+
+- `API_EXTERNAL_URL` is used by the Auth service for OAuth callback URLs and email confirmation links
+- `SUPABASE_PUBLIC_URL` is used by Studio for browser-side API communication
+- `SITE_URL` is the default redirect URL after authentication
+- `DOMAIN` is used by the Caddyfile to configure the server name
+
+### Step 2 - Remove Kong's public port bindings
+
+Comment out Kong's host port mappings in `docker-compose.yml` so that only Caddy is exposed to the internet:
+
+```yaml docker-compose.yml
+kong:
+  # ...
+  ports:
+    # - ${KONG_HTTP_PORT}:8000/tcp
+    # - ${KONG_HTTPS_PORT}:8443/tcp
+```
+
+Kong remains accessible to other containers on the internal Docker network.
+
+### Step 3 - Start with the Caddy overlay
+
+The repository includes a `docker-compose.caddy.yml` overlay that adds a Caddy reverse proxy service. Start your stack with both compose files:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.caddy.yml up -d
+```
+
+This uses the following configuration files:
+
+**`docker-compose.caddy.yml`** adds the Caddy service:
+
+```yaml docker-compose.caddy.yml
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./volumes/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      kong:
+        condition: service_healthy
+    environment:
+      DOMAIN: ${DOMAIN}
+
+volumes:
+  caddy_data:
+  caddy_config:
+```
+
+**`volumes/caddy/Caddyfile`** configures reverse proxying to Kong:
+
+```text volumes/caddy/Caddyfile
+{$DOMAIN} {
+	reverse_proxy kong:8000
+}
+```
+
+Caddy automatically handles Let's Encrypt certificate provisioning, HTTPS, HTTP-to-HTTPS redirects, WebSocket upgrades, and certificate renewal.
+
+### Step 4 - Verify
+
+```bash
+curl https://supabase.example.com/auth/v1/health
+```
+
+You should receive a JSON response confirming the Auth service is healthy.
+
+</TabPanel>
+<TabPanel id="nginx" label="Nginx + Let's Encrypt">
+
+This approach uses the [`jonasal/nginx-certbot`](https://github.com/JonasAlfworken/docker-nginx-certbot) Docker image, which integrates Nginx with Certbot for automatic Let's Encrypt certificate issuance and renewal in a single container.
+
+### Step 1 - Update environment variables
+
+Update the following variables in your `.env` file to use your HTTPS domain:
+
+```sh .env
+SITE_URL=https://supabase.example.com
+API_EXTERNAL_URL=https://supabase.example.com
+SUPABASE_PUBLIC_URL=https://supabase.example.com
+CERTBOT_EMAIL=your-email@example.com
+```
+
+- `API_EXTERNAL_URL` is used by the Auth service for OAuth callback URLs and email confirmation links
+- `SUPABASE_PUBLIC_URL` is used by Studio for browser-side API communication
+- `SITE_URL` is the default redirect URL after authentication
+- `CERTBOT_EMAIL` is used by Let's Encrypt for certificate expiry notifications
+
+### Step 2 - Remove Kong's public port bindings
+
+Comment out Kong's host port mappings in `docker-compose.yml` so that only Nginx is exposed to the internet:
+
+```yaml docker-compose.yml
+kong:
+  # ...
+  ports:
+    # - ${KONG_HTTP_PORT}:8000/tcp
+    # - ${KONG_HTTPS_PORT}:8443/tcp
+```
+
+Kong remains accessible to other containers on the internal Docker network.
+
+### Step 3 - Start with the Nginx overlay
+
+The repository includes a `docker-compose.nginx.yml` overlay that adds an Nginx reverse proxy service with automatic Let's Encrypt certificates. Start your stack with both compose files:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.nginx.yml up -d
+```
+
+This uses the following configuration files:
+
+**`docker-compose.nginx.yml`** adds the Nginx service:
+
+```yaml docker-compose.nginx.yml
+services:
+  nginx:
+    image: jonasal/nginx-certbot:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./volumes/nginx/nginx.conf:/etc/nginx/user_conf.d/default.conf:ro
+      - nginx_letsencrypt:/etc/letsencrypt
+    depends_on:
+      kong:
+        condition: service_healthy
+    environment:
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+
+volumes:
+  nginx_letsencrypt:
+```
+
+**`volumes/nginx/nginx.conf`** configures SSL termination and reverse proxying:
+
+```nginx volumes/nginx/nginx.conf
+upstream kong_upstream {
+    server kong:8000;
+    keepalive 2;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name _;
+
+    ssl_certificate     /etc/letsencrypt/live/supabase/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/supabase/privkey.pem;
+
+    proxy_http_version 1.1;
+
+    location / {
+        proxy_pass http://kong_upstream;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /realtime/v1/ {
+        proxy_pass http://kong_upstream;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 3600s;
+    }
+}
+```
+
+The `/realtime/v1/` location block includes WebSocket upgrade headers (`Upgrade`, `Connection`) and a long read timeout to keep WebSocket connections alive.
+
+HTTP-to-HTTPS redirects are handled automatically by the `jonasal/nginx-certbot` image.
+
+### Step 4 - Verify
+
+```bash
+curl https://supabase.example.com/auth/v1/health
+```
+
+You should receive a JSON response confirming the Auth service is healthy.
+
+</TabPanel>
+</Tabs>
+
+<Admonition type="tip">
+
+**Using a different reverse proxy?** If you already run [Nginx Proxy Manager](https://nginxproxymanager.com/), [Traefik](https://traefik.io/), or another reverse proxy for your infrastructure, you can use it instead of Caddy or Nginx above. The key requirements are:
+
+- Proxy to Kong on port `8000` (or `<server-ip>:8000` if the proxy runs outside the Docker network)
+- Enable WebSocket support (required for Realtime)
+- Update `SITE_URL`, `API_EXTERNAL_URL`, and `SUPABASE_PUBLIC_URL` in `.env` to your HTTPS URL
+- Comment out Kong's host port bindings in `docker-compose.yml` if the proxy runs in the same Docker network
+
+</Admonition>
+
+## Self-signed certificates (development only)
+
+<Admonition type="caution">
+
+Self-signed certificates trigger browser warnings and are rejected by most OAuth providers. Use this approach only for local development or internal networks.
+
+</Admonition>
+
+For development or internal networks where you cannot use Let's Encrypt, you can configure Kong to serve HTTPS directly using self-signed certificates.
+
+### Step 1 - Generate a self-signed certificate
+
+```bash
+mkdir -p volumes/api/tls
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout volumes/api/tls/server.key \
+  -out volumes/api/tls/server.crt \
+  -subj "/CN=localhost"
+```
+
+### Step 2 - Configure Kong for SSL
+
+Add the certificate volume mount and SSL environment variables to the `kong` service in `docker-compose.yml`:
+
+```yaml docker-compose.yml
+kong:
+  # ... existing configuration ...
+  volumes:
+    - ./volumes/api/kong.yml:/home/kong/temp.yml:ro,z
+    - ./volumes/api/tls:/etc/kong/tls:ro
+  environment:
+    # ... existing environment variables ...
+    KONG_SSL_CERT: /etc/kong/tls/server.crt
+    KONG_SSL_CERT_KEY: /etc/kong/tls/server.key
+```
+
+### Step 3 - Update environment variables
+
+Update your `.env` file to use HTTPS with the Kong HTTPS port:
+
+```sh .env
+SITE_URL=https://localhost:8443
+API_EXTERNAL_URL=https://localhost:8443
+SUPABASE_PUBLIC_URL=https://localhost:8443
+```
+
+### Step 4 - Restart and verify
+
+```bash
+docker compose up -d
+curl -k https://localhost:8443/auth/v1/health
+```
+
+The `-k` flag tells curl to accept the self-signed certificate.
+
+## Troubleshooting
+
+### Certificate not issued
+
+If Caddy or Certbot fails to obtain a certificate:
+
+- Verify that ports 80 and 443 are open on your firewall
+- Verify that your domain's DNS A record points to your server's public IP
+- Check Caddy logs (`docker compose logs caddy`) or Certbot logs for specific errors
+- Let's Encrypt has [rate limits](https://letsencrypt.org/docs/rate-limits/) — if you hit them, wait before retrying
+
+### WebSocket connection failed
+
+If Realtime subscriptions fail to connect:
+
+- **Caddy** handles WebSocket upgrades automatically — check that Kong is healthy
+- **Nginx** requires explicit `Upgrade` and `Connection` headers on the `/realtime/v1/` location. Verify your `nginx.conf` includes these headers as shown above
+
+### OAuth callback URL mismatch
+
+If OAuth redirects fail with a callback URL error:
+
+- Verify `API_EXTERNAL_URL` in `.env` is set to your HTTPS URL
+- Verify the callback URL registered with your OAuth provider matches `{API_EXTERNAL_URL}/auth/v1/callback`
+- After changing `API_EXTERNAL_URL`, restart all services with `docker compose down && docker compose up -d`
+
+### Mixed content warnings
+
+If the browser console shows mixed content errors:
+
+- Verify `SUPABASE_PUBLIC_URL` is set to your HTTPS URL
+- Verify `SITE_URL` is also set to HTTPS
+- Clear your browser cache after making changes
+
+### ERR_CERT_AUTHORITY_INVALID
+
+This is expected when using self-signed certificates. For production, use Caddy or Nginx with Let's Encrypt. If you need to use self-signed certificates, add the certificate to your system's trust store or use a browser flag to bypass the warning.
