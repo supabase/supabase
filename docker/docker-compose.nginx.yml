@@ -1,25 +1,31 @@
 services:
 
   nginx:
-    image: jonasal/nginx-certbot:latest
+    container_name: supabase-nginx
+    image: jonasal/nginx-certbot:6.0.1-nginx1.29.5
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./volumes/nginx/nginx.template:/etc/nginx/user_conf.d/nginx.template:ro
-      - nginx_letsencrypt:/etc/letsencrypt
+      - "443:443/udp"
     depends_on:
       kong:
         condition: service_healthy
     environment:
-      NGINX_SERVER_NAME: ${NGINX_SERVER_NAME}
+      PROXY_DOMAIN: ${PROXY_DOMAIN}
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+      PROXY_AUTH_USERNAME: ${DASHBOARD_USERNAME}
+      PROXY_AUTH_PASSWORD: ${DASHBOARD_PASSWORD}
     command:
       - /bin/bash
       - -c
       - |
-        envsubst '$${NGINX_SERVER_NAME}' < /etc/nginx/user_conf.d/nginx.template > /etc/nginx/user_conf.d/nginx.conf && /scripts/start_nginx_certbot.sh
+        echo "$${PROXY_AUTH_USERNAME}:$${PROXY_AUTH_PASSWORD}" > /etc/nginx/user_conf.d/dashboard-passwd && \
+        envsubst '$${PROXY_DOMAIN}' < /etc/nginx/user_conf.d/nginx.conf.tpl > /etc/nginx/user_conf.d/nginx.conf && \
+        /scripts/start_nginx_certbot.sh
+    volumes:
+      - ./volumes/nginx:/etc/nginx/user_conf.d
+      - nginx_letsencrypt:/etc/letsencrypt
 
 volumes:
   nginx_letsencrypt:

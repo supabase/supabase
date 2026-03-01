@@ -45,16 +45,23 @@ Kong remains accessible to other containers on the internal Docker network.
 
 ### Step 2: Update environment variables
 
-Update the following variables in your `.env` file to use your HTTPS domain:
+Update the URL configuration in your `.env` file to use your HTTPS domain:
 
 ```
 SUPABASE_PUBLIC_URL=https://<your-domain>
 API_EXTERNAL_URL=https://<your-domain>
 SITE_URL=https://<your-domain>
+```
 
-DOMAIN=<your-domain>
-NGINX_SERVER_NAME=<your-domain>
-CERTBOT_EMAIL=<your-username>@<your-domain>
+Depending on whether you choose Caddy or Nginx, change the following:
+
+```
+# Used by Caddy
+PROXY_DOMAIN=localhost
+
+# Used by Nginx + Let's Encrypt
+NGINX_SERVER_NAME=localhost
+CERTBOT_EMAIL=user@localhost
 ```
 
 ### Step 3: Start the reverse proxy
@@ -82,7 +89,7 @@ Caddy configuration is in `volumes/caddy/Caddyfile`.
 </TabPanel>
 <TabPanel id="nginx" label="Nginx + Let's Encrypt">
 
-This option uses the [`jonasal/nginx-certbot`](https://github.com/JonasAlfredsson/docker-nginx-certbot) Docker image, which integrates Nginx with Certbot for automatic Let's Encrypt certificate issuance and renewal in a single container.
+This option uses a 3rd party Nginx Docker image ([`jonasal/nginx-certbot`](https://github.com/JonasAlfredsson/docker-nginx-certbot)), which includes Certbot for automatic Let's Encrypt certificate issuance and renewal in a single container.
 
 Start Nginx by using the pre-configured `docker-compose.nginx.yml` overlay:
 
@@ -126,7 +133,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 
 ### Step 2: Configure Kong for SSL
 
-Add the certificate volume mounts and SSL environment variables to the `kong` service in `docker-compose.yml`:
+Uncomment the certificate volume mounts and SSL environment variables in `docker-compose.yml`:
 
 ```yaml docker-compose.yml
 kong:

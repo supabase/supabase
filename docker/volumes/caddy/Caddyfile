@@ -1,11 +1,46 @@
-{$DOMAIN} {
-	handle_path /storage/v1/* {
-		reverse_proxy storage:5000 {
-			header_up X-Forwarded-Prefix /storage/v1
-		}
-	}
+# Check https://enable-cors.org/server_caddy2.html
+(cors) {
+    @cors_preflight method OPTIONS
+    @cors header Origin {args.0}
 
-	handle {
-		reverse_proxy kong:8000
-	}
+    handle @cors_preflight {
+        header Access-Control-Allow-Origin "{args.0}"
+        header Access-Control-Allow-Methods "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS, TRACE, CONNECT"
+        header Access-Control-Allow-Headers *
+        header Access-Control-Max-Age "86400";
+        respond "" 204
+    }
+
+    handle @cors {
+        header Access-Control-Allow-Origin "{args.0}"
+    }
+}
+
+{$PROXY_DOMAIN} {
+    @supabase_api path /rest/v1/* /auth/v1/* /realtime/v1/* /functions/v1/* /mcp
+
+    handle @supabase_api {
+        reverse_proxy kong:8000
+    }
+
+    handle_path /storage/v1/* {
+        import cors *
+        reverse_proxy storage:5000 {
+            header_up X-Forwarded-Prefix /{http.request.orig_uri.path.0}/{http.request.orig_uri.path.1}
+        }
+    }
+
+    handle_path /goapi/* {
+        reverse_proxy kong:8000
+    }
+
+    handle {
+        basic_auth {
+            {$DASHBOARD_USERNAME} {$DASHBOARD_PASSWORD}
+        }
+
+        reverse_proxy studio:3000
+    }
+
+    header -server
 }
