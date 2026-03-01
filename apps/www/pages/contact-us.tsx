@@ -70,12 +70,6 @@ const ContactUs = ({}: Props) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
               <ContactSection
-                title="General Support"
-                email="support@supabase.io"
-                description="For product questions, billing issues, account access, technical troubleshooting, or anything related to using Supabase services."
-              />
-
-              <ContactSection
                 title="Legal"
                 email="legal@supabase.io"
                 description="For general legal inquiries."
