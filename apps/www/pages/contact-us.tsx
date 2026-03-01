@@ -102,6 +102,12 @@ const ContactUs = ({}: Props) => {
                 description="To responsibly disclose potential security vulnerabilities or report suspected security incidents involving Supabase infrastructure or services."
               />
 
+              <ContactSection
+                title="Events"
+                email="help-events@supabase.com"
+                description="For hackathon or event sponsorship requests. While we can't sponsor every event, we'd love to hear about yours. We'll follow up if it's a good fit."
+              />
+
               <div className="">
                 <div className="border-t-[1px] border-brand-500 w-[32px] mb-1"></div>
                 <h2 className="text-xl md:text-2xl lg:text-3xl pt-1.5 lg:pt-3 tracking-[-1px] text-foreground">
