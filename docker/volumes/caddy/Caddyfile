@@ -17,7 +17,7 @@
 }
 
 {$PROXY_DOMAIN} {
-    @supabase_api path /rest/v1/* /auth/v1/* /realtime/v1/* /functions/v1/* /mcp
+    @supabase_api path /auth/v1/* /rest/v1/* /realtime/v1/* /functions/v1/* /mcp
 
     handle @supabase_api {
         reverse_proxy kong:8000
@@ -28,10 +28,6 @@
         reverse_proxy storage:5000 {
             header_up X-Forwarded-Prefix /{http.request.orig_uri.path.0}/{http.request.orig_uri.path.1}
         }
-    }
-
-    handle_path /goapi/* {
-        reverse_proxy kong:8000
     }
 
     handle {

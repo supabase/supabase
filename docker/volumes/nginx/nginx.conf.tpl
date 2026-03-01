@@ -46,24 +46,26 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /goapi/ {
-        proxy_pass http://kong_upstream/;
+    location /auth {
+        proxy_pass http://kong_upstream;
     }
 
     location /rest {
         proxy_pass http://kong_upstream;
     }
 
-    location /auth {
+    location /realtime/v1/ {
         proxy_pass http://kong_upstream;
-    }
 
-    location /functions {
-        proxy_pass http://kong_upstream;
-    }
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
 
-    location /mcp {
-        proxy_pass http://kong_upstream;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_read_timeout 3600s;
     }
 
     location /storage/v1/ {
@@ -88,18 +90,12 @@ server {
         include /etc/nginx/user_conf.d/snippets/cors.conf;
     }
 
-    location /realtime/v1/ {
+    location /functions {
         proxy_pass http://kong_upstream;
+    }
 
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        proxy_read_timeout 3600s;
+    location /mcp {
+        proxy_pass http://kong_upstream;
     }
 }
 
