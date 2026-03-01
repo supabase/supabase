@@ -42,7 +42,7 @@ export const DataApiOverviewTab = () => {
               <Admonition
                 type="default"
                 title="Managed via configuration variables"
-                description="Data API settings for self-hosted projects are configured through your docker-compose.yml and .env files."
+                description="Data API settings are configured via config.toml for CLI and local development, or via docker-compose.yml and .env for self-hosted deployments."
               />
             )}
           </>
