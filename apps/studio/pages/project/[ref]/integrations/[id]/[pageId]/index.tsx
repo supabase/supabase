@@ -1,5 +1,4 @@
 import { useFlag, useParams } from 'common'
-import { IS_PLATFORM } from 'lib/constants'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
@@ -134,10 +133,6 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   if (!router?.isReady) {
     return null
-  }
-
-  if (id === 'data_api' && !IS_PLATFORM) {
-    return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
   }
 
   if (id === 'stripe_sync_engine' && !stripeSyncEnabled) {

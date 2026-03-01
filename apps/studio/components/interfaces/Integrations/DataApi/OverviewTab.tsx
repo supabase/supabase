@@ -1,13 +1,14 @@
 import { useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { DataApiEnableSwitch } from '@/components/interfaces/Settings/API/DataApiEnableSwitch'
 import { DataApiProjectUrlCard } from '@/components/interfaces/Settings/API/DataApiProjectUrlCard'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from '@/lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 
 export const DataApiOverviewTab = () => {
   const { ref: projectRef } = useParams()
@@ -28,10 +29,22 @@ export const DataApiOverviewTab = () => {
           </Alert_Shadcn_>
         ) : (
           <>
-            <div className={cn((isLoading || !isEnabled) && 'opacity-50 pointer-events-none')}>
+            <div
+              className={cn(
+                IS_PLATFORM && (isLoading || !isEnabled) && 'opacity-50 pointer-events-none'
+              )}
+            >
               <DataApiProjectUrlCard />
             </div>
-            <DataApiEnableSwitch />
+            {IS_PLATFORM ? (
+              <DataApiEnableSwitch />
+            ) : (
+              <Admonition
+                type="default"
+                title="Managed via docker-compose"
+                description="Data API settings for self-hosted projects are configured through your docker-compose.yml and .env files."
+              />
+            )}
           </>
         )}
       </div>
