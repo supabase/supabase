@@ -130,6 +130,42 @@ og_image: /images/events/2025-01-meetup/custom-og.png # Optional override
 
 **Note**: The `og_image` field is optional. If not provided, OG images are generated automatically via the Edge Function.
 
+## Go pages (`/go/*`)
+
+`/go/` is a system for building standalone campaign landing pages (lead generation, legal, thank-you flows). The name is intentionally generic — these pages are typically linked from ads, emails, or partner campaigns and are not part of the main site navigation.
+
+Pages are defined as TypeScript objects (not MDX files) and validated against Zod schemas at build time.
+
+### Parts
+
+| Location                                    | Purpose                                                                                              |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `apps/www/_go/`                             | Page definitions. Each file exports a page object. `index.tsx` registers all pages.                  |
+| `apps/www/app/go/[slug]/page.tsx`           | App Router route — renders the page for a given slug, handles 404s and metadata.                     |
+| `apps/www/components/Go/GoPageRenderer.tsx` | www-specific wrapper — adds the Supabase logo header and footer, registers custom section renderers. |
+| `packages/marketing/src/go/`                | Framework-agnostic core: schemas, section components, templates, form server action.                 |
+| `packages/marketing/src/crm/`               | CRM client abstraction (HubSpot + Customer.io) used by the form server action.                       |
+
+### Page structure
+
+Each page specifies a `template` which determines its top-level layout:
+
+- **`lead-gen`** — hero + arbitrary sections (form, metrics, feature grid, tweets, social proof, etc.)
+- **`thank-you`** — hero + sections + confetti animation
+- **`legal`** — hero + table-of-contents sidebar + markdown body
+
+Pages are arrays of typed section objects. The `SectionRenderer` in `packages/marketing` dispatches each section to the right component based on its `type` field.
+
+### Custom renderers
+
+The `marketing` package doesn't know about `topTweets` data or the Pages Router `basePath`, so the `tweets` section type has no default renderer. `GoPageRenderer.tsx` in www registers `TweetsSection` as a custom renderer for that type. This is the extension point for any section that requires www-specific dependencies.
+
+### Adding a new page
+
+1. Create a new file in `apps/www/_go/<category>/my-page.tsx` exporting a page object.
+2. Register it in `apps/www/_go/index.tsx`.
+3. The page will be available at `/go/<slug>` automatically via static generation.
+
 #### Customer Stories (Case Studies)
 
 Customer stories are defined in MDX files (`apps/www/_customers/*.mdx`) and use a different approach:

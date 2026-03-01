@@ -242,10 +242,15 @@ export function FilterCondition({
               onFocus={() => handleOperatorFocus(path)}
               onBlur={handleOperatorBlur}
               onKeyDown={handleOperatorKeyDown}
-              className="h-full border-none bg-transparent py-0 px-1 text-center text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-brand w-full absolute left-0 top-0"
+              className="h-full border-none bg-transparent py-0 px-1 text-center text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground w-full absolute left-0 top-0"
               disabled={isLoading}
               aria-label={`Operator for ${property.label}`}
               data-testid={`filter-operator-${property.name}`}
+              tabIndex={-1}
+              autoComplete="off"
+              data-1p-ignore
+              data-lpignore="true"
+              data-form-type="other"
             />
             <span className="invisible whitespace-pre text-xs block px-1 shrink-0 px-1">
               {condition.operator || ' '}
@@ -289,6 +294,11 @@ export function FilterCondition({
               disabled={isLoading}
               aria-label={`Value for ${property.label}`}
               data-testid={`filter-value-${property.name}`}
+              tabIndex={-1}
+              autoComplete="off"
+              data-1p-ignore
+              data-lpignore="true"
+              data-form-type="other"
             />
             <span className="invisible whitespace-pre text-xs block px-1">{localValue || ' '}</span>
           </div>

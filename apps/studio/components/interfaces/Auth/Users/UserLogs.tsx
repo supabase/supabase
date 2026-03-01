@@ -19,6 +19,9 @@ interface UserLogsProps {
   user: User
 }
 
+const API_LOGS_QUERY = (userId: string) =>
+  `select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nWHERE (\n  metadata[SAFE_OFFSET(0)].request[SAFE_OFFSET(0)].sb[SAFE_OFFSET(0)].auth_user\n    = '${userId}'\n)\nlimit 100`
+
 export const UserLogs = ({ user }: UserLogsProps) => {
   const { ref } = useParams()
   const { filters, setFilters } = useLogsUrlState()
@@ -48,6 +51,25 @@ export const UserLogs = ({ user }: UserLogsProps) => {
   return (
     <div>
       <UserHeader user={user} />
+
+      <Separator />
+
+      <div className={cn('flex flex-col gap-y-3', PANEL_PADDING)}>
+        <div>
+          <p>API logs</p>
+          <p className="text-sm text-foreground-light">
+            View edge logs for requests made by this user
+          </p>
+        </div>
+
+        <Button asChild type="default" className="w-min">
+          <Link
+            href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(API_LOGS_QUERY(user.id ?? ''))}`}
+          >
+            Open in Log Explorer
+          </Link>
+        </Button>
+      </div>
 
       <Separator />
 

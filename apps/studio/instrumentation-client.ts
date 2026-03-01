@@ -1,14 +1,20 @@
 // This file configures the initialization of Sentry on the client.
-// The config you add here will be used whenever a users loads a page in their browser.
+// The config you add here will be used whenever a user loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
-import { match } from 'path-to-regexp'
-
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from 'lib/sanitize'
+
+const DEFAULT_ERROR_SAMPLE_RATE = 1.0
+const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01
+const CHUNK_LOAD_ERROR_PATTERNS = [
+  /ChunkLoadError/i,
+  /Loading chunk [\d]+ failed/i,
+  /Loading CSS chunk [\d]+ failed/i,
+]
 
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
@@ -24,30 +30,61 @@ function isHCaptchaRelatedError(event: Sentry.Event): boolean {
   return false
 }
 
-// We want to ignore errors not originating from docs app static files
-// (such as errors from browser extensions). Those errors come from files
-// not starting with 'app:///_next'.
-//
-// However, there is a complication because the Sentry code that sends
-// the error shows up in the stack trace, and that _does_ start with
-// 'app:///_next'. It is always the first frame in the stack trace,
-// and has a specific pre_context comment that we can use for filtering.
-// Copied from docs app instrumentation-client.ts
-function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
-  if (!frames || frames.length === 0) return false
-
-  function isSentryFrame(frame: Sentry.StackFrame, index: number) {
-    return index === 0 && frame.pre_context?.some((line) => line.includes('sentry.javascript'))
-  }
-
-  // Check if any frame is from our app (excluding Sentry's own frame)
-  const hasAppFrame = frames.some((frame, index) => {
-    const path = frame.abs_path || frame.filename
-    return path?.startsWith('app:///_next') && !isSentryFrame(frame, index)
+// Filter browser wallet extension errors (e.g., Gate.io wallet)
+// These errors come from injected wallet scripts and are not actionable
+// Examples: SUPABASE-APP-AFC, SUPABASE-APP-92A
+export function isBrowserWalletExtensionError(event: Sentry.Event): boolean {
+  const frames = event.exception?.values?.flatMap((e) => e.stacktrace?.frames || []) || []
+  return frames.some((frame) => {
+    const filename = frame.filename || frame.abs_path || ''
+    return filename.includes('gt-window-provider') || filename.includes('wallet-provider')
   })
+}
 
-  // If no app frames found, it's a third-party error
-  return !hasAppFrame
+// Filter user-aborted operations (intentional cancellations)
+// These are expected when users cancel requests or navigate away
+// Examples: SUPABASE-APP-BG6, SUPABASE-APP-BG7
+export function isUserAbortedOperation(error: unknown, event: Sentry.Event): boolean {
+  const errorMessage = error instanceof Error ? error.message : ''
+  const eventMessage = event.message || ''
+  const message = errorMessage || eventMessage
+
+  return (
+    message.includes('operation was aborted') ||
+    message.includes('signal is aborted') ||
+    message.includes('manually canceled') ||
+    message.includes('AbortError')
+  )
+}
+
+// Filter cancellation promise rejections (e.g., from query cancellation)
+// These occur when operations are intentionally cancelled by the user
+// Example: SUPABASE-APP-353 (~466k events)
+export function isCancellationRejection(event: Sentry.Event): boolean {
+  const serialized = event.extra?.__serialized__ as Record<string, unknown> | undefined
+  return serialized?.type === 'cancelation'
+}
+
+// Filter challenge/captcha expired errors (user timeout)
+// These happen when users don't complete captcha in time - expected behavior
+// Example: SUPABASE-APP-ACC
+export function isChallengeExpiredError(error: unknown, event: Sentry.Event): boolean {
+  const errorMessage = error instanceof Error ? error.message : ''
+  const eventMessage = event.message || ''
+  const message = errorMessage || eventMessage
+
+  return message.includes('challenge-expired')
+}
+
+function isChunkLoadError(error: unknown, event: Sentry.Event): boolean {
+  const errorMessage = error instanceof Error ? error.message : ''
+  const eventMessage = event.message || ''
+  const exceptionMessages = event.exception?.values?.map((ex) => ex.value ?? '') ?? []
+  const combinedMessages = [errorMessage, eventMessage, ...exceptionMessages].filter(Boolean)
+
+  return CHUNK_LOAD_ERROR_PATTERNS.some((pattern) =>
+    combinedMessages.some((message) => pattern.test(message))
+  )
 }
 
 Sentry.init({
@@ -57,9 +94,32 @@ Sentry.init({
   }),
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
-  // [Ali] Filter out browser extensions and user scripts (FE-2094)
-  // Using denyUrls to block known third-party script patterns
-  denyUrls: [/userscript/i],
+
+  // Enable performance monitoring
+  tracesSampleRate: 0.001, // Capture 0.1% of transactions for performance monitoring
+
+  integrations: (() => {
+    const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
+    if (!thirdPartyErrorFilterIntegration) return []
+
+    // Drop errors whose stack trace only contains third-party frames (browser extensions,
+    // injected scripts, etc.). This uses build-time code annotation via the applicationKey
+    // in next.config.js to reliably distinguish our code from third-party code.
+    return [
+      thirdPartyErrorFilterIntegration({
+        filterKeys: ['supabase-studio'],
+        behaviour: 'drop-error-if-exclusively-contains-third-party-frames',
+      }),
+    ]
+  })(),
+
+  // Only capture errors originating from our own code.
+  // This is a whitelist on the source URL in stack frames — it drops errors from
+  // browser extensions, injected scripts, third-party widgets, etc. (FE-2094)
+  allowUrls: [
+    /https?:\/\/(.*\.)?supabase\.(com|co|green|io)/,
+    /app:\/\//, // Next.js rewrites source URLs to app:// with source maps
+  ],
   beforeBreadcrumb(breadcrumb, _hint) {
     const cleanedBreadcrumb = { ...breadcrumb }
 
@@ -86,25 +146,36 @@ Sentry.init({
       return null
     }
 
-    // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+    // Downsample only known high-noise classes; keep all other errors at full rate.
     const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
       `Failed to construct 'URL': Invalid URL`
     )
-    // [Joshen] Similar behaviour for this error from SessionTimeoutModal to control the quota usage
     const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
       'Session error detected'
     )
+    const isChunkLoadFailure = isChunkLoadError(hint.originalException, event)
 
-    if ((isInvalidUrlEvent || isSessionTimeoutEvent) && Math.random() > 0.01) {
+    const codeSampleRate =
+      isInvalidUrlEvent || isSessionTimeoutEvent || isChunkLoadFailure
+        ? LOW_PRIORITY_ERROR_SAMPLE_RATE
+        : DEFAULT_ERROR_SAMPLE_RATE
+
+    if (Math.random() > codeSampleRate) {
       return null
+    }
+
+    event.tags = {
+      ...event.tags,
+      codeSampleRate: codeSampleRate.toString(),
     }
 
     if (isHCaptchaRelatedError(event)) {
       return null
     }
 
-    const frames = event.exception?.values?.[0].stacktrace?.frames || []
-    if (isThirdPartyError(frames)) {
+    // Drop events where every exception has no stack trace — these are not debuggable
+    const exceptions = event.exception?.values ?? []
+    if (exceptions.length > 0 && exceptions.every((ex) => !ex.stacktrace?.frames?.length)) {
       return null
     }
 
@@ -116,71 +187,100 @@ Sentry.init({
       return null
     }
 
+    if (isBrowserWalletExtensionError(event)) {
+      return null
+    }
+    if (isUserAbortedOperation(hint.originalException, event)) {
+      return null
+    }
+    if (isCancellationRejection(event)) {
+      return null
+    }
+    if (isChallengeExpiredError(hint.originalException, event)) {
+      return null
+    }
+
     if (event.breadcrumbs) {
       event.breadcrumbs = sanitizeArrayOfObjects(event.breadcrumbs) as Sentry.Breadcrumb[]
     }
     return event
   },
   ignoreErrors: [
-    // Used exclusively in Monaco Editor.
+    // === Monaco Editor ===
     'ResizeObserver',
     's.getModifierState is not a function',
     /^Uncaught NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope'/,
-    // [Joshen] We currently use stripe-js for customers to save their credit card data
-    // I'm unable to reproduce this error on local, staging nor prod across chrome, safari or firefox
-    // Based on https://github.com/stripe/stripe-js/issues/26, it seems like this error is safe to ignore,
+
+    // === Browser extension errors ===
+    // Gate.io wallet
+    'shouldSetTallyForCurrentProvider is not a function',
+    // SAP browser extensions (SAP GUI, SAP Companion)
+    'sap is not defined',
+    // Non-Error objects thrown as exceptions (e.g., Event objects)
+    '[object Event]',
+
+    // === Third-party SDK errors ===
+    // stripe-js: https://github.com/stripe/stripe-js/issues/26
     'Failed to load Stripe.js',
-    // [Joshen] This event started occurring after our fix in the org dropdown by reading the slug from
-    // the URL params instead of the store, but we cannot repro locally, staging nor on prod
-    // Safe to ignore since it's not a user-facing issue + we've not received any user feedback/report about it
-    // Ref: https://github.com/supabase/supabase/pull/9729
-    'The provided `href` (/org/[slug]/general) value is missing query values (slug)',
-    'The provided `href` (/org/[slug]/team) value is missing query values (slug)',
-    'The provided `href` (/org/[slug]/billing) value is missing query values (slug)',
-    'The provided `href` (/org/[slug]/invoices) value is missing query values (slug)',
-    // [Joshen] Seems to be from hcaptcha
+    // hCaptcha
     "undefined is not an object (evaluating 'n.chat.setReady')",
     "undefined is not an object (evaluating 'i.chat.setReady')",
-    // [Terry] When users paste in an embedded GitHub Gist
-    // Error thrown by `sql-formatter` lexer when given invalid input
-    // Original format: new Error(`Parse error: Unexpected "${text}" at line ${line} column ${col}`)
+
+    // === Next.js internals ===
+    // Ref: https://github.com/supabase/supabase/pull/9729
+    /The provided `href` \(\/org\/\[slug\]\/.*\) value is missing query values/,
+    // Next.js throws these during navigation, not actual errors
+    'NEXT_NOT_FOUND',
+    'NEXT_REDIRECT',
+
+    // === User input errors (not bugs) ===
+    // sql-formatter lexer on invalid SQL input
     /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
-    // [Joshen] IMO, should be caught on API if there's anything to handle - FE shouldn't dupe this alert
+
+    // === Network / infrastructure (not actionable on FE) ===
     /504 Gateway Time-out/,
-    // [Joshen] This is the one caused by Google translate in the browser + 3rd party extensions
+    'Network request failed',
+    'Failed to fetch',
+    'Load failed',
+    'AbortError',
+    'TypeError: cancelled',
+    'TypeError: Cancelled',
+
+    // === Browser extensions & Google Translate DOM manipulation ===
     'Node.insertBefore: Child to insert before is not a child of this node',
-    // [Joshen] This one sprung up recently and I've no idea where this is coming from
+    "NotFoundError: Failed to execute 'removeChild' on 'Node'",
+    "NotFoundError: Failed to execute 'insertBefore' on 'Node'",
+    'NotFoundError: The object can not be found here.',
+    "Cannot read properties of null (reading 'parentNode')",
+    "Cannot read properties of null (reading 'removeChild')",
+    "TypeError: can't access dead object",
+    /^NS_ERROR_/,
+
+    // === Non-Error throws (extensions, third-party libs throwing strings/objects) ===
+    'Non-Error exception captured',
+    'Non-Error promise rejection captured',
+
+    // === Cross-origin script errors (no useful info) ===
+    'Script error.',
+    'Script error',
+
+    // === React hydration mismatches caused by extensions modifying DOM ===
+    // Note: we only suppress the generic browser messages, NOT "Hydration failed because..."
+    // which can indicate real SSR/client mismatches in our own code.
+    /text content does not match/i,
+    /There was an error while hydrating/i,
+
+    // === Web crawler / bot errors ===
+    'instantSearchSDKJSBridgeClearHighlight',
+
+    // === Misc known noise ===
     'r.default.setDefaultLevel is not a function',
-    // [Joshen] Safe to ignore, it an error from the copyToClipboard
+    // Clipboard permission denied
     'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
+    // Facebook pixel
+    'fb_xd_fragment',
   ],
 })
-
-// Replace dynamic query param with a template text
-// Support grouping sentry transaction
-function standardiseRouterUrl(url: string) {
-  let finalUrl = url
-
-  const orgMatch = match('/org/:slug{/*path}', { decode: decodeURIComponent })
-  const orgMatchResult = orgMatch(finalUrl)
-  if (orgMatchResult) {
-    finalUrl = finalUrl.replace((orgMatchResult.params as any).slug, '[slug]')
-  }
-
-  const newOrgMatch = match('/new/:slug', { decode: decodeURIComponent })
-  const newOrgMatchResult = newOrgMatch(finalUrl)
-  if (newOrgMatchResult) {
-    finalUrl = finalUrl.replace((newOrgMatchResult.params as any).slug, '[slug]')
-  }
-
-  const projectMatch = match('/project/:ref{/*path}', { decode: decodeURIComponent })
-  const projectMatchResult = projectMatch(finalUrl)
-  if (projectMatchResult) {
-    finalUrl = finalUrl.replace((projectMatchResult.params as any).ref, '[ref]')
-  }
-
-  return finalUrl
-}
 
 // This export will instrument router navigations, and is only relevant if you enable tracing.
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart

@@ -114,7 +114,7 @@ const SSLConfiguration = () => {
     <PageSection id="ssl-configuration">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>SSL Configuration</PageSectionTitle>
+          <PageSectionTitle>SSL configuration</PageSectionTitle>
         </PageSectionSummary>
         <DocsButton href={`${DOCS_URL}/guides/platform/ssl-enforcement`} />
       </PageSectionMeta>
