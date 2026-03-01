@@ -1,0 +1,25 @@
+services:
+
+  nginx:
+    image: jonasal/nginx-certbot:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./volumes/nginx/nginx.template:/etc/nginx/user_conf.d/nginx.template:ro
+      - nginx_letsencrypt:/etc/letsencrypt
+    depends_on:
+      kong:
+        condition: service_healthy
+    environment:
+      NGINX_SERVER_NAME: ${NGINX_SERVER_NAME}
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+    command:
+      - /bin/bash
+      - -c
+      - |
+        envsubst '$${NGINX_SERVER_NAME}' < /etc/nginx/user_conf.d/nginx.template > /etc/nginx/user_conf.d/nginx.conf && /scripts/start_nginx_certbot.sh
+
+volumes:
+  nginx_letsencrypt:

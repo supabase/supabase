@@ -1,0 +1,11 @@
+{$DOMAIN} {
+	handle_path /storage/v1/* {
+		reverse_proxy storage:5000 {
+			header_up X-Forwarded-Prefix /storage/v1
+		}
+	}
+
+	handle {
+		reverse_proxy kong:8000
+	}
+}

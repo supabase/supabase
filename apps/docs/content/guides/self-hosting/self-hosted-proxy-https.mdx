@@ -102,11 +102,19 @@ volumes:
 
 ```text volumes/caddy/Caddyfile
 {$DOMAIN} {
-	reverse_proxy kong:8000
+	handle_path /storage/v1/* {
+		reverse_proxy storage:5000 {
+			header_up X-Forwarded-Prefix /storage/v1
+		}
+	}
+
+	handle {
+		reverse_proxy kong:8000
+	}
 }
 ```
 
-Caddy automatically handles Let's Encrypt certificate provisioning, HTTPS, HTTP-to-HTTPS redirects, WebSocket upgrades, and certificate renewal.
+Storage requests are proxied directly to the Storage service, bypassing Kong for better performance with large file uploads. All other requests go through Kong. Caddy automatically handles Let's Encrypt certificate provisioning, HTTPS, HTTP-to-HTTPS redirects, WebSocket upgrades, and certificate renewal.
 
 ### Step 4 - Verify
 
@@ -129,12 +137,14 @@ Update the following variables in your `.env` file to use your HTTPS domain:
 SITE_URL=https://supabase.example.com
 API_EXTERNAL_URL=https://supabase.example.com
 SUPABASE_PUBLIC_URL=https://supabase.example.com
+NGINX_SERVER_NAME=supabase.example.com
 CERTBOT_EMAIL=your-email@example.com
 ```
 
 - `API_EXTERNAL_URL` is used by the Auth service for OAuth callback URLs and email confirmation links
 - `SUPABASE_PUBLIC_URL` is used by Studio for browser-side API communication
 - `SITE_URL` is the default redirect URL after authentication
+- `NGINX_SERVER_NAME` is your domain name, used in the Nginx config and for the Let's Encrypt certificate request
 - `CERTBOT_EMAIL` is used by Let's Encrypt for certificate expiry notifications
 
 ### Step 2 - Remove Kong's public port bindings
@@ -172,21 +182,29 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./volumes/nginx/nginx.conf:/etc/nginx/user_conf.d/default.conf:ro
+      - ./volumes/nginx/nginx.template:/etc/nginx/user_conf.d/nginx.template:ro
       - nginx_letsencrypt:/etc/letsencrypt
     depends_on:
       kong:
         condition: service_healthy
     environment:
+      NGINX_SERVER_NAME: ${NGINX_SERVER_NAME}
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+    command:
+      - /bin/bash
+      - -c
+      - |
+        envsubst '$${NGINX_SERVER_NAME}' < /etc/nginx/user_conf.d/nginx.template > /etc/nginx/user_conf.d/nginx.conf && /scripts/start_nginx_certbot.sh
 
 volumes:
   nginx_letsencrypt:
 ```
 
-**`volumes/nginx/nginx.conf`** configures SSL termination and reverse proxying:
+The `command` uses `envsubst` to substitute your domain name from `NGINX_SERVER_NAME` into the Nginx config template at container startup, then starts the Nginx + Certbot process.
 
-```nginx volumes/nginx/nginx.conf
+**`volumes/nginx/nginx.template`** is the Nginx config template:
+
+```nginx volumes/nginx/nginx.template
 upstream kong_upstream {
     server kong:8000;
     keepalive 2;
@@ -196,12 +214,19 @@ server {
     listen 443 ssl;
     listen [::]:443 ssl;
     http2 on;
-    server_name _;
+
+    server_name ${NGINX_SERVER_NAME};
 
     ssl_certificate     /etc/letsencrypt/live/supabase/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/supabase/privkey.pem;
 
     proxy_http_version 1.1;
+
+    # Prevent 502 errors from large Supabase auth cookies
+    large_client_header_buffers 4 16k;
+    proxy_buffer_size 128k;
+    proxy_buffers 4 256k;
+    proxy_busy_buffers_size 256k;
 
     location / {
         proxy_pass http://kong_upstream;
@@ -209,6 +234,16 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /storage/v1/ {
+        proxy_pass http://storage:5000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Prefix /storage/v1;
+        client_max_body_size 0;
     }
 
     location /realtime/v1/ {
@@ -224,7 +259,13 @@ server {
 }
 ```
 
-The `/realtime/v1/` location block includes WebSocket upgrade headers (`Upgrade`, `Connection`) and a long read timeout to keep WebSocket connections alive.
+Key details:
+
+- `${NGINX_SERVER_NAME}` is substituted at container startup from your `.env` file — you do not need to edit this file. The [`jonasal/nginx-certbot`](https://github.com/JonasAlfredsson/docker-nginx-certbot) image reads the resolved `server_name` to determine which domain to request a Let's Encrypt certificate for.
+- The certificate path uses a fixed name (`supabase`) — you do not need to change it.
+- The `large_client_header_buffers` and `proxy_buffer*` settings prevent 502 errors caused by large Supabase auth cookies, which exceed Nginx's default buffer sizes.
+- Storage requests are proxied directly to the Storage service, bypassing Kong for better performance with large file uploads. `client_max_body_size 0` removes Nginx's default 1MB upload limit. The `X-Forwarded-Prefix` header tells Storage its original path prefix.
+- The `/realtime/v1/` location block includes WebSocket upgrade headers (`Upgrade`, `Connection`) and a long read timeout to keep WebSocket connections alive.
 
 HTTP-to-HTTPS redirects are handled automatically by the `jonasal/nginx-certbot` image.
 
