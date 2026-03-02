@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
+import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
 import { WithSidebar } from 'components/layouts/AccountLayout/WithSidebar'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
@@ -13,6 +14,7 @@ interface OrganizationSettingsMenuItemsProps {
   showSecuritySettings?: boolean
   showSsoSettings?: boolean
   showLegalDocuments?: boolean
+  showPlatformWebhooks?: boolean
 }
 
 interface OrganizationSettingsSectionsProps extends OrganizationSettingsMenuItemsProps {
@@ -35,6 +37,7 @@ export const generateOrganizationSettingsMenuItems = ({
   showSecuritySettings = true,
   showSsoSettings = true,
   showLegalDocuments = true,
+  showPlatformWebhooks = true,
 }: OrganizationSettingsMenuItemsProps) => [
   {
     key: 'general',
@@ -64,11 +67,15 @@ export const generateOrganizationSettingsMenuItems = ({
         },
       ]
     : []),
-  {
-    key: 'webhooks',
-    label: 'Webhooks',
-    href: `/org/${slug}/webhooks`,
-  },
+  ...(showPlatformWebhooks
+    ? [
+        {
+          key: 'webhooks',
+          label: 'Webhooks',
+          href: `/org/${slug}/webhooks`,
+        },
+      ]
+    : []),
   {
     key: 'audit',
     label: 'Audit Logs',
@@ -91,6 +98,7 @@ export const generateOrganizationSettingsSections = ({
   showSecuritySettings = true,
   showSsoSettings = true,
   showLegalDocuments = true,
+  showPlatformWebhooks = true,
 }: OrganizationSettingsSectionsProps): SidebarSection[] => {
   const isLinkActive = (key: string, href: string) =>
     key === 'webhooks'
@@ -129,11 +137,15 @@ export const generateOrganizationSettingsSections = ({
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
-    {
-      key: 'webhooks',
-      label: 'Webhooks',
-      href: `/org/${slug}/webhooks`,
-    },
+    ...(showPlatformWebhooks
+      ? [
+          {
+            key: 'webhooks',
+            label: 'Webhooks',
+            href: `/org/${slug}/webhooks`,
+          },
+        ]
+      : []),
   ]
 
   const complianceLinks = [
@@ -186,6 +198,7 @@ function OrganizationSettingsLayout({
   pageTitle,
 }: PropsWithChildren<OrganizationSettingsLayoutProps>) {
   const { slug } = useParams()
+  const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
   const fullCurrentPath = useCurrentPath()
   const currentPath = normalizeOrganizationSettingsPath(fullCurrentPath)
   const { appTitle } = useCustomContent(['app:title'])
@@ -207,6 +220,7 @@ function OrganizationSettingsLayout({
     showSecuritySettings,
     showSsoSettings,
     showLegalDocuments,
+    showPlatformWebhooks,
   })
 
   return (

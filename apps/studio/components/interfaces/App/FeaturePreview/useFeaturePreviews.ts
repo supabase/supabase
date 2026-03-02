@@ -19,6 +19,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
   const tableEditorNewFilterBar = useFlag('tableEditorNewFilterBar')
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
+  const platformWebhooksEnabled = useFlag('platformWebhooks')
 
   return [
     {
@@ -57,6 +58,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isPlatformOnly: true,
       isDefaultOptIn: true,
       enabled: pgDeltaDiffEnabled,
+    },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
+      name: 'Platform webhooks',
+      discussionsUrl: undefined,
+      isNew: true,
+      isPlatformOnly: true,
+      isDefaultOptIn: false,
+      enabled: platformWebhooksEnabled,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,

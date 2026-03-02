@@ -114,6 +114,12 @@ export const useIsQueueOperationsEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
 }
 
+export const useIsPlatformWebhooksEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const platformWebhooksEnabled = useFlag('platformWebhooks')
+  return platformWebhooksEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]
+}
+
 export const useIsTableFilterBarEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]

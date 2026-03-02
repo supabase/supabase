@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,6 +46,7 @@ interface PlatformWebhooksPageProps {
 export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPageProps) => {
   const router = useRouter()
   const { slug, ref } = useParams()
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   const {
     endpoints,
     deliveries,
@@ -74,6 +76,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     scope === 'organization'
       ? 'Organization-level webhook endpoints and deliveries'
       : 'Webhook endpoints scoped to this project'
+  const fallbackHref =
+    scope === 'organization' ? `/org/${slug}/general` : `/project/${ref}/settings/general`
 
   const eventTypeOptions = PLATFORM_WEBHOOKS_MOCK_DATA[scope].eventTypes
   const webhooksHref =
@@ -91,6 +95,12 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     () => endpoints.find((endpoint) => endpoint.id === endpointIdPendingDelete) ?? null,
     [endpoints, endpointIdPendingDelete]
   )
+
+  useEffect(() => {
+    if (!platformWebhooksEnabled) {
+      router.replace(fallbackHref)
+    }
+  }, [fallbackHref, platformWebhooksEnabled, router])
 
   useEffect(() => {
     if (!!endpointId && !selectedEndpoint) {
@@ -210,6 +220,10 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       setDeliveryId(null)
     }
   }, [deliveryId, selectedDelivery, setDeliveryId])
+
+  if (!platformWebhooksEnabled) {
+    return null
+  }
 
   return (
     <>

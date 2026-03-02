@@ -189,8 +189,14 @@ export const generateOtherRoutes = (
   ]
 }
 
-export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
-  const settingsMenu = generateSettingsMenu(ref as string)
+export const generateSettingsRoutes = (
+  ref?: string,
+  project?: Project,
+  features?: { platformWebhooks?: boolean }
+): Route[] => {
+  const settingsMenu = generateSettingsMenu(ref as string, undefined, undefined, {
+    platformWebhooks: features?.platformWebhooks,
+  })
   return [
     {
       key: 'settings',

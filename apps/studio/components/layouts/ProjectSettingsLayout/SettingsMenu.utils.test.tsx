@@ -18,11 +18,25 @@ describe('generateSettingsMenu', () => {
       { slug: 'my-org' } as any
     )
 
-    const projectSettingsGroup = menu.find((group) => group.title === 'Project Settings')
-    const hasWebhooks = projectSettingsGroup?.items.some(
+    const configurationGroup = menu.find((group) => group.title === 'Configuration')
+    const hasWebhooks = configurationGroup?.items.some(
       (item) => item.name === 'Webhooks' && item.url === '/project/project-ref/settings/webhooks'
     )
 
     expect(hasWebhooks).toBe(true)
+  })
+
+  it('hides webhooks when platformWebhooks feature is disabled', () => {
+    const menu = generateSettingsMenu(
+      'project-ref',
+      { status: 'ACTIVE_HEALTHY' } as any,
+      { slug: 'my-org' } as any,
+      { platformWebhooks: false }
+    )
+
+    const configurationGroup = menu.find((group) => group.title === 'Configuration')
+    const hasWebhooks = configurationGroup?.items.some((item) => item.name === 'Webhooks')
+
+    expect(hasWebhooks).toBe(false)
   })
 })
