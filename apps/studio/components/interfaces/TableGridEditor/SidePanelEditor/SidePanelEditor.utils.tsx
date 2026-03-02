@@ -50,6 +50,9 @@ import type { ImportContent } from './TableEditor/TableEditor.types'
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
+const unwrapTransaction = (sql: string) =>
+  sql.replace(/^\s*BEGIN;?\s*/i, '').replace(/\s*COMMIT;?\s*$/i, '').trim()
+
 /**
  * The functions below are basically just queries but may be supported directly
  * from the pg-meta library in the future
@@ -72,9 +75,13 @@ const addPrimaryKey = async (
   connectionString: string | undefined | null,
   schema: string,
   table: string,
-  columns: string[]
+  columns: string[],
+  noTransaction = false
 ) => {
   const query = getAddPrimaryKeySQL({ schema, table, columns })
+  if (noTransaction) {
+    return query
+  }
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -88,9 +95,13 @@ const dropConstraint = async (
   connectionString: string | undefined | null,
   schema: string,
   table: string,
-  name: string
+  name: string,
+  noTransaction = false
 ) => {
   const query = `ALTER TABLE "${schema}"."${table}" DROP CONSTRAINT "${name}"`
+  if (noTransaction) {
+    return query
+  }
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -147,13 +158,18 @@ const addForeignKey = async ({
   connectionString,
   table,
   foreignKeys,
+  noTransaction = false,
 }: {
   projectRef: string
   connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
+  noTransaction?: boolean
 }) => {
   const query = getAddForeignKeySQL({ table, foreignKeys })
+  if (noTransaction) {
+    return query
+  }
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -188,13 +204,18 @@ const removeForeignKey = async ({
   connectionString,
   table,
   foreignKeys,
+  noTransaction = false,
 }: {
   projectRef: string
   connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
+  noTransaction?: boolean
 }) => {
   const query = getRemoveForeignKeySQL({ table, foreignKeys })
+  if (noTransaction) {
+    return query
+  }
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -208,11 +229,13 @@ const updateForeignKey = async ({
   connectionString,
   table,
   foreignKeys,
+  noTransaction = false,
 }: {
   projectRef: string
   connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
+  noTransaction?: boolean
 }) => {
   const query = `
   ${getRemoveForeignKeySQL({ table, foreignKeys })}
@@ -220,6 +243,9 @@ const updateForeignKey = async ({
   `
     .replace(/\s+/g, ' ')
     .trim()
+  if (noTransaction) {
+    return query
+  }
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -525,7 +551,7 @@ export const createTable = async ({
 
   // 1. Create table SQL
   const { sql: createTableSql } = pgMeta.tables.create(payload)
-  sqlStatements.push(createTableSql)
+  sqlStatements.push(unwrapTransaction(createTableSql))
 
   // 2. Enable RLS if configured
   if (isRLSEnabled) {
@@ -553,7 +579,7 @@ export const createTable = async ({
       comment: columnPayload.comment,
       check: columnPayload.check,
     })
-    sqlStatements.push(columnSQL)
+    sqlStatements.push(unwrapTransaction(columnSQL))
   }
 
   // 4. Add primary key constraint (supports composite keys)
@@ -561,20 +587,26 @@ export const createTable = async ({
     .filter((column) => column.isPrimaryKey)
     .map((column) => column.name)
   if (primaryKeyColumns.length > 0) {
-    const primaryKeySQL = getAddPrimaryKeySQL({
-      schema: payload.schema,
-      table: payload.name,
-      columns: primaryKeyColumns,
-    })
+    const primaryKeySQL = (await addPrimaryKey(
+      projectRef,
+      connectionString,
+      payload.schema,
+      payload.name,
+      primaryKeyColumns,
+      true
+    )) as string
     sqlStatements.push(primaryKeySQL)
   }
 
   // 5. Add foreign key constraints
   if (foreignKeyRelations.length > 0) {
-    const fkSql = getAddForeignKeySQL({
+    const fkSql = (await addForeignKey({
+      projectRef,
+      connectionString,
       table: { schema: payload.schema, name: payload.name },
       foreignKeys: foreignKeyRelations,
-    })
+      noTransaction: true,
+    })) as string
     // Remove trailing semicolon since we join with semicolons
     sqlStatements.push(fkSql.replace(/;+$/, ''))
   }
@@ -585,7 +617,7 @@ export const createTable = async ({
   await executeSql({
     projectRef,
     connectionString,
-    sql: sqlStatements.join(';\n'),
+    sql: `BEGIN;\n${sqlStatements.join(';\n')};\nCOMMIT;`,
     queryKey: ['table', 'create-with-columns'],
   })
 
