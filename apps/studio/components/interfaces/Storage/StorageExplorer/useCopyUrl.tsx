@@ -8,6 +8,7 @@ import { copyToClipboard } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { fetchFileUrl } from './useFetchFileUrlQuery'
+import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 
 export const useCopyUrl = () => {
   const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
@@ -19,9 +20,9 @@ export const useCopyUrl = () => {
   const apiUrl = `${protocol}://${endpoint ?? '-'}`
 
   const getFileUrl = useCallback(
-    (fileName: string, expiresIn?: URL_EXPIRY_DURATION) => {
+    (item: StorageItemWithColumn | StorageItem, expiresIn?: URL_EXPIRY_DURATION) => {
       const pathToFile = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
-      const formattedPathToFile = [pathToFile, fileName].join('/')
+      const formattedPathToFile = item.path ?? [pathToFile, item.name].join('/')
 
       return fetchFileUrl(
         formattedPathToFile,
@@ -35,15 +36,15 @@ export const useCopyUrl = () => {
   )
 
   const onCopyUrl = useCallback(
-    (name: string, expiresIn?: URL_EXPIRY_DURATION) => {
-      const formattedUrl = getFileUrl(name, expiresIn).then((url) => {
+    (item: StorageItemWithColumn | StorageItem, expiresIn?: URL_EXPIRY_DURATION) => {
+      const formattedUrl = getFileUrl(item, expiresIn).then((url) => {
         return customDomainData?.customDomain?.status === 'active'
           ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
           : url
       })
 
       return copyToClipboard(formattedUrl, () => {
-        toast.success(`Copied URL for ${name} to clipboard.`)
+        toast.success(`Copied URL for ${item.name} to clipboard.`)
       })
     },
     [

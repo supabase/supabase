@@ -34,7 +34,7 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     switch (event) {
       case 'copy':
         if (expiresIn !== undefined && expiresIn < 0) return setSelectedFileCustomExpiry(item)
-        else return onCopyUrl(item.name, expiresIn)
+        else return onCopyUrl(item, expiresIn)
       case 'rename':
         return setSelectedItemToRename(item)
       case 'move':

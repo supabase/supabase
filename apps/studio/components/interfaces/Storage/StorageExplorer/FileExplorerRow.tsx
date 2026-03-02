@@ -207,7 +207,7 @@ export const FileExplorerRow = ({
                       {
                         name: 'Get URL',
                         icon: <Copy size={14} strokeWidth={1} />,
-                        onClick: () => onCopyUrl(itemWithColumnIndex.name),
+                        onClick: () => onCopyUrl(itemWithColumnIndex),
                       },
                     ]
                   : [
@@ -217,18 +217,16 @@ export const FileExplorerRow = ({
                         children: [
                           {
                             name: 'Expire in 1 week',
-                            onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.WEEK),
+                            onClick: () => onCopyUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK),
                           },
                           {
                             name: 'Expire in 1 month',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.MONTH),
+                              onCopyUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH),
                           },
                           {
                             name: 'Expire in 1 year',
-                            onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.YEAR),
+                            onClick: () => onCopyUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR),
                           },
                           {
                             name: 'Custom expiry',
