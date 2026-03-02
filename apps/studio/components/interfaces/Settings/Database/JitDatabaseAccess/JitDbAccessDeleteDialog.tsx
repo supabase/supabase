@@ -26,7 +26,7 @@ export function JitDbAccessDeleteDialog({
   onOpenChange,
   onConfirm,
 }: JitDbAccessDeleteDialogProps) {
-  const userDisplayName = user?.name ?? user?.email ?? 'this user'
+  const userDisplayName = user?.name?.trim() || user?.email || 'this user'
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

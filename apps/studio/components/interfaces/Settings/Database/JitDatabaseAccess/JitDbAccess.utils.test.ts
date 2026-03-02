@@ -1,12 +1,13 @@
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
+import type { OrganizationMembersData } from 'data/organizations/organization-members-query'
 import type { JitUserRuleDraft } from './JitDbAccess.types'
 import {
   computeStatusFromGrants,
   createEmptyGrant,
+  getJitMemberOptions,
   getRelativeDatetimeByMode,
-  isUuid,
   serializeDraftRolesForGrantMutation,
 } from './JitDbAccess.utils'
 
@@ -99,13 +100,28 @@ describe('serializeDraftRolesForGrantMutation', () => {
   })
 })
 
-describe('isUuid', () => {
-  it('returns true for valid UUID values', () => {
-    expect(isUuid('de305d54-75b4-431b-adb2-eb6b9e546014')).toBe(true)
-  })
+describe('getJitMemberOptions', () => {
+  it('excludes invited org members without gotrue IDs from selectable options', () => {
+    const organizationMembers: OrganizationMembersData = [
+      {
+        gotrue_id: 'de305d54-75b4-431b-adb2-eb6b9e546014',
+        primary_email: 'active@example.com',
+        username: 'Active User',
+      },
+      {
+        invited_id: 123,
+        invited_at: '2026-03-01T00:00:00.000Z',
+        primary_email: 'expired-invite@example.com',
+        username: 'e',
+      },
+    ]
 
-  it('returns false for non-UUID values', () => {
-    expect(isUuid('user@example.com')).toBe(false)
-    expect(isUuid('not-a-uuid')).toBe(false)
+    expect(getJitMemberOptions(organizationMembers, [])).toEqual([
+      {
+        id: 'de305d54-75b4-431b-adb2-eb6b9e546014',
+        email: 'active@example.com',
+        name: 'Active User',
+      },
+    ])
   })
 })

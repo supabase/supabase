@@ -28,6 +28,7 @@ interface JitDbAccessRulesTableProps {
   isLoading?: boolean
   canUpdate: boolean
   disableActions?: boolean
+  allProjectMembersHaveRules?: boolean
   onAddRule: () => void
   onEditRule: (user: JitUserRule) => void
   onDeleteRule: (user: JitUserRule) => void
@@ -38,11 +39,17 @@ export function JitDbAccessRulesTable({
   isLoading = false,
   canUpdate,
   disableActions = false,
+  allProjectMembersHaveRules = false,
   onAddRule,
   onEditRule,
   onDeleteRule,
 }: JitDbAccessRulesTableProps) {
-  const addDisabled = disableActions || !canUpdate
+  const addDisabled = disableActions || !canUpdate || allProjectMembersHaveRules
+  const addRuleTooltip = !canUpdate
+    ? 'Additional permissions required'
+    : allProjectMembersHaveRules
+      ? 'All project members already have JIT access rules'
+      : undefined
 
   if (isLoading) {
     return (
@@ -74,15 +81,13 @@ export function JitDbAccessRulesTable({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button type="default" icon={<Plus />} onClick={onAddRule} disabled={addDisabled}>
-                Add rule
-              </Button>
+              <span className="inline-flex">
+                <Button type="default" icon={<Plus />} onClick={onAddRule} disabled={addDisabled}>
+                  Add rule
+                </Button>
+              </span>
             </TooltipTrigger>
-            {!canUpdate && (
-              <TooltipContent side="bottom">
-                You need additional permissions to manage JIT access rules.
-              </TooltipContent>
-            )}
+            {addRuleTooltip && <TooltipContent side="bottom">{addRuleTooltip}</TooltipContent>}
           </Tooltip>
         </div>
 
@@ -120,20 +125,20 @@ export function JitDbAccessRulesTable({
                     onClick={
                       rowIsInteractive
                         ? (event) => {
-                            if ((event.target as HTMLElement).closest('button')) return
-                            onEditRule(user)
-                          }
+                          if ((event.target as HTMLElement).closest('button')) return
+                          onEditRule(user)
+                        }
                         : undefined
                     }
                     onKeyDown={
                       rowIsInteractive
                         ? (event) => {
-                            if ((event.target as HTMLElement).closest('button')) return
-                            if (event.key === 'Enter' || event.key === ' ') {
-                              event.preventDefault()
-                              onEditRule(user)
-                            }
+                          if ((event.target as HTMLElement).closest('button')) return
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            onEditRule(user)
                           }
+                        }
                         : undefined
                     }
                     tabIndex={rowIsInteractive ? 0 : undefined}

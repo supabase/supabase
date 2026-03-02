@@ -23,12 +23,6 @@ export function getRelativeDatetimeByMode(mode: JitExpiryMode) {
   return ''
 }
 
-export function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    value
-  )
-}
-
 export function inferExpiryMode(grant: Pick<JitRoleGrantDraft, 'hasExpiry'>): JitExpiryMode {
   if (!grant.hasExpiry) return 'never'
   return 'custom'
@@ -199,6 +193,9 @@ export function getJitMemberOptions(
   const byId = new Map<string, JitMemberOption>()
 
   for (const member of organizationMembers ?? []) {
+    // JIT rules should only target accepted org members (invites can be expired/pending).
+    if (!member.gotrue_id) continue
+
     const id = member.gotrue_id ?? member.primary_email
     if (!id) continue
 

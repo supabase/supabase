@@ -54,7 +54,6 @@ import {
   createDraft,
   draftFromRule,
   getAssignableJitRoleOptions,
-  isUuid,
   getJitMemberOptions,
   mapJitMembersToUserRules,
   serializeDraftRolesForGrantMutation,
@@ -182,8 +181,6 @@ const JitDbAccessConfiguration = () => {
 
   const isDuplicateSelectedMember =
     sheetMode === 'add' && draft.memberId !== '' && membersWithRules.has(draft.memberId)
-  const hasInvalidSelectedMemberId =
-    sheetMode === 'add' && draft.memberId !== '' && !isUuid(draft.memberId)
 
   const enabledRoleCount = useMemo(
     () => draft.grants.filter((grant) => grant.enabled).length,
@@ -199,14 +196,12 @@ const JitDbAccessConfiguration = () => {
     () => ({
       member: !draft.memberId
         ? 'Select a member for this JIT access rule.'
-        : hasInvalidSelectedMemberId
-          ? 'Select a valid project member for this JIT access rule.'
         : isDuplicateSelectedMember
           ? 'This member already has a JIT access rule. Edit their existing rule from the list.'
           : undefined,
       roles: enabledRoleCount > 0 ? undefined : 'Select at least one role.',
     }),
-    [draft.memberId, enabledRoleCount, hasInvalidSelectedMemberId, isDuplicateSelectedMember]
+    [draft.memberId, enabledRoleCount, isDuplicateSelectedMember]
   )
 
   const resetSheetState = () => {
@@ -496,6 +491,7 @@ const JitDbAccessConfiguration = () => {
                 isLoading={isRulesLoading}
                 canUpdate={!!canUpdateJitDbAccess}
                 disableActions={disableRuleActions}
+                allProjectMembersHaveRules={availableMembersForAdd.length === 0}
                 onAddRule={openAddRuleSheet}
                 onEditRule={openEditRuleSheet}
                 onDeleteRule={openDeleteDialog}
