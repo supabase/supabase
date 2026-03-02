@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { debounce, noop } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
