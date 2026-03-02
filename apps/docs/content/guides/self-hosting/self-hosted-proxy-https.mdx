@@ -35,7 +35,7 @@ Below are two options for adding a reverse proxy with automatic HTTPS in front o
 
 Comment out Kong's host port mappings in `docker-compose.yml` so that it's not exposed to the Internet:
 
-```
+```yaml
 kong:
   # ...
   ports:
@@ -78,7 +78,7 @@ defaultActiveId="caddy"
 
 Start Caddy by using the pre-configured `docker-compose.caddy.yml` overlay:
 
-```bash
+```sh
 docker compose -f docker-compose.yml -f docker-compose.caddy.yml up -d
 ```
 
@@ -91,7 +91,7 @@ This option uses a 3rd party Nginx Docker image ([`jonasal/nginx-certbot`](https
 
 Start Nginx by using the pre-configured `docker-compose.nginx.yml` overlay:
 
-```bash
+```sh
 docker compose -f docker-compose.yml -f docker-compose.nginx.yml up -d
 ```
 
@@ -104,7 +104,7 @@ HTTP-to-HTTPS redirects are handled automatically by the `jonasal/nginx-certbot`
 
 ### Step 4: Verify HTTPS connection
 
-```bash
+```sh
 curl -I https://<your-domain>/auth/v1/
 ```
 
@@ -122,7 +122,7 @@ For development or internal networks where you cannot use Let's Encrypt, you can
 
 ### Step 1: Generate a self-signed certificate
 
-```bash
+```sh
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -keyout volumes/api/server.key \
   -out volumes/api/server.crt \
@@ -134,7 +134,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 
 Uncomment the certificate volume mounts and SSL environment variables in `docker-compose.yml`:
 
-```yaml docker-compose.yml
+```yaml
 kong:
   # ... existing configuration ...
   volumes:
@@ -159,11 +159,11 @@ SITE_URL=https://<your-domain>:8443
 
 ### Step 4: Restart and verify
 
-```
+```sh
 docker compose down && docker compose up -d
 ```
 
-```
+```sh
 curl -I -k https://<your-domain>:8443/auth/v1/
 ```
 
