@@ -1,13 +1,14 @@
-import dynamic from 'next/dynamic'
-import { IS_PLATFORM } from 'lib/constants'
 import { ConnectionPooling } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import ResetDbPassword from 'components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
+import { SettingsDatabaseEmptyStateLocal } from 'components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
+import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -17,26 +18,12 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
-import type { NextPageWithLayout } from 'types'
-import { SettingsDatabaseEmptyStateLocal } from 'components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
 
-const SSLConfiguration = dynamic(
-  () => import('components/interfaces/Settings/Database/SSLConfiguration')
-)
-const DiskSizeConfiguration = dynamic(
-  () => import('components/interfaces/Settings/Database/DiskSizeConfiguration')
-)
-const NetworkRestrictions = dynamic(() =>
-  import('components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions').then(
-    (mod) => mod.NetworkRestrictions
-  )
-)
-const BannedIPs = dynamic(() => import('components/interfaces/Settings/Database/BannedIPs'))
-const DiskManagementPanelForm = dynamic(() =>
-  import('components/interfaces/DiskManagement/DiskManagementPanelForm').then(
-    (mod) => mod.DiskManagementPanelForm
-  )
-)
+import { DiskManagementPanelForm } from '@/components/interfaces/DiskManagement/DiskManagementPanelForm'
+import { BannedIPs } from '@/components/interfaces/Settings/Database/BannedIPs'
+import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database/DiskSizeConfiguration'
+import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions'
+import { SSLConfiguration } from '@/components/interfaces/Settings/Database/SSLConfiguration'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const isAws = useIsAwsCloudProvider()
