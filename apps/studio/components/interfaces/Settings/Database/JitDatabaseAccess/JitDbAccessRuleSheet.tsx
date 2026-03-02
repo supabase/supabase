@@ -17,14 +17,14 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import type { JitMemberOption, JitUserRule, JitUserRuleDraft, SheetMode } from './JitDbAccess.types'
+import type { JitMemberOption, JitUserRuleDraft, SheetMode } from './JitDbAccess.types'
 import { JitDbAccessRoleGrantFields } from './JitDbAccessRoleGrantFields'
+import { Admonition } from 'ui-patterns/admonition'
 
 interface JitDbAccessRuleSheetProps {
   open: boolean
   mode: SheetMode
   draft: JitUserRuleDraft
-  editingUser: JitUserRule | null
   memberOptions: JitMemberOption[]
   availableMembersForAddCount: number
   showInlineValidation: boolean
@@ -36,14 +36,12 @@ interface JitDbAccessRuleSheetProps {
   onDraftChange: (next: JitUserRuleDraft) => void
   onCancel: () => void
   onSave: () => void
-  onRequestDelete: () => void
 }
 
 export function JitDbAccessRuleSheet({
   open,
   mode,
   draft,
-  editingUser,
   memberOptions,
   availableMembersForAddCount,
   showInlineValidation,
@@ -52,7 +50,6 @@ export function JitDbAccessRuleSheet({
   onDraftChange,
   onCancel,
   onSave,
-  onRequestDelete,
 }: JitDbAccessRuleSheetProps) {
   const updateGrant = (
     roleId: string,
@@ -107,6 +104,7 @@ export function JitDbAccessRuleSheet({
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
 
+
               {mode === 'edit' && (
                 <p className="mt-2 text-xs text-foreground-lighter">
                   The member cannot be changed when editing an existing JIT access rule.
@@ -142,6 +140,7 @@ export function JitDbAccessRuleSheet({
                 )}
               </div>
 
+
               <p className="mt-2 text-xs leading-normal text-foreground-lighter">
                 Define scoped permissions with{' '}
                 <InlineLink
@@ -162,13 +161,6 @@ export function JitDbAccessRuleSheet({
         </ScrollArea>
 
         <SheetFooter className="mt-auto w-full border-t py-4">
-          {mode === 'edit' && editingUser && (
-            <div className="mr-auto">
-              <Button type="danger" onClick={onRequestDelete} disabled={isSubmitting}>
-                Delete rule
-              </Button>
-            </div>
-          )}
           <Button type="default" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>

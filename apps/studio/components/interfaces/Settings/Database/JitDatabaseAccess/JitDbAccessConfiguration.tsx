@@ -504,7 +504,6 @@ const JitDbAccessConfiguration = () => {
         open={sheetOpen}
         mode={sheetMode}
         draft={draft}
-        editingUser={editingUser}
         memberOptions={memberOptionsForSheet}
         availableMembersForAddCount={availableMembersForAdd.length}
         showInlineValidation={showInlineValidation}
@@ -513,9 +512,6 @@ const JitDbAccessConfiguration = () => {
         onDraftChange={setDraft}
         onCancel={closeSheet}
         onSave={handleSaveRule}
-        onRequestDelete={() => {
-          if (editingUser) openDeleteDialog(editingUser)
-        }}
       />
 
       <JitDbAccessDeleteDialog
