@@ -11,7 +11,7 @@ export interface AlertErrorProps {
   projectRef?: string
   subject?: string
   error?: { message: string } | null
-  layout?: 'vertical' | 'horizontal'
+  layout?: 'vertical' | 'horizontal' | 'responsive'
   className?: string
   showIcon?: boolean
   showInstructions?: boolean
@@ -51,7 +51,7 @@ export const AlertError = ({
   error,
   className,
   showIcon = true,
-  layout = 'horizontal',
+  layout = 'responsive',
   showInstructions = true,
   showErrorPrefix = true,
   children,

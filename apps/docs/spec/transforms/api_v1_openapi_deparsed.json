@@ -861,6 +861,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "pgdelta",
+            "required": false,
+            "in": "query",
+            "description": "Use pg-delta instead of Migra for diffing when true",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -8327,11 +8336,19 @@
                               "db_connected": {
                                 "type": "boolean"
                               },
+                              "replication_connected": {
+                                "type": "boolean"
+                              },
                               "connected_cluster": {
                                 "type": "integer"
                               }
                             },
-                            "required": ["healthy", "db_connected", "connected_cluster"]
+                            "required": [
+                              "healthy",
+                              "db_connected",
+                              "replication_connected",
+                              "connected_cluster"
+                            ]
                           },
                           {
                             "type": "object",
@@ -10201,6 +10218,12 @@
                     "oauth_server_authorization_path": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "custom_oauth_enabled": {
+                      "type": "boolean"
+                    },
+                    "custom_oauth_max_providers": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -10434,7 +10457,9 @@
                     "uri_allow_list",
                     "oauth_server_enabled",
                     "oauth_server_allow_dynamic_registration",
-                    "oauth_server_authorization_path"
+                    "oauth_server_authorization_path",
+                    "custom_oauth_enabled",
+                    "custom_oauth_max_providers"
                   ]
                 }
               }
@@ -11463,6 +11488,9 @@
                   "oauth_server_authorization_path": {
                     "type": "string",
                     "nullable": true
+                  },
+                  "custom_oauth_enabled": {
+                    "type": "boolean"
                   }
                 }
               }
@@ -12406,6 +12434,12 @@
                     "oauth_server_authorization_path": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "custom_oauth_enabled": {
+                      "type": "boolean"
+                    },
+                    "custom_oauth_max_providers": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -12639,7 +12673,9 @@
                     "uri_allow_list",
                     "oauth_server_enabled",
                     "oauth_server_allow_dynamic_registration",
-                    "oauth_server_authorization_path"
+                    "oauth_server_authorization_path",
+                    "custom_oauth_enabled",
+                    "custom_oauth_max_providers"
                   ]
                 }
               }
@@ -17705,9 +17741,9 @@
         "x-oauth-scope": "storage:read"
       }
     },
-    "/v1/projects/{ref}/config/disk/util": {
+    "/v1/projects/{ref}/config/disk": {
       "get": {
-        "operationId": "v1-get-disk-utilization",
+        "operationId": "v1-get-database-disk",
         "parameters": [
           {
             "name": "ref",
@@ -17730,26 +17766,60 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "timestamp": {
-                      "type": "string"
-                    },
-                    "metrics": {
-                      "type": "object",
-                      "properties": {
-                        "fs_size_bytes": {
-                          "type": "number"
+                    "attributes": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "iops": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "size_gb": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "throughput_mibps": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": ["gp3"]
+                            }
+                          },
+                          "required": ["iops", "size_gb", "type"]
                         },
-                        "fs_avail_bytes": {
-                          "type": "number"
-                        },
-                        "fs_used_bytes": {
-                          "type": "number"
+                        {
+                          "type": "object",
+                          "properties": {
+                            "iops": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "size_gb": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": ["io2"]
+                            }
+                          },
+                          "required": ["iops", "size_gb", "type"]
                         }
-                      },
-                      "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+                      ]
+                    },
+                    "last_modified_at": {
+                      "type": "string"
                     }
                   },
-                  "required": ["timestamp", "metrics"]
+                  "required": ["attributes"]
                 }
               }
             }
@@ -17764,7 +17834,7 @@
             "description": "Rate limit exceeded"
           },
           "500": {
-            "description": "Failed to get disk utilization"
+            "description": "Failed to get database disk attributes"
           }
         },
         "security": [
@@ -17775,12 +17845,10 @@
             "fga_permissions": ["infra_disk_config_read"]
           }
         ],
-        "summary": "Get disk utilization",
+        "summary": "Get database disk attributes",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
-      }
-    },
-    "/v1/projects/{ref}/config/disk": {
+      },
       "post": {
         "operationId": "v1-modify-database-disk",
         "parameters": [
@@ -17888,6 +17956,81 @@
           }
         ],
         "summary": "Modify database disk",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
+    "/v1/projects/{ref}/config/disk/util": {
+      "get": {
+        "operationId": "v1-get-disk-utilization",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "timestamp": {
+                      "type": "string"
+                    },
+                    "metrics": {
+                      "type": "object",
+                      "properties": {
+                        "fs_size_bytes": {
+                          "type": "number"
+                        },
+                        "fs_avail_bytes": {
+                          "type": "number"
+                        },
+                        "fs_used_bytes": {
+                          "type": "number"
+                        }
+                      },
+                      "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+                    }
+                  },
+                  "required": ["timestamp", "metrics"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to get disk utilization"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_disk_config_read"]
+          }
+        ],
+        "summary": "Get disk utilization",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
       }
@@ -23914,11 +24057,19 @@
                   "db_connected": {
                     "type": "boolean"
                   },
+                  "replication_connected": {
+                    "type": "boolean"
+                  },
                   "connected_cluster": {
                     "type": "integer"
                   }
                 },
-                "required": ["healthy", "db_connected", "connected_cluster"]
+                "required": [
+                  "healthy",
+                  "db_connected",
+                  "replication_connected",
+                  "connected_cluster"
+                ]
               },
               {
                 "type": "object",
@@ -25168,6 +25319,12 @@
           "oauth_server_authorization_path": {
             "type": "string",
             "nullable": true
+          },
+          "custom_oauth_enabled": {
+            "type": "boolean"
+          },
+          "custom_oauth_max_providers": {
+            "type": "integer"
           }
         },
         "required": [
@@ -25401,7 +25558,9 @@
           "uri_allow_list",
           "oauth_server_enabled",
           "oauth_server_allow_dynamic_registration",
-          "oauth_server_authorization_path"
+          "oauth_server_authorization_path",
+          "custom_oauth_enabled",
+          "custom_oauth_max_providers"
         ]
       },
       "UpdateAuthConfigBody": {
@@ -26375,6 +26534,9 @@
           "oauth_server_authorization_path": {
             "type": "string",
             "nullable": true
+          },
+          "custom_oauth_enabled": {
+            "type": "boolean"
           }
         }
       },
@@ -27815,29 +27977,63 @@
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
       },
-      "DiskUtilMetricsResponse": {
+      "DiskResponse": {
         "type": "object",
         "properties": {
-          "timestamp": {
-            "type": "string"
-          },
-          "metrics": {
-            "type": "object",
-            "properties": {
-              "fs_size_bytes": {
-                "type": "number"
+          "attributes": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "iops": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "size_gb": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "throughput_mibps": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["gp3"]
+                  }
+                },
+                "required": ["iops", "size_gb", "type"]
               },
-              "fs_avail_bytes": {
-                "type": "number"
-              },
-              "fs_used_bytes": {
-                "type": "number"
+              {
+                "type": "object",
+                "properties": {
+                  "iops": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "size_gb": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["io2"]
+                  }
+                },
+                "required": ["iops", "size_gb", "type"]
               }
-            },
-            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+            ]
+          },
+          "last_modified_at": {
+            "type": "string"
           }
         },
-        "required": ["timestamp", "metrics"]
+        "required": ["attributes"]
       },
       "DiskRequestBody": {
         "type": "object",
@@ -27896,6 +28092,30 @@
           }
         },
         "required": ["attributes"]
+      },
+      "DiskUtilMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "fs_size_bytes": {
+                "type": "number"
+              },
+              "fs_avail_bytes": {
+                "type": "number"
+              },
+              "fs_used_bytes": {
+                "type": "number"
+              }
+            },
+            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+          }
+        },
+        "required": ["timestamp", "metrics"]
       },
       "DiskAutoscaleConfig": {
         "type": "object",
