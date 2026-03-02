@@ -15,6 +15,7 @@ import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { MobileSheetProvider } from './ProjectLayout/NavigationBar/MobileSheetContext'
+import StudioMobileSheetNav from './ProjectLayout/NavigationBar/StudioMobileSheetNav'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
@@ -119,6 +120,7 @@ export const DefaultLayout = ({
               </div>
 
               <BannerStack />
+              <StudioMobileSheetNav />
             </BannerStackProvider>
           </MobileSheetProvider>
         </ProjectContextProvider>

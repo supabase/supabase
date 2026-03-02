@@ -105,8 +105,12 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const router = useRouter()
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
-    const { showSidebar, mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
-    const { setContent: setMobileSheetContent, content: mobileSheetContent } = useMobileSheet()
+    const { showSidebar } = useAppStateSnapshot()
+    const {
+      setContent: setMobileSheetContent,
+      content: mobileSheetContent,
+      registerOpenMenu,
+    } = useMobileSheet()
 
     const pathname = router.asPath?.split('?')[0] ?? router.pathname
     const currentSectionKey = getSectionKeyFromPathname(pathname)
@@ -138,26 +142,23 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const showPausedState = isPaused && !ignorePausedState
 
     useLayoutEffect(() => {
-      if (mobileMenuOpen) {
+      const unregister = registerOpenMenu(() => {
         setMobileSheetContent(
           <MobileMenuContent
             currentProductMenu={productMenu ?? null}
             currentProduct={product}
             currentSectionKey={currentSectionKey}
-            onCloseSheet={() => {
-              setMobileSheetContent(null)
-              setMobileMenuOpen(false)
-            }}
+            onCloseSheet={() => setMobileSheetContent(null)}
           />
         )
-      }
+      })
+      return unregister
     }, [
-      mobileMenuOpen,
+      registerOpenMenu,
       productMenu,
       product,
       currentSectionKey,
       setMobileSheetContent,
-      setMobileMenuOpen,
     ])
 
     return (
@@ -243,12 +244,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         <ProjectAPIDocs />
         <MobileSheetNav
           open={mobileSheetContent !== null && typeof mobileSheetContent !== 'string'}
-          onOpenChange={(open) => {
-            if (!open) {
-              setMobileSheetContent(null)
-              setMobileMenuOpen(false)
-            }
-          }}
+          onOpenChange={(open) => !open && setMobileSheetContent(null)}
         >
           {mobileSheetContent}
         </MobileSheetNav>
