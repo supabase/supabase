@@ -1721,8 +1721,8 @@ importers:
         specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-markdown:
-        specifier: ^8.0.3
-        version: 8.0.7(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
+        specifier: ^9.0.1
+        version: 9.0.1(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
       react-syntax-highlighter:
         specifier: ^15.6.6
         version: 15.6.6(react@18.3.1)
@@ -1742,7 +1742,7 @@ importers:
         specifier: ^15.0.1
         version: 15.0.1(supports-color@8.1.1)
       remark-gfm:
-        specifier: ^4.0.0
+        specifier: ^4.0.1
         version: 4.0.1(supports-color@8.1.1)
       shared-data:
         specifier: workspace:*
@@ -12476,9 +12476,6 @@ packages:
   hast-util-to-html@9.0.5:
     resolution: {integrity: sha512-OguPdidb+fbHQSU4Q4ZiLKnzWo8Wwsf5bZfbvu7//a9oTYoqD/fWpe96NuHkoS9h0ccGOTe0C4NGXdtS0iObOw==}
 
-  hast-util-to-jsx-runtime@2.3.0:
-    resolution: {integrity: sha512-H/y0+IWPdsLLS738P8tDnrQ8Z+dj12zQQ6WC11TIM21C8WFVoIxcqWXf2H3hiTVZjF1AWqoimGwrTWecWrnmRQ==}
-
   hast-util-to-jsx-runtime@2.3.6:
     resolution: {integrity: sha512-zl6s8LwNyo1P9uw+XJGvZtdFF1GdAkOg8ujOw+4Pyb76874fLps4ueHXDhXWdk6YHQ6OgUtinliG7RsYvCbbBg==}
 
@@ -17904,6 +17901,7 @@ packages:
 
   unplugin-vue-router@0.15.0:
     resolution: {integrity: sha512-PyGehCjd9Ny9h+Uer4McbBjjib3lHihcyUEILa7pHKl6+rh8N7sFyw4ZkV+N30Oq2zmIUG7iKs3qpL0r+gXAaQ==}
+    deprecated: 'Merged into vuejs/router. Migrate: https://router.vuejs.org/guide/migration/v4-to-v5.html'
     peerDependencies:
       '@vue/compiler-sfc': ^3.5.17
       vue-router: ^4.5.1
@@ -30575,26 +30573,6 @@ snapshots:
       stringify-entities: 4.0.3
       zwitch: 2.0.4
 
-  hast-util-to-jsx-runtime@2.3.0(supports-color@8.1.1):
-    dependencies:
-      '@types/estree': 1.0.5
-      '@types/hast': 3.0.4
-      '@types/unist': 3.0.3
-      comma-separated-tokens: 2.0.3
-      devlop: 1.1.0
-      estree-util-is-identifier-name: 3.0.0
-      hast-util-whitespace: 3.0.0
-      mdast-util-mdx-expression: 2.0.0(supports-color@8.1.1)
-      mdast-util-mdx-jsx: 3.1.3(supports-color@8.1.1)
-      mdast-util-mdxjs-esm: 2.0.1(supports-color@8.1.1)
-      property-information: 6.3.0
-      space-separated-tokens: 2.0.2
-      style-to-object: 1.0.8
-      unist-util-position: 5.0.0
-      vfile-message: 4.0.2
-    transitivePeerDependencies:
-      - supports-color
-
   hast-util-to-jsx-runtime@2.3.6(supports-color@8.1.1):
     dependencies:
       '@types/estree': 1.0.5
@@ -35072,14 +35050,14 @@ snapshots:
       '@types/hast': 3.0.4
       '@types/react': 18.3.3
       devlop: 1.1.0
-      hast-util-to-jsx-runtime: 2.3.0(supports-color@8.1.1)
+      hast-util-to-jsx-runtime: 2.3.6(supports-color@8.1.1)
       html-url-attributes: 3.0.0
       mdast-util-to-hast: 13.2.1
       react: 18.3.1
       remark-parse: 11.0.0(supports-color@8.1.1)
       remark-rehype: 11.1.1
       unified: 11.0.5
-      unist-util-visit: 5.0.0
+      unist-util-visit: 5.1.0
       vfile: 6.0.3
     transitivePeerDependencies:
       - supports-color
