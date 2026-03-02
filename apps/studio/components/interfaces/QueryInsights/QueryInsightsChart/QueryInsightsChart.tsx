@@ -231,8 +231,8 @@ export const QueryInsightsChart = ({
                           fill={`url(#gradient-${item.dataKey})`}
                           dot={false}
                           name={item.label}
-                          strokeOpacity={isSeriesVisible(item.dataKey) ? 1 : 0}
-                          fillOpacity={isSeriesVisible(item.dataKey) ? 1 : 0}
+                          strokeOpacity={isSeriesVisible(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0}
+                          fillOpacity={isSeriesVisible(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0}
                         />
                       ))}
                       {hasSelection && (
@@ -316,8 +316,8 @@ export const QueryInsightsChart = ({
                           fill={`url(#gradient-${item.dataKey})`}
                           dot={false}
                           name={item.label}
-                          strokeOpacity={isSeriesVisible(item.dataKey) ? 1 : 0}
-                          fillOpacity={isSeriesVisible(item.dataKey) ? 1 : 0}
+                          strokeOpacity={isSeriesVisible(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0}
+                          fillOpacity={isSeriesVisible(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0}
                         />
                       ))}
                       {hasSelection && (
