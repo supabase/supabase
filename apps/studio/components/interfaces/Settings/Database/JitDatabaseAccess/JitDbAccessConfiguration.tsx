@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useJitDbAccessGrantMutation } from 'data/jit-db-access/jit-db-access-grant-mutation'
@@ -15,12 +16,13 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Loader2 } from 'lucide-react'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert,
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -116,7 +118,9 @@ const JitDbAccessConfiguration = () => {
   const initialIsEnabled =
     isSuccessConfiguration &&
     !!jitDbAccessConfiguration &&
+    'appliedSuccessfully' in jitDbAccessConfiguration &&
     jitDbAccessConfiguration.appliedSuccessfully &&
+    'state' in jitDbAccessConfiguration &&
     jitDbAccessConfiguration.state === 'enabled'
 
   const hasAccessToJitDbAccess = !(
@@ -235,7 +239,7 @@ const JitDbAccessConfiguration = () => {
           toast.success(
             activeRuleCount > 0
               ? `JIT access disabled. ${activeRuleCount} configured member${activeRuleCount === 1 ? '' : 's'} can no longer request temporary database access.`
-              : 'JIT access disabled.'
+              : 'JIT access disabled'
           )
         }
       },
@@ -356,17 +360,26 @@ const JitDbAccessConfiguration = () => {
     })
   }
 
-  const switchDisabled =
-    isLoadingConfiguration ||
-    isUpdatingJitDbAccess ||
-    !canUpdateJitDbAccess ||
-    !hasAccessToJitDbAccess
+  const switchDisabled = isLoadingConfiguration || isUpdatingJitDbAccess || !canUpdateJitDbAccess
 
   const switchTooltipText = !canUpdateJitDbAccess
-    ? 'You need additional permissions to update JIT database access for your project.'
-    : !hasAccessToJitDbAccess
-      ? 'Your project does not have access to JIT database access. Please update to the latest Postgres version.'
-      : undefined
+    ? 'Additional permissions required'
+    : undefined
+
+  const showToggleFailedWarning =
+    isSuccessConfiguration &&
+    !!jitDbAccessConfiguration &&
+    'appliedSuccessfully' in jitDbAccessConfiguration &&
+    !jitDbAccessConfiguration.appliedSuccessfully
+
+  const jitToggleSwitch = (
+    <Switch
+      size="large"
+      checked={enabled}
+      onCheckedChange={handleJitToggleChange}
+      disabled={switchDisabled}
+    />
+  )
 
   useEffect(() => {
     if (!ruleIdToEdit || isLoadingJitMembers || isLoadingProjectMembers || editingUser) return
@@ -394,50 +407,12 @@ const JitDbAccessConfiguration = () => {
             />
           )}
 
-          <Card>
-            <CardContent className="space-y-4">
-              <FormLayout
-                layout="flex-row-reverse"
-                label="Enable JIT access"
-                description="Allow configured project members to request temporary database access."
-              >
-                <div className="flex w-fit flex-shrink-0 items-center justify-end gap-2">
-                  {(isLoadingConfiguration || isUpdatingJitDbAccess) && (
-                    <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
-                  )}
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div>
-                        <Switch
-                          size="large"
-                          checked={enabled}
-                          onCheckedChange={handleJitToggleChange}
-                          disabled={switchDisabled}
-                        />
-                      </div>
-                    </TooltipTrigger>
-                    {switchTooltipText && (
-                      <TooltipContent side="bottom">{switchTooltipText}</TooltipContent>
-                    )}
-                  </Tooltip>
-                </div>
-              </FormLayout>
-
-              {isSuccessConfiguration && !jitDbAccessConfiguration?.appliedSuccessfully && (
-                <Alert withIcon variant="warning" title="JIT access was not updated successfully">
-                  Please try updating again, or contact support if this error persists
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
-
-          {!hasAccessToJitDbAccess && (
+          {!isErrorJitDbAccessConfiguration && !hasAccessToJitDbAccess && (
             <Admonition
               type="note"
-              layout="vertical"
+              layout="responsive"
               title="Postgres upgrade required"
-              description="Just-in-time access requires a newer Postgres version. Upgrade your project to enable JIT access."
+              description="Just-in-time access requires a newer Postgres version. Upgrade your project’s Postgres version to enable JIT access."
               actions={
                 ref ? (
                   <Button type="default" asChild>
@@ -446,6 +421,59 @@ const JitDbAccessConfiguration = () => {
                 ) : undefined
               }
             />
+          )}
+
+          {hasAccessToJitDbAccess && (
+            <Card>
+              <CardContent className="space-y-4">
+                <FormLayout
+                  layout="flex-row-reverse"
+                  label="Enable JIT access"
+                  description="Allow configured project members to request temporary database access."
+                >
+                  <div className="flex w-fit flex-shrink-0 items-center justify-end gap-2">
+                    {(isLoadingConfiguration || isUpdatingJitDbAccess) && (
+                      <Loader2 className="animate-spin text-foreground-muted/50" strokeWidth={2} size={16} />
+                    )}
+                    {switchTooltipText ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                          <div>
+                            {jitToggleSwitch}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">{switchTooltipText}</TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      jitToggleSwitch
+                    )}
+                  </div>
+                </FormLayout>
+              </CardContent>
+              {showToggleFailedWarning && (
+                <Admonition
+                  type="warning"
+                  layout="horizontal"
+                  title="JIT access update failed"
+                  description={
+                    <>
+                      The change didn’t apply. Try turning JIT access on or off again, or{' '}
+                      <SupportLink
+                        queryParams={{
+                          category: SupportCategories.DASHBOARD_BUG,
+                          subject: 'JIT access was not updated successfully',
+                        }}
+                        className={InlineLinkClassName}
+                      >
+                        contact support
+                      </SupportLink>{' '}if the issue persists.
+                    </>
+                  }
+                  className="mb-0 rounded-none border-0"
+                />
+              )}
+            </Card>
           )}
 
           {enabled && hasAccessToJitDbAccess && (
