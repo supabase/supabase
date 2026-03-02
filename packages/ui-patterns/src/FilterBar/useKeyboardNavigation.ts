@@ -1,7 +1,11 @@
 import { KeyboardEvent, useCallback } from 'react'
 
-import { ActiveInput } from './hooks'
-import { FilterGroup } from './types'
+import {
+  ConditionPath,
+  HighlightNavigationResult,
+  KeyboardNavigationConfig,
+  NavigationDirection,
+} from './types'
 import { findConditionByPath, findGroupByPath, removeFromGroup } from './utils'
 
 export function useKeyboardNavigation({
@@ -9,14 +13,11 @@ export function useKeyboardNavigation({
   setActiveInput,
   activeFilters,
   onFilterChange,
-}: {
-  activeInput: ActiveInput
-  setActiveInput: (input: ActiveInput) => void
-  activeFilters: FilterGroup
-  onFilterChange: (filters: FilterGroup) => void
-}) {
+  highlightedConditionPath,
+  setHighlightedConditionPath,
+}: KeyboardNavigationConfig) {
   const removeByPath = useCallback(
-    (path: number[]) => {
+    (path: ConditionPath) => {
       const updatedFilters = removeFromGroup(activeFilters, path)
       onFilterChange(updatedFilters)
     },
@@ -24,7 +25,7 @@ export function useKeyboardNavigation({
   )
 
   const findFirstConditionInGroup = useCallback(
-    (groupPath: number[]): number[] | null => {
+    (groupPath: ConditionPath): ConditionPath | null => {
       const group = findGroupByPath(activeFilters, groupPath)
       if (!group || group.conditions.length === 0) return null
 
@@ -38,7 +39,7 @@ export function useKeyboardNavigation({
   )
 
   const findLastConditionInGroup = useCallback(
-    (groupPath: number[]): number[] | null => {
+    (groupPath: ConditionPath): ConditionPath | null => {
       const group = findGroupByPath(activeFilters, groupPath)
       if (!group || group.conditions.length === 0) return null
 
@@ -53,7 +54,7 @@ export function useKeyboardNavigation({
   )
 
   const findPreviousCondition = useCallback(
-    (currentPath: number[]): number[] | null => {
+    (currentPath: ConditionPath): ConditionPath | null => {
       const groupPath = currentPath.slice(0, -1)
       const conditionIndex = currentPath[currentPath.length - 1]
 
@@ -78,82 +79,47 @@ export function useKeyboardNavigation({
     [activeFilters, findLastConditionInGroup]
   )
 
-  const findNextCondition = useCallback(
-    (currentPath: number[]): number[] | null => {
-      const groupPath = currentPath.slice(0, -1)
-      const conditionIndex = currentPath[currentPath.length - 1]
-      const group = findGroupByPath(activeFilters, groupPath)
+  const getHighlightNavigationPath = useCallback(
+    (direction: NavigationDirection): HighlightNavigationResult => {
+      if (activeInput?.type !== 'group') return null
 
-      if (group && conditionIndex < group.conditions.length - 1) {
-        const nextPath = [...groupPath, conditionIndex + 1]
-        const nextCondition = group.conditions[conditionIndex + 1]
-        if (!('logicalOperator' in nextCondition)) {
-          return nextPath
+      const group = findGroupByPath(activeFilters, activeInput.path)
+      if (!group || group.conditions.length === 0) return null
+
+      if (highlightedConditionPath) {
+        const currentIndex = highlightedConditionPath[highlightedConditionPath.length - 1]
+
+        if (direction === 'prev') {
+          if (currentIndex > 0) {
+            return [...activeInput.path, currentIndex - 1]
+          }
+          return 'clear'
+        } else {
+          if (currentIndex < group.conditions.length - 1) {
+            return [...activeInput.path, currentIndex + 1]
+          }
+          return 'clear'
         }
-        return findFirstConditionInGroup(nextPath)
+      } else {
+        if (direction === 'prev') {
+          return [...activeInput.path, group.conditions.length - 1]
+        }
+        // 'next' with no highlight does nothing - user is already at the rightmost position
+        return null
       }
-
-      if (groupPath.length > 0) {
-        return findNextCondition(groupPath)
-      }
-
-      return null
     },
-    [activeFilters, findFirstConditionInGroup]
+    [activeInput, activeFilters, highlightedConditionPath]
   )
 
-  const findPreviousConditionFromGroup = useCallback(
-    (groupPath: number[]): number[] | null => {
-      const group = findGroupByPath(activeFilters, groupPath)
-      if (group && group.conditions.length > 0) {
-        return findLastConditionInGroup(groupPath)
+  const applyHighlightNavigation = useCallback(
+    (result: HighlightNavigationResult) => {
+      if (result === 'clear') {
+        setHighlightedConditionPath(null)
+      } else if (result) {
+        setHighlightedConditionPath(result)
       }
-
-      if (groupPath.length > 0) {
-        const parentPath = groupPath.slice(0, -1)
-        const groupIndex = groupPath[groupPath.length - 1]
-        if (groupIndex > 0) {
-          const prevSiblingPath = [...parentPath, groupIndex - 1]
-          const parentGroup = findGroupByPath(activeFilters, parentPath)
-          const prevSibling = parentGroup?.conditions[groupIndex - 1]
-          if (prevSibling) {
-            if ('logicalOperator' in prevSibling) {
-              return findLastConditionInGroup(prevSiblingPath)
-            } else {
-              return prevSiblingPath
-            }
-          }
-        }
-        return findPreviousConditionFromGroup(parentPath)
-      }
-
-      return null
     },
-    [activeFilters, findLastConditionInGroup]
-  )
-
-  const findNextConditionFromGroup = useCallback(
-    (groupPath: number[]): number[] | null => {
-      if (groupPath.length > 0) {
-        const parentPath = groupPath.slice(0, -1)
-        const groupIndex = groupPath[groupPath.length - 1]
-        const parentGroup = findGroupByPath(activeFilters, parentPath)
-
-        if (parentGroup && groupIndex < parentGroup.conditions.length - 1) {
-          const nextSiblingPath = [...parentPath, groupIndex + 1]
-          const nextSibling = parentGroup.conditions[groupIndex + 1]
-          if ('logicalOperator' in nextSibling) {
-            return findFirstConditionInGroup(nextSiblingPath)
-          } else {
-            return nextSiblingPath
-          }
-        }
-        return findNextConditionFromGroup(parentPath)
-      }
-
-      return null
-    },
-    [activeFilters, findFirstConditionInGroup]
+    [setHighlightedConditionPath]
   )
 
   const handleBackspace = useCallback(
@@ -165,14 +131,19 @@ export function useKeyboardNavigation({
 
       if (activeInput?.type === 'group' && isEmpty) {
         e.preventDefault()
-        const group = findGroupByPath(activeFilters, activeInput.path)
 
-        if (group && group.conditions.length > 0) {
-          const lastConditionPath = [...activeInput.path, group.conditions.length - 1]
-          removeByPath(lastConditionPath)
-          setActiveInput({ type: 'group', path: activeInput.path })
-        } else if (group && group.conditions.length === 0 && activeInput.path.length > 0) {
-          // Only remove nested empty groups, not the root group
+        if (highlightedConditionPath) {
+          removeByPath(highlightedConditionPath)
+          setHighlightedConditionPath(null)
+        } else {
+          const result = getHighlightNavigationPath('prev')
+          applyHighlightNavigation(result)
+        }
+      } else if (activeInput?.type === 'group' && activeInput.path.length > 0) {
+        // Edge case: remove nested empty groups, but not the root group
+        const group = findGroupByPath(activeFilters, activeInput.path)
+        if (group && group.conditions.length === 0) {
+          e.preventDefault()
           removeByPath(activeInput.path)
           setActiveInput({
             type: 'group',
@@ -187,66 +158,90 @@ export function useKeyboardNavigation({
         }
       }
     },
-    [activeInput, activeFilters, removeByPath, setActiveInput]
+    [
+      activeInput,
+      activeFilters,
+      removeByPath,
+      setActiveInput,
+      highlightedConditionPath,
+      setHighlightedConditionPath,
+      getHighlightNavigationPath,
+      applyHighlightNavigation,
+    ]
   )
 
   const handleArrowLeft = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       const inputElement = e.target as HTMLInputElement
-      if (inputElement.selectionStart === 0) {
+      const isEmpty = inputElement.value === ''
+
+      if (activeInput?.type === 'group' && isEmpty) {
         e.preventDefault()
-        if (activeInput?.type === 'value') {
-          const prevPath = findPreviousCondition(activeInput.path)
-          if (prevPath) {
-            setActiveInput({ type: 'value', path: prevPath })
-          }
-        } else if (activeInput?.type === 'group') {
-          const prevPath = findPreviousConditionFromGroup(activeInput.path)
-          if (prevPath) {
-            setActiveInput({ type: 'value', path: prevPath })
-          }
+        const result = getHighlightNavigationPath('prev')
+        applyHighlightNavigation(result)
+        return
+      }
+
+      if (activeInput?.type === 'value' && inputElement.selectionStart === 0) {
+        e.preventDefault()
+        const prevPath = findPreviousCondition(activeInput.path)
+        if (prevPath) {
+          setActiveInput({ type: 'value', path: prevPath })
         }
       }
     },
-    [activeInput, findPreviousCondition, findPreviousConditionFromGroup, setActiveInput]
+    [
+      activeInput,
+      getHighlightNavigationPath,
+      applyHighlightNavigation,
+      findPreviousCondition,
+      setActiveInput,
+    ]
   )
 
   const handleArrowRight = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       const inputElement = e.target as HTMLInputElement
-      if (inputElement.selectionStart === inputElement.value.length) {
-        e.preventDefault()
-        if (activeInput?.type === 'value') {
-          const groupPath = activeInput.path.slice(0, -1)
-          const conditionIndex = activeInput.path[activeInput.path.length - 1]
-          const group = findGroupByPath(activeFilters, groupPath)
+      const isEmpty = inputElement.value === ''
 
-          if (group && conditionIndex < group.conditions.length - 1) {
-            const nextCondition = group.conditions[conditionIndex + 1]
-            if ('logicalOperator' in nextCondition) {
-              const nextPath = findFirstConditionInGroup([...groupPath, conditionIndex + 1])
-              if (nextPath) {
-                setActiveInput({ type: 'value', path: nextPath })
-              }
-            } else {
-              setActiveInput({ type: 'value', path: [...groupPath, conditionIndex + 1] })
+      if (activeInput?.type === 'group' && isEmpty && highlightedConditionPath) {
+        e.preventDefault()
+        const result = getHighlightNavigationPath('next')
+        applyHighlightNavigation(result)
+        return
+      }
+
+      if (
+        activeInput?.type === 'value' &&
+        inputElement.selectionStart === inputElement.value.length
+      ) {
+        e.preventDefault()
+        const groupPath = activeInput.path.slice(0, -1)
+        const conditionIndex = activeInput.path[activeInput.path.length - 1]
+        const group = findGroupByPath(activeFilters, groupPath)
+
+        if (group && conditionIndex < group.conditions.length - 1) {
+          const nextCondition = group.conditions[conditionIndex + 1]
+          if ('logicalOperator' in nextCondition) {
+            const nextPath = findFirstConditionInGroup([...groupPath, conditionIndex + 1])
+            if (nextPath) {
+              setActiveInput({ type: 'value', path: nextPath })
             }
           } else {
-            setActiveInput({ type: 'group', path: groupPath })
+            setActiveInput({ type: 'value', path: [...groupPath, conditionIndex + 1] })
           }
-        } else if (activeInput?.type === 'group') {
-          const nextPath = findNextConditionFromGroup(activeInput.path)
-          if (nextPath) {
-            setActiveInput({ type: 'value', path: nextPath })
-          }
+        } else {
+          setActiveInput({ type: 'group', path: groupPath })
         }
       }
     },
     [
       activeInput,
       activeFilters,
+      highlightedConditionPath,
+      getHighlightNavigationPath,
+      applyHighlightNavigation,
       findFirstConditionInGroup,
-      findNextConditionFromGroup,
       setActiveInput,
     ]
   )
@@ -255,20 +250,26 @@ export function useKeyboardNavigation({
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Backspace') {
         handleBackspace(e)
-      } else if (e.key === ' ' && activeInput?.type === 'value') {
-        e.preventDefault()
-        setActiveInput({ type: 'group', path: [] })
       } else if (e.key === 'ArrowLeft') {
         handleArrowLeft(e)
       } else if (e.key === 'ArrowRight') {
         handleArrowRight(e)
       } else if (e.key === 'Escape') {
-        const activeElement = document.activeElement as HTMLElement | null
-        if (activeElement && activeElement.blur) {
-          activeElement.blur()
+        if (highlightedConditionPath) {
+          e.preventDefault()
+          setHighlightedConditionPath(null)
+        } else {
+          const activeElement = document.activeElement as HTMLElement | null
+          if (activeElement && activeElement.blur) {
+            activeElement.blur()
+          }
         }
       } else if (e.key === 'Enter') {
-        if (activeInput?.type === 'value') {
+        if (highlightedConditionPath) {
+          e.preventDefault()
+          setActiveInput({ type: 'value', path: highlightedConditionPath })
+          setHighlightedConditionPath(null)
+        } else if (activeInput?.type === 'value') {
           e.preventDefault()
           setActiveInput({ type: 'group', path: activeInput.path.slice(0, -1) })
         } else if (activeInput?.type === 'operator') {
@@ -278,7 +279,15 @@ export function useKeyboardNavigation({
         }
       }
     },
-    [activeInput, handleBackspace, handleArrowLeft, handleArrowRight, setActiveInput]
+    [
+      activeInput,
+      handleBackspace,
+      handleArrowLeft,
+      handleArrowRight,
+      setActiveInput,
+      highlightedConditionPath,
+      setHighlightedConditionPath,
+    ]
   )
 
   return {

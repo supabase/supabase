@@ -5,6 +5,7 @@ import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
@@ -133,6 +134,10 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   if (!router?.isReady) {
     return null
+  }
+
+  if (id === 'data_api' && !IS_PLATFORM) {
+    return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
   }
 
   if (id === 'stripe_sync_engine' && !stripeSyncEnabled) {

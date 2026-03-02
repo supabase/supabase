@@ -1,7 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import dayjs from 'dayjs'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
+import type { VaultSecret } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -9,28 +16,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
-import type { VaultSecret } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { SecretTableColumn } from './Secrets.types'
 
 interface SecretRowProps {
   row: VaultSecret
   col: SecretTableColumn
-  onSelectEdit: (secret: VaultSecret) => void
-  onSelectRemove: (secret: VaultSecret) => void
 }
 
-export const SecretRow = ({ row, col, onSelectEdit, onSelectRemove }: SecretRowProps) => {
+export const SecretRow = ({ row, col }: SecretRowProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [revealSecret, setRevealSecret] = useState(false)
   const name = row?.name ?? 'No name provided'
+
+  const [, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
+  const [, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
 
   const { can: canManageSecrets } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -59,7 +61,7 @@ export const SecretRow = ({ row, col, onSelectEdit, onSelectRemove }: SecretRowP
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!canManageSecrets}
-              onClick={() => onSelectEdit(row)}
+              onClick={() => setSelectedSecretToEdit(row.id)}
               tooltip={{
                 content: { side: 'left', text: 'You need additional permissions to edit secrets' },
               }}
@@ -73,7 +75,7 @@ export const SecretRow = ({ row, col, onSelectEdit, onSelectRemove }: SecretRowP
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!canManageSecrets}
-              onClick={() => onSelectRemove(row)}
+              onClick={() => setSelectedSecretToDelete(row.id)}
               tooltip={{
                 content: {
                   side: 'left',

@@ -1,11 +1,5 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronUp, Loader2 } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   isExplainQuery,
@@ -32,6 +26,11 @@ import { formatSql } from 'lib/formatSql'
 import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { ChevronUp, Loader2 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -56,6 +55,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
@@ -477,6 +477,16 @@ export const SQLEditor = () => {
     editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
   }
 
+  const buildDebugPrompt = useCallback(() => {
+    const snippet = snapV2.snippets[id]
+    const result = snapV2.results[id]?.[0]
+    const sql = (snippet?.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim()
+    const errorMessage = result?.error?.message ?? 'Unknown error'
+    const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
+
+    return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
+  }, [id, snapV2.results, snapV2.snippets])
+
   const onDebug = useCallback(async () => {
     try {
       const snippet = snapV2.snippets[id]
@@ -774,10 +784,10 @@ export const SQLEditor = () => {
       <div className="flex h-full">
         <ResizablePanelGroup
           className="relative"
-          direction="vertical"
+          orientation="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
@@ -888,7 +898,7 @@ export const SQLEditor = () => {
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="animate-spin text-brand" />
@@ -904,6 +914,7 @@ export const SQLEditor = () => {
                 executeQuery={executeQuery}
                 executeExplainQuery={executeExplainQuery}
                 onDebug={onDebug}
+                buildDebugPrompt={buildDebugPrompt}
                 activeTab={activeUtilityTab}
                 onActiveTabChange={setActiveUtilityTab}
               />

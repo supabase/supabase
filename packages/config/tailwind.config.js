@@ -183,6 +183,9 @@ const uiConfig = ui({
             p: {
               fontWeight: '400',
             },
+            strong: {
+              fontWeight: '500',
+            },
             pre: {
               background: 'none',
               padding: 0,
@@ -414,6 +417,7 @@ const uiConfig = ui({
       },
       padding: {
         content: '21px',
+        card: 'var(--card-padding-x)',
       },
       // borderRadius: {
       //   lg: `var(--radius)`,

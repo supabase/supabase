@@ -150,8 +150,10 @@ Serverside-poolers, such as Supabase's [Supavisor](https://github.com/supabase/s
     light:
       '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png',
   }}
+  width={1851}
+  height={907}
   caption="Connecting to the database directly vs using a Connection Pooler"
-  zoomable
+
 />
 
 They maintain hot connections with the database and intelligently share them with clients only when needed, maximizing the amount of queries a single connection can service. They're best used to manage queries from auto-scaling systems, such as edge and serverless functions.
@@ -304,5 +306,7 @@ You can follow the decision flow in the connection method diagram to quickly cho
     light: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree-light.svg',
   }}
   caption="Choosing between direct Postgres connections and connection pooling"
-  zoomable
+  width={291}
+  height={150}
+
 />

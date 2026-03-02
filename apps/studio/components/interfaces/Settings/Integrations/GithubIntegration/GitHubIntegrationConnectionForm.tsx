@@ -1,11 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { IS_PLATFORM } from 'common'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
@@ -20,9 +14,17 @@ import type { GitHubConnection } from 'data/integrations/integrations.types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
+import { ChevronDown, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -44,8 +46,10 @@ import {
   PopoverTrigger_Shadcn_,
   Switch,
 } from 'ui'
+import { InlineLink } from 'components/ui/InlineLink'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -204,7 +208,7 @@ const GitHubIntegrationConnectionForm = ({
       new_branch_per_pr: true,
       supabaseDirectory: '.',
       supabaseChangesOnly: true,
-      branchLimit: '50',
+      branchLimit: '3',
     },
   })
 
@@ -343,7 +347,7 @@ const GitHubIntegrationConnectionForm = ({
         new_branch_per_pr: true,
         supabaseDirectory: '.',
         supabaseChangesOnly: true,
-        branchLimit: '50',
+        branchLimit: '3',
       })
     } catch (error) {
       console.error('Error removing integration:', error)
@@ -626,6 +630,18 @@ const GitHubIntegrationConnectionForm = ({
               </div>
             </CardContent>
             <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
+              <Alert_Shadcn_ variant="warning" className="mb-4">
+                <AlertTitle_Shadcn_>Branching and billing</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Branching Compute is not covered by your organization&apos;s Spend Cap. Costs
+                  should be closely monitored, as they may be incurred.{' '}
+                  <InlineLink
+                    href={`${DOCS_URL}/guides/platform/cost-control#usage-items-not-covered-by-the-spend-cap`}
+                  >
+                    Learn more
+                  </InlineLink>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
               {/* Automatic Branching Section */}
               <div className="space-y-4">
                 <FormField_Shadcn_

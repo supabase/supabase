@@ -27,6 +27,8 @@ type UseCronJobsDataParams = ConnectionVars & {
 
 interface CronJobsGridState {
   rows: Array<CronJob>
+  queryCost?: number
+  isSuccess: boolean
   isLoading: boolean
   error: ResponseError | null
   isRefetching: boolean
@@ -63,6 +65,7 @@ export function useCronJobsData({
   const {
     data: cronJobsData,
     error: cronJobsError,
+    isSuccess: isCronJobsSuccess,
     isLoading: isCronJobsLoading,
     isRefetching: isCronJobsRefetching,
     isFetchingNextPage,
@@ -81,6 +84,7 @@ export function useCronJobsData({
   const {
     data: cronJobsMinimalData,
     error: cronJobsMinimalError,
+    isSuccess: isCronJobsMinimalSuccess,
     isLoading: isCronJobsMinimalLoading,
     isRefetching: isCronJobsMinimalRefetching,
     isFetchingNextPage: isFetchingNextPageMinimal,
@@ -127,7 +131,9 @@ export function useCronJobsData({
   return {
     grid: {
       rows: cronJobs,
+      queryCost: cronJobsError?.metadata?.cost,
       error: useMinimalQuery ? cronJobsMinimalError : cronJobsError,
+      isSuccess: useMinimalQuery ? isCronJobsMinimalSuccess : isCronJobsSuccess,
       isLoading: useMinimalQuery ? isCronJobsMinimalLoading : isCronJobsLoading,
       isRefetching: useMinimalQuery ? isCronJobsMinimalRefetching : isCronJobsRefetching,
       isFetchingNextPage: useMinimalQuery ? isFetchingNextPageMinimal : isFetchingNextPage,

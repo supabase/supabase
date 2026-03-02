@@ -1,24 +1,25 @@
+import { ACCESS_TOKEN_RESOURCES } from 'components/interfaces/Account/AccessTokens/AccessToken.constants'
+import { Key, Plus } from 'lucide-react'
 import { Path, PathValue } from 'react-hook-form'
 import {
   Button,
+  Checkbox_Shadcn_,
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Checkbox_Shadcn_,
 } from 'ui'
-import { Plus, Key } from 'lucide-react'
-import { ACCESS_TOKEN_RESOURCES } from '../../../AccessToken.constants'
+
 import {
   PermissionResource,
+  PermissionResourceSelectorProps,
   PermissionRow,
   PermissionsFormValues,
-  PermissionResourceSelectorProps,
 } from './Permissions.types'
 import { togglePermissionResource } from './Permissions.utils'
 
