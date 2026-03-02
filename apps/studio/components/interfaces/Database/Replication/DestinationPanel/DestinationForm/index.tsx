@@ -39,8 +39,11 @@ import {
 import { Button, DialogSectionSeparator, Form_Shadcn_, SheetFooter, SheetSection } from 'ui'
 import * as z from 'zod'
 
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+} from '../../useIsETLPrivateAlpha'
 import { DestinationType } from '../DestinationPanel.types'
-import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { AdvancedSettings } from './AdvancedSettings'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
