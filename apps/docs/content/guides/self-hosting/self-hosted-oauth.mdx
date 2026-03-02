@@ -56,7 +56,7 @@ The default `.env.example` and `docker-compose.yml` include commented-out placeh
 2. Set the **authorized redirect URL**, e.g., `https://<your-domain>/auth/v1/callback`
 3. Copy the **client ID** and **client secret** into your `.env` file.
 
-### Step 2: Uncomment and configure variables in the `.env` file
+### Step 2: Configure variables in the `.env` file
 
 Uncomment the lines for your provider in `.env` and add your client ID and secret, e.g., for Google:
 
@@ -66,7 +66,7 @@ GOOGLE_CLIENT_ID=your-client-id
 GOOGLE_SECRET=your-client-secret
 ```
 
-### Step 3: Uncomment the matching lines in `docker-compose.yml`
+### Step 3: Enable the matching lines in `docker-compose.yml`
 
 Uncomment the corresponding `GOTRUE_EXTERNAL_` lines in the `auth` service's `environment`:
 
@@ -85,7 +85,7 @@ For providers **not** pre-configured in the files (see the [full provider list](
 
 ### Step 4: Restart the auth service
 
-```
+```sh
 docker compose up -d --force-recreate --no-deps auth
 ```
 
@@ -93,7 +93,7 @@ docker compose up -d --force-recreate --no-deps auth
 
 Check that the provider is enabled:
 
-```
+```sh
 curl https://<your-domain>/auth/v1/settings
 ```
 
@@ -266,7 +266,7 @@ Apple uses `response_mode=form_post` for its OAuth flow. The Auth service handle
 
 **`.env` variables:**
 
-```bash
+```
 KEYCLOAK_ENABLED=true
 KEYCLOAK_CLIENT_ID=supabase
 KEYCLOAK_SECRET=your-keycloak-client-secret
@@ -342,7 +342,7 @@ You can test OAuth with the following minimal HTML page:
   <pre id="result"></pre>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://supabase.example.com'
+    const SUPABASE_URL = 'https://<your-domain>.example.com'
     const SUPABASE_ANON_KEY = 'your-anon-key'
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     async function login() {
@@ -424,7 +424,7 @@ All OAuth-related environment variables for the `auth` service in `docker-compos
 | `GOTRUE_EXTERNAL_*_REDIRECT_URI` | Callback URL: `${API_EXTERNAL_URL}/auth/v1/callback` | Yes |
 | `GOTRUE_SITE_URL` | Default redirect URL after authentication (set via `SITE_URL` in `.env`) | Yes |
 
-### Additional resources
+## Additional resources
 
 - [Redirect URLs](/docs/guides/auth/redirect-urls)
 - [Auth server on GitHub](https://github.com/supabase/auth) (check README and `example.env`)

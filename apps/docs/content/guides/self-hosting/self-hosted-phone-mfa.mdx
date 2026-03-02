@@ -55,13 +55,13 @@ GOTRUE_SMS_TWILIO_MESSAGE_SERVICE_SID: ${SMS_TWILIO_MESSAGE_SERVICE_SID}
 
 ### Step 3: Restart the auth service
 
-```
+```sh
 docker compose up -d --force-recreate --no-deps auth
 ```
 
 ### Step 4: Verify
 
-```
+```sh
 docker compose exec auth env | grep GOTRUE_SMS
 ```
 
@@ -173,7 +173,7 @@ SMS_OTP_EXP=300
 
 Ensure `GOTRUE_SMS_OTP_EXP: ${SMS_OTP_EXP}` is uncommented in `docker-compose.yml`, then restart:
 
-```
+```sh
 docker compose up -d --force-recreate --no-deps auth
 ```
 
@@ -181,13 +181,13 @@ docker compose up -d --force-recreate --no-deps auth
 
 Check the auth container logs for errors:
 
-```
+```sh
 docker compose logs auth --tail 50
 ```
 
 Verify provider credentials reach the container:
 
-```
+```sh
 docker compose exec auth env | grep GOTRUE_SMS
 ```
 
@@ -200,13 +200,13 @@ Common causes:
 
 Configuration variables from `.env` are **not** automatically available inside the container unless there's a matching passthrough definition in `docker-compose.yml`. Check, e.g., for:
 
-```
+```sh
 docker compose exec auth env | grep -E 'GOTRUE_SMS|GOTRUE_MFA'
 ```
 
 After changing the configuration environment variables, recreate the Auth service container:
 
-```
+```sh
 docker compose up -d --force-recreate --no-deps auth
 ```
 
