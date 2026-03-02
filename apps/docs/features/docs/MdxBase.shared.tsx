@@ -96,6 +96,13 @@ const components = {
     </Heading>
   ),
   pre: CodeBlock,
+  /**
+   * Force inline code tags to go sync, this prevents Heading anchor resolution fail due to
+   * our CodeBlock component being async. We need to find a better solution for more future
+   * proof MDX rendering. Definitely improving the anchors utility in the ui/Heading component
+   * plus having a more resilient highlighting strategy.
+   */
+  code: (props: any) => <code {...props}>{props.children}</code>,
   Price,
 }
 
