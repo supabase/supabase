@@ -9,6 +9,7 @@ import { number, object } from 'yup'
 import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -45,7 +46,10 @@ const DiskSizeConfigurationModal = ({
   const { data: projectSubscriptionData, isPending: isLoadingSubscription } =
     useOrgSubscriptionQuery({ orgSlug: organization?.slug }, { enabled: visible })
 
-  const isLoading = isLoadingProject || isLoadingSubscription
+  const { hasAccess: hasAccessToDiskModifications, isLoading: isLoadingDiskEntitlement } =
+    useCheckEntitlements('instances.disk_modifications')
+
+  const isLoading = isLoadingProject || isLoadingDiskEntitlement
 
   const timeTillNextAvailableDatabaseResize =
     lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
@@ -101,7 +105,7 @@ const DiskSizeConfigurationModal = ({
           <ShimmeringLoader />
           <ShimmeringLoader />
         </div>
-      ) : projectSubscriptionData?.usage_billing_enabled === true ? (
+      ) : hasAccessToDiskModifications ? (
         <Form
           name="disk-resize-form"
           initialValues={INITIAL_VALUES}
@@ -186,12 +190,12 @@ const DiskSizeConfigurationModal = ({
         <Alert_Shadcn_ className="border-none">
           <InfoIcon />
           <AlertTitle_Shadcn_>
-            {projectSubscriptionData?.plan?.id === 'free'
+            {hasAccessToDiskModifications === false
               ? 'Disk size configuration is not available for projects on the Free Plan'
               : 'Disk size configuration is only available when the spend cap has been disabled'}
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
-            {projectSubscriptionData?.plan?.id === 'free' ? (
+            {hasAccessToDiskModifications === false ?(
               <p>
                 If you are intending to use more than 500MB of disk space, then you will need to
                 upgrade to at least the Pro Plan.
@@ -205,11 +209,11 @@ const DiskSizeConfigurationModal = ({
             <Button asChild type="default" className="mt-3">
               <Link
                 href={`/org/${organization?.slug}/billing?panel=${
-                  projectSubscriptionData?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                  hasAccessToDiskModifications === false ? 'subscriptionPlan' : 'costControl'
                 }`}
                 target="_blank"
               >
-                {projectSubscriptionData?.plan?.id === 'free'
+                {hasAccessToDiskModifications === false
                   ? 'Upgrade subscription'
                   : 'Disable spend cap'}
               </Link>
