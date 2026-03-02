@@ -67,6 +67,7 @@ export const SpreadsheetImport = ({
   })
   const [errors, setErrors] = useState<any>([])
   const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
+  const [treatEmptyAsNull, setTreatEmptyAsNull] = useState(false)
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -89,7 +90,8 @@ export const SpreadsheetImport = ({
 
       const { headers, rowCount, columnTypeMap, errors, previewRows } = await parseSpreadsheet(
         file,
-        onProgressUpdate
+        onProgressUpdate,
+        treatEmptyAsNull
       )
 
       if (errors.length > 0) {
@@ -100,7 +102,7 @@ export const SpreadsheetImport = ({
       setSelectedHeaders(headers)
       setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
     },
-    [updateEditorDirty]
+    [updateEditorDirty, treatEmptyAsNull]
   )
 
   // Handle file upload events from file input
@@ -124,9 +126,9 @@ export const SpreadsheetImport = ({
     updateEditorDirty(false)
   }, [updateEditorDirty])
 
-  const readSpreadsheetText = async (text: string) => {
+  const readSpreadsheetText = async (text: string, emptyAsNull = treatEmptyAsNull) => {
     if (text.length > 0) {
-      const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(text)
+      const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(text, emptyAsNull)
       if (errors.length > 0) {
         toast.error(csvParseErrorMessage)
       }
@@ -172,6 +174,12 @@ export const SpreadsheetImport = ({
       })
     }
   }
+
+  useEffect(() => {
+    if (uploadedFile !== undefined) processFile(uploadedFile)
+    else if (input.length > 0) readSpreadsheetText(input, treatEmptyAsNull)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [treatEmptyAsNull])
 
   useEffect(() => {
     if (visiblityChanged && visible) {
@@ -240,6 +248,8 @@ export const SpreadsheetImport = ({
             spreadsheetData={spreadsheetData}
             selectedHeaders={selectedHeaders}
             onToggleHeader={onToggleHeader}
+            treatEmptyAsNull={treatEmptyAsNull}
+            onToggleTreatEmptyAsNull={() => setTreatEmptyAsNull((prev) => !prev)}
           />
           <SidePanel.Separator />
           <SpreadsheetImportPreview

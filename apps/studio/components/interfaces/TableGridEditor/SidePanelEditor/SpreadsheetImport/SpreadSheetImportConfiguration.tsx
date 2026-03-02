@@ -1,19 +1,23 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 
-import { Button, cn, Collapsible, SidePanel } from 'ui'
+import { Button, Checkbox_Shadcn_, cn, Collapsible, Label_Shadcn_, SidePanel } from 'ui'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 
 interface SpreadSheetImportConfigurationProps {
   spreadsheetData: SpreadsheetData
   selectedHeaders: string[]
   onToggleHeader: (header: string) => void
+  treatEmptyAsNull: boolean
+  onToggleTreatEmptyAsNull: () => void
 }
 
 const SpreadsheetImportConfiguration = ({
   spreadsheetData,
   selectedHeaders,
   onToggleHeader,
+  treatEmptyAsNull,
+  onToggleTreatEmptyAsNull,
 }: SpreadSheetImportConfigurationProps) => {
   const [expandConfiguration, setExpandConfiguration] = useState(false)
 
@@ -46,6 +50,16 @@ const SpreadsheetImportConfiguration = ({
               <p className="text-sm text-foreground-light">
                 By default, all columns are selected to be imported from your CSV
               </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox_Shadcn_
+                id="treat-empty-as-null"
+                checked={treatEmptyAsNull}
+                onCheckedChange={onToggleTreatEmptyAsNull}
+              />
+              <Label_Shadcn_ htmlFor="treat-empty-as-null" className="text-sm text-foreground-light cursor-pointer">
+                Treat empty cells as <code className="text-xs">NULL</code>
+              </Label_Shadcn_>
             </div>
             <div className="flex items-center flex-wrap gap-2 pl-0.5 pb-0.5">
               {spreadsheetData.headers.map((header) => {
