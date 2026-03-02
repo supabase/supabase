@@ -195,7 +195,7 @@ const DiskSizeConfigurationModal = ({
               : 'Disk size configuration is only available when the spend cap has been disabled'}
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
-            {hasAccessToDiskModifications === false ?(
+            {hasAccessToDiskModifications === false ? (
               <p>
                 If you are intending to use more than 500MB of disk space, then you will need to
                 upgrade to at least the Pro Plan.
