@@ -81,6 +81,21 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
         </>
       )
 
+    case 'scalekit':
+      return (
+        <>
+          Allow users to use Supabase with ScaleKit. Additional setup may be required. You can read
+          more in the{' '}
+          <a
+            className="hover:decoration-brand underline hover:text-foreground transition"
+            href={`${DOCS_URL}/guides/auth`}
+          >
+            documentation
+          </a>
+          .
+        </>
+      )
+
     case 'workos':
       return (
         <>
@@ -156,6 +171,14 @@ export const IntegrationTypeContent = ({
       return (
         <div className="text-sm flex flex-row gap-x-4">
           <span className="text-foreground-light w-36">Domain</span>
+          <span className="text-foreground">{integration?.oidc_issuer_url ?? ''}</span>
+        </div>
+      )
+
+    case 'scalekit':
+      return (
+        <div className="text-sm flex flex-row gap-x-4">
+          <span className="text-foreground-light w-36">Issuer URL</span>
           <span className="text-foreground">{integration?.oidc_issuer_url ?? ''}</span>
         </div>
       )

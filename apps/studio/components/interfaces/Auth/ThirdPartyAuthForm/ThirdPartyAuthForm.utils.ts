@@ -6,6 +6,7 @@ export const INTEGRATION_TYPES = [
   'auth0',
   'awsCognito',
   'clerk',
+  'scalekit',
   'workos',
   'custom',
 ] as const
@@ -36,6 +37,13 @@ export const getIntegrationType = (integration?: ThirdPartyAuthIntegration): INT
     return 'clerk'
   }
 
+  if (
+    integration?.oidc_issuer_url?.includes('scalekit') ||
+    integration?.oidc_issuer_url?.includes('scale-kit')
+  ) {
+    return 'scalekit'
+  }
+
   return 'custom'
 }
 
@@ -49,6 +57,8 @@ export const getIntegrationTypeLabel = (type: INTEGRATION_TYPES) => {
       return 'Amazon Cognito'
     case 'clerk':
       return 'Clerk'
+    case 'scalekit':
+      return 'ScaleKit'
     case 'workos':
       return 'WorkOS'
     case 'custom':
@@ -67,6 +77,8 @@ export const getIntegrationTypeIcon = (type: INTEGRATION_TYPES) => {
       return `${BASE_PATH}/img/icons/cognito-icon.svg`
     case 'clerk':
       return `${BASE_PATH}/img/icons/clerk-icon.svg`
+    case 'scalekit':
+      return `${BASE_PATH}/img/icons/scalekit-icon.svg`
     case 'workos':
       return `${BASE_PATH}/img/icons/workos-icon.svg`
 
