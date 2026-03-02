@@ -15,7 +15,7 @@
     "@supabase/supabase-js": "^2.38.2",
     "expo": "~51.0.8",
     "expo-constants": "~16.0.1",
-    "expo-dev-client": "~4.0.14",
+    "expo-dev-client": "~55.0.10",
     "expo-device": "~6.0.2",
     "expo-notifications": "~0.28.3",
     "expo-status-bar": "~1.12.1",
