@@ -19,7 +19,7 @@ import {
   createSQLPolicy,
 } from '../Policies.utils'
 import PolicyEditor from '../PolicyEditor'
-import PolicyReview from '../PolicyReview'
+import { PolicyReview } from '../PolicyReview'
 import PolicySelection from '../PolicySelection'
 import PolicyTemplates from '../PolicyTemplates'
 import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
