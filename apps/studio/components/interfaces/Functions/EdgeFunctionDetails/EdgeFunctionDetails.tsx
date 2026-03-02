@@ -48,12 +48,12 @@ import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 import AlertError from '@/components/ui/AlertError'
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
 import { DOCS_URL } from '@/lib/constants'
 
 const FormSchema = z.object({

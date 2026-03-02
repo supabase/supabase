@@ -22,7 +22,7 @@ import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']

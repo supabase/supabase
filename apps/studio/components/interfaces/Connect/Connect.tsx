@@ -34,7 +34,7 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 export const Connect = () => {
   const router = useRouter()

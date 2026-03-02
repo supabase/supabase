@@ -12,7 +12,7 @@ import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user'] as const
 const EMPTY_CONNECTION_INFO = {

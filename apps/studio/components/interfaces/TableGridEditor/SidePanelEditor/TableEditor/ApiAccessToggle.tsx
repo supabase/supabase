@@ -27,8 +27,8 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import {
   API_ACCESS_ROLES,

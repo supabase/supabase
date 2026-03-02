@@ -20,7 +20,7 @@ import { UserManagement } from './Content/UserManagement'
 import { FirstLevelNav } from './FirstLevelNav'
 import LanguageSelector from './LanguageSelector'
 import { SecondLevelNav } from './SecondLevelNav'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 /**
  * [Joshen] Reminder: when we choose to release this as a main feature

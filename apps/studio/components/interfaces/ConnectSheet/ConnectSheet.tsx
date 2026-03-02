@@ -10,8 +10,8 @@ import type { ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useConnectState } from './useConnectState'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
 
 export const ConnectSheet = () => {
   const { ref: projectRef } = useParams()

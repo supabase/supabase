@@ -7,8 +7,8 @@ import { useState } from 'react'
 import { copyToClipboard, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { EdgeFunctionsResponse } from '@/data/edge-functions/edge-functions-query'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
 import { createNavigationHandler } from '@/lib/navigation'
 
 interface EdgeFunctionsListItemProps {

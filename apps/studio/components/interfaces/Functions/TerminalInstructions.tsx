@@ -17,7 +17,7 @@ import {
 } from 'ui'
 
 import type { Commands } from './Functions.types'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
   closable?: boolean

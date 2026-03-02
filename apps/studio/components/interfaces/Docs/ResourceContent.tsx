@@ -7,9 +7,9 @@ import Description from '@/components/interfaces/Docs/Description'
 import Param from '@/components/interfaces/Docs/Param'
 import Snippets from '@/components/interfaces/Docs/Snippets'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ResourceContentProps {

@@ -6,7 +6,7 @@ import { copyToClipboard } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { fetchFileUrl } from './useFetchFileUrlQuery'
-import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 export const useCopyUrl = () => {
   const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
