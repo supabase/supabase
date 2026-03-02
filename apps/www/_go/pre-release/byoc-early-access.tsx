@@ -26,8 +26,7 @@ const page: GoPageInput = {
     {
       type: 'feature-grid',
       title: 'Your cloud, operated by Supabase',
-      description:
-        'Get the full power of Supabase deployed inside your own infrastructure.',
+      description: 'Get the full power of Supabase deployed inside your own infrastructure.',
       items: [
         {
           title: 'Control where your data goes',
