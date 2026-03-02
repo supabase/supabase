@@ -783,6 +783,31 @@ export const QueryInsightsTable = ({
     <div className="flex flex-col flex-1 min-h-0">
       <div className="overflow-x-auto flex-shrink-0 bg-surface-100 border-b">
         <div className="flex items-center justify-between px-6 h-10 min-w-max">
+          <div className="flex items-center gap-x-1.5">
+            <TwoOptionToggle
+              width={75}
+              options={['explorer', 'triage']}
+              activeOption={mode}
+              borderOverride="border"
+              onClickOption={setMode}
+            />
+            <ButtonTooltip
+              tooltip={{
+                content: {
+                  text: showIntrospection ? 'Hide system queries' : 'Show system queries',
+                },
+              }}
+              type={showIntrospection ? 'default' : 'outline'}
+              size="tiny"
+              className={cn(
+                'w-[26px] h-[26px] !p-0',
+                showIntrospection ? 'bg-surface-300' : 'border-dashed'
+              )}
+              icon={showIntrospection ? <Eye size={14} /> : <EyeOff size={14} />}
+              onClick={onToggleIntrospection}
+            />
+          </div>
+
           <div className="flex items-center">
             {mode === 'triage' ? (
               <Tabs_Shadcn_ value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
@@ -838,31 +863,6 @@ export const QueryInsightsTable = ({
                 ]}
               />
             )}
-          </div>
-
-          <div className="flex items-center gap-x-1.5">
-            <ButtonTooltip
-              tooltip={{
-                content: {
-                  text: showIntrospection ? 'Hide system queries' : 'Show system queries',
-                },
-              }}
-              type={showIntrospection ? 'default' : 'outline'}
-              size="tiny"
-              className={cn(
-                'w-[26px] h-[26px] !p-0',
-                showIntrospection ? 'bg-surface-300' : 'border-dashed'
-              )}
-              icon={showIntrospection ? <Eye size={14} /> : <EyeOff size={14} />}
-              onClick={onToggleIntrospection}
-            />
-            <TwoOptionToggle
-              width={75}
-              options={['explorer', 'triage']}
-              activeOption={mode}
-              borderOverride="border"
-              onClickOption={setMode}
-            />
           </div>
         </div>
       </div>
