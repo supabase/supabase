@@ -16,7 +16,7 @@ import {
 
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
-export const parseSpreadsheetText: any = (text: string) => {
+export const parseSpreadsheetText: any = (text: string, treatEmptyAsNull = false) => {
   const columnTypeMap: Record<any, any> = {}
   let previewRows: any[] = []
   return new Promise((resolve) => {
@@ -24,6 +24,7 @@ export const parseSpreadsheetText: any = (text: string) => {
       header: true,
       dynamicTyping: false,
       skipEmptyLines: true,
+      transform: treatEmptyAsNull ? (value: string) => (value === '' ? null : value) : undefined,
       complete: (results) => {
         const headers = results.meta.fields || []
         const rows = results.data
@@ -52,7 +53,8 @@ export const parseSpreadsheetText: any = (text: string) => {
  */
 export const parseSpreadsheet = (
   file: File,
-  onProgressUpdate: (progress: number) => void
+  onProgressUpdate: (progress: number) => void,
+  treatEmptyAsNull = false
 ): Promise<any> => {
   let headers: string[] = []
   let chunkNumber = 0
@@ -70,6 +72,7 @@ export const parseSpreadsheet = (
       worker: true,
       quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
       chunkSize: CHUNK_SIZE,
+      transform: treatEmptyAsNull ? (value: string) => (value === '' ? null : value) : undefined,
       chunk: (results) => {
         headers = results.meta.fields as string[]
 
