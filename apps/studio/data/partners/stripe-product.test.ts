@@ -38,7 +38,7 @@ describe('stripe product', () => {
       const result = await getAccountRequest('ar_123')
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `https://api.supabase.io/partners/stripe/product/provisioning/account_requests/ar_123`,
+        `https://api.supabase.io/platform/stripe/product/provisioning/account_requests/ar_123`,
         expect.objectContaining({ headers: expect.any(Headers) })
       )
       expect(result).toEqual(mockBody)
@@ -84,7 +84,7 @@ describe('stripe product', () => {
       await getAccountRequest('../evil')
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `https://api.supabase.io/partners/stripe/product/provisioning/account_requests/..%2Fevil`,
+        `https://api.supabase.io/platform/stripe/product/provisioning/account_requests/..%2Fevil`,
         expect.objectContaining({ headers: expect.any(Headers) })
       )
     })
@@ -107,7 +107,7 @@ describe('stripe product', () => {
       const result = await confirmAccountRequest('ar_123')
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `https://api.supabase.io/partners/stripe/product/provisioning/account_requests/ar_123/confirm`,
+        `https://api.supabase.io/platform/stripe/product/provisioning/account_requests/ar_123/confirm`,
         expect.objectContaining({
           method: 'POST',
           headers: mockHeaders,

@@ -20,7 +20,7 @@ export async function getAccountRequest(arId: string): Promise<AccountRequestDet
   const safeArId = encodeURIComponent(arId)
   const headers = await constructHeaders()
   const response = await fetchHandler(
-    `${BASE_API_URL}/partners/stripe/product/provisioning/account_requests/${safeArId}`,
+    `${BASE_API_URL}/platform/stripe/product/provisioning/account_requests/${safeArId}`,
     { headers }
   )
 
@@ -40,7 +40,7 @@ export async function confirmAccountRequest(
   headers.set('Content-Type', 'application/json')
 
   const response = await fetchHandler(
-    `${BASE_API_URL}/partners/stripe/product/provisioning/account_requests/${safeArId}/confirm`,
+    `${BASE_API_URL}/platform/stripe/product/provisioning/account_requests/${safeArId}/confirm`,
     {
       method: 'POST',
       headers,
