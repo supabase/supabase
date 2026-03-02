@@ -7,13 +7,13 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { useMemo } from 'react'
+import { parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
 import { INTEGRATIONS } from './Integrations.constants'
 import {
   isInstalled as checkIsInstalled,
   findStripeSchema,
-  parseStripeSchema,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 
 export const useInstalledIntegrations = () => {
@@ -86,7 +86,7 @@ export const useInstalledIntegrations = () => {
         }
         if (integration.id === 'stripe_sync_engine') {
           const stripeSchema = findStripeSchema(schemas)
-          const parsedSchema = parseStripeSchema(stripeSchema)
+          const parsedSchema = parseSchemaComment(stripeSchema?.comment)
           return checkIsInstalled(parsedSchema.status)
         }
         if (integration.type === 'wrapper') {

@@ -10,11 +10,11 @@ import {
   isInstalling,
   isUninstallDone,
   isUninstalling,
-  StripeInstallationStatus,
+  SchemaInstallationStatus,
 } from './stripe-sync-status'
 
 type StripeSyncChangesCardProps = {
-  installationStatus: StripeInstallationStatus
+  installationStatus: SchemaInstallationStatus
   className?: string
 }
 

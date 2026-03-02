@@ -1,12 +1,12 @@
 import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
 import { SchemasVariables, useSchemasQuery } from 'data/database/schemas-query'
 import { useEffect } from 'react'
+import { parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import {
   findStripeSchema,
   isInProgress,
   isInstalled,
-  parseStripeSchema,
   type StripeSyncStatusResult,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 
@@ -30,10 +30,10 @@ export function useStripeSyncStatus({
 
   // Find and parse stripe schema status
   const stripeSchema = findStripeSchema(schemas)
-  const parsedSchema = parseStripeSchema(stripeSchema)
+  const schemaComment = parseSchemaComment(stripeSchema?.comment)
 
-  const installed = isInstalled(parsedSchema.status)
-  const inProgress = isInProgress(parsedSchema.status)
+  const installed = isInstalled(schemaComment.status)
+  const inProgress = isInProgress(schemaComment.status)
 
   // Poll schemas during install/uninstall operations
   useEffect(() => {
@@ -58,7 +58,7 @@ export function useStripeSyncStatus({
   )
 
   return {
-    parsedSchema,
+    schemaComment,
     syncState: installed ? syncState : undefined,
     isLoading: isSchemasLoading,
   }

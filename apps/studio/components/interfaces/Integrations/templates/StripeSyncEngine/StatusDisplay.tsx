@@ -6,7 +6,7 @@ import {
   isInstalled,
   isInstalling,
   isUninstalling,
-  StripeInstallationStatus,
+  SchemaInstallationStatus,
 } from './stripe-sync-status'
 
 export const StatusDisplay = ({
@@ -14,7 +14,7 @@ export const StatusDisplay = ({
   isInstallRequested,
   isUninstallRequested,
 }: {
-  status: StripeInstallationStatus
+  status: SchemaInstallationStatus
   isInstallRequested: boolean
   isUninstallRequested: boolean
 }) => {

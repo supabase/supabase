@@ -23,7 +23,7 @@ export const StripeSyncSettingsPage = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const {
-    parsedSchema: { status: installationStatus },
+    schemaComment: { status: installationStatus },
     syncState,
     isLoading: isLoadingInstallationStatus,
   } = useStripeSyncStatus({
