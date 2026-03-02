@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   test:
+    name: 'Selfhosted Studio E2E Tests - Tests'
     timeout-minutes: 60
     runs-on: blacksmith-4vcpu-ubuntu-2404
     strategy:
@@ -97,6 +98,7 @@ jobs:
           exit 1
 
   merge-reports:
+    name: 'Selfhosted Studio E2E Tests - Merge reports'
     # Merge reports after playwright-tests, even if some shards have failed
     if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
     needs: [test]
