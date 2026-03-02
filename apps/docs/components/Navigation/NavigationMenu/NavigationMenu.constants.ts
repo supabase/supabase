@@ -1,8 +1,9 @@
-import type { ComponentProps } from 'react'
 // End of third-party imports
 
 import { isFeatureEnabled } from 'common/enabled-features'
+import type { ComponentProps } from 'react'
 import type { IconPanel } from 'ui-patterns/IconPanel'
+
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
 const {
@@ -2841,7 +2842,10 @@ export const self_hosting: NavMenuConstant = {
       name: 'How-to Guides',
       items: [
         { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
-        { name: 'Add Reverse Proxy with HTTPS', url: '/guides/self-hosting/self-hosted-proxy-https' },
+        {
+          name: 'Add Reverse Proxy with HTTPS',
+          url: '/guides/self-hosting/self-hosted-proxy-https',
+        },
         { name: 'Restore from Platform', url: '/guides/self-hosting/restore-from-platform' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
