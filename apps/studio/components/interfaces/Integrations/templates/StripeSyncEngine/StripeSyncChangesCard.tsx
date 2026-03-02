@@ -92,13 +92,13 @@ export const StripeSyncChangesCard = ({
         <CardContent className="p-0">
           <ul className="text-foreground-light text-sm">
             <li className={ListItemClassName}>
-              <Table size={16} strokeWidth={1.5} className="text-foreground-muted shrink-0" />
+              <Table size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
               <span>
                 {dbLine} <code className="text-code-inline">stripe</code>
               </span>
             </li>
             <li className={ListItemClassName}>
-              <Table size={16} strokeWidth={1.5} className="text-foreground-muted shrink-0" />
+              <Table size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
               <span>
                 {tableAndViewLine} <code className="text-code-inline">stripe</code> schema for
                 synced Stripe data
@@ -108,12 +108,12 @@ export const StripeSyncChangesCard = ({
               <EdgeFunctions
                 size={16}
                 strokeWidth={1.5}
-                className="text-foreground-muted shrink-0"
+                className="text-foreground-lighter shrink-0"
               />
               <span>{edgeFunctionsLine}</span>
             </li>
             <li className="flex items-center gap-x-3 py-2 px-3">
-              <Layers size={16} strokeWidth={1.5} className="text-foreground-muted shrink-0" />
+              <Layers size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
               <span>{scheduleLine}</span>
             </li>
           </ul>

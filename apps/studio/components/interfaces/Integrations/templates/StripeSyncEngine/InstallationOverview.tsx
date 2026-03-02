@@ -7,9 +7,9 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTrack } from 'lib/telemetry/track'
-import { AlertCircle, Check, ExternalLink, RefreshCwIcon } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -31,6 +31,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
+import { InstallationError } from './InstallationError'
+import { StatusDisplay } from './StatusDisplay'
 import {
   canInstall as checkCanInstall,
   hasInstallError,
@@ -38,13 +40,13 @@ import {
   isInstallDone,
   isInstalled,
   isInstalling,
-  isSyncRunning,
   isUninstallDone,
   isUninstalling,
 } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
 
 const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
@@ -117,11 +119,21 @@ export const StripeSyncInstallationPage = () => {
   const uninstalling = uninstallInProgress || isUninstallRequested || isUninstallInitiated
   const canInstall = checkCanInstall(installationStatus) && !installed && !installing
 
+  const hasError = (uninstallError || installError) && !uninstalling && !installing
+
   // Poll for schema changes during transitions
   useSchemasQuery(
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { refetchInterval: installing || uninstalling ? 5000 : false }
   )
+
+  const { data: sslEnforcementConfiguration, isSuccess: isSuccessSslEnforcement } =
+    useSSLEnforcementQuery({
+      projectRef: project?.ref,
+    })
+  const isSSLEnforced =
+    sslEnforcementConfiguration?.appliedSuccessfully &&
+    sslEnforcementConfiguration?.currentConfig.database
 
   const handleUninstall = useCallback(() => {
     if (!project?.ref) return
@@ -145,98 +157,6 @@ export const StripeSyncInstallationPage = () => {
       resetInstallError()
     }
   }
-
-  const alert = useMemo(() => {
-    if (uninstallError) {
-      return (
-        <Admonition type="destructive" showIcon={true} title="Uninstallation Error">
-          <div>
-            There was an error during the uninstallation of the Stripe Sync Engine. Please try
-            again. If the problem persists, contact support.
-          </div>
-          <div className="flex gap-2 mt-4">
-            <Button
-              type="warning"
-              onClick={handleUninstall}
-              loading={isUninstallRequested}
-              disabled={isUninstallRequested}
-            >
-              Try Again
-            </Button>
-          </div>
-        </Admonition>
-      )
-    }
-
-    if (installError) {
-      return (
-        <Admonition type="destructive" showIcon={true} title="Installation Error">
-          <div>
-            There was an error during the installation of the Stripe Sync Engine. Please try
-            reinstalling the integration. If the problem persists, contact support.
-          </div>
-          <div className="flex gap-2 mt-4">
-            <Button onClick={handleOpenInstallSheet}>Try Again</Button>
-            <Button
-              type="warning"
-              onClick={handleUninstall}
-              loading={isUninstallRequested}
-              disabled={isUninstallRequested}
-            >
-              Uninstall
-            </Button>
-          </div>
-        </Admonition>
-      )
-    }
-
-    return null
-  }, [uninstallError, installError, isUninstallRequested, handleOpenInstallSheet, handleUninstall])
-
-  const statusDisplay = useMemo(() => {
-    if (uninstallError) {
-      return (
-        <span className="flex items-center gap-2 text-foreground-light text-sm">
-          <AlertCircle size={14} className="text-destructive" />
-          Uninstallation error
-        </span>
-      )
-    }
-    if (uninstalling) {
-      return (
-        <span className="flex items-center gap-2 text-foreground-light text-sm">
-          <RefreshCwIcon size={14} className="animate-spin text-foreground-lighter" />
-          Uninstalling...
-        </span>
-      )
-    }
-    if (installError) {
-      return (
-        <span className="flex items-center gap-2 text-foreground-light text-sm">
-          <AlertCircle size={14} className="text-destructive" />
-          Installation error
-        </span>
-      )
-    }
-    if (installing) {
-      return (
-        <span className="flex items-center gap-2 text-foreground-light text-sm">
-          <RefreshCwIcon size={14} className="animate-spin text-foreground-lighter" />
-          Installing...
-        </span>
-      )
-    }
-    if (installed) {
-      return (
-        <span className="flex items-center gap-2 text-foreground-light text-sm">
-          <Check size={14} strokeWidth={1.5} className="text-brand" /> Installed
-        </span>
-      )
-    }
-    return (
-      <span className="flex items-center gap-2 text-foreground-light text-sm">Not installed</span>
-    )
-  }, [uninstallError, uninstalling, installError, installing, installed])
 
   // Track install failures
   useEffect(() => {
@@ -268,79 +188,100 @@ export const StripeSyncInstallationPage = () => {
   }, [isUninstallInitiated, uninstallDone])
 
   return (
-    <>
-      <IntegrationOverviewTab
-        alert={alert}
-        status={statusDisplay}
-        actions={
-          !installed && !uninstalling && !uninstallError ? (
-            <>
-              <StripeSyncChangesCard installationStatus={installationStatus} />
-              <div className="flex justify-end mt-4">
-                <ButtonTooltip
-                  type="primary"
-                  onClick={() => setShouldShowInstallSheet(true)}
-                  disabled={!canInstall || !canManageSecrets}
-                  loading={installing}
-                  tooltip={{
-                    content: {
-                      text: !canInstall
-                        ? 'Your database already uses a schema named "stripe"'
-                        : !canManageSecrets
-                          ? 'You need additional permissions to install the Stripe Sync Engine.'
-                          : undefined,
-                    },
-                  }}
-                >
-                  Install integration
-                </ButtonTooltip>
-              </div>
-            </>
-          ) : installed || uninstalling || uninstallError ? (
-            <>
-              <StripeSyncChangesCard installationStatus={installationStatus} />
-              <div className="flex justify-end mt-4">
-                <ButtonTooltip
-                  type="default"
-                  onClick={() => setShowUninstallModal(true)}
-                  disabled={!canManageSecrets}
-                  loading={uninstalling}
-                  tooltip={{
-                    content: {
-                      text: !canManageSecrets
-                        ? 'You need additional permissions to uninstall the Stripe Sync Engine.'
+    <IntegrationOverviewTab
+      alert={
+        hasError ? (
+          <InstallationError
+            error={uninstallError ? 'uninstall' : 'install'}
+            handleUninstall={handleUninstall}
+            handleOpenInstallSheet={handleOpenInstallSheet}
+          />
+        ) : null
+      }
+      status={
+        <StatusDisplay
+          status={installationStatus}
+          isInstallRequested={isInstallRequested || isInstallInitiated}
+          isUninstallRequested={isUninstallRequested || isUninstallInitiated}
+        />
+      }
+      actions={
+        !installed && !uninstalling && !uninstallError ? (
+          <>
+            <StripeSyncChangesCard installationStatus={installationStatus} />
+            <div className="flex gap-x-2 justify-end mt-4">
+              <ButtonTooltip
+                type="primary"
+                onClick={() => setShouldShowInstallSheet(true)}
+                disabled={!canInstall || !canManageSecrets}
+                loading={installing}
+                tooltip={{
+                  content: {
+                    text: !canInstall
+                      ? 'Your database already uses a schema named "stripe"'
+                      : !canManageSecrets
+                        ? 'You need additional permissions to install the Stripe Sync Engine.'
                         : undefined,
-                    },
-                  }}
-                >
-                  Uninstall integration
-                </ButtonTooltip>
-              </div>
-            </>
-          ) : null
-        }
-      >
-        <Sheet open={!!shouldShowInstallSheet} onOpenChange={handleCloseInstallSheet}>
-          <SheetContent size="lg" tabIndex={undefined} className="flex flex-col gap-0">
-            <Form_Shadcn_ {...form}>
-              <form
-                id={formId}
-                onSubmit={form.handleSubmit(({ stripeSecretKey }) => {
-                  if (!project?.ref) return
-                  installStripeSync({ projectRef: project.ref, stripeSecretKey })
-                })}
-                className="overflow-auto flex-grow px-0 flex flex-col"
+                  },
+                }}
               >
-                <SheetHeader>
-                  <SheetTitle>Install Stripe Sync Engine</SheetTitle>
-                </SheetHeader>
-                <SheetSection className="flex-1 flex flex-col gap-y-6">
-                  <StripeSyncChangesCard installationStatus={installationStatus} />
+                {installError ? 'Retry installation' : 'Install integration'}
+              </ButtonTooltip>
+              {installError && (
+                <Button type="default" loading={isUninstallRequested} onClick={handleUninstall}>
+                  Uninstall
+                </Button>
+              )}
+            </div>
+          </>
+        ) : installed || uninstalling || uninstallError ? (
+          <>
+            <StripeSyncChangesCard installationStatus={installationStatus} />
+            <div className="flex justify-end mt-4">
+              <ButtonTooltip
+                type="default"
+                onClick={() => setShowUninstallModal(true)}
+                disabled={!canManageSecrets}
+                loading={uninstalling}
+                tooltip={{
+                  content: {
+                    text: !canManageSecrets
+                      ? 'You need additional permissions to uninstall the Stripe Sync Engine.'
+                      : undefined,
+                  },
+                }}
+              >
+                Uninstall integration
+              </ButtonTooltip>
+            </div>
+          </>
+        ) : null
+      }
+    >
+      <Sheet open={!!shouldShowInstallSheet} onOpenChange={handleCloseInstallSheet}>
+        <SheetContent size="lg" tabIndex={undefined} className="flex flex-col gap-0">
+          <Form_Shadcn_ {...form}>
+            <form
+              id={formId}
+              onSubmit={form.handleSubmit(({ stripeSecretKey }) => {
+                if (!project?.ref) return
+                installStripeSync({ projectRef: project.ref, stripeSecretKey })
+              })}
+              className="overflow-auto flex-grow px-0 flex flex-col"
+            >
+              <SheetHeader>
+                <SheetTitle>Install Stripe Sync Engine</SheetTitle>
+              </SheetHeader>
+              <SheetSection className="flex-1 flex flex-col gap-y-6">
+                <StripeSyncChangesCard installationStatus={installationStatus} />
 
+                {isSuccessSslEnforcement && isSSLEnforced && (
                   <Admonition type="warning">
                     <h5 className="mb-0.5">
                       This integration currently requires{' '}
-                      <InlineLink href="https://supabase.com/docs/guides/platform/ssl-enforcement">
+                      <InlineLink
+                        href={`/project/${project?.ref ?? '_'}/database/settings#ssl-configuration`}
+                      >
                         SSL Enforcement
                       </InlineLink>{' '}
                       to be disabled during initial setup.
@@ -350,9 +291,11 @@ export const StripeSyncInstallationPage = () => {
                       all webhook and sync operations use HTTPS/SSL.
                     </p>
                   </Admonition>
+                )}
 
-                  <h3 className="heading-default">Configuration</h3>
+                <h3 className="heading-default">Configuration</h3>
 
+                <div className="flex flex-col gap-y-2">
                   <FormField_Shadcn_
                     control={form.control}
                     name="stripeSecretKey"
@@ -399,65 +342,65 @@ export const StripeSyncInstallationPage = () => {
                       </Link>
                     </Button>
                   </div>
+                </div>
 
-                  {installRequestError && (
-                    <Admonition
-                      type="destructive"
-                      title="Installation failed"
-                      description={installRequestError.message}
-                    />
-                  )}
-                </SheetSection>
+                {installRequestError && (
+                  <Admonition
+                    type="destructive"
+                    title="Installation failed"
+                    description={installRequestError.message}
+                  />
+                )}
+              </SheetSection>
 
-                <SheetFooter>
-                  <Button
-                    type="default"
-                    disabled={isInstallRequested}
-                    onClick={() => handleCloseInstallSheet(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    form={formId}
-                    htmlType="submit"
-                    type="primary"
-                    loading={isInstallRequested}
-                    disabled={!form.formState.isValid || isInstallRequested}
-                  >
-                    {isInstallRequested ? 'Installing' : 'Install'}
-                  </Button>
-                </SheetFooter>
-              </form>
-            </Form_Shadcn_>
-          </SheetContent>
-        </Sheet>
+              <SheetFooter>
+                <Button
+                  type="default"
+                  disabled={isInstallRequested}
+                  onClick={() => handleCloseInstallSheet(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  form={formId}
+                  htmlType="submit"
+                  type="primary"
+                  loading={isInstallRequested}
+                  disabled={!form.formState.isValid || isInstallRequested}
+                >
+                  {isInstallRequested ? 'Installing' : 'Install'}
+                </Button>
+              </SheetFooter>
+            </form>
+          </Form_Shadcn_>
+        </SheetContent>
+      </Sheet>
 
-        <ConfirmationModal
-          visible={showUninstallModal}
-          title="Uninstall Stripe Sync Engine"
-          confirmLabel="Uninstall"
-          confirmLabelLoading="Uninstalling..."
-          variant="destructive"
-          loading={isUninstallRequested}
-          onCancel={() => setShowUninstallModal(false)}
-          onConfirm={handleUninstall}
-        >
-          <p className="text-sm text-foreground-light">
-            Are you sure you want to uninstall the Stripe Sync Engine? This will:
-          </p>
-          <ul className="list-disc pl-5 mt-2 text-sm text-foreground-light space-y-1">
-            <li>
-              Remove the <code className="text-code-inline">stripe</code> schema and all tables
-            </li>
-            <li>Delete all synced Stripe data</li>
-            <li>Remove the associated Edge Functions</li>
-            <li>Remove the scheduled sync jobs</li>
-          </ul>
-          <p className="mt-4 text-sm text-foreground-light font-medium">
-            This action cannot be undone.
-          </p>
-        </ConfirmationModal>
-      </IntegrationOverviewTab>
-    </>
+      <ConfirmationModal
+        visible={showUninstallModal}
+        title="Uninstall Stripe Sync Engine"
+        confirmLabel="Uninstall"
+        confirmLabelLoading="Uninstalling..."
+        variant="destructive"
+        loading={isUninstallRequested}
+        onCancel={() => setShowUninstallModal(false)}
+        onConfirm={handleUninstall}
+      >
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to uninstall the Stripe Sync Engine? This will:
+        </p>
+        <ul className="list-disc pl-5 mt-2 text-sm text-foreground-light space-y-1">
+          <li>
+            Remove the <code className="text-code-inline">stripe</code> schema and all tables
+          </li>
+          <li>Delete all synced Stripe data</li>
+          <li>Remove the associated Edge Functions</li>
+          <li>Remove the scheduled sync jobs</li>
+        </ul>
+        <p className="mt-4 text-sm text-foreground-light font-medium">
+          This action cannot be undone.
+        </p>
+      </ConfirmationModal>
+    </IntegrationOverviewTab>
   )
 }
