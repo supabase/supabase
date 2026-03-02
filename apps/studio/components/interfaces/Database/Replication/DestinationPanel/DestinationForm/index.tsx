@@ -40,6 +40,7 @@ import { Button, DialogSectionSeparator, Form_Shadcn_, SheetFooter, SheetSection
 import * as z from 'zod'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { AdvancedSettings } from './AdvancedSettings'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
@@ -76,8 +77,8 @@ export const DestinationForm = ({
   const { ref: projectRef } = useParams()
   const { setRequestStatus } = usePipelineRequestStatus()
 
-  const etlEnableBigQuery = useFlag('etlEnableBigQuery')
-  const etlEnableIceberg = useFlag('etlEnableIceberg')
+  const etlEnableBigQuery = useFlag('etlEnableBigQuery') || useIsETLBigQueryPrivateAlpha()
+  const etlEnableIceberg = useFlag('etlEnableIceberg') || useIsETLIcebergPrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [isFormInteracting, setIsFormInteracting] = useState(false)

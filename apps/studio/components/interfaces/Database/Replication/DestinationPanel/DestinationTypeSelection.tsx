@@ -1,18 +1,22 @@
 import { useFlag } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
-import { Badge, RadioGroupStacked, RadioGroupStackedItem, cn } from 'ui'
+import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
 import { useDestinationInformation } from '../useDestinationInformation'
-import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+  useIsETLPrivateAlpha,
+} from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
 
 export const DestinationTypeSelection = () => {
   const enablePgReplicate = useIsETLPrivateAlpha()
   const unifiedReplication = useFlag('unifiedReplication')
-  const etlEnableBigQuery = useFlag('etlEnableBigQuery')
-  const etlEnableIceberg = useFlag('etlEnableIceberg')
+  const etlEnableBigQuery = useFlag('etlEnableBigQuery') || useIsETLBigQueryPrivateAlpha()
+  const etlEnableIceberg = useFlag('etlEnableIceberg') || useIsETLIcebergPrivateAlpha()
 
   const numberOfTypes = [unifiedReplication, etlEnableBigQuery, etlEnableIceberg].filter(
     Boolean
