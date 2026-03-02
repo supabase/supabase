@@ -220,6 +220,16 @@ export const QueryInsightsTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheetView, activeSheetRow?.query])
 
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setQueryStates({ search: null })
+      onCurrentSelectQuery?.(null)
+    }
+    router.events.on('routeChangeStart', handleRouteChange)
+    return () => router.events.off('routeChangeStart', handleRouteChange)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const timeConsumedWidth = useMemo(() => {
     if (!explorerItems.length) return 150
     let maxWidth = 150
