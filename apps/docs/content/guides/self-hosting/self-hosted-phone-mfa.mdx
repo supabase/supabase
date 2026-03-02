@@ -192,6 +192,7 @@ docker compose exec auth env | grep GOTRUE_SMS
 ```
 
 Common causes:
+
 - Provider credentials are in `.env` but the matching `GOTRUE_SMS_*` line is still commented out in `docker-compose.yml`
 - Provider credentials are wrong
 - Phone number format is wrong (use E.164 format: `+1234567890`)

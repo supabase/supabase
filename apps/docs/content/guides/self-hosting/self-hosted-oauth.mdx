@@ -125,11 +125,11 @@ The response should include your provider under `external`:
 3. Select **Solutions** > **All products** in the navigation menu on the left
 4. Go to **APIs & services** > **OAuth consent screen** and click **Get started**
 5. Follow the configuration steps and add an **External** app
-3. Go to **APIs & Services** > **Credentials**
-4. Click **Create Credentials** > **OAuth client ID**
-5. Set application type to **Web application**
-6. Under **Authorized redirect URIs**, add: `https://<your-domain>/auth/v1/callback`
-7. Click **Create** and copy the client ID and client secret
+6. Go to **APIs & Services** > **Credentials**
+7. Click **Create Credentials** > **OAuth client ID**
+8. Set application type to **Web application**
+9. Under **Authorized redirect URIs**, add: `https://<your-domain>/auth/v1/callback`
+10. Click **Create** and copy the client ID and client secret
 
 **`.env`:**
 
@@ -157,9 +157,9 @@ GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
 2. Click **New OAuth app**
 3. Fill in **Homepage URL**, e.g., `https://<your-domain>`
-3. Set **Authorization callback URL** to: `https://<your-domain>/auth/v1/callback`
-4. Click **Register application**
-4. Copy the client ID, generate and copy a client secret
+4. Set **Authorization callback URL** to: `https://<your-domain>/auth/v1/callback`
+5. Click **Register application**
+6. Copy the client ID, generate and copy a client secret
 
 **`.env`:**
 
@@ -298,28 +298,28 @@ GOTRUE_EXTERNAL_KEYCLOAK_URL: ${KEYCLOAK_URL}
 
 Supabase Auth supports the following OAuth providers:
 
-| Provider | Env prefix | Additional variables | Docs |
-|----------|-----------|-----------------|------|
-| Apple | `APPLE_` | - | [Login with Apple](/docs/guides/auth/social-login/auth-apple) |
-| Azure (Microsoft) | `AZURE_` | `URL` (tenant URL) | [Login with Azure](/docs/guides/auth/social-login/auth-azure) |
-| Bitbucket | `BITBUCKET_` | - | [Login with Bitbucket](/docs/guides/auth/social-login/auth-bitbucket) |
-| Discord | `DISCORD_` | - | [Login with Discord](/docs/guides/auth/social-login/auth-discord) |
-| Facebook | `FACEBOOK_` | - | [Login with Facebook](/docs/guides/auth/social-login/auth-facebook) |
-| Figma | `FIGMA_` | - | [Login with Figma](/docs/guides/auth/social-login/auth-figma) |
-| GitHub | `GITHUB_` | `URL` (for GitHub Enterprise) | [Login with GitHub](/docs/guides/auth/social-login/auth-github) |
-| GitLab | `GITLAB_` | `URL` (for self-hosted GitLab) | [Login with GitLab](/docs/guides/auth/social-login/auth-gitlab) |
-| Google | `GOOGLE_` | - | [Login with Google](/docs/guides/auth/social-login/auth-google) |
-| Kakao | `KAKAO_` | - | [Login with Kakao](/docs/guides/auth/social-login/auth-kakao) |
-| Keycloak (OIDC) | `KEYCLOAK_` | `URL` (realm URL, **required**) | [Login with Keycloak](/docs/guides/auth/social-login/auth-keycloak) |
-| LinkedIn (OIDC) | `LINKEDIN_OIDC_` | - | [Login with LinkedIn](/docs/guides/auth/social-login/auth-linkedin) |
-| Notion | `NOTION_` | - | [Login with Notion](/docs/guides/auth/social-login/auth-notion) |
-| Slack (OIDC) | `SLACK_OIDC_` | - | [Login with Slack](/docs/guides/auth/social-login/auth-slack) |
-| Snapchat | `SNAPCHAT_` | - | - |
-| Spotify | `SPOTIFY_` | - | [Login with Spotify](/docs/guides/auth/social-login/auth-spotify) |
-| Twitch | `TWITCH_` | - | [Login with Twitch](/docs/guides/auth/social-login/auth-twitch) |
-| Twitter | `TWITTER_` | - | [Login with Twitter](/docs/guides/auth/social-login/auth-twitter) |
-| WorkOS | `WORKOS_` | - | [Login with WorkOS](/docs/guides/auth/social-login/auth-workos) |
-| Zoom | `ZOOM_` | - | [Login with Zoom](/docs/guides/auth/social-login/auth-zoom) |
+| Provider          | Env prefix       | Additional variables            | Docs                                                                  |
+| ----------------- | ---------------- | ------------------------------- | --------------------------------------------------------------------- |
+| Apple             | `APPLE_`         | -                               | [Login with Apple](/docs/guides/auth/social-login/auth-apple)         |
+| Azure (Microsoft) | `AZURE_`         | `URL` (tenant URL)              | [Login with Azure](/docs/guides/auth/social-login/auth-azure)         |
+| Bitbucket         | `BITBUCKET_`     | -                               | [Login with Bitbucket](/docs/guides/auth/social-login/auth-bitbucket) |
+| Discord           | `DISCORD_`       | -                               | [Login with Discord](/docs/guides/auth/social-login/auth-discord)     |
+| Facebook          | `FACEBOOK_`      | -                               | [Login with Facebook](/docs/guides/auth/social-login/auth-facebook)   |
+| Figma             | `FIGMA_`         | -                               | [Login with Figma](/docs/guides/auth/social-login/auth-figma)         |
+| GitHub            | `GITHUB_`        | `URL` (for GitHub Enterprise)   | [Login with GitHub](/docs/guides/auth/social-login/auth-github)       |
+| GitLab            | `GITLAB_`        | `URL` (for self-hosted GitLab)  | [Login with GitLab](/docs/guides/auth/social-login/auth-gitlab)       |
+| Google            | `GOOGLE_`        | -                               | [Login with Google](/docs/guides/auth/social-login/auth-google)       |
+| Kakao             | `KAKAO_`         | -                               | [Login with Kakao](/docs/guides/auth/social-login/auth-kakao)         |
+| Keycloak (OIDC)   | `KEYCLOAK_`      | `URL` (realm URL, **required**) | [Login with Keycloak](/docs/guides/auth/social-login/auth-keycloak)   |
+| LinkedIn (OIDC)   | `LINKEDIN_OIDC_` | -                               | [Login with LinkedIn](/docs/guides/auth/social-login/auth-linkedin)   |
+| Notion            | `NOTION_`        | -                               | [Login with Notion](/docs/guides/auth/social-login/auth-notion)       |
+| Slack (OIDC)      | `SLACK_OIDC_`    | -                               | [Login with Slack](/docs/guides/auth/social-login/auth-slack)         |
+| Snapchat          | `SNAPCHAT_`      | -                               | -                                                                     |
+| Spotify           | `SPOTIFY_`       | -                               | [Login with Spotify](/docs/guides/auth/social-login/auth-spotify)     |
+| Twitch            | `TWITCH_`        | -                               | [Login with Twitch](/docs/guides/auth/social-login/auth-twitch)       |
+| Twitter           | `TWITTER_`       | -                               | [Login with Twitter](/docs/guides/auth/social-login/auth-twitter)     |
+| WorkOS            | `WORKOS_`        | -                               | [Login with WorkOS](/docs/guides/auth/social-login/auth-workos)       |
+| Zoom              | `ZOOM_`          | -                               | [Login with Zoom](/docs/guides/auth/social-login/auth-zoom)           |
 
 For each provider, you need at minimum `ENABLED`, `CLIENT_ID`, `SECRET`, and `REDIRECT_URI` in `.env` and `docker-compose.yml`.
 
@@ -334,26 +334,27 @@ For each provider, you need at minimum `ENABLED`, `CLIENT_ID`, `SECRET`, and `RE
 You can test OAuth with the following minimal HTML page:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<body>
-  <h1>Supabase OAuth Test</h1>
-  <button onclick="login()">Sign in with Google</button>
-  <pre id="result"></pre>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://<your-domain>.example.com'
-    const SUPABASE_ANON_KEY = 'your-anon-key'
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    async function login() {
-      const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
-      if (error) document.getElementById('result').textContent = JSON.stringify(error, null, 2)
-    }
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) document.getElementById('result').textContent = 'Logged in as: ' + data.session.user.email
-    })
-  </script>
-</body>
+  <body>
+    <h1>Supabase OAuth Test</h1>
+    <button onclick="login()">Sign in with Google</button>
+    <pre id="result"></pre>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const SUPABASE_URL = 'https://<your-domain>.example.com'
+      const SUPABASE_ANON_KEY = 'your-anon-key'
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      async function login() {
+        const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
+        if (error) document.getElementById('result').textContent = JSON.stringify(error, null, 2)
+      }
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session)
+          document.getElementById('result').textContent = 'Logged in as: ' + data.session.user.email
+      })
+    </script>
+  </body>
 </html>
 ```
 
@@ -416,13 +417,13 @@ Common causes:
 
 All OAuth-related environment variables for the `auth` service in `docker-compose.yml`:
 
-| Variable | Description | Required |
-|----------|------------|----------|
-| `GOTRUE_EXTERNAL_*_ENABLED` | Enable the provider (`true`/`false`) | Yes |
-| `GOTRUE_EXTERNAL_*_CLIENT_ID` | OAuth client ID from the provider | Yes |
-| `GOTRUE_EXTERNAL_*_SECRET` | OAuth client secret from the provider | Yes |
-| `GOTRUE_EXTERNAL_*_REDIRECT_URI` | Callback URL: `${API_EXTERNAL_URL}/auth/v1/callback` | Yes |
-| `GOTRUE_SITE_URL` | Default redirect URL after authentication (set via `SITE_URL` in `.env`) | Yes |
+| Variable                         | Description                                                              | Required |
+| -------------------------------- | ------------------------------------------------------------------------ | -------- |
+| `GOTRUE_EXTERNAL_*_ENABLED`      | Enable the provider (`true`/`false`)                                     | Yes      |
+| `GOTRUE_EXTERNAL_*_CLIENT_ID`    | OAuth client ID from the provider                                        | Yes      |
+| `GOTRUE_EXTERNAL_*_SECRET`       | OAuth client secret from the provider                                    | Yes      |
+| `GOTRUE_EXTERNAL_*_REDIRECT_URI` | Callback URL: `${API_EXTERNAL_URL}/auth/v1/callback`                     | Yes      |
+| `GOTRUE_SITE_URL`                | Default redirect URL after authentication (set via `SITE_URL` in `.env`) | Yes      |
 
 ## Additional resources
 
