@@ -135,3 +135,16 @@ jobs:
         with:
           report-file: e2e/studio/test-results/test-results.json
           comment-title: '🎭 Playwright Test Results'
+
+  tests:
+    name: 'Selfhosted Studio E2E Tests - Results'
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
+    steps:
+      - name: All tests ok
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Some tests failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
