@@ -67,8 +67,8 @@ export function AllIcon(props: SVGProps<SVGSVGElement>) {
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       {...props}
     >
       <path d="M16 5H3" />
