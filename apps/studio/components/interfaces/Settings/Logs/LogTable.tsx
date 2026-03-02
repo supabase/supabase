@@ -1,10 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
 import { isEqual } from 'lodash'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
@@ -34,6 +29,11 @@ import LogSelection from './LogSelection'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useProfile } from '@/lib/profile'
 
 interface Props {
   data?: LogData[]
@@ -393,14 +393,12 @@ export const LogTable = ({
   return (
     <section className={'h-full flex w-full flex-col flex-1'}>
       {!queryType && <LogsExplorerTableHeader />}
-
-      <ResizablePanelGroup direction="horizontal">
+      <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel
           id="log-table-content"
-          order={1}
-          minSize={panelContentMinSize}
-          maxSize={panelContentMaxSize}
-          defaultSize={panelContentMaxSize}
+          minSize={`${panelContentMinSize}`}
+          maxSize={`${panelContentMaxSize}`}
+          defaultSize={`${panelContentMaxSize}`}
         >
           <DataGrid
             role="table"
@@ -459,10 +457,9 @@ export const LogTable = ({
             <ResizableHandle withHandle />
             <ResizablePanel
               id="log-table-panel"
-              order={2}
-              minSize={100 - panelContentMaxSize}
-              maxSize={100 - panelContentMinSize}
-              defaultSize={100 - panelContentMaxSize}
+              minSize={`${100 - panelContentMaxSize}`}
+              maxSize={`${100 - panelContentMinSize}`}
+              defaultSize={`${100 - panelContentMaxSize}`}
             >
               <LogSelection
                 isLoading={isSelectedLogLoading || false}

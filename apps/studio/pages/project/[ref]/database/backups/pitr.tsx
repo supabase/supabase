@@ -112,12 +112,12 @@ const PITR = () => {
             <UpgradeToPro
               addon={hasAccessToPitr ? 'pitr' : undefined}
               source="pitr"
-              featureProposition="enable Point in Time Recovery"
+              featureProposition="enable Point-in-Time Recovery"
               primaryText="Point in Time Recovery is a Pro Plan add-on"
               secondaryText={
                 !hasAccessToPitr
                   ? 'Roll back your database to a specific second. Starts at $100/month. Pro Plan already includes daily backups at no extra cost.'
-                  : 'Please enable the add-on to enable point in time recovery for your project.'
+                  : 'Enable the add-on to add point-in-time recovery to your project.'
               }
             />
           ) : !isActiveHealthy ? (

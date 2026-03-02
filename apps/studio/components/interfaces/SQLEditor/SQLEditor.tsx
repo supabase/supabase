@@ -784,10 +784,10 @@ export const SQLEditor = () => {
       <div className="flex h-full">
         <ResizablePanelGroup
           className="relative"
-          direction="vertical"
+          orientation="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
@@ -898,7 +898,7 @@ export const SQLEditor = () => {
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="animate-spin text-brand" />

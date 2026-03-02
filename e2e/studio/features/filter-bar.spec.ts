@@ -13,6 +13,7 @@ import {
 } from '../utils/filter-bar-helpers.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
+import { createApiResponseWaiter } from '../utils/wait-for-response.js'
 
 const tableNamePrefix = 'pw_filter_bar'
 
@@ -806,6 +807,52 @@ test.describe('Filter Bar', () => {
         await page.keyboard.press('Shift+Tab')
 
         await expect(freeformInput).not.toBeFocused()
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+  })
+
+  test.describe('Filter Error Feedback', () => {
+    test('invalid filter value shows friendly error and remove button clears filters', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_err_fb`
+
+      await createTable(tableName, 'name', [{ name: 'Alice' }, { name: 'Bob' }])
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        // Apply a filter using the 'is' operator with an invalid value
+        // 'is' only accepts null/not null/true/false, so 'badvalue' triggers a syntax error
+        await selectColumnFilter(page, 'name')
+        await selectOperatorByClick(page, 'name', 'is')
+
+        const valueInput = page.getByTestId('filter-value-name')
+        const rowsWaiter = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-rows-')
+        await valueInput.fill('badvalue')
+        await page.keyboard.press('Enter')
+        await rowsWaiter
+
+        // Should show the friendly filter error, not the scary general error
+        await expect(page.getByText('No results found — check your filter values')).toBeVisible({
+          timeout: 10000,
+        })
+        await expect(page.getByText("doesn't match the column's data type")).toBeVisible()
+
+        const removeButton = page.getByRole('button', { name: 'Remove filters' })
+        await expect(removeButton).toBeVisible()
+
+        // Clicking "Remove filters" should clear filters and restore data
+        await removeButton.click()
+
+        // Filter pill should be gone and data should be visible again
+        await expect(page.getByTestId('filter-condition-name')).not.toBeVisible({ timeout: 10000 })
+        await expect(page.getByRole('gridcell', { name: 'Alice' })).toBeVisible({ timeout: 10000 })
+        await expect(page.getByRole('gridcell', { name: 'Bob' })).toBeVisible()
       } finally {
         await dropTable(tableName)
       }
