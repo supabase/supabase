@@ -122,6 +122,7 @@ export const exposedTablesInfiniteQueryOptions = (
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   return infiniteQueryOptions({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: privilegeKeys.exposedTablesInfinite(projectRef, search),
     queryFn: ({ signal, pageParam }) =>
       getExposedTables(
