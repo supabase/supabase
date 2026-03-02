@@ -137,6 +137,7 @@ allow_list = [
     "[Tt]radeoffs?",
     "[Tt]unneled",
     "UncaughtException",
+    "[Uu]comment(ing|ed)?",
     "[Uu]nlink(ing|s|ed)?",
     "[Uu]pserts?",
     "[Uu]ptime",
