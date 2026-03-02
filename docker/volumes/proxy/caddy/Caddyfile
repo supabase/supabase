@@ -1,5 +1,5 @@
 {$PROXY_DOMAIN} {
-    @supabase_api path /auth/v1/* /rest/v1/* /realtime/v1/* /functions/v1/* /mcp
+    @supabase_api path /auth/v1/* /rest/v1/* /graphql/v1/* /realtime/v1/* /functions/v1/* /mcp
 
     handle @supabase_api {
         reverse_proxy kong:8000
@@ -25,7 +25,8 @@
 
     handle {
         basic_auth {
-            {$DASHBOARD_USERNAME} {$DASHBOARD_PASSWORD}
+            # PROXY_AUTH_PASSWORD is overwritten with the bcrypt on startup
+            {$PROXY_AUTH_USERNAME} {$PROXY_AUTH_PASSWORD}
         }
 
         reverse_proxy studio:3000

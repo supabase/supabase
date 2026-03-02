@@ -20,9 +20,9 @@ server {
     proxy_set_header X-Forwarded-Host $http_host;
     proxy_set_header X-Forwarded-Port $server_port;
 
-    ssl_certificate /etc/letsencrypt/live/supabase/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/supabase/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/supabase/chain.pem;
+    ssl_certificate /etc/letsencrypt/live/${PROXY_DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${PROXY_DOMAIN}/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/${PROXY_DOMAIN}/chain.pem;
 
     ssl_dhparam /etc/letsencrypt/dhparams/dhparam.pem;
 
@@ -99,15 +99,11 @@ server {
         proxy_pass http://kong_upstream;
     }
 
+    location /graphql {
+        proxy_pass http://kong_upstream;
+    }
+
     location /mcp {
         proxy_pass http://kong_upstream;
     }
-}
-
-server {
-    listen 80;
-    listen [::]:80;
-    server_name ${PROXY_DOMAIN};
-
-    return 301 https://$server_name$request_uri;
 }
