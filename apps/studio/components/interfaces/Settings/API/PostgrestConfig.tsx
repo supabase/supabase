@@ -35,16 +35,15 @@ import {
 } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
-import { ExposedSchemasList } from './ExposedSchemasList'
+import { ExposedSchemaSelector } from './ExposedSchemaSelector'
 import { HardenAPIModal } from './HardenAPIModal'
 import { ExposedTableSelector } from '@/components/interfaces/Settings/API/ExposedTableSelector'
 import { FormActions } from '@/components/ui/Forms/FormActions'
-import SchemaSelector from '@/components/ui/SchemaSelector'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { exposeModeQueryOptions } from '@/data/privileges/expose-mode-query'
+import { type ExposeMode, exposeModeQueryOptions } from '@/data/privileges/expose-mode-query'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateExposedTablesMutation } from '@/data/privileges/update-exposed-tables-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -232,8 +231,20 @@ export const PostgrestConfig = () => {
         }),
       ])
 
+      const updatedExposeMode = queryClient.getQueryData<ExposeMode>(
+        privilegeKeys.exposeMode(projectRef)
+      )
+
       toast.success('Successfully saved settings')
-      resetForm()
+      form.reset({
+        dbSchema: dbSchema.split(',').map((x) => x.trim()).filter(Boolean),
+        maxRows: values.maxRows,
+        dbExtraSearchPath: values.dbExtraSearchPath,
+        dbPool: values.dbPool,
+        exposeMode: updatedExposeMode ?? values.exposeMode,
+        tableIdsToAdd: [],
+        tableIdsToRemove: [],
+      })
     } catch (error) {
       toast.error('Failed to save settings: ' + (error as ResponseError).message || 'Unknown error')
     } finally {
@@ -255,16 +266,6 @@ export const PostgrestConfig = () => {
   const watchedDbSchema = form.watch('dbSchema')
   const watchedTableIdsToAdd = form.watch('tableIdsToAdd')
   const watchedTableIdsToRemove = form.watch('tableIdsToRemove')
-  const excludedSchemas = useMemo(() => {
-    return (
-      INTERNAL_SCHEMAS
-        // Allow exposing graphql_public schema
-        .filter((schema) => schema !== 'graphql_public')
-        // Exclude schemas that are already exposed
-        .concat(watchedDbSchema)
-    )
-  }, [watchedDbSchema])
-
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
@@ -339,42 +340,31 @@ export const PostgrestConfig = () => {
                       />
 
                       {watchedExposeMode === 'schemas' ? (
-                        <>
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="dbSchema"
-                            render={({ field }) => (
-                              <FormItem_Shadcn_>
-                                <FormItemLayout
-                                  layout="flex-row-reverse"
-                                  label="Exposed schemas"
-                                  description="Select schemas to fully expose through the Data API."
-                                >
-                                  <SchemaSelector
-                                    excludedSchemas={excludedSchemas}
-                                    size="small"
-                                    onSelectSchema={(name) => {
-                                      field.onChange([name, ...field.value])
-                                    }}
-                                    placeholderLabel="Select schemas to expose..."
-                                    disabled={!canUpdatePostgrestConfig}
-                                  />
-                                </FormItemLayout>
-                              </FormItem_Shadcn_>
-                            )}
-                          />
-
-                          <ExposedSchemasList
-                            schemas={watchedDbSchema}
-                            onRemoveSchema={(schema) => {
-                              form.setValue(
-                                'dbSchema',
-                                form.getValues('dbSchema').filter((x) => x !== schema),
-                                { shouldDirty: true }
-                              )
+                        <FormItemLayout
+                          isReactForm={false}
+                          layout="flex-row-reverse"
+                          label="Exposed schemas"
+                          description="Select schemas to fully expose through the Data API."
+                        >
+                          <ExposedSchemaSelector
+                            selectedSchemas={watchedDbSchema}
+                            disabled={!canUpdatePostgrestConfig}
+                            onToggleSchema={(schema) => {
+                              const current = form.getValues('dbSchema')
+                              if (current.includes(schema)) {
+                                form.setValue(
+                                  'dbSchema',
+                                  current.filter((x) => x !== schema),
+                                  { shouldDirty: true }
+                                )
+                              } else {
+                                form.setValue('dbSchema', [...current, schema], {
+                                  shouldDirty: true,
+                                })
+                              }
                             }}
                           />
-                        </>
+                        </FormItemLayout>
                       ) : (
                         <FormItemLayout
                           isReactForm={false}
