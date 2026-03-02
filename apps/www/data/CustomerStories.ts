@@ -22,7 +22,7 @@ export const data: CustomerStoryType[] = [
     type: 'Customer Story',
     title: 'Hyper builds AI marketing agents on Supabase',
     description:
-      "Hyper is an AI-native marketing platform with agents that operate across the entire marketing workflow. Supabase gives their three-person team the database platform to do it at enterprise scale.",
+      'Hyper is an AI-native marketing platform with agents that operate across the entire marketing workflow. Supabase gives their three-person team the database platform to do it at enterprise scale.',
     organization: 'Hyper',
     imgUrl: 'images/customers/logos/hyper.svg',
     logo: '/images/customers/logos/hyper.svg',
@@ -32,7 +32,8 @@ export const data: CustomerStoryType[] = [
   },
   {
     type: 'Customer Story',
-    title: 'How Brevo built AI-powered sales workflows on Supabase, without waiting for engineering',
+    title:
+      'How Brevo built AI-powered sales workflows on Supabase, without waiting for engineering',
     description:
       "Brevo's Revenue Operations team built three production AI workflows connecting their CRM to Dust's AI agents via Supabase MCP—without a single engineering ticket.",
     organization: 'Brevo',
