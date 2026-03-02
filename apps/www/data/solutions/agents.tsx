@@ -121,13 +121,22 @@ const data: () => {
         role: 'Founder, Chatbase',
         link: '/customers/chatbase',
         logo: (
-          <Image
-            src="/images/customers/logos/chatbase.png"
-            alt="Chatbase"
-            width={128}
-            height={48}
-            className="object-contain w-24 md:w-32"
-          />
+          <>
+            <Image
+              src="/images/customers/logos/chatbase.png"
+              alt="Chatbase"
+              width={128}
+              height={48}
+              className="object-contain w-24 md:w-32 dark:hidden"
+            />
+            <Image
+              src="/images/customers/logos/light/chatbase.png"
+              alt="Chatbase"
+              width={128}
+              height={48}
+              className="object-contain w-24 md:w-32 hidden dark:block"
+            />
+          </>
         ),
       },
     },

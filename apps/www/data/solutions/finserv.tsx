@@ -120,13 +120,22 @@ const data: () => {
         role: 'VP of Engineering, Deriv',
         link: '/customers/deriv',
         logo: (
-          <Image
-            src="/images/customers/logos/deriv.png"
-            alt="Deriv"
-            width={128}
-            height={48}
-            className="object-contain w-24 md:w-32"
-          />
+          <>
+            <Image
+              src="/images/customers/logos/deriv.png"
+              alt="Deriv"
+              width={128}
+              height={48}
+              className="object-contain w-24 md:w-32 dark:hidden"
+            />
+            <Image
+              src="/images/customers/logos/light/deriv.png"
+              alt="Deriv"
+              width={128}
+              height={48}
+              className="object-contain w-24 md:w-32 hidden dark:block"
+            />
+          </>
         ),
       },
     },

@@ -119,13 +119,22 @@ const data: () => {
         role: 'Founding Engineer, Juniver',
         link: '/customers/juniver',
         logo: (
-          <Image
-            src="/images/customers/logos/juniver.png"
-            alt="Juniver"
-            width={128}
-            height={48}
-            className="object-contain w-24 md:w-32"
-          />
+          <>
+            <Image
+              src="/images/customers/logos/juniver.png"
+              alt="Juniver"
+              width={128}
+              height={48}
+              className="object-contain w-24 md:w-32 dark:hidden"
+            />
+            <Image
+              src="/images/customers/logos/light/juniver.png"
+              alt="Juniver"
+              width={128}
+              height={48}
+              className="object-contain w-24 md:w-32 hidden dark:block"
+            />
+          </>
         ),
       },
     },

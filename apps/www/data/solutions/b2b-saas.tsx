@@ -122,13 +122,22 @@ const data: () => {
         role: 'CEO, Resend',
         link: '/customers/resend',
         logo: (
-          <Image
-            src="/images/customers/logos/resend.png"
-            alt="Resend"
-            width={128}
-            height={48}
-            className="object-contain w-24 md:w-32"
-          />
+          <>
+            <Image
+              src="/images/customers/logos/resend.png"
+              alt="Resend"
+              width={128}
+              height={48}
+              className="object-contain w-24 md:w-32 dark:hidden"
+            />
+            <Image
+              src="/images/customers/logos/light/resend.png"
+              alt="Resend"
+              width={128}
+              height={48}
+              className="object-contain w-24 md:w-32 hidden dark:block"
+            />
+          </>
         ),
       },
     },
