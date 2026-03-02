@@ -122,15 +122,27 @@ For development or internal networks where you cannot use Let's Encrypt, you can
 
 ### Step 1: Generate a self-signed certificate
 
+Change `<your-domain>` in the example below, and create certificates with `openssl`:
+
 ```sh
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -keyout volumes/api/server.key \
   -out volumes/api/server.crt \
-  -subj "/CN=localhost"
+  -subj "/CN=<your-domain>" && \
+  chmod 644 volumes/api/server.key
 ```
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 ### Step 2: Configure Kong for SSL
+
+Comment out Kong's HTTP port mapping in `docker-compose.yml`:
+
+```yaml
+kong:
+  # ...
+  ports:
+    # - ${KONG_HTTP_PORT}:8000/tcp
+```
 
 Uncomment the certificate volume mounts and SSL environment variables in `docker-compose.yml`:
 
@@ -147,9 +159,9 @@ kong:
     KONG_SSL_CERT_KEY: /home/kong/server.key
 ```
 
-### Step 3: Update environment variables
+### Step 3: Update configuration variables in `.env`
 
-Update your `.env` file to use HTTPS with the Kong HTTPS port:
+Edit your `.env` file to use HTTPS with the Kong HTTPS port:
 
 ```
 SUPABASE_PUBLIC_URL=https://<your-domain>:8443
