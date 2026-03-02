@@ -307,7 +307,7 @@ const data: () => {
       id: 'case-studies',
       heading: (
         <>
-          Case <span className="text-foreground">studies</span>
+          Customer <span className="text-foreground">stories</span>
         </>
       ),
       customers: [
