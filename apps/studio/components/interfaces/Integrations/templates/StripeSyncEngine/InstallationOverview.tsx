@@ -388,20 +388,6 @@ export const StripeSyncInstallationPage = () => {
                 <SheetSection className="flex-1 flex flex-col gap-y-6">
                   <StripeSyncChangesCard />
 
-                  <Admonition type="warning">
-                    <h5 className="mb-0.5">
-                      This integration currently requires{' '}
-                      <InlineLink href="https://supabase.com/docs/guides/platform/ssl-enforcement">
-                        SSL Enforcement
-                      </InlineLink>{' '}
-                      to be disabled during initial setup.
-                    </h5>
-                    <p className="text-foreground-light">
-                      Support for SSL Enforcement will be added in a future update. Once installed,
-                      all webhook and sync operations use HTTPS/SSL.
-                    </p>
-                  </Admonition>
-
                   <h3 className="heading-default">Configuration</h3>
 
                   <FormField_Shadcn_
