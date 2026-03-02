@@ -117,7 +117,7 @@ async function createDestinationPipeline(
     max_table_sync_workers: maxTableSyncWorkers,
     max_copy_connections_per_table: maxCopyConnectionsPerTable,
     invalidated_slot_behavior: invalidatedSlotBehavior,
-    batch,
+    batch: batch ? { max_fill_ms: batch.maxFillMs } : undefined,
   }
 
   const { data, error } = await post('/platform/replication/{ref}/destinations-pipelines', {
