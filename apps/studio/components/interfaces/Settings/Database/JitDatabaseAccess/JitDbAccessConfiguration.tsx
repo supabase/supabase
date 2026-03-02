@@ -476,7 +476,7 @@ const JitDbAccessConfiguration = () => {
             </Card>
           )}
 
-          {enabled && hasAccessToJitDbAccess && (
+          {enabled && hasAccessToJitDbAccess && !isUpdatingJitDbAccess && (
             <>
               {isErrorJitMembers && (
                 <AlertError

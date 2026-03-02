@@ -39,7 +39,7 @@ export const useJitDbAccessRevokeMutation = ({
 
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(jitDbAccessKeys.members(projectRef))
+      await queryClient.invalidateQueries({ queryKey: jitDbAccessKeys.members(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

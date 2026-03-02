@@ -48,7 +48,7 @@ export const useJitDbAccessUpdateMutation = ({
 
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(jitDbAccessKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: jitDbAccessKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
