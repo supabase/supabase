@@ -120,17 +120,29 @@ export function computeStatusFromGrants(grants: JitRoleGrantDraft[]): JitStatus 
   return { active, expired, activeIp, expiredIp }
 }
 
+function formatBadgeLabel(raw: string, showCount: boolean): string {
+  if (showCount) return raw
+  // If only one in count:
+  // Strip leading "N " and "· N " count segments, then capitalize first letter
+  return raw
+    .replace(/^\d+\s/, '')
+    .replace(/·\s*\d+\s/g, '· ')
+    .replace(/^./, (c) => c.toUpperCase())
+}
+
 export function getJitStatusDisplay(status: JitStatus): { badges: JitStatusBadge[] } {
   const { active, expired, activeIp } = status
   const badges: JitStatusBadge[] = []
+  const showCount = (active > 0 ? 1 : 0) + (expired > 0 ? 1 : 0) > 1
 
   if (active > 0) {
-    const label = activeIp > 0 ? `${active} active · ${activeIp} IP` : `${active} active`
-    badges.push({ label, variant: 'success' })
+    const raw = activeIp > 0 ? `${active} active · ${activeIp} IP` : `${active} active`
+    badges.push({ label: formatBadgeLabel(raw, showCount), variant: 'success' })
   }
 
   if (expired > 0) {
-    badges.push({ label: `${expired} expired`, variant: 'default' })
+    const raw = `${expired} expired`
+    badges.push({ label: formatBadgeLabel(raw, showCount), variant: 'default' })
   }
 
   return { badges }
