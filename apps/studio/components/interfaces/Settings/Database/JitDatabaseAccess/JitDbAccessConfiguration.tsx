@@ -193,41 +193,38 @@ const JitDbAccessConfiguration = () => {
     [users]
   )
 
-  const inlineValidation = useMemo(
-    () => {
-      let invalidIpGrant: (typeof draft.grants)[number] | undefined
-      let invalidCidrs: string[] = []
+  const inlineValidation = useMemo(() => {
+    let invalidIpGrant: (typeof draft.grants)[number] | undefined
+    let invalidCidrs: string[] = []
 
-      for (const grant of draft.grants) {
-        if (!grant.enabled) continue
+    for (const grant of draft.grants) {
+      if (!grant.enabled) continue
 
-        const nextInvalidCidrs = getInvalidCidrs(grant.ipRanges)
-        if (nextInvalidCidrs.length === 0) continue
+      const nextInvalidCidrs = getInvalidCidrs(grant.ipRanges)
+      if (nextInvalidCidrs.length === 0) continue
 
-        invalidIpGrant = grant
-        invalidCidrs = nextInvalidCidrs
-        break
-      }
+      invalidIpGrant = grant
+      invalidCidrs = nextInvalidCidrs
+      break
+    }
 
-      const invalidPreview = invalidCidrs.slice(0, 3).join(', ')
-      const hasOverflowInvalidCidrs = invalidCidrs.length > 3
+    const invalidPreview = invalidCidrs.slice(0, 3).join(', ')
+    const hasOverflowInvalidCidrs = invalidCidrs.length > 3
 
-      return {
-        member: !draft.memberId
-          ? 'Select a member for this JIT access rule.'
-          : isDuplicateSelectedMember
-            ? 'This member already has a JIT access rule. Edit their existing rule from the list.'
+    return {
+      member: !draft.memberId
+        ? 'Select a member for this JIT access rule.'
+        : isDuplicateSelectedMember
+          ? 'This member already has a JIT access rule. Edit their existing rule from the list.'
+          : undefined,
+      roles:
+        enabledRoleCount === 0
+          ? 'Select at least one role.'
+          : invalidIpGrant
+            ? `Invalid CIDR range${invalidCidrs.length > 1 ? 's' : ''} for role "${invalidIpGrant.roleId}": ${invalidPreview}${hasOverflowInvalidCidrs ? ', ...' : ''}`
             : undefined,
-        roles:
-          enabledRoleCount === 0
-            ? 'Select at least one role.'
-            : invalidIpGrant
-              ? `Invalid CIDR range${invalidCidrs.length > 1 ? 's' : ''} for role "${invalidIpGrant.roleId}": ${invalidPreview}${hasOverflowInvalidCidrs ? ', ...' : ''}`
-              : undefined,
-      }
-    },
-    [draft.grants, draft.memberId, enabledRoleCount, isDuplicateSelectedMember]
-  )
+    }
+  }, [draft.grants, draft.memberId, enabledRoleCount, isDuplicateSelectedMember])
 
   const resetSheetState = () => {
     void setShowCreateRuleSheet(false)
@@ -387,9 +384,7 @@ const JitDbAccessConfiguration = () => {
 
   const switchDisabled = isLoadingConfiguration || isUpdatingJitDbAccess || !canUpdateJitDbAccess
 
-  const switchTooltipText = !canUpdateJitDbAccess
-    ? 'Additional permissions required'
-    : undefined
+  const switchTooltipText = !canUpdateJitDbAccess ? 'Additional permissions required' : undefined
 
   const showToggleFailedWarning =
     isSuccessConfiguration &&
@@ -458,15 +453,17 @@ const JitDbAccessConfiguration = () => {
                 >
                   <div className="flex w-fit flex-shrink-0 items-center justify-end gap-2">
                     {(isLoadingConfiguration || isUpdatingJitDbAccess) && (
-                      <Loader2 className="animate-spin text-foreground-muted/50" strokeWidth={2} size={16} />
+                      <Loader2
+                        className="animate-spin text-foreground-muted/50"
+                        strokeWidth={2}
+                        size={16}
+                      />
                     )}
                     {switchTooltipText ? (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                          <div>
-                            {jitToggleSwitch}
-                          </div>
+                          <div>{jitToggleSwitch}</div>
                         </TooltipTrigger>
                         <TooltipContent side="bottom">{switchTooltipText}</TooltipContent>
                       </Tooltip>
@@ -492,7 +489,8 @@ const JitDbAccessConfiguration = () => {
                         className={InlineLinkClassName}
                       >
                         contact support
-                      </SupportLink>{' '}if the issue persists.
+                      </SupportLink>{' '}
+                      if the issue persists.
                     </>
                   }
                   className="mb-0 rounded-none border-0"

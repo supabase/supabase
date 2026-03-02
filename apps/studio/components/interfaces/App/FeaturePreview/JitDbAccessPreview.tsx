@@ -8,8 +8,7 @@ export const JitDbAccessPreview = () => {
   return (
     <div>
       <p className="text-sm text-foreground-light mb-4">
-        Grant project members temporary database role access through Just-in-Time (JIT) controls in
-        {' '}
+        Grant project members temporary database role access through Just-in-Time (JIT) controls in{' '}
         <InlineLink href={`/project/${ref}/database/settings`}>Database Settings</InlineLink>.
       </p>
       <div className="space-y-2 !mt-4">

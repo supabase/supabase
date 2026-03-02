@@ -20,6 +20,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { JitMemberOption, JitUserRuleDraft, SheetMode } from './JitDbAccess.types'
@@ -155,16 +156,10 @@ export function JitDbAccessRuleSheet({
                       </Select_Shadcn_>
                     </FormControl_Shadcn_>
 
-                    {mode === 'edit' && (
-                      <p className="mt-2 text-xs text-foreground-lighter">
-                        The member cannot be changed when editing an existing JIT access rule.
-                      </p>
-                    )}
-
                     {mode === 'add' && availableMembersForAddCount === 0 && (
-                      <p className="mt-2 text-xs text-foreground-lighter">
-                        All project members already have JIT access rules. Edit an existing rule from
-                        the table above.
+                      <p className="mt-2 text-foreground-lighter">
+                        All project members already have JIT access rules. Edit an existing rule
+                        from the table above.
                       </p>
                     )}
                   </FormItemLayout>
@@ -179,26 +174,27 @@ export function JitDbAccessRuleSheet({
                     layout="vertical"
                     label="Roles and settings"
                     description={
-                      <span className="text-xs leading-normal text-foreground-lighter">
-                        Define scoped permissions with{' '}
+                      <>
+                        Use{' '}
                         <InlineLink
                           href={`${DOCS_URL}/guides/database/postgres/roles`}
                           className="decoration-foreground-muted"
                         >
                           custom Postgres roles
                         </InlineLink>{' '}
-                        before creating a JIT access rule. Narrow roles limit the impact of direct
-                        database access.
-                      </span>
+                        with narrow permissions to reduce the impact of direct database access.
+                      </>
                     }
                   >
-                    <div className="overflow-hidden rounded-md border">
-                      {draft.grants.length === 0 ? (
-                        <div className="p-4 text-sm text-foreground-light">
-                          No assignable roles found
-                        </div>
-                      ) : (
-                        draft.grants.map((grant, index) => (
+                    {draft.grants.length === 0 ? (
+                      <Admonition
+                        type="note"
+                        title="No assignable roles found"
+                        className="bg-background"
+                      />
+                    ) : (
+                      <div className="overflow-hidden rounded-md border">
+                        {draft.grants.map((grant, index) => (
                           <div key={grant.roleId} className={index > 0 ? 'border-t' : ''}>
                             <JitDbAccessRoleGrantFields
                               role={{ id: grant.roleId, label: grant.roleId }}
@@ -206,9 +202,9 @@ export function JitDbAccessRuleSheet({
                               onChange={(next) => updateGrant(grant.roleId, () => next)}
                             />
                           </div>
-                        ))
-                      )}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </FormItemLayout>
                 )}
               />

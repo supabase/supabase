@@ -12,6 +12,7 @@ import {
   SelectValue_Shadcn_,
   WarningIcon,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { JIT_EXPIRY_MODE_OPTIONS, JIT_MAX_CUSTOM_EXPIRY_YEARS } from './JitDbAccess.constants'
@@ -192,6 +193,17 @@ export function JitDbAccessRoleGrantFields({
                   </DatePicker>
                 )}
               </div>
+
+              {grant.hasExpiry && grant.expiry && (
+                <p className="text-xs text-foreground-lighter">
+                  Expires at{' '}
+                  <TimestampInfo
+                    utcTimestamp={grant.expiry}
+                    className="text-foreground-lighter"
+                    labelFormat="DD MMM, HH:mm"
+                  />
+                </p>
+              )}
 
               {grant.expiryMode === 'never' && (
                 <div className="mt-3 mx-0.5 flex w-full items-center gap-x-2">

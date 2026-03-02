@@ -125,20 +125,20 @@ export function JitDbAccessRulesTable({
                     onClick={
                       rowIsInteractive
                         ? (event) => {
-                          if ((event.target as HTMLElement).closest('button')) return
-                          onEditRule(user)
-                        }
+                            if ((event.target as HTMLElement).closest('button')) return
+                            onEditRule(user)
+                          }
                         : undefined
                     }
                     onKeyDown={
                       rowIsInteractive
                         ? (event) => {
-                          if ((event.target as HTMLElement).closest('button')) return
-                          if (event.key === 'Enter' || event.key === ' ') {
-                            event.preventDefault()
-                            onEditRule(user)
+                            if ((event.target as HTMLElement).closest('button')) return
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              onEditRule(user)
+                            }
                           }
-                        }
                         : undefined
                     }
                     tabIndex={rowIsInteractive ? 0 : undefined}

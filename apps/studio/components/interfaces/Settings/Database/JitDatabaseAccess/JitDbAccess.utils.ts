@@ -299,16 +299,30 @@ export function mapJitMembersToUserRules(
 }
 
 export function serializeDraftRolesForGrantMutation(draft: JitUserRuleDraft) {
+  const serializeAllowedNetworks = (value: string) => {
+    const cidrs = parseCommaSeparatedCidrs(value)
+    if (cidrs.length === 0) return undefined
+
+    const allowed_cidrs = cidrs.filter((cidr) => !cidr.includes(':')).map((cidr) => ({ cidr }))
+    const allowed_cidrs_v6 = cidrs.filter((cidr) => cidr.includes(':')).map((cidr) => ({ cidr }))
+
+    if (allowed_cidrs.length === 0 && allowed_cidrs_v6.length === 0) return undefined
+
+    return {
+      ...(allowed_cidrs.length > 0 ? { allowed_cidrs } : {}),
+      ...(allowed_cidrs_v6.length > 0 ? { allowed_cidrs_v6 } : {}),
+    }
+  }
+
   return draft.grants
     .filter((grant) => grant.enabled)
     .map((grant) => {
       const expires_at = grant.hasExpiry ? toUnixSeconds(grant.expiry) : undefined
-
-      // TODO(DEPR-366): IP restrictions are shown in the UI but not yet supported by the
-      // SEC-462 write payload, so only role + optional expiry are sent here.
+      const allowed_networks = serializeAllowedNetworks(grant.ipRanges)
       return {
         role: grant.roleId,
         ...(typeof expires_at === 'number' ? { expires_at } : {}),
+        ...(allowed_networks ? { allowed_networks } : {}),
       }
     })
 }

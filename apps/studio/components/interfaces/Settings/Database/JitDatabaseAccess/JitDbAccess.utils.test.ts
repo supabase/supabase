@@ -76,7 +76,7 @@ describe('jitDbAccess.utils', () => {
 })
 
 describe('serializeDraftRolesForGrantMutation', () => {
-  it('serializes supported role fields and omits prototype-only IP fields', () => {
+  it('serializes role expiry and IP restrictions for grant mutation payload', () => {
     const expiry = '2026-06-01T12:00:00.000Z'
     const draft: JitUserRuleDraft = {
       memberId: 'user-1',
@@ -88,7 +88,7 @@ describe('serializeDraftRolesForGrantMutation', () => {
           expiryMode: 'custom',
           expiry,
           hasIpRestriction: true,
-          ipRanges: '192.0.2.0/24',
+          ipRanges: '192.0.2.0/24, 2001:db8::/64',
         },
         {
           ...createEmptyGrant('supabase_read_only_user'),
@@ -108,6 +108,10 @@ describe('serializeDraftRolesForGrantMutation', () => {
       {
         role: 'postgres',
         expires_at: dayjs(expiry).unix(),
+        allowed_networks: {
+          allowed_cidrs: [{ cidr: '192.0.2.0/24' }],
+          allowed_cidrs_v6: [{ cidr: '2001:db8::/64' }],
+        },
       },
       {
         role: 'supabase_read_only_user',
