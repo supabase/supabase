@@ -146,59 +146,62 @@ export const QueryBlock = ({
       label={label}
       badge={isWriteQuery && <Badge variant="warning">Write</Badge>}
       actions={
-        disabled ? null : (
-          <>
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              className="w-7 h-7"
-              icon={<Code size={14} strokeWidth={1.5} />}
-              onClick={() => setShowSql(!showSql)}
-              tooltip={{
-                content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
-              }}
-            />
-            {hasResults && (
-              <BlockViewConfiguration
-                view={view}
-                isChart={view === 'chart'}
-                lockColumns={false}
-                chartConfig={chartSettings}
-                columns={Object.keys(results?.[0] ?? {})}
-                changeView={(nextView) => {
-                  if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view: nextView } })
-                  setChartSettings({ ...chartSettings, view: nextView })
-                }}
-                updateChartConfig={(config) => {
-                  if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
-                  setChartSettings(config)
+        <>
+          {!disabled && (
+            <>
+              <ButtonTooltip
+                type="text"
+                size="tiny"
+                className="w-7 h-7"
+                icon={<Code size={14} strokeWidth={1.5} />}
+                onClick={() => setShowSql(!showSql)}
+                tooltip={{
+                  content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
                 }}
               />
-            )}
+              {hasResults && (
+                <BlockViewConfiguration
+                  view={view}
+                  isChart={view === 'chart'}
+                  lockColumns={false}
+                  chartConfig={chartSettings}
+                  columns={Object.keys(results?.[0] ?? {})}
+                  changeView={(nextView) => {
+                    if (onUpdateChartConfig)
+                      onUpdateChartConfig({ chartConfig: { view: nextView } })
+                    setChartSettings({ ...chartSettings, view: nextView })
+                  }}
+                  updateChartConfig={(config) => {
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
+                    setChartSettings(config)
+                  }}
+                />
+              )}
 
-            <EditQueryButton id={id} title={label} sql={sql} />
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              className="w-7 h-7"
-              icon={<Play size={14} strokeWidth={1.5} />}
-              loading={isExecuting}
-              disabled={isExecuting || disabled || !sql}
-              onClick={runSelect}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  className: 'max-w-56 text-center',
-                  text: isExecuting
-                    ? 'Query is running. Check the SQL Editor to manage running queries.'
-                    : 'Run query',
-                },
-              }}
-            />
+              <EditQueryButton id={id} title={label} sql={sql} />
+              <ButtonTooltip
+                type="text"
+                size="tiny"
+                className="w-7 h-7"
+                icon={<Play size={14} strokeWidth={1.5} />}
+                loading={isExecuting}
+                disabled={isExecuting || disabled || !sql}
+                onClick={runSelect}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    className: 'max-w-56 text-center',
+                    text: isExecuting
+                      ? 'Query is running. Check the SQL Editor to manage running queries.'
+                      : 'Run query',
+                  },
+                }}
+              />
+            </>
+          )}
 
-            {actions}
-          </>
-        )
+          {actions}
+        </>
       }
     >
       {!!showWarning && !blockWriteQueries && (

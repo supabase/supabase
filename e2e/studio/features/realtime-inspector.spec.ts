@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test'
-import { test } from '../utils/test.js'
+
 import {
   getMessageCount,
   joinChannel,
@@ -10,6 +10,7 @@ import {
   stopListening,
   waitForRealtimeMessage,
 } from '../utils/realtime-helpers.js'
+import { test } from '../utils/test.js'
 
 const testChannelName = 'pw_realtime_test_channel'
 
@@ -116,6 +117,7 @@ test.describe('Realtime Inspector', () => {
       await openBroadcastModal(page)
 
       const codeEditor = page.getByRole('textbox', { name: /Editor content/i })
+      await expect(codeEditor).toBeInViewport({ timeout: 5000 })
       await codeEditor.click({ force: true })
       await page.keyboard.press('ControlOrMeta+KeyA')
       await page.keyboard.type('{ invalid json }')
