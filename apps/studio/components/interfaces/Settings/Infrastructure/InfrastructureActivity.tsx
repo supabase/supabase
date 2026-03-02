@@ -25,6 +25,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import dayjs from 'dayjs'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
@@ -64,7 +65,9 @@ export const InfrastructureActivity = () => {
   const { data: subscription, isPending: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
-  const isFreePlan = organization?.plan?.id === 'free'
+  const { hasAccess: canChangeComputeSize } = useCheckEntitlements(
+    'instances.compute_update_available_sizes'
+  )
 
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
@@ -269,7 +272,7 @@ export const InfrastructureActivity = () => {
                     <>
                       <DiskIOBandwidthWarnings
                         upgradeUrl={upgradeUrl}
-                        isFreePlan={isFreePlan}
+                        canChangeComputeSize={canChangeComputeSize}
                         hasLatest={hasLatest}
                         currentBillingCycleSelected={currentBillingCycleSelected}
                         latestIoBudgetConsumption={latestIoBudgetConsumption}
@@ -329,15 +332,15 @@ export const InfrastructureActivity = () => {
                   )}
                   {attribute.key === 'max_cpu_usage' && (
                     <CPUWarnings
-                      isFreePlan={isFreePlan}
                       upgradeUrl={upgradeUrl}
+                      canChangeComputeSize={canChangeComputeSize}
                       severity={projectResourceWarnings?.cpu_exhaustion}
                     />
                   )}
                   {attribute.key === 'ram_usage' && (
                     <RAMWarnings
-                      isFreePlan={isFreePlan}
                       upgradeUrl={upgradeUrl}
+                      canChangeComputeSize={canChangeComputeSize}
                       severity={projectResourceWarnings?.memory_and_swap_exhaustion}
                     />
                   )}

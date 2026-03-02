@@ -4,7 +4,7 @@ import { Admonition } from 'ui-patterns'
 
 // [Joshen] In the future, conditionals should be from resource exhaustion endpoint as single source of truth
 interface DiskIOBandwidthWarningsProps {
-  isFreePlan: boolean
+  canChangeComputeSize: boolean
   hasLatest: boolean
   upgradeUrl: string
   currentBillingCycleSelected: boolean
@@ -13,7 +13,7 @@ interface DiskIOBandwidthWarningsProps {
 }
 
 export const DiskIOBandwidthWarnings = ({
-  isFreePlan,
+  canChangeComputeSize,
   hasLatest,
   currentBillingCycleSelected,
   upgradeUrl,
@@ -34,7 +34,7 @@ export const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="danger">
               <Link href={upgradeUrl}>
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+                {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -58,7 +58,7 @@ export const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="danger">
               <Link href={upgradeUrl}>
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+                {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -81,7 +81,7 @@ export const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="warning">
               <Link href={upgradeUrl}>
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+                {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -105,7 +105,7 @@ export const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="warning">
               <Link href={upgradeUrl}>
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+                {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
