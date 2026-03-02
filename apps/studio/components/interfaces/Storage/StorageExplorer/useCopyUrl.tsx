@@ -4,19 +4,19 @@ import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { copyToClipboard } from 'ui'
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { fetchFileUrl } from './useFetchFileUrlQuery'
 import { useProjectApiUrl } from '@/hooks/misc/useProjectApiUrl'
 
 export const useCopyUrl = () => {
-  const { projectRef, selectedBucket, getPathAlongOpenedFolders } =
-    useStorageExplorerStateSnapshot()
+  const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
 
   const { hostEndpoint, customEndpoint } = useProjectApiUrl({ projectRef })
   const isCustomDomainActive = !!customEndpoint
 
   const getFileUrl = useCallback(
     (fileName: string, expiresIn?: URL_EXPIRY_DURATION) => {
-      const pathToFile = getPathAlongOpenedFolders(false)
+      const pathToFile = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
       const formattedPathToFile = [pathToFile, fileName].join('/')
 
       return fetchFileUrl(
@@ -27,7 +27,7 @@ export const useCopyUrl = () => {
         expiresIn
       )
     },
-    [projectRef, selectedBucket.id, selectedBucket.public, getPathAlongOpenedFolders]
+    [projectRef, selectedBucket, openedFolders]
   )
 
   const onCopyUrl = useCallback(
