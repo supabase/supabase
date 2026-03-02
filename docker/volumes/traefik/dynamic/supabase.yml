@@ -1,0 +1,214 @@
+# Traefik dynamic configuration for Supabase
+# Template markers (%%VAR%%) are expanded at container startup from environment variables.
+
+http:
+  routers:
+    # Studio dashboard - catch-all with lowest priority
+    studio:
+      rule: "Host(`%%SUPABASE_DOMAIN%%`)"
+      entryPoints:
+        - websecure
+      service: studio
+      priority: 1
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - dashboard-auth
+
+    # PostgREST API
+    rest:
+      rule: "Host(`%%SUPABASE_DOMAIN%%`) && PathPrefix(`/rest/v1`)"
+      entryPoints:
+        - websecure
+      service: rest
+      priority: 10
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - cors-headers
+        - rest-strip
+
+    # PostgREST GraphQL endpoint
+    graphql:
+      rule: "Host(`%%SUPABASE_DOMAIN%%`) && PathPrefix(`/graphql/v1`)"
+      entryPoints:
+        - websecure
+      service: rest
+      priority: 10
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - cors-headers
+        - graphql-rewrite
+        - graphql-headers
+
+    # GoTrue Auth
+    auth:
+      rule: "Host(`%%SUPABASE_DOMAIN%%`) && PathPrefix(`/auth/v1`)"
+      entryPoints:
+        - websecure
+      service: auth
+      priority: 10
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - cors-headers
+        - auth-strip
+
+    # Realtime REST API (higher priority to match before WS catch-all)
+    realtime-api:
+      rule: "Host(`%%SUPABASE_DOMAIN%%`) && PathPrefix(`/realtime/v1/api`)"
+      entryPoints:
+        - websecure
+      service: realtime
+      priority: 11
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - cors-headers
+        - realtime-strip
+
+    # Realtime WebSocket
+    realtime:
+      rule: "Host(`%%SUPABASE_DOMAIN%%`) && PathPrefix(`/realtime/v1`)"
+      entryPoints:
+        - websecure
+      service: realtime
+      priority: 10
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - cors-headers
+        - realtime-ws-rewrite
+
+    # Storage API
+    storage:
+      rule: "Host(`%%SUPABASE_DOMAIN%%`) && PathPrefix(`/storage/v1`)"
+      entryPoints:
+        - websecure
+      service: storage
+      priority: 10
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - cors-headers
+        - storage-strip
+
+    # Edge Functions
+    functions:
+      rule: "Host(`%%SUPABASE_DOMAIN%%`) && PathPrefix(`/functions/v1`)"
+      entryPoints:
+        - websecure
+      service: functions
+      priority: 10
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - cors-headers
+        - functions-strip
+
+    # Postgres Meta (pg-meta)
+    meta:
+      rule: "Host(`%%SUPABASE_DOMAIN%%`) && PathPrefix(`/pg`)"
+      entryPoints:
+        - websecure
+      service: meta
+      priority: 10
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - meta-strip
+
+  services:
+    studio:
+      loadBalancer:
+        servers:
+          - url: "http://studio:3000"
+    rest:
+      loadBalancer:
+        servers:
+          - url: "http://rest:3000"
+    auth:
+      loadBalancer:
+        servers:
+          - url: "http://auth:9999"
+    realtime:
+      loadBalancer:
+        servers:
+          - url: "http://realtime-dev.supabase-realtime:4000"
+    storage:
+      loadBalancer:
+        servers:
+          - url: "http://storage:5000"
+    functions:
+      loadBalancer:
+        servers:
+          - url: "http://functions:9000"
+    meta:
+      loadBalancer:
+        servers:
+          - url: "http://meta:8080"
+
+  middlewares:
+    # Basic auth for Studio dashboard
+    dashboard-auth:
+      basicAuth:
+        usersFile: "/etc/traefik/htpasswd"
+
+    # CORS headers for API routes
+    cors-headers:
+      headers:
+        accessControlAllowMethods:
+          - "*"
+        accessControlAllowHeaders:
+          - "*"
+        accessControlAllowOriginList:
+          - "%%SITE_URL%%"
+        accessControlMaxAge: 100
+        addVaryHeader: true
+
+    # Path stripping middlewares
+    rest-strip:
+      stripPrefix:
+        prefixes:
+          - "/rest/v1"
+
+    auth-strip:
+      stripPrefix:
+        prefixes:
+          - "/auth/v1"
+
+    realtime-strip:
+      stripPrefix:
+        prefixes:
+          - "/realtime/v1"
+
+    realtime-ws-rewrite:
+      replacePathRegex:
+        regex: "^/realtime/v1/(.*)"
+        replacement: "/socket/$1"
+
+    storage-strip:
+      stripPrefix:
+        prefixes:
+          - "/storage/v1"
+
+    functions-strip:
+      stripPrefix:
+        prefixes:
+          - "/functions/v1"
+
+    meta-strip:
+      stripPrefix:
+        prefixes:
+          - "/pg"
+
+    # GraphQL path rewrite and header injection
+    graphql-rewrite:
+      replacePath:
+        path: "/rpc/graphql"
+
+    graphql-headers:
+      headers:
+        customRequestHeaders:
+          Content-Profile: "graphql_public"

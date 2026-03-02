@@ -27,6 +27,8 @@ services:
     depends_on:
       analytics:
         condition: service_healthy
+      traefik:
+        condition: service_started
     environment:
       # Binds nestjs listener to both IPv4 and IPv6 network interfaces
       HOSTNAME: "::"
@@ -42,7 +44,7 @@ services:
       DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
 
-      SUPABASE_URL: http://kong:8000
+      SUPABASE_URL: https://${SUPABASE_DOMAIN}
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
@@ -65,33 +67,41 @@ services:
       - ./volumes/snippets:/app/snippets:Z
       - ./volumes/functions:/app/edge-functions:Z
 
-  kong:
-    container_name: supabase-kong
-    image: kong:2.8.1
+  traefik:
+    container_name: supabase-traefik
+    image: traefik:v3.0
     restart: unless-stopped
     ports:
-      - ${KONG_HTTP_PORT}:8000/tcp
-      - ${KONG_HTTPS_PORT}:8443/tcp
-    volumes:
-      # https://github.com/supabase/supabase/issues/12661
-      - ./volumes/api/kong.yml:/home/kong/temp.yml:ro,z
-    depends_on:
-      analytics:
-        condition: service_healthy
+      - "80:80"
+      - "443:443"
     environment:
-      KONG_DATABASE: "off"
-      KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
-      # https://github.com/supabase/cli/issues/14
-      KONG_DNS_ORDER: LAST,A,CNAME
-      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,request-termination,ip-restriction
-      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
-      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
-      SUPABASE_ANON_KEY: ${ANON_KEY}
-      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      SUPABASE_DOMAIN: ${SUPABASE_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+      SITE_URL: ${SITE_URL}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
-      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
-    # https://unix.stackexchange.com/a/294837
-    entrypoint: bash -c 'eval "echo \"$$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
+      DASHBOARD_PASSWORD_HASHED: ${DASHBOARD_PASSWORD_HASHED}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./volumes/traefik/letsencrypt:/letsencrypt
+      - ./volumes/traefik/dynamic:/etc/traefik/dynamic-templates:ro
+    # Process the dynamic config template, generate htpasswd file, then start Traefik
+    entrypoint: >-
+      sh -c '
+      mkdir -p /etc/traefik/dynamic &&
+      printf "%s:%s\n" "$$DASHBOARD_USERNAME" "$$DASHBOARD_PASSWORD_HASHED" > /etc/traefik/htpasswd &&
+      sed -e "s|%%SUPABASE_DOMAIN%%|$$SUPABASE_DOMAIN|g" -e "s|%%SITE_URL%%|$$SITE_URL|g"
+      /etc/traefik/dynamic-templates/supabase.yml > /etc/traefik/dynamic/supabase.yml &&
+      exec traefik
+      --providers.file.directory=/etc/traefik/dynamic
+      --providers.docker=true
+      --providers.docker.exposedbydefault=false
+      --entrypoints.web.address=:80
+      --entrypoints.websecure.address=:443
+      --entrypoints.web.http.redirections.entrypoint.to=websecure
+      --entrypoints.web.http.redirections.entrypoint.scheme=https
+      --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      --certificatesresolvers.letsencrypt.acme.email=$$ACME_EMAIL
+      --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json'
 
   auth:
     container_name: supabase-auth
@@ -348,7 +358,7 @@ services:
         condition: service_healthy
     environment:
       JWT_SECRET: ${JWT_SECRET}
-      SUPABASE_URL: http://kong:8000
+      SUPABASE_URL: https://${SUPABASE_DOMAIN}
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}

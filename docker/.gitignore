@@ -1,5 +1,6 @@
-volumes/db/data
-volumes/storage
+volumes/db/data/
+volumes/storage/
+volumes/traefik/letsencrypt/acme.json
 .env
 test.http
 docker-compose.override.yml
