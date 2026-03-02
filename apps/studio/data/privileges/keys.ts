@@ -9,7 +9,7 @@ export const privilegeKeys = {
       projectRef,
       'privileges',
       'exposed-tables-infinite',
-      search ? { search } : undefined,
+      ...(search ? ([{ search }] as const) : []),
     ] as const,
   exposeMode: (projectRef: string | undefined) =>
     ['projects', projectRef, 'privileges', 'expose-mode'] as const,
