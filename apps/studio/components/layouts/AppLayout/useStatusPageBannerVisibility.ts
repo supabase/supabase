@@ -12,7 +12,11 @@ import {
 } from '@/data/projects/org-projects-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
-export type StatusPageBannerData = { title: string; dismiss?: () => void }
+export type StatusPageBannerData = {
+  title: string
+  dismiss?: () => void
+  incidents?: Array<{ id: string; name: string }>
+}
 
 export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
   const showIncidentBannerOverride =
@@ -70,6 +74,7 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
     ])
   }, [incidents, hasProjects, userRegions, hasUnknownRegions, setDismissedIds])
 
+  // Override path: no dismiss or incident list, since there is no incident ID to dismiss against
   if (showIncidentBannerOverride) return { title: 'We are investigating a technical issue' }
 
   if (!hasActiveIncidents || !isProjectsFetched) return null
@@ -97,8 +102,15 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
     ? 'We are investigating a technical issue'
     : 'Project creation may be impacted in some regions'
 
+  const relevantIncidents = undismissedIncidents
+    .filter((i) =>
+      shouldShowBanner({ incidents: [i], hasProjects, userRegions, hasUnknownRegions })
+    )
+    .map((i) => ({ id: i.id, name: i.name }))
+
   return {
     title,
     dismiss,
+    incidents: relevantIncidents,
   }
 }

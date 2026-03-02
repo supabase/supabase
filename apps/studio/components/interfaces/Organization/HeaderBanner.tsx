@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { InfoIcon, XIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { Button, cn, CriticalIcon, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 
-import { useOrganizationRestrictions } from 'hooks/misc/useOrganizationRestrictions'
-import { XIcon } from 'lucide-react'
-import { Button, cn, CriticalIcon, WarningIcon } from 'ui'
+import { useOrganizationRestrictions } from '@/hooks/misc/useOrganizationRestrictions'
 
 const bannerMotionProps = {
   initial: { height: 0, opacity: 0 },
@@ -32,6 +32,7 @@ interface HeaderBannerProps {
   title: string
   description: string | ReactNode
   onDismiss?: () => void
+  titleTooltip?: ReactNode
 }
 const variantStyles = {
   danger: {
@@ -48,7 +49,13 @@ const variantStyles = {
   },
 } as const
 
-export const HeaderBanner = ({ variant, title, description, onDismiss }: HeaderBannerProps) => {
+export const HeaderBanner = ({
+  variant,
+  title,
+  description,
+  onDismiss,
+  titleTooltip,
+}: HeaderBannerProps) => {
   const { banner: bannerStyles, icon: iconStyles } = variantStyles[variant]
   const Icon = variant === 'danger' ? CriticalIcon : WarningIcon
 
@@ -91,7 +98,24 @@ export const HeaderBanner = ({ variant, title, description, onDismiss }: HeaderB
             )}
           >
             {/* Title */}
-            <p className="text-sm text-foreground font-medium md:truncate">{title}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm text-foreground font-medium md:truncate">{title}</p>
+              {titleTooltip && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+                      aria-label="View incident details"
+                    >
+                      <InfoIcon size={14} className="text-foreground" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    {titleTooltip}
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
             {/* Description */}
             <div className="flex flex-row items-center gap-1.5 min-w-0 md:flex-nowrap text-sm">
               <span className="hidden md:inline text-foreground-muted">·</span>
