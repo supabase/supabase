@@ -1,19 +1,18 @@
 import { useParams } from 'common'
-import { SidebarContent } from 'components/interfaces/Sidebar'
 import { IS_PLATFORM } from 'lib/constants'
 import { Menu, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 import { Button, cn } from 'ui'
-import { CommandMenuTrigger, MobileSheetNav } from 'ui-patterns'
+import { CommandMenuTrigger } from 'ui-patterns'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
   const router = useRouter()
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const { setMobileMenuOpen } = useAppStateSnapshot()
   const { ref: projectRef } = useParams()
 
   return (
@@ -61,14 +60,11 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
               type="default"
               className="flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30"
               icon={<Menu />}
-              onClick={() => setIsSheetOpen(true)}
+              onClick={() => setMobileMenuOpen(true)}
             />
           )}
         </div>
       </nav>
-      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen} data-state="expanded">
-        <SidebarContent />
-      </MobileSheetNav>
     </div>
   )
 }

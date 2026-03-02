@@ -2,7 +2,14 @@ import { mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import {
+  forwardRef,
+  Fragment,
+  PropsWithChildren,
+  ReactNode,
+  useEffect,
+  useLayoutEffect,
+} from 'react'
 import {
   cn,
   LogoLoader,
@@ -18,7 +25,9 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useSetMainScrollContainer } from '../MainScrollContainerContext'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
+import { getSectionKeyFromPathname, MobileMenuContent } from './LayoutHeader/MobileMenuContent'
 import { LoadingState } from './LoadingState'
+import { useMobileSheet } from './NavigationBar/MobileSheetContext'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
 import { PausingState } from './PausingState'
@@ -96,7 +105,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const router = useRouter()
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
-    const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
+    const { showSidebar, mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
+    const { setContent: setMobileSheetContent, content: mobileSheetContent } = useMobileSheet()
+
+    const pathname = router.asPath?.split('?')[0] ?? router.pathname
+    const currentSectionKey = getSectionKeyFromPathname(pathname)
 
     const setMainScrollContainer = useSetMainScrollContainer()
     const combinedRef = mergeRefs(ref, setMainScrollContainer)
@@ -123,6 +136,29 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
     const showPausedState = isPaused && !ignorePausedState
+
+    useLayoutEffect(() => {
+      if (mobileMenuOpen) {
+        setMobileSheetContent(
+          <MobileMenuContent
+            currentProductMenu={productMenu ?? null}
+            currentProduct={product}
+            currentSectionKey={currentSectionKey}
+            onCloseSheet={() => {
+              setMobileSheetContent(null)
+              setMobileMenuOpen(false)
+            }}
+          />
+        )
+      }
+    }, [
+      mobileMenuOpen,
+      productMenu,
+      product,
+      currentSectionKey,
+      setMobileSheetContent,
+      setMobileMenuOpen,
+    ])
 
     return (
       <>
@@ -205,8 +241,16 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         </div>
         <CreateBranchModal />
         <ProjectAPIDocs />
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          {productMenu}
+        <MobileSheetNav
+          open={mobileSheetContent !== null && typeof mobileSheetContent !== 'string'}
+          onOpenChange={(open) => {
+            if (!open) {
+              setMobileSheetContent(null)
+              setMobileMenuOpen(false)
+            }
+          }}
+        >
+          {mobileSheetContent}
         </MobileSheetNav>
       </>
     )

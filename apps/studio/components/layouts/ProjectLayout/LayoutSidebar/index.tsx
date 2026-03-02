@@ -23,11 +23,12 @@ export const LayoutSidebar = ({
   const isMobile = useBreakpoint('md')
   const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSheet()
 
-  // On mobile the sidebar content is rendered in MobileSheetNav
+  // On mobile the sidebar content is rendered in MobileSheetNav (content === sidebar id)
+  const isSidebarSheetOpen = isMobile && mobileSheetContent === activeSidebar?.id
   useEffect(() => {
     if (isMobile && activeSidebar?.component) {
       setMobileSheetContent(activeSidebar.id)
-    } else {
+    } else if (!isMobile) {
       setMobileSheetContent(null)
     }
   }, [isMobile, activeSidebar, setMobileSheetContent])
@@ -39,7 +40,7 @@ export const LayoutSidebar = ({
       <MobileSheetNav
         shouldCloseOnRouteChange={false}
         shouldCloseOnViewportResize={false}
-        open={mobileSheetContent !== null}
+        open={isSidebarSheetOpen}
         onOpenChange={(open: boolean) => {
           if (!open) {
             setMobileSheetContent(null)
