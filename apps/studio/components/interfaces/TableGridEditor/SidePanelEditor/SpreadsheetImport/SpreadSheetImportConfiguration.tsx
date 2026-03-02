@@ -57,7 +57,10 @@ const SpreadsheetImportConfiguration = ({
                 checked={treatEmptyAsNull}
                 onCheckedChange={onToggleTreatEmptyAsNull}
               />
-              <Label_Shadcn_ htmlFor="treat-empty-as-null" className="text-sm text-foreground-light cursor-pointer">
+              <Label_Shadcn_
+                htmlFor="treat-empty-as-null"
+                className="text-sm text-foreground-light cursor-pointer"
+              >
                 Treat empty cells as <code className="text-xs">NULL</code>
               </Label_Shadcn_>
             </div>
