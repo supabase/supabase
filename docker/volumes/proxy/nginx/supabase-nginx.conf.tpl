@@ -9,7 +9,7 @@ server {
     http2 on;
 
     server_name ${PROXY_DOMAIN};
-    add_header Server "" always;
+    server_tokens off;
 
     proxy_http_version 1.1;
 
@@ -36,7 +36,7 @@ server {
     proxy_busy_buffers_size 256k;
 
     location / {
-        auth_basic "Supabase Dashboard";
+        auth_basic "supabase";
         auth_basic_user_file /etc/nginx/user_conf.d/dashboard-passwd;
 
         proxy_pass http://studio:3000;
