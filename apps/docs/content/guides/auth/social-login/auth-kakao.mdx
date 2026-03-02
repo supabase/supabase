@@ -67,9 +67,11 @@ This serves as the `client_id` when you make API calls to authenticate the user.
 - Set **State** to "ON" in the **Usage settings** section to enable Kakao Login.
 - Go to **Product Settings** > **Kakao Login** > **Consent Items**.
 - Set the following scopes under the **Consent Items**:
-  - account_email
+  - account_email (optional)
   - profile_image
   - profile_nickname
+
+If you don't need an email address (or `account_email` isn't available for your app), you can omit `account_email` and enable **Allow users without an email** in the Supabase Kakao provider settings.
 
 ![Kakao consent items configuration](/docs/img/guides/auth-kakao/kakao-developers-consent-items-set.png)
 
@@ -82,6 +84,8 @@ In the Kakao Developers Portal, the "account_email" consent item is only availab
 ## Add your OAuth credentials to Supabase
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Kakao" }} />
+
+If you did not request `account_email` in Kakao, enable **Allow users without an email** in the Kakao provider settings.
 
 ## Add login code to your client app
 

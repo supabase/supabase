@@ -14,5 +14,13 @@ Sentry.init({
   debug: false,
 
   // Enable performance monitoring
-  tracesSampleRate: 0.03, // Capture 3% of transactions for performance monitoring
+  tracesSampleRate: 0.001, // Capture 0.1% of transactions for performance monitoring
+  ignoreErrors: [
+    'NEXT_NOT_FOUND',
+    'NEXT_REDIRECT',
+    /504 Gateway Time-out/,
+    'Network request failed',
+    'Failed to fetch',
+    'AbortError',
+  ],
 })
