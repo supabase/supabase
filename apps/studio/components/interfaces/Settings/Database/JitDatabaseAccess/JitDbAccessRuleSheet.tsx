@@ -19,7 +19,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { JitMemberOption, JitUserRuleDraft, SheetMode } from './JitDbAccess.types'
 import { JitDbAccessRoleGrantFields } from './JitDbAccessRoleGrantFields'
-import { Admonition } from 'ui-patterns/admonition'
 
 interface JitDbAccessRuleSheetProps {
   open: boolean
@@ -104,7 +103,6 @@ export function JitDbAccessRuleSheet({
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
 
-
               {mode === 'edit' && (
                 <p className="mt-2 text-xs text-foreground-lighter">
                   The member cannot be changed when editing an existing JIT access rule.
@@ -139,7 +137,6 @@ export function JitDbAccessRuleSheet({
                   ))
                 )}
               </div>
-
 
               <p className="mt-2 text-xs leading-normal text-foreground-lighter">
                 Define scoped permissions with{' '}

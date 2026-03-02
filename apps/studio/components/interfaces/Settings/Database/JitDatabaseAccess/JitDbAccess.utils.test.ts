@@ -6,6 +6,7 @@ import {
   computeStatusFromGrants,
   createEmptyGrant,
   getRelativeDatetimeByMode,
+  isUuid,
   serializeDraftRolesForGrantMutation,
 } from './JitDbAccess.utils'
 
@@ -95,5 +96,16 @@ describe('serializeDraftRolesForGrantMutation', () => {
         role: 'supabase_read_only_user',
       },
     ])
+  })
+})
+
+describe('isUuid', () => {
+  it('returns true for valid UUID values', () => {
+    expect(isUuid('de305d54-75b4-431b-adb2-eb6b9e546014')).toBe(true)
+  })
+
+  it('returns false for non-UUID values', () => {
+    expect(isUuid('user@example.com')).toBe(false)
+    expect(isUuid('not-a-uuid')).toBe(false)
   })
 })
