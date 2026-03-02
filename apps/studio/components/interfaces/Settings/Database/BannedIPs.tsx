@@ -1,32 +1,29 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Globe } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from 'data/misc/user-ip-address-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { Globe } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Badge, Card, CardContent, Skeleton } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
+  PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionContent,
-  PageSectionDescription,
 } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-const BannedIPs = () => {
+export const BannedIPs = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -84,64 +81,59 @@ const BannedIPs = () => {
       <PageSection id="banned-ips">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Network Bans</PageSectionTitle>
+            <PageSectionTitle>Network bans</PageSectionTitle>
             <PageSectionDescription>
-              List of IP addresses that are temporarily blocked if their traffic pattern looks
-              abusive
+              IP addresses temporarily blocked due to suspicious traffic
             </PageSectionDescription>
           </PageSectionSummary>
           <DocsButton href={`${DOCS_URL}/reference/cli/supabase-network-bans`} />
         </PageSectionMeta>
-        <PageSectionContent></PageSectionContent>
+        <PageSectionContent>
+          {ipListLoading ? (
+            <Card>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+              </CardContent>
+            </Card>
+          ) : ipListError ? (
+            <AlertError error={ipListError} subject="Failed to retrieve banned IP addresses" />
+          ) : ipList.banned_ipv4_addresses.length > 0 ? (
+            <Card>
+              {ipList.banned_ipv4_addresses.map((ip) => (
+                <CardContent key={ip} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-5">
+                    <Globe size={16} className="text-foreground-lighter" />
+                    <p className="text-sm font-mono">{ip}</p>
+                    {ip === userIPAddress && <Badge>Your IP address</Badge>}
+                  </div>
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canUnbanNetworks}
+                    onClick={() => openConfirmationModal(ip)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canUnbanNetworks
+                          ? 'You need additional permissions to unban networks'
+                          : undefined,
+                      },
+                    }}
+                  >
+                    Unban IP
+                  </ButtonTooltip>
+                </CardContent>
+              ))}
+            </Card>
+          ) : (
+            <Card>
+              <CardContent className="text-foreground text-sm">
+                There are no banned IP addresses for your project
+              </CardContent>
+            </Card>
+          )}
+        </PageSectionContent>
       </PageSection>
-      {/* TODO: Remove mockIpList usage - using mock data for UI testing */}
-      {ipListLoading ? (
-        <Card>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-          </CardContent>
-        </Card>
-      ) : ipListError ? (
-        <AlertError
-          className="border-0 rounded-none"
-          error={ipListError}
-          subject="Failed to retrieve banned IP addresses"
-        />
-      ) : ipList.banned_ipv4_addresses.length > 0 ? (
-        <Card>
-          {ipList.banned_ipv4_addresses.map((ip) => (
-            <CardContent key={ip} className="flex items-center justify-between">
-              <div className="flex items-center space-x-5">
-                <Globe size={16} className="text-foreground-lighter" />
-                <p className="text-sm font-mono">{ip}</p>
-                {ip === userIPAddress && <Badge>Your IP address</Badge>}
-              </div>
-              <ButtonTooltip
-                type="default"
-                disabled={!canUnbanNetworks}
-                onClick={() => openConfirmationModal(ip)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canUnbanNetworks
-                      ? 'You need additional permissions to unban networks'
-                      : undefined,
-                  },
-                }}
-              >
-                Unban IP
-              </ButtonTooltip>
-            </CardContent>
-          ))}
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="text-foreground-light text-sm">
-            There are no banned IP addresses for your project.
-          </CardContent>
-        </Card>
-      )}
 
       <ConfirmationModal
         variant="destructive"
@@ -161,5 +153,3 @@ const BannedIPs = () => {
     </>
   )
 }
-
-export default BannedIPs

@@ -348,7 +348,7 @@ test.describe.serial('Index Advisor', () => {
       expect(isIndexAdvisorEnabled, 'Both extensions should be enabled after enabling').toBe(true)
     })
 
-    test('should show Warnings filter after Index Advisor is enabled', async ({ ref }) => {
+    test('should show Index Advisor filter after Index Advisor is enabled', async ({ ref }) => {
       if (!isIndexAdvisorEnabled) {
         test.skip(true, 'Index Advisor needs to be enabled first')
       }
@@ -357,15 +357,15 @@ test.describe.serial('Index Advisor', () => {
       await page.goto(toUrl(`/project/${ref}/observability/query-performance`))
       await page.waitForLoadState('networkidle')
 
-      // Wait patiently for the Warnings button to appear
+      // Wait patiently for the Index Advisor button to appear
       // Extensions may need time to initialize, so use a generous timeout
-      const warningsButton = page.getByText('Warnings', { exact: true })
+      const indexAdvisorButton = page.getByRole('button', { name: /Index Advisor/i })
       await expect(
-        warningsButton,
-        'Warnings filter button should be visible when Index Advisor is enabled'
+        indexAdvisorButton,
+        'Index Advisor filter button should be visible when Index Advisor is enabled'
       ).toBeVisible({ timeout: 30000 })
 
-      console.log('✓ Warnings button is now visible')
+      console.log('✓ Index Advisor button is now visible')
     })
   })
 
@@ -409,36 +409,12 @@ test.describe.serial('Index Advisor', () => {
       await page.goto(toUrl(`/project/${ref}/observability/query-performance`))
       await page.waitForLoadState('networkidle')
 
-      // Wait patiently for Warnings button
-      const warningsButton = page.getByText('Warnings', { exact: true }).first()
-      await expect(warningsButton, 'Warnings filter should be visible').toBeVisible({
+      // Wait for Index Advisor button and click to enable the filter
+      const indexAdvisorButton = page.getByRole('button', { name: /Index Advisor/i })
+      await expect(indexAdvisorButton, 'Index Advisor filter should be visible').toBeVisible({
         timeout: 30000,
       })
-      await warningsButton.click()
-
-      // Wait for popover to open by checking for the Index Advisor label
-      const indexAdvisorLabel = page.getByText('Index Advisor', { exact: true }).first()
-      await expect(
-        indexAdvisorLabel,
-        'Index Advisor option should be in Warnings popover'
-      ).toBeVisible({ timeout: 5000 })
-
-      // Click the label to select Index Advisor filter
-      await indexAdvisorLabel.click()
-
-      // Find and click the "Save" button if it exists
-      const saveButton = page.getByRole('button', { name: 'Save' }).first()
-
-      try {
-        await saveButton.waitFor({ state: 'visible', timeout: 2000 })
-        await saveButton.click()
-        // Wait for the popover to close
-        await saveButton.waitFor({ state: 'hidden', timeout: 3000 })
-      } catch (e) {
-        // If no Save button, the filter might apply automatically
-        // Close the popover by pressing Escape
-        await page.keyboard.press('Escape')
-      }
+      await indexAdvisorButton.click()
 
       // Check if any rows with Index Advisor warnings appear in the results
       // Look for rows in the query performance grid (excluding header)

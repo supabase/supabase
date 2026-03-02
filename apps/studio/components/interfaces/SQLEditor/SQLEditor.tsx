@@ -1,12 +1,11 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronUp, Loader2 } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import {
+  isExplainQuery,
+  isExplainSql,
+  splitSqlStatements,
+} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
@@ -15,6 +14,7 @@ import { constructHeaders, isValidConnString } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { wrapWithRollback } from 'data/sql/utils/transaction'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -26,6 +26,11 @@ import { formatSql } from 'lib/formatSql'
 import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { ChevronUp, Loader2 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -50,6 +55,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
@@ -72,7 +78,7 @@ import UtilityPanel from './UtilityPanel/UtilityPanel'
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
 const DiffEditor = dynamic(
-  () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
+  () => import('../../ui/DiffEditor').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
 
@@ -93,6 +99,7 @@ export const SQLEditor = () => {
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   const {
     sourceSqlDiff,
@@ -119,6 +126,7 @@ export const SQLEditor = () => {
   const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
   const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
   const [showWidget, setShowWidget] = useState(false)
+  const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
 
   // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
@@ -151,7 +159,17 @@ export const SQLEditor = () => {
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
-      if (id) snapV2.addResult(id, data.result, vars.autoLimit)
+      if (id) {
+        snapV2.addResult(id, data.result, vars.autoLimit)
+
+        if (showPrettyExplain && isExplainQuery(data.result)) {
+          snapV2.addExplainResult(id, data.result)
+          setActiveUtilityTab('explain')
+        } else if (activeUtilityTab === 'explain') {
+          // If on Explain tab but ran a non-EXPLAIN query, switch to Results tab
+          setActiveUtilityTab('results')
+        }
+      }
 
       // revalidate lint query
       queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
@@ -194,11 +212,27 @@ export const SQLEditor = () => {
     },
   })
 
+  const { mutate: executeExplain, isPending: isExplainExecuting } = useExecuteSqlMutation({
+    onSuccess(data) {
+      if (id) {
+        snapV2.addExplainResult(id, data.result)
+        setActiveUtilityTab('explain')
+      }
+    },
+    onError(error) {
+      if (id) {
+        snapV2.addExplainResultError(id, error)
+        setActiveUtilityTab('explain')
+      }
+    },
+  })
+
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
         const { title: name } = await generateSqlTitle({ sql })
-        snapV2.renameSnippet({ id, name })
+        snapV2.updateSnippet({ id, snippet: { name } })
+        snapV2.addNeedsSaving(id)
         const tabId = createTabId('sql', { id })
         tabs.updateTab(tabId, { label: name })
       } catch (error) {
@@ -334,6 +368,78 @@ export const SQLEditor = () => {
     ]
   )
 
+  const executeExplainQuery = useCallback(async () => {
+    if (isDiffOpen) return
+
+    // use the latest state
+    const state = getSqlEditorV2StateSnapshot()
+    const snippet = state.snippets[id]
+
+    if (editorRef.current !== null && !isExplainExecuting && project !== undefined) {
+      const editor = editorRef.current
+      const selection = editor.getSelection()
+      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+
+      const sql = snippet
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        : selectedValue || editorRef.current?.getValue()
+
+      // Check for multiple statements - EXPLAIN only works on a single statement
+      const statements = splitSqlStatements(sql)
+      if (statements.length > 1) {
+        snapV2.addExplainResultError(id, {
+          message:
+            'EXPLAIN only works on a single SQL statement. Please select just one query to analyze.',
+        })
+        setActiveUtilityTab('explain')
+        return
+      }
+
+      if (lineHighlights.length > 0) {
+        editor?.deltaDecorations(lineHighlights, [])
+        setLineHighlights([])
+      }
+
+      const impersonatedRoleState = getImpersonatedRoleState()
+      const connectionString = databases?.find(
+        (db) => db.identifier === databaseSelectorState.selectedDatabaseId
+      )?.connectionString
+      if (!isValidConnString(connectionString)) {
+        return toast.error('Unable to run query: Connection string is missing')
+      }
+
+      // Wrap the query with EXPLAIN ANALYZE only if it's not already an EXPLAIN query
+      const explainSql = isExplainSql(sql) ? sql : `EXPLAIN ANALYZE ${sql}`
+
+      // Wrap EXPLAIN queries in a transaction with rollback to prevent data modifications
+      // This ensures EXPLAIN ANALYZE INSERT/UPDATE/DELETE queries don't actually modify data
+      const explainSqlWithTransaction = wrapWithRollback(
+        wrapWithRoleImpersonation(explainSql, impersonatedRoleState)
+      )
+
+      executeExplain({
+        projectRef: project.ref,
+        connectionString: connectionString,
+        sql: explainSqlWithTransaction,
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+        handleError: (error) => {
+          throw error
+        },
+      })
+    }
+  }, [
+    isDiffOpen,
+    id,
+    isExplainExecuting,
+    project,
+    executeExplain,
+    getImpersonatedRoleState,
+    databaseSelectorState.selectedDatabaseId,
+    databases,
+    lineHighlights,
+    snapV2,
+  ])
+
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
       if (!ref) return console.error('Project ref is required')
@@ -370,6 +476,16 @@ export const SQLEditor = () => {
     }, 20)
     editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
   }
+
+  const buildDebugPrompt = useCallback(() => {
+    const snippet = snapV2.snippets[id]
+    const result = snapV2.results[id]?.[0]
+    const sql = (snippet?.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim()
+    const errorMessage = result?.error?.message ?? 'Unknown error'
+    const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
+
+    return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
+  }, [id, snapV2.results, snapV2.snippets])
 
   const onDebug = useCallback(async () => {
     try {
@@ -668,10 +784,10 @@ export const SQLEditor = () => {
       <div className="flex h-full">
         <ResizablePanelGroup
           className="relative"
-          direction="vertical"
+          orientation="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
@@ -682,7 +798,6 @@ export const SQLEditor = () => {
                   {isDiffOpen && (
                     <div className="w-full h-full">
                       <DiffEditor
-                        theme="supabase"
                         language="pgsql"
                         original={defaultSqlDiff.original}
                         modified={defaultSqlDiff.modified}
@@ -690,21 +805,6 @@ export const SQLEditor = () => {
                           diffEditorRef.current = editor
                           setIsDiffEditorMounted(true)
                         }}
-                        options={{
-                          fontSize: 13,
-                          renderSideBySide: false,
-                          minimap: { enabled: false },
-                          wordWrap: 'on',
-                          lineNumbers: 'on',
-                          folding: false,
-                          padding: { top: 4 },
-                          lineNumbersMinChars: 3,
-                        }}
-                        // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
-                        // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
-                        // Error: TextModel got disposed before DiffEditorWidget model got reset
-                        keepCurrentModifiedModel={true}
-                        keepCurrentOriginalModel={true}
                       />
                       {showWidget && (
                         <ResizableAIWidget
@@ -798,7 +898,7 @@ export const SQLEditor = () => {
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="animate-spin text-brand" />
@@ -807,11 +907,16 @@ export const SQLEditor = () => {
               <UtilityPanel
                 id={id}
                 isExecuting={isExecuting}
+                isExplainExecuting={isExplainExecuting}
                 isDisabled={isDiffOpen}
                 hasSelection={hasSelection}
                 prettifyQuery={prettifyQuery}
                 executeQuery={executeQuery}
+                executeExplainQuery={executeExplainQuery}
                 onDebug={onDebug}
+                buildDebugPrompt={buildDebugPrompt}
+                activeTab={activeUtilityTab}
+                onActiveTabChange={setActiveUtilityTab}
               />
             )}
           </ResizablePanel>

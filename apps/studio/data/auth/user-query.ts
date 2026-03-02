@@ -1,12 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { getUserSQL } from 'data/sql/queries/get-user'
 import { UseCustomQueryOptions } from 'types'
+
+import { getUserSQL } from './auth.sql'
 import { authKeys } from './keys'
 import { User } from './users-infinite-query'
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+import { UUID_REGEX } from '@/lib/constants'
 
 type UserVariables = {
   projectRef?: string

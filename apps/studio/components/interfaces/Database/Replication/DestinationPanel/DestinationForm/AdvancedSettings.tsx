@@ -10,6 +10,7 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  PrePostTab,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DestinationType } from '../DestinationPanel.types'
@@ -47,18 +48,96 @@ export const AdvancedSettings = ({
               name="maxFillMs"
               render={({ field }) => (
                 <FormItemLayout
-                  label="Batch wait time (milliseconds)"
                   layout="horizontal"
-                  description="How long to wait for more changes before sending. Shorter times mean more real-time updates but higher overhead."
+                  label="Batch wait time"
+                  description={
+                    <>
+                      <p>
+                        Maximum time the pipeline waits to collect additional changes before
+                        flushing a batch.
+                      </p>
+                      <p>
+                        Lower values reduce replication latency; higher values improve batching
+                        efficiency.
+                      </p>
+                    </>
+                  }
                 >
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      {...field}
-                      type="number"
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field)}
-                      placeholder="e.g., 5000 (5 seconds)"
-                    />
+                    <PrePostTab postTab="milliseconds">
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder="Default: 10000"
+                      />
+                    </PrePostTab>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+
+            <FormField_Shadcn_
+              control={form.control}
+              name="maxTableSyncWorkers"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Table sync workers"
+                  layout="horizontal"
+                  description={
+                    <>
+                      <p>Number of tables copied in parallel during the initial snapshot phase.</p>
+                      <p>
+                        Each worker uses one replication slot (up to N + 1 total while syncing).
+                      </p>
+                    </>
+                  }
+                >
+                  <FormControl_Shadcn_>
+                    <PrePostTab postTab="workers">
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder="Default: 4"
+                      />
+                    </PrePostTab>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+
+            <FormField_Shadcn_
+              control={form.control}
+              name="maxCopyConnectionsPerTable"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Copy connections per table"
+                  layout="horizontal"
+                  description={
+                    <>
+                      <p>
+                        Number of parallel connections each table copy can use during initial sync.
+                      </p>
+                      <p>
+                        Higher values can copy large tables faster, but consume more database
+                        connections.
+                      </p>
+                    </>
+                  }
+                >
+                  <FormControl_Shadcn_>
+                    <PrePostTab postTab="connections">
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder="Default: 2"
+                      />
+                    </PrePostTab>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -73,21 +152,34 @@ export const AdvancedSettings = ({
                   <FormItemLayout
                     label={
                       <div className="flex flex-col gap-y-2">
-                        <span>Maximum staleness (minutes)</span>
+                        <span>Maximum staleness</span>
                         <Badge className="w-min">BigQuery only</Badge>
                       </div>
                     }
                     layout="horizontal"
-                    description="Maximum age of cached data before BigQuery reads from base tables at query time. Lower values ensure fresher results but may increase query costs."
+                    description={
+                      <>
+                        <p>
+                          Maximum allowed age for BigQuery cached metadata before reading base
+                          tables.
+                        </p>
+                        <p>
+                          Lower values improve freshness; higher values can reduce query cost and
+                          latency.
+                        </p>
+                      </>
+                    }
                   >
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        {...field}
-                        type="number"
-                        value={field.value ?? ''}
-                        onChange={handleNumberChange(field)}
-                        placeholder="e.g. 60 (1 hour)"
-                      />
+                      <PrePostTab postTab="minutes">
+                        <Input_Shadcn_
+                          {...field}
+                          type="number"
+                          value={field.value ?? ''}
+                          onChange={handleNumberChange(field)}
+                          placeholder="Default: None (No staleness limit)"
+                        />
+                      </PrePostTab>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}

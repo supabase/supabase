@@ -36,7 +36,7 @@ import {
 } from 'ui'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
-import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
+import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'
 import { SmoothstepEdge } from './Edge'
 import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'

@@ -1,10 +1,11 @@
 import { SupaTable } from 'components/grid/types'
-import { Lint } from '../../../data/lint/lint-query'
+
+import { Lint } from '@/data/lint/lint-query'
 
 export const getEntityLintDetails = (
   entityName: string,
   lintName: string,
-  lintLevels: ('ERROR' | 'WARN')[],
+  lintLevels: ('ERROR' | 'WARN' | 'INFO')[],
   lints: Lint[],
   schema: string
 ): { hasLint: boolean; count: number; matchingLint: Lint | null } => {
@@ -14,7 +15,7 @@ export const getEntityLintDetails = (
         lint?.metadata?.name === entityName &&
         lint?.metadata?.schema === schema &&
         lint?.name === lintName &&
-        lintLevels.includes(lint?.level as 'ERROR' | 'WARN')
+        lintLevels.includes(lint?.level)
     ) || null
 
   return {

@@ -7,7 +7,11 @@ title: 'Manage Branching usage'
 
 Each [Preview branch](/docs/guides/deployment/branching) is a separate environment with all Supabase services (Database, Auth, Storage, etc.). You're charged for usage within that environment—such as [Compute](/docs/guides/platform/manage-your-usage/compute), [Disk Size](/docs/guides/platform/manage-your-usage/disk-size), [Egress](/docs/guides/platform/manage-your-usage/egress), and [Storage](/docs/guides/platform/manage-your-usage/storage-size)—just like the project you branched from.
 
-Usage by Preview branches counts toward your subscription plan's quota.
+<Admonition type="note">
+
+Usage by Preview branches counts toward your subscription plan's quota. Branches are **not** covered by the [Spend Cap](/docs/guides/platform/cost-control#spend-cap).
+
+</Admonition>
 
 ## How charges are calculated
 
@@ -51,7 +55,9 @@ You can view Branching usage on the [organization's usage page](/dashboard/org/_
     light: '/docs/img/guides/platform/usage-navbar--light.png',
     dark: '/docs/img/guides/platform/usage-navbar--dark.png',
   }}
-  zoomable
+
+width={1546}
+height={208}
 />
 
 In the Usage Summary section, you can see how many hours your Preview branches existed during the selected time period. Hover over "Branching Compute Hours" for a detailed breakdown.
@@ -62,7 +68,9 @@ In the Usage Summary section, you can see how many hours your Preview branches e
     light: '/docs/img/guides/platform/usage-summary-branch-hours--light.png',
     dark: '/docs/img/guides/platform/usage-summary-branch-hours--dark.png',
   }}
-  zoomable
+
+width={2258}
+height={1360}
 />
 
 ## Optimize usage

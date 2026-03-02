@@ -108,8 +108,8 @@ export const RestoreToNewProject = () => {
         buttonText="Upgrade"
         source="backupsRestoreToNewProject"
         featureProposition="enable restoring to new project"
-        primaryText="Restore to a new project requires a pro plan or above."
-        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
+        primaryText="Restore to a new project requires Pro Plan and above"
+        secondaryText="To restore to a new project, you need to upgrade to a Pro Plan and have physical backups enabled."
       />
     )
   }

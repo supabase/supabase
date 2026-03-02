@@ -1,8 +1,9 @@
-import { numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { compactNumberFormatter, numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import type { Organization } from 'types'
+
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
 import { Project } from '../projects/project-detail-query'
@@ -28,7 +29,7 @@ export const getReportAttributesV2: (
       showTooltip: true,
       showLegend: true,
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       showMaxValue: false,
       showGrid: true,
       syncId: 'database-reports',
@@ -76,10 +77,14 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 45,
-        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+        tickFormatter: (value: any) => {
+          // avoid displaying 100.00%
+          if (value === 100) return '100%'
+          return `${numberFormatter(value, 2)}%`
+        },
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'cpu_usage_busy_system',
@@ -144,10 +149,10 @@ export const getReportAttributesV2: (
       showGrid: true,
       showMaxValue: true,
       YAxisProps: {
-        width: 35,
-        tickFormatter: (value: any) => numberFormatter(value, 0),
+        width: 55,
+        tickFormatter: (value: any) => compactNumberFormatter(value),
       },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'disk_iops_write',
@@ -234,7 +239,7 @@ export const getReportAttributesV2: (
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
@@ -267,7 +272,7 @@ export const getReportAttributesV2: (
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
@@ -331,7 +336,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
@@ -363,7 +368,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'supavisor_connections_active',
@@ -389,7 +394,7 @@ export const getReportAttributesV2: (
         tickFormatter: (value: any) => formatBytes(value, 1),
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-size`,
       attributes: [
         {

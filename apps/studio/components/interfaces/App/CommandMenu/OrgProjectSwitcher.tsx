@@ -45,7 +45,7 @@ export function useProjectSwitchCommand() {
     [
       {
         id: 'switch-project',
-        name: 'Switch project',
+        name: 'Switch project...',
         value: 'Switch project, Change project, Select project',
         action: () => setPage(PROJECT_SWITCHER_PAGE_NAME),
         icon: () => <Wrench />,
@@ -87,7 +87,7 @@ export function useConfigureOrganizationCommand() {
     [
       {
         id: 'configure-organization',
-        name: 'Configure organization',
+        name: 'Configure organization...',
         value: 'Configure organization, Change organization, Select organization',
         action: () => setPage(ORGANIZATION_SWITCHER_PAGE_NAME),
         icon: () => <Building />,
