@@ -4,7 +4,7 @@ import { Admonition } from 'ui-patterns'
 
 // [Joshen] In the future, conditionals should be from resource exhaustion endpoint as single source of truth
 interface DiskIOBandwidthWarningsProps {
-  canChangeComputeSize: boolean
+  hasAccessToComputeSizes: boolean
   hasLatest: boolean
   upgradeUrl: string
   currentBillingCycleSelected: boolean
@@ -13,7 +13,7 @@ interface DiskIOBandwidthWarningsProps {
 }
 
 export const DiskIOBandwidthWarnings = ({
-  canChangeComputeSize,
+  hasAccessToComputeSizes,
   hasLatest,
   currentBillingCycleSelected,
   upgradeUrl,
@@ -34,7 +34,7 @@ export const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="danger">
               <Link href={upgradeUrl}>
-                {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
+                {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -58,7 +58,7 @@ export const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="danger">
               <Link href={upgradeUrl}>
-                {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
+                {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -81,7 +81,7 @@ export const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="warning">
               <Link href={upgradeUrl}>
-                {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
+                {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -105,7 +105,7 @@ export const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="warning">
               <Link href={upgradeUrl}>
-                {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
+                {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>

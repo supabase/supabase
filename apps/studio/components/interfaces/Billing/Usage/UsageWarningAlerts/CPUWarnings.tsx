@@ -6,12 +6,16 @@ import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 interface CPUWarningsProps {
-  canChangeComputeSize: boolean
+  hasAccessToComputeSizes: boolean
   upgradeUrl: string
   severity?: 'warning' | 'critical' | null
 }
 
-export const CPUWarnings = ({ canChangeComputeSize, upgradeUrl, severity }: CPUWarningsProps) => {
+export const CPUWarnings = ({
+  hasAccessToComputeSizes,
+  upgradeUrl,
+  severity,
+}: CPUWarningsProps) => {
   if (severity === 'warning') {
     return (
       <Alert_Shadcn_ variant="warning">
@@ -28,7 +32,7 @@ export const CPUWarnings = ({ canChangeComputeSize, upgradeUrl, severity }: CPUW
           </Button>
           <Button asChild type="warning">
             <Link href={upgradeUrl}>
-              {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
+              {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>
           </Button>
         </div>
@@ -52,7 +56,7 @@ export const CPUWarnings = ({ canChangeComputeSize, upgradeUrl, severity }: CPUW
           </Button>
           <Button asChild type="danger">
             <Link href={upgradeUrl}>
-              {canChangeComputeSize ? 'Change compute add-on' : 'Upgrade project'}
+              {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>
           </Button>
         </div>

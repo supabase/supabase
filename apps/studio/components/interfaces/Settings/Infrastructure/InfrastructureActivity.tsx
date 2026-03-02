@@ -65,7 +65,7 @@ export const InfrastructureActivity = () => {
   const { data: subscription, isPending: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
-  const { hasAccess: canChangeComputeSize } = useCheckEntitlements(
+  const { hasAccess: hasAccessToComputeSizes } = useCheckEntitlements(
     'instances.compute_update_available_sizes'
   )
 
@@ -108,7 +108,7 @@ export const InfrastructureActivity = () => {
   const upgradeUrl =
     organization === undefined
       ? `/`
-      : organization.plan.id === 'free'
+      : hasAccessToComputeSizes
         ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
         : `/project/${projectRef}/settings/addons`
 
@@ -272,7 +272,7 @@ export const InfrastructureActivity = () => {
                     <>
                       <DiskIOBandwidthWarnings
                         upgradeUrl={upgradeUrl}
-                        canChangeComputeSize={canChangeComputeSize}
+                        hasAccessToComputeSizes={hasAccessToComputeSizes}
                         hasLatest={hasLatest}
                         currentBillingCycleSelected={currentBillingCycleSelected}
                         latestIoBudgetConsumption={latestIoBudgetConsumption}
@@ -333,14 +333,14 @@ export const InfrastructureActivity = () => {
                   {attribute.key === 'max_cpu_usage' && (
                     <CPUWarnings
                       upgradeUrl={upgradeUrl}
-                      canChangeComputeSize={canChangeComputeSize}
+                      hasAccessToComputeSizes={hasAccessToComputeSizes}
                       severity={projectResourceWarnings?.cpu_exhaustion}
                     />
                   )}
                   {attribute.key === 'ram_usage' && (
                     <RAMWarnings
                       upgradeUrl={upgradeUrl}
-                      canChangeComputeSize={canChangeComputeSize}
+                      hasAccessToComputeSizes={hasAccessToComputeSizes}
                       severity={projectResourceWarnings?.memory_and_swap_exhaustion}
                     />
                   )}
