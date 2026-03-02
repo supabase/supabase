@@ -1,10 +1,11 @@
-import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useParams } from 'common'
 import { partition } from 'lodash'
-import { NextRouter } from 'next/router'
+import { type NextRouter } from 'next/router'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
+
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
@@ -387,7 +388,7 @@ function createTabsState(projectRef: string) {
       onClearDashboardHistory()
       router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
     },
-    handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: any) => {
+    handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: NextRouter) => {
       // Make permanent if needed
       const draggedTab = store.tabsMap[tabId]
       if (draggedTab?.isPreview) {
@@ -415,20 +416,20 @@ export type TabsState = ReturnType<typeof createTabsState>
 export const TabsStateContext = createContext<TabsState>(createTabsState(''))
 
 export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
-  const { data: project } = useSelectedProjectQuery()
-  const [state, setState] = useState(createTabsState(project?.ref ?? ''))
+  const { ref: projectRef } = useParams()
+  const [state, setState] = useState(createTabsState(projectRef ?? ''))
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !!project?.ref) {
-      setState(createTabsState(project?.ref ?? ''))
+    if (typeof window !== 'undefined' && !!projectRef) {
+      setState(createTabsState(projectRef ?? ''))
     }
-  }, [project?.ref])
+  }, [projectRef])
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && project?.ref) {
+    if (typeof window !== 'undefined' && projectRef) {
       return subscribe(state, () => {
         localStorage.setItem(
-          getTabsStorageKey(project?.ref),
+          getTabsStorageKey(projectRef),
           JSON.stringify({
             activeTab: state.activeTab,
             openTabs: state.openTabs,
@@ -437,14 +438,14 @@ export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
           })
         )
         localStorage.setItem(
-          getRecentItemsStorageKey(project?.ref),
+          getRecentItemsStorageKey(projectRef),
           JSON.stringify({
             items: state.recentItems,
           })
         )
       })
     }
-  }, [project?.ref, state])
+  }, [projectRef, state])
 
   return <TabsStateContext.Provider value={state}>{children}</TabsStateContext.Provider>
 }
@@ -471,38 +472,4 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
     default:
       return ''
   }
-}
-
-// Remove from local storage when feature flag is disabled
-export function removeTabsByEditor(ref: string, editor: 'table' | 'sql') {
-  // Recent items
-  const recentItems = getSavedRecentItems(ref)
-  const filteredRecentItems = recentItems.filter((item) =>
-    editor === 'sql' ? item.type !== 'sql' : item.type === 'sql'
-  )
-  localStorage.setItem(
-    getRecentItemsStorageKey(ref),
-    JSON.stringify({ items: filteredRecentItems })
-  )
-
-  // Tabs
-  const tabs = getSavedTabs(ref)
-  const filteredTabsMap = Object.fromEntries(
-    Object.entries(tabs.tabsMap).filter(([, tab]) =>
-      editor === 'sql' ? tab.type !== 'sql' : tab.type === 'sql'
-    )
-  )
-
-  const filteredOpenTabs = tabs.openTabs.filter((tabId) => filteredTabsMap[tabId])
-  localStorage.setItem(
-    getTabsStorageKey(ref),
-    JSON.stringify({
-      activeTab: filteredOpenTabs.includes(tabs.activeTab ?? '')
-        ? tabs.activeTab
-        : filteredOpenTabs[0] ?? null,
-      openTabs: filteredOpenTabs,
-      tabsMap: filteredTabsMap,
-      previewTabId: tabs.previewTabId,
-    })
-  )
 }

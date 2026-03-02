@@ -140,7 +140,7 @@ export const AccountIdentities = () => {
                     <div className="flex items-center gap-x-1">
                       {provider === 'email' && (
                         <Button asChild type="default">
-                          <Link href="/reset-password">Reset password</Link>
+                          <Link href="/reset-password?type=change">Change password</Link>
                         </Button>
                       )}
                       <ButtonTooltip
