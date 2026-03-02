@@ -3,6 +3,14 @@ export const privilegeKeys = {
     ['projects', projectRef, 'database', 'table-privileges'] as const,
   columnPrivilegesList: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database', 'column-privileges'] as const,
-  exposedTablesInfinite: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'privileges', 'exposed-tables-infinite'] as const,
+  exposedTablesInfinite: (projectRef: string | undefined, search?: string) =>
+    [
+      'projects',
+      projectRef,
+      'privileges',
+      'exposed-tables-infinite',
+      search ? { search } : undefined,
+    ] as const,
+  exposeMode: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'privileges', 'expose-mode'] as const,
 }

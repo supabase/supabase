@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { indexOf } from 'lodash'
 import { Lock } from 'lucide-react'
@@ -34,20 +35,24 @@ import {
 } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
-import TableSelector from '../../Realtime/Inspector/RealtimeFilterPopover/TableSelector'
 import { ExposedSchemasList } from './ExposedSchemasList'
-import { ExposedTablesList } from './ExposedTablesList'
 import { HardenAPIModal } from './HardenAPIModal'
+import { ExposedTableSelector } from '@/components/interfaces/Settings/API/ExposedTableSelector'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import SchemaSelector from '@/components/ui/SchemaSelector'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { exposeModeQueryOptions } from '@/data/privileges/expose-mode-query'
+import { privilegeKeys } from '@/data/privileges/keys'
+import { useUpdateExposedTablesMutation } from '@/data/privileges/update-exposed-tables-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
+import { noop } from '@/lib/void'
+import type { ResponseError } from '@/types'
 
 const formSchema = z.object({
   // Fields for updatePostgrestConfig
@@ -71,6 +76,7 @@ const formSchema = z.object({
 export const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const queryClient = useQueryClient()
   const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
 
   const [showModal, setShowModal] = useState(false)
@@ -94,7 +100,29 @@ export const PostgrestConfig = () => {
     connectionString: project?.connectionString,
   })
 
-  const isLoading = isLoadingConfig || isLoadingSchemas
+  const configDbSchemas = useMemo(
+    () => (config?.db_schema ? config.db_schema.split(',').map((x) => x.trim()) : []),
+    [config?.db_schema]
+  )
+
+  const {
+    data: exposeMode,
+    isPending: isLoadingExposeMode,
+    isError: isExposeModeError,
+    isSuccess: isSuccessExposeMode,
+  } = useQuery(
+    exposeModeQueryOptions(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schemas: configDbSchemas,
+      },
+      { enabled: isSuccessConfig && isApiGrantTogglesEnabled }
+    )
+  )
+
+  const isLoading =
+    isLoadingConfig || isLoadingSchemas || (isApiGrantTogglesEnabled && isLoadingExposeMode)
 
   const schemas = useMemo(
     () =>
@@ -114,12 +142,11 @@ export const PostgrestConfig = () => {
     [allSchemas]
   )
 
-  const { mutate: updatePostgrestConfig, isPending: isUpdating } =
-    useProjectPostgrestConfigUpdateMutation({
-      onSuccess: () => {
-        toast.success('Successfully saved settings')
-      },
-    })
+  const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation()
+
+  const { mutateAsync: updateExposedTables } = useUpdateExposedTablesMutation()
+
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const formId = 'project-postgres-config'
 
@@ -130,9 +157,8 @@ export const PostgrestConfig = () => {
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
   const defaultValues = useMemo(() => {
-    const dbSchema = config?.db_schema ? config?.db_schema.split(',').map((x) => x.trim()) : []
     return {
-      dbSchema,
+      dbSchema: configDbSchemas,
       maxRows: config?.max_rows,
       // TODO: only display schemas that exist in the db
       dbExtraSearchPath: (config?.db_extra_search_path ?? '')
@@ -140,11 +166,11 @@ export const PostgrestConfig = () => {
         .map((x) => x.trim())
         .filter(Boolean),
       dbPool: config?.db_pool,
-      exposeMode: 'schemas' as const,
+      exposeMode: exposeMode ?? ('schemas' as const),
       tableIdsToAdd: [] as number[],
       tableIdsToRemove: [] as number[],
     }
-  }, [config])
+  }, [config, configDbSchemas, exposeMode])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -157,27 +183,78 @@ export const PostgrestConfig = () => {
   }, [form, defaultValues])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!projectRef) return console.error('Project ref is required') // is this needed ?
+    if (!projectRef) return console.error('Project ref is required')
 
-    updatePostgrestConfig({
-      projectRef,
-      dbSchema: values.dbSchema.join(','),
-      maxRows: values.maxRows,
-      dbExtraSearchPath: values.dbExtraSearchPath.join(','),
-      dbPool: values.dbPool ? values.dbPool : null,
-    })
+    setIsUpdating(true)
+
+    try {
+      let dbSchema = values.dbSchema.join(',')
+
+      if (values.exposeMode === 'specific') {
+        const exposedSchemas = await updateExposedTables({
+          projectRef,
+          connectionString: project?.connectionString,
+          tableIdsToAdd: values.tableIdsToAdd,
+          tableIdsToRemove: values.tableIdsToRemove,
+        })
+
+        // graphql_public is managed separately from table-level grants,
+        // so preserve its original exposure state when saving in specific mode.
+        const hadGraphqlPublic = configDbSchemas.includes('graphql_public')
+        const hasGraphqlPublic = exposedSchemas.includes('graphql_public')
+
+        if (hadGraphqlPublic && !hasGraphqlPublic) {
+          exposedSchemas.push('graphql_public')
+        } else if (!hadGraphqlPublic && hasGraphqlPublic) {
+          exposedSchemas.splice(exposedSchemas.indexOf('graphql_public'), 1)
+        }
+
+        dbSchema = exposedSchemas.join(',')
+      }
+
+      await updatePostgrestConfig(
+        {
+          projectRef,
+          dbSchema,
+          maxRows: values.maxRows,
+          dbExtraSearchPath: values.dbExtraSearchPath.join(','),
+          dbPool: values.dbPool ? values.dbPool : null,
+        },
+        { onError: noop }
+      )
+
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.exposedTablesInfinite(projectRef),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.exposeMode(projectRef),
+        }),
+      ])
+
+      toast.success('Successfully saved settings')
+      resetForm()
+    } catch (error) {
+      toast.error('Failed to save settings: ' + (error as ResponseError).message || 'Unknown error')
+    } finally {
+      setIsUpdating(false)
+    }
   }
 
   useEffect(() => {
-    if (isSuccessConfig && isSuccessSchemas) {
+    const isReady = isApiGrantTogglesEnabled
+      ? isSuccessConfig && isSuccessSchemas && isSuccessExposeMode
+      : isSuccessConfig && isSuccessSchemas
+
+    if (isReady) {
       resetForm()
     }
-  }, [isSuccessConfig, isSuccessSchemas, resetForm])
+  }, [isSuccessConfig, isSuccessSchemas, isSuccessExposeMode, isApiGrantTogglesEnabled, resetForm])
 
   const watchedExposeMode = form.watch('exposeMode')
   const watchedDbSchema = form.watch('dbSchema')
+  const watchedTableIdsToAdd = form.watch('tableIdsToAdd')
   const watchedTableIdsToRemove = form.watch('tableIdsToRemove')
-
   const excludedSchemas = useMemo(() => {
     return (
       INTERNAL_SCHEMAS
@@ -198,7 +275,7 @@ export const PostgrestConfig = () => {
                 <CardContent>
                   <GenericSkeletonLoader />
                 </CardContent>
-              ) : isError ? (
+              ) : isError || (isApiGrantTogglesEnabled && isExposeModeError) ? (
                 <CardContent>
                   <Admonition type="destructive" title="Failed to retrieve API settings" />
                 </CardContent>
@@ -292,51 +369,52 @@ export const PostgrestConfig = () => {
                             onRemoveSchema={(schema) => {
                               form.setValue(
                                 'dbSchema',
-                                form.getValues('dbSchema').filter((x) => x !== schema)
+                                form.getValues('dbSchema').filter((x) => x !== schema),
+                                { shouldDirty: true }
                               )
                             }}
                           />
                         </>
                       ) : (
-                        <>
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="tableIdsToAdd"
-                            render={({ field }) => (
-                              <FormItem_Shadcn_>
-                                <FormItemLayout
-                                  layout="flex-row-reverse"
-                                  label="Exposed tables"
-                                  description="Grant Data API access to selected tables."
-                                >
-                                  <TableSelector
-                                    selectedSchemaName="*"
-                                    onSelectTable={(_name, tableId) => {
-                                      field.onChange([...field.value, tableId])
-                                    }}
-                                  />
-                                </FormItemLayout>
-                              </FormItem_Shadcn_>
-                            )}
-                          />
-
-                          <ExposedTablesList
-                            tableIdsPendingRemoval={watchedTableIdsToRemove}
-                            onRemoveTable={(tableId) => {
-                              const tableIdsToAdd = form.getValues('tableIdsToAdd')
-                              const tableIdsToRemove = form.getValues('tableIdsToRemove')
-
-                              if (tableIdsToAdd.includes(tableId)) {
+                        <FormItemLayout
+                          isReactForm={false}
+                          layout="flex-row-reverse"
+                          label="Exposed tables"
+                          description="Toggle Data API access for individual tables."
+                        >
+                          <ExposedTableSelector
+                            pendingAddTableIds={watchedTableIdsToAdd}
+                            pendingRemoveTableIds={watchedTableIdsToRemove}
+                            onTogglePendingAdd={(tableId) => {
+                              const current = form.getValues('tableIdsToAdd')
+                              if (current.includes(tableId)) {
                                 form.setValue(
                                   'tableIdsToAdd',
-                                  tableIdsToAdd.filter((x) => x !== tableId)
+                                  current.filter((x) => x !== tableId),
+                                  { shouldDirty: true }
                                 )
                               } else {
-                                form.setValue('tableIdsToRemove', [...tableIdsToRemove, tableId])
+                                form.setValue('tableIdsToAdd', [...current, tableId], {
+                                  shouldDirty: true,
+                                })
+                              }
+                            }}
+                            onTogglePendingRemove={(tableId) => {
+                              const current = form.getValues('tableIdsToRemove')
+                              if (current.includes(tableId)) {
+                                form.setValue(
+                                  'tableIdsToRemove',
+                                  current.filter((x) => x !== tableId),
+                                  { shouldDirty: true }
+                                )
+                              } else {
+                                form.setValue('tableIdsToRemove', [...current, tableId], {
+                                  shouldDirty: true,
+                                })
                               }
                             }}
                           />
-                        </>
+                        </FormItemLayout>
                       )}
 
                       {watchedDbSchema.length === 0 && (
