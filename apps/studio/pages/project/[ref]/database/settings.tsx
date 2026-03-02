@@ -9,6 +9,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 import { PageContainer } from 'ui-patterns/PageContainer'
+import { useIsJitDbAccessEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -44,6 +45,7 @@ const JitDbAccessConfiguration = dynamic(
 const ProjectSettings: NextPageWithLayout = () => {
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const jitDbAccessEnabled = useIsJitDbAccessEnabled()
   const showNewDiskManagementUI = isAws || isAwsK8s
   const { databaseNetworkRestrictions } = useIsFeatureEnabled(['database:network_restrictions'])
 
@@ -66,7 +68,7 @@ const ProjectSettings: NextPageWithLayout = () => {
             <ResetDbPassword />
             <ConnectionPooling />
             <SSLConfiguration />
-            <JitDbAccessConfiguration />
+            {jitDbAccessEnabled && <JitDbAccessConfiguration />}
             {showNewDiskManagementUI ? (
               // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
               <DiskManagementPanelForm />
