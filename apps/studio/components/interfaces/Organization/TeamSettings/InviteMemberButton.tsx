@@ -15,6 +15,7 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
@@ -78,8 +79,7 @@ export const InviteMemberButton = () => {
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
 
-  const currentPlan = organization?.plan
-  const isFreeOrProPlan = currentPlan?.id === 'free' || currentPlan?.id === 'pro'
+  const { hasAccess: hasAccessToSso } = useCheckEntitlements('auth.platform.sso')
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
@@ -308,7 +308,7 @@ export const InviteMemberButton = () => {
           type="note"
           showIcon={false}
           title="Single Sign-On (SSO) available"
-          layout={isFreeOrProPlan ? 'vertical' : 'horizontal'}
+          layout={!hasAccessToSso ? 'vertical' : 'horizontal'}
           className="rounded-none border-t-0 border-x-0 px-5"
           description="Enforce login via your company identity provider for added security and access control. Available on Team plan and above."
           actions={
@@ -318,7 +318,7 @@ export const InviteMemberButton = () => {
                   Learn more
                 </Link>
               </Button>
-              {isFreeOrProPlan ? (
+              {!hasAccessToSso ? (
                 <UpgradePlanButton
                   plan="Team"
                   source="inviteMemberSSO"
