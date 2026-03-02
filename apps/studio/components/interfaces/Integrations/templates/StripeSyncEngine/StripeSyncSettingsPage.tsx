@@ -3,7 +3,6 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BadgeCheck, RefreshCwIcon, Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -36,15 +35,8 @@ export const StripeSyncSettingsPage = () => {
   const uninstalling = isUninstalling(installationStatus)
   const tableEditorUrl = `/project/${project?.ref}/editor?schema=stripe`
 
-  // Redirect to overview page when integration is not installed
-  useEffect(() => {
-    if (isLoadingInstallationStatus || installed || !project?.ref) return
-
-    router.push(`/project/${project.ref}/integrations/stripe_sync_engine/overview`)
-  }, [isLoadingInstallationStatus, installed, project?.ref, router])
-
   return (
-    <PageContainer>
+    <PageContainer className="mx-0">
       {syncState && installed && !uninstalling && (
         <PageSection id="sync-status">
           <PageSectionMeta>
