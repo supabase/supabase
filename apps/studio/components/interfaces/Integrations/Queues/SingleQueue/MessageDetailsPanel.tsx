@@ -77,11 +77,15 @@ export const MessageDetailsPanel = ({
 
   return (
     <ResizablePanel
-      defaultSize={30}
-      maxSize={45}
-      minSize={30}
+      defaultSize="30"
+      maxSize="45"
+      minSize="30"
       collapsible
-      onCollapse={() => setSelectedMessage(null)}
+      onResize={(panelSize) => {
+        if (panelSize.asPercentage === 0) {
+          setSelectedMessage(null)
+        }
+      }}
       className="bg-studio border-t pointer-events-auto"
     >
       <Button

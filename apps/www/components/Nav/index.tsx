@@ -5,7 +5,8 @@ import Link from 'next/link'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
-import { useIsLoggedIn, useUser } from 'common'
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { DevToolbarTrigger } from 'dev-tools'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns'
 
@@ -50,9 +51,10 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
+  const user = useUser()
   const menu = getMenu()
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const user = useUser()
   const userMenu = useDropdownMenu(user)
 
   const isLaunchWeekXPage = pathname === '/launch-week/x'
@@ -148,45 +150,52 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 </NavigationMenu>
               </div>
               <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
-                <GitHubButton />
-
-                {isLoggedIn ? (
-                  <>
-                    <Button className="hidden lg:block" asChild>
-                      <Link href="/dashboard/projects">Dashboard</Link>
-                    </Button>
-                    <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
-                  </>
-                ) : (
-                  <>
-                    <Button type="default" className="hidden lg:block" asChild>
-                      <Link
-                        href="https://supabase.com/dashboard"
-                        onClick={() =>
-                          sendTelemetryEvent({
-                            action: 'sign_in_button_clicked',
-                            properties: { buttonLocation: 'Header Nav' },
-                          })
-                        }
-                      >
-                        Sign in
-                      </Link>
-                    </Button>
-                    <Button className="hidden lg:block" asChild>
-                      <Link
-                        href="https://supabase.com/dashboard"
-                        onClick={() =>
-                          sendTelemetryEvent({
-                            action: 'start_project_button_clicked',
-                            properties: { buttonLocation: 'Header Nav' },
-                          })
-                        }
-                      >
-                        Start your project
-                      </Link>
-                    </Button>
-                  </>
-                )}
+                <div
+                  className={cn(
+                    'flex items-center gap-2 transition-opacity',
+                    isUserLoading ? 'opacity-0' : 'opacity-100'
+                  )}
+                >
+                  <DevToolbarTrigger />
+                  <GitHubButton />
+                  {isLoggedIn ? (
+                    <>
+                      <Button className="hidden lg:block" asChild>
+                        <Link href="/dashboard/projects">Dashboard</Link>
+                      </Button>
+                      <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
+                    </>
+                  ) : (
+                    <>
+                      <Button type="default" className="hidden lg:block" asChild>
+                        <Link
+                          href="https://supabase.com/dashboard"
+                          onClick={() =>
+                            sendTelemetryEvent({
+                              action: 'sign_in_button_clicked',
+                              properties: { buttonLocation: 'Header Nav' },
+                            })
+                          }
+                        >
+                          Sign in
+                        </Link>
+                      </Button>
+                      <Button className="hidden lg:block" asChild>
+                        <Link
+                          href="https://supabase.com/dashboard"
+                          onClick={() =>
+                            sendTelemetryEvent({
+                              action: 'start_project_button_clicked',
+                              properties: { buttonLocation: 'Header Nav' },
+                            })
+                          }
+                        >
+                          Start your project
+                        </Link>
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             <HamburgerButton

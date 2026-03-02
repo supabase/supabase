@@ -1,18 +1,20 @@
-import { useMemo } from 'react'
-
+import { useFlag } from 'common'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useFlag } from 'common'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
-import {
-  INSTALLATION_INSTALLED_SUFFIX,
-  STRIPE_SCHEMA_COMMENT_PREFIX,
-} from 'stripe-experiment-sync/supabase'
+import { useMemo } from 'react'
+
 import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
 import { INTEGRATIONS } from './Integrations.constants'
+import {
+  isInstalled as checkIsInstalled,
+  findStripeSchema,
+  parseStripeSchemaStatus,
+} from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -28,6 +30,9 @@ export const useInstalledIntegrations = () => {
         return false
       }
       if (!stripeSyncEnabled && integration.id === 'stripe_sync_engine') {
+        return false
+      }
+      if (!IS_PLATFORM && integration.id === 'data_api') {
         return false
       }
       return true
@@ -76,12 +81,13 @@ export const useInstalledIntegrations = () => {
         if (integration.id === 'webhooks') {
           return isHooksEnabled
         }
+        if (integration.id === 'data_api') {
+          return true
+        }
         if (integration.id === 'stripe_sync_engine') {
-          const stripeSchema = schemas?.find(({ name }) => name === 'stripe')
-          return (
-            !!stripeSchema?.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
-            !!stripeSchema.comment?.includes(INSTALLATION_INSTALLED_SUFFIX)
-          )
+          const stripeSchema = findStripeSchema(schemas)
+          const status = parseStripeSchemaStatus(stripeSchema)
+          return checkIsInstalled(status)
         }
         if (integration.type === 'wrapper') {
           return wrappers.find((w) => wrapperMetaComparator(integration.meta, w))

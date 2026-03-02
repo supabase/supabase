@@ -1,8 +1,9 @@
-import { writeToDisk } from './helpers'
-import stringify from 'json-stringify-safe'
-import { parseArgs } from 'node:util'
 import fs from 'fs'
 import { strict as assert } from 'node:assert'
+import { parseArgs } from 'node:util'
+import stringify from 'json-stringify-safe'
+
+import { writeToDisk } from './helpers'
 
 const args = parseArgs({
   options: {

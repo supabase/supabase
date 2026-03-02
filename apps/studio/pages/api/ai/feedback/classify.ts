@@ -1,8 +1,8 @@
 import { generateObject } from 'ai'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -28,7 +28,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { model, error: modelError } = await getModel({
+    const {
+      model,
+      error: modelError,
+      providerOptions,
+    } = await getModel({
       provider: 'openai',
       routingKey: 'feedback',
     })
@@ -39,6 +43,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const { object } = await generateObject({
       model,
+      providerOptions,
       schema: z.object({
         feedback_category: z.enum(['support', 'feedback', 'unknown']),
       }),

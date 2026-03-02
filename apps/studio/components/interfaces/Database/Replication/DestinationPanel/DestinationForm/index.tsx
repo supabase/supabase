@@ -1,12 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { snakeCase } from 'lodash'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useFlag, useParams } from 'common'
 import { CreateAnalyticsBucketSheet } from 'components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -32,13 +25,20 @@ import {
 import { useValidatePipelineMutation } from 'data/replication/validate-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { snakeCase } from 'lodash'
 import { Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import { Button, DialogSectionSeparator, Form_Shadcn_, SheetFooter, SheetSection } from 'ui'
+import * as z from 'zod'
+
 import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
@@ -174,8 +174,8 @@ export const DestinationForm = ({
       name: destinationData?.name ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? undefined,
-      maxSize: pipelineData?.config?.batch?.max_size ?? undefined,
       maxTableSyncWorkers: pipelineData?.config?.max_table_sync_workers ?? undefined,
+      maxCopyConnectionsPerTable: pipelineData?.config?.max_copy_connections_per_table ?? undefined,
       // BigQuery fields
       projectId: isBigQueryConfig ? config.big_query.project_id : '',
       datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
@@ -303,8 +303,8 @@ export const DestinationForm = ({
         sourceId,
         publicationName: data.publicationName,
         maxFillMs: data.maxFillMs,
-        maxSize: data.maxSize,
         maxTableSyncWorkers: data.maxTableSyncWorkers,
+        maxCopyConnectionsPerTable: data.maxCopyConnectionsPerTable,
       }),
     ])
 
@@ -403,10 +403,9 @@ export const DestinationForm = ({
         }
 
         const batchConfig: BatchConfig | undefined =
-          data.maxFillMs !== undefined || data.maxSize !== undefined
+          data.maxFillMs !== undefined
             ? {
                 ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
-                ...(data.maxSize !== undefined ? { maxSize: data.maxSize } : {}),
               }
             : undefined
         const hasBatchFields = batchConfig !== undefined
@@ -422,6 +421,7 @@ export const DestinationForm = ({
           pipelineConfig: {
             publicationName: data.publicationName,
             maxTableSyncWorkers: data.maxTableSyncWorkers,
+            maxCopyConnectionsPerTable: data.maxCopyConnectionsPerTable,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
           },
           sourceId,
@@ -486,10 +486,9 @@ export const DestinationForm = ({
           destinationConfig = { iceberg: icebergConfig }
         }
         const batchConfig: BatchConfig | undefined =
-          data.maxFillMs !== undefined || data.maxSize !== undefined
+          data.maxFillMs !== undefined
             ? {
                 ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
-                ...(data.maxSize !== undefined ? { maxSize: data.maxSize } : {}),
               }
             : undefined
         const hasBatchFields = batchConfig !== undefined
@@ -504,6 +503,7 @@ export const DestinationForm = ({
           pipelineConfig: {
             publicationName: data.publicationName,
             maxTableSyncWorkers: data.maxTableSyncWorkers,
+            maxCopyConnectionsPerTable: data.maxCopyConnectionsPerTable,
             ...(hasBatchFields ? { batch: batchConfig } : {}),
           },
         })

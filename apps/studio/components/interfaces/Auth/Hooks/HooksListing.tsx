@@ -1,14 +1,13 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { cn } from 'ui'
 import { EmptyStatePresentational, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -20,10 +19,11 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
-import { HOOKS_DEFINITIONS, Hook } from './hooks.constants'
+import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 
 export const HooksListing = () => {
@@ -35,6 +35,8 @@ export const HooksListing = () => {
     isError,
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
+
+  const [hook, setHook] = useQueryState('hook', parseAsString)
 
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
 
@@ -53,7 +55,7 @@ export const HooksListing = () => {
       }
       toast.success(`${selectedHookForDeletion.title} has been deleted.`)
       setSelectedHookForDeletion(null)
-      setSelectedHook(null)
+      setHook(null)
     },
     onError: (error) => {
       toast.error(`Failed to delete hook: ${error.message}`)
@@ -71,16 +73,14 @@ export const HooksListing = () => {
     }
   })
 
-  const { setValue: setSelectedHook, value: selectedHook } = useQueryStateWithSelect({
-    urlKey: 'hook',
-    select: (id: string) => {
-      if (!id) return null
-      const hook = hooks.find((h) => h.id === id)
-      return hook ? hook.title : undefined
-    },
-    enabled: !!hooks && hooks.length > 0,
-    onError: () => toast.error(`Hook not found`),
-  })
+  const selectedHook = hooks.find((h) => h.id === hook)
+
+  useEffect(() => {
+    if (!!hook && !selectedHook) {
+      toast('Hook not found')
+      setHook(null)
+    }
+  }, [hook, selectedHook, setHook])
 
   if (isError) {
     return (
@@ -115,7 +115,7 @@ export const HooksListing = () => {
           <AddHookDropdown
             onSelectHook={(title) => {
               const hook = hooks.find((h) => h.title === title)
-              if (hook) setSelectedHook(hook.id)
+              if (hook) setHook(hook.id)
             }}
           />
         </PageSectionAside>
@@ -132,7 +132,7 @@ export const HooksListing = () => {
               buttonText="Add a new hook"
               onSelectHook={(title) => {
                 const hook = hooks.find((h) => h.title === title)
-                if (hook) setSelectedHook(hook.id)
+                if (hook) setHook(hook.id)
               }}
             />
           </EmptyStatePresentational>
@@ -143,23 +143,19 @@ export const HooksListing = () => {
             .filter((h) => isValidHook(h))
             .map((hook) => {
               return (
-                <HookCard
-                  key={hook.enabledKey}
-                  hook={hook}
-                  onSelect={() => setSelectedHook(hook.id)}
-                />
+                <HookCard key={hook.enabledKey} hook={hook} onSelect={() => setHook(hook.id)} />
               )
             })}
         </div>
 
         <CreateHookSheet
-          title={selectedHook ?? null}
+          title={selectedHook?.title ?? null}
           visible={!!selectedHook}
           onDelete={() => {
-            const hook = hooks.find((h) => h.title === selectedHook)
+            const hook = hooks.find((h) => h.title === selectedHook?.title)
             if (hook) setSelectedHookForDeletion(hook)
           }}
-          onClose={() => setSelectedHook(null)}
+          onClose={() => setHook(null)}
           authConfig={authConfig!}
         />
 

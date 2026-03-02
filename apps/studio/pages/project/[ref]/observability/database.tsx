@@ -168,7 +168,7 @@ const DatabaseUsage = () => {
       if (isReplicaSelected) {
         queryClient.invalidateQueries({
           queryKey: analyticsKeys.infraMonitoring(ref, {
-            attribute: 'physical_replication_lag_physical_replica_lag_seconds',
+            attribute: 'physical_replication_lag_physical_replication_lag_seconds',
             startDate: period_start.date,
             endDate: period_end.date,
             interval,
@@ -286,7 +286,7 @@ const DatabaseUsage = () => {
                 <ChartHandler
                   startDate={selectedDateRange?.period_start?.date}
                   endDate={selectedDateRange?.period_end?.date}
-                  attribute="physical_replication_lag_physical_replica_lag_seconds"
+                  attribute="physical_replication_lag_physical_replication_lag_seconds"
                   label="Replication lag"
                   interval={selectedDateRange.interval}
                   provider="infra-monitoring"

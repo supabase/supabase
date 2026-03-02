@@ -21,10 +21,7 @@ export const TransferProjectPanel = () => {
     <PageSection id="transfer-project">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Transfer Project</PageSectionTitle>
-          <PageSectionDescription>
-            Transfer your project to a different organization.
-          </PageSectionDescription>
+          <PageSectionTitle>Transfer project</PageSectionTitle>
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>

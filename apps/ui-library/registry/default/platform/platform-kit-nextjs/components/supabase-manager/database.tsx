@@ -1,17 +1,18 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
-import { z, type ZodTypeAny } from 'zod'
-import { useListTables } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-tables'
-import { useRunQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
-import { SqlEditor } from '@/registry/default/platform/platform-kit-nextjs/components/sql-editor'
-import { DynamicForm } from '@/registry/default/platform/platform-kit-nextjs/components/dynamic-form'
-import { toast } from 'sonner'
-import { useSheetNavigation } from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
-import { Skeleton } from '@/registry/default/components/ui/skeleton'
-import { Button } from '@/registry/default/components/ui/button'
 import { AlertTriangle, Table, Wand } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import { z, type ZodTypeAny } from 'zod'
+
 import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
+import { Button } from '@/registry/default/components/ui/button'
+import { Skeleton } from '@/registry/default/components/ui/skeleton'
+import { DynamicForm } from '@/registry/default/platform/platform-kit-nextjs/components/dynamic-form'
+import { SqlEditor } from '@/registry/default/platform/platform-kit-nextjs/components/sql-editor'
+import { useSheetNavigation } from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
+import { useRunQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
+import { useListTables } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-tables'
 
 // Helper to generate a Zod schema from the table's column definitions
 function generateZodSchema(table: any): z.ZodObject<any, any, any> {

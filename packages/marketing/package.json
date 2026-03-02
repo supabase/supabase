@@ -1,0 +1,28 @@
+{
+  "name": "marketing",
+  "version": "0.0.0",
+  "description": "Reusable marketing sections and schemas for campaign landing pages",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./crm": "./src/crm/index.ts"
+  },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules"
+  },
+  "devDependencies": {
+    "tsconfig": "workspace:",
+    "typescript": "catalog:"
+  },
+  "dependencies": {
+    "ui": "workspace:*",
+    "zod": "catalog:",
+    "react": "catalog:",
+    "react-markdown": "^8.0.3",
+    "server-only": "^0.0.1",
+    "@types/react": "catalog:"
+  },
+  "license": "MIT"
+}

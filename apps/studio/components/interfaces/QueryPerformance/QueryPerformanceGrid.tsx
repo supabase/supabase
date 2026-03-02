@@ -34,7 +34,6 @@ import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
 import {
   QUERY_PERFORMANCE_COLUMNS,
-  QUERY_PERFORMANCE_REPORT_TYPES,
   QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
@@ -98,7 +97,6 @@ export const QueryPerformanceGrid = ({
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
-  const reportType = QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED
 
   const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
     const nonSortableColumns = ['query']
@@ -334,6 +332,18 @@ export const QueryPerformanceGrid = ({
                     }
                   </InfoTooltip>
                 </span>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
+        if (col.id === 'application_name') {
+          return (
+            <div className="w-full flex flex-col justify-center">
+              {value ? (
+                <p className="font-mono text-xs">{value}</p>
               ) : (
                 <p className="text-muted">&ndash;</p>
               )}
