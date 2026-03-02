@@ -6,7 +6,9 @@ import type { JitUserRuleDraft } from './JitDbAccess.types'
 import {
   computeStatusFromGrants,
   createEmptyGrant,
+  getInvalidCidrs,
   getJitMemberOptions,
+  parseCommaSeparatedCidrs,
   getRelativeDatetimeByMode,
   serializeDraftRolesForGrantMutation,
 } from './JitDbAccess.utils'
@@ -56,6 +58,20 @@ describe('jitDbAccess.utils', () => {
       activeIp: 1,
       expiredIp: 1,
     })
+  })
+
+  it('parses comma-separated CIDR lists and trims whitespace', () => {
+    expect(parseCommaSeparatedCidrs('192.0.2.0/24, 2001:db8::/64 , ,203.0.113.4/32')).toEqual([
+      '192.0.2.0/24',
+      '2001:db8::/64',
+      '203.0.113.4/32',
+    ])
+  })
+
+  it('returns invalid CIDRs from comma-separated input', () => {
+    expect(
+      getInvalidCidrs('192.0.2.0/24, not-a-cidr, 10.0.0.1/33, 2001:db8::/64, 2001:db8::/129')
+    ).toEqual(['not-a-cidr', '10.0.0.1/33', '2001:db8::/129'])
   })
 })
 

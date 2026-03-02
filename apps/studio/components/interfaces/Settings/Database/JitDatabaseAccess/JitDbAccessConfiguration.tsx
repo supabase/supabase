@@ -54,6 +54,7 @@ import {
   createDraft,
   draftFromRule,
   getAssignableJitRoleOptions,
+  getInvalidCidrs,
   getJitMemberOptions,
   mapJitMembersToUserRules,
   serializeDraftRolesForGrantMutation,
@@ -193,15 +194,39 @@ const JitDbAccessConfiguration = () => {
   )
 
   const inlineValidation = useMemo(
-    () => ({
-      member: !draft.memberId
-        ? 'Select a member for this JIT access rule.'
-        : isDuplicateSelectedMember
-          ? 'This member already has a JIT access rule. Edit their existing rule from the list.'
-          : undefined,
-      roles: enabledRoleCount > 0 ? undefined : 'Select at least one role.',
-    }),
-    [draft.memberId, enabledRoleCount, isDuplicateSelectedMember]
+    () => {
+      let invalidIpGrant: (typeof draft.grants)[number] | undefined
+      let invalidCidrs: string[] = []
+
+      for (const grant of draft.grants) {
+        if (!grant.enabled) continue
+
+        const nextInvalidCidrs = getInvalidCidrs(grant.ipRanges)
+        if (nextInvalidCidrs.length === 0) continue
+
+        invalidIpGrant = grant
+        invalidCidrs = nextInvalidCidrs
+        break
+      }
+
+      const invalidPreview = invalidCidrs.slice(0, 3).join(', ')
+      const hasOverflowInvalidCidrs = invalidCidrs.length > 3
+
+      return {
+        member: !draft.memberId
+          ? 'Select a member for this JIT access rule.'
+          : isDuplicateSelectedMember
+            ? 'This member already has a JIT access rule. Edit their existing rule from the list.'
+            : undefined,
+        roles:
+          enabledRoleCount === 0
+            ? 'Select at least one role.'
+            : invalidIpGrant
+              ? `Invalid CIDR range${invalidCidrs.length > 1 ? 's' : ''} for role "${invalidIpGrant.roleId}": ${invalidPreview}${hasOverflowInvalidCidrs ? ', ...' : ''}`
+              : undefined,
+      }
+    },
+    [draft.grants, draft.memberId, enabledRoleCount, isDuplicateSelectedMember]
   )
 
   const resetSheetState = () => {

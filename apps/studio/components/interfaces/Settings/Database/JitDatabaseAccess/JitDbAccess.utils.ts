@@ -3,6 +3,7 @@ import type { JitDbAccessMembersData } from 'data/jit-db-access/jit-db-access-me
 import type { OrganizationMembersData } from 'data/organizations/organization-members-query'
 import type { ProjectMembersData } from 'data/projects/project-members-query'
 import dayjs from 'dayjs'
+import { IPv4CidrRange, IPv6CidrRange } from 'ip-num'
 
 import type {
   JitExpiryMode,
@@ -152,6 +153,31 @@ export function toUnixSeconds(datetimeIso: string) {
   const value = dayjs(datetimeIso)
   if (!value.isValid()) return undefined
   return value.unix()
+}
+
+export function parseCommaSeparatedCidrs(value: string) {
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0)
+}
+
+function isValidCidr(value: string) {
+  try {
+    if (value.includes(':')) {
+      IPv6CidrRange.fromCidr(value)
+      return true
+    }
+
+    IPv4CidrRange.fromCidr(value)
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function getInvalidCidrs(value: string) {
+  return parseCommaSeparatedCidrs(value).filter((cidr) => !isValidCidr(cidr))
 }
 
 function isAssignableJitRole(role: PgRole) {
