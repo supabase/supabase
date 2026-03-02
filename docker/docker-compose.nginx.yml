@@ -22,7 +22,7 @@ services:
       - /bin/bash
       - -c
       - |
-        echo "$${PROXY_AUTH_USERNAME}:$$(openssl passwd -apr1 $${PROXY_AUTH_PASSWORD})" > /etc/nginx/user_conf.d/dashboard-passwd && \
+        printf '%s:%s\n' "$${PROXY_AUTH_USERNAME}" "$$(openssl passwd -apr1 "$${PROXY_AUTH_PASSWORD}")" > /etc/nginx/user_conf.d/dashboard-passwd && \
         envsubst '$${PROXY_DOMAIN}' < /etc/nginx/supabase-nginx.conf.tpl > /etc/nginx/user_conf.d/nginx.conf && \
         /scripts/start_nginx_certbot.sh
     volumes:
