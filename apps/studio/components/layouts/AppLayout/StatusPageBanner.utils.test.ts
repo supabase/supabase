@@ -1,18 +1,22 @@
 import { describe, expect, it } from 'vitest'
 
-import { shouldShowBanner } from './StatusPageBanner.utils'
+import { getRelevantIncidentIds, shouldShowBanner } from './StatusPageBanner.utils'
 
-const noCache = { cache: null } as const
+const noCache = { id: 'no-cache', cache: null } as const
 const noRestrictions = {
+  id: 'no-restrictions',
   cache: { affected_regions: null, affects_project_creation: false },
 }
 const affectsCreation = {
+  id: 'affects-creation',
   cache: { affected_regions: null, affects_project_creation: true },
 }
 const usEast1Only = {
+  id: 'us-east-1-only',
   cache: { affected_regions: ['us-east-1'], affects_project_creation: false },
 }
 const usEast1AndCreation = {
+  id: 'us-east-1-and-creation',
   cache: { affected_regions: ['us-east-1'], affects_project_creation: true },
 }
 
@@ -87,7 +91,9 @@ describe('shouldShowBanner', () => {
     it('shows when affected_regions is an empty array', () => {
       expect(
         shouldShowBanner({
-          incidents: [{ cache: { affected_regions: [], affects_project_creation: false } }],
+          incidents: [
+            { id: 'test', cache: { affected_regions: [], affects_project_creation: false } },
+          ],
           hasProjects: true,
           userRegions: new Set(['us-east-1']),
         })
@@ -110,7 +116,10 @@ describe('shouldShowBanner', () => {
       expect(
         shouldShowBanner({
           incidents: [
-            { cache: { affected_regions: ['eu-west-1'], affects_project_creation: false } },
+            {
+              id: 'test',
+              cache: { affected_regions: ['eu-west-1'], affects_project_creation: false },
+            },
           ],
           hasProjects: true,
           userRegions: new Set(['us-east-1', 'eu-west-1']),
@@ -123,6 +132,7 @@ describe('shouldShowBanner', () => {
         shouldShowBanner({
           incidents: [
             {
+              id: 'test',
               cache: {
                 affected_regions: ['us-east-1', 'ap-southeast-1'],
                 affects_project_creation: false,
@@ -220,6 +230,110 @@ describe('shouldShowBanner', () => {
           hasUnknownRegions: true,
         })
       ).toBe(true)
+    })
+  })
+})
+
+describe('getRelevantIncidentIds', () => {
+  it('returns empty array when there are no incidents', () => {
+    expect(
+      getRelevantIncidentIds({ incidents: [], hasProjects: true, userRegions: new Set() })
+    ).toEqual([])
+  })
+
+  it('returns empty array when no incidents are relevant to the user', () => {
+    expect(
+      getRelevantIncidentIds({
+        incidents: [usEast1Only],
+        hasProjects: true,
+        userRegions: new Set(['eu-west-1']),
+      })
+    ).toEqual([])
+  })
+
+  it('returns the ID of a single relevant incident', () => {
+    expect(
+      getRelevantIncidentIds({
+        incidents: [noRestrictions],
+        hasProjects: true,
+        userRegions: new Set(['us-east-1']),
+      })
+    ).toEqual(['no-restrictions'])
+  })
+
+  it('returns IDs of all relevant incidents', () => {
+    const euWest1Only = {
+      id: 'eu-west-1-only',
+      cache: { affected_regions: ['eu-west-1'], affects_project_creation: false },
+    }
+    const apSoutheast1Only = {
+      id: 'ap-southeast-1-only',
+      cache: { affected_regions: ['ap-southeast-1'], affects_project_creation: false },
+    }
+
+    expect(
+      getRelevantIncidentIds({
+        incidents: [euWest1Only, apSoutheast1Only],
+        hasProjects: true,
+        userRegions: new Set(['eu-west-1', 'ap-southeast-1']),
+      })
+    ).toEqual(expect.arrayContaining(['ap-southeast-1-only', 'eu-west-1-only']))
+  })
+
+  it('excludes incidents irrelevant to the user from the result', () => {
+    // User is in eu-west-1; us-east-1-only incident should not be included
+    expect(
+      getRelevantIncidentIds({
+        incidents: [usEast1Only, noRestrictions],
+        hasProjects: true,
+        userRegions: new Set(['eu-west-1']),
+      })
+    ).toEqual(['no-restrictions'])
+  })
+
+  describe('user has no projects', () => {
+    it('includes incidents with affects_project_creation', () => {
+      expect(
+        getRelevantIncidentIds({
+          incidents: [affectsCreation],
+          hasProjects: false,
+          userRegions: new Set(),
+        })
+      ).toEqual(['affects-creation'])
+    })
+
+    it('excludes incidents without affects_project_creation', () => {
+      expect(
+        getRelevantIncidentIds({
+          incidents: [noRestrictions, usEast1Only],
+          hasProjects: false,
+          userRegions: new Set(),
+        })
+      ).toEqual([])
+    })
+  })
+
+  describe('hasUnknownRegions', () => {
+    it('includes region-restricted incidents when regions are unknown', () => {
+      expect(
+        getRelevantIncidentIds({
+          incidents: [usEast1Only],
+          hasProjects: true,
+          userRegions: new Set(),
+          hasUnknownRegions: true,
+        })
+      ).toEqual(['us-east-1-only'])
+    })
+
+    it('still excludes incidents for no-project users even when regions are unknown', () => {
+      expect(
+        getRelevantIncidentIds({
+          incidents: [usEast1Only],
+          hasProjects: false,
+          userRegions: new Set(),
+          hasUnknownRegions: true,
+        })
+      ).toEqual([])
     })
   })
 })
