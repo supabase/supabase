@@ -1885,7 +1885,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const storeAlreadyLoaded = state.projectRef === project?.ref
 
     if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
-      const clientEndpoint = storageEndpoint ?? hostEndpoint
+      const clientEndpoint = storageEndpoint ?? hostEndpoint ?? ''
       const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
       setState(
         createStorageExplorerState({

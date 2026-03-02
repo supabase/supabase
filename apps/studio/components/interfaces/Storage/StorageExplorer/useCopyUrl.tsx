@@ -33,7 +33,9 @@ export const useCopyUrl = () => {
   const onCopyUrl = useCallback(
     (name: string, expiresIn?: URL_EXPIRY_DURATION) => {
       const formattedUrl = getFileUrl(name, expiresIn).then((url) => {
-        return isCustomDomainActive ? url.replace(hostEndpoint, customEndpoint) : url
+        return isCustomDomainActive && hostEndpoint
+          ? url.replace(hostEndpoint, customEndpoint)
+          : url
       })
 
       return copyToClipboard(formattedUrl, () => {
