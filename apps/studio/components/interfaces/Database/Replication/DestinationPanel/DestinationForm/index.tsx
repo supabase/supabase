@@ -6,9 +6,6 @@ import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import {
   BatchConfig,
-  BigQueryDestinationConfig,
-  DestinationConfig,
-  IcebergDestinationConfig,
   useCreateDestinationPipelineMutation,
 } from 'data/replication/create-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
@@ -27,7 +24,6 @@ import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespac
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { snakeCase } from 'lodash'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -41,9 +37,12 @@ import * as z from 'zod'
 
 import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
-import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
+import { CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
-import { buildDestinationConfigForValidation } from './DestinationForm.utils'
+import {
+  buildDestinationConfig,
+  buildDestinationConfigForValidation,
+} from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
 import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
 import { NewPublicationPanel } from './NewPublicationPanel'
@@ -176,10 +175,16 @@ export const DestinationForm = ({
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? undefined,
       maxTableSyncWorkers: pipelineData?.config?.max_table_sync_workers ?? undefined,
       maxCopyConnectionsPerTable: pipelineData?.config?.max_copy_connections_per_table ?? undefined,
+      invalidatedSlotBehavior:
+        (pipelineData?.config as { invalidated_slot_behavior?: 'error' | 'recreate' } | undefined)
+          ?.invalidated_slot_behavior ?? undefined,
       // BigQuery fields
       projectId: isBigQueryConfig ? config.big_query.project_id : '',
       datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
       serviceAccountKey: isBigQueryConfig ? config.big_query.service_account_key : '',
+      connectionPoolSize:
+        (config as { big_query?: { connection_pool_size?: number } } | undefined)?.big_query
+          ?.connection_pool_size ?? undefined,
       maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined, // Default: null
       // Analytics Bucket fields
       warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
@@ -305,6 +310,7 @@ export const DestinationForm = ({
         maxFillMs: data.maxFillMs,
         maxTableSyncWorkers: data.maxTableSyncWorkers,
         maxCopyConnectionsPerTable: data.maxCopyConnectionsPerTable,
+        invalidatedSlotBehavior: data.invalidatedSlotBehavior,
       }),
     ])
 
@@ -349,10 +355,6 @@ export const DestinationForm = ({
     return !hasCriticalFailures
   }
 
-  // [Joshen] I reckon this function can be refactored to be a bit more modular, it's currently pretty
-  // complicated with 4 different types of flows -> edit bigquery/analytics, and create bigquery/analytics
-  // At first glance we could try grouping as edit / create bigquery, edit / create analytics
-  // since the destination config seems rather similar between edit and create for the same type
   const submitPipeline = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!sourceId) return console.error('Source id is required')
@@ -361,56 +363,31 @@ export const DestinationForm = ({
     }
 
     try {
+      const destinationConfig = await buildDestinationConfig({
+        projectRef,
+        selectedType,
+        warehouseName,
+        data,
+        createS3AccessKey,
+        resolveNamespace,
+      })
+
+      if (!destinationConfig) throw new Error('Destination configuration is missing')
+
+      const batchConfig: BatchConfig | undefined =
+        data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : undefined
+      const hasBatchFields = batchConfig !== undefined
+
+      const pipelineConfig = {
+        publicationName: data.publicationName,
+        maxTableSyncWorkers: data.maxTableSyncWorkers,
+        maxCopyConnectionsPerTable: data.maxCopyConnectionsPerTable,
+        invalidatedSlotBehavior: data.invalidatedSlotBehavior,
+        ...(hasBatchFields ? { batch: batchConfig } : {}),
+      }
+
       if (editMode && existingDestination) {
         if (!existingDestination.pipelineId) return console.error('Pipeline id is required')
-
-        let destinationConfig: DestinationConfig | undefined = undefined
-
-        if (selectedType === 'BigQuery') {
-          const bigQueryConfig: BigQueryDestinationConfig = {
-            projectId: data.projectId ?? '',
-            datasetId: data.datasetId ?? '',
-            serviceAccountKey: data.serviceAccountKey ?? '',
-          }
-          if (!!data.maxStalenessMins) {
-            bigQueryConfig.maxStalenessMins = data.maxStalenessMins
-          }
-          destinationConfig = { bigQuery: bigQueryConfig }
-        } else if (selectedType === 'Analytics Bucket') {
-          let s3Keys = { accessKey: data.s3AccessKeyId, secretKey: data.s3SecretAccessKey }
-
-          if (data.s3AccessKeyId === CREATE_NEW_KEY) {
-            const newKeys = await createS3AccessKey({
-              projectRef,
-              description: `Autogenerated key for replication to ${snakeCase(warehouseName)}`,
-            })
-            s3Keys = { accessKey: newKeys.access_key, secretKey: newKeys.secret_key }
-          }
-
-          // Resolve namespace (create if needed)
-          const finalNamespace = await resolveNamespace(data)
-
-          const icebergConfig: IcebergDestinationConfig = {
-            projectRef: projectRef,
-            warehouseName: data.warehouseName ?? '',
-            namespace: finalNamespace,
-            catalogToken: data.catalogToken ?? '',
-            s3AccessKeyId: s3Keys.accessKey ?? '',
-            s3SecretAccessKey: s3Keys.secretKey ?? '',
-            s3Region: data.s3Region ?? '',
-          }
-          destinationConfig = { iceberg: icebergConfig }
-        }
-
-        const batchConfig: BatchConfig | undefined =
-          data.maxFillMs !== undefined
-            ? {
-                ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
-              }
-            : undefined
-        const hasBatchFields = batchConfig !== undefined
-
-        if (!destinationConfig) throw new Error('Destination configuration is missing')
 
         await updateDestinationPipeline({
           destinationId: existingDestination.destinationId,
@@ -418,12 +395,7 @@ export const DestinationForm = ({
           projectRef,
           destinationName: data.name,
           destinationConfig,
-          pipelineConfig: {
-            publicationName: data.publicationName,
-            maxTableSyncWorkers: data.maxTableSyncWorkers,
-            maxCopyConnectionsPerTable: data.maxCopyConnectionsPerTable,
-            ...(hasBatchFields ? { batch: batchConfig } : {}),
-          },
+          pipelineConfig,
           sourceId,
         })
         // Set request status only right before starting, then fire and close
@@ -448,64 +420,12 @@ export const DestinationForm = ({
         }
         onClose()
       } else {
-        let destinationConfig: DestinationConfig | undefined = undefined
-
-        if (selectedType === 'BigQuery') {
-          const bigQueryConfig: BigQueryDestinationConfig = {
-            projectId: data.projectId ?? '',
-            datasetId: data.datasetId ?? '',
-            serviceAccountKey: data.serviceAccountKey ?? '',
-          }
-          if (!!data.maxStalenessMins) {
-            bigQueryConfig.maxStalenessMins = data.maxStalenessMins
-          }
-          destinationConfig = { bigQuery: bigQueryConfig }
-        } else if (selectedType === 'Analytics Bucket') {
-          let s3Keys = { accessKey: data.s3AccessKeyId, secretKey: data.s3SecretAccessKey }
-
-          if (data.s3AccessKeyId === CREATE_NEW_KEY) {
-            const newKeys = await createS3AccessKey({
-              projectRef,
-              description: `Autogenerated key for replication to ${snakeCase(warehouseName)}`,
-            })
-            s3Keys = { accessKey: newKeys.access_key, secretKey: newKeys.secret_key }
-          }
-
-          // Resolve namespace (create if needed)
-          const finalNamespace = await resolveNamespace(data)
-
-          const icebergConfig: IcebergDestinationConfig = {
-            projectRef: projectRef,
-            warehouseName: data.warehouseName ?? '',
-            namespace: finalNamespace,
-            catalogToken: data.catalogToken ?? '',
-            s3AccessKeyId: s3Keys.accessKey ?? '',
-            s3SecretAccessKey: s3Keys.secretKey ?? '',
-            s3Region: data.s3Region ?? '',
-          }
-          destinationConfig = { iceberg: icebergConfig }
-        }
-        const batchConfig: BatchConfig | undefined =
-          data.maxFillMs !== undefined
-            ? {
-                ...(data.maxFillMs !== undefined ? { maxFillMs: data.maxFillMs } : {}),
-              }
-            : undefined
-        const hasBatchFields = batchConfig !== undefined
-
-        if (!destinationConfig) throw new Error('Destination configuration is missing')
-
         const { pipeline_id: pipelineId } = await createDestinationPipeline({
           projectRef,
           destinationName: data.name,
           destinationConfig,
+          pipelineConfig,
           sourceId,
-          pipelineConfig: {
-            publicationName: data.publicationName,
-            maxTableSyncWorkers: data.maxTableSyncWorkers,
-            maxCopyConnectionsPerTable: data.maxCopyConnectionsPerTable,
-            ...(hasBatchFields ? { batch: batchConfig } : {}),
-          },
         })
         // Set request status only right before starting, then fire and close
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
