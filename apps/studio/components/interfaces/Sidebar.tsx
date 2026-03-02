@@ -373,6 +373,14 @@ const OrganizationLinks = () => {
   const showBilling = useIsFeatureEnabled('billing:all')
 
   const activeRoute = router.pathname.split('/')[3]
+  const organizationSettingsRoutes = new Set([
+    'general',
+    'security',
+    'sso',
+    'apps',
+    'audit',
+    'documents',
+  ])
 
   const navMenuItems = [
     {
@@ -410,7 +418,7 @@ const OrganizationLinks = () => {
         ]
       : []),
     {
-      label: 'Organization settings',
+      label: 'Organization Settings',
       href: `/org/${organizationSlug}/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
@@ -429,11 +437,7 @@ const OrganizationLinks = () => {
               i === 0
                 ? activeRoute === undefined
                 : item.key === 'settings'
-                  ? router.pathname.includes('/general') ||
-                    router.pathname.includes('/apps') ||
-                    router.pathname.includes('/audit') ||
-                    router.pathname.includes('/documents') ||
-                    router.pathname.includes('/security')
+                  ? organizationSettingsRoutes.has(activeRoute ?? '')
                   : activeRoute === item.key
             }
             route={{
