@@ -1,6 +1,6 @@
 import type { IncidentCache } from 'lib/api/incident-status'
 
-type BannerIncident = { cache?: IncidentCache | null }
+type BannerIncident = { id: string; cache?: IncidentCache | null }
 
 /**
  * Determines whether the incident status banner should be shown to a given user,
@@ -41,4 +41,28 @@ export function shouldShowBanner({
     // Region restriction: only show if the user has a database in an affected region
     return affectedRegions.some((region) => userRegions.has(region))
   })
+}
+
+/**
+ * Returns the IDs of incidents that are relevant to the given user.
+ *
+ * An incident is considered relevant if it would trigger banner visibility for
+ * the user, per the same logic as shouldShowBanner.
+ */
+export function getRelevantIncidentIds({
+  incidents,
+  hasProjects,
+  userRegions,
+  hasUnknownRegions = false,
+}: {
+  incidents: Array<BannerIncident>
+  hasProjects: boolean
+  userRegions: Set<string>
+  hasUnknownRegions?: boolean
+}): Array<string> {
+  return incidents
+    .filter((incident) =>
+      shouldShowBanner({ incidents: [incident], hasProjects, userRegions, hasUnknownRegions })
+    )
+    .map((incident) => incident.id)
 }
