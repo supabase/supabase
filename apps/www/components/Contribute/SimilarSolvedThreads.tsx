@@ -30,7 +30,7 @@ import type {
   SimilarThreadFeedbackReaction,
   ThreadSource,
 } from '~/types/contribute'
-import { submitSimilarThreadFeedback, updateSimilarThreadFeedback } from '~/data/contribute'
+import { submitSimilarThreadFeedback, updateSimilarThreadFeedback } from '~/app/contribute/actions'
 import { ChannelIcon } from './Icons'
 
 function getChannelFromUrl(url: string): ThreadSource {
