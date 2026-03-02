@@ -11,6 +11,7 @@ import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useS
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
+  PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
   PageHeaderTitle,
@@ -45,23 +46,22 @@ const ProjectSettings: NextPageWithLayout = () => {
 
   return (
     <>
-      <PageHeader>
+      <PageHeader size="small">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Settings</PageHeaderTitle>
+            <PageHeaderDescription>
+              Connections, security, and network configuration
+            </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
       {IS_PLATFORM ? (
         <>
-          <PageContainer className="pb-12">
-            <PageSection>
-              <PageSectionContent className="space-y-4 md:space-y-8">
-                <DatabaseReadOnlyAlert />
-                <ResetDbPassword />
-                <ConnectionPooling />
-              </PageSectionContent>
-            </PageSection>
+          <PageContainer size="small" className="flex flex-col gap-8 pb-12">
+            <DatabaseReadOnlyAlert />
+            <ResetDbPassword />
+            <ConnectionPooling />
             <SSLConfiguration />
             {showNewDiskManagementUI ? (
               // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
@@ -75,7 +75,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           <PoolingModesModal />
         </>
       ) : (
-        <PageContainer className="pb-12">
+        <PageContainer size="small" className="pb-12">
           <PageSection>
             <PageSectionContent className="space-y-4 md:space-y-8">
               <SettingsDatabaseEmptyStateLocal />

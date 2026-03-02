@@ -189,7 +189,7 @@ export const General = () => {
           <PageSectionSummary>
             <PageSectionTitle>Project availability</PageSectionTitle>
             <PageSectionDescription>
-              Restart or pause your project when performing maintenance.
+              Restart or pause your project when performing maintenance
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
@@ -235,9 +235,6 @@ export const General = () => {
           <PageSectionMeta>
             <PageSectionSummary>
               <PageSectionTitle>Project usage</PageSectionTitle>
-              <PageSectionDescription>
-                Usage statistics now live under your organization settings.
-              </PageSectionDescription>
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent>
