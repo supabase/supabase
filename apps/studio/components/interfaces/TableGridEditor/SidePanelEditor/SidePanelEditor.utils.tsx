@@ -1,10 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
-import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
-import { chunk, find, isEmpty, isEqual } from 'lodash'
-import Papa from 'papaparse'
-import { toast } from 'sonner'
-
 import { Query } from '@supabase/pg-meta/src/query'
+import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
 import { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import SparkBar from 'components/ui/SparkBar'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
@@ -26,10 +22,10 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { executeWithRetry } from 'data/table-rows/table-rows-query'
 import { tableKeys } from 'data/tables/keys'
 import {
+  RetrieveTableResult,
+  RetrievedTableColumn,
   getTable,
   getTableQuery,
-  RetrievedTableColumn,
-  RetrieveTableResult,
 } from 'data/tables/table-retrieve-query'
 import {
   UpdateTableBody,
@@ -38,6 +34,10 @@ import {
 import { getTables } from 'data/tables/tables-query'
 import { sendEvent } from 'data/telemetry/send-event-mutation'
 import { timeout, tryParseJson } from 'lib/helpers'
+import { chunk, find, isEmpty, isEqual } from 'lodash'
+import Papa from 'papaparse'
+import { toast } from 'sonner'
+
 import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
@@ -51,7 +51,10 @@ const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 const unwrapTransaction = (sql: string) =>
-  sql.replace(/^\s*BEGIN;?\s*/i, '').replace(/\s*COMMIT;?\s*$/i, '').trim()
+  sql
+    .replace(/^\s*BEGIN;?\s*/i, '')
+    .replace(/\s*COMMIT;?\s*$/i, '')
+    .trim()
 
 /**
  * The functions below are basically just queries but may be supported directly
