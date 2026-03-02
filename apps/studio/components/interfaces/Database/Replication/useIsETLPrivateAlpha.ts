@@ -4,9 +4,9 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 const useIsCurrentOrgInFlagList = (flagName: string, overrideFlagName?: string) => {
   const { data: organization } = useSelectedOrganizationQuery()
 
-  const flagValue = useFlag(flagName)
+  const flagValue = useFlag<string | boolean>(flagName)
   const allowedOrgSlugs =
-    typeof flagValue === 'string' ? flagValue.split(',').map((x) => x.trim()) : []
+    typeof flagValue === 'string' ? flagValue.split(',').map((x: string) => x.trim()) : []
 
   const isOverrideEnabled = overrideFlagName ? useFlag(overrideFlagName) : false
 
