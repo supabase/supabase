@@ -1,16 +1,11 @@
-import { UseFormReturn } from 'react-hook-form'
-
 import { useFlag, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import Panel from 'components/ui/Panel'
-import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
-import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
-import type { DesiredInstanceSize } from 'data/projects/new-project.constants'
-import { BASE_PATH, PROVIDERS } from 'lib/constants'
+import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
+  cn,
   FormField_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -18,15 +13,23 @@ import {
   SelectSeparator_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { getAvailableRegions } from './ProjectCreation.utils'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
+import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
+import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
+import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
+import { BASE_PATH, PROVIDERS } from '@/lib/constants'
 
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -37,6 +40,18 @@ interface RegionSelectorProps {
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
 // I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
 // ^ can try again next time
+
+// Maps smart region group codes to the specific-region code prefixes they contain.
+// Used to check whether an incident affecting specific regions also affects a smart region selection.
+const SMART_REGION_PREFIXES: Record<string, Array<string>> = {
+  americas: ['us-', 'ca-', 'sa-'],
+  emea: ['eu-', 'me-', 'af-'],
+  apac: ['ap-'],
+}
+
+function smartRegionMatchesSpecific(smartCode: string, specificCode: string): boolean {
+  return (SMART_REGION_PREFIXES[smartCode] ?? []).some((prefix) => specificCode.startsWith(prefix))
+}
 
 // Map backend region names to user-friendly display names
 const getDisplayNameForSmartRegion = (name: string): string => {
@@ -55,6 +70,9 @@ export const RegionSelector = ({
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
 
   const smartRegionEnabled = useFlag('enableSmartRegion')
+
+  const { data: statusData } = useIncidentStatusQuery()
+  const { incidents = [] } = statusData ?? {}
 
   const { isPending: isLoadingDefaultRegion } = useDefaultRegionQuery(
     { cloudProvider },
@@ -114,150 +132,183 @@ export const RegionSelector = ({
             return !!region.name && region.name === field.value
           })
 
+          const affectingIncidents = incidents.filter((incident) => {
+            const affectedRegions = incident.cache?.affected_regions ?? []
+            if (affectedRegions.length === 0 || selectedRegion?.code === undefined) return false
+
+            // Specific region: direct code match
+            if (affectedRegions.includes(selectedRegion.code)) return true
+
+            // Smart region: match if any affected region falls within the smart group
+            return affectedRegions.some((specificCode) =>
+              smartRegionMatchesSpecific(selectedRegion.code, specificCode)
+            )
+          })
+
           return (
-            <FormItemLayout
-              layout={layout}
-              label="Region"
-              description={
-                <>
-                  <p>Select the region closest to your users for the best performance.</p>
-                  {showNonProdFields && (
-                    <div className="mt-2 text-warning">
-                      <p>Only these regions are supported for local/staging projects:</p>
-                      <ul className="list-disc list-inside mt-1">
-                        <li>East US (North Virginia)</li>
-                        <li>Central EU (Frankfurt)</li>
-                        <li>Southeast Asia (Singapore)</li>
-                      </ul>
-                    </div>
-                  )}
-                </>
-              }
-            >
-              <Select_Shadcn_
-                value={field.value}
-                onValueChange={field.onChange}
-                disabled={isLoading}
-              >
-                <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
-                  <SelectValue_Shadcn_
-                    placeholder={
-                      isLoading
-                        ? 'Loading available regions...'
-                        : 'Select a region for your project..'
-                    }
-                  >
-                    {field.value !== undefined && (
-                      <div className="flex items-center gap-x-3">
-                        {selectedRegion?.code && (
-                          <img
-                            alt="region icon"
-                            className="w-5 rounded-sm"
-                            src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
-                          />
-                        )}
-                        <span className="text-foreground">
-                          {selectedRegion?.name
-                            ? getDisplayNameForSmartRegion(selectedRegion.name)
-                            : field.value}
-                        </span>
+            <>
+              <FormItemLayout
+                layout={layout}
+                label="Region"
+                description={
+                  <>
+                    <p>Select the region closest to your users for the best performance.</p>
+                    {showNonProdFields && (
+                      <div className="mt-2 text-warning">
+                        <p>Only these regions are supported for local/staging projects:</p>
+                        <ul className="list-disc list-inside mt-1">
+                          <li>East US (North Virginia)</li>
+                          <li>Central EU (Frankfurt)</li>
+                          <li>Southeast Asia (Singapore)</li>
+                        </ul>
                       </div>
                     )}
-                  </SelectValue_Shadcn_>
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  {smartRegionEnabled && (
-                    <>
-                      <SelectGroup_Shadcn_>
-                        <SelectLabel_Shadcn_>General regions</SelectLabel_Shadcn_>
-                        {smartRegions.map((value) => {
-                          return (
-                            <SelectItem_Shadcn_
-                              key={value.code}
-                              value={value.name}
-                              className="w-full [&>:nth-child(2)]:w-full"
-                            >
-                              <div className="flex flex-row items-center justify-between w-full">
-                                <div className="flex items-center gap-x-3">
-                                  <img
-                                    alt="region icon"
-                                    className="w-5 rounded-sm"
-                                    src={`${BASE_PATH}/img/regions/${value.code}.svg`}
-                                  />
-                                  <span className="text-foreground">
-                                    {getDisplayNameForSmartRegion(value.name)}
+                  </>
+                }
+              >
+                <Select_Shadcn_
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
+                    <SelectValue_Shadcn_
+                      placeholder={
+                        isLoading
+                          ? 'Loading available regions...'
+                          : 'Select a region for your project..'
+                      }
+                    >
+                      {field.value !== undefined && (
+                        <div className="flex items-center gap-x-3">
+                          {selectedRegion?.code && (
+                            <img
+                              alt="region icon"
+                              className="w-5 rounded-sm"
+                              src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
+                            />
+                          )}
+                          <span className="text-foreground">
+                            {selectedRegion?.name
+                              ? getDisplayNameForSmartRegion(selectedRegion.name)
+                              : field.value}
+                          </span>
+                        </div>
+                      )}
+                    </SelectValue_Shadcn_>
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    {smartRegionEnabled && (
+                      <>
+                        <SelectGroup_Shadcn_>
+                          <SelectLabel_Shadcn_>General regions</SelectLabel_Shadcn_>
+                          {smartRegions.map((value) => {
+                            return (
+                              <SelectItem_Shadcn_
+                                key={value.code}
+                                value={value.name}
+                                className="w-full [&>:nth-child(2)]:w-full"
+                              >
+                                <div className="flex flex-row items-center justify-between w-full">
+                                  <div className="flex items-center gap-x-3">
+                                    <img
+                                      alt="region icon"
+                                      className="w-5 rounded-sm"
+                                      src={`${BASE_PATH}/img/regions/${value.code}.svg`}
+                                    />
+                                    <span className="text-foreground">
+                                      {getDisplayNameForSmartRegion(value.name)}
+                                    </span>
+                                  </div>
+
+                                  <div>
+                                    {recommendedSmartRegions.has(value.code) && (
+                                      <Badge variant="success" className="mr-1">
+                                        Recommended
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              </SelectItem_Shadcn_>
+                            )
+                          })}
+                        </SelectGroup_Shadcn_>
+                        <SelectSeparator_Shadcn_ />
+                      </>
+                    )}
+
+                    <SelectGroup_Shadcn_>
+                      <SelectLabel_Shadcn_>Specific regions</SelectLabel_Shadcn_>
+                      {regionOptions.map((value) => {
+                        return (
+                          <SelectItem_Shadcn_
+                            key={value.code}
+                            value={value.name}
+                            className={cn(
+                              'w-full [&>:nth-child(2)]:w-full',
+                              value.status !== undefined && '!pointer-events-auto'
+                            )}
+                            disabled={value.status !== undefined}
+                          >
+                            <div className="flex flex-row items-center justify-between w-full gap-x-2">
+                              <div className="flex items-center gap-x-3">
+                                <img
+                                  alt="region icon"
+                                  className="w-5 rounded-sm"
+                                  src={`${BASE_PATH}/img/regions/${value.code}.svg`}
+                                />
+                                <div className="flex items-center gap-x-2">
+                                  <span className="text-foreground">{value.name}</span>
+                                  <span className="text-xs text-foreground-lighter font-mono">
+                                    {value.code}
                                   </span>
                                 </div>
+                              </div>
 
-                                <div>
-                                  {recommendedSmartRegions.has(value.code) && (
-                                    <Badge variant="success" className="mr-1">
-                                      Recommended
+                              {recommendedSpecificRegions.has(value.code) && (
+                                <Badge variant="success" className="mr-1">
+                                  Recommended
+                                </Badge>
+                              )}
+                              {value.status !== undefined && value.status === 'capacity' && (
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Badge variant="warning" className="mr-1">
+                                      Unavailable
                                     </Badge>
-                                  )}
-                                </div>
-                              </div>
-                            </SelectItem_Shadcn_>
-                          )
-                        })}
-                      </SelectGroup_Shadcn_>
-                      <SelectSeparator_Shadcn_ />
-                    </>
-                  )}
-
-                  <SelectGroup_Shadcn_>
-                    <SelectLabel_Shadcn_>Specific regions</SelectLabel_Shadcn_>
-                    {regionOptions.map((value) => {
-                      return (
-                        <SelectItem_Shadcn_
-                          key={value.code}
-                          value={value.name}
-                          className={cn(
-                            'w-full [&>:nth-child(2)]:w-full',
-                            value.status !== undefined && '!pointer-events-auto'
-                          )}
-                          disabled={value.status !== undefined}
-                        >
-                          <div className="flex flex-row items-center justify-between w-full gap-x-2">
-                            <div className="flex items-center gap-x-3">
-                              <img
-                                alt="region icon"
-                                className="w-5 rounded-sm"
-                                src={`${BASE_PATH}/img/regions/${value.code}.svg`}
-                              />
-                              <div className="flex items-center gap-x-2">
-                                <span className="text-foreground">{value.name}</span>
-                                <span className="text-xs text-foreground-lighter font-mono">
-                                  {value.code}
-                                </span>
-                              </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    Temporarily unavailable due to this region being at capacity.
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
                             </div>
+                          </SelectItem_Shadcn_>
+                        )
+                      })}
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormItemLayout>
 
-                            {recommendedSpecificRegions.has(value.code) && (
-                              <Badge variant="success" className="mr-1">
-                                Recommended
-                              </Badge>
-                            )}
-                            {value.status !== undefined && value.status === 'capacity' && (
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Badge variant="warning" className="mr-1">
-                                    Unavailable
-                                  </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Temporarily unavailable due to this region being at capacity.
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                          </div>
-                        </SelectItem_Shadcn_>
-                      )
-                    })}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-            </FormItemLayout>
+              {affectingIncidents.length > 0 && (
+                <Admonition
+                  type="warning"
+                  title="Incident in progress for this region"
+                  description={
+                    <>
+                      We're currently investigating an issue that may impact projects in this
+                      region. Follow updates on{' '}
+                      <InlineLink href="https://status.supabase.com">
+                        status.supabase.com
+                      </InlineLink>
+                      .
+                    </>
+                  }
+                  className="mt-3"
+                />
+              )}
+            </>
           )
         }}
       />

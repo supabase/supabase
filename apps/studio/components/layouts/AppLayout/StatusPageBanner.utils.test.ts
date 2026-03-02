@@ -56,14 +56,14 @@ describe('shouldShowBanner', () => {
       ).toBe(true)
     })
 
-    it('shows when affects_project_creation is true even with a region restriction', () => {
+    it('does not show when affects_project_creation is true but there is a region restriction', () => {
       expect(
         shouldShowBanner({
           incidents: [usEast1AndCreation],
           hasProjects: false,
           userRegions: new Set(),
         })
-      ).toBe(true)
+      ).toBe(false)
     })
   })
 
@@ -221,7 +221,7 @@ describe('shouldShowBanner', () => {
       ).toBe(false)
     })
 
-    it('still shows for affects_project_creation with no projects even when regions are unknown', () => {
+    it('does not show for affects_project_creation with no projects when there is a region restriction, even when regions are unknown', () => {
       expect(
         shouldShowBanner({
           incidents: [usEast1AndCreation],
@@ -229,7 +229,7 @@ describe('shouldShowBanner', () => {
           userRegions: new Set(),
           hasUnknownRegions: true,
         })
-      ).toBe(true)
+      ).toBe(false)
     })
   })
 })
