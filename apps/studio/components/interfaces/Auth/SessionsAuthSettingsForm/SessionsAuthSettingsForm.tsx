@@ -11,8 +11,8 @@ import NoPermission from 'components/ui/NoPermission'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
@@ -83,9 +83,9 @@ export const SessionsAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isProPlanAndUp = organization?.plan?.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+  const { hasAccess: hasUserSessionsEntitlement, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('auth.user_sessions')
+  const promptProPlanUpgrade = IS_PLATFORM && !hasUserSessionsEntitlement
 
   const refreshTokenForm = useForm<z.infer<typeof RefreshTokenSchema>>({
     resolver: zodResolver(RefreshTokenSchema),
@@ -182,7 +182,7 @@ export const SessionsAuthSettingsForm = () => {
     )
   }
 
-  if (isLoading) {
+  if (isLoading || isLoadingEntitlements) {
     return (
       <PageSection>
         <PageSectionContent>
@@ -304,7 +304,7 @@ export const SessionsAuthSettingsForm = () => {
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            disabled={!canUpdateConfig || !isProPlanAndUp}
+                            disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -328,7 +328,7 @@ export const SessionsAuthSettingsForm = () => {
                               type="number"
                               min={0}
                               {...field}
-                              disabled={!canUpdateConfig || !isProPlanAndUp}
+                              disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
                             />
                           </PrePostTab>
                         </FormControl_Shadcn_>
@@ -353,7 +353,7 @@ export const SessionsAuthSettingsForm = () => {
                               type="number"
                               {...field}
                               className="flex-1"
-                              disabled={!canUpdateConfig || !isProPlanAndUp}
+                              disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
                             />
                           </PrePostTab>
                         </FormControl_Shadcn_>
