@@ -77,5 +77,5 @@ export const exposeModeQueryOptions = (
     // eslint-disable-next-line @tanstack/query/exhaustive-deps -- project-level cache entry; schemas scope the SQL but don't differentiate cache entries
     queryKey: privilegeKeys.exposeMode(projectRef),
     queryFn: ({ signal }) => getExposeMode({ projectRef, connectionString, schemas }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && schemas.length > 0,
+    enabled: enabled && typeof projectRef !== 'undefined',
   })
