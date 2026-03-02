@@ -221,9 +221,12 @@ export const QueryInsightsTable = ({
   }, [sheetView, activeSheetRow?.query])
 
   useEffect(() => {
-    const handleRouteChange = () => {
-      setQueryStates({ search: null })
-      onCurrentSelectQuery?.(null)
+    const currentPath = router.asPath.split('?')[0]
+    const handleRouteChange = (url: string) => {
+      if (url.split('?')[0] !== currentPath) {
+        setQueryStates({ search: null })
+        onCurrentSelectQuery?.(null)
+      }
     }
     router.events.on('routeChangeStart', handleRouteChange)
     return () => router.events.off('routeChangeStart', handleRouteChange)

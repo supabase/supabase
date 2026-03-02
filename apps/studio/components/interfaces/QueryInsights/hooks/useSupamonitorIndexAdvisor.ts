@@ -33,12 +33,14 @@ export function useSupamonitorIndexAdvisor(rows: QueryPerformanceRow[]): QueryPe
 
   if (!isIndexAdvisorEnabled) return rows
 
-  const resultByQuery = new Map(eligibleQueries.map((query, i) => [query, results[i]?.data ?? null]))
+  const resultByQuery = new Map(
+    eligibleQueries.map((query, i) => [query, results[i]?.data ?? null])
+  )
 
   return rows.map((row) => ({
     ...row,
     index_advisor_result: resultByQuery.has(row.query)
-      ? (resultByQuery.get(row.query) ?? null)
-      : (row.index_advisor_result ?? null),
+      ? resultByQuery.get(row.query) ?? null
+      : row.index_advisor_result ?? null,
   }))
 }
