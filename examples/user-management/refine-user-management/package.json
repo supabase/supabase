@@ -4,25 +4,25 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@refinedev/cli": "^2.16.50",
-    "@refinedev/core": "^5.0.5",
-    "@refinedev/inferencer": "^6.0.2",
+    "@refinedev/cli": "^2.16.51",
+    "@refinedev/core": "^5.0.9",
+    "@refinedev/inferencer": "^7.0.0",
     "@refinedev/kbar": "^2.0.1",
-    "@refinedev/react-hook-form": "^5.0.2",
+    "@refinedev/react-hook-form": "^5.0.4",
     "@refinedev/react-router": "^2.0.3",
     "@refinedev/supabase": "^6.0.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-hook-form": "^7.57.0",
-    "react-router": "^7.0.2"
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-hook-form": "^7.71.2",
+    "react-router": "^7.13.1"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19.1.0",
-    "@types/react-dom": "^19.1.0",
-    "@vitejs/plugin-react": "^4.2.1",
-    "typescript": "^5.8.3",
-    "vite": "^5.4.15"
+    "@types/node": "^25.3.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
   },
   "scripts": {
     "dev": "refine dev",

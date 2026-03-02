@@ -9,10 +9,6 @@ import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 
 import {
-  inverseValidObjectKeyRegex,
-  validObjectKeyRegex,
-} from '@/components/interfaces/Storage/CreateBucketModal.utils'
-import {
   STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
@@ -32,6 +28,10 @@ import {
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
+  getPathAlongFoldersToIndex,
+  getPathAlongOpenedFolders,
+  sanitizeNameForDuplicateInColumn,
+  validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -73,7 +73,7 @@ const DEFAULT_PREFERENCES = {
 }
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
-let abortController: any
+let abortController: AbortController
 if (typeof window !== 'undefined') {
   abortController = new AbortController()
 }
@@ -100,7 +100,6 @@ function createStorageExplorerState({
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
 
-    // abortController,
     abortApiCalls: () => {
       if (abortController) {
         abortController.abort()
@@ -133,7 +132,6 @@ function createStorageExplorerState({
     popOpenedFolders: () => {
       state.openedFolders = state.openedFolders.slice(0, state.openedFolders.length - 1)
     },
-
     popOpenedFoldersAtIndex: (index: number) => {
       state.openedFolders = state.openedFolders.slice(0, index + 1)
     },
@@ -241,33 +239,6 @@ function createStorageExplorerState({
 
     // ======== Folders CRUD ========
 
-    getPathAlongOpenedFolders: (includeBucket = true) => {
-      if (includeBucket) {
-        return state.openedFolders.length > 0
-          ? `${state.selectedBucket.name}/${state.openedFolders.map((folder) => folder.name).join('/')}`
-          : state.selectedBucket.name
-      }
-      return state.openedFolders.map((folder) => folder.name).join('/')
-    },
-
-    getPathAlongFoldersToIndex: (index: number) => {
-      return state.openedFolders
-        .slice(0, index)
-        .map((folder) => folder.name)
-        .join('/')
-    },
-
-    validateFolderName: (name: string) => {
-      if (!validObjectKeyRegex.test(name)) {
-        const [match] = name.match(inverseValidObjectKeyRegex) ?? []
-        return !!match
-          ? `Folder name cannot contain the "${match}" character`
-          : 'Folder name contains an invalid special character'
-      }
-
-      return null
-    },
-
     addNewFolderPlaceholder: (columnIndex: number) => {
       const isPrepend = true
       const folderName = 'Untitled folder'
@@ -293,7 +264,7 @@ function createStorageExplorerState({
       onError?: () => void
     }) => {
       const autofix = false
-      const formattedName = state.sanitizeNameForDuplicateInColumn({
+      const formattedName = sanitizeNameForDuplicateInColumn(state, {
         name: folderName,
         autofix,
         columnIndex,
@@ -308,7 +279,7 @@ function createStorageExplorerState({
         return state.removeTempRows(columnIndex)
       }
 
-      const folderNameError = state.validateFolderName(formattedName)
+      const folderNameError = validateFolderName(formattedName)
       if (folderNameError) {
         onError?.()
         return toast.error(folderNameError)
@@ -640,7 +611,7 @@ function createStorageExplorerState({
         })
       }
 
-      const folderNameError = state.validateFolderName(newName)
+      const folderNameError = validateFolderName(newName)
       if (folderNameError) {
         onError?.()
         return toast.error(folderNameError)
@@ -1103,7 +1074,7 @@ function createStorageExplorerState({
           const path = file.path.split('/')
           const topLevelFolder = path.length > 1 ? path[0] : null
           if (topLevelFolders.includes(topLevelFolder as string)) {
-            const newTopLevelFolder = state.sanitizeNameForDuplicateInColumn({
+            const newTopLevelFolder = sanitizeNameForDuplicateInColumn(state, {
               name: topLevelFolder as string,
               autofix,
               columnIndex,
@@ -1144,7 +1115,7 @@ function createStorageExplorerState({
 
         const isWithinFolder = (file?.path ?? '').split('/').length > 1
         const fileName = !isWithinFolder
-          ? state.sanitizeNameForDuplicateInColumn({ name: file.name, autofix })
+          ? sanitizeNameForDuplicateInColumn(state, { name: file.name, autofix })
           : file.name
         const unsanitizedFormattedFileName =
           has(file, ['path']) && isWithinFolder ? file.path : fileName
@@ -1707,7 +1678,7 @@ function createStorageExplorerState({
           columnIndex,
           updatedName: newName,
         })
-        const pathToFile = state.getPathAlongFoldersToIndex(columnIndex)
+        const pathToFile = getPathAlongFoldersToIndex(state, columnIndex)
 
         const fromPath = pathToFile.length > 0 ? `${pathToFile}/${originalName}` : originalName
         const toPath = pathToFile.length > 0 ? `${pathToFile}/${newName}` : newName
@@ -1775,54 +1746,6 @@ function createStorageExplorerState({
         // Select items within the range
         state.setSelectedItems(uniqBy(state.selectedItems.concat(rangeToSelect), 'id'))
       }
-    },
-
-    sanitizeNameForDuplicateInColumn: ({
-      name,
-      columnIndex,
-      autofix = false,
-    }: {
-      name: string
-      columnIndex?: number
-      autofix?: boolean
-    }) => {
-      const columnIndex_ = columnIndex !== undefined ? columnIndex : state.getLatestColumnIndex()
-      const currentColumn = state.columns[columnIndex_]
-      const currentColumnItems = currentColumn.items.filter(
-        (item) => item.status !== STORAGE_ROW_STATUS.EDITING
-      )
-      // [Joshen] JFYI storage does support folders of the same name with different casing
-      // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
-      // for folders of the same name with different casing
-      // We should remove this check once all projects are on the List V2 endpoint
-      const hasSameNameInColumn =
-        currentColumnItems.filter((item) => item.name.toLowerCase() === name.toLowerCase()).length >
-        0
-
-      if (hasSameNameInColumn) {
-        if (autofix) {
-          const fileNameSegments = name.split('.')
-          const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
-          const fileExt = fileNameSegments[fileNameSegments.length - 1]
-
-          const dupeNameRegex = new RegExp(
-            `${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`
-          )
-          const itemsWithSameNameInColumn = currentColumnItems.filter((item) =>
-            item.name.match(dupeNameRegex)
-          )
-
-          const updatedFileName = fileName + ` (${itemsWithSameNameInColumn.length + 1})`
-          return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
-        } else {
-          toast.error(
-            `The name ${name} already exists in the current directory. Please use a different name.`
-          )
-          return null
-        }
-      }
-
-      return name
     },
 
     addTempRow: ({
@@ -1927,7 +1850,7 @@ function createStorageExplorerState({
   return state
 }
 
-type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
+export type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
 
 const DEFAULT_STATE_CONFIG = {
   projectRef: '',
