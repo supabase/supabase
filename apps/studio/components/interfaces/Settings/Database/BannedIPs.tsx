@@ -1,30 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Globe } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from 'data/misc/user-ip-address-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { Globe } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Badge, Card, CardContent, Skeleton } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
+  PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionContent,
-  PageSectionDescription,
 } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const BannedIPs = () => {
   const { ref } = useParams()
@@ -100,11 +97,7 @@ const BannedIPs = () => {
               </CardContent>
             </Card>
           ) : ipListError ? (
-            <AlertError
-              className="border-0 rounded-none"
-              error={ipListError}
-              subject="Failed to retrieve banned IP addresses"
-            />
+            <AlertError error={ipListError} subject="Failed to retrieve banned IP addresses" />
           ) : ipList.banned_ipv4_addresses.length > 0 ? (
             <Card>
               {ipList.banned_ipv4_addresses.map((ip) => (
