@@ -63,8 +63,8 @@ export const ReportBlock = ({
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchIntervalInBackground: false,
-      retry: (failureCount: number) => {
-        if (failureCount >= 2) return false
+      retry: (failureCount: number, error) => {
+        if (error.code === 404 || failureCount >= 2) return false
         return true
       },
     }
@@ -151,18 +151,16 @@ export const ReportBlock = ({
                 ? String(executeSqlError)
                 : undefined
           }
-          isExecuting={executeSqlLoading}
+          isExecuting={!contentError && executeSqlLoading}
           isWriteQuery={isWriteQuery}
           actions={
-            !isLoadingContent && (
-              <ButtonTooltip
-                type="text"
-                icon={<X />}
-                className="w-7 h-7"
-                onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
-                tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
-              />
-            )
+            <ButtonTooltip
+              type="text"
+              icon={<X />}
+              className="w-7 h-7"
+              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+            />
           }
           onExecute={(queryType) => {
             refetch()
