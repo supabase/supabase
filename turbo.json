@@ -70,6 +70,7 @@
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
         "PG_META_CRYPTO_KEY",
+        "PGRST_DB_SCHEMAS",
         "POSTGRES_PASSWORD",
         "POSTGRES_HOST",
         "POSTGRES_USER_READ_WRITE",
