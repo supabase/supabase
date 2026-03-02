@@ -513,3 +513,40 @@
  3. Integration test passes: npx vitest --project integration — full-page test renders storage page with mock services, layouts render, page data appears
  4. Contract tests pass: Verify live implementations match interfaces
  5. Type checking: npx tsc --noEmit — all service interfaces, registry, hooks type-safe
+
+---
+Progress
+
+Phase 1: Core infrastructure — steps 1-3 done ✓
+
+New files created in apps/studio/lib/services/:
+
+lib/services/registry.ts
+  ServiceRegistry interface with auth and featureFlags slots.
+  Other services (projects, orgs, profile, permissions, storage) added in later phases.
+
+lib/services/context.ts
+  ServiceRegistryContext (null! default — no fallback pattern).
+  ServiceRegistryProvider = ServiceRegistryContext.Provider.
+  useService(key) hook.
+
+lib/services/auth-service.ts
+  AuthService interface with named operations only — no client field.
+  Rationale: exposing the full AuthClient is hard to mock; named methods are not.
+    signOut() — return type inferred from gotrueClient.signOut
+    getMfaAssuranceLevel() — wraps mfa.getAuthenticatorAssuranceLevel
+  authServiceLive wires to gotrueClient singleton.
+  Note: when Phase 2 makes AuthProvider injectable, its client prop will accept a
+  separate narrow interface (initialize, onAuthStateChange, refreshSession) defined
+  at that point — not added to AuthService.
+
+lib/services/feature-flag-service.ts
+  FeatureFlagService interface:
+    getConfigCatFlags(userEmail?) — matches FeatureFlagProvider's existing prop type
+    getPostHogFlags(options?) — wraps getFeatureFlags(); wired to FeatureFlagProvider in Phase 2
+  featureFlagServiceLive wires to getFlags (configcat) and getFeatureFlags (posthog).
+
+lib/services/live-registry.ts
+  createLiveRegistry() assembles authServiceLive + featureFlagServiceLive.
+
+No existing files modified. Steps 4-6 (app-providers.tsx + _app.tsx wiring) are next.
