@@ -1,23 +1,23 @@
-import { X } from 'lucide-react'
-import { useRef } from 'react'
-import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-import ReactMarkdown from 'react-markdown'
-
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import {
   LintCategoryBadge,
   LintEntity,
-  NoIssuesFound,
   lintInfoMap,
+  NoIssuesFound,
 } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
-import { useRouter } from 'next/router'
 import { useTrack } from 'lib/telemetry/track'
-import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import { X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useRef } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import ReactMarkdown from 'react-markdown'
+import { Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { EntityTypeIcon } from './Linter.utils'
+
 import LintDetail from './LintDetail'
+import { EntityTypeIcon } from './Linter.utils'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -117,11 +117,11 @@ const LinterDataGrid = ({
 
   return (
     <ResizablePanelGroup
-      direction="horizontal"
+      orientation="horizontal"
       className="relative flex flex-grow bg-alternative min-h-0"
       autoSaveId="linter-layout-v1"
     >
-      <ResizablePanel defaultSize={1}>
+      <ResizablePanel>
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
@@ -177,9 +177,9 @@ const LinterDataGrid = ({
         <>
           <ResizableHandle withHandle />
           <ResizablePanel
-            defaultSize={30}
-            maxSize={45}
-            minSize={30}
+            defaultSize="30"
+            maxSize="45"
+            minSize="30"
             className="bg-studio border-t flex flex-col h-full"
           >
             <div className="flex items-center justify-between w-full border-b py-3 px-6">

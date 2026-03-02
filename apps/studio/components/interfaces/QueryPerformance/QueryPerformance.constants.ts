@@ -22,6 +22,7 @@ export const QUERY_PERFORMANCE_COLUMNS = [
   { id: 'rows_read', name: 'Rows processed', description: undefined, minWidth: 130 },
   { id: 'cache_hit_rate', name: 'Cache hit rate', description: undefined, minWidth: 130 },
   { id: 'rolname', name: 'Role', description: undefined, minWidth: 200 },
+  { id: 'application_name', name: 'Application', description: undefined, minWidth: 150 },
 ] as const
 
 export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
@@ -88,46 +89,40 @@ export const QUERY_PERFORMANCE_CHART_TABS = [
   },
 ]
 
-export const QUERY_PERFORMANCE_TIME_RANGES = [
-  {
-    id: 'last_60_minutes',
-    label: 'Last 60 minutes',
-  },
-  {
-    id: 'last_3_hours',
-    label: 'Last 3 hours',
-  },
-  {
-    id: 'last_24_hours',
-    label: 'Last 24 hours',
-  },
-]
-
-export const getPgStatMonitorLogsQuery = (startTime: string, endTime: string) =>
+export const getSupamonitorLogsQuery = (startTime: string, endTime: string) =>
   `
-select 
-  id,
-  pgl.timestamp as timestamp,
-  'postgres' as log_type,
-  CAST(pgl_parsed.sql_state_code AS STRING) as status,
-  CASE
-      WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
-      WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
-      WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
-      WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
-      ELSE null
-  END as level,
-  event_message as event_message
-from postgres_logs as pgl
-cross join unnest(pgl.metadata) as pgl_metadata
-cross join unnest(pgl_metadata.parsed) as pgl_parsed
-WHERE pgl.event_message LIKE '%[pg_stat_monitor]%'
-  AND pgl.timestamp >= CAST('${startTime}' AS TIMESTAMP)
-  AND pgl.timestamp <= CAST('${endTime}' AS TIMESTAMP)
+select
+  TIMESTAMP_TRUNC(sml.timestamp, MINUTE) as timestamp,
+  CAST(sml_parsed.application_name AS STRING) as application_name,
+  SUM(sml_parsed.calls) as calls,
+  CAST(sml_parsed.database_name AS STRING) as database_name,
+  CAST(sml_parsed.query AS STRING) as query,
+  sml_parsed.query_id as query_id,
+  SUM(sml_parsed.total_exec_time) as total_exec_time,
+  SUM(sml_parsed.total_plan_time) as total_plan_time,
+  CAST(sml_parsed.user_name AS STRING) as user_name,
+  CASE WHEN SUM(sml_parsed.calls) > 0
+    THEN SUM(sml_parsed.total_exec_time) / SUM(sml_parsed.calls)
+    ELSE 0
+  END as mean_exec_time,
+  MIN(NULLIF(sml_parsed.total_exec_time, 0)) as min_exec_time,
+  MAX(sml_parsed.total_exec_time) as max_exec_time,
+  CASE WHEN SUM(sml_parsed.calls) > 0
+    THEN SUM(sml_parsed.total_plan_time) / SUM(sml_parsed.calls)
+    ELSE 0
+  END as mean_plan_time,
+  MIN(NULLIF(sml_parsed.total_plan_time, 0)) as min_plan_time,
+  MAX(sml_parsed.total_plan_time) as max_plan_time,
+  APPROX_QUANTILES(sml_parsed.total_exec_time, 100)[OFFSET(50)] as p50_exec_time,
+  APPROX_QUANTILES(sml_parsed.total_exec_time, 100)[OFFSET(95)] as p95_exec_time,
+  APPROX_QUANTILES(sml_parsed.total_plan_time, 100)[OFFSET(50)] as p50_plan_time,
+  APPROX_QUANTILES(sml_parsed.total_plan_time, 100)[OFFSET(95)] as p95_plan_time
+from supamonitor_logs as sml
+cross join unnest(sml.metadata) as sml_metadata
+cross join unnest(sml_metadata.supamonitor) as sml_parsed
+WHERE sml.event_message = 'log'
+  AND sml.timestamp >= CAST('${startTime}' AS TIMESTAMP)
+  AND sml.timestamp <= CAST('${endTime}' AS TIMESTAMP)
+GROUP BY timestamp, user_name, database_name, application_name, query_id, query
 ORDER BY timestamp DESC
 `.trim()
-
-export const PG_STAT_MONITOR_LOGS_QUERY = getPgStatMonitorLogsQuery(
-  new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-  new Date().toISOString()
-)

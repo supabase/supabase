@@ -35,8 +35,19 @@ export function useSyncFiltersToUrl() {
   const snap = useTableEditorTableStateSnapshot()
   const { setParams } = useTableEditorFiltersSort()
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const previousFiltersRef = useRef<string>('')
 
   useEffect(() => {
+    // Serialize filters for comparison
+    const currentFiltersStr = JSON.stringify(snap.filters)
+
+    // Only proceed if filters have actually changed
+    if (currentFiltersStr === previousFiltersRef.current) {
+      return
+    }
+
+    previousFiltersRef.current = currentFiltersStr
+
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -44,8 +55,13 @@ export function useSyncFiltersToUrl() {
 
     // Debounce URL updates by 500ms
     timeoutRef.current = setTimeout(() => {
+      const completeFilters = snap.filters.filter((filter) => {
+        const value = filter.value
+        return value !== '' && value !== null && value !== undefined
+      })
+
       // Convert filters to URL format
-      const urlFilters = filtersToUrlParams(snap.filters)
+      const urlFilters = filtersToUrlParams(completeFilters)
 
       // Update URL params
       setParams((prev) => ({

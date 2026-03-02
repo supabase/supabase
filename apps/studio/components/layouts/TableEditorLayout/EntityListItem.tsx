@@ -1,31 +1,13 @@
-import { useFlag, useParams } from 'common'
-import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import { InlineLink } from 'components/ui/InlineLink'
-import { getTableDefinition } from 'data/database/table-definition-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { Entity } from 'data/entity-types/entity-types-infinite-query'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import type { TableApiAccessData, TableApiAccessMap } from 'data/privileges/table-api-access-query'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useParams } from 'common'
 import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 import {
-  type RoleImpersonationState,
-  useRoleImpersonationStateSnapshot,
-} from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import {
   Badge,
   Button,
+  cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -38,12 +20,33 @@ import {
   TooltipContent,
   TooltipTrigger,
   TreeViewItemVariant,
-  cn,
-  copyToClipboard,
 } from 'ui'
 
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { getTableDefinition } from '@/data/database/table-definition-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { Entity } from '@/data/entity-types/entity-types-infinite-query'
+import { useProjectLintsQuery } from '@/data/lint/lint-query'
+import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
+import type {
+  TableApiAccessData,
+  TableApiAccessMap,
+} from '@/data/privileges/table-api-access-query'
+import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationState,
+} from '@/state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface EntityListItemProps {
   id: number | string
@@ -79,7 +82,6 @@ export const EntityListItem = ({
   const tabs = useTabsStateSnapshot()
   const isPreview = tabs.previewTabId === tabId
 
-  const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
@@ -405,7 +407,6 @@ const EntityTooltipTrigger = ({
   apiAccessData?: TableApiAccessData
 }) => {
   const { ref } = useParams()
-  const isDataApiExposedBadgeEnabled = useFlag('dataApiExposedBadge')
 
   let tooltipContent = null
   const accessWarning = 'Data is publicly accessible via API'
@@ -476,7 +477,7 @@ const EntityTooltipTrigger = ({
     entity.type === ENTITY_TYPE.TABLE &&
     apiAccessData?.apiAccessType === 'access' &&
     tableHasRlsEnabledNoPolicyLint
-  if (isDataApiExposedBadgeEnabled && isRlsEnabledNoPolicies) {
+  if (isRlsEnabledNoPolicies) {
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
@@ -492,7 +493,7 @@ const EntityTooltipTrigger = ({
 
   const isApiExposedWithRlsAndPolicies =
     apiAccessData?.apiAccessType === 'access' && !tableHasRlsEnabledNoPolicyLint
-  if (isDataApiExposedBadgeEnabled && isApiExposedWithRlsAndPolicies) {
+  if (isApiExposedWithRlsAndPolicies) {
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">

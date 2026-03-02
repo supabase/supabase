@@ -1,25 +1,24 @@
-import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { OrgProject, getComputeSize } from 'data/projects/org-projects-infinite-query'
+import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
-import { Copy, Github, MoreVertical, Trash } from 'lucide-react'
-import { useState } from 'react'
+import { Copy, Github, MoreVertical, Settings } from 'lucide-react'
+import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import type { Organization } from 'types'
 import {
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  copyToClipboard,
 } from 'ui'
 
 import { inferProjectStatus } from './ProjectCard.utils'
@@ -38,14 +37,13 @@ export interface ProjectCardProps {
 export const ProjectCard = ({
   slug,
   project,
-  organization,
   rewriteHref,
   githubIntegration,
   vercelIntegration,
   resourceWarnings,
 }: ProjectCardProps) => {
+  const router = useRouter()
   const { name, ref: projectRef } = project
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
   const providerLabel =
@@ -104,11 +102,11 @@ export const ProjectCard = ({
                           className="gap-x-2"
                           onClick={(e) => {
                             e.stopPropagation()
-                            setIsDeleteModalOpen(true)
+                            router.push(`/project/${projectRef}/settings/general`)
                           }}
                         >
-                          <Trash size={14} />
-                          <span>Delete project</span>
+                          <Settings size={14} />
+                          <span>Settings</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -116,7 +114,7 @@ export const ProjectCard = ({
                 </div>
                 <p className="text-sm text-foreground-lighter">{desc}</p>
               </div>
-              <div className="flex items-center gap-x-1.5 relative">
+              <div className="flex items-center gap-x-1.5 relative overflow-hidden">
                 <ProjectCardStatus
                   projectStatus={projectStatus}
                   resourceWarnings={resourceWarnings}
@@ -140,8 +138,8 @@ export const ProjectCard = ({
                   </div>
                 )}
                 {isGithubIntegrated && (
-                  <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
-                    <div className="w-5 h-5 p-1 flex items-center justify-center">
+                  <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md min-w-0">
+                    <div className="w-5 h-5 p-1 flex items-center justify-center shrink-0">
                       <Github size={12} strokeWidth={1.5} />
                     </div>
                     <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
@@ -156,12 +154,6 @@ export const ProjectCard = ({
           containerElement={<ProjectIndexPageLink projectRef={projectRef} />}
         />
       </li>
-      <DeleteProjectModal
-        visible={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        project={project}
-        organization={organization}
-      />
     </>
   )
 }

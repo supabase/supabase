@@ -1,5 +1,5 @@
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -15,8 +15,10 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { QueuedOperation } from 'state/table-editor-operation-queue.types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
-import { useIsQueueOperationsEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { validateMsSqlSorting } from './MsSqlValidation'
+import {
+  useIsQueueOperationsEnabled,
+  useIsTableFilterBarEnabled,
+} from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
@@ -25,6 +27,7 @@ import { HeaderNew } from './components/header/HeaderNew'
 import { RowContextMenu } from './components/menu/RowContextMenu'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
+import { validateMsSqlSorting } from './MsSqlValidation'
 import { GridProps } from './types'
 import { reapplyOptimisticUpdates } from './utils/queueOperationUtils'
 
@@ -46,11 +49,12 @@ export const SupabaseGrid = ({
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const newFilterBarEnabled = useFlag('tableEditorNewFilterBar')
+  const newFilterBarEnabled = useIsTableFilterBarEnabled()
 
   const { filters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
@@ -78,6 +82,7 @@ export const SupabaseGrid = ({
       sorts,
       filters,
       page: snap.page,
+      preflightCheck,
       limit: tableEditorSnap.rowsPerPage,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
@@ -98,13 +103,16 @@ export const SupabaseGrid = ({
 
   // Re-apply optimistic updates when table data is loaded/refetched
   // This ensures pending changes remain visible when switching tabs or after data refresh
+  // Skip re-applying during save to avoid race condition where refetch completes before queue clears
+  const isSaving = tableEditorSnap.operationQueue.status === 'saving'
   useEffect(() => {
     if (
       isSuccess &&
       project?.ref &&
       tableId &&
       isQueueOperationsEnabled &&
-      tableEditorSnap.hasPendingOperations
+      tableEditorSnap.hasPendingOperations &&
+      !isSaving
     ) {
       reapplyOptimisticUpdates({
         queryClient,
@@ -122,6 +130,7 @@ export const SupabaseGrid = ({
     tableEditorSnap.hasPendingOperations,
     tableEditorSnap.operationQueue.operations,
     queryClient,
+    isSaving,
   ])
 
   const rows = data?.rows ?? EMPTY_ARR

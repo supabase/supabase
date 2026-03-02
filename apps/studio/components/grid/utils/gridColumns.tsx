@@ -1,6 +1,7 @@
-import { CalculatedColumn } from 'react-data-grid'
+import { CalculatedColumn, RenderCellProps } from 'react-data-grid'
 
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import { DefaultValue } from '../components/common/DefaultValue'
+import { NullValue } from '../components/common/NullValue'
 import { BooleanEditor } from '../components/editor/BooleanEditor'
 import { DateTimeEditor } from '../components/editor/DateTimeEditor'
 import { JsonEditor } from '../components/editor/JsonEditor'
@@ -16,7 +17,13 @@ import { JsonFormatter } from '../components/formatter/JsonFormatter'
 import { AddColumn } from '../components/grid/AddColumn'
 import { ColumnHeader } from '../components/grid/ColumnHeader'
 import { SelectColumn } from '../components/grid/SelectColumn'
-import type { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
+import {
+  isPendingAddRow,
+  type ColumnType,
+  type SupaColumn,
+  type SupaRow,
+  type SupaTable,
+} from '../types'
 import {
   isArrayColumn,
   isBinaryColumn,
@@ -31,6 +38,7 @@ import {
   isTextColumn,
   isTimeColumn,
 } from './types'
+import { COLUMN_MIN_WIDTH } from '@/components/grid/constants'
 
 export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 
@@ -64,8 +72,7 @@ export function getGridColumns(
       sortable: true,
       width: columnWidth,
       minWidth: COLUMN_MIN_WIDTH,
-      frozen: x.isPrimaryKey || false,
-      isLastFrozenColumn: false,
+      frozen: false,
       renderHeaderCell: (props) => (
         <ColumnHeader
           {...props}
@@ -185,33 +192,65 @@ function getCellEditor(
   }
 }
 
+function withPendingAddPlaceholders(
+  Formatter: React.ComponentType<RenderCellProps<SupaRow, unknown>>,
+  columnDef: SupaColumn
+) {
+  return function PendingAwareFormatter(props: RenderCellProps<SupaRow, unknown>) {
+    const value = props.row[props.column.key]
+
+    if (isPendingAddRow(props.row) && (value === undefined || value === null || value === '')) {
+      if (columnDef.defaultValue !== undefined && columnDef.defaultValue !== null) {
+        return <DefaultValue />
+      }
+      if (columnDef.isIdentity || columnDef.isGeneratable) {
+        return <DefaultValue />
+      }
+      if (columnDef.isNullable) {
+        return <NullValue />
+      }
+    }
+
+    return <Formatter {...props} />
+  }
+}
+
 function getCellRenderer(
   columnDef: SupaColumn,
   columnType: ColumnType,
   metadata: { tableId?: number }
 ) {
+  let formatter: React.ComponentType<RenderCellProps<SupaRow, unknown>>
+
   switch (columnType) {
     case 'boolean': {
-      return BooleanFormatter
+      formatter = BooleanFormatter
+      break
     }
     case 'foreign_key': {
       if (!columnDef.isUpdatable) {
-        return DefaultFormatter
+        formatter = DefaultFormatter
       } else {
         // eslint-disable-next-line react/display-name
-        return (p: any) => <ForeignKeyFormatter {...p} tableId={metadata.tableId} />
+        formatter = (p: any) => <ForeignKeyFormatter {...p} tableId={metadata.tableId} />
       }
+      break
     }
     case 'binary': {
-      return BinaryFormatter
+      formatter = BinaryFormatter
+      break
     }
     case 'json': {
-      return JsonFormatter
+      formatter = JsonFormatter
+      break
     }
     default: {
-      return DefaultFormatter
+      formatter = DefaultFormatter
     }
   }
+
+  // Wrap all formatters to handle pending add row placeholders
+  return withPendingAddPlaceholders(formatter, columnDef)
 }
 
 function getColumnType(columnDef: SupaColumn): ColumnType {

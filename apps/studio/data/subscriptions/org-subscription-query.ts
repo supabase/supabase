@@ -13,13 +13,15 @@ export type OrgSubscriptionVariables = {
 
 export async function getOrgSubscription(
   { orgSlug }: OrgSubscriptionVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: Record<string, string>
 ) {
   if (!orgSlug) throw new Error('orgSlug is required')
 
   const { error, data } = await get('/platform/organizations/{slug}/billing/subscription', {
     params: { path: { slug: orgSlug } },
     signal,
+    headers,
   })
 
   if (error) handleError(error)

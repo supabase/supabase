@@ -15,8 +15,16 @@ permissions:
 
 jobs:
   test:
+    name: 'E2E tests'
     timeout-minutes: 60
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2]
+        shardTotal: [2]
+    outputs:
+      tests_ran: ${{ steps.filter.outputs.studio == 'true' }}
 
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -55,13 +63,65 @@ jobs:
         if: steps.filter.outputs.studio == 'true'
         run: pnpm -C e2e/studio exec playwright install chromium --with-deps --only-shell
 
+      - name: Set up NextJS/Turbo cache
+        if: steps.filter.outputs.studio == 'true'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          # See here for caching with `yarn`, `bun` or other package managers https://github.com/actions/cache/blob/main/examples.md or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
+          path: |
+            .turbo/cache
+            apps/studio/.next/build
+            apps/studio/.next/cache
+          # Generate a new cache whenever packages or source files change.
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('apps/studio/**/*.js', 'apps/studio/**/*.jsx', 'apps/studio/**/*.ts', 'apps/studio/**/*.tsx') }}
+          # If source files changed but packages didn't, rebuild from a prior cache.
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+
       - name: 🚀 Run Playwright tests against Vercel Preview
         if: steps.filter.outputs.studio == 'true'
         id: playwright
-        run: pnpm e2e
+        run: pnpm e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: always() && steps.filter.outputs.studio == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: blob-report-${{ matrix.shardIndex }}
+          path: e2e/studio/blob-report
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.filter.outputs.studio == 'true' && steps.playwright.outcome != 'success'
+        run: |
+          echo "E2E tests failed" >&2
+          exit 1
+
+  merge-reports:
+    name: 'E2E reports'
+    # Merge reports after playwright-tests, even if some shards have failed
+    if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
+    needs: [test]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v 5.0.0
+        with:
+          path: e2e/studio/blob-report
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge Playwright reports
+        run: npx playwright merge-reports --config=e2e/studio/playwright.merge.config.ts -- e2e/studio/blob-report
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        if: always() && steps.filter.outputs.studio == 'true'
         with:
           name: playwright-artifacts
           path: |
@@ -70,14 +130,21 @@ jobs:
           retention-days: 7
 
       - name: Comment Playwright test results on PR
+        if: always() && github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork
         uses: daun/playwright-report-comment@be9e270edd5ad86038604d3caa84a819a6ff6fed # v3.10.0
-        if: always() && steps.filter.outputs.studio == 'true' && github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork
         with:
           report-file: e2e/studio/test-results/test-results.json
           comment-title: '🎭 Playwright Test Results'
 
-      - name: Fail job if tests failed
-        if: steps.filter.outputs.studio == 'true' && (steps.playwright.outcome != 'success' || steps.summarize.outputs.flaky_count > 0)
-        run: |
-          echo "E2E tests failed" >&2
-          exit 1
+  merge-results:
+    name: 'E2E results'
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
+    steps:
+      - name: All tests ok
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Some tests failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
