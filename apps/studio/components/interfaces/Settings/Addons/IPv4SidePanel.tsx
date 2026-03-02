@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
@@ -112,17 +112,9 @@ const IPv4SidePanel = () => {
             : undefined
       }
       header={
-        <div className="flex items-center justify-between">
+        <div className="flex w-full items-center justify-between">
           <h4>Dedicated IPv4 address</h4>
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <Link
-              href={`${DOCS_URL}/guides/platform/ipv4-address`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              About dedicated IPv4 addresses
-            </Link>
-          </Button>
+          <DocsButton href={`${DOCS_URL}/guides/platform/ipv4-address`} />
         </div>
       }
     >
@@ -231,20 +223,19 @@ const IPv4SidePanel = () => {
               {selectedOption !== 'ipv4_none' && (
                 <p className="text-sm text-foreground-light">
                   By default, this is only applied to the Primary database for your project. If{' '}
-                  <Link
-                    href="/docs/guides/platform/read-replicas"
-                    className="text-brand"
+                  <InlineLink
+                    href={`${DOCS_URL}/guides/platform/read-replicas`}
                     target="_blank"
                   >
-                    Read replicas
-                  </Link>{' '}
+                    read replicas
+                  </InlineLink>{' '}
                   are used, each replica also gets its own IPv4 address, with a corresponding{' '}
                   <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
                   charge.
                 </p>
               )}
               <p className="text-sm text-foreground-light">
-                There are no immediate charges. The addon is billed at the end of your billing cycle
+                There are no immediate charges. The add-on is billed at the end of your billing cycle
                 based on your usage and prorated to the hour.
               </p>
             </>

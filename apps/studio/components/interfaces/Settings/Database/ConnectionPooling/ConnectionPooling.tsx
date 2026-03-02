@@ -8,6 +8,7 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { Button } from 'ui'
 import { DocsButton } from 'components/ui/DocsButton'
 import { setValueAsNullableNumber } from 'components/ui/Forms/Form.constants'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -46,6 +47,7 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import Link from 'next/link'
 
 const formId = 'pooling-configuration-form'
 
@@ -95,8 +97,8 @@ export const ConnectionPooling = () => {
     computeInstance?.variant.name ?? capitalize(project?.infra_compute_size) ?? 'Nano'
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
-      (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
-        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
+    (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
+    (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
     ]
   const defaultPoolSize = poolingOptimizations.poolSize ?? 15
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
@@ -161,15 +163,13 @@ export const ConnectionPooling = () => {
       </PageSectionMeta>
       <PageSectionContent className="space-y-4">
         {isSuccessAddons && !disablePoolModeSelection && !hasIpv4Addon && (
-          <Admonition type="default" title="Dedicated Pooler is not IPv4 compatible">
-            <p className="!m-0">
-              If your network only supports IPv4, consider purchasing the{' '}
-              <InlineLink href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
-                IPv4 add-on
-              </InlineLink>
-              .
-            </p>
-          </Admonition>
+          <Admonition
+            type="default"
+            layout="responsive"
+            title="Dedicated Pooler uses IPv6 by default"
+            description="Connections from IPv4-only networks require enabling the IPv4 add-on on your project instance."
+            actions={<Button type="default" asChild><Link href={`/project/${projectRef}/settings/addons?panel=ipv4`}>Enable IPv4 add-on</Link></Button>}
+          />
         )}
 
         <Panel
