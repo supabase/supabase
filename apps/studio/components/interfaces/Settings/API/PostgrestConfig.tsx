@@ -43,11 +43,12 @@ import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { type ExposeMode, exposeModeQueryOptions } from '@/data/privileges/expose-mode-query'
+import { exposeModeQueryOptions, type ExposeMode } from '@/data/privileges/expose-mode-query'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateExposedTablesMutation } from '@/data/privileges/update-exposed-tables-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { noop } from '@/lib/void'
@@ -237,7 +238,10 @@ export const PostgrestConfig = () => {
 
       toast.success('Successfully saved settings')
       form.reset({
-        dbSchema: dbSchema.split(',').map((x) => x.trim()).filter(Boolean),
+        dbSchema: dbSchema
+          .split(',')
+          .map((x) => x.trim())
+          .filter(Boolean),
         maxRows: values.maxRows,
         dbExtraSearchPath: values.dbExtraSearchPath,
         dbPool: values.dbPool,
@@ -252,15 +256,16 @@ export const PostgrestConfig = () => {
     }
   }
 
+  const resetFormRef = useLatest(resetForm)
+  const isReady = isApiGrantTogglesEnabled
+    ? isSuccessConfig && isSuccessSchemas && isSuccessExposeMode
+    : isSuccessConfig && isSuccessSchemas
   useEffect(() => {
-    const isReady = isApiGrantTogglesEnabled
-      ? isSuccessConfig && isSuccessSchemas && isSuccessExposeMode
-      : isSuccessConfig && isSuccessSchemas
-
     if (isReady) {
-      resetForm()
+      resetFormRef.current()
     }
-  }, [isSuccessConfig, isSuccessSchemas, isSuccessExposeMode, isApiGrantTogglesEnabled, resetForm])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReady])
 
   const watchedExposeMode = form.watch('exposeMode')
   const watchedDbSchema = form.watch('dbSchema')
