@@ -6,7 +6,7 @@ const page: GoPageInput = {
   metadata: {
     title: 'Executive Dinner: The Future of Scalable Databases | Supabase',
     description:
-      'Join Supabase leaders for an intimate dinner exploring what comes next for Postgres at scale. April 28, 2026 at Spruce, San Francisco.',
+      'Join Supabase leaders for an intimate dinner exploring what comes next for Postgres at scale. April 29, 2026 at Spruce, San Francisco.',
   },
   hero: {
     title: 'The future of scalable databases',
