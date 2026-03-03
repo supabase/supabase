@@ -119,7 +119,7 @@ const CustomDomainSidePanel = () => {
             : undefined
       }
       header={
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <h4>Custom domains</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
