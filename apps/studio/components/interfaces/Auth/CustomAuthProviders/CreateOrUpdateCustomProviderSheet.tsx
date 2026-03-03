@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
 import { X } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -65,9 +65,9 @@ const FormSchema = z
     userinfo_url: z.union([z.string().url(), z.literal('')]).default(''),
     jwks_uri: z.union([z.string().url(), z.literal('')]).default(''),
     discovery_url: z.union([z.string().url(), z.literal('')]).default(''),
-  scopes: z.string(),
-  callback_url: z.string().optional(), // Readonly display from project endpoint, not part of payload
-})
+    scopes: z.string(),
+    callback_url: z.string().optional(), // Readonly display from project endpoint, not part of payload
+  })
   .superRefine((data, ctx) => {
     if (data.provider_type === 'oauth2') {
       if (!data.authorization_url?.trim())
@@ -127,7 +127,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
 }: CreateOrUpdateCustomProviderSheetProps) => {
   const isEditMode = !!providerToEdit
   const { ref: projectRef } = useParams()
-  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
+  const { data: endpointData } = useProjectApiUrl({ projectRef })
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
@@ -212,7 +212,9 @@ export const CreateOrUpdateCustomProviderSheet = ({
         discoveryData && {
           issuer: data.issuer,
           skip_nonce_check: false,
-          discovery_url: data.discovery_url || `${data.issuer.replace(/\/$/, '')}/.well-known/openid-configuration`,
+          discovery_url:
+            data.discovery_url ||
+            `${data.issuer.replace(/\/$/, '')}/.well-known/openid-configuration`,
           authorization_url: discoveryData.authorization_endpoint,
           token_url: discoveryData.token_endpoint,
           userinfo_url: discoveryData.userinfo_endpoint,
@@ -473,11 +475,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                     render={({ field }) => (
                       <FormItemLayout layout="horizontal" label="Client Secret">
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            type="password"
-                            placeholder="Client secret"
-                          />
+                          <Input_Shadcn_ {...field} type="password" placeholder="Client secret" />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
@@ -535,8 +533,8 @@ export const CreateOrUpdateCustomProviderSheet = ({
                         copy
                         readOnly
                         disabled
-                        value={`${endpointData?.endpoint}/auth/v1/callback`}
-                        placeholder={`${endpointData?.endpoint}/auth/v1/callback`}
+                        value={`${endpointData}/auth/v1/callback`}
+                        placeholder={`${endpointData}/auth/v1/callback`}
                       />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
