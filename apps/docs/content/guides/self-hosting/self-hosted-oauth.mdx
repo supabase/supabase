@@ -338,20 +338,35 @@ You can test OAuth with the following minimal HTML page:
 <html>
   <body>
     <h1>Supabase OAuth Test</h1>
-    <button onclick="login()">Sign in with Google</button>
+    <button id="loginBtn">Sign in with Google</button>
     <pre id="result"></pre>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      const SUPABASE_URL = 'https://<your-domain>.example.com'
-      const SUPABASE_ANON_KEY = 'your-anon-key'
-      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      async function login() {
-        const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
-        if (error) document.getElementById('result').textContent = JSON.stringify(error, null, 2)
-      }
-      supabase.auth.getSession().then(({ data }) => {
-        if (data.session)
-          document.getElementById('result').textContent = 'Logged in as: ' + data.session.user.email
+      document.addEventListener('DOMContentLoaded', function () {
+        const SUPABASE_URL = 'https://<your-domain>.example.com'
+        const SUPABASE_ANON_KEY = 'your-anon-key'
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        const button = document.getElementById('loginBtn')
+
+        button.addEventListener('click', async () => {
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+          })
+
+          if (error) {
+            document.getElementById('result').textContent = JSON.stringify(error, null, 2)
+          }
+        })
+
+        supabase.auth.getSession().then(({ data }) => {
+          if (data.session) {
+            document.getElementById('result').textContent =
+              'Logged in as: ' + data.session.user.email
+          }
+        })
       })
     </script>
   </body>
