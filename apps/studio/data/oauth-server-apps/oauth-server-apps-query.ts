@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
 import { handleError } from 'data/fetchers'
 import { createProjectSupabaseClient } from 'lib/project-supabase-client'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { useAuthConfigQuery } from '../auth/auth-config-query'
 import { oauthServerAppKeys } from './keys'
 
@@ -46,9 +46,7 @@ export const useOAuthServerAppsQuery = <TData = OAuthServerAppsData>(
     ...options
   }: UseCustomQueryOptions<OAuthServerAppsData, OAuthServerAppsError, TData> = {}
 ) => {
-  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
-  const clientEndpoint = endpointData?.endpoint
-
+  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
   const { data: authConfig, isSuccess: isSuccessConfig } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
 

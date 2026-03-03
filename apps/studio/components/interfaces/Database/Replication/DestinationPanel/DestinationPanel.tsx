@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   DialogSectionSeparator,
   Sheet,
   SheetContent,
@@ -14,7 +15,6 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  cn,
 } from 'ui'
 
 import { EnableReplicationCallout } from '../EnableReplicationCallout'

@@ -1,9 +1,10 @@
+import { formatRelative } from 'date-fns'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Table2 } from 'lucide-react'
+import { BadgeCheck, RefreshCwIcon, Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { Button, Card, CardContent } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -14,28 +15,73 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { isInstalled } from './stripe-sync-status'
+import { isInstalled, isSyncRunning, isUninstalling } from './stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 export const StripeSyncSettingsPage = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
 
-  const { installationStatus, isLoading: isLoadingInstallationStatus } = useStripeSyncStatus({
+  const {
+    parsedSchema: { status: installationStatus },
+    syncState,
+    isLoading: isLoadingInstallationStatus,
+  } = useStripeSyncStatus({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const installed = isInstalled(installationStatus)
-
-  // Redirect to overview page when integration is not installed
-  useEffect(() => {
-    if (isLoadingInstallationStatus || installed || !project?.ref) return
-
-    router.push(`/project/${project.ref}/integrations/stripe_sync_engine/overview`)
-  }, [isLoadingInstallationStatus, installed, project?.ref, router])
+  const isSyncing = isSyncRunning(syncState)
+  const uninstalling = isUninstalling(installationStatus)
+  const tableEditorUrl = `/project/${project?.ref}/editor?schema=stripe`
 
   return (
-    <PageContainer>
+    <PageContainer className="mx-0">
+      {syncState && installed && !uninstalling && (
+        <PageSection id="sync-status">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Sync Status</PageSectionTitle>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <Admonition type="default" showIcon={false}>
+              <div className="flex items-center justify-between gap-2">
+                {isSyncing ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <RefreshCwIcon size={14} className="animate-spin" />
+                      <div>Sync in progress...</div>
+                    </div>
+                    <div className="text-foreground-light text-sm">
+                      Started{' '}
+                      {syncState.started_at
+                        ? formatRelative(new Date(syncState.started_at), new Date())
+                        : 'recently'}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <BadgeCheck size={14} className="text-brand" />
+                      <div>All up to date</div>
+                      <Button asChild type="text">
+                        <Link href={tableEditorUrl}>View data</Link>
+                      </Button>
+                    </div>
+                    <div className="text-foreground-light text-sm">
+                      Last synced{' '}
+                      {syncState.closed_at
+                        ? formatRelative(new Date(syncState.closed_at), new Date())
+                        : 'recently'}
+                    </div>
+                  </>
+                )}
+              </div>
+            </Admonition>
+          </PageSectionContent>
+        </PageSection>
+      )}
       <PageSection id="stripe-schema">
         <PageSectionMeta>
           <PageSectionSummary>

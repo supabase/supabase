@@ -9,29 +9,30 @@ import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
+  cn,
   CodeBlock,
+  copyToClipboard,
   CriticalIcon,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Switch,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  cn,
-  copyToClipboard,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -40,7 +41,6 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import CommandRender from '../CommandRender'
@@ -48,8 +48,7 @@ import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 import AlertError from '@/components/ui/AlertError'
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
@@ -86,24 +85,18 @@ export const EdgeFunctionDetails = () => {
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery(
-    {
-      projectRef,
-    },
-    { enabled: canReadAPIKeys }
-  )
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+
   const {
     data: selectedFunction,
     error,
     isPending: isLoading,
     isError,
     isSuccess,
-  } = useEdgeFunctionQuery({
-    projectRef,
-    slug: functionSlug,
-  })
+  } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+
+  const { data: endpoint } = useProjectApiUrl({ projectRef })
+  const functionUrl = `${endpoint}/functions/v1/${selectedFunction?.slug}`
 
   const { mutate: updateEdgeFunction, isPending: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
@@ -121,12 +114,6 @@ export const EdgeFunctionDetails = () => {
   const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint ?? ''
-  const functionUrl =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
-      : `${protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
   const hasImportMap = useMemo(
     () => selectedFunction?.import_map || selectedFunction?.import_map_path,
     [selectedFunction]
