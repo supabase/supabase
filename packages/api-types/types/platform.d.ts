@@ -5297,15 +5297,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -5373,15 +5373,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -5451,12 +5451,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -5481,12 +5484,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -8468,15 +8474,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -8556,15 +8562,15 @@ export interface components {
           | {
               big_query: {
                 /**
+                 * @description Number of concurrent BigQuery Storage Write API connections.
+                 * @example 8
+                 */
+                connection_pool_size?: number
+                /**
                  * @description BigQuery dataset id
                  * @example analytics
                  */
                 dataset_id: string
-                /**
-                 * @description Maximum number of concurrent write streams
-                 * @example 8
-                 */
-                max_concurrent_streams?: number
                 /**
                  * @description Maximum data staleness in minutes
                  * @example 5
@@ -8766,12 +8772,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -8828,12 +8837,15 @@ export interface components {
              * @example 200
              */
             max_fill_ms?: number
-            /**
-             * @description Maximum size of the batch
-             * @example 200
-             */
-            max_size?: number
           }
+          /**
+           * @description Behavior when the replication slot is invalidated
+           * @example error
+           * @enum {string}
+           */
+          invalidated_slot_behavior?: 'error' | 'recreate'
+          /** @description Maximum number of copy connections per table */
+          max_copy_connections_per_table?: number
           /** @description Maximum number of table sync workers */
           max_table_sync_workers?: number
           /**
@@ -10211,15 +10223,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -10287,15 +10299,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -10365,12 +10377,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -10395,12 +10410,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -10731,15 +10749,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -10806,12 +10824,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**

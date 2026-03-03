@@ -1,11 +1,12 @@
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Area,
   Bar,
   CartesianGrid,
+  Customized,
   Label,
   Line,
   ComposedChart as RechartComposedChart,
@@ -14,11 +15,10 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Customized,
 } from 'recharts'
-
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
+
 import { ChartHeader } from './ChartHeader'
 import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
@@ -29,12 +29,12 @@ import {
   updateStackedChartColors,
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
-import { formatPercentage, numberFormatter, useChartSize } from './Charts.utils'
+import { computeYAxisDomain, formatPercentage, numberFormatter, useChartSize } from './Charts.utils'
 import {
+  calculateTotalChartAggregate,
   CustomLabel,
   CustomTooltip,
   MultiAttribute,
-  calculateTotalChartAggregate,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
@@ -338,6 +338,28 @@ export function ComposedChart({
   )
   const yDomain = [0, yMaxFromVisible]
 
+  const yAxisDomain = useMemo(
+    () =>
+      computeYAxisDomain({
+        isPercentage,
+        showMaxValue,
+        yMaxFromVisible,
+        maxAttributeKey: maxAttribute?.attribute,
+        showMaxLine: _showMaxValue,
+        data,
+        visibleAttributeNames: visibleAttributes.map((a) => a.name),
+      }),
+    [
+      isPercentage,
+      showMaxValue,
+      yMaxFromVisible,
+      maxAttribute,
+      _showMaxValue,
+      data,
+      visibleAttributes,
+    ]
+  )
+
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
@@ -435,7 +457,7 @@ export function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={isPercentage && !showMaxValue ? yDomain : ['auto', 'auto']}
+            domain={yAxisDomain}
             key={yAxisKey}
           />
           <XAxis

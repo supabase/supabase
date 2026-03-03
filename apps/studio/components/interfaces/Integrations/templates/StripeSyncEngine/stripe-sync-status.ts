@@ -22,11 +22,25 @@ export type StripeInstallationStatus =
   | 'uninstall_error'
 
 /**
+ * Parsed Stripe schema status including version and error message
+ */
+export interface ParsedStripeSchema {
+  /** The installation status */
+  status: StripeInstallationStatus
+
+  /** The version from the schema comment (e.g., 'v1.2.3') */
+  version?: string
+
+  /** Error message if status is install_error or uninstall_error */
+  errorMessage?: string
+}
+
+/**
  * Complete Stripe Sync status including schema, installation state, and sync state
  */
 export interface StripeSyncStatusResult {
-  /** The installation status */
-  installationStatus: StripeInstallationStatus
+  /** The parsed schema with status, version and error */
+  parsedSchema: ParsedStripeSchema
 
   /** Current sync run state (only available when installationStatus is installed) */
   syncState: StripeSyncState | undefined
@@ -51,40 +65,72 @@ function isStripeSyncSchema(schema: Schema | undefined): boolean {
   return !!schema?.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX)
 }
 
-function hasStatusSuffix(schema: Schema | undefined, suffix: string): boolean {
-  return isStripeSyncSchema(schema) && !!schema?.comment?.endsWith(suffix)
-}
-
 /**
  * Parse the installation status from a stripe schema.
  *
+ * Schema comment format: {PREFIX} {version} {SUFFIX}[ - {error message}]
+ * Example: "stripe_sync v1.2.3 installation:error - Could not apply migration"
+ *
  * @param stripeSchema - The stripe schema from the database, if it exists
- * @returns The installation status
+ * @returns The parsed status including version and optional error message
  */
-export function parseStripeSchemaStatus(
-  stripeSchema: Schema | undefined
-): StripeInstallationStatus {
-  if (hasStatusSuffix(stripeSchema, UNINSTALLATION_ERROR_SUFFIX)) {
-    return 'uninstall_error'
+export function parseStripeSchema(stripeSchema: Schema | undefined): ParsedStripeSchema {
+  if (!isStripeSyncSchema(stripeSchema)) {
+    return { status: 'uninstalled' }
   }
 
-  if (hasStatusSuffix(stripeSchema, INSTALLATION_ERROR_SUFFIX)) {
-    return 'install_error'
+  const comment = stripeSchema!.comment!
+
+  // Remove prefix and leading space
+  const afterPrefix = comment.slice(STRIPE_SCHEMA_COMMENT_PREFIX.length).trimStart()
+
+  // Split at first space to get version and trailing segment
+  const firstSpaceIndex = afterPrefix.indexOf(' ')
+  if (firstSpaceIndex === -1) {
+    return { status: 'uninstalled' }
   }
 
-  if (hasStatusSuffix(stripeSchema, UNINSTALLATION_STARTED_SUFFIX)) {
-    return 'uninstalling'
+  const version = afterPrefix.slice(0, firstSpaceIndex)
+  const trailing = afterPrefix.slice(firstSpaceIndex + 1)
+
+  // Helper to extract error message if present after ' - ' separator
+  const extractError = (afterSuffix: string): string | undefined => {
+    if (afterSuffix.startsWith(' - ')) {
+      return afterSuffix.slice(3) // Remove ' - ' (3 characters)
+    }
+    return afterSuffix
   }
 
-  if (hasStatusSuffix(stripeSchema, INSTALLATION_STARTED_SUFFIX)) {
-    return 'installing'
+  // Check status in priority order
+  if (trailing.startsWith(UNINSTALLATION_ERROR_SUFFIX)) {
+    return {
+      status: 'uninstall_error',
+      version,
+      errorMessage: extractError(trailing.slice(UNINSTALLATION_ERROR_SUFFIX.length)),
+    }
   }
 
-  if (hasStatusSuffix(stripeSchema, INSTALLATION_INSTALLED_SUFFIX)) {
-    return 'installed'
+  if (trailing.startsWith(INSTALLATION_ERROR_SUFFIX)) {
+    return {
+      status: 'install_error',
+      version,
+      errorMessage: extractError(trailing.slice(INSTALLATION_ERROR_SUFFIX.length)),
+    }
   }
 
-  return 'uninstalled'
+  if (trailing.startsWith(UNINSTALLATION_STARTED_SUFFIX)) {
+    return { status: 'uninstalling', version }
+  }
+
+  if (trailing.startsWith(INSTALLATION_STARTED_SUFFIX)) {
+    return { status: 'installing', version }
+  }
+
+  if (trailing.startsWith(INSTALLATION_INSTALLED_SUFFIX)) {
+    return { status: 'installed', version }
+  }
+
+  return { status: 'uninstalled' }
 }
 
 export function isInstalled(status: StripeInstallationStatus): boolean {

@@ -53,11 +53,12 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
   queryGroup="auth-store"
 >
   <TabPanel id="async-storage" label="AsyncStorage">
+
     <$CodeSample
       path="/auth/expo-social-auth/lib/supabase.web.ts"
       lines={[[1, -1]]}
       meta="name=lib/supabase.web.ts"
-/>
+    />
 
   </TabPanel>
   <TabPanel id="secure-store" label="SecureStore">
@@ -65,6 +66,7 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
     If you want to encrypt the user's session information, use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
 
     Make sure that:
+
     - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
     - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
     - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
@@ -75,8 +77,7 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
       path="/auth/expo-social-auth/lib/supabase.ts"
       lines={[[1, -1]]}
       meta="name=lib/supabase.ts"
-
-/>
+    />
 
   </TabPanel>
 </Tabs>
@@ -89,7 +90,7 @@ These variables are safe to expose in your Expo app since Supabase has [Row Leve
 Create a `.env` file containing these variables:
 
 <$CodeSample
-path="/auth/expo-social-auth/.env"
+path="/auth/expo-social-auth/.env.template"
 lines={[[1, -1]]}
 meta="name=.env"
 />
@@ -162,8 +163,9 @@ Wrap the navigation with the `AuthProvider` and `SplashScreenController`.
 
 Using [Expo Router's protected routes](https://docs.expo.dev/router/advanced/authentication/#using-protected-routes), you can secure navigation:
 
+{/* prettier-ignore */}
 <$CodeSample
-path="/auth/expo-social-auth/app/\_layout.tsx"
+path="/auth/expo-social-auth/app/_layout.tsx"
 lines={[[1, -1]]}
 meta="name=app/\_layout.tsx"
 />
@@ -197,22 +199,22 @@ Start by adding the button inside the login screen:
 <$CodeTabs>
 
 ```tsx name=app/login.tsx
-...
+…
 import AppleSignInButton from '@/components/social-auth-buttons/apple/apple-sign-in-button';
-...
+…
 export default function LoginScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Login' }} />
       <ThemedView style={styles.container}>
-        ...
+        …
         <AppleSignInButton />
-        ...
+        …
       </ThemedView>
     </>
   );
 }
-...
+…
 ```
 
 </$CodeTabs>
@@ -269,9 +271,11 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Then create the iOS specific button component `AppleSignInButton`:
 
-    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx"
-
-/>
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx"
+    />
 
     <Admonition type="note">
 
@@ -280,9 +284,9 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
     <$CodeTabs>
 
     ```tsx name=components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx
-    ...
+    …
     const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
-    ...
+    …
     ```
 
     </$CodeTabs>
@@ -297,13 +301,13 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
     ```json name=app.json
     {
       "expo": {
-        ...
+        …
         "ios": {
-          ...
+          …
           "usesAppleSignIn": true
-          ...
+          …
         },
-        ...
+        …
       }
     }
     ```
@@ -357,9 +361,11 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Next, create the Android-specific `AppleSignInButton` component:
 
-    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.android.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.android.tsx"
-
-/>
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.android.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/apple/apple-sign-in-button.android.tsx"
+    />
 
     You should now be able to test the authentication by running it on a physical device or simulator:
 
@@ -392,9 +398,11 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Next, create the Web-specific `AppleSignInButton` component:
 
-    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.web.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.web.tsx"
-
-/>
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.web.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/apple/apple-sign-in-button.web.tsx"
+    />
 
     Test the authentication in your browser using the tunneled HTTPS URL:
 
@@ -425,14 +433,14 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
     ```json name=app.json
     {
       "expo": {
-        ...
+        …
         "ios": {
-          ...
+          …
           "usesAppleSignIn": true
-          ...
+          …
         },
         "plugins": ["expo-apple-authentication"]
-        ...
+        …
       }
     }
     ```
@@ -441,9 +449,11 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Then create the iOS specific button component `AppleSignInButton`:
 
-    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/apple/apple-sign-in-button.tsx"
-
-/>
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/apple/apple-sign-in-button.tsx"
+    />
 
     <Admonition type="note">
 
@@ -461,22 +471,22 @@ Start by adding the button to the login screen:
 <$CodeTabs>
 
 ```tsx name=app/login.tsx
-...
+…
 import GoogleSignInButton from '@/components/social-auth-buttons/google/google-sign-in-button';
-...
+…
 export default function LoginScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Login' }} />
       <ThemedView style={styles.container}>
-        ...
+        …
         <GoogleSignInButton />
-        ...
+        …
       </ThemedView>
     </>
   );
 }
-...
+…
 ```
 
 </$CodeTabs>
@@ -485,7 +495,7 @@ For Google authentication, you can choose between the following options:
 
 - [GN Google Sign In Premium](https://react-native-google-signin.github.io/docs/install#sponsor-only-version) - that supports iOS, Android, and Web by using the latest Google's One Tap sign-in (but [it requires a subscription](https://universal-sign-in.com/))
 - [@react-oauth/google](https://github.com/MomenSherif/react-oauth#googlelogin) - that supports Web (so it's not a good option for mobile, but it works)
-- Relying on the [``signInWithOAuth](/docs/reference/javascript/auth-signinwithoauth) function of the Supabase Auth - that also supports iOS, Android and Web (useful also to manage any other OAuth provider)
+- Relying on the [`signInWithOAuth`](/docs/reference/javascript/auth-signinwithoauth) function of the Supabase Auth - that also supports iOS, Android and Web (useful also to manage any other OAuth provider)
 
 <Admonition type="note">
 
@@ -510,13 +520,16 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
   defaultActiveId="web"
   queryGroup="google-authentication"
 >
- <TabPanel id="mobile" label="Mobile">
+
+  <TabPanel id="mobile" label="Mobile">
 
     Create the mobile generic button component `GoogleSignInButton`:
 
-    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/google/google-sign-in-button.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/google/google-sign-in-button.tsx"
-
-/>
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/google/google-sign-in-button.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/google/google-sign-in-button.tsx"
+    />
 
     Finally, update the iOS and Android projects by running the Expo prebuild command:
 
@@ -550,18 +563,18 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
     ```json name=app.json
     {
       "expo": {
-        ...
-        "plugins": {
-          ...
+        …
+        "plugins": [
+          …
           [
             "expo-web-browser",
             {
               "experimentalLauncherActivity": false
             }
           ]
-          ...
-        },
-        ...
+          …
+        ],
+        …
       }
     }
     ```
@@ -570,9 +583,11 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
 
     Then create the iOS specific button component `GoogleSignInButton`:
 
-    <$CodeSample path="/auth/expo-social-auth/components/social-auth-buttons/google/google-sign-in-button.web.tsx" lines={[[1, -1]]} meta="name=components/social-auth-buttons/google/google-sign-in-button.web.tsx"
-
-/>
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/google/google-sign-in-button.web.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/google/google-sign-in-button.web.tsx"
+    />
 
     Test the authentication in your browser using the tunnelled HTTPS URL:
 

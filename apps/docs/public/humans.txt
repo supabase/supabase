@@ -81,6 +81,7 @@ Firas El Rachidi
 Francesco Sansalvadore
 Garrett Crowell
 Gerardo Estaba
+Gildas Garcia
 Greg Kress
 Greg P
 Greg Richardson
@@ -108,6 +109,7 @@ Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
 Joel Low
+Joel Martin
 John Pena
 John Schaeffer
 Jon M
@@ -126,6 +128,7 @@ Katerina Skroumpelou
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kevin Strong-Holte
 Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
@@ -135,6 +138,7 @@ Leigh Anne Applewhite
 Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
+Lindsay Moss
 Long Hoang
 Luca Forstner
 Lukas Bernert
@@ -176,6 +180,7 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Rodrigo Esteves
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
@@ -184,8 +189,10 @@ Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Sana Cordeaux
 Sara Read
 Sean Oliver
+Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shane E

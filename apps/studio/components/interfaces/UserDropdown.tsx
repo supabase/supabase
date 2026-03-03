@@ -54,7 +54,7 @@ export function UserDropdown() {
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-              {!!username && (
+              {!!username ? (
                 <>
                   <span title={username} className="w-full text-left text-foreground truncate">
                     {username}
@@ -68,6 +68,10 @@ export function UserDropdown() {
                     </span>
                   )}
                 </>
+              ) : (
+                <span title={primaryEmail} className="w-full text-left text-foreground truncate">
+                  {primaryEmail}
+                </span>
               )}
             </div>
             <DropdownMenuSeparator />

@@ -132,10 +132,10 @@ export const ChartConfig = ({
   }
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
-      <ResizablePanel className="p-4 h-full" defaultSize={75}>
+    <ResizablePanelGroup orientation="horizontal" className="flex-grow h-full">
+      <ResizablePanel className="p-4 h-full" defaultSize="75">
         {!hasConfig ? (
-          <ResizablePanel className="p-4 h-full" defaultSize={75}>
+          <ResizablePanel className="p-4 h-full" defaultSize="75">
             <NoDataPlaceholder
               size="normal"
               title="Configure your chart"
@@ -173,8 +173,8 @@ export const ChartConfig = ({
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel
-        defaultSize={25}
-        minSize={15}
+        defaultSize="25"
+        minSize="15"
         className="px-3 py-3 space-y-4 !overflow-y-auto"
       >
         <div className="flex justify-between items-center h-5">

@@ -1,20 +1,17 @@
 import { mergeRefs, useParams } from 'common'
-import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
-import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { withAuth } from 'hooks/misc/withAuth'
-import { usePHFlag } from 'hooks/ui/useFlag'
-import { PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { cn, LogoLoader, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import {
+  cn,
+  LogoLoader,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  useIsMobile,
+  usePanelRef,
+} from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
@@ -31,6 +28,17 @@ import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
+import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { ResourceExhaustionWarningBanner } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { PROJECT_STATUS } from '@/lib/constants'
+import { useAppStateSnapshot } from '@/state/app-state'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -96,9 +104,13 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { appTitle } = useCustomContent(['app:title'])
     const titleSuffix = appTitle || 'Supabase'
 
+    const isMobile = useIsMobile()
+
     const editor = useEditorType()
     const forceShowProductMenu = editor === undefined
-    const sideBarIsOpen = forceShowProductMenu || showSidebar
+    const sideBarIsOpen = (forceShowProductMenu || showSidebar) && !isMobile
+
+    const panelRef = usePanelRef()
 
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
@@ -111,10 +123,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
     const showPausedState = isPaused && !ignorePausedState
-
-    const sidebarMinSizePercentage = 1
-    const sidebarDefaultSizePercentage = 15
-    const sidebarMaxSizePercentage = 33
 
     return (
       <>
@@ -133,45 +141,35 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup direction="horizontal">
-            {productMenu && (
+          <ResizablePanelGroup orientation="horizontal">
+            {productMenu && sideBarIsOpen && (
               <ResizablePanel
-                order={1}
-                minSize={sidebarMinSizePercentage}
-                maxSize={sidebarMaxSizePercentage}
-                defaultSize={sidebarDefaultSizePercentage}
+                panelRef={panelRef}
+                minSize={256}
+                maxSize={resizableSidebar ? 512 : 256}
+                defaultSize={256}
                 id="panel-left"
-                className={cn(
-                  'hidden md:block',
-                  'transition-[max-width,min-width,width] duration-[120ms]',
-                  sideBarIsOpen
-                    ? resizableSidebar
-                      ? 'min-w-64 max-w-[32rem]'
-                      : 'min-w-64 max-w-64'
-                    : 'w-0 flex-shrink-0 max-w-0'
-                )}
+                disabled={!resizableSidebar}
               >
-                {sideBarIsOpen && (
-                  <AnimatePresence initial={false}>
-                    <motion.div
-                      initial={{ width: 0, opacity: 0, height: '100%' }}
-                      animate={{ width: 'auto', opacity: 1, height: '100%' }}
-                      exit={{ width: 0, opacity: 0, height: '100%' }}
-                      className="h-full"
-                      transition={{ duration: 0.12 }}
+                <AnimatePresence initial={false}>
+                  <motion.div
+                    initial={{ width: 0, opacity: 0, height: '100%' }}
+                    animate={{ width: 'auto', opacity: 1, height: '100%' }}
+                    exit={{ width: 0, opacity: 0, height: '100%' }}
+                    className="h-full"
+                    transition={{ duration: 0.12 }}
+                  >
+                    <MenuBarWrapper
+                      isLoading={isLoading}
+                      isBlocking={isBlocking}
+                      productMenu={productMenu}
                     >
-                      <MenuBarWrapper
-                        isLoading={isLoading}
-                        isBlocking={isBlocking}
-                        productMenu={productMenu}
-                      >
-                        <ProductMenuBar title={product} className={productMenuClassName}>
-                          {productMenu}
-                        </ProductMenuBar>
-                      </MenuBarWrapper>
-                    </motion.div>
-                  </AnimatePresence>
-                )}
+                      <ProductMenuBar title={product} className={productMenuClassName}>
+                        {productMenu}
+                      </ProductMenuBar>
+                    </MenuBarWrapper>
+                  </motion.div>
+                </AnimatePresence>
               </ResizablePanel>
             )}
             {productMenu && sideBarIsOpen && (
@@ -182,12 +180,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               />
             )}
             <ResizablePanel
-              order={2}
-              minSize={100 - sidebarMaxSizePercentage}
-              maxSize={100 - sidebarMinSizePercentage}
-              defaultSize={100 - sidebarDefaultSizePercentage}
-              id="panel-project-content"
               className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
+              id="panel-project-content"
             >
               <main
                 className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
