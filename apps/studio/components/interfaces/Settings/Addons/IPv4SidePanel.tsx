@@ -121,9 +121,8 @@ const IPv4SidePanel = () => {
       <SidePanel.Content>
         <div className="py-6 space-y-4">
           <p className="text-sm">
-            Direct connections to the database only work if your client is able to resolve IPv6
-            addresses. Enabling the dedicated IPv4 add-on allows you to directly connect to your
-            database via a IPv4 address.
+            Direct connections require IPv6 by default. Enable the dedicated IPv4 add-on to connect
+            from IPv4-only networks.
           </p>
 
           {!isAws && (
@@ -133,22 +132,15 @@ const IPv4SidePanel = () => {
             />
           )}
 
-          {isPgBouncerEnabled ? (
-            <Admonition
-              type="default"
-              title="The Dedicated Pooler does not support IPv4 addresses"
-              description="If you are connecting to your database via the Dedicated Pooler, you may need this add-on if your network does not support communicating via IPv6. Alternatively, you may consider using our Shared Pooler."
-            />
-          ) : (
-            <p className="text-sm">
-              If you are connecting via the Shared connection pooler, you do not need this add-on as
-              our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
-              <InlineLink href={`/project/${projectRef}/database/settings#connection-pooler`}>
-                project database settings
-              </InlineLink>
-              .
-            </p>
-          )}
+          <p className="text-sm">
+            If you connect via the Shared Pooler, you usually don’t need this add-on because the
+            Shared Pooler supports IPv4 by default.
+          </p>
+
+          <p className="text-sm">
+            If you connect directly to your database or via the Dedicated Pooler, you may need the
+            IPv4 add-on when your network does not support IPv6.
+          </p>
 
           <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
             <Radio.Group
@@ -243,7 +235,7 @@ const IPv4SidePanel = () => {
 
           {!hasAccessToIPv4 && (
             <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
-              <p>Upgrade your plan to enable a IPv4 address for your project</p>
+              <p>Upgrade your plan to enable an IPv4 address for your project</p>
               <Button asChild type="default">
                 <Link
                   href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=ipv4SidePanel`}
