@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test'
+import { expect } from '@playwright/test'
 
 import { env } from '../env.config.js'
 import { createTable, dropTable, query } from '../utils/db/index.js'
@@ -69,7 +69,7 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Download Schema' }).click()
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
-      await expect(download.suggestedFilename()).toContain('.png')
+      expect(download.suggestedFilename()).toContain('.png')
 
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
@@ -111,7 +111,7 @@ test.describe('Database', () => {
       await expect(page.getByRole('button', { name: 'New table' })).toBeVisible()
 
       // validates database name is present and has accurate number of columns
-      const tableRow = await page.getByRole('row', {
+      const tableRow = page.getByRole('row', {
         name: `${databaseTableName} No description`,
       })
       await expect(tableRow).toContainText(databaseTableName)
@@ -426,9 +426,9 @@ test.describe('Database', () => {
       ).toBeVisible({
         timeout: 50000,
       })
-      const triggerRow = await page.getByRole('row', { name: databaseTriggerName })
-      expect(triggerRow).toContainText('subscription_check_filters')
-      expect(triggerRow).toContainText(databaseTriggerName)
+      const triggerRow = page.getByRole('row', { name: databaseTriggerName })
+      await expect(triggerRow).toContainText('subscription_check_filters')
+      await expect(triggerRow).toContainText(databaseTriggerName)
 
       // update trigger
       await triggerRow.getByRole('button', { name: 'More options' }).click()
@@ -547,13 +547,15 @@ test.describe('Database', () => {
       ).toBeVisible()
 
       // check index definition
-      const newIndexRow = await page.getByRole('row', {
+      const newIndexRow = page.getByRole('row', {
         name: `${databaseTableName}_${databaseColumnName}_idx`,
       })
       await newIndexRow.getByRole('button', { name: 'View definition' }).click()
-      expect(await page.getByRole('presentation').textContent()).toBe(
-        `CREATE INDEX ${databaseTableName}_${databaseColumnName}_idx ON public.${databaseTableName} USING btree (${databaseColumnName})`
-      )
+      await expect(
+        page.getByText(
+          `CREATE INDEX ${databaseTableName}_${databaseColumnName}_idx ON public.${databaseTableName} USING btree (${databaseColumnName})`
+        )
+      ).toBeVisible()
       await page.getByRole('button', { name: 'Cancel' }).click()
 
       // delete the index
@@ -745,7 +747,6 @@ test.describe('Database Functions', () => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/functions?schema=public`))
 
     // Wait for database functions to be populated
-    // await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
     await page.waitForLoadState('networkidle')
 
     // delete function if exists
@@ -796,8 +797,8 @@ END;`)
     ).toBeVisible({
       timeout: 50000,
     })
-    const functionRow = await page.getByRole('row', { name: databaseFunctionName })
-    expect(functionRow).toContainText(databaseFunctionName)
+    const functionRow = page.getByRole('row', { name: databaseFunctionName })
+    await expect(functionRow).toContainText(databaseFunctionName)
 
     // update function
     await functionRow.getByRole('button', { name: 'More options' }).click()
