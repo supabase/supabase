@@ -1,13 +1,12 @@
-import Link from 'next/link'
-
-import { useFlag } from 'common'
 import { SidePanelVercelProjectLinker } from 'components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
+import Link from 'next/link'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, WarningIcon } from 'ui'
+
 import { AWSPrivateLinkSection } from './AWSPrivateLink/AWSPrivateLinkSection'
 import { GitHubSection } from './GithubIntegration/GithubSection'
 import { VercelSection } from './VercelIntegration/VercelSection'
@@ -29,11 +28,9 @@ const IntegrationSettings = () => {
 
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
   const showAWSPrivateLinkFeature = useIsFeatureEnabled('integrations:aws_private_link')
-  const showAWSPrivateLinkConfigCat = useFlag('awsPrivateLinkIntegration')
   // PrivateLink is not available in eu-central-2 (Zurich) until Feb 2026
   const isPrivateLinkUnsupportedRegion = project?.region === 'eu-central-2'
-  const showAWSPrivateLink =
-    showAWSPrivateLinkFeature && showAWSPrivateLinkConfigCat && !isPrivateLinkUnsupportedRegion
+  const showAWSPrivateLink = showAWSPrivateLinkFeature && !isPrivateLinkUnsupportedRegion
 
   return (
     <>
