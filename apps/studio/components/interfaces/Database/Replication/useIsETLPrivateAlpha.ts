@@ -1,23 +1,25 @@
 import { useFlag } from 'common'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
-const useIsCurrentOrgInFlagList = (flagName: string, overrideFlagName?: string) => {
+/**
+ * Organization level opt in for ETL private alpha, there's 2 flags we're using which controls
+ * the individual destination types. Access to the ETL UI (`useIsETLPrivateAlpha`) will just
+ * check if the org has access to at least one of the destination types
+ */
+const useIsCurrentOrgInFlagList = (flag: string) => {
+  const flagValue = useFlag(flag)
   const { data: organization } = useSelectedOrganizationQuery()
 
-  const flagValue = useFlag<string | boolean>(flagName)
   const allowedOrgSlugs =
-    typeof flagValue === 'string' ? flagValue.split(',').map((x: string) => x.trim()) : []
+    typeof flagValue === 'string'
+      ? (flagValue as string).split(',').map((x: string) => x.trim())
+      : []
 
-  const isOverrideEnabled = overrideFlagName ? useFlag(overrideFlagName) : false
+  // [Joshen] Override for to enable for all organizations by setting the flag value as `all`
+  if (allowedOrgSlugs.includes('all')) return true
 
-  return isOverrideEnabled || allowedOrgSlugs.includes(organization?.slug ?? '')
-}
-
-/**
- * Organization level opt in for ETL private alpha
- */
-export const useIsETLPrivateAlpha = () => {
-  return useIsCurrentOrgInFlagList('etlPrivateAlpha', 'etlPrivateAlphaOverride')
+  // [Joshen] Otherwise fallback to checking against org slug
+  return allowedOrgSlugs.includes(organization?.slug ?? '')
 }
 
 export const useIsETLBigQueryPrivateAlpha = () => {
@@ -26,4 +28,11 @@ export const useIsETLBigQueryPrivateAlpha = () => {
 
 export const useIsETLIcebergPrivateAlpha = () => {
   return useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
+}
+
+export const useIsETLPrivateAlpha = () => {
+  const hasAccessToETLBigQuery = useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
+  const hasAccessToETLIceberg = useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
+
+  return hasAccessToETLBigQuery || hasAccessToETLIceberg
 }

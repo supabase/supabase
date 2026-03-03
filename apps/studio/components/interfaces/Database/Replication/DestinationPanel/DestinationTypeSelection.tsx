@@ -13,10 +13,10 @@ import { DestinationType } from './DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
 
 export const DestinationTypeSelection = () => {
-  const enablePgReplicate = useIsETLPrivateAlpha()
   const unifiedReplication = useFlag('unifiedReplication')
-  const etlEnableBigQuery = useFlag('etlEnableBigQuery') || useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useFlag('etlEnableIceberg') || useIsETLIcebergPrivateAlpha()
+  const enablePgReplicate = useIsETLPrivateAlpha()
+  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
+  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
 
   const numberOfTypes = [unifiedReplication, etlEnableBigQuery, etlEnableIceberg].filter(
     Boolean
@@ -56,8 +56,8 @@ export const DestinationTypeSelection = () => {
         value={destinationType}
         onValueChange={(value) => setDestinationType(value as DestinationType)}
         className={cn(
-          'grid [&>button>div]:py-4',
-          numberOfTypes === 3 ? 'grid-cols-3' : numberOfTypes === 2 ? 'grid-cols-2' : 'grid-cols-1',
+          'grid [&>button>div]:py-4 grid-cols-3',
+          numberOfTypes === 3 ? 'grid-cols-3' : 'grid-cols-2',
           '[&>button:first-of-type]:rounded-none [&>button:last-of-type]:rounded-none',
           '[&>button:first-of-type]:!rounded-l-lg [&>button:last-of-type]:!rounded-r-lg'
         )}
