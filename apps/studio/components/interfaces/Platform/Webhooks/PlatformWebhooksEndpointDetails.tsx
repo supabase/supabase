@@ -7,7 +7,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  Input,
   Table,
   TableBody,
   TableCell,
@@ -15,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { formatDate, formatEvents, statusBadgeVariant } from './PlatformWebhooksView.utils'
 
@@ -62,10 +62,10 @@ export const PlatformWebhooksEndpointDetails = ({
                   {selectedEndpoint.customHeaders.length === 0
                     ? '-'
                     : selectedEndpoint.customHeaders.map((header) => (
-                        <div key={header.id}>
-                          <code className="text-code-inline">{header.key}</code>: {header.value}
-                        </div>
-                      ))}
+                      <div key={header.id}>
+                        <code className="text-code-inline">{header.key}</code>: {header.value}
+                      </div>
+                    ))}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -99,18 +99,20 @@ export const PlatformWebhooksEndpointDetails = ({
       </div>
 
       <div className="space-y-4">
+
+        <h2 className="text-foreground text-xl">Deliveries</h2>
+
         <div className="flex items-center justify-between gap-2">
-          <h4 className="text-foreground">Deliveries</h4>
-          <p className="text-sm text-foreground-light">{filteredDeliveries.length} total</p>
+          <Input
+            placeholder="Search deliveries"
+            size="tiny"
+            icon={<Search />}
+            value={deliverySearch}
+            className="w-full lg:w-52"
+            onChange={(event) => onDeliverySearchChange(event.target.value)}
+          />
+          <p className="text-sm text-foreground-muted">{filteredDeliveries.length} total</p>
         </div>
-        <Input
-          placeholder="Search deliveries"
-          size="tiny"
-          icon={<Search />}
-          value={deliverySearch}
-          className="w-full lg:w-80"
-          onChange={(event) => onDeliverySearchChange(event.target.value)}
-        />
         <Card className="overflow-hidden">
           <Table>
             <TableHeader>

@@ -380,14 +380,15 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
               specification.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="space-y-2 px-5">
-            <div className="space-y-2">
-              <Label_Shadcn_ className="text-foreground">Signing secret</Label_Shadcn_>
+          {/* Content */}
+          <div className="space-y-4 mx-5 pt-4 pb-5 border-t border-muted">
+            <div className="space-y-1">
+              <Label_Shadcn_ className="text-foreground-lighter">Signing secret</Label_Shadcn_>
               <Input
                 copy
                 readOnly
                 value={signingSecretReveal?.signingSecret ?? ''}
-                onChange={() => {}}
+                onChange={() => { }}
                 onCopy={() => toast.success('Copied signing secret')}
               />
             </div>
@@ -399,11 +400,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
               />
             </div>
           </div>
-          <AlertDialogDescription>
-            Validate each request by comparing the{' '}
-            <code className="text-code-inline">x-supabase-signature</code> header to the
-            signature you compute from the request payload and this secret.
-          </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setSigningSecretReveal(null)}>
               I’ve stored the secret

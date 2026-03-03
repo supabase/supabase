@@ -12,7 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
   Table,
   TableBody,
   TableCell,
@@ -22,6 +21,7 @@ import {
   TableRow,
 } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { formatDate } from './PlatformWebhooksView.utils'
 
@@ -92,19 +92,21 @@ export const PlatformWebhooksEndpointList = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
-        <h4 className="text-foreground">Endpoints</h4>
+        <h2 className="text-foreground text-xl">Endpoints</h2>
+      </div>
+      <div className="flex items-center justify-between gap-x-2">
+        <Input
+          placeholder="Search endpoints"
+          size="tiny"
+          icon={<Search />}
+          value={search}
+          className="w-full lg:w-52"
+          onChange={(event) => onSearchChange(event.target.value)}
+        />
         <Button type="primary" icon={<Plus />} onClick={onCreateEndpoint}>
           New endpoint
         </Button>
       </div>
-      <Input
-        placeholder="Search endpoints"
-        size="tiny"
-        icon={<Search />}
-        value={search}
-        className="w-full lg:w-80"
-        onChange={(event) => onSearchChange(event.target.value)}
-      />
 
       {filteredEndpoints.length === 0 ? (
         <EmptyStatePresentational
