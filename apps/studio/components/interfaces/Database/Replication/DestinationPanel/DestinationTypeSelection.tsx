@@ -4,17 +4,12 @@ import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
 import { useDestinationInformation } from '../useDestinationInformation'
-import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
-  useIsETLPrivateAlpha,
-} from '../useIsETLPrivateAlpha'
+import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
 
 export const DestinationTypeSelection = () => {
   const unifiedReplication = useFlag('unifiedReplication')
-  const enablePgReplicate = useIsETLPrivateAlpha()
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
 
@@ -125,7 +120,7 @@ export const DestinationTypeSelection = () => {
         )}
       </RadioGroupStacked>
 
-      {destinationType !== 'Read Replica' && enablePgReplicate && (
+      {destinationType !== 'Read Replica' && (
         <p className="mt-3 text-sm text-foreground-light">
           Replication is in alpha. Expect rapid changes and possible breaking updates.{' '}
           <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
