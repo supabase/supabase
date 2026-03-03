@@ -46,8 +46,7 @@ export const useReportDateRange = (
   defaultHelper:
     | REPORT_DATERANGE_HELPER_LABELS
     | string
-    | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
-  useV2Granularity = false
+    | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
 ) => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
@@ -180,35 +179,11 @@ export const useReportDateRange = (
     const diffInDays = dayjs(to).diff(from, 'day', true)
     const diffInHours = dayjs(to).diff(from, 'hour', true)
 
-    if (useV2Granularity) {
-      if (diffInHours <= 1) return '1m'
-      if (diffInHours <= 12) return '2m'
-      if (diffInHours <= 24) return '10m'
-      if (diffInDays <= 7) return '1h'
-      return '1d'
-    }
-
-    const conditions = {
-      '1m': diffInHours < 1.1, // less than 1.1 hours
-      '5m': diffInHours < 3.1, // less than 3.1 hours
-      '10m': diffInHours < 6.1, // less than 6.1 hours
-      '30m': diffInHours < 25, // less than 25 hours
-      '1h': diffInDays < 10, // less than 10 days
-      '1d': diffInDays >= 10, // more than 10 days
-    }
-
-    switch (true) {
-      case conditions['1m']:
-        return '1m'
-      case conditions['5m']:
-        return '5m'
-      case conditions['10m']:
-        return '10m'
-      case conditions['30m']:
-        return '30m'
-      default:
-        return '1h'
-    }
+    if (diffInHours <= 1) return '1m'
+    if (diffInHours <= 12) return '2m'
+    if (diffInHours <= 24) return '10m'
+    if (diffInDays <= 7) return '1h'
+    return '1d'
   }
 
   // Derive selectedDateRange from current values
@@ -218,7 +193,7 @@ export const useReportDateRange = (
       period_end: { date: timestampEnd, time_period: 'today' },
       interval: handleIntervalGranularity(timestampStart, timestampEnd),
     }),
-    [timestampStart, timestampEnd, useV2Granularity]
+    [timestampStart, timestampEnd]
   )
 
   const updateDateRange = useCallback(

@@ -1,12 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
@@ -36,15 +30,20 @@ import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import dayjs from 'dayjs'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, Button } from 'ui'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -67,7 +66,6 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const reportGranularityV2 = useFlag('reportGranularityV2')
 
   const {
     selectedDateRange,
@@ -78,7 +76,7 @@ const DatabaseUsage = () => {
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES, reportGranularityV2)
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
