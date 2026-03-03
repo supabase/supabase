@@ -18,7 +18,7 @@ You need:
 
 Below are two options for adding a reverse proxy with automatic HTTPS in front of your self-hosted Supabase: **Caddy** (simpler, zero-config TLS) and **Nginx + Let's Encrypt** (more control over proxy settings). Both sit in front of Kong and terminate TLS, so internal traffic stays on HTTP.
 
-<Admonition type="tip">
+<Admonition type="tip" label="Using a different reverse proxy?">
 
 **Using a different reverse proxy?** If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefik.io/), [Nginx Proxy Manager](https://nginxproxymanager.com/), or another reverse proxy for your infrastructure, you can use it instead of Caddy or Nginx above. The key requirements are:
 
