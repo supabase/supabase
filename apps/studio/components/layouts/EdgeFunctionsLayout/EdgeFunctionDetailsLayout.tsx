@@ -49,6 +49,14 @@ interface EdgeFunctionDetailsLayoutProps {
   title?: string
 }
 
+const getEdgeFunctionDetailsSectionTitle = (pathname: string) => {
+  if (pathname.endsWith('/invocations')) return 'Invocations'
+  if (pathname.endsWith('/logs')) return 'Logs'
+  if (pathname.endsWith('/details')) return 'Details'
+  if (pathname.endsWith('/code')) return 'Code'
+  return 'Overview'
+}
+
 const EdgeFunctionDetailsLayout = ({
   title,
   children,
@@ -91,6 +99,10 @@ const EdgeFunctionDetailsLayout = ({
     )
 
   const name = selectedFunction?.name || ''
+  const browserTitle = {
+    entity: functionSlug ? name || functionSlug : undefined,
+    section: title || getEdgeFunctionDetailsSectionTitle(router.pathname),
+  }
 
   const breadcrumbItems = [
     {
@@ -215,14 +227,18 @@ const EdgeFunctionDetailsLayout = ({
 
   if (!isLoading && !canReadFunctions) {
     return (
-      <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
+      <ProjectLayout
+        title={title || 'Edge Functions'}
+        product="Edge Functions"
+        browserTitle={browserTitle}
+      >
         <NoPermission isFullPage resourceText="access your project's edge functions" />
       </ProjectLayout>
     )
   }
 
   return (
-    <EdgeFunctionsLayout>
+    <EdgeFunctionsLayout browserTitle={browserTitle}>
       <div className="w-full min-h-full flex flex-col items-stretch">
         <PageHeader size="full" className="sticky top-0 z-10 bg-background">
           {breadcrumbItems.length > 0 && (

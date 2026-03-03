@@ -8,12 +8,21 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
+import { buildStudioPageTitle } from 'lib/page-title'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 import { WithSidebar } from './WithSidebar'
 
 export interface AccountLayoutProps {
   title: string
+}
+
+const ACCOUNT_ROUTE_TITLES: Record<string, string> = {
+  '/account/me': 'Preferences',
+  '/account/tokens': 'Access Tokens',
+  '/account/tokens/scoped': 'Scoped Access Tokens',
+  '/account/security': 'Security',
+  '/account/audit': 'Audit Logs',
 }
 
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
@@ -23,7 +32,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
 
   const { appTitle } = useCustomContent(['app:title'])
-  const titleSuffix = appTitle || 'Supabase'
+  const brandTitle = appTitle || 'Supabase'
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -38,6 +47,12 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         : '/organizations'
 
   const currentPath = router.pathname
+  const sectionTitle = ACCOUNT_ROUTE_TITLES[currentPath] ?? title
+  const pageTitle = buildStudioPageTitle({
+    section: sectionTitle,
+    surface: 'Account',
+    brand: brandTitle,
+  })
 
   useEffect(() => {
     if (!IS_PLATFORM) {
@@ -48,7 +63,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   return (
     <>
       <Head>
-        <title>{title ? `${title} | ${titleSuffix}` : titleSuffix}</title>
+        <title>{pageTitle}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
       <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>

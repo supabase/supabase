@@ -1,4 +1,5 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import Head from 'next/head'
 import { useCallback, useEffect, useState } from 'react'
 
 import { NewOrgForm } from 'components/interfaces/Organization/NewOrg/NewOrgForm'
@@ -6,6 +7,8 @@ import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import WizardLayout from 'components/layouts/WizardLayout'
 import { SetupIntentResponse, useSetupIntent } from 'data/stripe/setup-intent-mutation'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { buildStudioPageTitle } from 'lib/page-title'
 import type { NextPageWithLayout } from 'types'
 
 /**
@@ -13,6 +16,11 @@ import type { NextPageWithLayout } from 'types'
  */
 const Wizard: NextPageWithLayout = () => {
   const [intent, setIntent] = useState<SetupIntentResponse>()
+  const { appTitle } = useCustomContent(['app:title'])
+  const pageTitle = buildStudioPageTitle({
+    section: 'New Organization',
+    brand: appTitle || 'Supabase',
+  })
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
@@ -75,6 +83,11 @@ const Wizard: NextPageWithLayout = () => {
 
   return (
     <>
+      {/* Wizard layouts set the visual header but not the browser tab title. */}
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content="Supabase Studio" />
+      </Head>
       <HCaptcha
         ref={captchaRefCallback}
         sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}

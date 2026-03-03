@@ -22,6 +22,7 @@ export const EditorBaseLayout = ({
   product,
   productMenuClassName,
   productMenu,
+  browserTitle,
 }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
@@ -33,11 +34,31 @@ export const EditorBaseLayout = ({
   const hideTabs =
     pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql` || hasNoOpenTabs
 
+  const activeEditorTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
+  const activeEditorTabEntity =
+    activeEditorTab === undefined
+      ? undefined
+      : editor === 'sql'
+        ? activeEditorTab.type === 'sql'
+          ? activeEditorTab.metadata?.name || activeEditorTab.label
+          : undefined
+        : editor === 'table'
+          ? activeEditorTab.type !== 'sql'
+            ? activeEditorTab.metadata?.name || activeEditorTab.label
+            : undefined
+          : undefined
+
+  const mergedBrowserTitle = {
+    ...browserTitle,
+    entity: browserTitle?.entity ?? activeEditorTabEntity,
+  }
+
   return (
     <ProjectLayoutWithAuth
       resizableSidebar
       title={title}
       product={product}
+      browserTitle={mergedBrowserTitle}
       productMenuClassName={productMenuClassName}
       productMenu={productMenu}
     >

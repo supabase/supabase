@@ -9,6 +9,26 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { ProjectLayout } from '../ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
 
+const AUTH_SECTION_TITLE_BY_PAGE: Record<string, string> = {
+  overview: 'Overview',
+  users: 'Users',
+  'oauth-apps': 'OAuth Apps',
+  policies: 'Policies',
+  providers: 'Sign In / Providers',
+  'third-party': 'Sign In / Providers',
+  'oauth-server': 'OAuth Server',
+  sessions: 'Sessions',
+  'rate-limits': 'Rate Limits',
+  mfa: 'Multi-Factor',
+  'url-configuration': 'URL Configuration',
+  protection: 'Attack Protection',
+  hooks: 'Auth Hooks',
+  'audit-logs': 'Audit Logs',
+  performance: 'Performance',
+  templates: 'Email',
+  smtp: 'Email',
+}
+
 const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
@@ -34,28 +54,28 @@ const AuthProductMenu = () => {
 
   useAuthConfigPrefetch({ projectRef })
   const page = router.pathname.split('/')[4]
+  const menu = generateAuthMenu(projectRef, {
+    authenticationSignInProviders,
+    authenticationRateLimits,
+    authenticationEmails,
+    authenticationMultiFactor,
+    authenticationAttackProtection,
+    authenticationShowOverview,
+    authenticationOauth21,
+    authenticationPerformance,
+  })
 
-  return (
-    <ProductMenu
-      page={page}
-      menu={generateAuthMenu(projectRef, {
-        authenticationSignInProviders,
-        authenticationRateLimits,
-        authenticationEmails,
-        authenticationMultiFactor,
-        authenticationAttackProtection,
-        authenticationShowOverview,
-        authenticationOauth21,
-        authenticationPerformance,
-      })}
-    />
-  )
+  return <ProductMenu page={page} menu={menu} />
 }
 
 const AuthLayout = ({ children }: PropsWithChildren<{}>) => {
+  const router = useRouter()
+  const page = router.pathname.split('/')[4]
+  const sectionTitle = page !== undefined ? AUTH_SECTION_TITLE_BY_PAGE[page] : undefined
+
   return (
     <ProjectLayout
-      title="Authentication"
+      title={sectionTitle}
       product="Authentication"
       productMenu={<AuthProductMenu />}
       isBlocking={false}
