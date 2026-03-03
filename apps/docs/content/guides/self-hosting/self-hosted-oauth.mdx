@@ -344,7 +344,7 @@ You can test OAuth with the following minimal HTML page:
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        const SUPABASE_URL = 'https://<your-domain>.example.com'
+        const SUPABASE_URL = 'https://<your-domain>'
         const SUPABASE_ANON_KEY = 'your-anon-key'
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -409,13 +409,23 @@ After a successful OAuth login, the Auth service redirects to `SITE_URL` or a UR
 
 ### Nonce check failure on mobile (Google Sign In)
 
-When using Google Sign In on mobile with ID tokens, nonce verification may fail. Uncomment the following in `docker-compose.yml`:
+When using Google Sign In on mobile with ID tokens, nonce verification may fail because mobile SDKs don't always support the nonce flow that the Auth service expects.
 
-```yaml
+<Admonition type="caution">
+
+`GOTRUE_EXTERNAL_SKIP_NONCE_CHECK` disables nonce validation on ID tokens, which weakens replay-attack protection. Treat it as a **short-lived troubleshooting workaround**, not a permanent fix:
+
+- Enable it only in the environment where you're debugging the issue.
+- Revert it as soon as the issue is resolved.
+- Prefer fixing the client-side nonce handling or switching to an OAuth flow (authorization code with PKCE) that avoids ID-token nonce issues entirely.
+
+</Admonition>
+
+To enable it, uncomment the following line in `docker-compose.yml`:
+
+```
 GOTRUE_EXTERNAL_SKIP_NONCE_CHECK: true
 ```
-
-This is already included as a commented-out line in the default `docker-compose.yml`.
 
 ### Auth service fails to start
 
