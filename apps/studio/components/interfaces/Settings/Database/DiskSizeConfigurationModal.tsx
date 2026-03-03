@@ -49,7 +49,7 @@ const DiskSizeConfigurationModal = ({
   const { hasAccess: hasAccessToDiskModifications, isLoading: isLoadingDiskEntitlement } =
     useCheckEntitlements('instances.disk_modifications')
 
-  const isLoading = isLoadingProject || isLoadingDiskEntitlement
+  const isLoading = isLoadingProject || isLoadingSubscription || isLoadingDiskEntitlement
 
   const timeTillNextAvailableDatabaseResize =
     lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
@@ -105,7 +105,7 @@ const DiskSizeConfigurationModal = ({
           <ShimmeringLoader />
           <ShimmeringLoader />
         </div>
-      ) : hasAccessToDiskModifications ? (
+      ) : projectSubscriptionData?.usage_billing_enabled === true ? (
         <Form
           name="disk-resize-form"
           initialValues={INITIAL_VALUES}
