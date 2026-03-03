@@ -1,9 +1,9 @@
-import { useIsAdvisorRulesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Badge, Button } from 'ui'
+
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
 import { generateAdvisorsMenu } from './AdvisorsMenu.utils'
 
@@ -13,7 +13,6 @@ interface AdvisorsSidebarMenuProps {
 
 export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
   const { data: project } = useSelectedProjectQuery()
-  const advisorRules = useIsAdvisorRulesEnabled()
   const { toggleSidebar } = useSidebarManagerSnapshot()
 
   const handleOpenAdvisor = () => {
@@ -34,7 +33,7 @@ export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
         }
       />
 
-      <ProductMenu page={page} menu={generateAdvisorsMenu(project, { advisorRules })} />
+      <ProductMenu page={page} menu={generateAdvisorsMenu(project)} />
     </div>
   )
 }
