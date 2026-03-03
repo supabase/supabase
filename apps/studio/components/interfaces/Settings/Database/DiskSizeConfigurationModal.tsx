@@ -105,7 +105,7 @@ const DiskSizeConfigurationModal = ({
           <ShimmeringLoader />
           <ShimmeringLoader />
         </div>
-      ) : projectSubscriptionData?.usage_billing_enabled === true ? (
+      ) : projectSubscriptionData?.usage_billing_enabled === true && hasAccessToDiskModifications ? (
         <Form
           name="disk-resize-form"
           initialValues={INITIAL_VALUES}
