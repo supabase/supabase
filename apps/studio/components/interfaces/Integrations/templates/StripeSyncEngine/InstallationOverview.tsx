@@ -214,6 +214,8 @@ export const StripeSyncInstallationPage = () => {
             handleUninstall={handleUninstall}
             handleOpenInstallSheet={handleOpenInstallSheet}
             isUpgrade={upgradeAvailable}
+            installing={installing}
+            uninstalling={uninstalling}
           />
         ) : null
       }
@@ -274,7 +276,8 @@ export const StripeSyncInstallationPage = () => {
                 <ButtonTooltip
                   type="primary"
                   onClick={() => setShouldShowInstallSheet(true)}
-                  disabled={!canManageSecrets}
+                  disabled={installing || !canManageSecrets}
+                  loading={installing}
                   tooltip={{
                     content: {
                       text: !canManageSecrets
@@ -289,7 +292,7 @@ export const StripeSyncInstallationPage = () => {
               <ButtonTooltip
                 type="default"
                 onClick={() => setShowUninstallModal(true)}
-                disabled={!canManageSecrets}
+                disabled={installing || uninstalling || !canManageSecrets}
                 loading={uninstalling}
                 tooltip={{
                   content: {

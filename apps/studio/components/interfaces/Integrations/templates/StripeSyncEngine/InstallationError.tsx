@@ -9,11 +9,15 @@ export const InstallationError = ({
   handleUninstall,
   handleOpenInstallSheet,
   isUpgrade,
+  installing,
+  uninstalling,
 }: {
   error: 'install' | 'uninstall'
   handleUninstall: () => void
   handleOpenInstallSheet: () => void
   isUpgrade?: boolean
+  installing?: boolean
+  uninstalling?: boolean
 }) => {
   const { ref } = useParams()
 
@@ -26,7 +30,12 @@ export const InstallationError = ({
         description="There was an error during the uninstallation of the Stripe Sync Engine, please try again. If the problem persists, contact support."
         actions={
           <div className="flex items-center gap-x-2">
-            <Button type="default" onClick={handleUninstall}>
+            <Button
+              type="default"
+              onClick={handleUninstall}
+              disabled={uninstalling}
+              loading={uninstalling}
+            >
               Retry uninstallation
             </Button>
             <ContactSupportButton
@@ -56,7 +65,12 @@ export const InstallationError = ({
         }
         actions={
           <div className="flex items-center gap-x-2">
-            <Button type="default" onClick={handleOpenInstallSheet}>
+            <Button
+              type="default"
+              onClick={handleOpenInstallSheet}
+              disabled={installing}
+              loading={installing}
+            >
               {isUpgrade ? 'Retry upgrade' : 'Retry installation'}
             </Button>
             <ContactSupportButton
