@@ -59,10 +59,8 @@ export default function PricingContent() {
   )
 
   useEffect(() => {
-    console.log('[experiment] mount, current flag:', posthogClient.getFeatureFlag(EXPERIMENT_ID))
     return posthogClient.onFeatureFlags(() => {
       const value = posthogClient.getFeatureFlag(EXPERIMENT_ID)
-      console.log('[experiment] onFeatureFlags fired, value:', value)
       setFlagValue(value as PricingCalculatorVariant | false | undefined)
     })
   }, [])
