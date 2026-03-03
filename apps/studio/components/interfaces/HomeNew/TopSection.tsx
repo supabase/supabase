@@ -11,7 +11,7 @@ import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedPr
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import Link from 'next/link'
 import { ReactFlowProvider } from 'reactflow'
-import { Badge, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 
@@ -95,7 +95,7 @@ export const TopSection = () => {
             )}
           >
             <ReactFlowProvider>
-              <InstanceConfiguration diagramOnly />
+              <InstanceConfiguration diagramOnly={false} />
             </ReactFlowProvider>
           </div>
         </div>
