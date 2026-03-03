@@ -20,9 +20,26 @@ interface UpdateEndpointOptions {
   headerIdFactory?: () => string
 }
 
-const randomId = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 10)}`
+const secureRandomHex = (length: number) => {
+  if (length <= 0) return ''
 
-const generateSigningSecret = () => `whsec_${Math.random().toString(36).slice(2, 18)}`
+  const cryptoApi = globalThis.crypto
+  if (!cryptoApi?.getRandomValues) {
+    throw new Error('Web Crypto API is not available')
+  }
+
+  const byteCount = Math.ceil(length / 2)
+  const bytes = new Uint8Array(byteCount)
+  cryptoApi.getRandomValues(bytes)
+
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, length)
+}
+
+const randomId = (prefix: string) => `${prefix}-${secureRandomHex(8)}`
+
+const generateSigningSecret = () => `whsec_${secureRandomHex(16)}`
 
 const deepClone = <T>(value: T): T => JSON.parse(JSON.stringify(value))
 

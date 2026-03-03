@@ -47,6 +47,23 @@ describe('PlatformWebhooks.store', () => {
     expect(next.endpoints[0].id).toBe('endpoint-fixed')
   })
 
+  it('creates endpoint with generated secure id, header id, and signing secret', () => {
+    const state = createInitialPlatformWebhooksState('project')
+    const { endpoint, signingSecret } = createWebhookEndpoint(state, {
+      name: 'Generated endpoint',
+      url: 'https://example.com/webhooks',
+      description: 'Generated values',
+      enabled: true,
+      eventTypes: ['project.updated'],
+      customHeaders: [{ key: 'X-Test', value: '1' }],
+    })
+
+    expect(endpoint.id).toMatch(/^endpoint-[a-f0-9]{8}$/)
+    expect(endpoint.customHeaders).toHaveLength(1)
+    expect(endpoint.customHeaders[0].id).toMatch(/^header-[a-f0-9]{8}$/)
+    expect(signingSecret).toMatch(/^whsec_[a-f0-9]{16}$/)
+  })
+
   it('updates endpoint fields and replaces custom headers', () => {
     const state = createInitialPlatformWebhooksState('organization')
     const endpoint = state.endpoints[0]
@@ -96,6 +113,15 @@ describe('PlatformWebhooks.store', () => {
 
     const regenerated = regenerateWebhookEndpointSecret(state, endpoint.id, 'whsec_new_secret')
     expect(regenerated.signingSecret).toBe('whsec_new_secret')
+    expect(regenerated.state.endpoints).toEqual(state.endpoints)
+  })
+
+  it('regenerates secure signing secret when not explicitly provided', () => {
+    const state = createInitialPlatformWebhooksState('project')
+    const endpoint = state.endpoints[0]
+    const regenerated = regenerateWebhookEndpointSecret(state, endpoint.id)
+
+    expect(regenerated.signingSecret).toMatch(/^whsec_[a-f0-9]{16}$/)
     expect(regenerated.state.endpoints).toEqual(state.endpoints)
   })
 
