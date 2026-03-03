@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
@@ -19,7 +18,6 @@ import {
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
 
   const allIntegrations = useMemo(() => {
     return INTEGRATIONS.filter((integration) => {
@@ -29,15 +27,12 @@ export const useInstalledIntegrations = () => {
       ) {
         return false
       }
-      if (!stripeSyncEnabled && integration.id === 'stripe_sync_engine') {
-        return false
-      }
       if (!IS_PLATFORM && integration.id === 'data_api') {
         return false
       }
       return true
     })
-  }, [integrationsWrappers, stripeSyncEnabled])
+  }, [integrationsWrappers])
 
   const {
     data,
