@@ -245,11 +245,6 @@ export function ${sheetComponentName}({ open, onOpenChange, mode, item }: ${shee
 ${stateDeclarations}
 
   const isCreate = mode === 'create'
-  const title = isCreate ? 'Create New ${singularPascal}' : 'Edit ${singularPascal}'
-  const description = isCreate
-    ? 'Add a new ${singularName.replace(/_/g, ' ')} to your database.'
-    : 'Update the ${singularName.replace(/_/g, ' ')} information.'
-  const submitLabel = isCreate ? 'Create ${singularPascal}' : 'Save Changes'
 
   useEffect(() => {
     if (open) {
@@ -281,8 +276,12 @@ ${resetStates}
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-md">
         <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
+          <SheetTitle>{isCreate ? 'Create New ${singularPascal}' : 'Edit ${singularPascal}'}</SheetTitle>
+          <SheetDescription>
+            {isCreate
+              ? 'Add a new ${singularName.replace(/_/g, ' ')} to your database.'
+              : 'Update the ${singularName.replace(/_/g, ' ')} information.'}
+          </SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col gap-6 py-6">
@@ -302,7 +301,7 @@ ${editableFormFields}
             Cancel
           </Button>
           <Button onClick={handleSubmit}>
-            {submitLabel}
+            {isCreate ? 'Create ${singularPascal}' : 'Save Changes'}
           </Button>
         </SheetFooter>
       </SheetContent>
