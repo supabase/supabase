@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { toast } from 'sonner'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -50,11 +49,9 @@ const StripeProductLoginPage = () => {
   const handleApprove = async () => {
     if (!ar_id) return
 
-    try {
-      await confirmAccountRequest({ arId: ar_id })
-    } catch (error: any) {
-      toast.error(`Failed to confirm: ${error.message}`)
-    }
+    confirmAccountRequest({ arId: ar_id })
+    // The onSuccess handler in the mutation will show a success screen, on error it'll show a toast, so we don't need
+    // to do anything else here
   }
 
   return (
@@ -83,7 +80,7 @@ const StripeProductLoginPage = () => {
               <strong>{accountRequest.email}</strong>
               {accountRequest.name && <> ({accountRequest.name})</>}.
             </p>
-            {accountRequest.email ? (
+            {(accountRequest as any).email_matches ? (
               <div className="py-6">
                 <Button size="large" type="primary" onClick={handleApprove}>
                   Approve
