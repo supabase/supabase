@@ -2851,6 +2851,10 @@ export const self_hosting: NavMenuConstant = {
       items: [
         { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         {
+          name: 'Add Reverse Proxy with HTTPS',
+          url: '/guides/self-hosting/self-hosted-proxy-https',
+        },
+        {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',
         },
@@ -2858,7 +2862,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
-        { name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
       ],
     },
     {
