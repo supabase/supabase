@@ -15,7 +15,7 @@ There are two provider types:
 
 <Admonition type="note">
 
-You can add up to 3 custom providers per project. If you need more, [contact support](https://supabase.com/dashboard/support/new).
+You can add up to 3 custom providers per project. If you need more, [contact support](/dashboard/support/new).
 
 </Admonition>
 
@@ -39,7 +39,7 @@ Use an OAuth2 provider when your identity provider does not support OpenID Conne
 3. Select **OAuth2** as the provider type.
 4. Enter a unique identifier (must start with `custom:`, for example `custom:my-oauth-provider`).
 5. Enter the provider's **Client ID** and **Client Secret**.
-6. Enter the **Authorization URL**, **Token URL**, and **Userinfo URL**.
+6. Enter the **Authorization URL**, **Token URL**, and **UserInfo URL**.
 7. Optionally configure scopes and enable PKCE.
 8. Click **Save**.
 
@@ -108,7 +108,7 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 OIDC providers have the following automatic behavior:
 
 - The discovery document is fetched from `{issuer}/.well-known/openid-configuration` (or from `discovery_url` if set).
-- The `openid` scope is always included — it is automatically prepended if missing from the `scopes` array.
+- The `openid` scope is always included — it is automatically added if missing from the `scopes` array.
 - ID tokens are verified against the provider's JWKS (fetched from the discovery document's `jwks_uri`).
 
 ## Provider identifiers
