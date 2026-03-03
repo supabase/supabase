@@ -105,8 +105,7 @@ export const useIsPgDeltaDiffEnabled = () => {
 
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const advisorRulesEnabled = useFlag('advisorRules')
-  return advisorRulesEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
 export const useIsQueueOperationsEnabled = () => {
