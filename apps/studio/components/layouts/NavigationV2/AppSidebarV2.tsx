@@ -133,12 +133,17 @@ export function AppSidebarV2({ scope }: AppSidebarV2Props = {}) {
           }))
       : []
 
+  const isProjectHome =
+    router.pathname === `/project/[ref]` || router.pathname === `/project/${ref}`
+  const isProjectSettings = router.pathname.includes('/settings')
+
   const projectItems = isProjectScope
     ? [
         {
           title: 'Home',
           url: ref ? `/project/${ref}` : '/project',
-          icon: <Home size={16} strokeWidth={1.5} />,
+          icon: Home,
+          isActive: isProjectHome,
         },
         {
           title: 'Project Settings',
@@ -149,7 +154,11 @@ export function AppSidebarV2({ scope }: AppSidebarV2Props = {}) {
                 ? `/project/${ref}/settings/log-drains`
                 : '/project',
           icon: Settings,
-          items: projectSettingsItems,
+          items: projectSettingsItems.map((item) => ({
+            ...item,
+            isActive: router.pathname.includes(item.url),
+          })),
+          isActive: isProjectSettings,
         },
       ]
     : []
@@ -164,6 +173,7 @@ export function AppSidebarV2({ scope }: AppSidebarV2Props = {}) {
           enablePgReplicate,
           showRoles,
           showWrappers,
+          pathname: router.pathname,
         })
       : []
 
@@ -175,6 +185,7 @@ export function AppSidebarV2({ scope }: AppSidebarV2Props = {}) {
           storageEnabled,
           realtimeEnabled,
           authOverviewPageEnabled,
+          pathname: router.pathname,
         })
       : []
 
@@ -183,6 +194,7 @@ export function AppSidebarV2({ scope }: AppSidebarV2Props = {}) {
       ? generateObservabilityNavItems(ref, project, {
           showReports,
           unifiedLogs: isUnifiedLogsEnabled,
+          pathname: router.pathname,
         })
       : []
 
@@ -195,12 +207,19 @@ export function AppSidebarV2({ scope }: AppSidebarV2Props = {}) {
             title: 'Explore',
             url: isProjectBuilding ? `/project/${ref}` : `/project/${ref}/integrations`,
             icon: Compass,
+            isActive:
+              router.pathname === `/project/[ref]/integrations` ||
+              (router.pathname.includes('/integrations') &&
+                !installedIntegrations.some((int) =>
+                  router.pathname.includes(`/integrations/${int.id}`)
+                )),
           },
           ...installedIntegrations.map((integration) => ({
             title: integration.name,
             label: integration.status,
             url: `/project/${ref}/integrations/${integration.id}/overview`,
             icon: Blocks,
+            isActive: router.pathname.includes(`/integrations/${integration.id}`),
           })),
         ]
       : []
@@ -265,15 +284,15 @@ export function AppSidebarV2({ scope }: AppSidebarV2Props = {}) {
           <div className="space-y-2">
             {isProjectScope ? <ProjectBranchSelector /> : IS_PLATFORM ? <OrgSelector /> : null}
             {isProjectScope && (
-              <div className="flex items-center gap-3 px-2">
+              <div className="flex items-center gap-2 px-1.5">
                 <Button
                   type="outline"
                   size="small"
                   onClick={() => {
                     setCommandMenuOpen(true)
                   }}
-                  className="h-8 w-8 px-0 justify-center text-foreground-lighter font-normal bg-transparent"
-                  icon={<Search size={14} strokeWidth={1.5} />}
+                  className="h-8 min-w-8 !w-8 px-0 justify-center text-foreground-lighter font-normal bg-transparent"
+                  icon={<Search strokeWidth={1.5} />}
                 />
                 <Button
                   type="default"
@@ -282,8 +301,8 @@ export function AppSidebarV2({ scope }: AppSidebarV2Props = {}) {
                   onClick={() => {
                     setShowConnect(true)
                   }}
-                  className="h-8 flex-1 justify-center gap-0"
-                  icon={<Plug size={14} strokeWidth={1.5} />}
+                  className="h-8 flex-1 justify-center gap-0 pl-2"
+                  icon={<Plug className="rotate-90" strokeWidth={1.5} />}
                 >
                   <span>Connect</span>
                 </Button>
@@ -295,23 +314,28 @@ export function AppSidebarV2({ scope }: AppSidebarV2Props = {}) {
           <SidebarContent className="h-full gap-0">
             {isProjectScope ? (
               <>
-                <NavGroup label="Project" items={projectItems} />
-                <NavGroup label="Database" items={databaseItems} />
-                <NavGroup label="Platform" items={platformItems} />
-                <NavGroup label="Observability" items={observabilityItems} />
-                <NavGroup label="Integrations" items={integrationsItems} />
+                <NavGroup id="project" label="Project" items={projectItems} />
+                <NavGroup id="database" label="Database" items={databaseItems} />
+                <NavGroup id="platform" label="Platform" items={platformItems} />
+                <NavGroup id="observability" label="Observability" items={observabilityItems} />
+                <NavGroup id="integrations" label="Integrations" items={integrationsItems} />
               </>
             ) : (
-              <NavGroup label="Organization" items={organizationItems} />
+              <NavGroup
+                id="organization"
+                label="Organization"
+                items={organizationItems}
+                isCollapsible={false}
+              />
             )}
           </SidebarContent>
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-gradient-to-b from-sidebar to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 z-10 h-4 bg-gradient-to-b from-sidebar to-transparent"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-6 bg-gradient-to-t from-sidebar to-transparent"
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-4 bg-gradient-to-t from-sidebar to-transparent"
           />
         </div>
         <SidebarFooter>{IS_PLATFORM && <NavUser />}</SidebarFooter>

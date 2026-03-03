@@ -1,7 +1,3 @@
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, useEffect } from 'react'
-
 import { mergeRefs, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -12,8 +8,12 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { forwardRef, Fragment, PropsWithChildren, useEffect } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { LogoLoader } from 'ui'
+
 import { useSetMainScrollContainer } from '../MainScrollContainerContext'
 import BuildingState from '../ProjectLayout/BuildingState'
 import ConnectingState from '../ProjectLayout/ConnectingState'
@@ -65,17 +65,7 @@ export interface ProjectLayoutV2Props {
  * only handles title, loading states, and content wrapping.
  */
 export const ProjectLayoutV2 = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutV2Props>>(
-  (
-    {
-      title,
-      isLoading = false,
-      isBlocking = true,
-      product = '',
-      children,
-      selectedTable,
-    },
-    ref
-  ) => {
+  ({ title, isLoading = false, isBlocking = true, product = '', children, selectedTable }, ref) => {
     const router = useRouter()
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()

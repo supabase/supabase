@@ -1,8 +1,12 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import type { LucideIcon } from 'lucide-react'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { isValidElement, ReactNode } from 'react'
+import { isValidElement } from 'react'
+import type { ReactNode } from 'react'
 import {
+  Badge,
   Collapsible_Shadcn_ as Collapsible,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
@@ -30,83 +34,128 @@ export interface NavGroupItem {
 }
 
 export interface NavGroupProps {
+  id?: string
   label?: string
   items: NavGroupItem[]
+  isCollapsible?: boolean
 }
 
-export function NavGroup({ label, items }: NavGroupProps) {
-  return (
-    <SidebarGroup>
-      {label && <SidebarGroupLabel className="text-foreground-lighter">{label}</SidebarGroupLabel>}
-      <SidebarMenu>
-        {items.map((item) =>
-          item.items && item.items.length > 0 ? (
-            <Collapsible
-              key={item.title}
-              asChild
-              defaultOpen={item.isActive}
-              className="group/collapsible"
-            >
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    isActive={item.isActive}
-                    className="gap-3 text-foreground-light"
-                  >
-                    <NavItemIcon icon={item.icon} />
-                    <span>{item.title}</span>
-                    {item.label && (
-                      <span className="ml-1 rounded bg-foreground-muted/20 px-1.5 py-0.5 text-[10px] leading-none font-medium">
-                        {item.label}
-                      </span>
-                    )}
-                    <ChevronRight
-                      size={14}
-                      strokeWidth={1.5}
-                      className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-foreground-lighter hidden !w-4 !h-4 group-hover:block"
-                    />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {item.items.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild isActive={subItem.isActive}>
-                          <Link href={subItem.url}>
-                            <span>{subItem.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
-            </Collapsible>
-          ) : (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                tooltip={item.title}
-                isActive={item.isActive}
-                asChild
-                className="gap-3 text-foreground-light"
-              >
-                <Link href={item.url}>
-                  <NavItemIcon icon={item.icon} />
-                  <span>{item.title}</span>
-                  {item.label && (
-                    <span className="ml-1 rounded bg-foreground-muted/20 px-1.5 py-0.5 text-[10px] leading-none font-medium">
-                      {item.label}
-                    </span>
-                  )}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )
-        )}
-      </SidebarMenu>
-    </SidebarGroup>
+export function NavGroup({ id, label, items, isCollapsible = true }: NavGroupProps) {
+  // Load the sidebar state from localStorage using react-query for cross-component sync
+  const [sidebarState, setSidebarState] = useLocalStorageQuery<Record<string, boolean>>(
+    LOCAL_STORAGE_KEYS.DASHBOARD_SIDEBAR_STATE,
+    {}
   )
+
+  // Get the current group's open state, defaulting to true (open)
+  const isOpen = id ? sidebarState[id] ?? true : true
+
+  // Handler to update the open state for this specific group
+  const handleOpenChange = (open: boolean) => {
+    if (id && isCollapsible) {
+      setSidebarState((prev) => ({ ...prev, [id]: open }))
+    }
+  }
+
+  const content = (
+    <SidebarMenu className="gap-[2px]">
+      {items.map((item) =>
+        item.items && item.items.length > 0 ? (
+          <Collapsible
+            key={item.title}
+            asChild
+            defaultOpen={item.isActive}
+            className="group/collapsible"
+          >
+            <SidebarMenuItem>
+              <CollapsibleTrigger asChild>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  isActive={item.isActive}
+                  className="gap-2 text-foreground-light !py-1.5 !h-7"
+                >
+                  <NavItemIcon icon={item.icon} />
+                  <span className="truncate">{item.title}</span>
+                  {item.label && (
+                    <Badge className="ml-1 px-1.5 py-0.5 bg-transparent !border-stronger text-[10px] leading-none font-medium">
+                      {item.label}
+                    </Badge>
+                  )}
+                  <ChevronRight
+                    strokeWidth={1.5}
+                    className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-foreground-lighter hidden !w-4 !h-4 group-hover:block"
+                  />
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarMenuSub className="gap-[2px] ml-3 mr-0 pl-3.5 pr-0">
+                  {item.items.map((subItem) => (
+                    <SidebarMenuSubItem key={subItem.title}>
+                      <SidebarMenuSubButton asChild isActive={subItem.isActive}>
+                        <Link href={subItem.url}>
+                          <span>{subItem.title}</span>
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  ))}
+                </SidebarMenuSub>
+              </CollapsibleContent>
+            </SidebarMenuItem>
+          </Collapsible>
+        ) : (
+          <SidebarMenuItem key={item.title}>
+            <SidebarMenuButton
+              tooltip={item.title}
+              isActive={item.isActive}
+              asChild
+              className="gap-2 text-foreground-light !py-1.5 !h-7"
+            >
+              <Link href={item.url}>
+                <NavItemIcon icon={item.icon} />
+                <span>{item.title}</span>
+                {item.label && (
+                  <Badge className="ml-1 px-1.5 py-0.5 bg-transparent !border-stronger text-[10px] leading-none font-medium">
+                    {item.label}
+                  </Badge>
+                )}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )
+      )}
+    </SidebarMenu>
+  )
+
+  if (label) {
+    return (
+      <Collapsible
+        open={isOpen}
+        onOpenChange={handleOpenChange}
+        className="group/group-collapsible"
+      >
+        <SidebarGroup>
+          <CollapsibleTrigger asChild>
+            <SidebarGroupLabel
+              className={`group/label text-foreground-lighter flex items-center gap-1 ${
+                isCollapsible ? 'cursor-pointer hover:text-foreground-light' : 'pointer-events-none'
+              }`}
+            >
+              <span>{label}</span>
+              {isCollapsible && (
+                <ChevronRight
+                  strokeWidth={1.5}
+                  className="!w-4 !h-4 text-foreground-muted group-hover/label:text-foreground-light transition-transform duration-200 group-data-[state=open]/group-collapsible:rotate-90 hidden group-hover:block"
+                />
+              )}
+            </SidebarGroupLabel>
+          </CollapsibleTrigger>
+          <CollapsibleContent>{content}</CollapsibleContent>
+        </SidebarGroup>
+      </Collapsible>
+    )
+  }
+
+  return <SidebarGroup>{content}</SidebarGroup>
 }
 
 function NavItemIcon({ icon }: { icon?: LucideIcon | ReactNode }) {
@@ -119,5 +168,5 @@ function NavItemIcon({ icon }: { icon?: LucideIcon | ReactNode }) {
 
   // Otherwise it's a component reference (function or forwardRef) - render it
   const IconComponent = icon as LucideIcon
-  return <IconComponent size={14} strokeWidth={1.5} />
+  return <IconComponent strokeWidth={1.5} className="!w-4 !h-4" />
 }

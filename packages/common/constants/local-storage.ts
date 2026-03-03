@@ -5,6 +5,7 @@ export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
+  DASHBOARD_SIDEBAR_STATE: 'dashboard-sidebar-state',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
   PROJECTS_VIEW: 'projects-view',
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
@@ -145,6 +146,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+  LOCAL_STORAGE_KEYS.DASHBOARD_SIDEBAR_STATE,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_V2,
 ]
 

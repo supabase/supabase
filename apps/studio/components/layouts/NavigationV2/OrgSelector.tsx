@@ -67,23 +67,23 @@ export function OrgSelector() {
           <PopoverTrigger_Shadcn_ asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-3 h-auto text-left group px-2"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2 h-auto text-left group px-1.5 py-1"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded border bg-surface-100 text-xs font-medium text-foreground-lighter">
+              <span className="flex w-8 aspect-square shrink-0 items-center justify-center rounded border bg-surface-100 text-xs font-medium text-foreground-lighter">
                 {selectedOrgInitial}
               </span>
-              <div className="text-left min-w-0">
-                <div className="truncate text-foreground font-medium">
+              <div className="text-left min-w-0 -mb-0.5">
+                <div className="truncate text-foreground font-medium leading-tight -mb-0.5">
                   {selectedOrganization?.name ?? 'Select organization'}
                 </div>
-                <div className="flex items-center gap-1 truncate text-foreground-light">
+                <div className="flex items-center gap-1 truncate text-foreground-light leading-tight">
                   <Boxes size={12} />
                   <span>{projectsLabel}</span>
                 </div>
               </div>
               <ChevronsUpDown
-                strokeWidth={1.5}
-                className="ml-auto text-foreground-lighter hidden group-hover:block !w-4 !h-4"
+                strokeWidth={1}
+                className="ml-auto text-foreground-light hidden group-hover:block !w-4 !h-4"
               />
             </SidebarMenuButton>
           </PopoverTrigger_Shadcn_>
