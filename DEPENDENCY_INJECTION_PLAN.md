@@ -519,6 +519,25 @@ Progress
 
 Phase 1: Core infrastructure — done ✓
 
+Phase 2: Common package changes — done ✓
+
+packages/common/auth.tsx
+  Added AuthClient interface (initialize, onAuthStateChange, refreshSession) — narrow interface
+  for the 3 methods AuthProvider uses, enabling mock injection in tests.
+  AuthProvider now accepts optional gotrueClient?: AuthClient prop.
+  Resolves to injectedClient ?? gotrueClient (singleton fallback for backward compatibility).
+  useEffect and useCallback deps updated to [client].
+
+packages/common/feature-flags.tsx
+  Added optional getPostHogFlags prop to FeatureFlagProvider with same signature as
+  getFeatureFlags(). When provided, used in place of the hardcoded getFeatureFlags(API_URL, ...)
+  call. Falls back to existing behavior when omitted. Added to useEffect dep array.
+
+apps/studio/lib/app-providers.tsx
+  Wires registry.featureFlags.getPostHogFlags into FeatureFlagProviderWithOrgContext.
+  getConfigCatFlags still built locally via useDefaultProvider() hook (cloudProvider attribute
+  needed) — will be moved to registry in a future step.
+
 New files created in apps/studio/lib/services/:
 
 lib/services/registry.ts

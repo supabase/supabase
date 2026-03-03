@@ -102,6 +102,7 @@ export function AppProviders({
                   API_URL={API_URL}
                   enabled={IS_PLATFORM}
                   getConfigCatFlags={getConfigCatFlags}
+                  getPostHogFlags={registry.featureFlags.getPostHogFlags}
                 >
                   <ProfileProvider>
                     <Head>

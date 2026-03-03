@@ -78,6 +78,7 @@ export const FeatureFlagProvider = ({
   organizationSlug,
   projectRef,
   getConfigCatFlags,
+  getPostHogFlags,
   children,
 }: PropsWithChildren<{
   API_URL?: string
@@ -89,6 +90,11 @@ export const FeatureFlagProvider = ({
   getConfigCatFlags?: (
     userEmail?: string
   ) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
+  /** Custom fetcher for PostHog flags. Falls back to built-in getFeatureFlags when omitted. */
+  getPostHogFlags?: (options?: {
+    organizationSlug?: string
+    projectRef?: string
+  }) => Promise<CallFeatureFlagsResponse>
 }>) => {
   const { session, isLoading } = useAuth()
   const userEmail = session?.user?.email
@@ -150,10 +156,15 @@ export const FeatureFlagProvider = ({
         loadPHFlags
           ? (async () => {
               await ensureGroupContext()
-              return getFeatureFlags(API_URL, {
-                organizationSlug: resolvedOrganizationSlug,
-                projectRef: resolvedProjectRef,
-              })
+              return getPostHogFlags
+                ? getPostHogFlags({
+                    organizationSlug: resolvedOrganizationSlug,
+                    projectRef: resolvedProjectRef,
+                  })
+                : getFeatureFlags(API_URL, {
+                    organizationSlug: resolvedOrganizationSlug,
+                    projectRef: resolvedProjectRef,
+                  })
             })()
           : Promise.resolve({}),
         loadCCFlags
@@ -239,6 +250,7 @@ export const FeatureFlagProvider = ({
     resolvedOrganizationSlug,
     resolvedProjectRef,
     getConfigCatFlags,
+    getPostHogFlags,
   ])
 
   return (

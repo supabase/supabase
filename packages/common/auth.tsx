@@ -16,6 +16,18 @@ import { gotrueClient, type User } from './gotrue'
 
 export type { User }
 
+/**
+ * Narrow interface for the GoTrue client methods used by AuthProvider.
+ * Enables injection of a mock client in tests.
+ */
+export interface AuthClient {
+  initialize(): Promise<{ error: AuthError | null }>
+  onAuthStateChange(
+    callback: (event: string, session: Session | null) => void
+  ): { data: { subscription: { unsubscribe(): void } } }
+  refreshSession(): Promise<{ data: { session: Session | null }; error: AuthError | null }>
+}
+
 const DEFAULT_SESSION: any = {
   access_token: undefined,
   expires_at: 0,
@@ -64,17 +76,22 @@ export const AuthContext = createContext<AuthContext>({
 
 export type AuthProviderProps = {
   alwaysLoggedIn?: boolean
+  /** Inject a custom GoTrue client. Falls back to the module singleton when omitted. */
+  gotrueClient?: AuthClient
 }
 
 export const AuthProvider = ({
   alwaysLoggedIn,
+  gotrueClient: injectedClient,
   children,
 }: PropsWithChildren<AuthProviderProps>) => {
+  const client = injectedClient ?? gotrueClient
+
   const [state, setState] = useState<AuthState>({ session: null, error: null, isLoading: true })
 
   useEffect(() => {
     let mounted = true
-    gotrueClient.initialize().then(({ error }) => {
+    client.initialize().then(({ error }) => {
       if (mounted && error !== null) {
         setState((prev) => ({ ...prev, error }))
       }
@@ -83,13 +100,13 @@ export const AuthProvider = ({
     return () => {
       mounted = false
     }
-  }, [])
+  }, [client])
 
   // Keep the session in sync
   useEffect(() => {
     const {
       data: { subscription },
-    } = gotrueClient.onAuthStateChange((_event, session) => {
+    } = client.onAuthStateChange((_event, session) => {
       setState((prev) => ({
         session,
         // If there is a session, we clear the error
@@ -99,17 +116,17 @@ export const AuthProvider = ({
     })
 
     return subscription.unsubscribe
-  }, [])
+  }, [client])
 
   // Helper method to refresh the session.
   // For example after a user updates their profile
   const refreshSession = useCallback(async () => {
     const {
       data: { session },
-    } = await gotrueClient.refreshSession()
+    } = await client.refreshSession()
 
     return session
-  }, [])
+  }, [client])
 
   const value = useMemo(() => {
     if (alwaysLoggedIn) {
