@@ -39,7 +39,7 @@ export const MOBILE_PRODUCT_MENU_REGISTRY: Record<string, ComponentType | null> 
   ),
   realtime: React.lazy(() =>
     import('components/layouts/RealtimeLayout/RealtimeLayout').then((m) => ({
-      default: m.RealtimeLayout,
+      default: m.RealtimeProductMenu,
     }))
   ),
   advisors: React.lazy(() =>
@@ -58,7 +58,11 @@ export const MOBILE_PRODUCT_MENU_REGISTRY: Record<string, ComponentType | null> 
     }))
   ),
   api: null,
-  integrations: null,
+  integrations: React.lazy(() =>
+    import('components/layouts/Integrations/layout').then((m) => ({
+      default: m.IntegrationsProductMenu,
+    }))
+  ),
   settings: React.lazy(() =>
     import('components/layouts/ProjectSettingsLayout/SettingsLayout').then((m) => ({
       default: m.SettingsProductMenu,
