@@ -19,7 +19,6 @@ import {
   useIsMobile,
   usePanelRef,
 } from 'ui'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useSetMainScrollContainer } from '../MainScrollContainerContext'
@@ -106,11 +105,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { showSidebar } = useAppStateSnapshot()
-    const {
-      setContent: setMobileSheetContent,
-      content: mobileSheetContent,
-      registerOpenMenu,
-    } = useMobileSheet()
+    const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
 
     const pathname = router.asPath?.split('?')[0] ?? router.pathname
     const currentSectionKey = getSectionKeyFromPathname(pathname)
@@ -242,12 +237,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         </div>
         <CreateBranchModal />
         <ProjectAPIDocs />
-        <MobileSheetNav
-          open={mobileSheetContent !== null && typeof mobileSheetContent !== 'string'}
-          onOpenChange={(open) => !open && setMobileSheetContent(null)}
-        >
-          {mobileSheetContent}
-        </MobileSheetNav>
       </>
     )
   }
