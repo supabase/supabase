@@ -173,6 +173,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   const onRowsPerPageChange = (value: string | number) => {
     const rowsPerPage = Number(value)
     tableEditorSnap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
+    snap.setPage(1)
   }
 
   // keep input value in-sync with actual page
