@@ -57,13 +57,14 @@ export const FeaturePreviewModal = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const { flags, onUpdateFlag } = featurePreviewContext
-  const selectedFeature =
-    featurePreviews.find((preview) => preview.key === selectedFeatureKey) ?? featurePreviews[0]
-  const isSelectedFeatureEnabled = flags[selectedFeatureKey]
+  const allFeaturePreviews = (
+    IS_PLATFORM ? featurePreviews : featurePreviews.filter((x) => !x.isPlatformOnly)
+  ).filter((x) => x.enabled)
 
-  const allFeaturePreviews = IS_PLATFORM
-    ? featurePreviews
-    : featurePreviews.filter((x) => !x.isPlatformOnly)
+  const selectedFeature =
+    allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
+    allFeaturePreviews[0]
+  const isSelectedFeatureEnabled = flags[selectedFeature?.key]
 
   const toggleFeature = () => {
     onUpdateFlag(selectedFeature.key, !isSelectedFeatureEnabled)
