@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
 import {
   loadTableEditorStateFromLocalStorage,
@@ -196,7 +195,6 @@ export const TableEditorTableStateContextProvider = ({
   table,
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
-  const showIndexAdvisor = useFlag('ShowIndexAdvisorOnTableEditor')
   const tableEditorSnap = useTableEditorStateSnapshot()
   const state = useRef(
     createTableEditorTableState({
@@ -246,7 +244,7 @@ export const TableEditorTableStateContextProvider = ({
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
-      {showIndexAdvisor && state.table.schema ? (
+      {state.table.schema ? (
         <TableIndexAdvisorProvider schema={state.table.schema ?? 'public'} table={state.table.name}>
           {children}
         </TableIndexAdvisorProvider>
