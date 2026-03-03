@@ -5,8 +5,7 @@ const page: GoPageInput = {
   slug: 'contest-rules',
   metadata: {
     title: 'Supabase Official Rules For Giveaways & Sweepstakes',
-    description:
-      'Official rules for Supabase giveaways, sweepstakes, and promotional contests.',
+    description: 'Official rules for Supabase giveaways, sweepstakes, and promotional contests.',
   },
   hero: {
     title: 'Supabase Official Rules For Giveaways & Sweepstakes',

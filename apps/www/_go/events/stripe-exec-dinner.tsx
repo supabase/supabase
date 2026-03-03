@@ -47,11 +47,15 @@ const page: GoPageInput = {
             </div>
             <div className="p-6 sm:p-8 md:border-r border-muted max-md:border-b">
               <h3 className="text-foreground font-medium text-base">Deepthi Sigireddi</h3>
-              <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">Head of Databases, Supabase</p>
+              <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
+                Head of Databases, Supabase
+              </p>
             </div>
             <div className="p-6 sm:p-8">
               <h3 className="text-foreground font-medium text-base">Sugu Sougoumarane</h3>
-              <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">Head of Multigres, Supabase</p>
+              <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
+                Head of Multigres, Supabase
+              </p>
             </div>
           </div>
         </div>
@@ -61,7 +65,7 @@ const page: GoPageInput = {
       type: 'form',
       id: 'rsvp',
       title: 'Reserve your seat',
-      description: 'Space is limited. Let us know you\'re coming.',
+      description: "Space is limited. Let us know you're coming.",
       fields: [
         {
           type: 'text',
