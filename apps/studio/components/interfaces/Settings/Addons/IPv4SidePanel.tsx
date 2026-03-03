@@ -121,9 +121,13 @@ const IPv4SidePanel = () => {
       <SidePanel.Content>
         <div className="py-6 space-y-4">
           <p className="text-sm">
-            Direct connections require IPv6 by default. Enable the dedicated IPv4 add-on to connect
-            from IPv4-only networks.
+            Your project’s direct connection endpoint and dedicated pooler are IPv6-only by default. Enable the dedicated IPv4 address add-on to connect from IPv4-only networks.
           </p>
+
+          <p className="text-sm">
+            The Shared Pooler endpoint accepts IPv4 connections by default and does not require this add-on.
+          </p>
+
 
           {!isAws && (
             <Admonition
@@ -132,15 +136,6 @@ const IPv4SidePanel = () => {
             />
           )}
 
-          <p className="text-sm">
-            If you connect via the Shared Pooler, you usually don’t need this add-on because the
-            Shared Pooler supports IPv4 by default.
-          </p>
-
-          <p className="text-sm">
-            If you connect directly to your database or via the Dedicated Pooler, you may need the
-            IPv4 add-on when your network does not support IPv6.
-          </p>
 
           <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
             <Radio.Group
@@ -214,7 +209,7 @@ const IPv4SidePanel = () => {
               />
               {selectedOption !== 'ipv4_none' && (
                 <p className="text-sm text-foreground-light">
-                  By default, this is only applied to the Primary database for your project. If{' '}
+                  By default, this is only applied to the primary database for your project. If{' '}
                   <InlineLink
                     href={`${DOCS_URL}/guides/platform/read-replicas`}
                     target="_blank"
