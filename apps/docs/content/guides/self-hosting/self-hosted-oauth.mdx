@@ -390,6 +390,8 @@ After a successful OAuth login, the Auth service redirects to `SITE_URL` or a UR
 - `SITE_URL` in `.env` is set to your application's URL
 - If your app uses a different redirect URL, add it to `ADDITIONAL_REDIRECT_URLS` (comma-separated)
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### Nonce check failure on mobile (Google Sign In)
 
 When using Google Sign In on mobile with ID tokens, nonce verification may fail. Uncomment the following in `docker-compose.yml`:
