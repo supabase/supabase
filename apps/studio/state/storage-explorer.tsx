@@ -29,7 +29,6 @@ import {
   formatTime,
   getFilesDataTransferItems,
   getPathAlongFoldersToIndex,
-  getPathAlongOpenedFolders,
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
@@ -37,7 +36,7 @@ import { convertFromBytes } from '@/components/interfaces/Storage/StorageSetting
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
 import { configKeys } from '@/data/config/keys'
-import { useProjectEndpointQuery } from '@/data/config/project-endpoint-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { ProjectStorageConfigResponse } from '@/data/config/project-storage-config-query'
 import { getQueryClient } from '@/data/query-client'
 import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation'
@@ -1870,9 +1869,11 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
-  const { data: endpointData, isSuccess: isSuccessSettings } = useProjectEndpointQuery({
-    projectRef: project?.ref,
-  })
+  const {
+    storageEndpoint,
+    hostEndpoint,
+    isSuccess: isSuccessSettings,
+  } = useProjectApiUrl({ projectRef: project?.ref })
 
   // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
   // before the project details were ready, hence the store kept returning project ref as undefined
@@ -1884,7 +1885,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const storeAlreadyLoaded = state.projectRef === project?.ref
 
     if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
-      const clientEndpoint = endpointData.storageEndpoint ?? endpointData.endpoint
+      const clientEndpoint = storageEndpoint ?? hostEndpoint ?? ''
       const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
       setState(
         createStorageExplorerState({
@@ -1901,8 +1902,8 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     project?.connectionString,
     stateRef,
     isPaused,
-    endpointData?.endpoint,
-    endpointData?.storageEndpoint,
+    hostEndpoint,
+    storageEndpoint,
     isSuccessSettings,
   ])
 
