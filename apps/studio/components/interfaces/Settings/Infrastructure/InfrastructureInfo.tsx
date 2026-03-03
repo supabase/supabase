@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import {
   ScaffoldContainer,
@@ -19,14 +19,11 @@ import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
-import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
 
 export const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-
-  const unifiedReplication = useFlag('unifiedReplication')
 
   const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
     useIsFeatureEnabled(['project_auth:all', 'project_settings:database_upgrades'])
@@ -73,31 +70,26 @@ export const InfrastructureInfo = () => {
   return (
     <>
       <ScaffoldDivider />
-      {project?.cloud_provider !== 'FLY' &&
-        (unifiedReplication ? (
-          <ScaffoldContainer>
-            <ScaffoldSection isFullWidth>
-              <NoticeBar
-                visible={true}
-                type="default"
-                title="Management of read replicas has moved"
-                description="Read replicas is now managed under Replication in the Database section."
-                actions={
-                  <Button type="default" asChild>
-                    <Link href={`/project/${ref}/database/replication`} className="!no-underline">
-                      Go to Replication
-                    </Link>
-                  </Button>
-                }
-              />
-            </ScaffoldSection>
-          </ScaffoldContainer>
-        ) : (
-          <>
-            <InstanceConfiguration />
-            <ScaffoldDivider />
-          </>
-        ))}
+
+      {project?.cloud_provider !== 'FLY' && (
+        <ScaffoldContainer>
+          <ScaffoldSection isFullWidth>
+            <NoticeBar
+              visible={true}
+              type="default"
+              title="Management of read replicas has moved"
+              description="Read replicas is now managed under Replication in the Database section."
+              actions={
+                <Button type="default" asChild>
+                  <Link href={`/project/${ref}/database/replication`} className="!no-underline">
+                    Go to Replication
+                  </Link>
+                </Button>
+              }
+            />
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      )}
 
       <ScaffoldContainer>
         <ScaffoldSection>
