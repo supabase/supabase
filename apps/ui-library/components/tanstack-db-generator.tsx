@@ -4,14 +4,14 @@ import { Check, Copy, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
+  cn,
+  copyToClipboard,
   Input_Shadcn_ as Input,
   Label_Shadcn_ as Label,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  cn,
-  copyToClipboard,
 } from 'ui'
 
 import { useLocalStorage } from './use-local-storage'
@@ -113,6 +113,7 @@ export function TanstackDBGenerator() {
                 value={projectRef}
                 onChange={(e) => setProjectRef(e.target.value)}
                 className="font-mono"
+                autoComplete="off"
               />
               <p className="text-xs text-muted-foreground">
                 Found in your project settings or URL (e.g., abcdefghijklmnop)
@@ -127,6 +128,7 @@ export function TanstackDBGenerator() {
                 onChange={(e) => setAnonKey(e.target.value)}
                 className="font-mono"
                 type="password"
+                autoComplete="off"
               />
               <p className="text-xs text-muted-foreground">
                 Found in your project&apos;s API settings
