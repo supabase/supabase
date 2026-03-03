@@ -1,9 +1,15 @@
+import { Sparkles } from 'lucide-react'
 import { useMemo } from 'react'
 import * as React from 'react'
-import { Sparkles } from 'lucide-react'
-import { ActiveInput } from './hooks'
-import { FilterProperty, FilterGroup } from './types'
-import { findConditionByPath, isCustomOptionObject, isFilterOptionObject } from './utils'
+
+import { ActiveInputState, FilterGroup, FilterProperty } from './types'
+import {
+  findConditionByPath,
+  isCustomOptionObject,
+  isFilterOperatorObject,
+  isFilterOptionObject,
+} from './utils'
+
 // Deprecated soon; kept for compatibility during refactor
 
 export type CommandItem = {
@@ -24,7 +30,7 @@ export function useCommandMenu({
   aiApiUrl,
   supportsOperators,
 }: {
-  activeInput: ActiveInput
+  activeInput: ActiveInputState
   freeformText: string
   activeFilters: FilterGroup
   filterProperties: FilterProperty[]
@@ -87,7 +93,7 @@ export function useCommandMenu({
 }
 
 function getOperatorItems(
-  activeInput: Extract<ActiveInput, { type: 'operator' }>,
+  activeInput: Extract<ActiveInputState, { type: 'operator' }>,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[]
 ): CommandItem[] {
@@ -97,12 +103,20 @@ function getOperatorItems(
   const availableOperators = property?.operators || ['=']
 
   return availableOperators
-    .filter((op) => op.toUpperCase().includes(operatorValue))
-    .map((op) => ({ value: op, label: op }))
+    .filter((op) => {
+      const searchText = isFilterOperatorObject(op) ? op.value : op
+      return searchText.toUpperCase().includes(operatorValue)
+    })
+    .map((op) => {
+      if (isFilterOperatorObject(op)) {
+        return { value: op.value, label: op.label }
+      }
+      return { value: op, label: op }
+    })
 }
 
 function getInputValue(
-  activeInput: ActiveInput,
+  activeInput: ActiveInputState,
   freeformText: string,
   activeFilters: FilterGroup
 ): string {
@@ -123,7 +137,7 @@ function getPropertyItems(filterProperties: FilterProperty[], inputValue: string
 }
 
 function getValueItems(
-  activeInput: Extract<ActiveInput, { type: 'value' }>,
+  activeInput: Extract<ActiveInputState, { type: 'value' }>,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
   propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>,

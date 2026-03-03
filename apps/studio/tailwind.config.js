@@ -99,6 +99,12 @@ module.exports = config({
             transform: 'rotate(10deg) scale(1.5) translateY(2rem)',
           },
         },
+        typewriter: {
+          from: { width: '0' },
+        },
+        'blink-caret': {
+          '50%': { borderColor: 'transparent' },
+        },
       },
     },
   },

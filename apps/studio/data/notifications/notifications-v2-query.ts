@@ -1,24 +1,24 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import type { components } from 'data/api'
-import type { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { notificationKeys } from './keys'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10
 
 export type NotificationVariables = {
-  page: number
+  page: number | undefined
   limit?: number
   status?: 'new' | 'seen' | 'archived'
   filters: {
-    priority: readonly string[]
-    organizations: readonly string[]
-    projects: readonly string[]
+    priority?: readonly string[]
+    organizations?: readonly string[]
+    projects?: readonly string[]
   }
 }
 
-export type Notification = components['schemas']['NotificationResponseV2']
+export type Notification = components['schemas']['NotificationResponse']
 
 /**
  * Notification Data - This is not typed from the API end as it's meant to be open-ended
@@ -37,16 +37,17 @@ export type NotificationData = {
 
 export async function getNotifications(options: NotificationVariables, signal?: AbortSignal) {
   const { status, filters, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
+  const { priority = [], organizations = [], projects = [] } = filters
+
   const { data, error } = await get('/platform/notifications', {
     params: {
       query: {
         offset: page * limit,
         limit,
-        // [Alaister]: 'as any' is needed because the API types don't reflect an array of strings
-        ...(status !== undefined ? { status } : { status: ['new', 'seen'].join(',') as any }),
-        ...(filters.priority.length > 0 ? { priority: filters.priority.join(',') as any } : {}),
-        ...(filters.organizations.length > 0 ? { org_slug: filters.organizations.join(',') } : {}),
-        ...(filters.projects.length > 0 ? { project_ref: filters.projects.join(',') } : {}),
+        ...(status !== undefined ? { status } : { status: ['new', 'seen'].join(',') }),
+        ...(priority.length > 0 ? { priority: priority.join(',') } : {}),
+        ...(organizations.length > 0 ? { org_slug: organizations.join(',') } : {}),
+        ...(projects.length > 0 ? { project_ref: projects.join(',') } : {}),
       },
     },
     headers: { Version: '2' },
@@ -64,22 +65,27 @@ export type NotificationsError = ResponseError
 export const useNotificationsV2Query = <TData = NotificationsData>(
   { status, filters, limit = NOTIFICATIONS_PAGE_LIMIT }: Omit<NotificationVariables, 'page'>,
   {
-    enabled = true,
+    enabled,
     ...options
-  }: UseInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    NotificationsData,
+    NotificationsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    number | undefined
+  > = {}
 ) => {
-  return useInfiniteQuery<NotificationsData, NotificationsError, TData>(
-    notificationKeys.listV2({ status, filters, limit }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery({
+    queryKey: notificationKeys.listV2({ status, filters, limit }),
+    queryFn: ({ signal, pageParam }) =>
       getNotifications({ status, filters, limit, page: pageParam }, signal),
-    {
-      enabled: enabled,
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        if ((lastPage ?? []).length < limit) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
+    enabled: enabled,
+    initialPageParam: 0,
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      if ((lastPage ?? []).length < limit) return undefined
+      return page
+    },
+    ...options,
+  })
 }

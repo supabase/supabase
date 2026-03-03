@@ -1,9 +1,13 @@
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
-import { ServiceFlowType, useUnifiedLogInspectionQuery } from 'data/logs'
 import {
+  ServiceFlowType,
+  useUnifiedLogInspectionQuery,
+} from 'data/logs/unified-log-inspection-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useState } from 'react'
+import {
+  cn,
   CodeBlock,
   ResizableHandle,
   ResizablePanel,
@@ -12,19 +16,19 @@ import {
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  cn,
 } from 'ui'
+
+import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
+import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
 import {
   MemoizedEdgeFunctionBlock,
   MemoizedGoTrueBlock,
   MemoizedNetworkBlock,
-  MemoizedPostgRESTBlock,
   MemoizedPostgresBlock,
+  MemoizedPostgRESTBlock,
   MemoizedStorageBlock,
 } from './ServiceFlow/components/ServiceBlocks'
 import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
-import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
-import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 
@@ -43,6 +47,8 @@ export function ServiceFlowPanel({
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('service-flow')
 
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
+
   const logType = selectedRow?.log_type
   const serviceFlowType: ServiceFlowType | undefined =
     logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
@@ -51,7 +57,7 @@ export function ServiceFlowPanel({
   // Query the logs API directly
   const {
     data: serviceFlowData,
-    isLoading,
+    isPending: isLoading,
     error,
   } = useUnifiedLogInspectionQuery(
     {
@@ -69,15 +75,22 @@ export function ServiceFlowPanel({
   const jsonData =
     shouldShowServiceFlow && serviceFlowData?.result?.[0] ? serviceFlowData.result[0] : selectedRow
 
+  const formattedJsonData =
+    !logsMetadata && 'raw_log_data' in jsonData && 'metadata' in jsonData.raw_log_data
+      ? {
+          ...jsonData,
+          raw_log_data: { ...jsonData.raw_log_data, metadata: undefined },
+        }
+      : jsonData
+
   if (selectedRowKey) {
     return (
       <>
         <ResizableHandle withHandle className="z-10" />
         <ResizablePanel
           id="log-sidepanel"
-          order={2}
-          defaultSize={1}
-          maxSize={40}
+          minSize={448}
+          maxSize={720}
           className={cn(
             'bg-dash-sidebar',
             'z-40',
@@ -85,7 +98,6 @@ export function ServiceFlowPanel({
             'md:absolute md:h-auto',
             // ' md:w-3/4',
             'xl:z-[1]',
-            'min-w-[28rem] max-w-[45rem]',
             'xl:relative xl:border-l-0'
           )}
         >
@@ -218,7 +230,7 @@ export function ServiceFlowPanel({
                     language="json"
                     className="max-h-[800px] overflow-auto border-none rounded-none [&_pre]:!leading-tight [&_code]:!leading-tight"
                   >
-                    {JSON.stringify(jsonData, null, 2)}
+                    {JSON.stringify(formattedJsonData, null, 2)}
                   </CodeBlock>
                 </TabsContent>
               </Tabs>

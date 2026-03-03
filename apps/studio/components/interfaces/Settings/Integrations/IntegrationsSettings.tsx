@@ -1,15 +1,18 @@
 import Link from 'next/link'
 
-import SidePanelVercelProjectLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
+import { useFlag } from 'common'
+import { SidePanelVercelProjectLinker } from 'components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
-import GitHubSection from './GithubIntegration/GithubSection'
-import VercelSection from './VercelIntegration/VercelSection'
+import { AWSPrivateLinkSection } from './AWSPrivateLink/AWSPrivateLinkSection'
+import { GitHubSection } from './GithubIntegration/GithubSection'
+import { VercelSection } from './VercelIntegration/VercelSection'
 
-export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
+export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' | 'aws' }) => {
   return (
     <img
       className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
@@ -21,10 +24,16 @@ export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' 
 
 const IntegrationSettings = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
+  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
   const isBranch = project?.parent_project_ref !== undefined
 
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
+  const showAWSPrivateLinkFeature = useIsFeatureEnabled('integrations:aws_private_link')
+  const showAWSPrivateLinkConfigCat = useFlag('awsPrivateLinkIntegration')
+  // PrivateLink is not available in eu-central-2 (Zurich) until Feb 2026
+  const isPrivateLinkUnsupportedRegion = project?.region === 'eu-central-2'
+  const showAWSPrivateLink =
+    showAWSPrivateLinkFeature && showAWSPrivateLinkConfigCat && !isPrivateLinkUnsupportedRegion
 
   return (
     <>
@@ -51,6 +60,12 @@ const IntegrationSettings = () => {
           <ScaffoldDivider />
           <VercelSection isProjectScoped={true} />
           <SidePanelVercelProjectLinker />
+        </>
+      )}
+      {showAWSPrivateLink && (
+        <>
+          <ScaffoldDivider />
+          <AWSPrivateLinkSection />
         </>
       )}
     </>

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-
 import { Button } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
@@ -25,8 +24,8 @@ const TextConfirmModalWithSize = () => {
 
   return (
     <>
-      <Button type="default" onClick={onVisibleChange}>
-        Open warning text confirm dialog
+      <Button type="danger" onClick={onVisibleChange}>
+        Show Text Confirm Dialog
       </Button>
       <TextConfirmModal
         key="withSize"

@@ -4,26 +4,26 @@ import { useMemo } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {
   ChartTooltipValueFormatter,
   ChartYFormatterCompactNumber,
-  getUpgradeUrl,
+  useGetUpgradeUrl,
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
 
 export interface AttributeUsageProps {
   slug: string
-  projectRef?: string
+  projectRef?: string | null
   attribute: CategoryAttribute
   usage?: OrgUsageResponse
   usageMeta?: OrgMetricsUsage
@@ -53,7 +53,7 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
-  const upgradeUrl = getUpgradeUrl(slug ?? '', subscription, attribute.key)
+  const upgradeUrl = useGetUpgradeUrl(slug ?? '', subscription, attribute.key)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
   const usageBasedBilling = subscription?.usage_billing_enabled
@@ -159,7 +159,7 @@ const AttributeUsage = ({
                     )}
 
                     <div>
-                      {usageMeta && (
+                      {usageMeta && usageMeta.pricing_free_units !== 0 && (
                         <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">
                             Included in {subscription?.plan?.name} Plan

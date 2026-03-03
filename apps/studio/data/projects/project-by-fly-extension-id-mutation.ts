@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type ProjectByFlyExtensionIdVariables = {
   flyExtensionId: string
@@ -28,23 +28,25 @@ export const useProjectByFlyExtensionIdMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectByFlyExtensionIdData, ResponseError, ProjectByFlyExtensionIdVariables>,
+  UseCustomMutationOptions<
+    ProjectByFlyExtensionIdData,
+    ResponseError,
+    ProjectByFlyExtensionIdVariables
+  >,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectByFlyExtensionIdData, ResponseError, ProjectByFlyExtensionIdVariables>(
-    (vars) => getProjectByFlyExtensionId(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to get project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectByFlyExtensionIdData, ResponseError, ProjectByFlyExtensionIdVariables>({
+    mutationFn: (vars) => getProjectByFlyExtensionId(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to get project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

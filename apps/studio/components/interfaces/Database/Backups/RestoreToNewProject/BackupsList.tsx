@@ -35,7 +35,12 @@ export const BackupsList = ({ onSelectRestore, disabled }: BackupsListProps) => 
               return (
                 <div className="grid grid-cols-4 gap-4 items-center p-4" key={backup.id}>
                   <div>
-                    <TimestampInfo utcTimestamp={backup.inserted_at} />
+                    <TimestampInfo
+                      displayAs="utc"
+                      utcTimestamp={backup.inserted_at}
+                      labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                      className="text-left !text-sm font-mono tracking-tight"
+                    />
                   </div>
                   <div>
                     <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>

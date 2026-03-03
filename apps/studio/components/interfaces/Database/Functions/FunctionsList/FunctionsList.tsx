@@ -1,53 +1,112 @@
-import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import { Search } from 'lucide-react'
-import { useRouter } from 'next/router'
-
 import { useParams } from 'common'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
+import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
+import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { Search } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import {
-  AiIconAnimation,
-  Card,
-  Input,
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 
-interface FunctionsListProps {
-  createFunction: () => void
-  editFunction: (fn: PostgresFunction) => void
-  deleteFunction: (fn: PostgresFunction) => void
-}
+const createFunctionSnippet = `create function function_name()
+returns void
+language plpgsql
+as $$
+begin
+  -- Write your function logic here
+end;
+$$;`
 
-const FunctionsList = ({
-  createFunction = noop,
-  editFunction = noop,
-  deleteFunction = noop,
-}: FunctionsListProps) => {
+export const FunctionsList = () => {
   const router = useRouter()
   const { search } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const {
+    setValue: setEditorPanelValue,
+    setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
+  } = useEditorPanelStateSnapshot()
+
+  const createFunction = () => {
+    setSelectedFunctionIdToDuplicate(null)
+    if (isInlineEditorEnabled) {
+      setEditorPanelInitialPrompt('Create a new database function that...')
+      setEditorPanelValue(createFunctionSnippet)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setShowCreateFunctionForm(true)
+    }
+  }
+
+  const duplicateFunction = (fn: DatabaseFunction) => {
+    if (isInlineEditorEnabled) {
+      const dupFn = {
+        ...fn,
+        name: `${fn.name}_duplicate`,
+      }
+      setEditorPanelInitialPrompt('Create new database function that...')
+      setEditorPanelValue(dupFn.complete_statement)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setSelectedFunctionIdToDuplicate(fn.id.toString())
+    }
+  }
+
+  const editFunction = (fn: DatabaseFunction) => {
+    setSelectedFunctionIdToDuplicate(null)
+    if (isInlineEditorEnabled) {
+      setEditorPanelValue(fn.complete_statement)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setSelectedFunctionToEdit(fn.id.toString())
+    }
+  }
 
   const filterString = search ?? ''
+
+  // Filters
+  const [returnTypeFilter, setReturnTypeFilter] = useQueryState(
+    'return_type',
+    parseAsJson(selectFilterSchema.parse)
+  )
+  const [securityFilter, setSecurityFilter] = useQueryState(
+    'security',
+    parseAsJson(selectFilterSchema.parse)
+  )
 
   const setFilterString = (str: string) => {
     const url = new URL(document.URL)
@@ -73,21 +132,100 @@ const FunctionsList = ({
   })
 
   const {
-    data: functions,
+    data: functions = [],
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
+    isSuccess,
   } = useDatabaseFunctionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  // Get unique return types from functions in the selected schema
+  const schemaFunctions = functions.filter((fn) => fn.schema === selectedSchema)
+  const uniqueReturnTypes = Array.from(new Set(schemaFunctions.map((fn) => fn.return_type))).sort()
+
+  // Get security options based on what exists in the selected schema
+  const hasDefiner = schemaFunctions.some((fn) => fn.security_definer)
+  const hasInvoker = schemaFunctions.some((fn) => !fn.security_definer)
+  const securityOptions = [
+    ...(hasDefiner ? [{ label: 'Definer', value: 'definer' }] : []),
+    ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
+  ]
+
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const [functionIdToEdit, setSelectedFunctionToEdit] = useQueryState('edit', parseAsString)
+  const functionToEdit = functions.find((fn) => fn.id.toString() === functionIdToEdit)
+
+  const [functionIdToDuplicate, setSelectedFunctionIdToDuplicate] = useQueryState(
+    'duplicate',
+    parseAsString
+  )
+  const functionToDuplicate = functions.find((fn) => fn.id.toString() === functionIdToDuplicate)
+
+  const [functionIdToDelete, setSelectedFunctionToDelete] = useQueryState('delete', parseAsString)
+  const functionToDelete = functions.find((fn) => fn.id.toString() === functionIdToDelete)
+
+  const {
+    mutate: deleteDatabaseFunction,
+    isPending: isDeletingFunction,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseFunctionDeleteMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Successfully removed function ${variables.func.name}`)
+      setSelectedFunctionToDelete(null)
+    },
+  })
+
+  const onDeleteFunction = () => {
+    if (!project) return console.error('Project is required')
+    if (!functionToDelete) return console.error('Function is required')
+
+    deleteDatabaseFunction({
+      func: functionToDelete,
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+    })
+  }
+
+  useEffect(() => {
+    if (isSuccess && !!functionIdToEdit && !functionToEdit) {
+      toast('Function not found')
+      setSelectedFunctionToEdit(null)
+    }
+  }, [functionIdToEdit, functionToEdit, isSuccess, setSelectedFunctionToEdit])
+
+  useEffect(() => {
+    if (isSuccess && !!functionIdToDuplicate && !functionToDuplicate) {
+      toast('Function not found')
+      setSelectedFunctionIdToDuplicate(null)
+    }
+  }, [functionIdToDuplicate, functionToDuplicate, isSuccess, setSelectedFunctionIdToDuplicate])
+
+  useEffect(() => {
+    if (isSuccess && !!functionIdToDelete && !functionToDelete && !isSuccessDelete) {
+      toast('Function not found')
+      setSelectedFunctionToDelete(null)
+    }
+  }, [
+    functionIdToDelete,
+    functionToDelete,
+    isSuccess,
+    isSuccessDelete,
+    setSelectedFunctionToDelete,
+  ])
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
 
   return (
     <>
-      {(functions ?? []).length == 0 ? (
+      {(functions ?? []).length === 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <ProductEmptyState
             title="Functions"
@@ -115,19 +253,36 @@ const FunctionsList = ({
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={(schema) => {
-                  const url = new URL(document.URL)
-                  url.searchParams.delete('search')
-                  router.push(url)
-                  setSelectedSchema(schema)
+                  setFilterString('')
+                  // Wait for the filter to be cleared from the URL
+                  setTimeout(() => {
+                    setSelectedSchema(schema)
+                  }, 50)
                 }}
               />
               <Input
                 placeholder="Search for a function"
                 size="tiny"
-                icon={<Search size={14} />}
+                icon={<Search />}
                 value={filterString}
                 className="w-full lg:w-52"
                 onChange={(e) => setFilterString(e.target.value)}
+              />
+              <ReportsSelectFilter
+                label="Return Type"
+                options={uniqueReturnTypes.map((type) => ({
+                  label: type,
+                  value: type,
+                }))}
+                value={returnTypeFilter ?? []}
+                onChange={setReturnTypeFilter}
+                showSearch
+              />
+              <ReportsSelectFilter
+                label="Security"
+                options={securityOptions}
+                value={securityFilter ?? []}
+                onChange={setSecurityFilter}
               />
             </div>
 
@@ -154,13 +309,13 @@ const FunctionsList = ({
                     disabled={!canCreateFunctions}
                     className="px-1 pointer-events-auto"
                     icon={<AiIconAnimation size={16} />}
-                    onClick={() =>
+                    onClick={() => {
+                      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                       aiSnap.newChat({
                         name: 'Create new function',
-                        open: true,
                         initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
                       })
-                    }
+                    }}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -198,16 +353,50 @@ const FunctionsList = ({
                   schema={selectedSchema}
                   filterString={filterString}
                   isLocked={isSchemaLocked}
+                  returnTypeFilter={returnTypeFilter ?? []}
+                  securityFilter={securityFilter ?? []}
+                  duplicateFunction={duplicateFunction}
                   editFunction={editFunction}
-                  deleteFunction={deleteFunction}
+                  deleteFunction={(fn) => setSelectedFunctionToDelete(fn.id.toString())}
+                  functions={functions ?? []}
                 />
               </TableBody>
             </Table>
           </Card>
         </div>
       )}
+
+      <CreateFunction
+        func={functionToEdit || functionToDuplicate}
+        visible={showCreateFunctionForm || !!functionToEdit || !!functionToDuplicate}
+        onClose={() => {
+          setShowCreateFunctionForm(false)
+          setSelectedFunctionToEdit(null)
+          setSelectedFunctionIdToDuplicate(null)
+        }}
+        isDuplicating={!!functionToDuplicate}
+      />
+
+      <TextConfirmModal
+        variant={'warning'}
+        visible={!!functionToDelete}
+        onCancel={() => setSelectedFunctionToDelete(null)}
+        onConfirm={onDeleteFunction}
+        title="Delete this function"
+        loading={isDeletingFunction}
+        confirmLabel={`Delete function ${functionToDelete?.name}`}
+        confirmPlaceholder="Type in name of function"
+        confirmString={functionToDelete?.name ?? 'Unknown'}
+        text={
+          <>
+            <span>This will delete the function</span>{' '}
+            <span className="text-bold text-foreground">{functionToDelete?.name}</span>{' '}
+            <span>from the schema</span>{' '}
+            <span className="text-bold text-foreground">{functionToDelete?.schema}</span>
+          </>
+        }
+        alert={{ title: 'You cannot recover this function once deleted.' }}
+      />
     </>
   )
 }
-
-export default FunctionsList

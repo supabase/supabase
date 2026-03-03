@@ -2,11 +2,9 @@
 
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
 import { startCase } from 'lib/helpers'
-import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/compat/router'
-import { useEffect, useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useEffect, useState, useCallback } from 'react'
 import type { BlogView } from 'app/blog/BlogClient'
-import type PostTypes from 'types/post'
 
 import { AlignJustify, ChevronDown, Grid, Search, X as CloseIcon } from 'lucide-react'
 import {
@@ -20,8 +18,7 @@ import {
 } from 'ui'
 
 interface Props {
-  allPosts: PostTypes[]
-  setPosts: (posts: any) => void
+  onFilterChange: (category?: string, search?: string) => void
   view: BlogView
   setView: (view: any) => void
 }
@@ -34,7 +31,7 @@ interface Props {
  * ✅ search via category and reset q param if present
  */
 
-function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
+function BlogFilters({ onFilterChange, view, setView }: Props) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const isList = view === 'list'
   const [category, setCategory] = useState<string>('all')
@@ -61,42 +58,47 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
     'launch-week',
   ]
 
-  useEffect(() => {
-    if (!q) {
-      handlePosts()
-    }
-  }, [category])
+  // Debounced filter change to avoid too many API calls
+  const debouncedFilterChange = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout
+      return (cat: string, search: string) => {
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(() => {
+          onFilterChange(cat, search)
+        }, 300)
+      }
+    })(),
+    [onFilterChange]
+  )
 
+  // Handle URL params on mount
   useEffect(() => {
     if (q) {
-      handleSearchByText(q)
+      setSearchTerm(q)
+      onFilterChange(category, q)
+    } else if (activeCategory && activeCategory !== 'all') {
+      setCategory(activeCategory)
+      onFilterChange(activeCategory, '')
     }
-  }, [q])
+  }, []) // Only run on mount
 
-  const handleReplaceRouter = () => {
-    if (!searchTerm && category !== 'all' && router) {
-      router.query.category = category
-      router?.replace(router, undefined, { shallow: true, scroll: false })
-    }
-  }
+  const handleSearchByText = useCallback(
+    (text: string) => {
+      setSearchTerm(text)
 
-  const handlePosts = () => {
-    // construct an array of blog posts
-    // not inluding the first blog post
-    const shiftedBlogs = [...allPosts]
-    shiftedBlogs.shift()
+      // Update URL
+      if (text.length > 0) {
+        router?.replace(`/blog?q=${text}`, { scroll: false })
+      } else {
+        router?.replace('/blog', { scroll: false })
+      }
 
-    handleReplaceRouter()
-
-    setPosts(
-      category === 'all'
-        ? shiftedBlogs
-        : allPosts.filter((post: any) => {
-            const found = post.categories?.includes(category)
-            return found
-          })
-    )
-  }
+      // Trigger filter change (debounced)
+      debouncedFilterChange(category, text)
+    },
+    [category, router, debouncedFilterChange]
+  )
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -112,48 +114,31 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
     setShowSearchInput(!isMobile)
   }, [isMobile])
 
-  useEffect(() => {
-    if (router?.isReady && q) {
-      setSearchTerm(q)
-    }
-    if (router?.isReady && activeCategory && activeCategory !== 'all') {
-      setCategory(activeCategory)
-    }
-  }, [activeCategory, router?.isReady, q])
+  const handleSetCategory = useCallback(
+    (newCategory: string) => {
+      setSearchTerm('')
+      setCategory(newCategory)
 
-  function handleSearchByText(text: string) {
-    setSearchTerm(text)
-    searchParams?.has('q') && router?.replace('/blog', undefined, { shallow: true, scroll: false })
-    router?.replace(`/blog?q=${text}`, undefined, { shallow: true, scroll: false })
-    if (text.length < 1) router?.replace('/blog', undefined, { shallow: true, scroll: false })
+      // Update URL
+      if (newCategory === 'all') {
+        router?.replace('/blog', { scroll: false })
+      } else {
+        router?.replace(`/blog?category=${newCategory}`, { scroll: false })
+      }
 
-    const matches = allPosts.filter((post: any) => {
-      const found =
-        post.tags?.join(' ').replaceAll('-', ' ').includes(text.toLowerCase()) ||
-        post.title?.toLowerCase().includes(text.toLowerCase()) ||
-        post.author?.includes(text.toLowerCase())
-      return found
-    })
+      // Trigger filter change immediately for category changes
+      onFilterChange(newCategory, '')
+    },
+    [router, onFilterChange]
+  )
 
-    setPosts(matches)
-  }
-
-  const handleSetCategory = (category: string) => {
-    searchTerm && handlePosts()
-    searchTerm && setSearchTerm('')
-    setCategory(category)
-    category === 'all'
-      ? router?.replace('/blog', undefined, { shallow: true, scroll: false })
-      : router?.replace(`/blog?category=${category}`, undefined, {
-          shallow: true,
-          scroll: false,
-        })
-  }
-
-  const handleSearchChange = (event: any) => {
-    activeCategory && setCategory('all')
-    handleSearchByText(event.target.value)
-  }
+  const handleSearchChange = useCallback(
+    (event: any) => {
+      setCategory('all')
+      handleSearchByText(event.target.value)
+    },
+    [handleSearchByText]
+  )
 
   const handleViewSelection = () => {
     setView((prevView: 'list' | 'grid') => {

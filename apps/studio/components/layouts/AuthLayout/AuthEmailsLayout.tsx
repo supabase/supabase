@@ -8,6 +8,7 @@ import AuthLayout from './AuthLayout'
 
 export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
+
   const showEmails = useIsFeatureEnabled('authentication:emails')
 
   const navItems = [

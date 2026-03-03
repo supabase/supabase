@@ -17,14 +17,12 @@ export interface FilterPopoverPrimitiveProps {
   buttonText?: string
   filters: Filter[]
   onApplyFilters: (filters: Filter[]) => void
-  portal?: boolean
 }
 
 export const FilterPopoverPrimitive = ({
   buttonText,
   filters,
   onApplyFilters,
-  portal = true,
 }: FilterPopoverPrimitiveProps) => {
   const [open, setOpen] = useState(false)
   const snap = useTableEditorTableStateSnapshot()
@@ -94,7 +92,7 @@ export const FilterPopoverPrimitive = ({
           {displayButtonText}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={portal}>
+      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
         <div className="space-y-2 py-2">
           <div className="space-y-2">
             {localFilters.map((filter, index) => (
@@ -109,7 +107,7 @@ export const FilterPopoverPrimitive = ({
             ))}
             {localFilters.length == 0 && (
               <div className="space-y-1 px-3">
-                <h5 className="text-foreground-light">No filters applied to this view</h5>
+                <h5 className="text-xs text-foreground-light">No filters applied to this view</h5>
                 <p className="text-xs text-foreground-lighter">
                   Add a column below to filter the view
                 </p>
@@ -118,7 +116,7 @@ export const FilterPopoverPrimitive = ({
           </div>
           <PopoverSeparator_Shadcn_ />
           <div className="px-3 flex flex-row justify-between">
-            <Button icon={<Plus />} type="text" onClick={onAddFilter}>
+            <Button icon={<Plus />} type="dashed" onClick={onAddFilter}>
               Add filter
             </Button>
             <Button

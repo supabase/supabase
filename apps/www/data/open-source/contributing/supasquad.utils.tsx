@@ -27,7 +27,7 @@ export const supaSquadApplicationSchema = z.object({
   github: z.string().optional(),
   twitter: z.string().optional(),
   discord: z.string().optional(),
-  contributions: z.string().optional(),
+  contributions: z.string().min(10, 'This field is required'),
 })
 
 export type SupaSquadApplication = z.infer<typeof supaSquadApplicationSchema>

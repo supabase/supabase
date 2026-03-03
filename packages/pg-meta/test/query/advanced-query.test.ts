@@ -1,4 +1,5 @@
 import { afterAll, describe, expect, test } from 'vitest'
+
 import { Query } from '../../src/query/Query'
 import { cleanupRoot, createTestDatabase } from '../db/utils'
 

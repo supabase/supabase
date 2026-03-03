@@ -8,6 +8,7 @@ const columns: Column<LogData>[] = [
   {
     name: 'database-postgres-first-column',
     key: 'database-postgres-first-column',
+    renderHeaderCell: () => null,
     renderCell: (props) => {
       if (!props.row.error_severity) {
         return defaultRenderCell(props)

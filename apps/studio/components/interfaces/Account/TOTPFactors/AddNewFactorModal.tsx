@@ -4,7 +4,6 @@ import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import InformationBox from 'components/ui/InformationBox'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { organizationKeys } from 'data/organizations/keys'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from 'data/profile/mfa-enroll-mutation'
@@ -12,16 +11,17 @@ import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface AddNewFactorModalProps {
   visible: boolean
   onClose: () => void
 }
 
-const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
+export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
   // Generate a name with a number between 0 and 1000
   const [name, setName] = useState(`App ${Math.floor(Math.random() * 1000)}`)
-  const { data, mutate: enroll, isLoading: isEnrolling, reset } = useMfaEnrollMutation()
+  const { data, mutate: enroll, isPending: isEnrolling, reset } = useMfaEnrollMutation()
 
   useEffect(() => {
     // reset has to be called because the state is kept between if the process is canceled during
@@ -122,13 +122,15 @@ const SecondStep = ({
   )
 
   const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
-  const { mutate: challengeAndVerify, isLoading: isVerifying } = useMfaChallengeAndVerifyMutation({
+  const { mutate: challengeAndVerify, isPending: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
       toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
     },
     onSuccess: async () => {
       if (lastVisitedOrganization) {
-        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+        await queryClient.invalidateQueries({
+          queryKey: organizationKeys.members(lastVisitedOrganization),
+        })
       }
       toast.success(`Successfully added a second factor authentication`)
       onClose()
@@ -216,5 +218,3 @@ const SecondStep = ({
     </ConfirmationModal>
   )
 }
-
-export default AddNewFactorModal

@@ -1,17 +1,21 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import type { components } from 'data/api'
-import type { ResponseError } from 'types'
-import { privilegeKeys } from './keys'
 import pgMeta from '@supabase/pg-meta'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { toast } from 'sonner'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { privilegeKeys } from './keys'
 
-export type ColumnPrivilegesGrant = components['schemas']['GrantColumnPrivilegesBody']
+export type ColumnPrivilegesGrant = {
+  column_id: string
+  grantee: string
+  privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
+  is_grantable?: boolean
+}
 
 export type ColumnPrivilegesGrantVariables = {
   projectRef: string
   connectionString?: string | null
-  grants: ColumnPrivilegesGrant
+  grants: ColumnPrivilegesGrant[]
 }
 
 export async function grantColumnPrivileges({
@@ -45,31 +49,33 @@ export const useColumnPrivilegesGrantMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ColumnPrivilegesGrantData, ResponseError, ColumnPrivilegesGrantVariables>,
+  UseCustomMutationOptions<
+    ColumnPrivilegesGrantData,
+    ResponseError,
+    ColumnPrivilegesGrantVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ColumnPrivilegesGrantData, ResponseError, ColumnPrivilegesGrantVariables>(
-    (vars) => grantColumnPrivileges(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<ColumnPrivilegesGrantData, ResponseError, ColumnPrivilegesGrantVariables>({
+    mutationFn: (vars) => grantColumnPrivileges(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: privilegeKeys.columnPrivilegesList(projectRef) }),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

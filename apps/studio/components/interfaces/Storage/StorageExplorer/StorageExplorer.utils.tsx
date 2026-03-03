@@ -1,10 +1,11 @@
 import { toast } from 'sonner'
 
-import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
 import { StorageObject } from 'data/storage/bucket-objects-list-mutation'
-import { SONNER_DEFAULT_DURATION, copyToClipboard } from 'ui'
+import { copyToClipboard } from 'ui'
+import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../CreateBucketModal.utils'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
-import { StorageItem, StorageItemMetadata, StorageItemWithColumn } from '../Storage.types'
+import { StorageItem, StorageItemMetadata } from '../Storage.types'
+import type { StorageExplorerState } from '@/state/storage-explorer'
 
 type UploadProgress = {
   percentage: number
@@ -17,7 +18,109 @@ type UploadProgress = {
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 export const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 
-export const copyPathToFolder = (openedFolders: StorageItem[], item: StorageItemWithColumn) => {
+/**
+ * Returns the path to the current folder, optionally prefixed with the bucket name.
+ */
+export function getPathAlongOpenedFolders(
+  state: Pick<StorageExplorerState, 'openedFolders' | 'selectedBucket'>,
+  includeBucket = true
+): string {
+  if (includeBucket) {
+    return state.openedFolders.length > 0
+      ? `${state.selectedBucket.name}/${state.openedFolders.map((folder) => folder.name).join('/')}`
+      : state.selectedBucket.name
+  }
+  return state.openedFolders.map((folder) => folder.name).join('/')
+}
+
+/**
+ * Returns the path to the folder at the given index in the openedFolders array,
+ * joining all folders from the root up to (but not including) the given index.
+ */
+export function getPathAlongFoldersToIndex(
+  state: Pick<StorageExplorerState, 'openedFolders'>,
+  index: number
+): string {
+  return state.openedFolders
+    .slice(0, index)
+    .map((folder) => folder.name)
+    .join('/')
+}
+
+/**
+ * Returns an error message string if the folder name contains invalid characters,
+ * or null if the name is valid.
+ */
+export function validateFolderName(name: string): string | null {
+  if (!validObjectKeyRegex.test(name)) {
+    const [match] = name.match(inverseValidObjectKeyRegex) ?? []
+    return !!match
+      ? `Folder name cannot contain the "${match}" character`
+      : 'Folder name contains an invalid special character'
+  }
+  return null
+}
+
+/**
+ * Checks whether `name` already exists in the column (case-insensitive).
+ * - When `autofix` is false and a duplicate is found, shows an error toast and returns null.
+ * - When `autofix` is true and a duplicate is found, appends a numeric suffix and returns the new name.
+ * - Returns the original name when there is no conflict.
+ *
+ * When `columnIndex` is omitted it defaults to the last column.
+ */
+export function sanitizeNameForDuplicateInColumn(
+  state: Pick<StorageExplorerState, 'columns'>,
+  {
+    name,
+    columnIndex,
+    autofix = false,
+  }: {
+    name: string
+    columnIndex?: number
+    autofix?: boolean
+  }
+): string | null {
+  const columnIndex_ = columnIndex !== undefined ? columnIndex : state.columns.length - 1
+  const currentColumn = state.columns[columnIndex_]
+  const currentColumnItems = currentColumn.items.filter(
+    (item) => item.status !== STORAGE_ROW_STATUS.EDITING
+  )
+  // [Joshen] JFYI storage does support folders of the same name with different casing
+  // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
+  // for folders of the same name with different casing
+  // We should remove this check once all projects are on the List V2 endpoint
+  const hasSameNameInColumn =
+    currentColumnItems.filter((item) => item.name.toLowerCase() === name.toLowerCase()).length > 0
+
+  if (hasSameNameInColumn) {
+    if (autofix) {
+      const fileNameSegments = name.split('.')
+      const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
+      const fileExt = fileNameSegments[fileNameSegments.length - 1]
+
+      const dupeNameRegex = new RegExp(`${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`)
+      const itemsWithSameNameInColumn = currentColumnItems.filter((item) =>
+        item.name.match(dupeNameRegex)
+      )
+
+      const updatedFileName = fileName + ` (${itemsWithSameNameInColumn.length + 1})`
+      return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
+    } else {
+      toast.error(
+        `The name ${name} already exists in the current directory. Please use a different name.`
+      )
+      return null
+    }
+  }
+
+  return name
+}
+
+export const copyPathToFolder = (
+  openedFolders: StorageItem[],
+  item: StorageItem & { columnIndex: number }
+) => {
   const folders = openedFolders.slice(0, item.columnIndex).map((folder) => folder.name)
   const path = folders.length > 0 ? `${folders.join('/')}/${item.name}` : item.name
   copyToClipboard(path)
@@ -36,67 +139,6 @@ export const formatTime = (seconds: number) => {
   if (hours > 0) return `${hours}h `
   if (minutes > 0) return `${minutes}m `
   return `${seconds}s`
-}
-
-export const downloadFile = async ({
-  projectRef,
-  bucketId,
-  file,
-  showToast = true,
-  returnBlob = false,
-}: {
-  projectRef?: string
-  bucketId?: string
-  file: StorageItemWithColumn
-  showToast?: boolean
-  returnBlob?: boolean
-}) => {
-  if (!projectRef) return toast.error('Failed to download: Project ref is required')
-  if (!bucketId) return toast.error('Failed to download: Bucket ID is required')
-  if (!file.path) return toast.error('Failed to download: Unable to find path to file')
-
-  const fileName: string = file.name
-  const fileMimeType = file?.metadata?.mimetype ?? undefined
-
-  const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
-
-  try {
-    const data = await downloadBucketObject({
-      projectRef,
-      bucketId,
-      path: file.path,
-    })
-
-    const blob = await data.blob()
-    const newBlob = new Blob([blob], { type: fileMimeType })
-    if (returnBlob) return { name: fileName, blob: newBlob }
-
-    const blobUrl = window.URL.createObjectURL(newBlob)
-    const link = document.createElement('a')
-    link.href = blobUrl
-    link.setAttribute('download', `${fileName}`)
-    document.body.appendChild(link)
-    link.click()
-    link.parentNode?.removeChild(link)
-    window.URL.revokeObjectURL(blob)
-    if (toastId) {
-      toast.success(`Downloading ${fileName}`, {
-        id: toastId,
-        closeButton: true,
-        duration: SONNER_DEFAULT_DURATION,
-      })
-    }
-    return true
-  } catch (err) {
-    if (toastId) {
-      toast.error(`Failed to download ${fileName}`, {
-        id: toastId,
-        closeButton: true,
-        duration: SONNER_DEFAULT_DURATION,
-      })
-    }
-    return false
-  }
 }
 
 export const calculateTotalRemainingTime = (progresses: UploadProgress[]) => {

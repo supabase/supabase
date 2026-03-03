@@ -1,10 +1,11 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import dayjs from 'dayjs'
 import { X } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Alert, Button } from 'ui'
@@ -18,9 +19,11 @@ export const ProjectUpgradeFailedBanner = () => {
   const { status, initiated_at, latest_status_at, error } = data?.databaseUpgradeStatus ?? {}
 
   const key = `supabase-upgrade-${ref}-${initiated_at}`
-  const isAcknowledged =
-    typeof window !== 'undefined' ? localStorage?.getItem(key) === 'true' : false
-  const [showMessage, setShowMessage] = useState(!isAcknowledged)
+
+  const [hasDismissed, setHasDismissed] = useState(false)
+  useEffect(() => {
+    setHasDismissed(localStorage?.getItem(key) === 'true')
+  }, [key])
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const initiatedAt = dayjs
@@ -43,11 +46,11 @@ export const ProjectUpgradeFailedBanner = () => {
   const timestampFilter = `its=${initiatedAtEncoded}&ite=${latestStatusAtEncoded}`
 
   const acknowledgeMessage = () => {
-    setShowMessage(false)
+    setHasDismissed(true)
     localStorage.setItem(key, 'true')
   }
 
-  if (!isFailed || !showMessage) return null
+  if (!isFailed || hasDismissed) return null
 
   return (
     <div className="max-w-7xl">
@@ -58,13 +61,16 @@ export const ProjectUpgradeFailedBanner = () => {
         actions={
           <div className="flex items-center h-full space-x-4">
             <Button asChild type="default">
-              <Link
-                href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                target="_blank"
-                rel="noreferrer"
+              <SupportLink
+                queryParams={{
+                  category: SupportCategories.DATABASE_UNRESPONSIVE,
+                  projectRef: ref,
+                  subject,
+                  message,
+                }}
               >
                 Contact support
-              </Link>
+              </SupportLink>
             </Button>
             <Button
               type="text"

@@ -7,7 +7,7 @@ run: download transform generate format
 ###############################################################################
 # Download all the specs
 ###############################################################################
-# commment out download.auth.v1 temporarily, we're manually creating the file
+# comment out download.auth.v1 temporarily, we're manually creating the file
 # download: download.api.v1 download.auth.v1 download.storage.v1 download.tsdoc.v2
 download: download.api.v1 download.storage.v1 download.tsdoc.v2
 
@@ -37,12 +37,12 @@ download.storage.v1:
 # 	curl -sS https://supabase.github.io/functions-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/functions.json
 
 download.tsdoc.v2:
-	curl -sS https://supabase.github.io/supabase-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/supabase.json
-	curl -sS https://supabase.github.io/auth-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/gotrue.json
-	curl -sS https://supabase.github.io/postgrest-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/postgrest.json
-	curl -sS https://supabase.github.io/realtime-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/realtime.json
-	curl -sS https://supabase.github.io/storage-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/storage.json
-	curl -sS https://supabase.github.io/functions-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/functions.json
+	curl -sS https://supabase.github.io/supabase-js/supabase-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/supabase.json
+	curl -sS https://supabase.github.io/supabase-js/auth-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/gotrue.json
+	curl -sS https://supabase.github.io/supabase-js/postgrest-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/postgrest.json
+	curl -sS https://supabase.github.io/supabase-js/realtime-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/realtime.json
+	curl -sS https://supabase.github.io/supabase-js/storage-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/storage.json
+	curl -sS https://supabase.github.io/supabase-js/functions-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/functions.json
 
 download.analytics.v0:
 	curl -sS https://logflare.app/api/openapi > $(REPO_DIR)/analytics_v0_openapi.json
@@ -53,16 +53,16 @@ download.analytics.v0:
 transform: dereference.api.v1  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v2
 
 dereference.api.v1:
-	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/api_v1_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/api_v1_openapi.json
 
 dereference.auth.v1:
-	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
 
 dereference.storage.v0:
-	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
 
 dereference.analytics.v0:
-	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
 
 # No longer updated
 # dereference.tsdoc.v1:
@@ -74,12 +74,12 @@ dereference.analytics.v0:
 # 	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:supabase:v1
 
 dereference.tsdoc.v2:
-	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:functions:v2
-	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:gotrue:v2
-	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:postgrest:v2
-	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:realtime:v2
-	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:storage:v2
-	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:supabase:v2
+	cd $(GENERATOR_DIR) && pnpm run tsdoc:dereference:functions:v2
+	cd $(GENERATOR_DIR) && pnpm run tsdoc:dereference:gotrue:v2
+	cd $(GENERATOR_DIR) && pnpm run tsdoc:dereference:postgrest:v2
+	cd $(GENERATOR_DIR) && pnpm run tsdoc:dereference:realtime:v2
+	cd $(GENERATOR_DIR) && pnpm run tsdoc:dereference:storage:v2
+	cd $(GENERATOR_DIR) && pnpm run tsdoc:dereference:supabase:v2
 
 # No longer updated
 # combine.tsdoc.v1:
@@ -125,7 +125,7 @@ generate.sections.api.v1:
 ###############################################################################
 
 validate.analytics.v0:
-	npx @redocly/cli lint --extends=minimal $(REPO_DIR)/analytics_v0_openapi.json
+	cd $(GENERATOR_DIR) && pnpm exec redocly lint --extends=minimal $(REPO_DIR)/analytics_v0_openapi.json
 
 ###############################################################################
 # Format everything - easier for git to track changes.

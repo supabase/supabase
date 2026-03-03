@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { fetchHandler, handleError } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'sonner'
 
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type CheckCNAMERecordVariables = {
   domain: string
@@ -47,23 +47,21 @@ export const useCheckCNAMERecordMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>,
+  UseCustomMutationOptions<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>(
-    (vars) => checkCNAMERecord(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to check CNAME record: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>({
+    mutationFn: (vars) => checkCNAMERecord(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to check CNAME record: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

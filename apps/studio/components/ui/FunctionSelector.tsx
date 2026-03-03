@@ -7,6 +7,7 @@ import {
   DatabaseFunctionsData,
   useDatabaseFunctionsQuery,
 } from 'data/database-functions/database-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
@@ -26,7 +27,6 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 type DatabaseFunction = DatabaseFunctionsData[number]
 
@@ -59,7 +59,14 @@ const FunctionSelector = ({
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
 
-  const { data, error, isLoading, isError, isSuccess, refetch } = useDatabaseFunctionsQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+    refetch,
+  } = useDatabaseFunctionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

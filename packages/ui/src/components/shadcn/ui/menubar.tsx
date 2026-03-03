@@ -6,7 +6,7 @@ import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 
-const MenubarMenu = MenubarPrimitive.Menu
+const MenubarMenu = MenubarPrimitive.Menu as typeof MenubarPrimitive.Menu
 
 const MenubarGroup = MenubarPrimitive.Group
 

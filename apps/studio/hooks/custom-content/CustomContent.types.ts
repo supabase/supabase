@@ -1,7 +1,11 @@
 import type { CloudProvider } from 'shared-data'
 
 export type CustomContentTypes = {
+  appTitle: string
+
   dashboardAuthCustomProvider: string
+
+  docsRowLevelSecurityGuidePath: string
 
   organizationLegalDocuments: {
     id: string
@@ -15,7 +19,7 @@ export type CustomContentTypes = {
     officialSupport: boolean
     releaseState?: string
     docsUrl: string
-    gitUrl: string
+    gitUrl?: string
     altIconName?: string
   }[]
   projectHomepageExampleProjects: {

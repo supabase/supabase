@@ -4,9 +4,9 @@ import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 import 'reactflow/dist/style.css'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { tryParseJson } from 'lib/helpers'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
-import { LOCAL_STORAGE_KEYS } from 'common'
 
 const NODE_SEP = 25
 const RANK_SEP = 50
@@ -37,16 +37,19 @@ export async function getGraphDataFromTables(
       }
     })
 
+    const data: TableNodeData = {
+      ref,
+      id: table.id,
+      name: table.name,
+      schema: table.schema,
+      isForeign: false,
+      columns,
+    }
+
     return {
+      data,
       id: `${table.id}`,
       type: 'table',
-      data: {
-        ref,
-        id: table.id,
-        name: table.name,
-        isForeign: false,
-        columns,
-      } as TableNodeData,
       position: { x: 0, y: 0 },
     }
   })
@@ -66,17 +69,26 @@ export async function getGraphDataFromTables(
 
     // Create additional [this->foreign] node that we can point to on the graph.
     if (rel.target_table_schema !== currentSchema) {
-      nodes.push({
-        id: rel.constraint_name,
-        type: 'table',
-        data: {
-          ref,
-          name: `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`,
+      const targetId = `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`
+
+      const targetNode = nodes.find((n) => n.id === targetId)
+      if (!targetNode) {
+        const data: TableNodeData = {
+          id: rel.id,
+          ref: ref!,
+          schema: rel.target_table_schema,
+          name: targetId,
           isForeign: true,
           columns: [],
-        } as TableNodeData,
-        position: { x: 0, y: 0 },
-      })
+        }
+
+        nodes.push({
+          id: targetId,
+          type: 'table',
+          data: data,
+          position: { x: 0, y: 0 },
+        })
+      }
 
       const [source, sourceHandle] = findTablesHandleIds(
         tables,
@@ -89,8 +101,8 @@ export async function getGraphDataFromTables(
           id: String(rel.id),
           source,
           sourceHandle,
-          target: rel.constraint_name,
-          targetHandle: rel.constraint_name,
+          target: targetId,
+          targetHandle: targetId,
         })
       }
 

@@ -1,15 +1,14 @@
 import { useIsLoggedIn, useParams } from 'common'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import CopyButton from 'components/ui/CopyButton'
-import { Loading } from 'components/ui/Loading'
 import { createCliLoginSession } from 'data/cli/login'
 import { withAuth } from 'hooks/misc/withAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { NextPageWithLayout } from 'types'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from 'ui'
+import type { NextPageWithLayout } from 'types'
+import { InputOTP, InputOTPGroup, InputOTPSlot, LogoLoader } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const CliLoginPage: NextPageWithLayout = () => {
@@ -56,7 +55,7 @@ const CliLoginPage: NextPageWithLayout = () => {
               <InputOTP maxLength={8} value={device_code} disabled>
                 <InputOTPGroup>
                   {Array.from({ length: 8 }, (_, i) => (
-                    <InputOTPSlot className="text-xl" index={i} />
+                    <InputOTPSlot key={i} className="text-xl" index={i} />
                   ))}
                 </InputOTPGroup>
               </InputOTP>
@@ -77,7 +76,7 @@ const CliLoginPage: NextPageWithLayout = () => {
             />
           </>
         ) : (
-          <Loading />
+          <LogoLoader />
         )}
       </div>
     </APIAuthorizationLayout>

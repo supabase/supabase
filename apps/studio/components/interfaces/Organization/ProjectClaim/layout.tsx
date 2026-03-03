@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { PropsWithChildren, ReactNode } from 'react'
 
 import { UserDropdown } from 'components/interfaces/UserDropdown'
-import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
+import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown/FeedbackDropdown'
 import { BASE_PATH } from 'lib/constants'
 import { cn, Separator } from 'ui'
 

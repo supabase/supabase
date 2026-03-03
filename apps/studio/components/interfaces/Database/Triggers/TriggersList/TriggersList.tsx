@@ -1,50 +1,57 @@
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import { Plus, Search } from 'lucide-react'
-import { useState } from 'react'
-
-import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { DOCS_URL } from 'lib/constants'
+import { DatabaseZap, Search } from 'lucide-react'
+import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { CreateTriggerButtons } from './CreateTriggerButtons'
+import { TriggerList } from './TriggerList'
+import { generateTriggerCreateSQL } from './TriggerList.utils'
 import {
-  AiIconAnimation,
-  Card,
-  Input,
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
-import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
-import TriggerList from './TriggerList'
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 
-interface TriggersListProps {
-  createTrigger: () => void
-  editTrigger: (trigger: PostgresTrigger) => void
-  deleteTrigger: (trigger: PostgresTrigger) => void
-}
-
-const TriggersList = ({
-  createTrigger = noop,
-  editTrigger = noop,
-  deleteTrigger = noop,
-}: TriggersListProps) => {
+export const TriggersList = () => {
   const { data: project } = useSelectedProjectQuery()
-  const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [filterString, setFilterString] = useState<string>('')
+
+  const [filterString, setFilterString] = useQueryState('search', parseAsString.withDefault(''))
+  const [tablesFilter, setTablesFilter] = useQueryState(
+    'tables',
+    parseAsJson(selectFilterSchema.parse).withDefault([])
+  )
+
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const {
+    templates: editorPanelTemplates,
+    setValue: setEditorPanelValue,
+    setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
+  } = useEditorPanelStateSnapshot()
 
   const { data: protectedSchemas } = useProtectedSchemas()
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -57,9 +64,10 @@ const TriggersList = ({
     data.filter((a) => !protectedSchemas.find((s) => s.name === a.schema)).length > 0
 
   const {
-    data: triggers,
+    data: triggers = [],
     error,
-    isLoading,
+    isPending,
+    isSuccess,
     isError,
   } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -71,7 +79,109 @@ const TriggersList = ({
     'triggers'
   )
 
-  if (isLoading) {
+  const [showCreateTriggerForm, setShowCreateTriggerForm] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const [triggerIdToEdit, setTriggerToEdit] = useQueryState('edit', parseAsString)
+  const triggerToEdit = triggers?.find((fn) => fn.id.toString() === triggerIdToEdit)
+
+  const [triggerIdToDuplicate, setTriggerToDuplicate] = useQueryState('duplicate', parseAsString)
+  const triggerToDuplicate = triggers?.find((fn) => fn.id.toString() === triggerIdToDuplicate)
+
+  const [triggerIdToDelete, setTriggerToDelete] = useQueryState('delete', parseAsString)
+  const triggerToDelete = triggers?.find((fn) => fn.id.toString() === triggerIdToDelete)
+
+  const {
+    mutate: deleteDatabaseTrigger,
+    isPending: isDeletingTrigger,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseTriggerDeleteMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Successfully removed ${variables.trigger.name}`)
+      setTriggerToDelete(null)
+    },
+  })
+
+  const createTrigger = () => {
+    setTriggerToDuplicate(null)
+    if (isInlineEditorEnabled) {
+      setEditorPanelInitialPrompt('Create a new database trigger that...')
+      setEditorPanelValue(`create trigger trigger_name
+after insert or update or delete on table_name
+for each row
+execute function function_name();`)
+      if (editorPanelTemplates.length > 0) {
+        setEditorPanelTemplates([])
+      }
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setShowCreateTriggerForm(true)
+    }
+  }
+
+  const editTrigger = (trigger: PostgresTrigger) => {
+    setTriggerToDuplicate(null)
+    if (isInlineEditorEnabled) {
+      setEditorPanelValue(generateTriggerCreateSQL(trigger))
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setTriggerToEdit(trigger.id.toString())
+    }
+  }
+
+  const duplicateTrigger = (trigger: PostgresTrigger) => {
+    if (isInlineEditorEnabled) {
+      const dupTrigger = {
+        ...trigger,
+        name: `${trigger.name}_duplicate`,
+      }
+      setEditorPanelValue(generateTriggerCreateSQL(dupTrigger))
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setTriggerToDuplicate(trigger.id.toString())
+    }
+  }
+
+  const onDeleteTrigger = () => {
+    if (!project) return console.error('Project is required')
+    if (!triggerToDelete) return console.error('Trigger ID is required')
+
+    deleteDatabaseTrigger({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      trigger: triggerToDelete,
+    })
+  }
+
+  const schemaTriggers = triggers.filter((x) => x.schema === selectedSchema)
+  const tables = Array.from(new Set(schemaTriggers.map((x) => x.table))).sort()
+
+  useEffect(() => {
+    if (isSuccess && !!triggerIdToEdit && !triggerToEdit) {
+      toast('Trigger not found')
+      setTriggerToEdit(null)
+    }
+  }, [isSuccess, setTriggerToEdit, triggerIdToEdit, triggerToEdit])
+
+  useEffect(() => {
+    if (isSuccess && !!triggerIdToDuplicate && !triggerToDuplicate) {
+      toast('Trigger not found')
+      setTriggerToDuplicate(null)
+    }
+  }, [isSuccess, triggerIdToDuplicate, triggerToDuplicate, setTriggerToDuplicate])
+
+  useEffect(() => {
+    if (isSuccess && !!triggerIdToDelete && !triggerToDelete && !isSuccessDelete) {
+      toast('Trigger not found')
+      setTriggerToDelete(null)
+    }
+  }, [isSuccess, triggerIdToDelete, triggerToDelete, isSuccessDelete, setTriggerToDelete])
+
+  if (isPending) {
     return <GenericSkeletonLoader />
   }
 
@@ -81,113 +191,64 @@ const TriggersList = ({
 
   return (
     <>
-      {(triggers ?? []).length === 0 ? (
-        <div className="flex h-full w-full items-center justify-center">
-          <ProductEmptyState
-            title="Triggers"
-            ctaButtonLabel="Create a new trigger"
-            onClickCta={() => createTrigger()}
-          >
-            <AlphaPreview />
-            <p className="text-sm text-foreground-light">
-              A PostgreSQL trigger is a function invoked automatically whenever an event associated
-              with a table occurs.
-            </p>
-            <p className="text-sm text-foreground-light">
-              An event could be any of the following: INSERT, UPDATE, DELETE. A trigger is a special
-              user-defined function associated with a table.
-            </p>
-          </ProductEmptyState>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
-            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-              <SchemaSelector
-                className="w-full lg:w-[180px]"
-                size="tiny"
-                showError={false}
-                selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
-              />
-              <Input
-                placeholder="Search for a trigger"
-                size="tiny"
-                icon={<Search size="14" />}
-                value={filterString}
-                className="w-full lg:w-52"
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-            </div>
+      <div className="space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
+            <SchemaSelector
+              className="w-full lg:w-[180px]"
+              size="tiny"
+              showError={false}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
+            />
+            <Input
+              placeholder="Search for a trigger"
+              size="tiny"
+              icon={<Search />}
+              value={filterString}
+              className="w-full lg:w-52"
+              onChange={(e) => setFilterString(e.target.value)}
+            />
+            <ReportsSelectFilter
+              label="Table"
+              options={tables.map((type) => ({ label: type, value: type }))}
+              value={tablesFilter ?? []}
+              onChange={setTablesFilter}
+              showSearch
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <DocsButton href={`${DOCS_URL}/guides/database/postgres/triggers`} />
             {!isSchemaLocked && (
-              <div className="flex items-center gap-x-2">
-                <ButtonTooltip
-                  disabled={!hasTables || !canCreateTriggers}
-                  icon={<Plus />}
-                  onClick={() => createTrigger()}
-                  className="flex-grow"
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !hasTables
-                        ? 'Create a table first before creating triggers'
-                        : !canCreateTriggers
-                          ? 'You need additional permissions to create triggers'
-                          : undefined,
-                    },
-                  }}
-                >
-                  New trigger
-                </ButtonTooltip>
-
-                {hasTables && (
-                  <ButtonTooltip
-                    type="default"
-                    disabled={!hasTables || !canCreateTriggers}
-                    className="px-1 pointer-events-auto"
-                    icon={<AiIconAnimation size={16} />}
-                    onClick={() =>
-                      aiSnap.newChat({
-                        name: 'Create new trigger',
-                        open: true,
-                        initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
-                        suggestions: {
-                          title:
-                            'I can help you create a new trigger, here are a few example prompts to get you started:',
-                          prompts: [
-                            {
-                              label: 'Log Changes',
-                              description: 'Create a trigger that logs changes to the users table',
-                            },
-                            {
-                              label: 'Update Timestamp',
-                              description: 'Create a trigger that updates updated_at timestamp',
-                            },
-                            {
-                              label: 'Validate Email',
-                              description:
-                                'Create a trigger that validates email format before insert',
-                            },
-                          ],
-                        },
-                      })
-                    }
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canCreateTriggers
-                          ? 'You need additional permissions to create triggers'
-                          : 'Create with Supabase Assistant',
-                      },
-                    }}
-                  />
-                )}
-              </div>
+              <CreateTriggerButtons
+                hasTables={hasTables}
+                canCreateTriggers={canCreateTriggers}
+                selectedSchema={selectedSchema}
+                onCreateTrigger={createTrigger}
+                showPlusIcon={true}
+              />
             )}
           </div>
+        </div>
 
-          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
+        {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
+        {!isSchemaLocked && (schemaTriggers ?? []).length === 0 ? (
+          <EmptyStatePresentational
+            icon={DatabaseZap}
+            title="Add your first trigger"
+            description="Make your database reactive. Send updates in realtime, call edge functions, or validate data as it comes in."
+          >
+            <CreateTriggerButtons
+              hasTables={hasTables}
+              canCreateTriggers={canCreateTriggers}
+              selectedSchema={selectedSchema}
+              onCreateTrigger={createTrigger}
+              showPlusIcon={false}
+              buttonType="default"
+            />
+          </EmptyStatePresentational>
+        ) : (
           <div className="w-full overflow-hidden overflow-x-auto">
             <Card>
               <Table>
@@ -206,20 +267,49 @@ const TriggersList = ({
                 </TableHeader>
                 <TableBody>
                   <TriggerList
-                    schema={selectedSchema}
-                    filterString={filterString}
-                    isLocked={isSchemaLocked}
                     editTrigger={editTrigger}
-                    deleteTrigger={deleteTrigger}
+                    duplicateTrigger={duplicateTrigger}
+                    deleteTrigger={(trigger) => setTriggerToDelete(trigger.id.toString())}
                   />
                 </TableBody>
               </Table>
             </Card>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      <TriggerSheet
+        selectedTrigger={triggerToEdit || triggerToDuplicate}
+        open={showCreateTriggerForm || !!triggerToEdit || !!triggerToDuplicate}
+        onClose={() => {
+          setShowCreateTriggerForm(false)
+          setTriggerToEdit(null)
+          setTriggerToDuplicate(null)
+        }}
+        isDuplicatingTrigger={!!triggerToDuplicate}
+      />
+
+      <TextConfirmModal
+        variant="warning"
+        visible={!!triggerToDelete}
+        onCancel={() => setTriggerToDelete(null)}
+        onConfirm={() => onDeleteTrigger()}
+        title="Delete this trigger"
+        loading={isDeletingTrigger}
+        confirmLabel={`Delete trigger ${triggerToDelete?.name}`}
+        confirmPlaceholder="Type in name of trigger"
+        confirmString={triggerToDelete?.name ?? ''}
+        text={
+          <>
+            This will delete your trigger called{' '}
+            <span className="text-bold text-foreground">{triggerToDelete?.name}</span> of schema{' '}
+            <span className="text-bold text-foreground">{triggerToDelete?.schema}</span>
+          </>
+        }
+        alert={{
+          title: 'You cannot recover this trigger once deleted.',
+        }}
+      />
     </>
   )
 }
-
-export default TriggersList

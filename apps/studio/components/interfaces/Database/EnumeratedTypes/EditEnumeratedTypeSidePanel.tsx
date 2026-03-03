@@ -41,7 +41,7 @@ const EditEnumeratedTypeSidePanel = ({
 }: EditEnumeratedTypeSidePanelProps) => {
   const submitRef = useRef<HTMLButtonElement>(null)
   const { data: project } = useSelectedProjectQuery()
-  const { mutate: updateEnumeratedType, isLoading: isCreating } = useEnumeratedTypeUpdateMutation({
+  const { mutate: updateEnumeratedType, isPending: isCreating } = useEnumeratedTypeUpdateMutation({
     onSuccess: (_, vars) => {
       toast.success(`Successfully updated type "${vars.name.updated}"`)
       onClose()

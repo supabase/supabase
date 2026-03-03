@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { handleError, post } from 'data/fetchers'
 import type { SubscriptionTier } from 'data/subscriptions/types'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationBillingSubscriptionPreviewVariables = {
@@ -81,31 +81,11 @@ export const useOrganizationBillingSubscriptionPreview = <
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationBillingSubscriptionPreviewData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationBillingSubscriptionPreviewData, ResponseError, TData> = {}
 ) =>
-  useQuery<OrganizationBillingSubscriptionPreviewData, ResponseError, TData>(
-    organizationKeys.subscriptionPreview(organizationSlug, tier),
-    () => previewOrganizationBillingSubscription({ organizationSlug, tier }),
-    {
-      enabled: enabled && typeof organizationSlug !== 'undefined' && typeof tier !== 'undefined',
-      ...options,
-
-      retry: (failureCount, error) => {
-        // Don't retry on 400s
-        if (
-          typeof error === 'object' &&
-          error !== null &&
-          'code' in error &&
-          (error as any).code === 400
-        ) {
-          return false
-        }
-
-        if (failureCount < 3) {
-          return true
-        }
-
-        return false
-      },
-    }
-  )
+  useQuery<OrganizationBillingSubscriptionPreviewData, ResponseError, TData>({
+    queryKey: organizationKeys.subscriptionPreview(organizationSlug, tier),
+    queryFn: () => previewOrganizationBillingSubscription({ organizationSlug, tier }),
+    enabled: enabled && typeof organizationSlug !== 'undefined' && typeof tier !== 'undefined',
+    ...options,
+  })

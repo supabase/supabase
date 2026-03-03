@@ -1,8 +1,6 @@
 import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { useId, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { z } from 'zod'
-
-import { useMemo, useState } from 'react'
 import {
   Button,
   cn,
@@ -16,12 +14,13 @@ import {
   FormField_Shadcn_ as FormField,
   FormMessage_Shadcn_ as FormMessage,
   Input_Shadcn_ as Input,
-  Input_Shadcn_,
   Popover_Shadcn_ as Popover,
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import { COUNTRIES } from './BillingAddress.constants'
 import { TAX_IDS } from './TaxID.constants'
 
@@ -54,6 +53,8 @@ export const BillingCustomerDataForm = ({
 }: BillingCustomerDataFormProps) => {
   const [showCountriesPopover, setShowCountriesPopover] = useState(false)
   const [showTaxIDsPopover, setShowTaxIDsPopover] = useState(false)
+  const countryListboxId = useId()
+  const taxIdListboxId = useId()
 
   const onSelectTaxIdType = (name: string) => {
     const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
@@ -83,7 +84,7 @@ export const BillingCustomerDataForm = ({
       <FormField
         control={form.control}
         name="billing_name"
-        render={({ field }: { field: any }) => (
+        render={({ field }) => (
           <FormItemLayout hideMessage label="Name">
             <FormControl>
               <Input {...field} disabled={disabled} />
@@ -96,7 +97,7 @@ export const BillingCustomerDataForm = ({
       <FormField
         control={form.control}
         name="line1"
-        render={({ field }: { field: any }) => (
+        render={({ field }) => (
           <FormItemLayout hideMessage label="Address line 1">
             <FormControl>
               <Input {...field} placeholder="123 Main Street" disabled={disabled} />
@@ -109,7 +110,7 @@ export const BillingCustomerDataForm = ({
       <FormField
         control={form.control}
         name="line2"
-        render={({ field }: { field: any }) => (
+        render={({ field }) => (
           <FormItemLayout hideMessage label="Address line 2 (optional)">
             <FormControl>
               <Input
@@ -127,7 +128,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           control={form.control}
           name="country"
-          render={({ field }: { field: any }) => (
+          render={({ field }) => (
             <FormItemLayout hideMessage label="Country">
               <Popover open={showCountriesPopover} onOpenChange={setShowCountriesPopover}>
                 <PopoverTrigger asChild>
@@ -137,6 +138,8 @@ export const BillingCustomerDataForm = ({
                       role="combobox"
                       size="medium"
                       disabled={disabled}
+                      aria-expanded={showCountriesPopover}
+                      aria-controls={countryListboxId}
                       className={cn(
                         'w-full justify-between h-[34px]',
                         !field.value && 'text-muted'
@@ -155,7 +158,12 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                <PopoverContent
+                  id={countryListboxId}
+                  sameWidthAsTrigger
+                  className="p-0"
+                  align="start"
+                >
                   <Command>
                     <CommandInput placeholder="Search country..." />
                     <CommandList>
@@ -195,7 +203,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           control={form.control}
           name="postal_code"
-          render={({ field }: { field: any }) => (
+          render={({ field }) => (
             <FormItemLayout hideMessage label="Postal code">
               <FormControl>
                 <Input {...field} placeholder="12345" disabled={disabled} />
@@ -210,7 +218,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           control={form.control}
           name="city"
-          render={({ field }: { field: any }) => (
+          render={({ field }) => (
             <FormItemLayout hideMessage label="City">
               <FormControl>
                 <Input {...field} disabled={disabled} />
@@ -222,7 +230,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           control={form.control}
           name="state"
-          render={({ field }: { field: any }) => (
+          render={({ field }) => (
             <FormItemLayout hideMessage label="State / Province">
               <FormControl>
                 <Input {...field} disabled={disabled} />
@@ -237,7 +245,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           name="tax_id_name"
           control={form.control}
-          render={({ field }) => (
+          render={() => (
             <FormItemLayout hideMessage layout="vertical" label="Tax ID">
               <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
                 <PopoverTrigger asChild>
@@ -247,15 +255,14 @@ export const BillingCustomerDataForm = ({
                       role="combobox"
                       size="medium"
                       disabled={disabled}
+                      aria-expanded={showTaxIDsPopover}
+                      aria-controls={taxIdListboxId}
                       className={cn(
-                        'w-full justify-between h-[34px]',
+                        'w-full justify-between h-[34px] pr-2',
                         !selectedTaxId && 'text-muted'
                       )}
                       iconRight={
-                        <ChevronsUpDown
-                          className="ml-2 h-4 w-4 shrink-0 opacity-50"
-                          strokeWidth={1.5}
-                        />
+                        <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1.5} />
                       }
                     >
                       {selectedTaxId
@@ -264,7 +271,12 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                <PopoverContent
+                  id={taxIdListboxId}
+                  sameWidthAsTrigger
+                  className="p-0"
+                  align="start"
+                >
                   <Command>
                     <CommandInput placeholder="Search tax ID..." />
                     <CommandList>
@@ -299,17 +311,17 @@ export const BillingCustomerDataForm = ({
         />
 
         {selectedTaxId && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 [&>div]:w-full">
             <FormField
               name="tax_id_value"
               control={form.control}
               render={({ field }) => (
-                <FormItemLayout hideMessage className="w-full">
+                <FormItemLayout hideMessage>
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       {...field}
-                      placeholder={selectedTaxId?.placeholder}
                       disabled={disabled}
+                      placeholder={selectedTaxId?.placeholder}
                     />
                   </FormControl>
                 </FormItemLayout>

@@ -3,14 +3,21 @@
  *
  * If Elements is on a higher level, we risk losing all form state in case a payment fails.
  */
-
+import { zodResolver } from '@hookform/resolvers/zod'
 import { AddressElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import type { PaymentMethod } from '@stripe/stripe-js'
 import {
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
   type SetupIntent,
 } from '@stripe/stripe-js'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
+import { Form } from '@ui/components/shadcn/ui/form'
+import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
+import { getURL } from 'lib/helpers'
+import { Check, ChevronsUpDown } from 'lucide-react'
+import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -31,19 +38,8 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
-import {
-  TAX_IDS,
-  type TaxId,
-} from '../../../Organization/BillingSettings/BillingCustomerData/TaxID.constants'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { Form } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { getURL } from 'lib/helpers'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
-import type { PaymentMethod } from '@stripe/stripe-js'
+import { z } from 'zod'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
@@ -76,7 +72,7 @@ export type PaymentMethodElementRef = {
   >
 }
 
-const NewPaymentMethodElement = forwardRef(
+export const NewPaymentMethodElement = forwardRef(
   (
     {
       email,
@@ -114,6 +110,7 @@ const NewPaymentMethodElement = forwardRef(
     const [fullyLoaded, setFullyLoaded] = useState(false)
 
     const [showTaxIDsPopover, setShowTaxIDsPopover] = useState(false)
+    const taxIdListboxId = useId()
 
     const onSelectTaxIdType = (name: string) => {
       const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
@@ -242,9 +239,9 @@ const NewPaymentMethodElement = forwardRef(
     }, [availableTaxIds, stripeAddress])
 
     return (
-      <div className="space-y-4">
-        <p className="text-sm text-foreground-light mb-2">
-          Please ensure CVC and postal codes match what is on file for your card.
+      <div className="space-y-2">
+        <p className="text-sm text-foreground-lighter">
+          Please ensure CVC and postal codes match what’s on file for your card.
         </p>
 
         <PaymentElement
@@ -256,14 +253,14 @@ const NewPaymentMethodElement = forwardRef(
         />
 
         {fullyLoaded && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 py-4">
             <Checkbox_Shadcn_
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
             />
-            <label htmlFor="business" className="text-foreground-light text-sm leading-none">
-              I'm purchasing as a business
+            <label htmlFor="business" className="text-foreground text-sm leading-none">
+              I’m purchasing as a business
             </label>
           </div>
         )}
@@ -291,6 +288,8 @@ const NewPaymentMethodElement = forwardRef(
                             type="default"
                             role="combobox"
                             size="medium"
+                            aria-expanded={showTaxIDsPopover}
+                            aria-controls={taxIdListboxId}
                             className={cn(
                               'w-full justify-between h-[34px]',
                               !selectedTaxId && 'text-muted'
@@ -308,7 +307,12 @@ const NewPaymentMethodElement = forwardRef(
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                      <PopoverContent
+                        id={taxIdListboxId}
+                        sameWidthAsTrigger
+                        className="p-0"
+                        align="start"
+                      >
                         <Command>
                           <CommandInput placeholder="Search tax ID..." />
                           <CommandList>
@@ -367,5 +371,3 @@ const NewPaymentMethodElement = forwardRef(
 )
 
 NewPaymentMethodElement.displayName = 'NewPaymentMethodElement'
-
-export { NewPaymentMethodElement }

@@ -37,7 +37,7 @@ You will be using the [Supabase CLI](/docs/guides/cli) to initialise your local 
     <StepHikeCompact.Step step={2}>
         <StepHikeCompact.Details title="Pull your database migration" fullWidth>
 
-            Pull your database changes using `supabase db pull`. To get your database connection string, go to your project dashboard, click [Connect](/dashboard/project/_?showConnect=true) and look for the Session pooler connection string.
+            Pull your database changes using `supabase db pull`. To get your database connection string, go to your project dashboard, click [Connect](/dashboard/project/_?showConnect=true&method=session) and look for the Session pooler connection string.
 
             ```markdown
             supabase db pull --db-url <db_connection_string>
@@ -112,11 +112,13 @@ All other configurations, including API, Auth, and seed files, are ignored by de
 We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
 
 <Image
-  zoomable
-  className="max-w-[700px] !mx-auto"
-  alt='Check the "Require status checks to pass before merging" option.'
-  caption='Check the "Require status checks to pass before merging" option.'
-  src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1"
+
+className="max-w-[700px] !mx-auto"
+alt='Check the "Require status checks to pass before merging" option.'
+caption='Check the "Require status checks to pass before merging" option.'
+src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1"
+width={1140}
+height={979}
 />
 
 ### Email notifications

@@ -1,3 +1,4 @@
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { Button } from 'ui'
@@ -21,7 +22,7 @@ export default function EmptyPageState({ error }: any) {
           <Link href="/projects">Head back</Link>
         </Button>
         <Button asChild type="secondary">
-          <Link href="/support/new">Submit a support request</Link>
+          <SupportLink>Submit a support request</SupportLink>
         </Button>
       </div>
       <p className="text-sm text-foreground-light">

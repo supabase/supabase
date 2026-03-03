@@ -4,19 +4,16 @@ import { formatSortURLParams, sortsToUrlParams } from 'components/grid/SupabaseG
 import type { Sort } from 'components/grid/types'
 import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { useSaveTableEditorState } from './useSaveTableEditorState'
 
 /**
  * Hook for managing table sort URL parameters and saving.
  * Uses snapshot ONLY to get table name for formatting/mapping.
- * Uses useSaveTableEditorState for saving and side effects.
  * Does NOT format initial sorts (needs table name externally).
  * Does NOT interact with snapshot directly.
  */
 export function useTableSort() {
   const { sorts: urlSorts, setParams } = useTableEditorFiltersSort()
   const snap = useTableEditorTableStateSnapshot()
-  const { saveSortsAndTriggerSideEffects } = useSaveTableEditorState()
 
   const tableName = useMemo(() => snap.table?.name || '', [snap])
 
@@ -36,10 +33,8 @@ export function useTableSort() {
       const newUrlSorts = sortsToUrlParams(sortsWithTable)
 
       setParams((prevParams) => ({ ...prevParams, sort: newUrlSorts }))
-
-      saveSortsAndTriggerSideEffects(newUrlSorts)
     },
-    [snap, setParams, saveSortsAndTriggerSideEffects]
+    [snap, setParams]
   )
 
   /**

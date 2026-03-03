@@ -24,9 +24,7 @@ const NewFeatureCard = (props: CardProps) => (
     <div className="relative z-10 flex flex-col gap-4 p-4 md:p-8 h-full">
       <div className="flex items-center gap-2">
         <h4 className="text-lg text-foreground">{props.title}</h4>
-        {props.badge && (
-          <Badge className="border-strong !bg-alternative-200 text-foreground">{props.badge}</Badge>
-        )}
+        {props.badge && <Badge variant="success">{props.badge}</Badge>}
       </div>
       <div className="flex flex-col w-full xl:w-2/3 flex-grow mb-4 sm:mb-10 lg:mb-8 2xl:xl:mb-32">
         <ul className="flex flex-col text-foreground-lighter text-sm gap-1">

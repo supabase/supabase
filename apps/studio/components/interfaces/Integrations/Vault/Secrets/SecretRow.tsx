@@ -1,7 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import dayjs from 'dayjs'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
+import type { VaultSecret } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -9,29 +16,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
-import type { VaultSecret } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import EditSecretModal from './EditSecretModal'
-import type { SecretTableColumn } from './Secrets.utils'
+
+import { SecretTableColumn } from './Secrets.types'
 
 interface SecretRowProps {
   row: VaultSecret
   col: SecretTableColumn
-  onSelectRemove: (secret: VaultSecret) => void
 }
 
-const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
+export const SecretRow = ({ row, col }: SecretRowProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [modal, setModal] = useState<string | null>(null)
   const [revealSecret, setRevealSecret] = useState(false)
   const name = row?.name ?? 'No name provided'
+
+  const [, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
+  const [, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
 
   const { can: canManageSecrets } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -49,8 +50,6 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
     }
   )
 
-  const onCloseModal = () => setModal(null)
-
   if (col.id === 'actions') {
     return (
       <div className="flex items-center justify-end w-full" onClick={(e) => e.stopPropagation()}>
@@ -62,7 +61,7 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!canManageSecrets}
-              onClick={() => setModal(`edit`)}
+              onClick={() => setSelectedSecretToEdit(row.id)}
               tooltip={{
                 content: { side: 'left', text: 'You need additional permissions to edit secrets' },
               }}
@@ -76,7 +75,7 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!canManageSecrets}
-              onClick={() => onSelectRemove(row)}
+              onClick={() => setSelectedSecretToDelete(row.id)}
               tooltip={{
                 content: {
                   side: 'left',
@@ -89,8 +88,6 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
             </DropdownMenuItemTooltip>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <EditSecretModal visible={modal === `edit`} secret={row} onClose={onCloseModal} />
       </div>
     )
   }
@@ -147,16 +144,16 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
 
   return (
     <div className="w-full flex flex-col justify-center">
-      <p className="text-xs text-foreground truncate" title={name}>
+      <p className="text-xs text-foreground truncate select-text" title={name}>
         {name}
       </p>
       {row.description !== undefined && row.description !== '' && (
         <div>
-          <p className="text-xs text-foreground-lighter w-full truncate">{row.description}</p>
+          <p className="text-xs text-foreground-lighter w-full truncate select-text">
+            {row.description}
+          </p>
         </div>
       )}
     </div>
   )
 }
-
-export default SecretRow

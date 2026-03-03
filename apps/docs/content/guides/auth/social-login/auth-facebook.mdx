@@ -8,9 +8,10 @@ To enable Facebook Auth for your project, you need to set up a Facebook OAuth ap
 
 ## Overview
 
-Setting up Facebook logins for your application consists of 3 parts:
+Setting up Facebook logins for your application consists of 4 parts:
 
 - Create and configure a Facebook Application on the [Facebook Developers Site](https://developers.facebook.com)
+- **Configure email permissions** in your Facebook app (required for Supabase Auth)
 - Add your Facebook keys to your [Supabase Project](/dashboard)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
@@ -35,19 +36,39 @@ Setting up Facebook logins for your application consists of 3 parts:
 
 From the `Add Products to your App` screen:
 
-- Click `Setup` under `Facebook Login`
-- Skip the Quickstart screen, instead, in the left sidebar, click `Settings` under `Facebook Login`
-- Enter your callback URI under `Valid OAuth Redirect URIs` on the `Facebook Login Settings` page
-- Enter this in the `Valid OAuth Redirect URIs` box
-- Click `Save Changes` at the bottom right
+- Click **Setup** under **Facebook Login**
+- Skip the Quickstart screen. Instead, in the left sidebar, click **Settings** under **Facebook Login**
+- Enter your callback URI under **Valid OAuth Redirect URIs** on the **Facebook Login Settings** page
+- Click **Save Changes** at the bottom right
 
-Be aware that you have to set the right use case permissions to enable Third party applications to read the email address. To do so:
+<Admonition type="tip">
 
-Under `Build Your App`, click on `Use Cases` screen. From there, do the following steps:
+Your callback URI follows this pattern: `https://<project-ref>.supabase.co/auth/v1/callback`
 
-- Click the Edit button in `Authentication and Account Creation` on the right side. This action will lead to the other page.
-- `public_profile` is set by default, so make sure it and `email` have status of **Ready for testing** in the redirected page.
-- If not, click the **Add** button in email on right side.
+You can find your project's callback URI in the [Supabase Dashboard](/dashboard/project/_/auth/providers) under **Authentication > Providers > Facebook**.
+
+</Admonition>
+
+## Configure email permissions (required)
+
+<Admonition type="caution">
+
+This step is **required** for Supabase Auth to work correctly. Without email permissions, Facebook will not return the user's email address, which may cause authentication failures or incomplete user profiles.
+
+</Admonition>
+
+You must configure the email permission in your Facebook app's Use Cases:
+
+1. In your Facebook app dashboard, click **Use Cases** under `Build Your App`
+2. Find **Authentication and Account Creation** and click the **Edit** button on the right
+3. Verify that both `public_profile` and `email` show status **Ready for testing**
+4. If `email` is not listed, click the **Add** button next to it
+
+<Admonition type="tip">
+
+You can verify the permissions are set correctly by checking that both `public_profile` and `email` appear with a green check mark or "Ready for testing" status.
+
+</Admonition>
 
 ## Copy your Facebook app ID and secret
 
@@ -102,6 +123,13 @@ async function signInWithFacebook() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'facebook',
   })
+
+  if (error) {
+    console.error('Error signing in with Facebook:', error.message)
+    return
+  }
+
+  // The user will be redirected to Facebook for authentication
 }
 ```
 
@@ -129,8 +157,14 @@ First, add the Facebook SDK dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_facebook_auth: ^7.0.1
+  flutter_facebook_auth: ^7.0.0
 ```
+
+<Admonition type="tip">
+
+Check [pub.dev](https://pub.dev/packages/flutter_facebook_auth) for the latest version of `flutter_facebook_auth`.
+
+</Admonition>
 
 Then implement the Facebook authentication:
 
@@ -177,19 +211,39 @@ Make sure to configure your Facebook app properly and add the required permissio
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/swift/auth-signinwithoauth) with `facebook` as the `provider`:
 
 ```swift
-func signInWithFacebook() async throws {
-  try await supabase.auth.signInWithOAuth(
-    provider: .facebook,
-    redirectTo: URL(string: "my.scheme://my-host")!, // Optionally set the redirect link to bring back the user via deeplink.
-    launchFlow: { url in
-      // use url to start OAuth flow
-      // and return a result url that contains the OAuth token.
-      // ...
-      return resultURL
+import SwiftUI
+
+struct SignInWithFacebook: View {
+  @Environment(\.webAuthenticationSession) var webAuthenticationSession
+
+  var body: some View {
+    Button("Sign in with Facebook") {
+      Task {
+        do {
+          try await supabase.auth.signInWithOAuth(
+            provider: .facebook,
+            redirectTo: URL(string: "my.scheme://my-host")!,
+            launchFlow: { @MainActor url in
+              try await webAuthenticationSession.authenticate(
+                using: url,
+                callbackURLScheme: "my.scheme"
+              )
+            }
+          )
+        } catch {
+          print("Failed to sign in with Facebook: \(error)")
+        }
+      }
     }
-  )
+  }
 }
 ```
+
+<Admonition type="note">
+
+Make sure to configure your app's URL scheme in Xcode under **Target > Info > URL Types**. The callback URL scheme should match the scheme used in `redirectTo` (e.g., `my.scheme`).
+
+</Admonition>
 
 </TabPanel>
 </$Show>
@@ -228,6 +282,13 @@ const supabase = createClient('https://your-project.supabase.co', 'sb_publishabl
 // ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
+
+  if (error) {
+    console.error('Error signing out:', error.message)
+    return
+  }
+
+  // User has been signed out
 }
 ```
 
@@ -271,8 +332,89 @@ suspend fun signOut() {
 </$Show>
 </Tabs>
 
-Now, you should be able to login with Facebook and alert you to `Submit for Login Review` when users try to sign into your app. Follow the instructions there to make your app go live for full features and products.
-You can read more about App Review [here](https://developers.facebook.com/docs/app-review/).
+## Testing your integration
+
+Facebook apps start in **Development** mode, which has the following limitations:
+
+- Only users with a role on the app (administrators, developers, testers) can authenticate
+- Other users will see an "App Not Setup" error when trying to log in
+
+To add test users:
+
+1. Go to [developers.facebook.com](https://developers.facebook.com) and select your app
+2. Navigate to **App Roles > Roles**
+3. Add users as Testers, Developers, or Administrators
+4. Users must accept the invitation from their Facebook notification settings
+
+<Admonition type="tip">
+
+Development mode is sufficient for local development and testing. You only need to submit for App Review when you're ready to allow any Facebook user to authenticate with your app.
+
+</Admonition>
+
+## Going live with app review
+
+Before your app can be used by the general public, you need to complete Facebook's App Review process:
+
+1. **Complete App Settings**: In your Facebook app's **Settings > Basic**, fill in all required fields including:
+
+   - App Icon
+   - Privacy Policy URL
+   - Terms of Service URL (if applicable)
+   - App Domain
+
+2. **Request Permissions**: Navigate to **App Review > Permissions and Features** and request the permissions you need:
+
+   - `public_profile` - Usually pre-approved
+   - `email` - Requires verification that your app needs email access
+
+3. **Submit for Review**: Click **Submit for Review** and provide:
+
+   - Detailed instructions for how Facebook reviewers should test your login flow
+   - A screencast video demonstrating the Facebook Login feature
+   - Explanation of how user data will be used
+
+4. **Wait for Approval**: Facebook typically reviews apps within 1-5 business days
+
+<Admonition type="note">
+
+If you only need basic authentication (name and profile picture), you may not need full App Review. Apps requesting only `public_profile` and `email` with the "Authenticate and request data from users with Facebook Login" use case can often go live without a detailed review.
+
+</Admonition>
+
+For more details, see the [Facebook App Review documentation](https://developers.facebook.com/docs/app-review/).
+
+## Troubleshooting
+
+### "App not setup" error
+
+This error occurs when a user without a role on your app tries to log in while the app is in Development mode.
+
+**Solution**: Either add the user as a tester in your Facebook app settings, or complete the App Review process to make your app available to all users.
+
+### User's email not returned
+
+Facebook only returns the email address if:
+
+- The user has a confirmed email on their Facebook account
+- Your app has been granted the `email` permission
+- The `email` permission is marked as "Ready for testing" in **Use Cases > Authentication and Account Creation**
+
+**Solution**: Check that the `email` permission is properly configured in your Facebook app's Use Cases settings.
+
+### "Redirect URI mismatch" error
+
+This error indicates the callback URL configured in Facebook doesn't match the one used during authentication.
+
+**Solution**: Verify that the **Valid OAuth Redirect URIs** in your Facebook app settings exactly matches `https://<project-ref>.supabase.co/auth/v1/callback`. Make sure there are no trailing slashes or typos.
+
+### Login works in development but not production
+
+If login works locally but fails in production, check:
+
+- Your production URL is added to **Valid OAuth Redirect URIs** in Facebook
+- The App ID and Secret in your Supabase dashboard match your Facebook app
+- Your Facebook app is in **Live** mode (not Development mode)
 
 ## Resources
 

@@ -1,23 +1,28 @@
+import { useFlag } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
+import Panel from 'components/ui/Panel'
+import { DOCS_URL } from 'lib/constants'
 import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
-
-import Panel from 'components/ui/Panel'
-import { CreateProjectForm } from 'pages/new/[slug]'
 import {
   Badge,
-  cn,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { DocsButton } from 'components/ui/DocsButton'
+
+import { CreateProjectForm } from './ProjectCreation.schema'
 
 interface AdvancedConfigurationProps {
   form: UseFormReturn<CreateProjectForm>
@@ -30,6 +35,8 @@ export const AdvancedConfiguration = ({
   layout = 'horizontal',
   collapsible = true,
 }: AdvancedConfigurationProps) => {
+  const disableOrioleProjectCreation = useFlag('disableOrioleProjectCreation')
+
   const content = (
     <>
       <FormField_Shadcn_
@@ -57,35 +64,42 @@ export const AdvancedConfiguration = ({
                         label={
                           <>
                             Postgres
-                            <Badge color="scale" className="ml-2">
-                              Default
-                            </Badge>
+                            <Badge>Default</Badge>
                           </>
                         }
                         description="Recommended for production workloads"
-                        className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"
+                        className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2"
                       />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
                   <FormItem_Shadcn_ asChild>
                     <FormControl_Shadcn_>
-                      <RadioGroupStackedItem
-                        value="true"
-                        // @ts-ignore
-                        label={
-                          <>
-                            Postgres with OrioleDB
-                            <Badge color="warning" className="ml-2">
-                              Alpha
-                            </Badge>
-                          </>
-                        }
-                        description="Not recommended for production workloads"
-                        className={cn(
-                          '[&>div>div>p]:text-left [&>div>div>p]:text-xs',
-                          form.getValues('useOrioleDb') ? '!rounded-b-none' : ''
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <RadioGroupStackedItem
+                            value="true"
+                            // @ts-ignore
+                            label={
+                              <>
+                                Postgres with OrioleDB
+                                <Badge variant="warning">Alpha</Badge>
+                              </>
+                            }
+                            description="Not recommended for production workloads"
+                            className={cn(
+                              '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2',
+                              form.getValues('useOrioleDb') ? '!rounded-b-none' : ''
+                            )}
+                            disabled={disableOrioleProjectCreation}
+                          />
+                        </TooltipTrigger>
+                        {disableOrioleProjectCreation && (
+                          <TooltipContent side="right" className="w-60 text-center">
+                            OrioleDB is temporarily disabled for new projects. Please try again
+                            later.
+                          </TooltipContent>
                         )}
-                      />
+                      </Tooltip>
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
                 </RadioGroupStacked>
@@ -97,10 +111,7 @@ export const AdvancedConfiguration = ({
                   title="OrioleDB is not production ready"
                   description="Postgres with OrioleDB extension is currently in Public Alpha and not recommended for production usage yet."
                 >
-                  <DocsButton
-                    className="mt-2"
-                    href="https://supabase.com/docs/guides/database/orioledb"
-                  />
+                  <DocsButton className="mt-2" href={`${DOCS_URL}/guides/database/orioledb`} />
                 </Admonition>
               )}
             </FormItemLayout>

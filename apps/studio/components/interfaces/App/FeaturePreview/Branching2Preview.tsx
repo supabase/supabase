@@ -1,11 +1,19 @@
-import Image from 'next/image'
-
 import { InlineLink } from 'components/ui/InlineLink'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import Image from 'next/image'
 
 export const Branching2Preview = () => {
   return (
     <div>
+      <p className="text-sm text-foreground-light mb-4">
+        Create branches, review changes, and merge back into production all through the dashboard.
+        Read the below limitations and our{' '}
+        <InlineLink href={`${DOCS_URL}/guides/platform/branching`}>
+          branching documentation
+        </InlineLink>{' '}
+        before opting in.
+      </p>
+
       <Image
         src={`${BASE_PATH}/img/previews/branching-preview.png`}
         width={1296}
@@ -13,14 +21,7 @@ export const Branching2Preview = () => {
         alt="api-docs-side-panel-preview"
         className="rounded border mb-4"
       />
-      <p className="text-sm text-foreground-light mb-4">
-        Create branches, review changes, and merge back into production all through the dashboard.
-        Read the below limitations and our{' '}
-        <InlineLink href="https://supabase.com/docs/guides/platform/branching">
-          branching documentation
-        </InlineLink>{' '}
-        before opting in.
-      </p>
+
       <div className="my-6">
         <p className="text-sm text-foreground mb-2 font-medium">Limitations:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">

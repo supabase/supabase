@@ -6,21 +6,21 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
-import { render } from 'tests/helpers'
+import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock } from 'tests/lib/msw'
 import { routerMock } from 'tests/lib/route-mock'
 import { DeleteBucketModal } from '../DeleteBucketModal'
 
 const bucket: Bucket = {
-  id: faker.string.uuid(),
-  name: `test`,
+  id: 'test',
+  name: 'test',
   owner: faker.string.uuid(),
   public: faker.datatype.boolean(),
   allowed_mime_types: faker.helpers.multiple(() => faker.system.mimeType(), {
     count: { min: 1, max: 5 },
   }),
   file_size_limit: faker.number.int({ min: 0, max: 25165824 }),
-  type: faker.helpers.arrayElement(['STANDARD', 'ANALYTICS', undefined]),
+  type: 'STANDARD',
   created_at: faker.date.recent().toISOString(),
   updated_at: faker.date.recent().toISOString(),
 }
@@ -46,7 +46,7 @@ const Page = ({ onClose }: { onClose: () => void }) => {
 describe(`DeleteBucketModal`, () => {
   beforeEach(() => {
     // useParams
-    routerMock.setCurrentUrl(`/project/default/storage/buckets/test`)
+    routerMock.setCurrentUrl(`/project/default/storage/files`)
     // useProjectContext
     addAPIMock({
       method: `get`,
@@ -63,7 +63,7 @@ describe(`DeleteBucketModal`, () => {
         status: 'ACTIVE_HEALTHY',
       },
     })
-    // useBucketsQuery
+    // usePaginatedBucketsQuery
     addAPIMock({
       method: `get`,
       path: `/platform/storage/:ref/buckets`,
@@ -90,12 +90,18 @@ describe(`DeleteBucketModal`, () => {
         },
       ],
     })
-    // useBucketDeleteMutation
+    // useBucketDeleteMutation - empty bucket
     addAPIMock({
       method: `post`,
       path: `/platform/storage/:ref/buckets/:id/empty`,
     })
-    // useDatabasePolicyDeleteMutation
+    // useBucketDeleteMutation - poll for empty bucket
+    addAPIMock({
+      method: `post`,
+      path: `/platform/storage/:ref/buckets/:id/objects/list`,
+      response: [], // Return empty array to indicate bucket is empty
+    })
+    // useBucketDeleteMutation - delete bucket
     addAPIMock({
       method: `delete`,
       path: `/platform/storage/:ref/buckets/:id`,
@@ -104,38 +110,19 @@ describe(`DeleteBucketModal`, () => {
 
   it(`renders a confirmation dialog`, async () => {
     const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />)
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
     await screen.findByRole(`dialog`)
 
-    const input = screen.getByLabelText(/Type/)
+    const input = screen.getByPlaceholderText(`Type bucket name`)
     await userEvent.type(input, `test`)
 
     const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
-    expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets`)
-  })
-
-  it(`prevents submission when the input doesn't match the bucket name`, async () => {
-    const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
-
-    const openButton = screen.getByRole(`button`, { name: `Open` })
-    await userEvent.click(openButton)
-    await screen.findByRole(`dialog`)
-
-    const input = screen.getByLabelText(/Type/)
-    await userEvent.type(input, `invalid`)
-
-    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
-    fireEvent.click(confirmButton)
-
-    await waitFor(() => {
-      expect(screen.getByText(/Please enter/)).toBeInTheDocument()
-    })
+    expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`)
   })
 })

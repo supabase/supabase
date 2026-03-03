@@ -6,6 +6,7 @@ import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import { VIOLATION_TYPE_LABELS } from 'data/usage/constants'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { usePathname } from 'next/navigation'
 import {
   AlertDescription_Shadcn_,
@@ -94,9 +95,7 @@ export const Restriction = () => {
                 </Button>
               )}
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/cost-control#spend-cap">
-                  About spend cap
-                </a>
+                <a href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}>About spend cap</a>
               </Button>
             </div>
           </AlertDescription_Shadcn_>
@@ -139,7 +138,7 @@ export const Restriction = () => {
               )}
 
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
+                <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
               </Button>
@@ -179,7 +178,7 @@ export const Restriction = () => {
                 </Button>
               )}
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
+                <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
               </Button>
@@ -217,7 +216,7 @@ export const Restriction = () => {
                 </Button>
               )}
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
+                <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
               </Button>

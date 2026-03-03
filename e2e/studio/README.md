@@ -2,73 +2,123 @@
 
 ## Set up
 
+### Prerequisites
+
+#### For Self-Hosted Tests
+
+- Nothing is required, running with IS_PLATFORM=false should run the tests locally with a self hosted docker container
+
+#### For Platform Tests
+
+1. **Create a platform account** - You can authenticate using either:
+   - Email and password
+   - GitHub OAuth (requires TOTP 2FA)
+2. **Create an organization** on the platform, this can be done if run locally through `mise fullstack`
+3. **Generate a Personal Access Token (PAT)** for API access
+4. Configure the environment variables below (see Authentication section for details on email vs GitHub auth)
+
+### Configure Environment
+
+Choose the appropriate example file based on your testing scenario:
+
+**For self-hosted tests:**
+
 ```bash
-cp .env.local.example .env.local
+cp .env.local.self-hosted.example .env.local
 ```
 
-Edit the `.env.local` file with your credentials and environment.
+**For platform tests with email authentication:**
+
+```bash
+cp .env.local.email.example .env.local
+```
+
+**For platform tests with GitHub authentication:**
+
+```bash
+cp .env.local.github.example .env.local
+```
+
+Edit `.env.local` and set the appropriate values based on your test environment (see Environment Variables section below).
 
 ### Install the playwright browser
 
 ⚠️ This should be done in the `e2e/studio` directory
 
 ```bash
+cd e2e/studio
+
 pnpm exec playwright install
 ```
 
-## Environments
+### Environment Variables
 
-### Staging
+Configure your tests by setting the following environment variables in `.env.local`. We have examples of what required on self hosted and platform:
 
-```bash
-STUDIO_URL=https://supabase.green/dashboard
-API_URL=https://api.supabase.green
-AUTHENTICATION=true
-EMAIL=your@email.com
-PASSWORD=yourpassword
-PROJECT_REF=yourprojectref
-```
+#### Core Configuration
 
-### CLI (NO AUTH)
+- **`STUDIO_URL`**: The URL where Studio is running (default: `http://localhost:8082`)
+- **`API_URL`**: The Supabase API endpoint (default: `https://localhost:8080`)
+- **`IS_PLATFORM`**: Set to `true` for platform tests, `false` for self-hosted (default: `false`)
+  - When `true`: Tests run serially (1 worker) due to API rate limits
+  - When `false`: Tests run in parallel (5 workers)
 
-You'll need to run the CLI locally.
+#### Authentication (Required for Platform Tests)
 
-```bash
-STUDIO_URL=http://localhost:54323
-API_URL=http://localhost:54323/api
-AUTHENTICATION=false
-```
+⚠️ **Before running platform tests, you must create an account and organization on the platform you're testing.**
 
-### CLI Development (NO AUTH)
+Authentication is automatically enabled when either email/password OR GitHub credentials are configured.
 
-You'll need to run Studio in development mode with `IS_PLATFORM=false`
+##### Email Authentication
 
-```bash
-STUDIO_URL=http://localhost:8082/
-API_URL=http://localhost:8082/api
-AUTHENTICATION=false
-```
+- **`EMAIL`**: Your platform account email
+- **`PASSWORD`**: Your platform account password
+- **`PROJECT_REF`**: Project reference (optional, will be auto-created if not provided)
 
-### Hosted Development
+When both `EMAIL` and `PASSWORD` are set, the tests will authenticate using email/password. HCaptcha is mocked during test setup. Note this only works on local and staging environments
 
-You'll need to run Studio in development mode with `IS_PLATFORM=true`
+##### GitHub Authentication
 
-```bash
-STUDIO_URL=http://localhost:8082/
-API_URL=http://localhost:8080/api
-AUTHENTICATION=true
-EMAIL=your@email.com
-PASSWORD=yourpassword
-PROJECT_REF=yourprojectref
-```
+- **`GITHUB_USER`**: Your GitHub username
+- **`GITHUB_PASS`**: Your GitHub password
+- **`GITHUB_TOTP`**: Your GitHub TOTP secret for 2FA (required, as GitHub enforces 2FA)
+
+When `GITHUB_USER`, `GITHUB_PASS`, and `GITHUB_TOTP` are all set, the tests will authenticate using GitHub OAuth with TOTP-based 2FA. The authentication flow handles:
+
+- Clicking "Sign In with GitHub" button
+- Filling GitHub credentials
+- Generating and submitting TOTP codes
+- Handling GitHub authorization prompts
+- Automatic retry on failure (up to 3 attempts)
+
+**Getting your GitHub TOTP secret:**
+When setting up 2FA on GitHub, you'll see a QR code. Click "enter this text code instead" to reveal the secret key. This is the value to use for `GITHUB_TOTP`.
+
+#### Platform-Specific Variables (Required when `IS_PLATFORM=true`)
+
+- **`ORG_SLUG`**: Organization slug (default: `default`)
+- **`SUPA_REGION`**: Supabase region (default: `us-east-1`)
+- **`SUPA_PAT`**: Personal Access Token for API authentication (default: `test`)
+- **`BRANCH_NAME`**: Name for the test branch/project (default: `e2e-test-local`)
+
+#### Optional Variables
+
+- **`OPENAI_API_KEY`**: Required for the AI Assistant test (`assistant.spec.ts`). Without this variable, the assistant test will be skipped.
+- **`VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO`**: Bypass token for Vercel protection (default: `false`)
+
+#### Setup Commands Based on Configuration
+
+The test setup automatically runs different commands based on your environment:
+
+- **Platform + Localhost** (`IS_PLATFORM=true` and `STUDIO_URL=localhost`): Runs `pnpm run e2e:setup:platform`
+- **Platform + Remote** (`IS_PLATFORM=true` and remote `STUDIO_URL`): No web server setup
+- **Self-hosted** (`IS_PLATFORM=false`): Runs `pnpm run e2e:setup:selfhosted`
 
 ---
 
 ## Running the tests
 
 Check the `package.json` for the available commands and environments.
-
-#### Example:
 
 ```bash
 pnpm run e2e
@@ -107,19 +157,6 @@ import { test } from '../utils/test'
 
 ```bash
 PWDEBUG=1 pnpm run e2e -- --ui
-```
-
----
-
-## Organization
-
-Name the folders based on the feature you are testing.
-
-```bash
-e2e/studio/logs/
-e2e/studio/sql-editor/
-e2e/studio/storage/
-e2e/studio/auth/
 ```
 
 ---

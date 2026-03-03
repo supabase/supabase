@@ -1,10 +1,10 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { configKeys } from 'data/config/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseExtensionsKeys } from './keys'
 
 export type DatabaseExtensionDisableVariables = {
@@ -41,7 +41,7 @@ export const useDatabaseExtensionDisableMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     DatabaseExtensionDisableData,
     ResponseError,
     DatabaseExtensionDisableVariables
@@ -54,12 +54,13 @@ export const useDatabaseExtensionDisableMutation = ({
     DatabaseExtensionDisableData,
     ResponseError,
     DatabaseExtensionDisableVariables
-  >((vars) => disableDatabaseExtension(vars), {
+  >({
+    mutationFn: (vars) => disableDatabaseExtension(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries(databaseExtensionsKeys.list(projectRef)),
-        queryClient.invalidateQueries(configKeys.upgradeEligibility(projectRef)),
+        queryClient.invalidateQueries({ queryKey: databaseExtensionsKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.upgradeEligibility(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },

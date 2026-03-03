@@ -65,7 +65,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
     }
   }
 
-  const handleMouseUp: CategoricalChartFunc = (e) => {
+  const handleMouseUp: CategoricalChartFunc = () => {
     if (refAreaLeft && refAreaRight) {
       const [left, right] = [refAreaLeft, refAreaRight].sort(
         (a, b) => new Date(a).getTime() - new Date(b).getTime()

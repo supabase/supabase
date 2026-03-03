@@ -13,7 +13,7 @@ interface BillingChangeBadgeProps {
   free?: boolean
 }
 
-const BillingChangeBadge = ({
+export const BillingChangeBadge = ({
   beforePrice,
   afterPrice,
   show,
@@ -67,5 +67,3 @@ const BillingChangeBadge = ({
     </AnimatePresence>
   )
 }
-
-export { BillingChangeBadge }

@@ -38,7 +38,6 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>
     billing_partner: 'fly',
     scheduled_plan_change: null,
     customer_balance: 0,
-    cached_egress_enabled: false,
   }
 
   return res.status(200).json(response)

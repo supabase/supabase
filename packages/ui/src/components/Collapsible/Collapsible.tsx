@@ -2,6 +2,7 @@
 
 import * as RadixCollapsible from '@radix-ui/react-collapsible'
 import React from 'react'
+
 import styleHandler from '../../lib/theme/styleHandler'
 
 export interface CollapsibleProps extends RadixCollapsible.CollapsibleProps {
@@ -9,7 +10,7 @@ export interface CollapsibleProps extends RadixCollapsible.CollapsibleProps {
 }
 
 /**
- * @deprecated Use `import { Collapsible_shadcn_ } from "ui"` instead
+ * @deprecated Use `import { AlertCollapsible } from "ui"` instead
  */
 export const Collapsible = ({
   open = undefined,

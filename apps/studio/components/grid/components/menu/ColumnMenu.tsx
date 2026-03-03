@@ -1,13 +1,13 @@
-import type { Sort } from 'components/grid/types'
-import { ArrowDown, ArrowUp, ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
-import type { CalculatedColumn } from 'react-data-grid'
-
 import { useTableSort } from 'components/grid/hooks/useTableSort'
+import type { Sort } from 'components/grid/types'
+import { ArrowDown, ArrowUp, ChevronDown, Copy, Edit, Lock, Trash, Unlock } from 'lucide-react'
+import type { CalculatedColumn } from 'react-data-grid'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,7 +23,7 @@ interface ColumnMenuProps {
   isEncrypted?: boolean
 }
 
-const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
+export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const { sorts, addOrUpdateSort, removeSort } = useTableSort()
@@ -93,9 +93,19 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           <ArrowDown size={14} strokeWidth={currentSort && !currentSort.ascending ? 3 : 1.5} />
           <span>Sort Descending</span>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="space-x-2"
+          onClick={(e) => {
+            e.stopPropagation()
+            copyToClipboard(columnName)
+          }}
+        >
+          <Copy size={12} />
+          <span>Copy name</span>
+        </DropdownMenuItem>
         {snap.editable && (
           <>
-            <DropdownMenuSeparator />
             <Tooltip>
               <TooltipTrigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
                 <DropdownMenuItem
@@ -163,5 +173,3 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
     </>
   )
 }
-
-export default ColumnMenu

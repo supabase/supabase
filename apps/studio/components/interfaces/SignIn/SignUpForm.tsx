@@ -67,7 +67,7 @@ export const SignUpForm = () => {
     token: parseAsString.withDefault(''),
   })
 
-  const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
+  const { mutate: signup, isPending: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
       toast.success(`Signed up successfully!`)
       setIsSubmitted(true)
@@ -222,7 +222,7 @@ export const SignUpForm = () => {
               disabled={password.length === 0 || isSubmitting}
               loading={isSubmitting}
             >
-              Sign Up
+              Sign up
             </Button>
           </form>
         </Form_Shadcn_>

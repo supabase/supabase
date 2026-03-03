@@ -1,22 +1,23 @@
-import dayjs from 'dayjs'
-import { Archive, Database, GitBranch } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { useParams } from 'common'
 import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useMigrationsQuery } from 'data/database/migrations-query'
+import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
+import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Archive, Database, GitBranch } from 'lucide-react'
+import { useMemo } from 'react'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { ServiceStatus } from './ServiceStatus'
+import { EMPTY_ARR } from '@/lib/void'
 
 export const ActivityStats = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: branchesData, isLoading: isLoadingBranches } = useBranchesQuery({
+  const { data: branchesData, isPending: isLoadingBranches } = useBranchesQuery({
     projectRef: project?.parent_project_ref ?? project?.ref,
   })
   const isDefaultProject = project?.parent_project_ref === undefined
@@ -36,13 +37,18 @@ export const ActivityStats = () => {
       )[0]
   }, [branchesData])
 
-  const { data: migrationsData, isLoading: isLoadingMigrations } = useMigrationsQuery({
+  const { data: migrationsData = EMPTY_ARR, isPending: isLoadingMigrations } = useMigrationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const latestMigration = useMemo(() => (migrationsData ?? [])[0], [migrationsData])
+  const latestMigration = useMemo<DatabaseMigration | undefined>(
+    () => migrationsData[0],
+    [migrationsData]
+  )
+  const migrationLabelText =
+    migrationsData.length === 0 ? 'No migrations' : latestMigration?.name ?? 'Unknown'
 
-  const { data: backupsData, isLoading: isLoadingBackups } = useBackupsQuery({
+  const { data: backupsData, isPending: isLoadingBackups } = useBackupsQuery({
     projectRef: project?.ref,
   })
   const latestBackup = useMemo(() => {
@@ -55,7 +61,7 @@ export const ActivityStats = () => {
 
   return (
     <div className="@container">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-6 flex-wrap">
+      <div className="grid grid-cols-1 @md:grid-cols-2 gap-2 @md:gap-6 flex-wrap">
         <ServiceStatus />
 
         <SingleStat
@@ -69,14 +75,10 @@ export const ActivityStats = () => {
           value={
             isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
-            ) : latestMigration ? (
-              <TimestampInfo
-                className="text-base"
-                label={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()}
-                utcTimestamp={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').toISOString()}
-              />
             ) : (
-              <p className="text-foreground-lighter">No migrations</p>
+              <p className={!!latestMigration ? 'text-foreground' : 'text-foreground-lighter'}>
+                {migrationLabelText}
+              </p>
             )
           }
         />
@@ -124,6 +126,7 @@ export const ActivityStats = () => {
                   'truncate',
                   !latestNonDefaultBranch && 'text-foreground-lighter truncate'
                 )}
+                title={latestNonDefaultBranch?.name ?? 'No branches'}
               >
                 {latestNonDefaultBranch?.name ?? 'No branches'}
               </p>

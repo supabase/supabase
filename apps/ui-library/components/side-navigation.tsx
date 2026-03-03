@@ -1,9 +1,9 @@
 import Link from 'next/link'
 
-import NavigationItem from '@/components/side-navigation-item'
-import { aiEditorsRules, componentPages, gettingStarted, platformBlocks } from '@/config/docs'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
+import NavigationItem from '@/components/side-navigation-item'
+import { aiEditorsRules, componentPages, gettingStarted, platformBlocks } from '@/config/docs'
 
 function SideNavigation() {
   return (

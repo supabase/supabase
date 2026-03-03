@@ -66,7 +66,7 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
     defaultValues: { email: '' },
   })
 
-  const { mutate: updateEmail, isLoading } = useEmailUpdateMutation({
+  const { mutate: updateEmail, isPending } = useEmailUpdateMutation({
     onSuccess: (_, vars) => {
       toast.success(
         `A confirmation email has been sent to ${vars.email}. Please confirm the change within 10 minutes.`
@@ -121,10 +121,10 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
         </DialogSection>
 
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={onClose}>
+          <Button type="default" disabled={isPending} onClick={onClose}>
             Cancel
           </Button>
-          <Button htmlType="submit" loading={isLoading} disabled={isLoading}>
+          <Button htmlType="submit" loading={isPending} disabled={isPending}>
             Confirm
           </Button>
         </DialogFooter>

@@ -22,11 +22,14 @@ export interface Provider {
       descriptionOptional?: string
       units?: string
       isSecret?: boolean
+      isPaid?: boolean
+      link?: string
     }
   }
   validationSchema: any // todo: use Yup type
   misc: {
     iconKey: 'gitlab-icon'
+    hasLightIcon: boolean
     requiresRedirect: true
     helper: string
     alert: {

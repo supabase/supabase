@@ -1,10 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isEqual } from 'lodash'
-import { ExternalLink, Loader2, Megaphone } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import DataGrid, { Row } from 'react-data-grid'
-
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
@@ -12,10 +6,17 @@ import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
+import { DOCS_URL } from 'lib/constants'
+import { isEqual } from 'lodash'
+import { ExternalLink, Loader2, Megaphone } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import DataGrid, { Row } from 'react-data-grid'
+import { Button, cn, IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import MessageSelection from './MessageSelection'
+
 import type { LogData } from './Messages.types'
+import MessageSelection from './MessageSelection'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 
@@ -98,7 +99,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Not sure what to do?</p>
                 <p className="text-foreground-lighter text-xs">Browse our documentation</p>
               </div>
-              <DocsButton href="https://supabase.com/docs/guides/realtime" />
+              <DocsButton href={`${DOCS_URL}/guides/realtime`} />
             </div>
           </div>
         </>
@@ -139,12 +140,12 @@ const MessagesTable = ({
 
   return (
     <>
-      <section className="flex w-full flex-col" style={{ maxHeight: 'calc(100vh - 42px - 3rem)' }}>
+      <section className="flex w-full flex-col md:max-h-[calc(100vh-var(--header-height)-3rem)]">
         <ShimmerLine active={enabled} />
         <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
           <div className="flex flex-grow flex-col">
             {enabled && (
-              <div className="w-full h-9 px-4 bg-surface-100 border-b items-center inline-flex justify-between text-foreground-light">
+              <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
                 <div className="inline-flex gap-2.5 text-xs">
                   <Loader2 size="16" className="animate-spin" />
                   <div>Listening</div>

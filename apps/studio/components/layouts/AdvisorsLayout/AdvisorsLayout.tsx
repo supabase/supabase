@@ -1,21 +1,15 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { useIsAdvisorRulesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { generateAdvisorsMenu } from './AdvisorsMenu.utils'
+import { ProjectLayout } from '../ProjectLayout'
+import { AdvisorsSidebarMenu } from './AdvisorsSidebarMenu'
 
 export interface AdvisorsLayoutProps {
   title?: string
 }
 
 const AdvisorsLayout = ({ children }: PropsWithChildren<AdvisorsLayoutProps>) => {
-  const { data: project } = useSelectedProjectQuery()
-  const advisorRules = useIsAdvisorRulesEnabled()
-
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
@@ -23,9 +17,7 @@ const AdvisorsLayout = ({ children }: PropsWithChildren<AdvisorsLayoutProps>) =>
     <ProjectLayout
       isLoading={false}
       product="Advisors"
-      productMenu={
-        <ProductMenu page={page} menu={generateAdvisorsMenu(project, { advisorRules })} />
-      }
+      productMenu={<AdvisorsSidebarMenu page={page} />}
     >
       {children}
     </ProjectLayout>

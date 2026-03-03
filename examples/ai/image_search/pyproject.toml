@@ -8,9 +8,9 @@ packages = [{include = "image_search"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-sentence-transformers = "^2.2.2"
+sentence-transformers = "^2.7.0"
 vecs = "^0.2.4"
-matplotlib = "^3.7.1"
+matplotlib = "^3.10.1"
 
 [tool.poetry.scripts]
 seed = "image_search.main:seed"

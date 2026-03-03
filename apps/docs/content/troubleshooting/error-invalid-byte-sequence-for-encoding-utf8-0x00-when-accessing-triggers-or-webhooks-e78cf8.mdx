@@ -1,0 +1,19 @@
+---
+title = "Error: 'invalid byte sequence for encoding 'UTF8': 0x00' when accessing Triggers or Webhooks"
+topics = [ "cli", "database" ]
+keywords = []
+database_id = "12128731-0af6-4c57-9aa2-66e177f0c3f4"
+---
+
+If you encounter the error: `'invalid byte sequence for encoding "UTF8": 0x00'` when attempting to access your project's [Triggers](/dashboard/project/_/database/triggers) or [Webhooks](/dashboard/project/_/database/webhooks) via the dashboard, it indicates that the `standard_conforming_strings` database setting is currently `off`.
+
+This setting, when `off`, can cause issues with how certain character sequences are interpreted by Postgres, leading to errors in dashboard queries that expect UTF8-compliant strings.
+
+To resolve this issue:
+
+1.  Connect to your database instance using the [SQL Editor](/dashboard/project/_/sql/new) in the Dashboard or a client like `psql`.
+2.  Execute the following SQL command:
+    ```sql
+    ALTER DATABASE postgres SET standard_conforming_strings = on;
+    ```
+3.  Allow a few minutes for this setting to take effect, as existing pooled connections might retain the previous configuration. If the error persists after this period, a database restart may be necessary.

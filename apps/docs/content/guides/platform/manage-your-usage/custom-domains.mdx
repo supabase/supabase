@@ -7,6 +7,12 @@ title: 'Manage Custom Domain usage'
 
 You can configure a [custom domain](/docs/guides/platform/custom-domains) for a project by enabling the [Custom Domain add-on](/dashboard/project/_/settings/addons?panel=customDomain). You are charged for all custom domains configured across your projects.
 
+<Admonition type="note">
+
+Custom Domains are **not** covered by the [Spend Cap](/docs/guides/platform/cost-control#spend-cap).
+
+</Admonition>
+
 ## How charges are calculated
 
 Custom domains are charged by the hour, meaning you are charged for the exact number of hours that a custom domain is active. If a custom domain is active for part of an hour, you are still charged for the full hour.
@@ -62,6 +68,22 @@ All projects have a custom domain activated throughout the entire billing cycle.
 | **Subtotal**                  |       | **<Price price="65" />** |
 | Compute Credits               |       | -<Price price="10" />    |
 | **Total**                     |       | **<Price price="55" />** |
+
+### Add-on disabled after a day
+
+Project add-ons are billed in arrears based on how many hours you used them.
+If you remove the custom domain add-on, you are no longer billed from the time of removal onward.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+|                               |       |                             |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />        |
+| Custom Domain Hours Project 1 | 24    | <Price price="0.33" />      |
+|                               |       |                             |
+| **Subtotal**                  |       | **<Price price="35.33" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="25.33" />** |
 
 ## Optimize usage
 

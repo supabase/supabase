@@ -1,8 +1,8 @@
-import { AuthBindings } from "@refinedev/core";
+import { AuthProvider } from "@refinedev/core";
 
 import { supabaseClient } from "./utility";
 
-const authProvider: AuthBindings = {
+const authProvider: AuthProvider = {
   login: async ({ email }) => {
     try {
       const { error } = await supabaseClient.auth.signInWithOtp({ email });
@@ -12,8 +12,8 @@ const authProvider: AuthBindings = {
         return {
           success: true,
         };
-      };
-        
+      }
+
       throw error;
     } catch (e: any) {
       alert(e.message);
@@ -44,10 +44,9 @@ const authProvider: AuthBindings = {
   },
   check: async () => {
     try {
-      const { data } = await supabaseClient.auth.getSession();
-      const { session } = data;
+      const { data, error } = await supabaseClient.auth.getClaims();
 
-      if (!session) {
+      if (error || !data) {
         return {
           authenticated: false,
           error: {
