@@ -7202,7 +7202,9 @@ export interface components {
             | 'auth.user_sessions'
             | 'auth.leaked_password_protection'
             | 'auth.advanced_auth_settings'
+            | 'auth.performance_settings'
             | 'backup.retention_days'
+            | 'backup.restore_to_new_project'
             | 'function.max_count'
             | 'function.size_limit_mb'
             | 'realtime.max_concurrent_users'
@@ -7217,6 +7219,7 @@ export interface components {
             | 'project_pausing'
             | 'project_cloning'
             | 'assistant.advance_model'
+            | 'integrations.github_connections'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -17233,7 +17236,9 @@ export interface operations {
           | 'auth.user_sessions'
           | 'auth.leaked_password_protection'
           | 'auth.advanced_auth_settings'
+          | 'auth.performance_settings'
           | 'backup.retention_days'
+          | 'backup.restore_to_new_project'
           | 'function.max_count'
           | 'function.size_limit_mb'
           | 'realtime.max_concurrent_users'
@@ -17248,6 +17253,7 @@ export interface operations {
           | 'project_pausing'
           | 'project_cloning'
           | 'assistant.advance_model'
+          | 'integrations.github_connections'
       }
       header?: never
       path?: never
