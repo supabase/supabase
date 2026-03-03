@@ -292,21 +292,23 @@ export const RegionSelector = ({
               </FormItemLayout>
 
               {affectingIncidents.length > 0 && (
-                <Admonition
-                  type="warning"
-                  title="Incident in progress for this region"
-                  description={
-                    <>
-                      We're currently investigating an issue that may impact projects in this
-                      region. Follow updates on{' '}
-                      <InlineLink href="https://status.supabase.com">
-                        status.supabase.com
-                      </InlineLink>
-                      .
-                    </>
-                  }
-                  className="mt-3"
-                />
+                <FormItemLayout layout="horizontal">
+                  <Admonition
+                    type="warning"
+                    title="Incident in progress for this region"
+                    description={
+                      <>
+                        We're currently investigating an issue that may impact projects in this
+                        region. Follow updates on{' '}
+                        <InlineLink href="https://status.supabase.com">
+                          status.supabase.com
+                        </InlineLink>
+                        .
+                      </>
+                    }
+                    className="mt-3"
+                  />
+                </FormItemLayout>
               )}
             </>
           )
