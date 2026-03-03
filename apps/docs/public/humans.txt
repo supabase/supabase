@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Aaron Byrne
 Ada Wong
+Adam Mohammed
 Adam Mokan
 AJ Matias
 Akash Manimaran
