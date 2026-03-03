@@ -61,7 +61,7 @@ export const MOBILE_PRODUCT_MENU_REGISTRY: Record<string, ComponentType | null> 
   integrations: null,
   settings: React.lazy(() =>
     import('components/layouts/ProjectSettingsLayout/SettingsLayout').then((m) => ({
-      default: m.SettingsLayout,
+      default: m.SettingsProductMenu,
     }))
   ),
 }

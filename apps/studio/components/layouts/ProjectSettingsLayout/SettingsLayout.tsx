@@ -5,23 +5,22 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
-interface SettingsLayoutProps {
-  title?: string
-}
-
-export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
+/**
+ * Menu-only component for the settings section. Used by the desktop sidebar and by the
+ * mobile sheet submenu. Must not wrap ProjectLayout so that opening the settings submenu
+ * in the mobile sheet does not overwrite registerOpenMenu and break the menu button.
+ */
+export const SettingsProductMenu = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
-  // billing pages live under /billing/invoices and /billing/subscription, etc
-  // so we need to pass the [5]th part of the url to the menu
   const page = router.pathname.includes('billing')
     ? router.pathname.split('/')[5]
     : router.pathname.split('/')[4]
@@ -57,12 +56,20 @@ export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLa
     billing: billingAll,
   })
 
+  return <ProductMenu page={page} menu={menuRoutes} />
+}
+
+interface SettingsLayoutProps {
+  title?: string
+}
+
+export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   return (
     <ProjectLayout
       isBlocking={false}
       title={title || 'Settings'}
       product="Settings"
-      productMenu={<ProductMenu page={page} menu={menuRoutes} />}
+      productMenu={<SettingsProductMenu />}
     >
       {children}
     </ProjectLayout>
