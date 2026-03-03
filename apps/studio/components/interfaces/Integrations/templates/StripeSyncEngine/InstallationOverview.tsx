@@ -193,12 +193,13 @@ export const StripeSyncInstallationPage = () => {
     }
   }, [installError, track])
 
-  // Clear install initiated flag once schema reflects completion or error
+  // Clear install initiated flag once schema reflects successful completion
+  // For errors, the flag is cleared when user manually retries (handleOpenInstallSheet)
   useEffect(() => {
-    if (isInstallInitiated && installDone && upgradeDone) {
+    if (isInstallInitiated && installed && upgradeDone && !installError) {
       setIsInstallInitiated(false)
     }
-  }, [isInstallInitiated, installDone, upgradeDone])
+  }, [isInstallInitiated, installed, upgradeDone, installError])
 
   // Clear uninstall initiated flag once schema is removed or error
   useEffect(() => {
