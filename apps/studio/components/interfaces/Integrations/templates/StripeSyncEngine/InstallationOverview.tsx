@@ -105,7 +105,9 @@ export const StripeSyncInstallationPage = () => {
     oldVersion = schemaComment?.oldVersion
     newVersion = schemaComment?.newVersion
   }
+
   const upgradeAvailable = !!(oldVersion && newVersion && oldVersion !== newVersion)
+  const upgradeDone = latestAvailableVersion == schemaComment?.newVersion
 
   const {
     mutate: installStripeSync,
@@ -193,10 +195,10 @@ export const StripeSyncInstallationPage = () => {
 
   // Clear install initiated flag once schema reflects completion or error
   useEffect(() => {
-    if (isInstallInitiated && installDone) {
+    if (isInstallInitiated && installDone && upgradeDone) {
       setIsInstallInitiated(false)
     }
-  }, [isInstallInitiated, installDone])
+  }, [isInstallInitiated, installDone, upgradeDone])
 
   // Clear uninstall initiated flag once schema is removed or error
   useEffect(() => {
