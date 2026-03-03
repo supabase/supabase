@@ -29,19 +29,19 @@ export const StatusDisplay = ({
   const installing = installInProgress || isInstallRequested
   const uninstalling = uninstallInProgress || isUninstallRequested
 
-  if (uninstallError) {
-    return (
-      <span className="flex items-center gap-2 text-foreground-light text-sm">
-        <AlertCircle size={14} className="text-destructive" />
-        Uninstallation error
-      </span>
-    )
-  }
   if (uninstalling) {
     return (
       <span className="flex items-center gap-2 text-foreground-light text-sm">
         <RefreshCwIcon size={14} className="animate-spin text-foreground-lighter" />
         Uninstalling...
+      </span>
+    )
+  }
+  if (uninstallError) {
+    return (
+      <span className="flex items-center gap-2 text-foreground-light text-sm">
+        <AlertCircle size={14} className="text-destructive" />
+        Uninstallation error
       </span>
     )
   }
