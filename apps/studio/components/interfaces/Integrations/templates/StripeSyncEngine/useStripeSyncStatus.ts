@@ -1,7 +1,7 @@
 import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
 import { SchemasVariables, useSchemasQuery } from 'data/database/schemas-query'
 import { useEffect } from 'react'
-import { parseSchemaComment } from 'stripe-experiment-sync/supabase'
+import { getCurrentVersion, parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import {
   findStripeSchema,
@@ -57,9 +57,12 @@ export function useStripeSyncStatus({
     }
   )
 
+  const latestAvailableVersion = getCurrentVersion()
+
   return {
     schemaComment,
     syncState: installed ? syncState : undefined,
     isLoading: isSchemasLoading,
+    latestAvailableVersion,
   }
 }

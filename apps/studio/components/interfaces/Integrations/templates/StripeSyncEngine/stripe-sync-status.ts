@@ -21,15 +21,10 @@ export interface StripeSyncStatusResult {
 
   /** Whether the status is still being determined (schemas query is loading) */
   isLoading: boolean
-}
 
-// TODO: The current version of the package 'stripe-experiment-sync' doesn't export
-// these constants, but we plan to export them in future version. For now we
-// declare the same constants here to deploy this code without waiting for
-// a new version. We'll import them when we bump 'stripe-experiment-sync' package
-// version.
-const UNINSTALLATION_STARTED_SUFFIX = 'uninstallation:started'
-const UNINSTALLATION_ERROR_SUFFIX = 'uninstallation:error'
+  /** Latest version of stripe sync engine available for installation */
+  latestAvailableVersion: string
+}
 
 export function findStripeSchema(schemas: Schema[] | undefined): Schema | undefined {
   return schemas?.find((s) => s.name === 'stripe')
