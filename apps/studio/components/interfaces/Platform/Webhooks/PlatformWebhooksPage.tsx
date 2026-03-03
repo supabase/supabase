@@ -32,6 +32,12 @@ import {
   PlatformWebhooksEndpointSheet,
   toEndpointPayload,
 } from './PlatformWebhooksEndpointSheet'
+import {
+  clearPendingSigningSecretReveal,
+  getPendingSigningSecretReveal,
+  setPendingSigningSecretReveal,
+  shouldHandleEndpointNotFound,
+} from './PlatformWebhooksPage.utils'
 import { PlatformWebhooksHeader } from './PlatformWebhooksHeader'
 import {
   filterWebhookDeliveries,
@@ -77,6 +83,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const [showRegenerateSecretConfirm, setShowRegenerateSecretConfirm] = useState(false)
   const [editEnabledOverride, setEditEnabledOverride] = useState<boolean | null>(null)
   const [deliveryDetailsTab, setDeliveryDetailsTab] = useState<'event' | 'response'>('event')
+  const [pendingCreatedEndpointId, setPendingCreatedEndpointId] = useState<string | null>(null)
 
   const scopeLabel = scope === 'organization' ? 'Organization Webhooks' : 'Project Webhooks'
   const scopeDescription =
@@ -110,11 +117,31 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   }, [fallbackHref, platformWebhooksEnabled, router])
 
   useEffect(() => {
-    if (!!endpointId && !selectedEndpoint) {
+    if (
+      shouldHandleEndpointNotFound({
+        endpointId,
+        hasSelectedEndpoint: !!selectedEndpoint,
+        pendingCreatedEndpointId,
+      })
+    ) {
       toast('Endpoint not found')
       router.replace(webhooksHref)
     }
-  }, [endpointId, selectedEndpoint, router, webhooksHref])
+  }, [endpointId, pendingCreatedEndpointId, selectedEndpoint, router, webhooksHref])
+
+  useEffect(() => {
+    if (!pendingCreatedEndpointId) return
+    if (endpointId !== pendingCreatedEndpointId || selectedEndpoint?.id === pendingCreatedEndpointId) {
+      setPendingCreatedEndpointId(null)
+    }
+  }, [endpointId, pendingCreatedEndpointId, selectedEndpoint])
+
+  useEffect(() => {
+    if (signingSecretReveal || !endpointId) return
+    const pendingReveal = getPendingSigningSecretReveal(scope, endpointId)
+    if (!pendingReveal) return
+    setSigningSecretReveal({ signingSecret: pendingReveal.signingSecret })
+  }, [endpointId, scope, signingSecretReveal])
 
   const filteredEndpoints = useMemo(() => {
     return filterWebhookEndpoints(endpoints, search)
@@ -189,6 +216,11 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       const { endpointId: createdEndpointId, signingSecret } = createEndpoint(
         toEndpointPayload(values)
       )
+      setPendingCreatedEndpointId(createdEndpointId)
+      setPendingSigningSecretReveal(scope, {
+        endpointId: createdEndpointId,
+        signingSecret,
+      })
       router.push(`${webhooksHref}/${encodeURIComponent(createdEndpointId)}`)
       setSigningSecretReveal({ signingSecret })
       setPanel(null)
@@ -367,7 +399,11 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
       <AlertDialog
         open={!!signingSecretReveal}
-        onOpenChange={(open) => !open && setSigningSecretReveal(null)}
+        onOpenChange={(open) => {
+          if (open) return
+          setSigningSecretReveal(null)
+          clearPendingSigningSecretReveal(scope)
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -381,9 +417,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
             </AlertDialogDescription>
           </AlertDialogHeader>
           {/* Content */}
-          <div className="space-y-4 mx-5 pt-4 pb-5 border-t border-muted">
+          <div className="space-y-4 mx-5 pb-5">
             <div className="space-y-1">
-              <Label_Shadcn_ className="text-foreground-lighter">Signing secret</Label_Shadcn_>
+              <Label_Shadcn_>Signing secret</Label_Shadcn_>
               <Input
                 copy
                 readOnly
@@ -401,7 +437,12 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
             </div>
           </div>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setSigningSecretReveal(null)}>
+            <AlertDialogAction
+              onClick={() => {
+                setSigningSecretReveal(null)
+                clearPendingSigningSecretReveal(scope)
+              }}
+            >
               I’ve stored the secret
             </AlertDialogAction>
           </AlertDialogFooter>

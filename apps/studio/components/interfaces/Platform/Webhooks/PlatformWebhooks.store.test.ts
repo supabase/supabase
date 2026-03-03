@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { PLATFORM_WEBHOOKS_MOCK_DATA } from './PlatformWebhooks.mock'
 import {
   createInitialPlatformWebhooksState,
@@ -6,12 +7,18 @@ import {
   deleteWebhookEndpoint,
   filterWebhookDeliveries,
   filterWebhookEndpoints,
+  resetPlatformWebhooksMockStateForTests,
   regenerateWebhookEndpointSecret,
   toggleWebhookEndpoint,
+  usePlatformWebhooksMockStore,
   updateWebhookEndpoint,
 } from './PlatformWebhooks.store'
 
 describe('PlatformWebhooks.store', () => {
+  beforeEach(() => {
+    resetPlatformWebhooksMockStateForTests()
+  })
+
   it('creates isolated initial state from mock seed', () => {
     const state = createInitialPlatformWebhooksState('organization')
     state.endpoints[0].name = 'Changed'
@@ -136,5 +143,33 @@ describe('PlatformWebhooks.store', () => {
     const matchingDeliveries = filterWebhookDeliveries(state.deliveries, firstEndpoint.id, '500')
     expect(matchingDeliveries).toHaveLength(1)
     expect(matchingDeliveries[0].status).toBe('failure')
+  })
+
+  it('persists mock endpoint state across hook unmount/mount for the same scope', () => {
+    const createdEndpointUrl = 'https://persisted.example.com/webhooks'
+    const firstMount = renderHook(() => usePlatformWebhooksMockStore('project'))
+
+    let createdEndpointId = ''
+    act(() => {
+      const created = firstMount.result.current.createEndpoint({
+        name: 'Persisted endpoint',
+        url: createdEndpointUrl,
+        description: 'Persist across route changes',
+        enabled: true,
+        eventTypes: ['project.updated'],
+        customHeaders: [],
+      })
+      createdEndpointId = created.endpointId
+    })
+
+    firstMount.unmount()
+
+    const secondMount = renderHook(() => usePlatformWebhooksMockStore('project'))
+    const persistedEndpoint = secondMount.result.current.endpoints.find(
+      (endpoint) => endpoint.id === createdEndpointId
+    )
+
+    expect(persistedEndpoint?.url).toBe(createdEndpointUrl)
+    secondMount.unmount()
   })
 })

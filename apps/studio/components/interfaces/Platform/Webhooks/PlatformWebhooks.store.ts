@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { PLATFORM_WEBHOOKS_MOCK_DATA } from './PlatformWebhooks.mock'
 import type {
@@ -64,6 +64,29 @@ export const createInitialPlatformWebhooksState = (scope: WebhookScope): Platfor
   return {
     endpoints: deepClone(seed.endpoints),
     deliveries: deepClone(seed.deliveries),
+  }
+}
+
+const persistedMockStateByScope: Partial<Record<WebhookScope, PlatformWebhooksState>> = {}
+
+const getPersistedMockState = (scope: WebhookScope) => {
+  const persistedState = persistedMockStateByScope[scope]
+  if (persistedState) return persistedState
+
+  const initialState = createInitialPlatformWebhooksState(scope)
+  persistedMockStateByScope[scope] = initialState
+  return initialState
+}
+
+// Test-only helper to avoid cross-test state leakage in hook tests.
+export const resetPlatformWebhooksMockStateForTests = (scope?: WebhookScope) => {
+  if (scope) {
+    delete persistedMockStateByScope[scope]
+    return
+  }
+
+  for (const key of Object.keys(persistedMockStateByScope) as WebhookScope[]) {
+    delete persistedMockStateByScope[key]
   }
 }
 
@@ -185,9 +208,19 @@ export const filterWebhookDeliveries = (
 }
 
 export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
-  const [state, setState] = useState<PlatformWebhooksState>(() =>
-    createInitialPlatformWebhooksState(scope)
-  )
+  const [state, setState] = useState<PlatformWebhooksState>(() => deepClone(getPersistedMockState(scope)))
+
+  useEffect(() => {
+    setState(deepClone(getPersistedMockState(scope)))
+  }, [scope])
+
+  const applyStateUpdate = (updater: (previous: PlatformWebhooksState) => PlatformWebhooksState) => {
+    setState((previous) => {
+      const next = updater(previous)
+      persistedMockStateByScope[scope] = next
+      return next
+    })
+  }
 
   return {
     ...state,
@@ -197,32 +230,30 @@ export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
       const signingSecret = generateSigningSecret()
       const createdBy = 'mock-user@supabase.io'
       let createdSecret = signingSecret
-      setState(
-        (prev) => {
-          const next = createWebhookEndpoint(prev, input, {
-            endpointId,
-            now,
-            signingSecret,
-            createdBy,
-          })
-          createdSecret = next.signingSecret
-          return next.state
-        }
-      )
+      applyStateUpdate((prev) => {
+        const next = createWebhookEndpoint(prev, input, {
+          endpointId,
+          now,
+          signingSecret,
+          createdBy,
+        })
+        createdSecret = next.signingSecret
+        return next.state
+      })
       return { endpointId, signingSecret: createdSecret }
     },
     updateEndpoint: (endpointId: string, input: UpsertWebhookEndpointInput) => {
-      setState((prev) => updateWebhookEndpoint(prev, endpointId, input))
+      applyStateUpdate((prev) => updateWebhookEndpoint(prev, endpointId, input))
     },
     deleteEndpoint: (endpointId: string) => {
-      setState((prev) => deleteWebhookEndpoint(prev, endpointId))
+      applyStateUpdate((prev) => deleteWebhookEndpoint(prev, endpointId))
     },
     toggleEndpoint: (endpointId: string, enabled?: boolean) => {
-      setState((prev) => toggleWebhookEndpoint(prev, endpointId, enabled))
+      applyStateUpdate((prev) => toggleWebhookEndpoint(prev, endpointId, enabled))
     },
     regenerateSecret: (endpointId: string) => {
       let nextSecret: string | null = null
-      setState((prev) => {
+      applyStateUpdate((prev) => {
         const next = regenerateWebhookEndpointSecret(prev, endpointId)
         nextSecret = next.signingSecret
         return next.state

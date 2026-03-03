@@ -9,6 +9,13 @@ Context:
 
 Track temporary client-side mock scaffolding that must be removed or swapped when Platform Webhooks backend integration is implemented.
 
+## Incremental Fix Notes (Pre-Backend)
+
+- 2026-03-03: Replaced `Math.random()` usage in `PlatformWebhooks.store.ts` with Web Crypto randomness (`crypto.getRandomValues`) for generated endpoint IDs, header IDs, and signing secrets to satisfy GitHub Advanced Security findings in PR #43276.
+- 2026-03-03: Added create-route transition guard in `PlatformWebhooksPage.tsx` to avoid false "Endpoint not found" during immediate navigation after creating a mock endpoint.
+- 2026-03-03: Persisted mock webhook store state across route unmount/mount cycles (list route to endpoint route) so newly created endpoints are still present after navigation in feature-preview mode.
+- 2026-03-03: Persisted pending signing-secret reveal across transient page remounts so the post-create secret dialog remains visible until the user explicitly dismisses it.
+
 ## Remove/Swap on Backend Integration
 
 - [ ] Replace local mock store writes (`createEndpoint`, `updateEndpoint`, `deleteEndpoint`, `toggleEndpoint`, `regenerateSecret`) with backend query/mutation flows.

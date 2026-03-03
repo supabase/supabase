@@ -168,7 +168,7 @@ export const PlatformWebhooksEndpointList = ({
                   <TableCell className="max-w-[420px]">
                     <p className="truncate">{endpoint.url}</p>
                     {endpoint.description && (
-                      <p className="text-xs text-foreground-light truncate mt-1">
+                      <p className="text-xs text-foreground-lighter truncate mt-0.5">
                         {endpoint.description}
                       </p>
                     )}
@@ -178,7 +178,7 @@ export const PlatformWebhooksEndpointList = ({
                   </TableCell>
                   <TableCell>
                     <p>{formatDate(endpoint.createdAt)}</p>
-                    <p className="text-xs text-foreground-light mt-1">by {endpoint.createdBy}</p>
+                    <p className="text-xs text-foreground-lighter mt-0.5">by {endpoint.createdBy}</p>
                   </TableCell>
                   <TableCell className="text-right">
                     <div

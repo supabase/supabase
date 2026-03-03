@@ -36,7 +36,7 @@ export const PlatformWebhooksEndpointDetails = ({
   onRegenerateSecret,
 }: PlatformWebhooksEndpointDetailsProps) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-16">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <Card className="overflow-hidden">
           <CardHeader>
@@ -148,7 +148,7 @@ export const PlatformWebhooksEndpointDetails = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4}>No deliveries found.</TableCell>
+                  <TableCell colSpan={4}>No deliveries found</TableCell>
                 </TableRow>
               )}
             </TableBody>
