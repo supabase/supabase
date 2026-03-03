@@ -129,7 +129,8 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -keyout volumes/api/server.key \
   -out volumes/api/server.crt \
   -subj "/CN=<your-domain>" && \
-  chmod 644 volumes/api/server.key
+  chmod 640 volumes/api/server.key && \
+  chgrp 65533 volumes/api/server.key
 ```
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
