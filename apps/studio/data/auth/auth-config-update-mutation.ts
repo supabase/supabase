@@ -46,6 +46,10 @@ export const useAuthConfigUpdateMutation = ({
         queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) }),
         queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
       ])
+      await queryClient.refetchQueries({
+        queryKey: lintKeys.lint(projectRef),
+        type: 'active',
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

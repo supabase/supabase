@@ -17,10 +17,12 @@ export const DestinationPanelFormSchema = z.object({
     .int()
     .min(1, 'Max copy connections per table should be greater than 0')
     .optional(),
+  invalidatedSlotBehavior: z.enum(['error', 'recreate']).optional(),
   // BigQuery fields
   projectId: z.string().optional(),
   datasetId: z.string().optional(),
   serviceAccountKey: z.string().optional(),
+  connectionPoolSize: z.number().int().min(1).optional(),
   maxStalenessMins: z.number().nonnegative().optional(),
   // Analytics Bucket fields, only warehouse name and namespace are visible + editable fields
   warehouseName: z.string().optional(),

@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { storageCredentialsKeys } from './s3-access-key-keys'
 
-type CreateS3AccessKeyCredentialVariables = {
+export type CreateS3AccessKeyCredentialVariables = {
   description: string
   projectRef?: string
 }
@@ -25,7 +25,7 @@ const createS3AccessKeyCredential = async ({
   return data
 }
 
-type S3AccessKeyCreateData = Awaited<ReturnType<typeof createS3AccessKeyCredential>>
+export type S3AccessKeyCreateData = Awaited<ReturnType<typeof createS3AccessKeyCredential>>
 
 export function useS3AccessKeyCreateMutation({
   onSuccess,
