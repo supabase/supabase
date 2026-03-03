@@ -10,7 +10,7 @@ import {
 } from 'recharts'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
 import { Loader2 } from 'lucide-react'
-import type { ChartDataPoint } from '../../QueryPerformance/QueryPerformance.types'
+import type { ChartDataPoint } from '../QueryInsights.types'
 import { useTheme } from 'next-themes'
 import { QueryInsightsChartTooltip } from './QueryInsightsChartTooltip'
 import { CHART_TABS, LEGEND_ITEMS, CHART_TYPE } from './QueryInsightsChart.constants'

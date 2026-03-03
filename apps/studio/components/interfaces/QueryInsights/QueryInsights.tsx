@@ -4,14 +4,13 @@ import utc from 'dayjs/plugin/utc'
 
 import { useParams } from 'common'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { getSupamonitorLogsQuery } from '../QueryPerformance/QueryPerformance.constants'
+import { getSupamonitorLogsQuery } from './QueryInsights.constants'
 import {
   parseSupamonitorLogs,
   filterSystemLogs,
   transformLogsToChartData,
   aggregateLogsByQuery,
-} from '../QueryPerformance/WithSupamonitor/WithSupamonitor.utils'
+} from './utils/supamonitor.utils'
 
 import { QueryInsightsHealth } from './QueryInsightsHealth/QueryInsightsHealth'
 import { QueryInsightsChart } from './QueryInsightsChart/QueryInsightsChart'
@@ -26,10 +25,9 @@ interface QueryInsightsProps {
     period_end: { date: string; time_period: string }
     interval: string
   }
-  onDateRangeChange?: (from: string, to: string) => void
 }
 
-export const QueryInsights = ({ dateRange, onDateRangeChange }: QueryInsightsProps) => {
+export const QueryInsights = ({ dateRange }: QueryInsightsProps) => {
   const { ref } = useParams()
 
   const effectiveDateRange = useMemo(() => {
@@ -56,7 +54,7 @@ export const QueryInsights = ({ dateRange, onDateRangeChange }: QueryInsightsPro
     [effectiveDateRange]
   )
 
-  const { logData, isLoading, error } = useLogsQuery(ref as string, {
+  const { logData, isLoading } = useLogsQuery(ref as string, {
     sql,
     iso_timestamp_start: effectiveDateRange.iso_timestamp_start,
     iso_timestamp_end: effectiveDateRange.iso_timestamp_end,
