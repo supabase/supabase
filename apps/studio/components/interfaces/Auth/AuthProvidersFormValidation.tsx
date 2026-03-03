@@ -33,6 +33,14 @@ const PROVIDER_EMAIL = {
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
+    SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: {
+      title: 'Require the current password updating password',
+      description:
+        'Requires that the user supplies their current password when changing their password.',
+      type: 'boolean',
+      link: `${DOCS_URL}/guides/auth/password-security#require-current-password-when-changing`,
+      isPaid: false,
+    },
     PASSWORD_HIBP_ENABLED: {
       title: 'Prevent use of leaked passwords',
       description: `Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API. [Learn more](${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection)`,
@@ -70,7 +78,6 @@ const PROVIDER_EMAIL = {
         },
       ],
     },
-
     MAILER_OTP_EXP: {
       title: 'Email OTP expiration',
       type: 'number',
