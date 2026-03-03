@@ -118,9 +118,9 @@ const page: GoPageInput = {
             last_name: 'last_name',
             company_name: 'company_name',
           },
-          // TODO: Need staticProperties support in customerio schema to send
-          // event_name: 'Stripe Sessions 2026 Exec Dinner' as a track() property.
-          // Currently only form field values are sent as event properties.
+          staticProperties: {
+            event_name: 'Stripe Sessions 2026 Exec Dinner',
+          },
         },
       },
     },
