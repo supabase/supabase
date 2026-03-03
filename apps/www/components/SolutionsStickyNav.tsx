@@ -14,15 +14,16 @@ import {
 import SectionContainer from 'components/Layouts/SectionContainer'
 import {
   SolutionTypes,
+  appTypeSolutions,
+  migrationSolutions,
   skillBasedSolutions,
   useCaseSolutions,
-  migrationSolutions,
 } from 'data/Solutions'
 
 interface Props {
   activeItem: SolutionTypes
   className?: string
-  type?: 'skill-based' | 'use-case' | 'migration'
+  type?: 'skill-based' | 'use-case' | 'migration' | 'app-type'
 }
 
 function SolutionsStickyNav({ type, activeItem, className }: Props) {
@@ -32,7 +33,9 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
       ? skillBasedSolutions.solutions
       : type === 'use-case'
         ? useCaseSolutions.solutions
-        : migrationSolutions.solutions
+        : type === 'app-type'
+          ? appTypeSolutions.solutions
+          : migrationSolutions.solutions
   const items = solutions.map((solution: any) => ({
     id: solution.id,
     name: solution.text,

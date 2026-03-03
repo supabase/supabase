@@ -13,7 +13,7 @@ import { INTEGRATIONS } from './Integrations.constants'
 import {
   isInstalled as checkIsInstalled,
   findStripeSchema,
-  parseStripeSchemaStatus,
+  parseStripeSchema,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 
 export const useInstalledIntegrations = () => {
@@ -86,8 +86,8 @@ export const useInstalledIntegrations = () => {
         }
         if (integration.id === 'stripe_sync_engine') {
           const stripeSchema = findStripeSchema(schemas)
-          const status = parseStripeSchemaStatus(stripeSchema)
-          return checkIsInstalled(status)
+          const parsedSchema = parseStripeSchema(stripeSchema)
+          return checkIsInstalled(parsedSchema.status)
         }
         if (integration.type === 'wrapper') {
           return wrappers.find((w) => wrapperMetaComparator(integration.meta, w))
