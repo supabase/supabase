@@ -521,6 +521,51 @@ Phase 1: Core infrastructure — done ✓
 
 Phase 2: Common package changes — done ✓
 
+Phase 3: Projects + layout dependencies — done ✓
+
+Service interfaces + live wiring:
+  data/projects/projects-service.ts — ProjectsService { getProjectDetail }
+  data/projects/projects-service-live.ts — wires getProjectDetail
+  data/organizations/organizations-service.ts — OrganizationsService { getOrganizations }
+  data/organizations/organizations-service-live.ts — wires getOrganizations
+  data/profile/profile-service.ts — ProfileService { getProfile }
+  data/profile/profile-service-live.ts — wires getProfile
+  data/permissions/permissions-service.ts — PermissionsService { getPermissions }
+  data/permissions/permissions-service-live.ts — wires getPermissions
+
+Hooks migrated to useService():
+  data/projects/project-detail-query.ts — useProjectDetailQuery uses useService('projects')
+  data/organizations/organizations-query.ts — useOrganizationsQuery uses useService('organizations')
+  data/profile/profile-query.ts — useProfileQuery uses useService('profile')
+  data/permissions/permissions-query.ts — usePermissionsQuery uses useService('permissions')
+
+lib/services/registry.ts updated — added organizations, permissions, profile, projects slots.
+lib/services/live-registry.ts updated — assembles all six live services.
+Type-checked clean (tsc --noEmit --skipLibCheck).
+
+Phase 4: Test infrastructure — partially done
+
+Steps 16–17 complete:
+
+tests/lib/service-mocks.ts
+  Per-service mock factories: createMockProjectsService, createMockOrganizationsService,
+  createMockProfileService, createMockPermissionsService, createMockAuthService,
+  createMockFeatureFlagService. Each accepts Partial<Service> overrides and returns
+  vi.fn() mocks with sensible defaults.
+  createMockRegistry(overrides?) assembles a full ServiceRegistry from the factories.
+
+tests/lib/render-app.tsx
+  renderApp(PageComponent, opts) — full-page render helper. Sets router URL via
+  routerMock.setCurrentUrl, wraps the page in its layout chain via
+  PageComponent.getLayout?.(page) ?? page, then renders inside AppProviders with
+  a mock registry. Use for integration tests where layouts must render.
+  renderWithRegistry(ui, opts) — component-level render inside AppProviders + mock registry.
+  renderHookWithRegistry(hook, opts) — hook render inside AppProviders + mock registry.
+  All three helpers accept services?: Partial<ServiceRegistry> and queryClient?: QueryClient.
+
+Steps 14–15 (install browser deps, configure Vitest projects) and step 18
+(first full-page integration test) still to do.
+
 packages/common/auth.tsx
   Added AuthClient interface (initialize, onAuthStateChange, refreshSession) — narrow interface
   for the 3 methods AuthProvider uses, enabling mock injection in tests.
