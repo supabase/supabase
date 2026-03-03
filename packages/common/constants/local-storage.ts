@@ -11,7 +11,7 @@ export const LOCAL_STORAGE_KEYS = {
   PROJECTS_SORT: 'projects-sort',
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
-  INCIDENT_BANNER_DISMISSED: (id: string) => `incident-banner-dismissed-${id}`,
+  INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
   MAINTENANCE_BANNER_DISMISSED: (id: string) => `maintenance-banner-dismissed-${id}`,
 
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
@@ -23,6 +23,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
   UI_PREVIEW_TABLE_FILTER_BAR: 'supabase-ui-table-filter-bar',
+  UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',

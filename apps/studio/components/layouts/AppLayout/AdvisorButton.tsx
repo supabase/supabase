@@ -12,10 +12,8 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
-  const hasCriticalIssues = Array.isArray(lints) && lints.some((lint) => lint.level === 'ERROR')
 
   const { data: notificationsData } = useNotificationsV2Query({
-    status: 'new',
     filters: {},
     limit: 20,
   })
@@ -23,6 +21,11 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
     return notificationsData?.pages.flatMap((page) => page) ?? []
   }, [notificationsData?.pages])
   const hasUnreadNotifications = notifications.some((x) => x.status === 'new')
+  const hasCriticalNotifications = notifications.some((x) => x.priority === 'Critical')
+
+  const hasCriticalIssues =
+    hasCriticalNotifications ||
+    (Array.isArray(lints) && lints.some((lint) => lint.level === 'ERROR'))
 
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
 
