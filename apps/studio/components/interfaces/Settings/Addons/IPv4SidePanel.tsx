@@ -133,7 +133,7 @@ const IPv4SidePanel = () => {
           </p>
 
           <p className="text-sm">
-            The Shared Pooler endpoint accepts IPv4 connections by default and does not require this
+            The shared pooler endpoint accepts IPv4 connections by default and does not require this
             add-on.
           </p>
 
