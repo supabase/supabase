@@ -128,13 +128,14 @@ const IPv4SidePanel = () => {
       <SidePanel.Content>
         <div className="py-6 space-y-4">
           <p className="text-sm">
-            Your project’s direct connection endpoint and dedicated pooler are IPv6-only by default. Enable the dedicated IPv4 address add-on to connect from IPv4-only networks.
+            Your project’s direct connection endpoint and dedicated pooler are IPv6-only by default.
+            Enable the dedicated IPv4 address add-on to connect from IPv4-only networks.
           </p>
 
           <p className="text-sm">
-            The Shared Pooler endpoint accepts IPv4 connections by default and does not require this add-on.
+            The Shared Pooler endpoint accepts IPv4 connections by default and does not require this
+            add-on.
           </p>
-
 
           {!isAws && (
             <Admonition
@@ -142,7 +143,6 @@ const IPv4SidePanel = () => {
               title="Dedicated IPv4 address is only available for AWS projects"
             />
           )}
-
 
           <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
             <RadioGroup_Shadcn_
@@ -235,10 +235,7 @@ const IPv4SidePanel = () => {
               {selectedOption !== 'ipv4_none' && (
                 <p className="text-sm text-foreground-light">
                   By default, this is only applied to the primary database for your project. If{' '}
-                  <InlineLink
-                    href={`${DOCS_URL}/guides/platform/read-replicas`}
-                    target="_blank"
-                  >
+                  <InlineLink href={`${DOCS_URL}/guides/platform/read-replicas`} target="_blank">
                     read replicas
                   </InlineLink>{' '}
                   are used, each replica also gets its own IPv4 address, with a corresponding{' '}
@@ -247,8 +244,8 @@ const IPv4SidePanel = () => {
                 </p>
               )}
               <p className="text-sm text-foreground-light">
-                There are no immediate charges. The add-on is billed at the end of your billing cycle
-                based on your usage and prorated to the hour.
+                There are no immediate charges. The add-on is billed at the end of your billing
+                cycle based on your usage and prorated to the hour.
               </p>
             </>
           )}

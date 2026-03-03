@@ -97,8 +97,8 @@ export const ConnectionPooling = () => {
     computeInstance?.variant.name ?? capitalize(project?.infra_compute_size) ?? 'Nano'
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
-    (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
-    (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
+      (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
+        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
     ]
   const defaultPoolSize = poolingOptimizations.poolSize ?? 15
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
@@ -168,7 +168,13 @@ export const ConnectionPooling = () => {
             layout="responsive"
             title="Dedicated Pooler uses IPv6 by default"
             description="Connections from IPv4-only networks require enabling the IPv4 add-on on your project instance."
-            actions={<Button type="default" asChild><Link href={`/project/${projectRef}/settings/addons?panel=ipv4`}>Enable IPv4 add-on</Link></Button>}
+            actions={
+              <Button type="default" asChild>
+                <Link href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
+                  Enable IPv4 add-on
+                </Link>
+              </Button>
+            }
           />
         )}
 
