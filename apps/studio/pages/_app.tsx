@@ -20,66 +20,25 @@ import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
-import * as Sentry from '@sentry/nextjs'
-import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import {
-  FeatureFlagProvider,
-  getFlags,
-  TelemetryTagManager,
-  ThemeProvider,
-  useThemeSandbox,
-} from 'common'
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
-import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
-import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { FeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
-import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
-import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
-import { MainScrollContainerProvider } from 'components/layouts/MainScrollContainerContext'
-import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
-import { useRootQueryClient } from 'data/query-client'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { DevToolbar, DevToolbarProvider } from 'dev-tools'
-import { customFont, sourceCodePro } from 'fonts'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { AuthProvider } from 'lib/auth'
-import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
-import { ProfileProvider } from 'lib/profile'
-import { Telemetry } from 'lib/telemetry'
-import Head from 'next/head'
-import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { ErrorInfo, useCallback, type ComponentProps } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
-import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
-import type { AppPropsWithLayout } from 'types'
-import { SonnerToaster, TooltipProvider } from 'ui'
+import { useMemo } from 'react'
+
+import { useRootQueryClient } from '@/data/query-client'
+import { AppProviders } from '@/lib/app-providers'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { createLiveRegistry } from '@/lib/services/live-registry'
+import type { AppPropsWithLayout } from '@/types'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
-
-const FeatureFlagProviderWithOrgContext = ({
-  children,
-  ...props
-}: ComponentProps<typeof FeatureFlagProvider>) => {
-  const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
-
-  return (
-    <FeatureFlagProvider {...props} organizationSlug={selectedOrganization?.slug ?? undefined}>
-      {children}
-    </FeatureFlagProvider>
-  )
-}
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -101,109 +60,17 @@ loader.config({
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
-  const { appTitle } = useCustomContent(['app:title'])
-
+  const registry = useMemo(() => createLiveRegistry(), [])
   const getLayout = Component.getLayout ?? ((page) => page)
 
-  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
-    Sentry.withScope(function (scope) {
-      scope.setTag('globalErrorBoundary', true)
-      const eventId = Sentry.captureException(error)
-      // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
-      if (eventId && error && typeof error === 'object') {
-        ;(error as any).sentryId = eventId
-      }
-    })
-
-    console.error(error.stack)
-  }
-
-  useThemeSandbox()
-
-  const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
-
-  const cloudProvider = useDefaultProvider()
-
-  const getConfigCatFlags = useCallback(
-    (userEmail?: string) => {
-      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
-      return getFlags(userEmail, customAttributes)
-    },
-    [cloudProvider]
-  )
-
   return (
-    <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
-      <QueryClientProvider client={queryClient}>
-        <NuqsAdapter>
-          <HydrationBoundary state={pageProps.dehydratedState}>
-            <AuthProvider>
-              <FeatureFlagProviderWithOrgContext
-                API_URL={API_URL}
-                enabled={IS_PLATFORM}
-                getConfigCatFlags={getConfigCatFlags}
-              >
-                <ProfileProvider>
-                  <Head>
-                    <title>{appTitle ?? 'Supabase'}</title>
-                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                    <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
-                    <meta name="googlebot" content="notranslate" />
-                    {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
-                    <style
-                      dangerouslySetInnerHTML={{
-                        __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
-                      }}
-                    />
-                    {/* Speed up initial API loading times by pre-connecting to the API domain */}
-                    {IS_PLATFORM && (
-                      <link
-                        rel="preconnect"
-                        href={new URL(API_URL).origin}
-                        crossOrigin="use-credentials"
-                      />
-                    )}
-                  </Head>
-                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
-                  <TooltipProvider delayDuration={0}>
-                    <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
-                        <DevToolbarProvider apiUrl={API_URL}>
-                          <AiAssistantStateContextProvider>
-                            <CommandProvider>
-                              <FeaturePreviewContextProvider>
-                                <MainScrollContainerProvider>
-                                  {getLayout(<Component {...pageProps} />)}
-                                </MainScrollContainerProvider>
-                                <StudioCommandMenu />
-                                <FeaturePreviewModal />
-                              </FeaturePreviewContextProvider>
-                              <SonnerToaster position="top-right" />
-                              <MonacoThemeProvider />
-                            </CommandProvider>
-                          </AiAssistantStateContextProvider>
-                          <DevToolbar />
-                        </DevToolbarProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                  <Telemetry />
-                  {!isTestEnv && (
-                    <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
-                  )}
-                </ProfileProvider>
-              </FeatureFlagProviderWithOrgContext>
-            </AuthProvider>
-          </HydrationBoundary>
-        </NuqsAdapter>
-      </QueryClientProvider>
-      <TelemetryTagManager />
-    </ErrorBoundary>
+    <AppProviders
+      registry={registry}
+      queryClient={queryClient}
+      dehydratedState={pageProps.dehydratedState}
+    >
+      {getLayout(<Component {...pageProps} />)}
+    </AppProviders>
   )
 }
 

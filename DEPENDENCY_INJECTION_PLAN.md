@@ -517,7 +517,7 @@
 ---
 Progress
 
-Phase 1: Core infrastructure — steps 1-3 done ✓
+Phase 1: Core infrastructure — done ✓
 
 New files created in apps/studio/lib/services/:
 
@@ -549,4 +549,18 @@ lib/services/feature-flag-service.ts
 lib/services/live-registry.ts
   createLiveRegistry() assembles authServiceLive + featureFlagServiceLive.
 
-No existing files modified. Steps 4-6 (app-providers.tsx + _app.tsx wiring) are next.
+lib/app-providers.tsx
+  AppProviders component — all providers in one place (QueryClientProvider, NuqsAdapter,
+  ServiceRegistryProvider, AuthProvider, FeatureFlagProviderWithOrgContext, ProfileProvider,
+  TooltipProvider, RouteValidationWrapper, ThemeProvider, DevToolbarProvider,
+  AiAssistantStateContextProvider, CommandProvider, FeaturePreviewContextProvider,
+  MainScrollContainerProvider) plus singletons (StudioCommandMenu, FeaturePreviewModal,
+  SonnerToaster, MonacoThemeProvider, DevToolbar).
+  Takes registry: ServiceRegistry and queryClient: QueryClient as props.
+  getConfigCatFlags still built here using useDefaultProvider() — Phase 2 will wire
+  from registry.featureFlags.getConfigCatFlags.
+
+Modified pages/_app.tsx
+  Uses AppProviders with createLiveRegistry(). All provider JSX removed.
+  _app.tsx now only handles: actual page component and its layout
+Type-checked clean (tsc --noEmit --skipLibCheck).
