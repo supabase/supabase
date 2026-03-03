@@ -166,7 +166,7 @@ export const ConnectionPooling = () => {
           <Admonition
             type="default"
             layout="responsive"
-            title="Dedicated Pooler uses IPv6 by default"
+            title="Dedicated pooler uses IPv6 by default"
             description="Connections from IPv4-only networks require enabling the IPv4 add-on on your project instance."
             actions={
               <Button type="default" asChild>

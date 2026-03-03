@@ -172,7 +172,7 @@ const IPv4SidePanel = () => {
                     <div className="px-4 py-3">
                       <p className="text-sm font-medium">No IPv4 address</p>
                       <p className="text-foreground-light text-sm mt-1">
-                        Use connection pooler or IPv6 for direct connections
+                        Use shared pooler or IPv6 for database connections.
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
                         <p className="text-foreground text-sm">$0</p>
@@ -206,7 +206,7 @@ const IPv4SidePanel = () => {
                       <div className="px-4 py-3">
                         <p className="text-sm font-medium">Dedicated IPv4 address</p>
                         <p className="text-foreground-light text-sm mt-1">
-                          Allow direct database connections via IPv4 address
+                          Allow database connections from IPv4 networks.
                         </p>
                         <div className="flex items-center space-x-1 mt-3 text-sm">
                           <p className="text-sm" translate="no">
