@@ -4,11 +4,11 @@ import { ArrowDownIcon } from '@heroicons/react/outline'
 import { ArrowUpRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-import { hasConsented, posthogClient, useFeatureFlags } from 'common'
+import { hasConsented, posthogClient } from 'common'
 import DefaultLayout from '~/components/Layouts/Default'
 import NewPricingComputeSection from '~/components/Pricing/NewPricingComputeSection'
 import PricingPlans from '~/components/Pricing/PricingPlans'
@@ -52,11 +52,21 @@ export default function PricingContent() {
   const hasExistingOrganizations = !isLoading && organizations.length > 0
 
   // Pricing calculator A/B experiment
-  const featureFlags = useFeatureFlags()
-  const flagValue = featureFlags.posthog[EXPERIMENT_ID] as
-    | PricingCalculatorVariant
-    | false
-    | undefined
+  // Uses client-side PostHog directly — server-side evaluation lacks full person context for www pages.
+  // DevToolbar overrides (x-ph-flag-overrides cookie) are respected in local dev via posthogClient.getFeatureFlag.
+  const [flagValue, setFlagValue] = useState<PricingCalculatorVariant | false | undefined>(
+    () => posthogClient.getFeatureFlag(EXPERIMENT_ID) as PricingCalculatorVariant | false | undefined
+  )
+
+  useEffect(() => {
+    console.log('[experiment] mount, current flag:', posthogClient.getFeatureFlag(EXPERIMENT_ID))
+    return posthogClient.onFeatureFlags(() => {
+      const value = posthogClient.getFeatureFlag(EXPERIMENT_ID)
+      console.log('[experiment] onFeatureFlags fired, value:', value)
+      setFlagValue(value as PricingCalculatorVariant | false | undefined)
+    })
+  }, [])
+
   const isTestVariant = flagValue === 'test'
   const isInExperiment = flagValue === 'control' || flagValue === 'test'
 
