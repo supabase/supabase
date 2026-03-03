@@ -8,7 +8,7 @@ export const transformStatementDataToRows = (
   data: any[],
   filterIndexAdvisor: boolean = false
 ): QueryPerformanceRow[] => {
-  if (!data || data.length === 0) return []
+  if (!data || !Array.isArray(data) || data.length === 0) return []
 
   const totalTimeAcrossAllQueries = data.reduce((sum, row) => sum + (row.total_time || 0), 0)
 

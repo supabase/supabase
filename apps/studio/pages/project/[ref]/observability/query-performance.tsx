@@ -18,6 +18,7 @@ import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
+import { ErrorBoundary } from 'components/ui/ErrorBoundary/ErrorBoundary'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -113,14 +114,19 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           )}
         </div>
       </div>
-      <QueryPerformance
-        queryHitRate={queryHitRate}
-        queryPerformanceQuery={queryPerformanceQuery}
-        queryMetrics={queryMetrics}
-        isSupamonitorEnabled={isSupamonitorEnabled}
-        dateRange={selectedDateRange}
-        onDateRangeChange={updateDateRange}
-      />
+      <ErrorBoundary
+        message="Failed to load query performance data"
+        sentryContext={{ page: 'query-performance', projectRef: ref }}
+      >
+        <QueryPerformance
+          queryHitRate={queryHitRate}
+          queryPerformanceQuery={queryPerformanceQuery}
+          queryMetrics={queryMetrics}
+          isSupamonitorEnabled={isSupamonitorEnabled}
+          dateRange={selectedDateRange}
+          onDateRangeChange={updateDateRange}
+        />
+      </ErrorBoundary>
     </div>
   )
 }

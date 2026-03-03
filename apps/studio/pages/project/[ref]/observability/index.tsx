@@ -4,6 +4,7 @@ import { ObservabilityOverview } from 'components/interfaces/Observability/Obser
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { ErrorBoundary } from 'components/ui/ErrorBoundary/ErrorBoundary'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -63,7 +64,14 @@ export const UserReportPage: NextPageWithLayout = () => {
 
   // Show overview page if feature flag is enabled
   if (showOverview) {
-    return <ObservabilityOverview />
+    return (
+      <ErrorBoundary
+        message="Failed to load observability data"
+        sentryContext={{ page: 'observability', projectRef: ref }}
+      >
+        <ObservabilityOverview />
+      </ErrorBoundary>
+    )
   }
 
   return (
