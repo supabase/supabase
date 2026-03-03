@@ -1,9 +1,9 @@
 ---
 title: TanStack DB
-description: Type-safe database collections with TanStack Query and Supabase
+description: Local-first, reactive collections backed by Supabase
 ---
 
-This block provides TanStack Query integration with Supabase collections for type-safe database operations. It generates Zod schemas and collection configurations based on your database schema.
+A [TanStack/db](https://tanstack.com/db/latest) collection backed by [Supabase](https://supabase.com/). It wires up Supabase PostgREST queries, mutations, and real-time subscriptions so you get a reactive state that stays in sync with your Postgres database.
 
 ## Installation
 
@@ -20,15 +20,14 @@ Enter your Supabase project credentials to generate a personalized installation 
 
 This block installs the following files:
 
-| File                         | Description                                          |
-| ---------------------------- | ---------------------------------------------------- |
-| `lib/schemas.ts`             | Zod schemas for all your database tables             |
-| `lib/db.ts`                  | Supabase collections for type-safe CRUD operations   |
-| `lib/query-client.ts`        | TanStack Query client configuration with SSR support |
-| `app/providers.tsx`          | React Query provider component                       |
-| `lib/supabase/client.ts`     | Browser Supabase client                              |
-| `lib/supabase/server.ts`     | Server-side Supabase client                          |
-| `lib/supabase/middleware.ts` | Middleware for session handling                      |
+| File                         | Description                                        |
+| ---------------------------- | -------------------------------------------------- |
+| `lib/schemas.ts`             | Zod schemas for all your database tables           |
+| `lib/db.ts`                  | Supabase collections for type-safe CRUD operations |
+| `lib/supabase/client.ts`     | Browser Supabase client                            |
+| `lib/supabase/server.ts`     | Server-side Supabase client                        |
+| `lib/supabase/middleware.ts` | Middleware for session handling                     |
+| `app/providers.tsx`          | Provider component for TanStack DB                 |
 
 ## Getting started
 
@@ -59,62 +58,81 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-### Using collections in your components
+### Querying collections
 
-Each table in your database gets a corresponding collection. Here's how to use them:
+Each table in your database gets a corresponding collection. Query them with `useQuery` from `@tanstack/react-db`:
 
 ```tsx
 'use client'
 
-import { usersCollection } from '@/lib/db'
+import { useQuery } from '@tanstack/react-db'
+import { todos } from '@/lib/db'
 
-export function UserList() {
-  const { data: users, isLoading } = usersCollection.useList()
+export function TodoList() {
+  // all rows
+  const allTodos = useQuery(todos)
 
-  if (isLoading) return <div>Loading...</div>
-
-  return <ul>{users?.map((user) => <li key={user.id}>{user.name}</li>)}</ul>
-}
-```
-
-### Available collection methods
-
-Each collection provides the following methods:
-
-| Method        | Description                |
-| ------------- | -------------------------- |
-| `useList()`   | Fetch all items            |
-| `useGet(key)` | Fetch a single item by key |
-| `useCreate()` | Create a new item          |
-| `useUpdate()` | Update an existing item    |
-| `useDelete()` | Delete an item             |
-
-### Server-side data fetching
-
-For server components, you can prefetch data using the query client:
-
-```tsx
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
-
-import { usersCollection } from '@/lib/db'
-import { getQueryClient } from '@/lib/query-client'
-
-export default async function UsersPage() {
-  const queryClient = getQueryClient()
-
-  // Prefetch users on the server
-  await queryClient.prefetchQuery(usersCollection.listQueryOptions())
+  // with a filter
+  const done = useQuery(todos, {
+    where: { completed: { eq: true } },
+    orderBy: { created_at: 'desc' },
+    limit: 10,
+  })
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <UserList />
-    </HydrationBoundary>
+    <ul>
+      {allTodos.map((todo) => (
+        <li key={todo.id}>{todo.title}</li>
+      ))}
+    </ul>
   )
 }
 ```
 
+### Joins
+
+TanStack/db supports live joins across collections:
+
+```tsx
+import { useQuery } from '@tanstack/react-db'
+import { posts, users } from '@/lib/db'
+
+const postsWithAuthor = useQuery(posts, {
+  with: {
+    author: {
+      collection: users,
+      field: 'author_id',
+      references: 'id',
+    },
+  },
+})
+// postsWithAuthor[0].author.name
+```
+
+### Mutations
+
+Mutations are **optimistic** — the local collection updates immediately and syncs to Supabase in the background. If the server rejects a change it rolls back automatically.
+
+#### Insert
+
+```ts
+todos.insert({ title: 'Buy milk', completed: false })
+```
+
+#### Update
+
+```ts
+todos.update(todo, { completed: true })
+```
+
+#### Delete
+
+```ts
+todos.delete(todo)
+```
+
 ## Further reading
 
-- [TanStack Query documentation](https://tanstack.com/query/latest)
+- [TanStack DB documentation](https://tanstack.com/db/latest)
 - [Supabase JavaScript client](https://supabase.com/docs/reference/javascript)
 - [Generating TypeScript types](https://supabase.com/docs/guides/api/rest/generating-types)

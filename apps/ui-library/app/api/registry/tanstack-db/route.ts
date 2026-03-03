@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import fs from 'fs/promises'
 import path from 'path'
+import { NextRequest, NextResponse } from 'next/server'
 import { RegistryItem } from 'shadcn/schema'
 
 import {
@@ -11,7 +12,6 @@ import {
 } from './_generators'
 import { OpenAPISchema, RegistryFile } from './types'
 import { toSingular } from './utils'
-import fs from 'fs/promises'
 
 // Read the base registry JSON
 async function readBaseRegistry(): Promise<RegistryItem> {
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     // Get the first table for the example CRUD page
     const tableNames = Object.keys(openApiSpec.definitions).filter((name) => !name.startsWith('_'))
     // TODO: remove this once we have a way to select the table
-    const firstTableName = 'persons'
+    const firstTableName = tableNames.length > 0 ? tableNames[0] : null
     const firstTableDefinition = firstTableName ? openApiSpec.definitions[firstTableName] : null
 
     // Read the base registry JSON
