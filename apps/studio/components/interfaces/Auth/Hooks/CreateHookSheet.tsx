@@ -1,10 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import randomBytes from 'randombytes'
-import { useEffect, useMemo } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
@@ -16,11 +10,15 @@ import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import randomBytes from 'randombytes'
+import { useEffect, useMemo } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -35,7 +33,9 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
+import * as z from 'zod'
+
+import { Hook, HOOK_DEFINITION_TITLE, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 
 interface CreateHookSheetProps {
@@ -239,7 +239,7 @@ export const CreateHookSheet = ({
 
         form.reset({
           hookType: definition.title,
-          enabled: authConfig?.[definition.enabledKey] || true,
+          enabled: isCreating ? true : authConfig?.[definition.enabledKey],
           selectedType: values.type,
           httpsValues: {
             url: (values.type === 'https' && values.url) || '',
