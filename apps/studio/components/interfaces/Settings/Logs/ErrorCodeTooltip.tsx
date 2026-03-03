@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useTheme } from 'next-themes'
 import { ExternalLink } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { useErrorCodesQuery } from 'data/content-api/docs-error-codes-query'
 import { Service } from 'data/graphql/graphql'
@@ -13,7 +14,9 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   cn,
+  copyToClipboard,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
@@ -24,6 +27,13 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 const SERVICE_DOCS_URLS: Partial<Record<Service, string>> = {
   [Service.Auth]: 'https://supabase.com/docs/guides/auth/debugging/error-codes',
 }
+
+const EXTERNAL_AI_TOOLS = [
+  // ?q= pre-fills and auto-submits the prompt
+  { label: 'Open in Claude.ai', url: 'https://claude.ai/new', promptParam: 'q' },
+  // ?q= pre-fills and auto-submits the prompt
+  { label: 'Open in ChatGPT', url: 'https://chatgpt.com/', promptParam: 'q' },
+]
 
 interface ErrorCodeTooltipProps {
   errorCode: string
@@ -58,6 +68,17 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
       name: `Fix error ${errorCode}`,
       initialMessage: buildPrompt(),
     })
+  }
+
+  const handleOpenExternalAI = async (tool: (typeof EXTERNAL_AI_TOOLS)[number]) => {
+    const prompt = buildPrompt()
+    if (tool.promptParam) {
+      window.open(`${tool.url}?${tool.promptParam}=${encodeURIComponent(prompt)}`, '_blank', 'noreferrer')
+    } else {
+      await copyToClipboard(prompt)
+      window.open(tool.url, '_blank', 'noreferrer')
+      toast.success('Prompt copied — press ⌘V / Ctrl+V when Claude.ai opens')
+    }
   }
 
   return (
@@ -121,14 +142,28 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
               onOpenAssistant={handleOpenAssistant}
               copyLabel="Copy Markdown"
               extraDropdownItems={
-                docsUrl ? (
-                  <DropdownMenuItem asChild className="gap-2">
-                    <Link href={docsUrl} target="_blank" rel="noreferrer">
+                <>
+                  {docsUrl && (
+                    <DropdownMenuItem asChild className="gap-2">
+                      <Link href={docsUrl} target="_blank" rel="noreferrer">
+                        <ExternalLink size={14} />
+                        Go to Docs
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  {EXTERNAL_AI_TOOLS.map((tool) => (
+                    <DropdownMenuItem
+                      key={tool.url}
+                      className="gap-2"
+                      onClick={() => handleOpenExternalAI(tool)}
+                    >
                       <ExternalLink size={14} />
-                      Go to Docs
-                    </Link>
-                  </DropdownMenuItem>
-                ) : undefined
+                      {tool.label}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                </>
               }
             />
           </div>
