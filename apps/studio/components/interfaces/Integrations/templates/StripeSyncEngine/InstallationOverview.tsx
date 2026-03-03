@@ -103,9 +103,9 @@ export const StripeSyncInstallationPage = () => {
   // Detect if an upgrade is available for an already installed integration
   const upgradeAvailableForInstalled = !!(
     installed &&
-    schemaComment?.newVersion &&
+    schemaComment?.oldVersion &&
     latestAvailableVersion &&
-    schemaComment.newVersion !== latestAvailableVersion
+    schemaComment.oldVersion !== latestAvailableVersion
   )
 
   // Combined flag for upgrade detection (in-progress upgrade or available upgrade for installed)
