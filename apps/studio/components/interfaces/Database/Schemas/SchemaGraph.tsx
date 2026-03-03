@@ -1,15 +1,13 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toPng, toSvg } from 'html-to-image'
 import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
+
 import 'reactflow/dist/style.css'
-import { toast } from 'sonner'
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -17,22 +15,27 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { tablesToSQL } from 'lib/helpers'
+import { toast } from 'sonner'
 import {
+  Button,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
+
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = () => {
@@ -75,7 +78,7 @@ export const SchemaGraph = () => {
   })
 
   const {
-    data: tables,
+    data: tables = [],
     error: errorTables,
     isSuccess: isSuccessTables,
     isPending: isLoadingTables,
@@ -86,9 +89,10 @@ export const SchemaGraph = () => {
     schema: selectedSchema,
     includeColumns: true,
   })
+  const hasNoTables = isSuccessSchemas && tables.length === 0
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
-  const [_, setStoredPositions] = useLocalStorage(
+  const [, setStoredPositions] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref as string, schema?.id ?? 0),
     {}
   )
@@ -200,7 +204,7 @@ export const SchemaGraph = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-muted">
+      <div className="flex items-center justify-between p-4 border-b border-muted h-[var(--header-height)]">
         {isLoadingSchemas && (
           <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
         )}
@@ -218,66 +222,68 @@ export const SchemaGraph = () => {
               selectedSchemaName={selectedSchema}
               onSelectSchema={setSelectedSchema}
             />
-            <div className="flex items-center gap-x-2">
-              <ButtonTooltip
-                type="outline"
-                icon={copied ? <Check /> : <Copy />}
-                onClick={() => {
-                  if (tables) {
-                    copyToClipboard(tablesToSQL(tables))
-                    setCopied(true)
-                  }
-                }}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: (
-                      <div className="max-w-[180px] space-y-2 text-foreground-light">
-                        <p className="text-foreground">Note</p>
-                        <p>
-                          This schema is for context or debugging only. Table order and constraints
-                          may be invalid. Not meant to be run as-is.
-                        </p>
-                      </div>
-                    ),
-                  },
-                }}
-              >
-                Copy as SQL
-              </ButtonTooltip>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <ButtonTooltip
-                    aria-label="Download Schema"
-                    type="default"
-                    loading={isDownloading}
-                    className="px-1.5"
-                    icon={<Download />}
-                    tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-32">
-                  <DropdownMenuItem onClick={() => downloadImage('png')}>
-                    Download as PNG
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => downloadImage('svg')}>
-                    Download as SVG
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <ButtonTooltip
-                type="default"
-                onClick={resetLayout}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'Automatically arrange the layout of all nodes',
-                  },
-                }}
-              >
-                Auto layout
-              </ButtonTooltip>
-            </div>
+            {!hasNoTables && (
+              <div className="flex items-center gap-x-2">
+                <ButtonTooltip
+                  type="outline"
+                  icon={copied ? <Check /> : <Copy />}
+                  onClick={() => {
+                    if (tables) {
+                      copyToClipboard(tablesToSQL(tables))
+                      setCopied(true)
+                    }
+                  }}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: (
+                        <div className="max-w-[180px] space-y-2 text-foreground-light">
+                          <p className="text-foreground">Note</p>
+                          <p>
+                            This schema is for context or debugging only. Table order and
+                            constraints may be invalid. Not meant to be run as-is.
+                          </p>
+                        </div>
+                      ),
+                    },
+                  }}
+                >
+                  Copy as SQL
+                </ButtonTooltip>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <ButtonTooltip
+                      aria-label="Download Schema"
+                      type="default"
+                      loading={isDownloading}
+                      className="px-1.5"
+                      icon={<Download />}
+                      tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-32">
+                    <DropdownMenuItem onClick={() => downloadImage('png')}>
+                      Download as PNG
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => downloadImage('svg')}>
+                      Download as SVG
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <ButtonTooltip
+                  type="default"
+                  onClick={resetLayout}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: 'Automatically arrange the layout of all nodes',
+                    },
+                  }}
+                >
+                  Auto layout
+                </ButtonTooltip>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -294,7 +300,7 @@ export const SchemaGraph = () => {
       )}
       {isSuccessTables && (
         <>
-          {tables.length === 0 ? (
+          {hasNoTables ? (
             <div className="flex items-center justify-center w-full h-full">
               <Admonition
                 type="default"
@@ -325,10 +331,6 @@ export const SchemaGraph = () => {
                   type: 'smoothstep',
                   animated: true,
                   deletable: false,
-                  style: {
-                    stroke: 'hsl(var(--border-stronger))',
-                    strokeWidth: 1,
-                  },
                 }}
                 nodeTypes={nodeTypes}
                 fitView

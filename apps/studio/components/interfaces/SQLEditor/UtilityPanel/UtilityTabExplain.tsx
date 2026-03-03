@@ -4,7 +4,10 @@ import { useState } from 'react'
 import CopyButton from 'components/ui/CopyButton'
 import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
 import { ExplainHeader } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
-import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import {
+  isExplainQuery,
+  isTextFormatExplain,
+} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
@@ -78,6 +81,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
   }
 
   const isValidExplain = isExplainQuery(explainResult.rows)
+  const isTextFormat = isTextFormatExplain(explainResult.rows)
 
   if (!isValidExplain) {
     return (
@@ -85,6 +89,20 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
         <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
           Unable to parse explain results. Please try running the query again.
         </p>
+      </div>
+    )
+  }
+
+  // Handle non-TEXT formats (JSON, YAML, XML) - show raw output only
+  if (!isTextFormat) {
+    return (
+      <div className="h-full flex flex-col pb-9">
+        <div className="px-4 py-3 bg-surface-100 border-b border-default flex items-center gap-2">
+          <span className="text-sm text-foreground-light">
+            Visual execution plan is only available for TEXT format. Showing raw output.
+          </span>
+        </div>
+        <Results rows={explainResult.rows} />
       </div>
     )
   }

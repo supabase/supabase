@@ -105,12 +105,12 @@ export const SecuritySettings = () => {
   }
 
   return (
-    <ScaffoldContainer>
+    <ScaffoldContainer size="small" className="px-6 xl:px-10">
       <ScaffoldSection isFullWidth>
         {!isPaidPlan ? (
           <UpgradeToPro
             source="organizationMfa"
-            primaryText="Organization MFA enforcement is not available on Free plan"
+            primaryText="Organization MFA enforcement is not available on Free Plan"
             secondaryText="Upgrade to Pro or above to enforce MFA requirements for your organization."
             featureProposition="enforce MFA requirements"
           />

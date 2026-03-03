@@ -64,7 +64,7 @@ async function fetchDiscussions(
   const query = `
     query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
       repository(owner: $owner, name: $repo) {
-        discussions(first: 50, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+        discussions(first: 10, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
           totalCount
           pageInfo {
             hasPreviousPage

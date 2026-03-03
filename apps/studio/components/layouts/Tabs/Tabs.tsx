@@ -7,12 +7,12 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-
-import { useParams } from 'common'
-import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
+import { useEffect } from 'react'
 import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
 import {
   cn,
@@ -24,10 +24,12 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
+
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
+import { useTabsScroll } from './Tabs.utils'
 
 export const EditorTabs = () => {
   const { ref, id } = useParams()
@@ -132,6 +134,8 @@ export const EditorTabs = () => {
     tabs.handleTabNavigation(id, router)
   }
 
+  const { tabsListRef } = useTabsScroll({ activeTab: tabs.activeTab, tabCount: editorTabs.length })
+
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <Tabs_Shadcn_
@@ -141,8 +145,9 @@ export const EditorTabs = () => {
       >
         <CollapseButton hideTabs={false} />
         <TabsList_Shadcn_
+          ref={tabsListRef}
           className={cn(
-            'rounded-b-none gap-0 h-10 flex items-center w-full z-[1]',
+            'rounded-b-none gap-0 min-h-[var(--header-height)] flex items-center w-full z-[1]',
             'bg-surface-200 dark:bg-alternative border-none overflow-clip overflow-x-auto'
           )}
         >
@@ -221,7 +226,7 @@ export const EditorTabs = () => {
           <AnimatePresence initial={false}>
             {!hasNewTab && (
               <motion.button
-                className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
+                className="flex items-center justify-center w-10 min-h-[var(--header-height)] hover:bg-surface-100 shrink-0 border-b"
                 onClick={() =>
                   router.push(
                     `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`

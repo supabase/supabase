@@ -1,3 +1,8 @@
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Settings } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -10,7 +15,19 @@ import {
   type SetStateAction,
 } from 'react'
 import { usePreviousDistinct } from 'react-use'
+import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Switch } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import {
@@ -25,23 +42,6 @@ import {
 } from '@/lib/data-api-types'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorItem,
-  MultiSelectorList,
-  MultiSelectorTrigger,
-} from 'ui-patterns/multi-select'
 
 const ROLE_LABELS: Record<ApiAccessRole, string> = {
   anon: 'Anonymous (anon)',
@@ -335,7 +335,11 @@ export const ApiAccessToggle = ({
               onOpenChange={setIsPrivilegesPopoverOpen}
             >
               <PopoverTrigger_Shadcn_ asChild disabled={isDisabled || !hasNonEmptyPrivileges}>
-                <Button type="text" className="w-6 h-6 p-0 text-foreground-light">
+                <Button
+                  type="text"
+                  className="w-6 h-6 p-0 text-foreground-light"
+                  aria-label="Configure API privileges"
+                >
                   <Settings strokeWidth={1.5} size={16} />
                   {hasPartialPrivileges && (
                     <span className="absolute right-0 top-0 h-1.5 w-1.5 rounded-full bg-foreground shadow-sm" />
@@ -386,6 +390,7 @@ export const ApiAccessToggle = ({
           </div>
         </div>
       </div>
+
       <SchemaExposureOptions
         projectRef={projectRef}
         schemaName={schemaName}
@@ -418,14 +423,13 @@ const SchemaExposureOptions = ({
 }): ReactNode => {
   const { selectedDatabaseId } = useDatabaseSelectorStateSnapshot()
 
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const { data: endpoint } = useProjectApiUrl({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
   const { data: databases } = useReadReplicasQuery({ projectRef })
 
   const apiEndpoint = useMemo(() => {
-    const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
-    if (isCustomDomainActive && selectedDatabaseId === projectRef) {
-      return `https://${customDomainData.customDomain.hostname}`
+    if (selectedDatabaseId === projectRef) {
+      return endpoint
     }
 
     const loadBalancerSelected = selectedDatabaseId === 'load-balancer'
@@ -435,14 +439,8 @@ const SchemaExposureOptions = ({
 
     const selectedDatabase = databases?.find((db) => db.identifier === selectedDatabaseId)
     return selectedDatabase?.restUrl
-  }, [
-    projectRef,
-    databases,
-    selectedDatabaseId,
-    customDomainData?.customDomain?.status,
-    customDomainData?.customDomain?.hostname,
-    loadBalancers,
-  ])
+  }, [selectedDatabaseId, projectRef, databases, endpoint, loadBalancers])
+
   const apiBaseUrl = useMemo(() => {
     if (!apiEndpoint) return undefined
     return apiEndpoint.endsWith('/') ? apiEndpoint.slice(0, -1) : apiEndpoint
@@ -479,7 +477,7 @@ const SchemaExposureOptions = ({
               To enable API access for this table, you need to first expose the{' '}
               <code className="text-xs">{schemaName}</code> schema in your{' '}
               <Link
-                href={`/project/${projectRef}/settings/api`}
+                href={`/project/${projectRef}/integrations/data_api/overview`}
                 className="text-foreground hover:underline"
               >
                 API settings

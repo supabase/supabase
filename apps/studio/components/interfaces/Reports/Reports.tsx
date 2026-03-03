@@ -1,12 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { groupBy, isEqual, isNull } from 'lodash'
-import { ArrowRight, Plus, RefreshCw, Save } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { DragEvent, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
@@ -21,16 +14,24 @@ import {
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import dayjs from 'dayjs'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { groupBy, isEqual, isNull } from 'lodash'
+import { Plus, RefreshCw, Save } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { DragEvent, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
@@ -449,20 +450,6 @@ const Reports = () => {
                   </div>
                 }
               />
-
-              {startDate && endDate && (
-                <div className="hidden items-center space-x-1 lg:flex ">
-                  <span className="text-sm text-foreground-light">
-                    {dayjs(startDate).format('MMM D, YYYY')}
-                  </span>
-                  <span className="text-foreground-lighter">
-                    <ArrowRight size={12} />
-                  </span>
-                  <span className="text-sm text-foreground-light">
-                    {dayjs(endDate).format('MMM D, YYYY')}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
 
@@ -548,8 +535,13 @@ const Reports = () => {
         confirmLabel="Confirm"
         onConfirm={() => {
           setConfirmNavigate(true)
+          let urlToNavigate = navigateUrl ?? '/'
+          if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
+            urlToNavigate = urlToNavigate.slice(BASE_PATH.length) || '/'
+          }
+          if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
           setNavigateUrl(undefined)
-          router.push(navigateUrl ?? '/')
+          router.push(urlToNavigate)
         }}
         onCancel={() => setNavigateUrl(undefined)}
       >

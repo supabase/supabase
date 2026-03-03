@@ -81,6 +81,8 @@ Skip lists are multi-layer linked lists. The bottom layer is a regular linked li
     light: '/docs/img/ai/vector-indexes/hnsw-indexes/skip-list--light.png',
     dark: '/docs/img/ai/vector-indexes/hnsw-indexes/skip-list--dark.png',
   }}
+  width={1400}
+  height={700}
 />
 
 When searching for an element, the algorithm begins at the top layer and traverses its linked list horizontally. If the target element is found, the algorithm stops and returns it. Otherwise if the next element in the list is greater than the target (or `NULL`), the algorithm drops down to the next layer below. Since each layer below is less sparse than the layer above (with the bottom layer connecting all elements), the target will eventually be found. Skip lists offer O(log n) average complexity for both search and insertion/deletion.
@@ -93,7 +95,9 @@ A navigable small world (NSW) is a special type of proximity graph that also inc
   alt="visual of an example navigable small world graph"
   src="/docs/img/ai/vector-indexes/hnsw-indexes/nsw.png"
   className="max-h-[600px] mx-auto"
-  zoomable
+  width={1016}
+  height={759}
+
 />
 
 The “navigable” part of NSW specifically refers to the ability to logarithmically scale the greedy search algorithm on the graph, an algorithm that attempts to make only the locally optimal choice at each hop. Without this property, the graph may still be considered a small world with short paths between far-away nodes, but the greedy algorithm tends to miss them. Greedy search is ideal for NSW because it is quick to navigate and has low computational costs.

@@ -1,23 +1,37 @@
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { ArrowUpRight, Book, BookOpen } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 
+import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+
+export const getActivePage = (params: {
+  page?: string
+  resource?: string
+  rpc?: string
+}): string => {
+  const { page, resource, rpc } = params
+  if (!page && !resource && !rpc) return 'introduction'
+  return (page || rpc || resource) as string
+}
+
 export const generateDocsMenu = (
   ref: string,
-  tables: string[],
-  functions: string[],
-  flags?: { authEnabled: boolean }
-): ProductMenuGroup[] => {
+  tables: Array<string>,
+  functions: Array<string>,
+  flags?: { authEnabled: boolean },
+  basePath?: string
+): Array<ProductMenuGroup> => {
+  const docsBasePath = basePath ?? `/project/${ref}/integrations/data_api/docs`
+
   return [
     {
       title: 'Getting Started',
       items: [
-        { name: 'Introduction', key: 'introduction', url: `/project/${ref}/api`, items: [] },
+        { name: 'Introduction', key: 'introduction', url: docsBasePath, items: [] },
         {
           name: 'Authentication',
           key: 'auth',
-          url: `/project/${ref}/api?page=auth`,
+          url: `${docsBasePath}?page=auth`,
           items: [],
         },
         ...(flags?.authEnabled
@@ -25,7 +39,7 @@ export const generateDocsMenu = (
               {
                 name: 'User Management',
                 key: 'users-management',
-                url: `/project/${ref}/api?page=users-management`,
+                url: `${docsBasePath}?page=users-management`,
                 items: [],
               },
             ]
@@ -38,14 +52,14 @@ export const generateDocsMenu = (
         {
           name: 'Introduction',
           key: 'tables-intro',
-          url: `/project/${ref}/api?page=tables-intro`,
+          url: `${docsBasePath}?page=tables-intro`,
           items: [],
         },
         ...tables.sort().map((table) => {
           return {
             name: table,
             key: table,
-            url: `/project/${ref}/api?resource=${table}`,
+            url: `${docsBasePath}?resource=${table}`,
             items: [],
           }
         }),
@@ -57,11 +71,11 @@ export const generateDocsMenu = (
         {
           name: 'Introduction',
           key: 'rpc-intro',
-          url: `/project/${ref}/api?page=rpc-intro`,
+          url: `${docsBasePath}?page=rpc-intro`,
           items: [],
         },
         ...functions.map((fn) => {
-          return { name: fn, key: fn, url: `/project/${ref}/api?rpc=${fn}`, items: [] }
+          return { name: fn, key: fn, url: `${docsBasePath}?rpc=${fn}`, items: [] }
         }),
       ],
     },

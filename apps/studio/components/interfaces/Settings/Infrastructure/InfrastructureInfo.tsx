@@ -14,28 +14,15 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Badge,
-  Button,
-  Input,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
-import {
-  ObjectsToBeDroppedWarning,
-  ReadReplicasWarning,
-  UnsupportedExtensionsWarning,
-  UserDefinedObjectsInInternalSchemasWarning,
-} from './UpgradeWarnings'
+import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
 
-const InfrastructureInfo = () => {
+export const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -81,9 +68,7 @@ const InfrastructureInfo = () => {
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
 
-  const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
-  const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
-  const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
+  const hasValidationErrors = (data?.validation_errors ?? []).length > 0
 
   return (
     <>
@@ -117,21 +102,19 @@ const InfrastructureInfo = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <ScaffoldSectionDetail>
-            <h4 className="text-base capitalize m-0">Service Versions</h4>
+            <h4 className="text-base capitalize m-0">Service versions</h4>
             <p className="text-foreground-light text-sm pr-8 mt-1">
               Service versions and upgrade eligibility for your provisioned instance.
             </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
             {isInactive ? (
-              <Alert_Shadcn_>
-                <AlertTitle_Shadcn_>
-                  Service versions cannot be retrieved while project is paused
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  Restoring the project will update Postgres to the newest version
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+              <Admonition
+                type="note"
+                showIcon={false}
+                title="Service versions cannot be retrieved while project is paused"
+                description="Restoring the project will update Postgres to the newest version"
+              />
             ) : (
               <>
                 {/* [Joshen] Double check why we need this waterfall loading behaviour here */}
@@ -171,7 +154,7 @@ const InfrastructureInfo = () => {
                           label="Postgres version"
                           actions={[
                             isVisibleReleaseChannel && (
-                              <Tooltip>
+                              <Tooltip key="release-channel">
                                 <TooltipTrigger>
                                   <Badge variant="warning" className="mr-1">
                                     {isVisibleReleaseChannel}
@@ -184,7 +167,7 @@ const InfrastructureInfo = () => {
                               </Tooltip>
                             ),
                             isOrioleDb && (
-                              <Tooltip>
+                              <Tooltip key="orioledb">
                                 <TooltipTrigger>
                                   <Badge variant="default" className="mr-1">
                                     OrioleDB
@@ -196,7 +179,7 @@ const InfrastructureInfo = () => {
                               </Tooltip>
                             ),
                             isOnLatestVersion && (
-                              <Tooltip>
+                              <Tooltip key="latest-version">
                                 <TooltipTrigger>
                                   <Badge variant="success" className="mr-1">
                                     Latest
@@ -213,7 +196,7 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {showDatabaseUpgrades && data.eligible ? (
+                    {showDatabaseUpgrades && data && data.eligible ? (
                       hasReadReplicas ? (
                         <ReadReplicasWarning latestPgVersion={latestPgVersion} />
                       ) : (
@@ -221,20 +204,8 @@ const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {showDatabaseUpgrades && !data.eligible ? (
-                      hasObjectsToBeDropped ? (
-                        <ObjectsToBeDroppedWarning
-                          objectsToBeDropped={data.objects_to_be_dropped}
-                        />
-                      ) : hasUnsupportedExtensions ? (
-                        <UnsupportedExtensionsWarning
-                          unsupportedExtensions={data.unsupported_extensions}
-                        />
-                      ) : hasObjectsInternalSchema ? (
-                        <UserDefinedObjectsInInternalSchemasWarning
-                          objects={data.user_defined_objects_in_internal_schemas}
-                        />
-                      ) : null
+                    {showDatabaseUpgrades && data && !data.eligible && hasValidationErrors ? (
+                      <ValidationErrorsWarning validationErrors={data.validation_errors ?? []} />
                     ) : null}
                   </>
                 )}
@@ -246,5 +217,3 @@ const InfrastructureInfo = () => {
     </>
   )
 }
-
-export default InfrastructureInfo

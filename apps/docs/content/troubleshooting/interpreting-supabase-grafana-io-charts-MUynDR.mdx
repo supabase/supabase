@@ -14,22 +14,11 @@ There are two primary values that matter for IO:
 - **Disk Throughput**: how much data can be moved to and from disk per second
 - **IOPS(Input/Output per second)**: how many read/write requests can be performed against your disk per second
 
-Each compute instance has unique IO settings. The settings at the time this was written are listed below.
-| Plan | Baseline Disk Throughput | Baseline IOPS |
-|---------------|--------------------------|---------------|
-| Nano (free) | 43 Mbps | 250 IOPS |
-| Micro | 87 Mbps | 500 IOPS |
-| Small | 174 Mbps | 1,000 IOPS |
-| Medium | 347 Mbps | 2,000 IOPS |
-| Large | 630 Mbps | 3,000 IOPS |
-| XL | 1,048 Mbps | 3,000 IOPS |
-| 2XL | 1,048 Mbps | 3,000 IOPS |
-| 4XL | 1,048 Mbps | 3,000 IOPS |
-| 8XL | 1,048 Mbps | 3,000 IOPS |
-| 12XL | 1,048 Mbps | 3,000 IOPS |
-| 16XL | 1,048 Mbps | 3,000 IOPS |
+Each compute instance has unique IO settings. The current baseline (sustained) and max (burst) limits are listed below.
 
-Compute sizes below XL, to accommodate their limitations, have burst budgets. This is when instances are allowed to utilize 1048 Mbps of disk throughput and 3,000 IOPS for 30 minutes before returning back to their baseline behavior.
+<ComputeDiskLimitsTable />
+
+Compute sizes below XL can burst above baseline for short periods before returning back to their baseline behavior.
 
 There are other metrics that indicate IO strain.
 

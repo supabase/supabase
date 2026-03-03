@@ -1,15 +1,15 @@
+import { IS_PLATFORM } from 'common'
+import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { useParams } from 'common/hooks'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 import { copyToClipboard, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-import { createNavigationHandler } from 'lib/navigation'
+
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import type { EdgeFunctionsResponse } from '@/data/edge-functions/edge-functions-query'
+import { createNavigationHandler } from '@/lib/navigation'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -20,17 +20,13 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
+  const functionUrl = `${endpoint}/functions/v1/${item.slug}`
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint ?? ''
-  const functionUrl =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain.hostname}/functions/v1/${item.slug}`
-      : `${protocol}://${endpoint}/functions/v1/${item.slug}`
-
-  const handleNavigation = createNavigationHandler(`/project/${ref}/functions/${item.slug}`, router)
+  const handleNavigation = createNavigationHandler(
+    `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/details`}`,
+    router
+  )
 
   return (
     <TableRow

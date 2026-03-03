@@ -582,6 +582,10 @@
       "import": "./src/admonition.tsx",
       "types": "./src/admonition.tsx"
     },
+    "./MultipleCodeBlock": {
+      "import": "./src/MultipleCodeBlock/index.tsx",
+      "types": "./src/MultipleCodeBlock/index.tsx"
+    },
     "./consent": {
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"
@@ -650,7 +654,7 @@
     "github-slugger": "^2.0.0",
     "icons": "workspace:*",
     "js-yaml": "^3.14.1",
-    "lodash": "^4.17.21",
+    "lodash": "catalog:",
     "lucide-react": "*",
     "mdast": "^3.0.0",
     "monaco-editor": "*",

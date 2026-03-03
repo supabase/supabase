@@ -1,8 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -12,8 +8,12 @@ import { useContentIdQuery } from 'data/content/content-id-query'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards, SqlSnippets } from 'types'
+
 import { DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
@@ -63,8 +63,8 @@ export const ReportBlock = ({
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchIntervalInBackground: false,
-      retry: (failureCount: number) => {
-        if (failureCount >= 2) return false
+      retry: (failureCount: number, error) => {
+        if (error.code === 404 || failureCount >= 2) return false
         return true
       },
     }
@@ -151,18 +151,16 @@ export const ReportBlock = ({
                 ? String(executeSqlError)
                 : undefined
           }
-          isExecuting={executeSqlLoading}
+          isExecuting={!contentError && executeSqlLoading}
           isWriteQuery={isWriteQuery}
           actions={
-            !isLoadingContent && (
-              <ButtonTooltip
-                type="text"
-                icon={<X />}
-                className="w-7 h-7"
-                onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
-                tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
-              />
-            )
+            <ButtonTooltip
+              type="text"
+              icon={<X />}
+              className="w-7 h-7"
+              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+            />
           }
           onExecute={(queryType) => {
             refetch()
@@ -195,6 +193,7 @@ export const ReportBlock = ({
           attribute={item.attribute}
           provider={item.provider}
           defaultChartStyle={item.chart_type}
+          defaultLogScale={chartConfig?.logScale ?? false}
           maxHeight={176}
           label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
           actions={

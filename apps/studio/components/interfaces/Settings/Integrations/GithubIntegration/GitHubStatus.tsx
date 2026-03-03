@@ -44,10 +44,10 @@ export const GitHubStatus = () => {
           className="block w-full transition truncate text-sm text-foreground-light hover:text-foreground"
         >
           <div className="w-full flex items-center justify-between">
-            <h3 className="">GitHub Integration</h3>
+            <h3 className="text-sm">GitHub Integration</h3>
             <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
           </div>
-          <p className="mt-1 text-xs text-foreground-lighter flex items-center gap-2">
+          <p className="mt-0.5 text-xs text-foreground-lighter flex items-center gap-2">
             {isConnected ? (
               <>
                 <Image

@@ -67,7 +67,7 @@ export const BranchSelector = ({
           {isUpdating ? 'Creating...' : 'New merge request'}
         </ButtonTooltip>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal className="p-0 w-80" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="end">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Find branch to review..." />
           <CommandList_Shadcn_>
