@@ -131,7 +131,7 @@ export async function submitFormAction(
       consent,
       event: crm.customerio?.event,
       properties: crm.customerio
-        ? { ...crm.customerio.staticProperties, ...(values as Record<string, unknown>) }
+        ? { ...(values as Record<string, unknown>), ...crm.customerio.staticProperties }
         : undefined,
       customerioProfile,
     } as any)
