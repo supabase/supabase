@@ -34,8 +34,12 @@ export const StripeSyncChangesCard = ({
   const installDone = isInstallDone(installationStatus)
   const uninstallDone = isUninstallDone(installationStatus)
 
-  const title =
-    uninstallDone || installError
+  // Special case: installed integration with upgrade available (shown in sheet context)
+  const isInstalledWithUpgrade = installed && isUpgrade
+
+  const title = isInstalledWithUpgrade
+    ? 'This integration will upgrade your Supabase project:'
+    : uninstallDone || installError
       ? 'This integration will modify your Supabase project:'
       : installInProgress || uninstallInProgress
         ? 'This integration is modifying your Supabase project:'
@@ -43,8 +47,9 @@ export const StripeSyncChangesCard = ({
           ? 'This integration has modified your Supabase project:'
           : ''
 
-  const dbLine =
-    uninstallDone || installError
+  const dbLine = isInstalledWithUpgrade
+    ? 'Upgrades the database schema named '
+    : uninstallDone || installError
       ? 'Creates a new database schema named '
       : installInProgress
         ? isUpgrade
@@ -56,8 +61,9 @@ export const StripeSyncChangesCard = ({
             ? 'Dropping database schema named '
             : ''
 
-  const tableAndViewLine =
-    uninstallDone || installError
+  const tableAndViewLine = isInstalledWithUpgrade
+    ? 'Upgrades tables and views in the '
+    : uninstallDone || installError
       ? 'Creates tables and views in the '
       : installInProgress
         ? isUpgrade
@@ -69,8 +75,9 @@ export const StripeSyncChangesCard = ({
             ? 'Dropping tables and views in the '
             : ''
 
-  const edgeFunctionsLine =
-    uninstallDone || installError
+  const edgeFunctionsLine = isInstalledWithUpgrade
+    ? 'Upgrades Edge Functions to handle incoming webhooks from Stripe'
+    : uninstallDone || installError
       ? 'Deploys Edge Functions to handle incoming webhooks from Stripe'
       : installInProgress
         ? isUpgrade
@@ -82,8 +89,9 @@ export const StripeSyncChangesCard = ({
             ? 'Undeploying Edge Functions to handle incoming webhooks from Stripe'
             : ''
 
-  const scheduleLine =
-    uninstallDone || installError
+  const scheduleLine = isInstalledWithUpgrade
+    ? 'Upgrades automatic Stripe data syncs using Supabase Queues'
+    : uninstallDone || installError
       ? 'Schedules automatic Stripe data syncs using Supabase Queues'
       : installInProgress
         ? isUpgrade
