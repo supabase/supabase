@@ -95,7 +95,7 @@ export const TopSection = () => {
             )}
           >
             <ReactFlowProvider>
-              <InstanceConfiguration diagramOnly={false} />
+              <InstanceConfiguration diagramOnly />
             </ReactFlowProvider>
           </div>
         </div>
