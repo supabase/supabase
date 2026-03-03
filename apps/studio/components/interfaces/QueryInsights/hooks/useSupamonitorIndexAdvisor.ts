@@ -19,7 +19,11 @@ export function useSupamonitorIndexAdvisor(rows: QueryPerformanceRow[]): QueryPe
 
   const results = useQueries({
     queries: eligibleQueries.map((query) => ({
-      queryKey: databaseKeys.indexAdvisorFromQuery(project?.ref, query, project?.connectionString ?? undefined),
+      queryKey: databaseKeys.indexAdvisorFromQuery(
+        project?.ref,
+        query,
+        project?.connectionString ?? undefined
+      ),
       queryFn: () =>
         getIndexAdvisorResult({
           projectRef: project?.ref,

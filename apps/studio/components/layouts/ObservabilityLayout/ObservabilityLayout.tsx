@@ -28,10 +28,7 @@ const ObservabilityLayoutContent = ({
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
-  const { data: resourceWarnings } = useResourceWarningsQuery(
-    { ref },
-    { staleTime: 1000 * 60 * 5 }
-  )
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref }, { staleTime: 1000 * 60 * 5 })
   const resourceWarning = Array.isArray(resourceWarnings)
     ? resourceWarnings.find((w) => w.project === ref)
     : resourceWarnings

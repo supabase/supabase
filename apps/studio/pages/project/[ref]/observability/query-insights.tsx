@@ -1,7 +1,5 @@
 import { QueryInsights } from 'components/interfaces/QueryInsights/QueryInsights'
-import {
-  REPORT_DATERANGE_HELPER_LABELS,
-} from 'components/interfaces/Reports/Reports.constants'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
@@ -12,12 +10,8 @@ import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const QueryInsightsReport: NextPageWithLayout = () => {
-  const {
-    selectedDateRange,
-    datePickerValue,
-    datePickerHelpers,
-    handleDatePickerChange,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  const { selectedDateRange, datePickerValue, datePickerHelpers, handleDatePickerChange } =
+    useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   return (
     <div className="h-full flex flex-col">
