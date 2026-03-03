@@ -16,7 +16,7 @@ const useIsCurrentOrgInFlagList = (flag: string) => {
       : []
 
   // [Joshen] Override for to enable for all organizations by setting the flag value as `all`
-  if (allowedOrgSlugs.includes('all')) return false
+  if (allowedOrgSlugs.includes('all')) return true
 
   // [Joshen] Otherwise fallback to checking against org slug
   return allowedOrgSlugs.includes(organization?.slug ?? '')
