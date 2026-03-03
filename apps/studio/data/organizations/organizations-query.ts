@@ -1,11 +1,12 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { MANAGED_BY, ManagedBy } from 'lib/constants/infrastructure'
-import { useProfile } from 'lib/profile'
-import type { Organization, ResponseError, UseCustomQueryOptions } from 'types'
+
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { MANAGED_BY, ManagedBy } from '@/lib/constants/infrastructure'
+import { useProfile } from '@/lib/profile'
+import { useService } from '@/lib/services/context'
+import type { Organization, ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationBase = components['schemas']['OrganizationResponse']
 
@@ -54,9 +55,10 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   ...options
 }: UseCustomQueryOptions<OrganizationsData, OrganizationsError, TData> = {}) => {
   const { profile } = useProfile()
+  const { getOrganizations: fetchOrganizations } = useService('organizations')
   return useQuery<OrganizationsData, OrganizationsError, TData>({
     queryKey: organizationKeys.list(),
-    queryFn: ({ signal }) => getOrganizations({ signal }),
+    queryFn: ({ signal }) => fetchOrganizations({ signal }),
     enabled: enabled && profile !== undefined,
     ...options,
     staleTime: 30 * 60 * 1000,

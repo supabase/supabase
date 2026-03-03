@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { useIsLoggedIn } from 'common'
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { Permission, ResponseError, UseCustomQueryOptions } from 'types'
+
 import { permissionKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useService } from '@/lib/services/context'
+import type { Permission, ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type PermissionsResponse = Permission[]
 
@@ -35,10 +36,11 @@ export const usePermissionsQuery = <TData = PermissionsData>({
   ...options
 }: UseCustomQueryOptions<PermissionsData, PermissionsError, TData> = {}) => {
   const isLoggedIn = useIsLoggedIn()
+  const { getPermissions: fetchPermissions } = useService('permissions')
 
   return useQuery<PermissionsData, PermissionsError, TData>({
     queryKey: permissionKeys.list(),
-    queryFn: ({ signal }) => getPermissions(signal),
+    queryFn: ({ signal }) => fetchPermissions(signal),
     ...options,
     enabled: IS_PLATFORM && enabled && isLoggedIn,
     staleTime: 5 * 60 * 1000,

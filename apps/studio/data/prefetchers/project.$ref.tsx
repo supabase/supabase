@@ -3,11 +3,13 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback } from 'react'
 
 import { prefetchProjectDetail } from 'data/projects/project-detail-query'
+import { useService } from 'lib/services/context'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 
 export function usePrefetchProjectIndexPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const projectsService = useService('projects')
 
   return useCallback(
     ({ projectRef }: { projectRef?: string }) => {
@@ -15,13 +17,11 @@ export function usePrefetchProjectIndexPage() {
       router.prefetch(`/project/${projectRef}`)
 
       // Prefetch data
-      prefetchProjectDetail(queryClient, {
-        ref: projectRef,
-      }).catch(() => {
+      prefetchProjectDetail(queryClient, { ref: projectRef }, projectsService).catch(() => {
         // eat prefetching errors as they are not critical
       })
     },
-    [queryClient, router]
+    [queryClient, router, projectsService]
   )
 }
 

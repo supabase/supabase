@@ -1,11 +1,13 @@
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
-import type { components } from 'data/api'
-import { get, handleError, isValidConnString } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
 import { OrgProjectsResponse } from './org-projects-infinite-query'
+import type { ProjectsService } from './projects-service'
+import type { components } from '@/data/api'
+import { get, handleError, isValidConnString } from '@/data/fetchers'
+import { useService } from '@/lib/services/context'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string }
 export type ProjectDetail = components['schemas']['ProjectDetailResponse']
@@ -45,10 +47,12 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ProjectDetailData, ProjectDetailError, TData> = {}
-) =>
-  useQuery<ProjectDetailData, ProjectDetailError, TData>({
+) => {
+  const { getProjectDetail: fetchProjectDetail } = useService('projects')
+
+  return useQuery<ProjectDetailData, ProjectDetailError, TData>({
     queryKey: projectKeys.detail(ref),
-    queryFn: ({ signal }) => getProjectDetail({ ref }, signal),
+    queryFn: ({ signal }) => fetchProjectDetail({ ref }, signal),
     enabled: enabled && typeof ref !== 'undefined',
     staleTime: 30 * 1000,
     refetchInterval: (query) => {
@@ -64,11 +68,16 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
     },
     ...options,
   })
+}
 
-export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
+export function prefetchProjectDetail(
+  client: QueryClient,
+  { ref }: ProjectDetailVariables,
+  service: { getProjectDetail: ProjectsService['getProjectDetail'] }
+) {
   return client.fetchQuery({
     queryKey: projectKeys.detail(ref),
-    queryFn: ({ signal }) => getProjectDetail({ ref }, signal),
+    queryFn: ({ signal }) => service.getProjectDetail({ ref }, signal),
   })
 }
 
