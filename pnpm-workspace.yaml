@@ -13,9 +13,9 @@ catalog:
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
-  next: ^15.5.10
-  lodash-es: ^4.17.23
   lodash: ^4.17.23
+  lodash-es: ^4.17.23
+  next: ^15.5.10
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -44,14 +44,14 @@ minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
-  - 'next'
+  - next
   - '@next/*'
   - ai
   - js-yaml
   - supabase
   - iceberg-js
   - '@vitejs/plugin-rsc'
-  - stripe-experiment-sync # TODO(matlin) remove, temp just to unblock launch
+  - stripe-experiment-sync
   - braintrust
   - tar
   - diff
@@ -66,17 +66,17 @@ onlyBuiltDependencies:
   - supabase
 
 overrides:
+  '@aws-sdk/core>fast-xml-parser': ^5.3.5
+  '@mapbox/node-pre-gyp>tar': ^7.5.8
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
+  cacache>tar: ^7.5.8
   esbuild: ^0.25.2
-  nodemailer: ^7.0.11
-  lodash-es: 'catalog:'
   lodash: 'catalog:'
+  lodash-es: 'catalog:'
+  node-gyp>tar: ^7.5.8
+  nodemailer: ^7.0.11
+  openapi-sampler>fast-xml-parser: ^5.3.5
   payload>undici: ^7.18.2
   refractor>prismjs: ^1.30.0
-  cacache>tar: ^7.5.8
-  node-gyp>tar: ^7.5.8
-  '@mapbox/node-pre-gyp>tar': ^7.5.8
   tmp: ^0.2.4
-  '@aws-sdk/core>fast-xml-parser': ^5.3.5
-  openapi-sampler>fast-xml-parser: ^5.3.5
