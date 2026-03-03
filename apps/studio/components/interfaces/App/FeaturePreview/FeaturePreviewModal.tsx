@@ -29,6 +29,7 @@ import { QueueOperationsPreview } from './QueueOperationsPreview'
 import { TableFilterBarPreview } from './TableFilterBarPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
@@ -56,6 +57,11 @@ export const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const [isDismissedTableFilterBar, setIsDismissedTableFilterBar] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
+
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature =
     featurePreviews.find((preview) => preview.key === selectedFeatureKey) ?? featurePreviews[0]
@@ -72,6 +78,13 @@ export const FeaturePreviewModal = () => {
       properties: { feature: selectedFeature.key },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
+
+    if (
+      selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR &&
+      !isDismissedTableFilterBar
+    ) {
+      setIsDismissedTableFilterBar(true)
+    }
   }
 
   return (
