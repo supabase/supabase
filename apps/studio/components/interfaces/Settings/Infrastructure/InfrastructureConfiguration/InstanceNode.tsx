@@ -1,6 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import SparkBar from 'components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
@@ -9,15 +7,12 @@ import {
 } from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import dayjs from 'dayjs'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { Handle, NodeProps, Position } from 'reactflow'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -41,6 +36,7 @@ import {
   REPLICA_STATUS,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 interface NodeData {
   id: string
@@ -111,13 +107,11 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
 
 export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
-  const { provider, region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+  const { region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
-  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
-  const providerLabel = provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : provider
 
   return (
     <>
@@ -183,23 +177,17 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
 }
 
 export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
-  const {
-    id,
-    region,
-    computeSize,
-    status,
-    inserted_at,
-    onSelectRestartReplica,
-    onSelectDropReplica,
-  } = data
   const { ref } = useParams()
-  const dbSelectorState = useDatabaseSelectorStateSnapshot()
-  const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { id, region, computeSize, status, inserted_at } = data
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
 
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const state = useDatabaseSelectorStateSnapshot()
+  const [, setConnect] = useQueryStates({
+    showConnect: parseAsBoolean.withDefault(false),
+    source: parseAsString,
+  })
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
   const { replicaInitializationStatus } =
@@ -361,40 +349,21 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
               onClick={() => {
-                setShowConnect(true)
-                dbSelectorState.setSelectedDatabaseId(id)
+                setConnect({ showConnect: true, source: id })
+                state.setSelectedDatabaseId(id)
               }}
             >
               View connection string
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="gap-x-2"
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
-            >
-              <Link href={`/project/${ref}/observability/database?db=${id}&chart=replication-lag`}>
-                View replication lag
-              </Link>
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="gap-x-2"
-              onClick={() => onSelectRestartReplica()}
               disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
             >
-              Restart replica
+              <Link href={`/project/${ref}/database/replication/replica/${id}`}>
+                Manage replica
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItemTooltip
-              className="gap-x-2 !pointer-events-auto"
-              disabled={!canManageReplicas}
-              onClick={() => {
-                if (canManageReplicas) onSelectDropReplica()
-              }}
-              tooltip={{
-                content: { side: 'left', text: 'You need additional permissions to drop replicas' },
-              }}
-            >
-              Drop replica
-            </DropdownMenuItemTooltip>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
