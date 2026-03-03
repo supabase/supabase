@@ -4,10 +4,7 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 export function useQueryInsightsResourceStatus() {
   const { ref } = useParams()
 
-  const { data: warnings } = useResourceWarningsQuery(
-    { ref },
-    { staleTime: 1000 * 60 * 5 }
-  )
+  const { data: warnings } = useResourceWarningsQuery({ ref }, { staleTime: 1000 * 60 * 5 })
 
   const warning = Array.isArray(warnings) ? warnings.find((w) => w.project === ref) : warnings
 
