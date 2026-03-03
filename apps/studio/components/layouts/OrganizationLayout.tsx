@@ -65,9 +65,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren) => {
 
   useLayoutEffect(() => {
     const unregister = registerOpenMenu(() => {
-      setMobileSheetContent(
-        <OrgMenuContent onCloseSheet={() => setMobileSheetContent(null)} />
-      )
+      setMobileSheetContent(<OrgMenuContent onCloseSheet={() => setMobileSheetContent(null)} />)
     })
     return unregister
   }, [registerOpenMenu, setMobileSheetContent])

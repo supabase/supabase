@@ -148,13 +148,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         )
       })
       return unregister
-    }, [
-      registerOpenMenu,
-      productMenu,
-      product,
-      currentSectionKey,
-      setMobileSheetContent,
-    ])
+    }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
 
     return (
       <>
