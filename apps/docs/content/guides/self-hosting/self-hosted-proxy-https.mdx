@@ -20,7 +20,7 @@ Below are two options for adding a reverse proxy with automatic HTTPS in front o
 
 <Admonition type="tip" label="Using a different reverse proxy?">
 
-**Using a different reverse proxy?** If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefik.io/), [Nginx Proxy Manager](https://nginxproxymanager.com/), or another reverse proxy for your infrastructure, you can use it instead of Caddy or Nginx above. The key requirements are:
+If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefik.io/), [Nginx Proxy Manager](https://nginxproxymanager.com/), or another reverse proxy for your infrastructure, you can use it instead of Caddy or Nginx above. The key requirements are:
 
 - Proxy to Kong on port `8000` (or `<your-ip>:8000` if the proxy runs outside the Docker network)
 - Enable WebSocket support (required for Realtime)
