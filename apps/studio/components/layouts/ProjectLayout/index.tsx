@@ -5,10 +5,10 @@ import { useRouter } from 'next/router'
 import {
   forwardRef,
   Fragment,
-  PropsWithChildren,
-  ReactNode,
   useEffect,
   useLayoutEffect,
+  type PropsWithChildren,
+  type ReactNode,
 } from 'react'
 import {
   cn,
