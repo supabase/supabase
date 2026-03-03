@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { AlertCircle, ExternalLink, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import type { projectKeys } from './Connect.types'
 
 function KeyRow({ label, value }: { label: ReactNode; value: string }) {
@@ -63,7 +63,6 @@ export function ApiKeysTabContent({ projectKeys }: { projectKeys: projectKeys })
         value={projectKeys.anonKey ?? ''}
       />
 
-      {/* Footer */}
       <div className="gap-5 lg:grid lg:grid-cols-12">
         <div className="col-start-5 col-span-8 pl-2 flex items-center justify-between">
           <p className="text-xs text-foreground-lighter">For secret keys, see API settings.</p>

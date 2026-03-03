@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
@@ -11,9 +10,12 @@ import type { ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useConnectState } from './useConnectState'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const ConnectSheet = () => {
+  const { ref: projectRef } = useParams()
+
   const {
     projectConnectionShowAppFrameworks: showAppFrameworks,
     projectConnectionShowMobileFrameworks: showMobileFrameworks,
@@ -40,9 +42,8 @@ export const ConnectSheet = () => {
   const { state, activeFields, resolvedSteps, schema, getFieldOptions, setMode, updateField } =
     useConnectState()
 
-  // Project keys for step components
-  const { ref: projectRef } = useParams()
-  const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
+  const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })
+
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
@@ -53,22 +54,12 @@ export const ConnectSheet = () => {
     : { anonKey: null, publishableKey: null }
 
   const projectKeys: ProjectKeys = useMemo(() => {
-    const protocol = settings?.app_config?.protocol ?? 'https'
-    const endpoint = settings?.app_config?.endpoint ?? ''
-    const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
-
     return {
-      apiUrl: apiHost ?? null,
+      apiUrl: endpoint,
       anonKey: anonKey?.api_key ?? null,
       publishableKey: publishableKey?.api_key ?? null,
     }
-  }, [
-    settings?.app_config?.protocol,
-    settings?.app_config?.endpoint,
-    canReadAPIKeys,
-    anonKey?.api_key,
-    publishableKey?.api_key,
-  ])
+  }, [endpoint, anonKey?.api_key, publishableKey?.api_key])
 
   const availableModeIds = useMemo(() => {
     const modes: string[] = []

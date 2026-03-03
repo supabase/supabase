@@ -68,7 +68,7 @@ export const OAuthApps = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection isFullWidth className="flex flex-col gap-y-8">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
