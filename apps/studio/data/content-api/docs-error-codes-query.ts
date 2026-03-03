@@ -40,6 +40,8 @@ export const useErrorCodesQuery = <TData = ErrorCodeDescriptionsData>(
     queryKey: contentApiKeys.errorCodes(variables),
     queryFn: ({ signal }) => getErrorCodeDescriptions(variables, signal),
     enabled,
+    retry: false,
+    staleTime: Infinity,
     ...options,
   })
 }

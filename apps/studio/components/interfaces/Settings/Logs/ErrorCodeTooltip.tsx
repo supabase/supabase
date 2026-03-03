@@ -2,12 +2,18 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useTheme } from 'next-themes'
+import { ExternalLink } from 'lucide-react'
 
 import { useErrorCodesQuery } from 'data/content-api/docs-error-codes-query'
 import { Service } from 'data/graphql/graphql'
 import { BASE_PATH } from 'lib/constants'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
-  Button,
+  cn,
+  DropdownMenuItem,
   HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
@@ -28,6 +34,8 @@ interface ErrorCodeTooltipProps {
 export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTooltipProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const { resolvedTheme } = useTheme()
+  const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { data, isPending } = useErrorCodesQuery({ code: errorCode, service }, { enabled: isOpen })
 
@@ -36,6 +44,21 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
   const docsUrl =
     errors.map((e) => SERVICE_DOCS_URLS[e.service]).find(Boolean) ??
     (service ? SERVICE_DOCS_URLS[service] : undefined)
+
+  const buildPrompt = () => {
+    const description = errors[0]?.message
+    const servicePart = service ? ` in Supabase ${service}` : ''
+    const descriptionPart = description ? `\n\nError description: ${description}` : ''
+    return `I'm encountering error code \`${errorCode}\`${servicePart}.${descriptionPart}\n\nCan you explain what this error means and suggest steps to fix it?`
+  }
+
+  const handleOpenAssistant = () => {
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    snap.newChat({
+      name: `Fix error ${errorCode}`,
+      initialMessage: buildPrompt(),
+    })
+  }
 
   return (
     <HoverCard_Shadcn_ open={isOpen} onOpenChange={setIsOpen} openDelay={200} closeDelay={100}>
@@ -48,7 +71,9 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
       <HoverCardContent_Shadcn_ side="top" align="center" className="w-[360px] p-0 overflow-hidden">
         <div className="flex flex-col">
           <div className="px-4 pt-3 pb-2.5 border-b border-border">
-            <p className="font-mono text-xs uppercase text-foreground-light">{errorCode}</p>
+            <p className="font-mono text-xs uppercase text-foreground-light truncate max-w-[40ch]">
+              {errorCode}
+            </p>
           </div>
 
           <div className="px-4 py-3 space-y-2">
@@ -67,8 +92,13 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
             )}
           </div>
 
-          {docsUrl && (
-            <div className="border-t border-border px-4 py-2.5 flex items-center justify-between">
+          <div
+            className={cn(
+              'border-t border-border px-4 py-2.5 flex items-center',
+              docsUrl ? 'justify-between' : 'justify-end'
+            )}
+          >
+            {docsUrl && (
               <div className="flex items-center gap-1.5">
                 <Image
                   src={
@@ -84,13 +114,24 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
                   DOCS
                 </span>
               </div>
-              <Button type="default" size="tiny" asChild>
-                <Link href={docsUrl} target="_blank" rel="noreferrer">
-                  Go to docs
-                </Link>
-              </Button>
-            </div>
-          )}
+            )}
+            <AiAssistantDropdown
+              label="Fix with AI"
+              buildPrompt={buildPrompt}
+              onOpenAssistant={handleOpenAssistant}
+              copyLabel="Copy Markdown"
+              extraDropdownItems={
+                docsUrl ? (
+                  <DropdownMenuItem asChild className="gap-2">
+                    <Link href={docsUrl} target="_blank" rel="noreferrer">
+                      <ExternalLink size={14} />
+                      Go to Docs
+                    </Link>
+                  </DropdownMenuItem>
+                ) : undefined
+              }
+            />
+          </div>
         </div>
       </HoverCardContent_Shadcn_>
     </HoverCard_Shadcn_>

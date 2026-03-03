@@ -1,7 +1,7 @@
 import { AiPromptCopiedEvent } from 'common/telemetry-constants'
 import { useTrack } from 'lib/telemetry/track'
 import { Check, ChevronDown, Copy } from 'lucide-react'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import {
   AiIconAnimation,
   Button,
@@ -30,6 +30,8 @@ export interface AiAssistantDropdownProps {
   loading?: boolean
   className?: string
   tooltip?: string
+  copyLabel?: string
+  extraDropdownItems?: ReactNode
 }
 
 export function AiAssistantDropdown({
@@ -44,6 +46,8 @@ export function AiAssistantDropdown({
   loading = false,
   className,
   tooltip,
+  copyLabel = 'Copy prompt',
+  extraDropdownItems,
 }: AiAssistantDropdownProps) {
   const track = useTrack()
   const [showCopied, setShowCopied] = useState(false)
@@ -95,10 +99,11 @@ export function AiAssistantDropdown({
             icon={<ChevronDown size={12} />}
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuContent align="end" className="w-44">
+          {extraDropdownItems}
           <DropdownMenuItem onClick={handleCopyPrompt} className="gap-2">
             {showCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
-            {showCopied ? 'Copied!' : 'Copy prompt'}
+            {showCopied ? 'Copied!' : copyLabel}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
