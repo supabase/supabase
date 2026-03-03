@@ -1,8 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { indexOf } from 'lodash'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -19,9 +18,7 @@ import {
   FormItem_Shadcn_,
   Input_Shadcn_,
   PrePostTab,
-  RadioGroupStacked,
-  RadioGroupStackedItem,
-  Skeleton,
+  Skeleton
 } from 'ui'
 import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
@@ -35,15 +32,12 @@ import {
 } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
-import { ExposedSchemaSelector } from './ExposedSchemaSelector'
-import { HardenAPIModal } from './HardenAPIModal'
 import { ExposedTableSelector } from '@/components/interfaces/Settings/API/ExposedTableSelector'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { exposeModeQueryOptions, type ExposeMode } from '@/data/privileges/expose-mode-query'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateExposedTablesMutation } from '@/data/privileges/update-exposed-tables-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -53,6 +47,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { noop } from '@/lib/void'
 import type { ResponseError } from '@/types'
+import { ExposedSchemaSelector } from './ExposedSchemaSelector'
+import { HardenAPIModal } from './HardenAPIModal'
 
 const formSchema = z.object({
   // Fields for updatePostgrestConfig
@@ -66,9 +62,7 @@ const formSchema = z.object({
     .optional()
     .nullable(),
 
-  // Fields for expose mode
-  exposeMode: z.enum(['schemas', 'specific']),
-  // For exposeMode = 'specific
+  // Fields for expose toggles
   tableIdsToAdd: z.array(z.number()),
   tableIdsToRemove: z.array(z.number()),
 })
@@ -105,32 +99,12 @@ export const PostgrestConfig = () => {
     [config?.db_schema]
   )
 
-  const {
-    data: exposeMode,
-    isPending: isLoadingExposeMode,
-    isError: isExposeModeError,
-    isSuccess: isSuccessExposeMode,
-  } = useQuery(
-    exposeModeQueryOptions(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        schemas: configDbSchemas,
-      },
-      { enabled: isSuccessConfig && isApiGrantTogglesEnabled }
-    )
-  )
-
-  const isLoading =
-    isLoadingConfig || isLoadingSchemas || (isApiGrantTogglesEnabled && isLoadingExposeMode)
+  const isLoading = isLoadingConfig || isLoadingSchemas
 
   const schemas = useMemo(
     () =>
       allSchemas
-        .filter((x) => {
-          const find = indexOf(INTERNAL_SCHEMAS, x.name)
-          if (find < 0) return x
-        })
+        .filter((x) => !INTERNAL_SCHEMAS.some((schema) => schema === x.name))
         .map((x) => {
           return {
             id: x.id,
@@ -166,11 +140,10 @@ export const PostgrestConfig = () => {
         .map((x) => x.trim())
         .filter(Boolean),
       dbPool: config?.db_pool,
-      exposeMode: exposeMode ?? ('schemas' as const),
       tableIdsToAdd: [] as number[],
       tableIdsToRemove: [] as number[],
     }
-  }, [config, configDbSchemas, exposeMode])
+  }, [config, configDbSchemas])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -190,26 +163,13 @@ export const PostgrestConfig = () => {
     try {
       let dbSchema = values.dbSchema.join(',')
 
-      if (values.exposeMode === 'specific') {
-        const exposedSchemas = await updateExposedTables({
+      if (isApiGrantTogglesEnabled) {
+        await updateExposedTables({
           projectRef,
           connectionString: project?.connectionString,
           tableIdsToAdd: values.tableIdsToAdd,
           tableIdsToRemove: values.tableIdsToRemove,
         })
-
-        // graphql_public is managed separately from table-level grants,
-        // so preserve its original exposure state when saving in specific mode.
-        const hadGraphqlPublic = configDbSchemas.includes('graphql_public')
-        const hasGraphqlPublic = exposedSchemas.includes('graphql_public')
-
-        if (hadGraphqlPublic && !hasGraphqlPublic) {
-          exposedSchemas.push('graphql_public')
-        } else if (!hadGraphqlPublic && hasGraphqlPublic) {
-          exposedSchemas.splice(exposedSchemas.indexOf('graphql_public'), 1)
-        }
-
-        dbSchema = exposedSchemas.join(',')
       }
 
       await updatePostgrestConfig(
@@ -228,13 +188,9 @@ export const PostgrestConfig = () => {
           queryKey: privilegeKeys.exposedTablesInfinite(projectRef),
         }),
         queryClient.invalidateQueries({
-          queryKey: privilegeKeys.exposeMode(projectRef),
+          queryKey: privilegeKeys.exposedTableCounts(projectRef, watchedDbSchema),
         }),
       ])
-
-      const updatedExposeMode = queryClient.getQueryData<ExposeMode>(
-        privilegeKeys.exposeMode(projectRef)
-      )
 
       toast.success('Successfully saved settings')
       form.reset({
@@ -245,7 +201,6 @@ export const PostgrestConfig = () => {
         maxRows: values.maxRows,
         dbExtraSearchPath: values.dbExtraSearchPath,
         dbPool: values.dbPool,
-        exposeMode: updatedExposeMode ?? values.exposeMode,
         tableIdsToAdd: [],
         tableIdsToRemove: [],
       })
@@ -257,9 +212,7 @@ export const PostgrestConfig = () => {
   }
 
   const resetFormRef = useLatest(resetForm)
-  const isReady = isApiGrantTogglesEnabled
-    ? isSuccessConfig && isSuccessSchemas && isSuccessExposeMode
-    : isSuccessConfig && isSuccessSchemas
+  const isReady = isSuccessConfig && isSuccessSchemas
   useEffect(() => {
     if (isReady) {
       resetFormRef.current()
@@ -267,7 +220,6 @@ export const PostgrestConfig = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady])
 
-  const watchedExposeMode = form.watch('exposeMode')
   const watchedDbSchema = form.watch('dbSchema')
   const watchedTableIdsToAdd = form.watch('tableIdsToAdd')
   const watchedTableIdsToRemove = form.watch('tableIdsToRemove')
@@ -281,136 +233,80 @@ export const PostgrestConfig = () => {
                 <CardContent>
                   <GenericSkeletonLoader />
                 </CardContent>
-              ) : isError || (isApiGrantTogglesEnabled && isExposeModeError) ? (
+              ) : isError ? (
                 <CardContent>
                   <Admonition type="destructive" title="Failed to retrieve API settings" />
                 </CardContent>
               ) : (
                 <>
                   {isApiGrantTogglesEnabled ? (
-                    <CardContent className="space-y-6 p-6">
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="exposeMode"
-                        render={({ field }) => (
-                          <FormItem_Shadcn_>
-                            <FormItemLayout
-                              layout="flex-row-reverse"
-                              label="Expose mode"
-                              description="Choose whether to expose complete schemas or specific tables."
-                            >
-                              <FormControl_Shadcn_>
-                                <RadioGroupStacked
-                                  id="expose-mode"
-                                  name="expose-mode"
-                                  value={field.value}
-                                  disabled={!canUpdatePostgrestConfig}
-                                  onValueChange={(value) =>
-                                    field.onChange(value as 'schemas' | 'specific')
-                                  }
-                                >
-                                  <RadioGroupStackedItem
-                                    id="schemas"
-                                    value="schemas"
-                                    label=""
-                                    showIndicator={false}
-                                    className="text-left justify-start items-start"
-                                  >
-                                    <div className="flex flex-col">
-                                      <p className="text-foreground">Schemas</p>
-                                      <p className="text-foreground-light text-sm">
-                                        Expose all tables in selected schemas.
-                                      </p>
-                                    </div>
-                                  </RadioGroupStackedItem>
-                                  <RadioGroupStackedItem
-                                    id="specific"
-                                    value="specific"
-                                    label=""
-                                    showIndicator={false}
-                                    className="text-left justify-start items-start"
-                                  >
-                                    <div className="flex flex-col">
-                                      <p className="text-foreground">Specific tables</p>
-                                      <p className="text-foreground-light text-sm">
-                                        Expose only selected tables.
-                                      </p>
-                                    </div>
-                                  </RadioGroupStackedItem>
-                                </RadioGroupStacked>
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          </FormItem_Shadcn_>
-                        )}
-                      />
+                    <CardContent className="space-y-6">
+                      <FormItemLayout
+                        isReactForm={false}
+                        layout="flex-row-reverse"
+                        label="Exposed schemas"
+                        description="Select schemas to include in the Data API. Schemas must be included before tables can be exposed."
+                      >
+                        <ExposedSchemaSelector
+                          selectedSchemas={watchedDbSchema}
+                          disabled={!canUpdatePostgrestConfig}
+                          onToggleSchema={(schema) => {
+                            const current = form.getValues('dbSchema')
+                            if (current.includes(schema)) {
+                              form.setValue(
+                                'dbSchema',
+                                current.filter((x) => x !== schema),
+                                { shouldDirty: true }
+                              )
+                            } else {
+                              form.setValue('dbSchema', [...current, schema], {
+                                shouldDirty: true,
+                              })
+                            }
+                          }}
+                        />
+                      </FormItemLayout>
 
-                      {watchedExposeMode === 'schemas' ? (
-                        <FormItemLayout
-                          isReactForm={false}
-                          layout="flex-row-reverse"
-                          label="Exposed schemas"
-                          description="Select schemas to fully expose through the Data API."
-                        >
-                          <ExposedSchemaSelector
-                            selectedSchemas={watchedDbSchema}
-                            disabled={!canUpdatePostgrestConfig}
-                            onToggleSchema={(schema) => {
-                              const current = form.getValues('dbSchema')
-                              if (current.includes(schema)) {
-                                form.setValue(
-                                  'dbSchema',
-                                  current.filter((x) => x !== schema),
-                                  { shouldDirty: true }
-                                )
-                              } else {
-                                form.setValue('dbSchema', [...current, schema], {
-                                  shouldDirty: true,
-                                })
-                              }
-                            }}
-                          />
-                        </FormItemLayout>
-                      ) : (
-                        <FormItemLayout
-                          isReactForm={false}
-                          layout="flex-row-reverse"
-                          label="Exposed tables"
-                          description="Toggle Data API access for individual tables."
-                        >
-                          <ExposedTableSelector
-                            pendingAddTableIds={watchedTableIdsToAdd}
-                            pendingRemoveTableIds={watchedTableIdsToRemove}
-                            onTogglePendingAdd={(tableId) => {
-                              const current = form.getValues('tableIdsToAdd')
-                              if (current.includes(tableId)) {
-                                form.setValue(
-                                  'tableIdsToAdd',
-                                  current.filter((x) => x !== tableId),
-                                  { shouldDirty: true }
-                                )
-                              } else {
-                                form.setValue('tableIdsToAdd', [...current, tableId], {
-                                  shouldDirty: true,
-                                })
-                              }
-                            }}
-                            onTogglePendingRemove={(tableId) => {
-                              const current = form.getValues('tableIdsToRemove')
-                              if (current.includes(tableId)) {
-                                form.setValue(
-                                  'tableIdsToRemove',
-                                  current.filter((x) => x !== tableId),
-                                  { shouldDirty: true }
-                                )
-                              } else {
-                                form.setValue('tableIdsToRemove', [...current, tableId], {
-                                  shouldDirty: true,
-                                })
-                              }
-                            }}
-                          />
-                        </FormItemLayout>
-                      )}
+                      <FormItemLayout
+                        isReactForm={false}
+                        layout="flex-row-reverse"
+                        label="Exposed tables"
+                        description="Toggle Data API access for individual tables."
+                      >
+                        <ExposedTableSelector
+                          selectedSchemas={watchedDbSchema}
+                          pendingAddTableIds={watchedTableIdsToAdd}
+                          pendingRemoveTableIds={watchedTableIdsToRemove}
+                          onTogglePendingAdd={(tableId) => {
+                            const current = form.getValues('tableIdsToAdd')
+                            if (current.includes(tableId)) {
+                              form.setValue(
+                                'tableIdsToAdd',
+                                current.filter((x) => x !== tableId),
+                                { shouldDirty: true }
+                              )
+                            } else {
+                              form.setValue('tableIdsToAdd', [...current, tableId], {
+                                shouldDirty: true,
+                              })
+                            }
+                          }}
+                          onTogglePendingRemove={(tableId) => {
+                            const current = form.getValues('tableIdsToRemove')
+                            if (current.includes(tableId)) {
+                              form.setValue(
+                                'tableIdsToRemove',
+                                current.filter((x) => x !== tableId),
+                                { shouldDirty: true }
+                              )
+                            } else {
+                              form.setValue('tableIdsToRemove', [...current, tableId], {
+                                shouldDirty: true,
+                              })
+                            }
+                          }}
+                        />
+                      </FormItemLayout>
 
                       {watchedDbSchema.length === 0 && (
                         <Admonition

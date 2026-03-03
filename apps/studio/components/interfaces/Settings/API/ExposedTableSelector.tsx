@@ -1,6 +1,6 @@
-import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { Check, ChevronsUpDown, Info } from 'lucide-react'
+import { Check, ChevronsUpDown, CircleAlert, Info } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -20,6 +20,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { exposedTableCountsQueryOptions } from '@/data/privileges/exposed-table-counts-query'
 import { exposedTablesInfiniteQueryOptions } from '@/data/privileges/exposed-tables-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
@@ -27,6 +28,7 @@ import { pluralize } from '@/lib/helpers'
 interface ExposedTableSelectorProps {
   className?: string
   disabled?: boolean
+  selectedSchemas: string[]
   pendingAddTableIds: number[]
   pendingRemoveTableIds: number[]
   onTogglePendingAdd: (tableId: number) => void
@@ -36,6 +38,7 @@ interface ExposedTableSelectorProps {
 export const ExposedTableSelector = ({
   className,
   disabled = false,
+  selectedSchemas,
   pendingAddTableIds,
   pendingRemoveTableIds,
   onTogglePendingAdd,
@@ -54,15 +57,21 @@ export const ExposedTableSelector = ({
     rootMargin: '0px',
   })
 
-  const { data: countsData, isSuccess: isCountsSuccess } = useInfiniteQuery(
-    exposedTablesInfiniteQueryOptions({
+  const {
+    data: countsData,
+    isPending: isCountsPending,
+  } = useQuery({
+    ...exposedTableCountsQueryOptions({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-    })
-  )
-  const grantsCount = countsData?.pages[0]?.grants_count ?? 0
-  const totalCount = countsData?.pages[0]?.total_count ?? 0
+      selectedSchemas,
+    }),
+    placeholderData: keepPreviousData,
+  })
   const pendingCount = pendingAddTableIds.length + pendingRemoveTableIds.length
+
+  const totalCount = countsData?.total_count ?? 0
+  const grantsCount = countsData?.grants_count ?? 0
 
   const { data, isPending, isError, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
@@ -100,13 +109,13 @@ export const ExposedTableSelector = ({
           >
             <div className="w-full flex gap-1">
               <p className="text-foreground-lighter">
-                {isCountsSuccess
-                  ? `${grantsCount} of ${totalCount} tables exposed${
+                {isCountsPending
+                  ? 'Loading tables...'
+                  : `${grantsCount} of ${totalCount} tables exposed${
                       pendingCount > 0
                         ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
                         : ''
-                    }`
-                  : 'Loading tables...'}
+                    }`}
               </p>
             </div>
           </Button>
@@ -151,6 +160,7 @@ export const ExposedTableSelector = ({
                       className={tables.length > 7 ? 'h-[210px]' : ''}
                     >
                       {tables.map((table) => {
+                        const isSchemaExposed = selectedSchemas.includes(table.schema)
                         const hasPendingAdd = pendingAddSet.has(table.id)
                         const hasPendingRemove = pendingRemoveSet.has(table.id)
 
@@ -158,11 +168,13 @@ export const ExposedTableSelector = ({
                         const isGranted = table.status === 'granted'
 
                         const isCustomNeutral = isCustomTable && !hasPendingAdd && !hasPendingRemove
-                        const isExposed = isCustomTable
-                          ? hasPendingAdd
-                          : isGranted
-                            ? !hasPendingRemove
-                            : hasPendingAdd
+                        const isExposed =
+                          isSchemaExposed &&
+                          (isCustomTable
+                            ? hasPendingAdd
+                            : isGranted
+                              ? !hasPendingRemove
+                              : hasPendingAdd)
 
                         const customGrantsTooltip = getCustomGrantsTooltip({
                           hasPendingAdd,
@@ -173,8 +185,10 @@ export const ExposedTableSelector = ({
                           <CommandItem_Shadcn_
                             key={table.id}
                             value={`${table.schema}.${table.name}-${table.id}`}
-                            className="cursor-pointer w-full"
+                            className={cn('w-full', isSchemaExposed ? 'cursor-pointer' : 'opacity-50 !cursor-not-allowed')}
                             onSelect={() => {
+                              if (!isSchemaExposed) return
+
                               if (isCustomTable) {
                                 if (hasPendingAdd) {
                                   onTogglePendingAdd(table.id)
@@ -196,37 +210,57 @@ export const ExposedTableSelector = ({
                             }}
                           >
                             <div className="w-full flex items-center gap-x-2">
-                              <div className="w-4 shrink-0">
+                              <div className="w-4 shrink-0 flex items-center justify-center">
                                 {isExposed && <Check size={16} className="text-brand shrink-0" />}
                               </div>
                               <span
                                 className={cn(
                                   'truncate',
-                                  isCustomNeutral && 'text-foreground-muted'
+                                  (!isSchemaExposed || isCustomNeutral) && 'text-foreground-muted',
+                                  isCustomNeutral && isSchemaExposed && 'text-warning'
                                 )}
                               >
                                 {`${table.schema}.${table.name}`}
                               </span>
-                              {isCustomTable && (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <button
-                                      type="button"
-                                      tabIndex={-1}
-                                      aria-label="Custom grants information"
-                                      className="ml-auto inline-flex items-center text-foreground-muted hover:text-foreground-light"
-                                      onClick={(event) => event.stopPropagation()}
-                                      onMouseDown={(event) => event.stopPropagation()}
-                                      onKeyDown={(event) => event.stopPropagation()}
-                                    >
-                                      <Info size={14} />
-                                    </button>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="right" className="max-w-[320px] text-xs">
-                                    {customGrantsTooltip}
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
+                              
+                              <div className="ml-auto flex items-center gap-x-2">
+                                {isCustomTable && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div
+                                        className={cn(
+                                          'shrink-0 flex items-center justify-center hover:text-foreground-light',
+                                          isCustomNeutral && isSchemaExposed
+                                            ? 'text-warning'
+                                            : 'text-foreground-muted'
+                                        )}
+                                      >
+                                        <CircleAlert size={14} />
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-[320px] text-xs pointer-events-none">
+                                      {customGrantsTooltip}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                                {!isSchemaExposed && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <button
+                                        type="button"
+                                        tabIndex={-1}
+                                        aria-label="Schema not exposed"
+                                        className="inline-flex items-center text-foreground-muted hover:text-foreground-light"
+                                      >
+                                        <Info size={14} />
+                                      </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-[320px] text-xs">
+                                      {`The schema "${table.schema}" must be exposed before enabling this table.`}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
                             </div>
                           </CommandItem_Shadcn_>
                         )
