@@ -1,17 +1,127 @@
-import Link from 'next/link'
+import Head from 'next/head'
 import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
+import type { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
+import { WithSidebar } from 'components/layouts/AccountLayout/WithSidebar'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { NavMenu, NavMenuItem } from 'ui'
-import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
-function OrganizationSettingsLayout({ children }: PropsWithChildren) {
+interface OrganizationSettingsSectionsProps {
+  slug?: string
+  currentPath: string
+  showSecuritySettings?: boolean
+  showSsoSettings?: boolean
+  showLegalDocuments?: boolean
+}
+
+interface OrganizationSettingsLayoutProps {
+  pageTitle?: string
+}
+
+export const normalizeOrganizationSettingsPath = (path: string) => path.split('#')[0]
+export const getOrganizationSettingsPageTitle = (pageTitle?: string) => pageTitle ?? 'Settings'
+export const getOrganizationSettingsDocumentTitle = (
+  pageTitle: string | undefined,
+  title: string
+) => `${getOrganizationSettingsPageTitle(pageTitle)} | ${title}`
+
+export const generateOrganizationSettingsSections = ({
+  slug,
+  currentPath,
+  showSecuritySettings = true,
+  showSsoSettings = true,
+  showLegalDocuments = true,
+}: OrganizationSettingsSectionsProps): SidebarSection[] => {
+  const configurationLinks = [
+    {
+      key: 'general',
+      label: 'General',
+      href: `/org/${slug}/general`,
+    },
+    ...(showSecuritySettings
+      ? [
+          {
+            key: 'security',
+            label: 'Security',
+            href: `/org/${slug}/security`,
+          },
+        ]
+      : []),
+    ...(showSsoSettings
+      ? [
+          {
+            key: 'sso',
+            label: 'SSO',
+            href: `/org/${slug}/sso`,
+          },
+        ]
+      : []),
+  ]
+
+  const connectionsLinks = [
+    {
+      key: 'apps',
+      label: 'OAuth Apps',
+      href: `/org/${slug}/apps`,
+    },
+  ]
+
+  const complianceLinks = [
+    {
+      key: 'audit',
+      label: 'Audit Logs',
+      href: `/org/${slug}/audit`,
+    },
+    ...(showLegalDocuments
+      ? [
+          {
+            key: 'documents',
+            label: 'Legal Documents',
+            href: `/org/${slug}/documents`,
+          },
+        ]
+      : []),
+  ]
+
+  return [
+    {
+      key: 'configuration',
+      heading: 'Configuration',
+      links: configurationLinks.map((item) => ({
+        ...item,
+        isActive: currentPath === item.href,
+      })),
+    },
+    {
+      key: 'connections',
+      heading: 'Connections',
+      links: connectionsLinks.map((item) => ({
+        ...item,
+        isActive: currentPath === item.href,
+      })),
+    },
+    {
+      key: 'compliance',
+      heading: 'Compliance',
+      links: complianceLinks.map((item) => ({
+        ...item,
+        isActive: currentPath === item.href,
+      })),
+    },
+  ]
+}
+
+function OrganizationSettingsLayout({
+  children,
+  pageTitle,
+}: PropsWithChildren<OrganizationSettingsLayoutProps>) {
   const { slug } = useParams()
-  // Get the path without any hash values
   const fullCurrentPath = useCurrentPath()
-  const [currentPath] = fullCurrentPath.split('#')
+  const currentPath = normalizeOrganizationSettingsPath(fullCurrentPath)
+  const { appTitle } = useCustomContent(['app:title'])
+  const titleSuffix = appTitle || 'Supabase'
 
   const {
     organizationShowSsoSettings: showSsoSettings,
@@ -23,59 +133,32 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
     'organization:show_legal_documents',
   ])
 
-  const navMenuItems = [
-    {
-      label: 'General',
-      href: `/org/${slug}/general`,
-    },
-    ...(showSecuritySettings
-      ? [
-          {
-            label: 'Security',
-            href: `/org/${slug}/security`,
-          },
-        ]
-      : []),
-    {
-      label: 'OAuth Apps',
-      href: `/org/${slug}/apps`,
-    },
-    ...(showSsoSettings
-      ? [
-          {
-            label: 'SSO',
-            href: `/org/${slug}/sso`,
-          },
-        ]
-      : []),
-
-    {
-      label: 'Audit Logs',
-      href: `/org/${slug}/audit`,
-    },
-    ...(showLegalDocuments
-      ? [
-          {
-            label: 'Legal Documents',
-            href: `/org/${slug}/documents`,
-          },
-        ]
-      : []),
-  ]
+  const sections = generateOrganizationSettingsSections({
+    slug,
+    currentPath,
+    showSecuritySettings,
+    showSsoSettings,
+    showLegalDocuments,
+  })
 
   return (
     <>
-      <ScaffoldContainerLegacy className="mb-0">
-        <ScaffoldTitle>Organization Settings</ScaffoldTitle>
-        <NavMenu className="overflow-x-auto" aria-label="Organization menu navigation">
-          {(navMenuItems.filter(Boolean) as { label: string; href: string }[]).map((item) => (
-            <NavMenuItem key={item.label} active={currentPath === item.href}>
-              <Link href={item.href}>{item.label}</Link>
-            </NavMenuItem>
-          ))}
-        </NavMenu>
-      </ScaffoldContainerLegacy>
-      <div className="h-full w-full overflow-y-auto">{children}</div>
+      <Head>
+        <title>{getOrganizationSettingsDocumentTitle(pageTitle, titleSuffix)}</title>
+        <meta name="description" content="Supabase Studio" />
+      </Head>
+      <WithSidebar
+        title="Organization Settings"
+        breadcrumbs={[]}
+        sections={sections}
+        header={
+          <div className="border-default flex min-h-[var(--header-height)] items-center border-b px-6">
+            <h4 className="text-lg">Settings</h4>
+          </div>
+        }
+      >
+        {children}
+      </WithSidebar>
     </>
   )
 }
