@@ -275,7 +275,7 @@ export const StripeSyncInstallationPage = () => {
               isUpgrade={upgradeAvailable}
             />
             <div className="flex gap-x-2 justify-end mt-4">
-              {upgradeAvailable && (
+              {upgradeAvailable && !uninstallError && !uninstalling && (
                 <ButtonTooltip
                   type="primary"
                   onClick={() => setShouldShowInstallSheet(true)}
