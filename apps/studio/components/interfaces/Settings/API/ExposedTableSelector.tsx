@@ -1,6 +1,6 @@
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronsUpDown, Info } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -14,6 +14,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -148,9 +151,23 @@ export const ExposedTableSelector = ({
                       className={tables.length > 7 ? 'h-[210px]' : ''}
                     >
                       {tables.map((table) => {
-                        const isExposed = table.has_grants
-                          ? !pendingRemoveSet.has(table.id)
-                          : pendingAddSet.has(table.id)
+                        const hasPendingAdd = pendingAddSet.has(table.id)
+                        const hasPendingRemove = pendingRemoveSet.has(table.id)
+
+                        const isCustomTable = table.status === 'custom'
+                        const isGranted = table.status === 'granted'
+
+                        const isCustomNeutral = isCustomTable && !hasPendingAdd && !hasPendingRemove
+                        const isExposed = isCustomTable
+                          ? hasPendingAdd
+                          : isGranted
+                            ? !hasPendingRemove
+                            : hasPendingAdd
+
+                        const customGrantsTooltip = getCustomGrantsTooltip({
+                          hasPendingAdd,
+                          hasPendingRemove,
+                        })
 
                         return (
                           <CommandItem_Shadcn_
@@ -158,21 +175,58 @@ export const ExposedTableSelector = ({
                             value={`${table.schema}.${table.name}-${table.id}`}
                             className="cursor-pointer w-full"
                             onSelect={() => {
-                              if (table.has_grants) {
+                              if (isCustomTable) {
+                                if (hasPendingAdd) {
+                                  onTogglePendingAdd(table.id)
+                                  onTogglePendingRemove(table.id)
+                                } else if (hasPendingRemove) {
+                                  onTogglePendingRemove(table.id)
+                                  onTogglePendingAdd(table.id)
+                                } else {
+                                  onTogglePendingAdd(table.id)
+                                }
+                                return
+                              }
+
+                              if (isGranted) {
                                 onTogglePendingRemove(table.id)
                               } else {
                                 onTogglePendingAdd(table.id)
                               }
                             }}
                           >
-                            <div
-                              className={cn(
-                                'w-full flex items-center gap-x-2',
-                                !isExposed && 'ml-6'
+                            <div className="w-full flex items-center gap-x-2">
+                              <div className="w-4 shrink-0">
+                                {isExposed && <Check size={16} className="text-brand shrink-0" />}
+                              </div>
+                              <span
+                                className={cn(
+                                  'truncate',
+                                  isCustomNeutral && 'text-foreground-muted'
+                                )}
+                              >
+                                {`${table.schema}.${table.name}`}
+                              </span>
+                              {isCustomTable && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      type="button"
+                                      tabIndex={-1}
+                                      aria-label="Custom grants information"
+                                      className="ml-auto inline-flex items-center text-foreground-muted hover:text-foreground-light"
+                                      onClick={(event) => event.stopPropagation()}
+                                      onMouseDown={(event) => event.stopPropagation()}
+                                      onKeyDown={(event) => event.stopPropagation()}
+                                    >
+                                      <Info size={14} />
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-[320px] text-xs">
+                                    {customGrantsTooltip}
+                                  </TooltipContent>
+                                </Tooltip>
                               )}
-                            >
-                              {isExposed && <Check size={16} className="text-brand shrink-0" />}
-                              <span className="truncate">{`${table.schema}.${table.name}`}</span>
                             </div>
                           </CommandItem_Shadcn_>
                         )
@@ -193,4 +247,22 @@ export const ExposedTableSelector = ({
       </Popover_Shadcn_>
     </div>
   )
+}
+
+const getCustomGrantsTooltip = ({
+  hasPendingAdd,
+  hasPendingRemove,
+}: {
+  hasPendingAdd: boolean
+  hasPendingRemove: boolean
+}) => {
+  if (hasPendingAdd) {
+    return 'This table has custom grants. Saving will override them with standard Data API grants for anon, authenticated, and service_role. Select again to revoke all grants instead.'
+  }
+
+  if (hasPendingRemove) {
+    return 'This table has custom grants. Saving will revoke all grants for anon, authenticated, and service_role. Select again to override with standard Data API grants instead.'
+  }
+
+  return 'This table has custom grants. Select it to override with standard Data API grants for anon, authenticated, and service_role.'
 }
