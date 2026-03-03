@@ -17,7 +17,14 @@ import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
-import { Button, Radio, SidePanel, cn } from 'ui'
+import {
+  Button,
+  Label_Shadcn_,
+  RadioGroup_Shadcn_,
+  RadioGroupItem_Shadcn_,
+  SidePanel,
+  cn,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
@@ -138,65 +145,83 @@ const IPv4SidePanel = () => {
 
 
           <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
-            <Radio.Group
-              type="large-cards"
-              size="tiny"
-              id="ipv4"
-              onChange={(event: any) => setSelectedOption(event.target.value)}
+            <RadioGroup_Shadcn_
+              name="ipv4"
+              value={selectedOption}
+              onValueChange={setSelectedOption}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
-              <Radio
-                name="ipv4"
-                checked={selectedOption === 'ipv4_none'}
-                className="col-span-4 !p-0"
-                label="No IPv4"
-                value="ipv4_none"
+              <div
+                className={cn(
+                  'w-full rounded-md border p-0 transition-colors',
+                  selectedOption === 'ipv4_none'
+                    ? 'border-foreground bg-selection ring-1 ring-border'
+                    : 'border-default hover:border-control'
+                )}
               >
-                <div className="w-full group">
-                  <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                    <p className="text-sm">No IPv4 address</p>
-                  </div>
-                  <div className="px-4 py-2 flex flex-col justify-between">
-                    <p className="text-foreground-light">
-                      Use connection pooler or IPv6 for direct connections
-                    </p>
-                    <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-foreground text-sm">$0</p>
-                      <p className="text-foreground-light translate-y-[1px]"> / month</p>
-                    </div>
-                  </div>
-                </div>
-              </Radio>
-              {availableOptions.map((option) => (
-                <Radio
-                  className="col-span-4 !p-0"
-                  name="ipv4"
-                  key={option.identifier}
-                  disabled={!hasAccessToIPv4 || !isAws}
-                  checked={selectedOption === option.identifier}
-                  label={option.name}
-                  value={option.identifier}
-                >
-                  <div className="w-full group">
-                    <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                      <p className="text-sm">Dedicated IPv4 address</p>
-                    </div>
-                    <div className="px-4 py-2">
-                      <p className="text-foreground-light">
-                        Allow direct database connections via IPv4 address
+                <div className="flex items-start">
+                  <RadioGroupItem_Shadcn_
+                    value="ipv4_none"
+                    id="ipv4_none"
+                    className="sr-only aspect-auto h-0 w-0 border-0 p-0 overflow-hidden"
+                  />
+                  <Label_Shadcn_
+                    htmlFor="ipv4_none"
+                    className="cursor-pointer flex-1 font-normal min-w-0"
+                  >
+                    <div className="px-4 py-3">
+                      <p className="text-sm font-medium">No IPv4 address</p>
+                      <p className="text-foreground-light text-sm mt-1">
+                        Use connection pooler or IPv6 for direct connections
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm" translate="no">
-                          {formatCurrency(option.price)}
-                        </p>
-                        <p className="text-foreground-light translate-y-[1px]">
-                          / month / database
-                        </p>
+                        <p className="text-foreground text-sm">$0</p>
+                        <p className="text-foreground-light translate-y-[1px] text-sm">/ month</p>
                       </div>
                     </div>
+                  </Label_Shadcn_>
+                </div>
+              </div>
+              {availableOptions.map((option) => (
+                <div
+                  key={option.identifier}
+                  className={cn(
+                    'w-full rounded-md border p-0 transition-colors',
+                    selectedOption === option.identifier
+                      ? 'border-foreground bg-selection ring-1 ring-border'
+                      : 'border-default hover:border-control'
+                  )}
+                >
+                  <div className="flex items-start">
+                    <RadioGroupItem_Shadcn_
+                      value={option.identifier}
+                      id={option.identifier}
+                      disabled={!hasAccessToIPv4 || !isAws}
+                      className="sr-only aspect-auto h-0 w-0 border-0 p-0 overflow-hidden"
+                    />
+                    <Label_Shadcn_
+                      htmlFor={option.identifier}
+                      className="cursor-pointer flex-1 font-normal min-w-0"
+                    >
+                      <div className="px-4 py-3">
+                        <p className="text-sm font-medium">Dedicated IPv4 address</p>
+                        <p className="text-foreground-light text-sm mt-1">
+                          Allow direct database connections via IPv4 address
+                        </p>
+                        <div className="flex items-center space-x-1 mt-3 text-sm">
+                          <p className="text-sm" translate="no">
+                            {formatCurrency(option.price)}
+                          </p>
+                          <p className="text-foreground-light translate-y-[0.5px] ">
+                            / month / database
+                          </p>
+                        </div>
+                      </div>
+                    </Label_Shadcn_>
                   </div>
-                </Radio>
+                </div>
               ))}
-            </Radio.Group>
+            </RadioGroup_Shadcn_>
           </div>
 
           {hasChanges && (
