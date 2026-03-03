@@ -76,6 +76,39 @@ const IPv4SidePanel = () => {
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
   const isPgBouncerEnabled = !isFreePlan
 
+  const ipv4Options = [
+    {
+      value: 'ipv4_none',
+      id: 'ipv4_none',
+      title: 'No IPv4 address',
+      description: 'Use shared pooler or IPv6 for database connections.',
+      priceContent: (
+        <>
+          <p className="text-foreground text-sm">$0</p>
+          <p className="text-foreground-light translate-y-[1px] text-sm">/ month</p>
+        </>
+      ),
+      disabled: false,
+      priceRowClassName: 'mt-2',
+    },
+    ...availableOptions.map((option) => ({
+      value: option.identifier,
+      id: option.identifier,
+      title: 'Dedicated IPv4 address',
+      description: 'Allow database connections from IPv4 networks.',
+      priceContent: (
+        <>
+          <p className="text-sm" translate="no">
+            {formatCurrency(option.price)}
+          </p>
+          <p className="text-foreground-light translate-y-[0.5px]">/ month / database</p>
+        </>
+      ),
+      disabled: !hasAccessToIPv4 || !isAws,
+      priceRowClassName: 'mt-3',
+    })),
+  ]
+
   useEffect(() => {
     if (visible) {
       if (subscriptionIpV4Option !== undefined) {
@@ -151,70 +184,37 @@ const IPv4SidePanel = () => {
               onValueChange={setSelectedOption}
               className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
-              <div
-                className={cn(
-                  'w-full rounded-md border p-0 transition-colors',
-                  selectedOption === 'ipv4_none'
-                    ? 'border-foreground bg-selection ring-1 ring-border'
-                    : 'border-default hover:border-control'
-                )}
-              >
-                <div className="flex items-start">
-                  <RadioGroupItem_Shadcn_
-                    value="ipv4_none"
-                    id="ipv4_none"
-                    className="sr-only aspect-auto h-0 w-0 border-0 p-0 overflow-hidden"
-                  />
-                  <Label_Shadcn_
-                    htmlFor="ipv4_none"
-                    className="cursor-pointer flex-1 font-normal min-w-0"
-                  >
-                    <div className="px-4 py-3">
-                      <p className="text-sm font-medium">No IPv4 address</p>
-                      <p className="text-foreground-light text-sm mt-1">
-                        Use shared pooler or IPv6 for database connections.
-                      </p>
-                      <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">$0</p>
-                        <p className="text-foreground-light translate-y-[1px] text-sm">/ month</p>
-                      </div>
-                    </div>
-                  </Label_Shadcn_>
-                </div>
-              </div>
-              {availableOptions.map((option) => (
+              {ipv4Options.map((option) => (
                 <div
-                  key={option.identifier}
+                  key={option.id}
                   className={cn(
                     'w-full rounded-md border p-0 transition-colors',
-                    selectedOption === option.identifier
+                    selectedOption === option.value
                       ? 'border-foreground bg-selection ring-1 ring-border'
                       : 'border-default hover:border-control'
                   )}
                 >
                   <div className="flex items-start">
                     <RadioGroupItem_Shadcn_
-                      value={option.identifier}
-                      id={option.identifier}
-                      disabled={!hasAccessToIPv4 || !isAws}
+                      value={option.value}
+                      id={option.id}
+                      disabled={option.disabled}
                       className="sr-only aspect-auto h-0 w-0 border-0 p-0 overflow-hidden"
                     />
                     <Label_Shadcn_
-                      htmlFor={option.identifier}
+                      htmlFor={option.id}
                       className="cursor-pointer flex-1 font-normal min-w-0"
                     >
                       <div className="px-4 py-3">
-                        <p className="text-sm font-medium">Dedicated IPv4 address</p>
-                        <p className="text-foreground-light text-sm mt-1">
-                          Allow database connections from IPv4 networks.
-                        </p>
-                        <div className="flex items-center space-x-1 mt-3 text-sm">
-                          <p className="text-sm" translate="no">
-                            {formatCurrency(option.price)}
-                          </p>
-                          <p className="text-foreground-light translate-y-[0.5px] ">
-                            / month / database
-                          </p>
+                        <p className="text-sm font-medium">{option.title}</p>
+                        <p className="text-foreground-light text-sm mt-1">{option.description}</p>
+                        <div
+                          className={cn(
+                            'flex items-center space-x-1 text-sm',
+                            option.priceRowClassName
+                          )}
+                        >
+                          {option.priceContent}
                         </div>
                       </div>
                     </Label_Shadcn_>
