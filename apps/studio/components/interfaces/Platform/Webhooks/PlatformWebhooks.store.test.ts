@@ -21,7 +21,7 @@ describe('PlatformWebhooks.store', () => {
 
   it('creates endpoint with deterministic options', () => {
     const state = createInitialPlatformWebhooksState('project')
-    const { state: next, endpoint } = createWebhookEndpoint(
+    const { state: next, endpoint, signingSecret } = createWebhookEndpoint(
       state,
       {
         name: '',
@@ -42,7 +42,8 @@ describe('PlatformWebhooks.store', () => {
     expect(endpoint.id).toBe('endpoint-fixed')
     expect(endpoint.name).toBe('endpoint-fixed')
     expect(endpoint.eventTypes).toEqual(['*'])
-    expect(endpoint.signingSecret).toBe('whsec_fixed')
+    expect(signingSecret).toBe('whsec_fixed')
+    expect(endpoint).not.toHaveProperty('signingSecret')
     expect(next.endpoints[0].id).toBe('endpoint-fixed')
   })
 
@@ -94,9 +95,8 @@ describe('PlatformWebhooks.store', () => {
     )
 
     const regenerated = regenerateWebhookEndpointSecret(state, endpoint.id, 'whsec_new_secret')
-    expect(regenerated.endpoints.find((item) => item.id === endpoint.id)?.signingSecret).toBe(
-      'whsec_new_secret'
-    )
+    expect(regenerated.signingSecret).toBe('whsec_new_secret')
+    expect(regenerated.state.endpoints).toEqual(state.endpoints)
   })
 
   it('filters endpoints and deliveries by search query', () => {

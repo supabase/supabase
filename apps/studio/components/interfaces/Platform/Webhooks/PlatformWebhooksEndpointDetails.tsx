@@ -24,7 +24,6 @@ interface PlatformWebhooksEndpointDetailsProps {
   selectedEndpoint: WebhookEndpoint
   onDeliverySearchChange: (value: string) => void
   onOpenDelivery: (deliveryId: string) => void
-  onCopySecret: () => void
   onRegenerateSecret: () => void
 }
 
@@ -34,7 +33,6 @@ export const PlatformWebhooksEndpointDetails = ({
   selectedEndpoint,
   onDeliverySearchChange,
   onOpenDelivery,
-  onCopySecret,
   onRegenerateSecret,
 }: PlatformWebhooksEndpointDetailsProps) => {
   return (
@@ -87,18 +85,11 @@ export const PlatformWebhooksEndpointDetails = ({
             <CardTitle>Signing secret</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Table>
-              <TableBody>
-                <TableRow>
-                  <TableHead className="w-44">Secret</TableHead>
-                  <TableCell>{selectedEndpoint.signingSecret}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-            <div className="flex items-center gap-2">
-              <Button type="default" onClick={onCopySecret}>
-                Copy secret
-              </Button>
+            <p className="text-sm text-foreground-light">
+              Signing secrets are shown only when they are first created or regenerated. Store the
+              secret securely when shown.
+            </p>
+            <div>
               <Button type="warning" onClick={onRegenerateSecret}>
                 Regenerate secret
               </Button>

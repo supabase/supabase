@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { Admonition } from 'ui-patterns'
 import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   AlertDialog,
@@ -15,10 +17,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Button,
+  Label_Shadcn_,
   copyToClipboard,
 } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { PLATFORM_WEBHOOKS_MOCK_DATA } from './PlatformWebhooks.mock'
 import { PlatformWebhooksDeliveryDetailsSheet } from './PlatformWebhooksDeliveryDetailsSheet'
 import { PlatformWebhooksEndpointDetails } from './PlatformWebhooksEndpointDetails'
@@ -67,6 +71,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   )
 
   const [endpointIdPendingDelete, setEndpointIdPendingDelete] = useState<string | null>(null)
+  const [signingSecretReveal, setSigningSecretReveal] = useState<{ signingSecret: string } | null>(
+    null
+  )
   const [showRegenerateSecretConfirm, setShowRegenerateSecretConfirm] = useState(false)
   const [editEnabledOverride, setEditEnabledOverride] = useState<boolean | null>(null)
   const [deliveryDetailsTab, setDeliveryDetailsTab] = useState<'event' | 'response'>('event')
@@ -179,8 +186,11 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
   const handleUpsertEndpoint = (values: EndpointFormValues) => {
     if (panel === 'create') {
-      const createdEndpointId = createEndpoint(toEndpointPayload(values))
+      const { endpointId: createdEndpointId, signingSecret } = createEndpoint(
+        toEndpointPayload(values)
+      )
       router.push(`${webhooksHref}/${encodeURIComponent(createdEndpointId)}`)
+      setSigningSecretReveal({ signingSecret })
       setPanel(null)
       setEditEnabledOverride(null)
       toast.success('Endpoint created')
@@ -197,7 +207,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
   const handleRegenerateSecret = () => {
     if (!selectedEndpoint) return
-    regenerateSecret(selectedEndpoint.id)
+    const nextSecret = regenerateSecret(selectedEndpoint.id)
+    if (!nextSecret) return
+    setSigningSecretReveal({ signingSecret: nextSecret })
     setShowRegenerateSecretConfirm(false)
     toast.success('Signing secret regenerated')
   }
@@ -282,7 +294,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                   setDeliveryDetailsTab('event')
                   setDeliveryId(id)
                 }}
-                onCopySecret={() => handleCopy(selectedEndpoint.signingSecret, 'signing secret')}
                 onRegenerateSecret={() => setShowRegenerateSecretConfirm(true)}
               />
             )}
@@ -340,7 +351,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       <AlertDialog open={showRegenerateSecretConfirm} onOpenChange={setShowRegenerateSecretConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Regenerate signing secret</AlertDialogTitle>
+            <AlertDialogTitle>Regenerate secret</AlertDialogTitle>
             <AlertDialogDescription>
               This will rotate the current signing secret used for webhook signature verification.
             </AlertDialogDescription>
@@ -348,7 +359,54 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction variant="warning" onClick={handleRegenerateSecret}>
-              Regenerate secret
+              Regenerate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!signingSecretReveal}
+        onOpenChange={(open) => !open && setSigningSecretReveal(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Signing secret</AlertDialogTitle>
+            <AlertDialogDescription>
+              Use this secret to verify webhook signatures using the{' '}
+              <InlineLink href="https://www.standardwebhooks.com/">
+                Standard Webhooks
+              </InlineLink>{' '}
+              specification.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 px-5">
+            <div className="space-y-2">
+              <Label_Shadcn_ className="text-foreground">Signing secret</Label_Shadcn_>
+              <Input
+                copy
+                readOnly
+                value={signingSecretReveal?.signingSecret ?? ''}
+                onChange={() => {}}
+                onCopy={() => toast.success('Copied signing secret')}
+              />
+            </div>
+            <div>
+              <Admonition
+                type="warning"
+                title="This secret won’t be shown again"
+                description="Copy and store it securely now. You will not be able to view or copy it again after closing this dialog."
+              />
+            </div>
+          </div>
+          <AlertDialogDescription>
+            Validate each request by comparing the{' '}
+            <code className="text-code-inline">x-supabase-signature</code> header to the
+            signature you compute from the request payload and this secret.
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setSigningSecretReveal(null)}>
+              I’ve stored the secret
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

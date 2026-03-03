@@ -54,9 +54,10 @@ export const createWebhookEndpoint = (
   state: PlatformWebhooksState,
   input: UpsertWebhookEndpointInput,
   options?: CreateEndpointOptions
-): { state: PlatformWebhooksState; endpoint: WebhookEndpoint } => {
+): { state: PlatformWebhooksState; endpoint: WebhookEndpoint; signingSecret: string } => {
   const endpointId = options?.endpointId ?? randomId('endpoint')
   const internalName = input.name.trim().length > 0 ? input.name.trim() : endpointId
+  const signingSecret = options?.signingSecret ?? generateSigningSecret()
   const endpoint: WebhookEndpoint = {
     id: endpointId,
     name: internalName,
@@ -65,13 +66,13 @@ export const createWebhookEndpoint = (
     enabled: input.enabled,
     eventTypes: input.eventTypes.length > 0 ? input.eventTypes : ['*'],
     customHeaders: toHeaders(input.customHeaders),
-    signingSecret: options?.signingSecret ?? generateSigningSecret(),
     createdBy: options?.createdBy ?? 'mock-user@supabase.io',
     createdAt: options?.now ?? new Date().toISOString(),
   }
 
   return {
     endpoint,
+    signingSecret,
     state: {
       ...state,
       endpoints: [endpoint, ...state.endpoints],
@@ -130,13 +131,12 @@ export const regenerateWebhookEndpointSecret = (
   endpointId: string,
   secret?: string
 ) => {
+  const endpointExists = state.endpoints.some((endpoint) => endpoint.id === endpointId)
+  if (!endpointExists) return { state, signingSecret: null }
+
   return {
-    ...state,
-    endpoints: state.endpoints.map((endpoint) =>
-      endpoint.id === endpointId
-        ? { ...endpoint, signingSecret: secret ?? generateSigningSecret() }
-        : endpoint
-    ),
+    state: { ...state },
+    signingSecret: secret ?? generateSigningSecret(),
   }
 }
 
@@ -179,16 +179,20 @@ export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
       const now = new Date().toISOString()
       const signingSecret = generateSigningSecret()
       const createdBy = 'mock-user@supabase.io'
+      let createdSecret = signingSecret
       setState(
-        (prev) =>
-          createWebhookEndpoint(prev, input, {
+        (prev) => {
+          const next = createWebhookEndpoint(prev, input, {
             endpointId,
             now,
             signingSecret,
             createdBy,
-          }).state
+          })
+          createdSecret = next.signingSecret
+          return next.state
+        }
       )
-      return endpointId
+      return { endpointId, signingSecret: createdSecret }
     },
     updateEndpoint: (endpointId: string, input: UpsertWebhookEndpointInput) => {
       setState((prev) => updateWebhookEndpoint(prev, endpointId, input))
@@ -200,7 +204,13 @@ export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
       setState((prev) => toggleWebhookEndpoint(prev, endpointId, enabled))
     },
     regenerateSecret: (endpointId: string) => {
-      setState((prev) => regenerateWebhookEndpointSecret(prev, endpointId))
+      let nextSecret: string | null = null
+      setState((prev) => {
+        const next = regenerateWebhookEndpointSecret(prev, endpointId)
+        nextSecret = next.signingSecret
+        return next.state
+      })
+      return nextSecret
     },
   }
 }

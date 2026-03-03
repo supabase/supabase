@@ -16,7 +16,6 @@ export interface WebhookEndpoint {
   enabled: boolean
   eventTypes: string[]
   customHeaders: WebhookHeader[]
-  signingSecret: string
   createdBy: string
   createdAt: string
 }
