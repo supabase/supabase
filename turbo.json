@@ -103,6 +103,7 @@
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
         "VERCEL_URL",
+        "IS_PUSH",
         "IS_THROTTLED",
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
