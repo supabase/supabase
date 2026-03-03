@@ -1,5 +1,6 @@
 import { EdgeFunctions } from 'icons'
 import { Layers, Table } from 'lucide-react'
+import { SchemaInstallationStatus } from 'stripe-experiment-sync/supabase'
 import { Card, CardContent, cn } from 'ui'
 
 import {
@@ -10,12 +11,12 @@ import {
   isInstalling,
   isUninstallDone,
   isUninstalling,
-  SchemaInstallationStatus,
 } from './stripe-sync-status'
 
 type StripeSyncChangesCardProps = {
   installationStatus: SchemaInstallationStatus
   className?: string
+  isUpgrade?: boolean
 }
 
 const ListItemClassName = 'flex items-center gap-x-3 py-2 px-3 border-b'
@@ -23,6 +24,7 @@ const ListItemClassName = 'flex items-center gap-x-3 py-2 px-3 border-b'
 export const StripeSyncChangesCard = ({
   installationStatus,
   className,
+  isUpgrade,
 }: StripeSyncChangesCardProps) => {
   const installed = isInstalled(installationStatus)
   const installError = hasInstallError(installationStatus)
@@ -45,7 +47,9 @@ export const StripeSyncChangesCard = ({
     uninstallDone || installError
       ? 'Creates a new database schema named '
       : installInProgress
-        ? 'Creating a new database schema named '
+        ? isUpgrade
+          ? 'Upgrading database schema named '
+          : 'Creating a new database schema named '
         : installDone || installed || uninstallError
           ? 'Created a new database schema named '
           : uninstallInProgress
@@ -56,7 +60,9 @@ export const StripeSyncChangesCard = ({
     uninstallDone || installError
       ? 'Creates tables and views in the '
       : installInProgress
-        ? 'Creating tables and views in the '
+        ? isUpgrade
+          ? 'Upgrading tables and views in the '
+          : 'Creating tables and views in the '
         : installDone || installed || uninstallError
           ? 'Created tables and views in the '
           : uninstallInProgress
@@ -67,7 +73,9 @@ export const StripeSyncChangesCard = ({
     uninstallDone || installError
       ? 'Deploys Edge Functions to handle incoming webhooks from Stripe'
       : installInProgress
-        ? 'Deploying Edge Functions to handle incoming webhooks from Stripe'
+        ? isUpgrade
+          ? 'Upgrading Edge Functions to handle incoming webhooks from Stripe'
+          : 'Deploying Edge Functions to handle incoming webhooks from Stripe'
         : installDone || installed || uninstallError
           ? 'Deployed Edge Functions to handle incoming webhooks from Stripe'
           : uninstallInProgress
@@ -78,7 +86,9 @@ export const StripeSyncChangesCard = ({
     uninstallDone || installError
       ? 'Schedules automatic Stripe data syncs using Supabase Queues'
       : installInProgress
-        ? 'Scheduling automatic Stripe data syncs using Supabase Queues'
+        ? isUpgrade
+          ? 'Upgrading automatic Stripe data syncs using Supabase Queues'
+          : 'Scheduling automatic Stripe data syncs using Supabase Queues'
         : installDone || installed || uninstallError
           ? 'Scheduled automatic Stripe data syncs using Supabase Queues'
           : uninstallInProgress
