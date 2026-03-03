@@ -1,7 +1,7 @@
 .expo
 .next
 node_modules
-package-lock.json
+pnpm-lock.yaml
 docker*
 apps/**/out
 # prettier-plugin-sql-cst only supports sqlite syntax

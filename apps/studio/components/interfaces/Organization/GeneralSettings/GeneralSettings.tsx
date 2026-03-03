@@ -1,10 +1,12 @@
 import { NoProjectsOnPaidOrgInfo } from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { OrganizationDeletePanel } from './OrganizationDeletePanel'
 
 import { DataPrivacyForm } from './DataPrivacyForm'
@@ -14,20 +16,43 @@ export const GeneralSettings = () => {
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
 
   return (
-    <ScaffoldContainer>
+    <>
       <NoProjectsOnPaidOrgInfo />
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Organization Details</ScaffoldSectionTitle>
-        <OrganizationDetailsForm />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Organization details</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <OrganizationDetailsForm />
+        </PageSectionContent>
+      </PageSection>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Data Privacy</ScaffoldSectionTitle>
-        <DataPrivacyForm />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Data privacy</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <DataPrivacyForm />
+        </PageSectionContent>
+      </PageSection>
 
-      {organizationDeletionEnabled && <OrganizationDeletePanel />}
-    </ScaffoldContainer>
+      {organizationDeletionEnabled && (
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Danger zone</PageSectionTitle>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <OrganizationDeletePanel />
+          </PageSectionContent>
+        </PageSection>
+      )}
+    </>
   )
 }

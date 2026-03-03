@@ -30,7 +30,8 @@ export function shouldShowBanner({
     const affectsProjectCreation = incident.cache?.affects_project_creation ?? false
 
     // Users with no projects only see the banner if the incident affects project creation
-    if (!hasProjects) return affectsProjectCreation
+    // and has no specific region targeting (inline notice in RegionSelector handles region-specific incidents)
+    if (!hasProjects) return affectsProjectCreation && affectedRegions.length === 0
 
     // User has projects: if no region restriction, always show
     if (affectedRegions.length === 0) return true
