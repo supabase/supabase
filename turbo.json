@@ -108,7 +108,8 @@
         "AI_NORMAL_MODEL",
         "SUPPORT_SUPABASE_SECRET_KEY",
         "STATUSPAGE_API_KEY",
-        "STATUSPAGE_PAGE_ID"
+        "STATUSPAGE_PAGE_ID",
+		"LIVE_SUPABASE_SECRET_KEY"
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",

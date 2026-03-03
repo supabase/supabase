@@ -1,21 +1,21 @@
 'use client'
 
+import { format } from 'date-fns'
+import { BarChart2, ExternalLink } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import {
   Chart,
   ChartActions,
+  ChartBar,
   ChartCard,
   ChartContent,
-  ChartHeader,
-  ChartTitle,
   ChartEmptyState,
-  ChartLoadingState,
-  ChartBar,
   ChartFooter,
+  ChartHeader,
+  ChartLoadingState,
+  ChartTitle,
 } from 'ui-patterns/Chart'
-import { BarChart2, ExternalLink } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { Table, TableHead, TableBody, TableRow, TableCell, TableHeader } from 'ui'
-import { format } from 'date-fns'
 
 export default function ChartComposedTable() {
   const [isLoading, setIsLoading] = useState(true)

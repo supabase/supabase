@@ -11,13 +11,13 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"prettier": "^2.7.1",
-		"typescript": "^4.7.4",
-		"vite": "^4.3.9",
-		"vite-plugin-solid": "^2.3.0"
+		"prettier": "^3.8.1",
+		"typescript": "^5.9.3",
+		"vite": "^7.3.1",
+		"vite-plugin-solid": "^2.11.10"
 	},
 	"dependencies": {
-		"@supabase/supabase-js": "^2.0.4",
-		"solid-js": "^1.4.7"
+		"@supabase/supabase-js": "^2.97.0",
+		"solid-js": "^1.9.11"
 	}
 }

@@ -18,6 +18,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
   const tableEditorNewFilterBar = useFlag('tableEditorNewFilterBar')
+  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
 
   return [
     {
@@ -46,6 +47,16 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
+    },
+
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF,
+      name: 'PG Delta Diff',
+      discussionsUrl: undefined,
+      isNew: true,
+      isPlatformOnly: true,
+      isDefaultOptIn: true,
+      enabled: pgDeltaDiffEnabled,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,

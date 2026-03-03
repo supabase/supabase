@@ -137,6 +137,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-sandwiched": {
+      name: "admonition-sandwiched",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-sandwiched")),
+      source: "",
+      files: ["registry/default/example/admonition-sandwiched.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "alert-demo": {
       name: "alert-demo",
       type: "components:example",
@@ -144,6 +155,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/alert-demo")),
       source: "",
       files: ["registry/default/example/alert-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-collapsible-demo": {
+      name: "alert-collapsible-demo",
+      type: "components:example",
+      registryDependencies: ["alert","collapsible","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-collapsible-demo")),
+      source: "",
+      files: ["registry/default/example/alert-collapsible-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
