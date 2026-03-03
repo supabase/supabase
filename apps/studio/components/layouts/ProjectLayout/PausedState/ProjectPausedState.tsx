@@ -236,23 +236,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
         {isPauseStatusSuccess && !isRestoreDisabled && (
           <CardFooter className="flex justify-end items-center gap-x-2">
-            {isFreePlan ? (
-              <Button asChild type="default">
-                <Link
-                  href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=projectPausedStateRestore`}
-                >
-                  Upgrade to Pro
-                </Link>
-              </Button>
-            ) : (
-              <Button asChild type="default">
-                <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
-              </Button>
-            )}
-
             <ButtonTooltip
               size="tiny"
-              type="primary"
+              type="default"
               disabled={!canResumeProject}
               onClick={onSelectRestore}
               tooltip={{
@@ -266,6 +252,20 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
             >
               Resume project
             </ButtonTooltip>
+
+            {isFreePlan ? (
+              <Button asChild type="primary">
+                <Link
+                  href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=projectPausedStateRestore`}
+                >
+                  Upgrade to Pro
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild type="default">
+                <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
+              </Button>
+            )}
           </CardFooter>
         )}
 
