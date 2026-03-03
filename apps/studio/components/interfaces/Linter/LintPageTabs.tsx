@@ -17,6 +17,51 @@ import { Lint } from 'data/lint/lint-query'
 import { useRouter } from 'next/router'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+interface LintCountLabelProps {
+  tab: (typeof LINT_TABS)[number]
+  isLoading: boolean
+  errorLintsCount: number
+  warnLintsCount: number
+  infoLintsCount: number
+}
+
+const LintCountLabel = ({
+  tab,
+  isLoading,
+  errorLintsCount,
+  warnLintsCount,
+  infoLintsCount,
+}: LintCountLabelProps) => {
+  let count = 0
+  let label = ''
+  if (tab.id === LINTER_LEVELS.ERROR) {
+    count = errorLintsCount
+    label = 'errors'
+  }
+
+  if (tab.id === LINTER_LEVELS.WARN) {
+    count = warnLintsCount
+    label = 'warnings'
+  }
+
+  if (tab.id === LINTER_LEVELS.INFO) {
+    count = infoLintsCount
+    label = 'suggestions'
+  }
+
+  return (
+    <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+      {isLoading ? (
+        <ShimmeringLoader className="w-20 pt-1" />
+      ) : (
+        <>
+          {count} {label}
+        </>
+      )}
+    </span>
+  )
+}
+
 interface LintPageTabsProps {
   currentTab: string
   setCurrentTab: (value: LINTER_LEVELS) => void
@@ -29,37 +74,6 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
   const infoLintsCount = activeLints.filter((x) => x.level === 'INFO').length
-
-  const LintCountLabel = ({ tab }: { tab: (typeof LINT_TABS)[number] }) => {
-    let count = 0
-    let label = ''
-    if (tab.id === LINTER_LEVELS.ERROR) {
-      count = errorLintsCount
-      label = 'errors'
-    }
-
-    if (tab.id === LINTER_LEVELS.WARN) {
-      count = warnLintsCount
-      label = 'warnings'
-    }
-
-    if (tab.id === LINTER_LEVELS.INFO) {
-      count = infoLintsCount
-      label = 'suggestions'
-    }
-
-    return (
-      <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-        {isLoading ? (
-          <ShimmeringLoader className="w-20 pt-1" />
-        ) : (
-          <>
-            {count} {label}
-          </>
-        )}
-      </span>
-    )
-  }
 
   return (
     <Tabs_Shadcn_
@@ -110,7 +124,13 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
                 <TooltipContent side="top">{tab.description}</TooltipContent>
               </Tooltip>
             </div>
-            <LintCountLabel tab={tab} />
+            <LintCountLabel
+              tab={tab}
+              isLoading={isLoading}
+              errorLintsCount={errorLintsCount}
+              warnLintsCount={warnLintsCount}
+              infoLintsCount={infoLintsCount}
+            />
           </TabsTrigger_Shadcn_>
         ))}
       </TabsList_Shadcn_>

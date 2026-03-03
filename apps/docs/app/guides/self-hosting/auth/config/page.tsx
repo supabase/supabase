@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
@@ -29,7 +30,7 @@ const AuthConfigPage = async () => {
       <div>
         {specAuthV1.info.tags.map((tag: ReturnType<typeof specAuthV1>['info']['tags']) => {
           return (
-            <>
+            <Fragment key={tag.id}>
               <h2 className="text-foreground">{tag.title}</h2>
               <p className="text-foreground-lighter">{tag.description}</p>
               <div className="not-prose">
@@ -42,6 +43,7 @@ const AuthConfigPage = async () => {
                     .map((param: ReturnType<typeof specAuthV1>['parameters']) => {
                       return (
                         <Param
+                          key={param.title}
                           name={param.title}
                           type={param.type}
                           description={param.description}
@@ -51,7 +53,7 @@ const AuthConfigPage = async () => {
                     })}
                 </ul>
               </div>
-            </>
+            </Fragment>
           )
         })}
       </div>

@@ -288,6 +288,7 @@ export const EditorPanel = () => {
                 size="tiny"
                 type="text"
                 role="combobox"
+                aria-controls=""
                 aria-expanded={isSnippetsOpen}
                 className="w-7 h-7 p-0"
                 icon={<FolderOpen size={14} />}
@@ -341,6 +342,7 @@ export const EditorPanel = () => {
                   size="tiny"
                   type="default"
                   role="combobox"
+                  aria-controls=""
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
                   icon={<Book size={14} />}

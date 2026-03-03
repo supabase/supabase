@@ -106,7 +106,7 @@ function Resources({ schema }: { schema: any }) {
       <p>You can configure these resources using the Supabase Terraform provider:</p>
       <Tabs>
         {Object.keys(schema).map((resource) => (
-          <TabPanel id={resource} label={resource}>
+          <TabPanel key={resource} id={resource} label={resource}>
             <Heading tag="h4">Example usage</Heading>
             <CodeBlock className="not-prose">{codeBlock`
                 resource "${resource}" "<label>" {
@@ -230,7 +230,7 @@ function DataSources({ schema }: { schema: any }) {
       <p>You can read these resources using the Supabase Terraform provider:</p>
       <Tabs>
         {Object.keys(schema).map((dataSource) => (
-          <TabPanel id={dataSource} label={dataSource}>
+          <TabPanel key={dataSource} id={dataSource} label={dataSource}>
             <Heading tag="h4">Example usage</Heading>
             <CodeBlock className="not-prose">{codeBlock`
                   resource "${dataSource}" "all" {

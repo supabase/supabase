@@ -62,6 +62,25 @@ export const TextFormatter: React.FC<{ className?: string; value: string }> = ({
   </span>
 )
 
+const ResponseCodeItem = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) => (
+  <div className="flex h-full items-center">
+    <div
+      className={cn(
+        `relative flex h-6 items-center rounded-md justify-center px-2 py-1 text-center`,
+        className
+      )}
+    >
+      <label className="block font-mono text-sm">{children}</label>
+    </div>
+  </div>
+)
+
 export const ResponseCodeFormatter = ({ value }: { value: string }) => {
   if (!value) {
     return (
@@ -70,25 +89,6 @@ export const ResponseCodeFormatter = ({ value }: { value: string }) => {
       </div>
     )
   }
-
-  const ResponseCodeItem = ({
-    children,
-    className,
-  }: {
-    children: React.ReactNode
-    className?: string
-  }) => (
-    <div className="flex h-full items-center">
-      <div
-        className={cn(
-          `relative flex h-6 items-center rounded-md justify-center px-2 py-1 text-center`,
-          className
-        )}
-      >
-        <label className="block font-mono text-sm">{children}</label>
-      </div>
-    </div>
-  )
 
   const split = value.toString().split('')[0]
 
@@ -123,6 +123,11 @@ export const ResponseCodeFormatter = ({ value }: { value: string }) => {
  * for http response codes
  */
 
+const Layout: React.FC<React.PropsWithChildren<{ className?: string }>> = ({
+  className,
+  children,
+}) => <div className={`w-24 flex items-center h-full ${className}`}>{children}</div>
+
 export const SeverityFormatter = ({
   value,
   uppercase = true,
@@ -140,10 +145,6 @@ export const SeverityFormatter = ({
 
   const uppercasedValue = value.toUpperCase()
   const text = uppercase ? uppercasedValue : value
-  const Layout: React.FC<React.PropsWithChildren<{ className?: string }>> = ({
-    className,
-    children,
-  }) => <div className={`w-24 flex items-center h-full ${className}`}>{children}</div>
 
   switch (uppercasedValue) {
     case 'UNCAUGHTEXCEPTION':

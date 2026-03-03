@@ -41,8 +41,6 @@ const Step = ({ children, title, step }) => {
     setShow(true)
   }, [])
 
-  const ChildrenRender = ({ active }) => <div className="pl-[74px]">{children}</div>
-
   const { ref } = useInView({
     rootMargin: '10px 20px 30px 40px',
     threshold: 1,
@@ -88,7 +86,7 @@ const Step = ({ children, title, step }) => {
                   </span>
                 </div>
               </div>
-              <ChildrenRender active={active} />
+              <div className="pl-[74px]">{children}</div>
             </div>
           )
         }}

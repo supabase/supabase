@@ -5,25 +5,25 @@ interface NoPermissionProps {
   isFullPage?: boolean
 }
 
-export const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) => {
-  const NoPermissionMessage = () => (
-    <Admonition
-      type="warning"
-      title={`You need additional permissions to ${resourceText}`}
-      description="Contact your organization owner or administrator for assistance."
-    />
-  )
+const NoPermissionMessage = ({ resourceText }: { resourceText: string }) => (
+  <Admonition
+    type="warning"
+    title={`You need additional permissions to ${resourceText}`}
+    description="Contact your organization owner or administrator for assistance."
+  />
+)
 
+export const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) => {
   if (isFullPage) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="max-w-lg">
-          <NoPermissionMessage />
+          <NoPermissionMessage resourceText={resourceText} />
         </div>
       </div>
     )
   } else {
-    return <NoPermissionMessage />
+    return <NoPermissionMessage resourceText={resourceText} />
   }
 }
 

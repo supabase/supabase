@@ -87,9 +87,10 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   )
 
   const { setTheme } = useTheme()
+
   useEffect(() => {
     setTheme(theme)
-  }, [theme])
+  }, [theme, setTheme])
 
   const PluginContent = pluginContext?.visiblePlugin?.content
 

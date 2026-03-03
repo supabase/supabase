@@ -46,6 +46,7 @@ export const PublishAppSidePanel = ({
 }: PublishAppSidePanelProps) => {
   const { slug } = useParams()
   const uploadButtonRef = useRef<any>()
+  const resetFormRef = useRef<any>(null)
 
   const { mutate: createOAuthApp } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {
@@ -99,6 +100,13 @@ export const PublishAppSidePanel = ({
         setScopes([])
         setIconUrl(undefined)
       }
+    }
+  }, [visible, selectedApp])
+
+  useEffect(() => {
+    if (visible && selectedApp !== undefined && resetFormRef.current) {
+      const values = { name: selectedApp.name, website: selectedApp.website }
+      resetFormRef.current({ values, initialValues: values })
     }
   }, [visible, selectedApp])
 
@@ -192,16 +200,7 @@ export const PublishAppSidePanel = ({
         onSubmit={onSubmit}
       >
         {({ resetForm, values }: { resetForm: any; values: any }) => {
-          // [Joshen] although this "technically" is breaking the rules of React hooks
-          // it won't error because the hooks are always rendered in the same order
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          useEffect(() => {
-            if (visible && selectedApp !== undefined) {
-              const values = { name: selectedApp.name, website: selectedApp.website }
-              resetForm({ values, initialValues: values })
-            }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-          }, [visible, selectedApp])
+          resetFormRef.current = resetForm
 
           return (
             <>

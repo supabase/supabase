@@ -63,6 +63,20 @@ export interface ProjectLinkerProps {
   mode: 'Vercel' | 'GitHub'
 }
 
+const Panel = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <div
+      className={cn(
+        'flex-1 min-w-0 flex flex-col grow gap-6 px-5 mx-auto w-full justify-center items-center',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+}
+
 const ProjectLinker = ({
   slug,
   organizationIntegrationId,
@@ -148,20 +162,6 @@ const ProjectLinker = ({
         repository_id: Number(selectedForeignProject.id),
       },
     })
-  }
-
-  const Panel = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-    return (
-      <div
-        className={cn(
-          'flex-1 min-w-0 flex flex-col grow gap-6 px-5 mx-auto w-full justify-center items-center',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    )
   }
 
   const noSupabaseProjects = numProjects === 0

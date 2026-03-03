@@ -17,6 +17,72 @@ const {
   sdkSwift: sdkSwiftEnabled,
 } = isFeatureEnabled(['sdk:dart', 'sdk:kotlin', 'sdk:swift'])
 
+interface Framework {
+  tooltip: string
+  icon: string
+  href: string
+  hasLightIcon: boolean
+  enabled?: boolean
+}
+
+function GettingStarted({
+  frameworks,
+  isLightMode,
+  iconSize,
+}: {
+  frameworks: Framework[]
+  isLightMode: boolean
+  iconSize: 'sm' | 'lg'
+}) {
+  return (
+    <div
+      className="
+        border bg-background
+        relative overflow-hidden
+        grid grid-cols-12
+        rounded-lg
+        p-5 md:p-8
+        "
+    >
+      <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-3">
+        <div className="md:max-w-xs shrink w-fit xl:max-w-none">
+          <div className="flex items-center gap-3 mb-3">
+            <IconBackground>
+              <Play aria-hidden="true" className="text-brand-600 w-4" strokeWidth={2} />
+            </IconBackground>
+            <h2 className="text-2xl m-0 text-foreground">Getting Started</h2>
+          </div>
+          <p className="text-foreground-light text-sm">
+            Set up and connect a database in just a few minutes.
+          </p>
+        </div>
+        <div className="shrink-0">
+          <div className="flex flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
+            {frameworks
+              .filter((framework) => framework.enabled !== false)
+              .map((framework, i) => {
+                const iconToUse =
+                  framework.hasLightIcon && isLightMode ? `${framework.icon}-light` : framework.icon
+
+                return (
+                  <Link key={i} href={framework.href} passHref className="no-underline">
+                    <IconPanel
+                      iconSize={iconSize}
+                      hideArrow
+                      tooltip={framework.tooltip}
+                      icon={iconToUse}
+                    />
+                  </Link>
+                )
+              })}
+          </div>
+          <AiPrompt className="mt-6" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function AiPrompt({ className }: { className?: string }) {
   return (
     <Link
@@ -109,54 +175,6 @@ const HomePageCover = (props) => {
     },
   ]
 
-  const GettingStarted = () => (
-    <div
-      className="
-        border bg-background
-        relative overflow-hidden
-        grid grid-cols-12
-        rounded-lg
-        p-5 md:p-8
-        "
-    >
-      <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-3">
-        <div className="md:max-w-xs shrink w-fit xl:max-w-none">
-          <div className="flex items-center gap-3 mb-3">
-            <IconBackground>
-              <Play aria-hidden="true" className="text-brand-600 w-4" strokeWidth={2} />
-            </IconBackground>
-            <h2 className="text-2xl m-0 text-foreground">Getting Started</h2>
-          </div>
-          <p className="text-foreground-light text-sm">
-            Set up and connect a database in just a few minutes.
-          </p>
-        </div>
-        <div className="shrink-0">
-          <div className="flex flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
-            {frameworks
-              .filter((framework) => framework.enabled !== false)
-              .map((framework, i) => {
-                const iconToUse =
-                  framework.hasLightIcon && isLightMode ? `${framework.icon}-light` : framework.icon
-
-                return (
-                  <Link key={i} href={framework.href} passHref className="no-underline">
-                    <IconPanel
-                      iconSize={iconSize}
-                      hideArrow
-                      tooltip={framework.tooltip}
-                      icon={iconToUse}
-                    />
-                  </Link>
-                )
-              })}
-          </div>
-          <AiPrompt className="mt-6" />
-        </div>
-      </div>
-    </div>
-  )
-
   return (
     <div className="relative z-10 w-full bg-alternative border-b max-w-none mb-16 md:mb-12 xl:mb-0">
       <div className="max-w-7xl px-5 mx-auto py-8 sm:pb-16 sm:pt-12 xl:pt-16 flex flex-col xl:flex-row justify-between gap-12 xl:gap-12">
@@ -174,7 +192,7 @@ const HomePageCover = (props) => {
         </div>
         {isFeatureEnabled('docs:full_getting_started') && (
           <div className="w-full xl:max-w-[440px] -mb-40">
-            <GettingStarted />
+            <GettingStarted frameworks={frameworks} isLightMode={isLightMode} iconSize={iconSize} />
           </div>
         )}
       </div>

@@ -91,23 +91,22 @@ export function useContextSearchCommands() {
     projectStorageAll: storageEnabled,
   } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
 
-  const pageDefinitions = [
-    { title: 'Search Database Tables', context: 'database-tables' as const },
-    { title: 'Search RLS Policies', context: 'auth-policies' as const },
-    { title: 'Search Edge Functions', context: 'edge-functions' as const },
-    { title: 'Search Storage', context: 'storage' as const },
-  ]
-
-  // Register pages - pageDefinitions is constant, so hooks are called in consistent order
-  for (const { title, context } of pageDefinitions) {
-    const placeholder =
-      SEARCH_CONTEXT_OPTIONS.find((opt) => opt.value === context)?.placeholder ?? ''
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useRegisterPage(title, {
-      type: PageType.Component,
-      component: () => <ContextSearchPage context={context} placeholder={placeholder} />,
-    })
-  }
+  useRegisterPage('Search Database Tables', {
+    type: PageType.Component,
+    component: () => <ContextSearchPage context="database-tables" placeholder="Search database tables..." />,
+  })
+  useRegisterPage('Search RLS Policies', {
+    type: PageType.Component,
+    component: () => <ContextSearchPage context="auth-policies" placeholder="Search rls policies..." />,
+  })
+  useRegisterPage('Search Edge Functions', {
+    type: PageType.Component,
+    component: () => <ContextSearchPage context="edge-functions" placeholder="Search edge functions..." />,
+  })
+  useRegisterPage('Search Storage', {
+    type: PageType.Component,
+    component: () => <ContextSearchPage context="storage" placeholder="Search buckets..." />,
+  })
 
   const contextCommands = useMemo(() => {
     return SEARCH_CONTEXT_OPTIONS.filter((option) => {

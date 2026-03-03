@@ -4,6 +4,44 @@ import color from 'ui/src/lib/tailwind-demo-classes'
 
 import { Grid, GridItem } from './grid'
 
+const Example = ({
+  x,
+  definition,
+}: {
+  x: string
+  definition: 'background' | 'border' | 'text' | 'colors' | 'palletes'
+}) => {
+  switch (definition) {
+    case 'background':
+      return (
+        <div className={cn(x, 'relative w-full h-12 border border-overlay rounded-full')}></div>
+      )
+
+    case 'border':
+      return <div className={cn(x, 'relative w-full h-12 border-4 rounded-full')}></div>
+
+    case 'text':
+      return (
+        <span className={cn(x, 'relative w-full h-12 flex items-center justify-center')}>
+          Postgres
+        </span>
+      )
+
+    case 'colors':
+      return (
+        <div className={cn(x, 'relative w-full h-12 border border-overlay rounded-full')}></div>
+      )
+
+    case 'palletes':
+      return (
+        <div className={cn(x, 'relative w-full h-12 border border-overlay rounded-full')}></div>
+      )
+
+    default:
+      break
+  }
+}
+
 const Colors = ({
   definition,
 }: {
@@ -22,42 +60,6 @@ const Colors = ({
       console.error('Failed to copy text: ', err)
     }
   }
-  const Example = ({ x }: { x: string }) => {
-    switch (definition) {
-      case 'background':
-        return (
-          <div className={cn(x, 'relative w-full h-12 border border-overlay rounded-full')}></div>
-        )
-        break
-
-      case 'border':
-        return <div className={cn(x, 'relative w-full h-12 border-4 rounded-full')}></div>
-        break
-
-      case 'text':
-        return (
-          <span className={cn(x, 'relative w-full h-12 flex items-center justify-center')}>
-            Postgres
-          </span>
-        )
-        break
-
-      case 'colors':
-        return (
-          <div className={cn(x, 'relative w-full h-12 border border-overlay rounded-full')}></div>
-        )
-        break
-
-      case 'palletes':
-        return (
-          <div className={cn(x, 'relative w-full h-12 border border-overlay rounded-full')}></div>
-        )
-        break
-
-      default:
-        break
-    }
-  }
 
   return (
     <>
@@ -69,7 +71,7 @@ const Colors = ({
               className={cn(x.includes('contrast') && 'bg-foreground hover:bg-foreground-light')}
               onClick={() => handleCopy(x, i)}
             >
-              <Example x={x} />
+              <Example x={x} definition={definition} />
               <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-[state=open]:text-foreground text-center">
                 {copiedIndex === i ? 'Copied!' : x}
               </span>

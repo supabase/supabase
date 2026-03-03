@@ -59,6 +59,39 @@ interface Props {
 }
 type LogMap = { [id: string]: LogData }
 
+const RenderErrorAlert = ({
+  error,
+  queryType,
+}: {
+  error?: LogQueryError | null
+  queryType?: QueryType
+}) => {
+  if (!error) return null
+
+  const childProps = {
+    isCustomQuery: queryType ? false : true,
+    error: error!,
+  }
+
+  if (
+    typeof error === 'object' &&
+    error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
+  ) {
+    return <ResourcesExceededErrorRenderer {...childProps} />
+  }
+
+  return (
+    <div className="text-foreground flex gap-2 font-mono p-4">
+      <DefaultErrorRenderer {...childProps} />
+    </div>
+  )
+}
+
+const RenderNoResultAlert = ({ EmptyState }: { EmptyState?: ReactNode }) => {
+  if (EmptyState) return EmptyState as JSX.Element
+  else return <LogsTableEmptyState />
+}
+
 /**
  * Logs table view with focus side panel
  *
@@ -312,33 +345,6 @@ export const LogTable = ({
     </div>
   )
 
-  const RenderErrorAlert = () => {
-    if (!error) return null
-
-    const childProps = {
-      isCustomQuery: queryType ? false : true,
-      error: error!,
-    }
-
-    if (
-      typeof error === 'object' &&
-      error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
-    ) {
-      return <ResourcesExceededErrorRenderer {...childProps} />
-    }
-
-    return (
-      <div className="text-foreground flex gap-2 font-mono p-4">
-        <DefaultErrorRenderer {...childProps} />
-      </div>
-    )
-  }
-
-  const RenderNoResultAlert = () => {
-    if (EmptyState) return EmptyState
-    else return <LogsTableEmptyState />
-  }
-
   function onRowClick(row: LogData) {
     setSelectedRow(row)
     onSelectedLogChange?.(row)
@@ -434,8 +440,8 @@ export const LogTable = ({
               renderRow: RowRenderer,
               noRowsFallback: !isLoading ? (
                 <>
-                  {logDataRows.length === 0 && !error && <RenderNoResultAlert />}
-                  {error && <RenderErrorAlert />}
+                  {logDataRows.length === 0 && !error && <RenderNoResultAlert EmptyState={EmptyState} />}
+                  {error && <RenderErrorAlert error={error} queryType={queryType} />}
                 </>
               ) : null,
             }}

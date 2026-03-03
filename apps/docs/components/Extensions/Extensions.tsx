@@ -108,11 +108,12 @@ export default function Extensions() {
               )
               .map((extension) => (
                 <Link
+                  key={extension.name}
                   href={extension.link}
                   target={getLinkTarget(extension.link)}
                   className="no-underline"
                 >
-                  <GlassPanel title={extension.name} background={false} key={extension.name}>
+                  <GlassPanel title={extension.name} background={false}>
                     <p className="mt-4">
                       {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
                     </p>

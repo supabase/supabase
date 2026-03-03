@@ -61,8 +61,6 @@ const formSchema = z.object({
   apiKey: z.string().optional(),
 })
 
-const fakeApiKey = 'sk_live_51H3x4mpl3_4nd_53cur3_k3y_1234567890'
-
 export default function FormPatternsSidePanel() {
   const [open, setOpen] = useState(false)
   const uploadButtonRef = useRef<HTMLInputElement>(null)
@@ -89,7 +87,7 @@ export default function FormPatternsSidePanel() {
       password: '',
       duration: 10,
       redirectUris: [{ value: '' }],
-      apiKey: fakeApiKey,
+      apiKey: '',
     },
   })
 

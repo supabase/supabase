@@ -26,6 +26,42 @@ const newPolicyTemplate: any = {
   allowedOperations: [],
 }
 
+const StoragePolicyEditorModalTitle = ({
+  view,
+  bucketName,
+  onSelectBackFromTemplates = noop,
+}: any) => {
+  const getTitle = () => {
+    if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
+      return `Adding new policy to ${bucketName}`
+    }
+    if (view === POLICY_MODAL_VIEWS.REVIEW) {
+      return `Reviewing policies to be created for ${bucketName}`
+    }
+  }
+  if (view === POLICY_MODAL_VIEWS.TEMPLATES) {
+    return (
+      <div>
+        <div className="flex items-center space-x-3">
+          <span
+            onClick={onSelectBackFromTemplates}
+            className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
+          >
+            <ChevronLeft strokeWidth={2} size={14} />
+          </span>
+          <h4 className="textlg m-0">Select a template to use for your new policy</h4>
+        </div>
+      </div>
+    )
+  }
+  return (
+    <div className="w-full flex items-center justify-between gap-x-2 pr-6">
+      <h4 className="m-0 truncate">{getTitle()}</h4>
+      <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
+    </div>
+  )
+}
+
 const StoragePoliciesEditPolicyModal = ({
   visible = false,
   bucketName = '',
@@ -166,44 +202,6 @@ const StoragePoliciesEditPolicyModal = ({
     } else {
       onSaveSuccess()
     }
-  }
-
-  /* Misc components */
-
-  const StoragePolicyEditorModalTitle = ({
-    view,
-    bucketName,
-    onSelectBackFromTemplates = noop,
-  }: any) => {
-    const getTitle = () => {
-      if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
-        return `Adding new policy to ${bucketName}`
-      }
-      if (view === POLICY_MODAL_VIEWS.REVIEW) {
-        return `Reviewing policies to be created for ${bucketName}`
-      }
-    }
-    if (view === POLICY_MODAL_VIEWS.TEMPLATES) {
-      return (
-        <div>
-          <div className="flex items-center space-x-3">
-            <span
-              onClick={onSelectBackFromTemplates}
-              className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
-            >
-              <ChevronLeft strokeWidth={2} size={14} />
-            </span>
-            <h4 className="textlg m-0">Select a template to use for your new policy</h4>
-          </div>
-        </div>
-      )
-    }
-    return (
-      <div className="w-full flex items-center justify-between gap-x-2 pr-6">
-        <h4 className="m-0 truncate">{getTitle()}</h4>
-        <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
-      </div>
-    )
   }
 
   return (

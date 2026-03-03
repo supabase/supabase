@@ -93,6 +93,7 @@ export default function RealtimeLimitsEstimater({}) {
               )
               .map((l) => (
                 <Select.Option
+                  key={l.concurrency}
                   value={l.concurrency.toString()}
                   selected={l.concurrency === concurrency}
                 >
@@ -154,7 +155,7 @@ export default function RealtimeLimitsEstimater({}) {
               .map((l) => l.computeAddOn)
               .filter((v, i, a) => a.indexOf(v) === i)
               .map((computeAddOn) => (
-                <div>
+                <div key={computeAddOn}>
                   <h4>
                     {computeAddOn === 'micro'
                       ? 'Micro'
@@ -178,7 +179,7 @@ export default function RealtimeLimitsEstimater({}) {
                       {throughputTable
                         .filter((l) => l.computeAddOn === computeAddOn)
                         .map((l) => (
-                          <tr>
+                          <tr key={`${l.filters}-${l.rls}-${l.concurrency}`}>
                             <td className="border px-4 py-2">{l.filters ? '✅' : '🚫'}</td>
                             <td className="border px-4 py-2">{l.rls ? '✅' : '🚫'}</td>
                             <td className="border px-4 py-2">

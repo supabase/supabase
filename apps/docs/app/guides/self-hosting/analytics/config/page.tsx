@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
@@ -30,7 +31,7 @@ const AnalyticsConfigPage = async () => {
         {specAnalyticsV0.info.tags.map(
           (tag: ReturnType<typeof specAnalyticsV0>['info']['tags']) => {
             return (
-              <>
+              <Fragment key={tag.id}>
                 <h2 className="text-foreground">{tag.title}</h2>
                 <p className="text-foreground-lighter">{tag.description}</p>
                 <div className="not-prose">
@@ -43,6 +44,7 @@ const AnalyticsConfigPage = async () => {
                       .map((param: ReturnType<typeof specAnalyticsV0>['parameters']) => {
                         return (
                           <Param
+                            key={param.title}
                             name={param.title}
                             type={param.type}
                             description={param.description}
@@ -52,7 +54,7 @@ const AnalyticsConfigPage = async () => {
                       })}
                   </ul>
                 </div>
-              </>
+              </Fragment>
             )
           }
         )}

@@ -26,8 +26,9 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
 import { useFlag } from 'common'
+import { IntegrationDefinition } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 
-const FEATURED_INTEGRATIONS = ['cron', 'queues'] // + either stripe_sync_engine or stripe_wrapper depending on feature flag
+const FEATURED_INTEGRATIONS = ['cron', 'queues']
 
 // Featured integration images
 const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
@@ -36,6 +37,49 @@ const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
   stripe_wrapper: 'img/integrations/covers/stripe-cover.png',
   stripe_sync_engine: 'img/integrations/covers/stripe-cover.png',
 }
+
+const FeaturedIntegrationsGrid = ({
+  integrations,
+  installedIds,
+}: {
+  integrations: IntegrationDefinition[]
+  installedIds: string[]
+}) => (
+  <div
+    className="grid grid-cols-2 @4xl:grid-cols-3 gap-4 mb-4 items-stretch pb-6 mb-6 border-b"
+    style={{ gridAutoRows: 'minmax(110px, auto)' }}
+  >
+    {integrations.map((integration) => (
+      <IntegrationCard
+        key={integration.id}
+        {...integration}
+        isInstalled={installedIds.includes(integration.id)}
+        featured={true}
+        image={FEATURED_INTEGRATION_IMAGES[integration.id]}
+      />
+    ))}
+  </div>
+)
+
+const AllIntegrationsGrid = ({
+  integrations,
+  installedIds,
+}: {
+  integrations: IntegrationDefinition[]
+  installedIds: string[]
+}) => (
+  <div className="grid @xl:grid-cols-3 @6xl:grid-cols-4 gap-4">
+    {integrations.map((integration) => (
+      <IntegrationCard
+        key={integration.id}
+        {...integration}
+        isInstalled={installedIds.includes(integration.id)}
+        featured={false}
+        image={FEATURED_INTEGRATION_IMAGES[integration.id]}
+      />
+    ))}
+  </div>
+)
 
 const IntegrationsPage: NextPageWithLayout = () => {
   const [selectedCategory] = useQueryState(
@@ -128,47 +172,6 @@ const IntegrationsPage: NextPageWithLayout = () => {
     }
   }, [filteredAndSortedIntegrations, selectedCategory, search])
 
-  // Helper component to render featured integrations grid
-  const FeaturedIntegrationsGrid = ({
-    integrations,
-  }: {
-    integrations: typeof filteredAndSortedIntegrations
-  }) => (
-    <div
-      className="grid grid-cols-2 @4xl:grid-cols-3 gap-4 mb-4 items-stretch pb-6 mb-6 border-b"
-      style={{ gridAutoRows: 'minmax(110px, auto)' }}
-    >
-      {integrations.map((integration) => (
-        <IntegrationCard
-          key={integration.id}
-          {...integration}
-          isInstalled={installedIds.includes(integration.id)}
-          featured={true}
-          image={FEATURED_INTEGRATION_IMAGES[integration.id]}
-        />
-      ))}
-    </div>
-  )
-
-  // Helper component to render all integrations grid
-  const AllIntegrationsGrid = ({
-    integrations,
-  }: {
-    integrations: typeof filteredAndSortedIntegrations
-  }) => (
-    <div className="grid @xl:grid-cols-3 @6xl:grid-cols-4 gap-4">
-      {integrations.map((integration) => (
-        <IntegrationCard
-          key={integration.id}
-          {...integration}
-          isInstalled={installedIds.includes(integration.id)}
-          featured={false}
-          image={FEATURED_INTEGRATION_IMAGES[integration.id]}
-        />
-      ))}
-    </div>
-  )
-
   return (
     <>
       <PageHeader size="large">
@@ -226,19 +229,19 @@ const IntegrationsPage: NextPageWithLayout = () => {
                   <>
                     {/* Featured Integrations */}
                     {groupedIntegrations.featured.length > 0 && (
-                      <FeaturedIntegrationsGrid integrations={groupedIntegrations.featured} />
+                      <FeaturedIntegrationsGrid integrations={groupedIntegrations.featured} installedIds={installedIds} />
                     )}
 
                     {/* All Integrations */}
                     {groupedIntegrations.allIntegrations.length > 0 && (
-                      <AllIntegrationsGrid integrations={groupedIntegrations.allIntegrations} />
+                      <AllIntegrationsGrid integrations={groupedIntegrations.allIntegrations} installedIds={installedIds} />
                     )}
                   </>
                 )}
 
                 {/* Single List View (Category filtered or searching) */}
                 {!groupedIntegrations && filteredAndSortedIntegrations.length > 0 && (
-                  <AllIntegrationsGrid integrations={filteredAndSortedIntegrations} />
+                  <AllIntegrationsGrid integrations={filteredAndSortedIntegrations} installedIds={installedIds} />
                 )}
               </>
             )}

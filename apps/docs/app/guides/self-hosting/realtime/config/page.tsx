@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
@@ -29,7 +30,7 @@ const RealtimeConfigPage = async () => {
       <div>
         {specRealtimeV0.info.tags.map((tag: ReturnType<typeof specRealtimeV0>['info']['tags']) => {
           return (
-            <>
+            <Fragment key={tag.id}>
               <h2 className="text-foreground">{tag.title}</h2>
               <p className="text-foreground-lighter">{tag.description}</p>
               <div className="not-prose">
@@ -42,6 +43,7 @@ const RealtimeConfigPage = async () => {
                     .map((param: ReturnType<typeof specRealtimeV0>['parameters']) => {
                       return (
                         <Param
+                          key={param.title}
                           name={param.title}
                           type={param.type}
                           description={param.description}
@@ -51,7 +53,7 @@ const RealtimeConfigPage = async () => {
                     })}
                 </ul>
               </div>
-            </>
+            </Fragment>
           )
         })}
       </div>

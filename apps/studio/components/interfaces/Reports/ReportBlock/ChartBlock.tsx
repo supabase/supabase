@@ -16,7 +16,7 @@ import dayjs from 'dayjs'
 import { METRICS } from 'lib/constants/metrics'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
@@ -66,7 +66,6 @@ export const ChartBlock = ({
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
-  const [latestValue, setLatestValue] = useState<string | undefined>()
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -173,7 +172,7 @@ export const ChartBlock = ({
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
 
-  const getInitialHighlightedValue = useCallback(() => {
+  const latestValue = (() => {
     if (!chartData?.data?.length) return undefined
     const lastDataPoint = chartData.data[chartData.data.length - 1]
     const value = lastDataPoint[attribute]
@@ -182,15 +181,11 @@ export const ChartBlock = ({
       : typeof value === 'number'
         ? value.toLocaleString()
         : value
-  }, [chartData?.data, chartData?.format, attribute])
+  })()
 
   useEffect(() => {
     if (defaultChartStyle) setChartStyle(defaultChartStyle)
   }, [defaultChartStyle])
-
-  useEffect(() => {
-    setLatestValue(getInitialHighlightedValue())
-  }, [chartData, getInitialHighlightedValue])
 
   return (
     <ReportBlockContainer

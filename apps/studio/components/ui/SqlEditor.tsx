@@ -16,6 +16,8 @@ interface SqlEditorProps {
   readOnly?: boolean
 }
 
+const Loading = () => <h4 className="text-lg">Loading</h4>
+
 /**
  * @deprecated Use CodeEditor instead
  */
@@ -77,8 +79,6 @@ const SqlEditor = ({
       })
     })
   }
-
-  const Loading = () => <h4 className="text-lg">Loading</h4>
 
   return (
     <Editor

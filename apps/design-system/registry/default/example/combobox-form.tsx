@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -46,6 +47,7 @@ const FormSchema = z.object({
 })
 
 export default function ComboboxForm() {
+  const [open, setOpen] = useState(false)
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
@@ -69,12 +71,14 @@ export default function ComboboxForm() {
           render={({ field }) => (
             <FormItem_Shadcn_ className="flex flex-col">
               <FormLabel_Shadcn_>Language</FormLabel_Shadcn_>
-              <Popover_Shadcn_>
+              <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
                 <PopoverTrigger_Shadcn_ asChild>
                   <FormControl_Shadcn_>
                     <Button
                       type="default"
                       role="combobox"
+                      aria-controls=""
+                      aria-expanded={open}
                       className={cn(
                         'w-[200px] justify-between',
                         !field.value && 'text-muted-foreground'

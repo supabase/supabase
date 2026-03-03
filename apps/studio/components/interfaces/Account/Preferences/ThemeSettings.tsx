@@ -31,6 +31,34 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+const SingleThemeSelection = ({
+  theme,
+  setTheme,
+}: {
+  theme: string | undefined
+  setTheme: (theme: string) => void
+}) => (
+  <RadioGroup_Shadcn_
+    name="theme"
+    onValueChange={setTheme}
+    aria-label="Choose a theme"
+    defaultValue={theme}
+    value={theme}
+    className="grid grid-cols-2 gap-4"
+  >
+    {singleThemes.map((theme: Theme) => (
+      <RadioGroupLargeItem_Shadcn_
+        className="p-3 w-full"
+        key={theme.value}
+        value={theme.value}
+        label={theme.name}
+      >
+        <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg?v=2`} />
+      </RadioGroupLargeItem_Shadcn_>
+    ))}
+  </RadioGroup_Shadcn_>
+)
+
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
@@ -47,30 +75,6 @@ export const ThemeSettings = () => {
   useEffect(() => setMounted(true), [])
 
   if (!mounted) return null
-
-  function SingleThemeSelection() {
-    return (
-      <RadioGroup_Shadcn_
-        name="theme"
-        onValueChange={setTheme}
-        aria-label="Choose a theme"
-        defaultValue={theme}
-        value={theme}
-        className="grid grid-cols-2 gap-4"
-      >
-        {singleThemes.map((theme: Theme) => (
-          <RadioGroupLargeItem_Shadcn_
-            className="p-3 w-full"
-            key={theme.value}
-            value={theme.value}
-            label={theme.name}
-          >
-            <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg?v=2`} />
-          </RadioGroupLargeItem_Shadcn_>
-        ))}
-      </RadioGroup_Shadcn_>
-    )
-  }
 
   return (
     <PageSection>
@@ -95,7 +99,7 @@ export const ThemeSettings = () => {
             </div>
 
             <div className="col-span-full md:col-span-8 flex flex-col gap-4">
-              <SingleThemeSelection />
+              <SingleThemeSelection theme={theme} setTheme={setTheme} />
             </div>
           </CardContent>
           <Separator />

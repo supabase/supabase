@@ -34,6 +34,36 @@ import {
   uploadAttachment,
 } from './FeedbackDropdown.utils'
 
+const ThanksMessageView = ({
+  onSwitchToIssueOptions,
+  onClose,
+}: {
+  onSwitchToIssueOptions: () => void
+  onClose: () => void
+}) => (
+  <>
+    <div className="py-6 px-4 grid gap-4 text-center text-foreground-light">
+      <CircleCheck className="mx-auto text-brand-500" size={24} />
+      <div className="flex flex-col gap-1">
+        <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
+        <p className="text-sm text-balance">
+          We don’t always respond to feedback. If you need help with your project, use the button
+          below.
+        </p>
+      </div>
+    </div>
+    <PopoverSeparator_Shadcn_ />
+    <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
+      <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        Get help
+      </Button>
+      <Button type="default" size="tiny" onClick={onClose}>
+        Close
+      </Button>
+    </div>
+  </>
+)
+
 interface FeedbackWidgetProps {
   onClose: () => void
   onSwitchToIssueOptions: () => void
@@ -168,32 +198,8 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
     // eslint-disable-next-line react-hooks/exhaustive-deps -- setStoredFeedback is stable; only sync on debounced value
   }, [debouncedFeedback])
 
-  const ThanksMessageView = () => (
-    <>
-      <div className="py-6 px-4 grid gap-4 text-center text-foreground-light">
-        <CircleCheck className="mx-auto text-brand-500" size={24} />
-        <div className="flex flex-col gap-1">
-          <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
-          <p className="text-sm text-balance">
-            We don’t always respond to feedback. If you need help with your project, use the button
-            below.
-          </p>
-        </div>
-      </div>
-      <PopoverSeparator_Shadcn_ />
-      <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
-          Get help
-        </Button>
-        <Button type="default" size="tiny" onClick={onClose}>
-          Close
-        </Button>
-      </div>
-    </>
-  )
-
   return isFeedbackSent ? (
-    <ThanksMessageView />
+    <ThanksMessageView onSwitchToIssueOptions={onSwitchToIssueOptions} onClose={onClose} />
   ) : (
     <>
       <div className="p-4">

@@ -64,7 +64,11 @@ export const EditWrapperSheet = ({
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
   const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false)
   const [pendingFormState, setPendingFormState] = useState<Record<string, string> | null>(null)
+  const [loadingSecrets, setLoadingSecrets] = useState(false)
   const hasChangesRef = useRef(false)
+  const valuesRef = useRef<Record<string, string>>({})
+  const initialValuesRef = useRef<Record<string, string>>({})
+  const resetFormRef = useRef<(value: Record<string, Record<string, string>>) => void>(() => {})
 
   const initialValues = {
     wrapper_name: wrapper?.name,
@@ -123,6 +127,47 @@ export const EditWrapperSheet = ({
     setIsClosing(false)
   }, [checkIsDirty, confirmOnClose, isClosing, onClose, setIsClosing])
 
+  useEffect(() => {
+    const fetchEncryptedValues = async (ids: string[]) => {
+      try {
+        setLoadingSecrets(true)
+        const decryptedValues = await getDecryptedValues({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          ids: ids,
+        })
+
+        const transformValues = (values: Record<string, string>) => {
+          return mapValues(values, (value) => {
+            return decryptedValues[value] ?? value
+          })
+        }
+
+        resetFormRef.current({
+          values: transformValues(valuesRef.current),
+          initialValues: transformValues(initialValuesRef.current),
+        })
+      } catch (error) {
+        toast.error('Failed to fetch encrypted values')
+      } finally {
+        setLoadingSecrets(false)
+      }
+    }
+
+    const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
+
+    const encryptedIdsToFetch = compact(
+      encryptedOptions.map((option) => {
+        const value = initialValuesRef.current[option.name]
+        return value ?? null
+      })
+    ).filter((x) => UUID_REGEX.test(x))
+
+    if (encryptedIdsToFetch.length > 0) {
+      fetchEncryptedValues(encryptedIdsToFetch)
+    }
+  }, [project?.ref, project?.connectionString])
+
   return (
     <>
       <div className="flex flex-col h-full" tabIndex={-1}>
@@ -141,10 +186,9 @@ export const EditWrapperSheet = ({
             initialValues: Record<string, string>
             resetForm: (value: Record<string, Record<string, string>>) => void
           }) => {
-            // [Alaister] although this "technically" is breaking the rules of React hooks
-            // it won't error because the hooks are always rendered in the same order
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            const [loadingSecrets, setLoadingSecrets] = useState(false)
+            valuesRef.current = values
+            initialValuesRef.current = initialValues
+            resetFormRef.current = resetForm
 
             const initialTables = formatWrapperTables({
               handler: wrapper.handler,
@@ -154,61 +198,6 @@ export const EditWrapperSheet = ({
             const hasTableChanges = JSON.stringify(initialTables) !== JSON.stringify(wrapperTables)
             const hasChanges = hasFormChanges || hasTableChanges
             hasChangesRef.current = hasChanges
-
-            // [Alaister] although this "technically" is breaking the rules of React hooks
-            // it won't error because the hooks are always rendered in the same order
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            useEffect(() => {
-              const fetchEncryptedValues = async (ids: string[]) => {
-                try {
-                  setLoadingSecrets(true)
-                  // If the secrets haven't loaded, escape and run the effect again when they're loaded
-                  const decryptedValues = await getDecryptedValues({
-                    projectRef: project?.ref,
-                    connectionString: project?.connectionString,
-                    ids: ids,
-                  })
-
-                  // replace all values which are in the decryptedValues object with the decrypted value
-                  const transformValues = (values: Record<string, string>) => {
-                    return mapValues(values, (value) => {
-                      return decryptedValues[value] ?? value
-                    })
-                  }
-
-                  resetForm({
-                    values: transformValues(values),
-                    initialValues: transformValues(initialValues),
-                  })
-                } catch (error) {
-                  toast.error('Failed to fetch encrypted values')
-                } finally {
-                  setLoadingSecrets(false)
-                }
-              }
-
-              const encryptedOptions = wrapperMeta.server.options.filter(
-                (option) => option.encrypted
-              )
-
-              const encryptedIdsToFetch = compact(
-                encryptedOptions.map((option) => {
-                  const value = initialValues[option.name]
-                  return value ?? null
-                })
-              ).filter((x) => UUID_REGEX.test(x))
-              // [Joshen] ^ Validate UUID to filter out already decrypted values
-
-              if (encryptedIdsToFetch.length > 0) {
-                fetchEncryptedValues(encryptedIdsToFetch)
-              }
-              /**
-               * [Joshen] We're deliberately not adding values and initialValues to the dependency array here
-               * as we only want to fetch the encrypted values once on load + values and initialValues will be updated
-               * as a result of that
-               */
-              // eslint-disable-next-line react-hooks/exhaustive-deps
-            }, [project?.ref, project?.connectionString])
 
             return (
               <>

@@ -26,6 +26,65 @@ export interface LogSelectionProps {
   error?: string | object
 }
 
+const LogDetails = ({
+  log,
+  queryType,
+  error,
+}: {
+  log?: LogData
+  queryType?: QueryType
+  error?: string | object
+}) => {
+  if (error) return <LogErrorState error={error} />
+  if (!log) return <LogDetailEmptyState />
+
+  switch (queryType) {
+    case 'api':
+      const status = log?.metadata?.[0]?.response?.[0]?.status_code
+      const method = log?.metadata?.[0]?.request?.[0]?.method
+      const path = log?.metadata?.[0]?.request?.[0]?.path
+      const search = log?.metadata?.[0]?.request?.[0]?.search
+      const user_agent = log?.metadata?.[0]?.request?.[0]?.headers?.[0]?.user_agent
+      const error_code = log?.metadata?.[0]?.response?.[0]?.headers?.[0]?.x_sb_error_code
+      const apikey = jwtAPIKey(log?.metadata) ?? apiKey(log?.metadata)
+      const role = extractRole(log?.metadata)
+
+      const { id, metadata, timestamp, event_message, ...rest } = log
+
+      const apiLog = {
+        id,
+        status,
+        method,
+        path,
+        search,
+        user_agent,
+        timestamp,
+        event_message,
+        metadata,
+        ...(apikey ? { apikey } : null),
+        ...(error_code ? { error_code } : null),
+        ...(role ? { role } : null),
+        ...rest,
+      }
+
+      return <DefaultPreviewSelectionRenderer log={apiLog} />
+
+    case 'database':
+      const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
+      const detail = log?.metadata?.[0]?.parsed?.[0]?.detail
+      const query = log?.metadata?.[0]?.parsed?.[0]?.query
+      const postgresLog = {
+        ...(hint && { hint }),
+        ...(detail && { detail }),
+        ...(query && { query }),
+        ...log,
+      }
+      return <DefaultPreviewSelectionRenderer log={postgresLog} />
+    default:
+      return <DefaultPreviewSelectionRenderer log={log} />
+  }
+}
+
 const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectionProps) => {
   const [showCopied, setShowCopied] = useState(false)
 
@@ -34,57 +93,6 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
     const timer = setTimeout(() => setShowCopied(false), 2000)
     return () => clearTimeout(timer)
   }, [showCopied])
-
-  const LogDetails = () => {
-    if (error) return <LogErrorState error={error} />
-    if (!log) return <LogDetailEmptyState />
-
-    switch (queryType) {
-      case 'api':
-        const status = log?.metadata?.[0]?.response?.[0]?.status_code
-        const method = log?.metadata?.[0]?.request?.[0]?.method
-        const path = log?.metadata?.[0]?.request?.[0]?.path
-        const search = log?.metadata?.[0]?.request?.[0]?.search
-        const user_agent = log?.metadata?.[0]?.request?.[0]?.headers[0].user_agent
-        const error_code = log?.metadata?.[0]?.response?.[0]?.headers?.[0]?.x_sb_error_code
-        const apikey = jwtAPIKey(log?.metadata) ?? apiKey(log?.metadata)
-        const role = extractRole(log?.metadata)
-
-        const { id, metadata, timestamp, event_message, ...rest } = log
-
-        const apiLog = {
-          id,
-          status,
-          method,
-          path,
-          search,
-          user_agent,
-          timestamp,
-          event_message,
-          metadata,
-          ...(apikey ? { apikey } : null),
-          ...(error_code ? { error_code } : null),
-          ...(role ? { role } : null),
-          ...rest,
-        }
-
-        return <DefaultPreviewSelectionRenderer log={apiLog} />
-
-      case 'database':
-        const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
-        const detail = log?.metadata?.[0]?.parsed?.[0]?.detail
-        const query = log?.metadata?.[0]?.parsed?.[0]?.query
-        const postgresLog = {
-          ...(hint && { hint }),
-          ...(detail && { detail }),
-          ...(query && { query }),
-          ...log,
-        }
-        return <DefaultPreviewSelectionRenderer log={postgresLog} />
-      default:
-        return <DefaultPreviewSelectionRenderer log={log} />
-    }
-  }
 
   return (
     <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100 border-t">
@@ -128,7 +136,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
             ) : (
               <>
                 <TabsContent_Shadcn_ className="space-y-6 h-full" value="details">
-                  <LogDetails />
+                  <LogDetails log={log} queryType={queryType} error={error} />
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ value="raw">
                   <CodeBlock

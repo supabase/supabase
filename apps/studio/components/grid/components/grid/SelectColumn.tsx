@@ -15,6 +15,49 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
+function SelectColumnHeaderCell(props: RenderHeaderCellProps<unknown>) {
+  const { isRowSelected, onRowSelectionChange } = useHeaderRowSelection()
+  return (
+    <SelectCellHeader
+      aria-label="Select All"
+      tabIndex={props.tabIndex}
+      value={isRowSelected}
+      onChange={(checked) => onRowSelectionChange({ checked })}
+    />
+  )
+}
+
+function SelectColumnCell(props: RenderCellProps<SupaRow>) {
+  const { isRowSelected, onRowSelectionChange } = useRowSelection()
+  return (
+    <SelectCellFormatter
+      aria-label="Select"
+      tabIndex={props.tabIndex}
+      value={isRowSelected}
+      row={props.row}
+      onChange={(checked, isShiftClick) => {
+        onRowSelectionChange({ row: props.row, checked, isShiftClick })
+      }}
+      onClick={stopPropagation}
+    />
+  )
+}
+
+function SelectColumnGroupCell(props: RenderGroupCellProps<SupaRow>) {
+  const { isRowSelected, onRowSelectionChange } = useRowSelection()
+  return (
+    <SelectCellFormatter
+      aria-label="Select Group"
+      tabIndex={props.tabIndex}
+      value={isRowSelected}
+      onChange={(checked) => {
+        onRowSelectionChange({ row: props.row, checked, isShiftClick: false })
+      }}
+      onClick={stopPropagation}
+    />
+  )
+}
+
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,
   name: '',
@@ -24,59 +67,9 @@ export const SelectColumn: CalculatedColumn<any, any> = {
   resizable: false,
   sortable: false,
   frozen: true,
-  renderHeaderCell: (props: RenderHeaderCellProps<unknown>) => {
-    // [Joshen] formatter is actually a valid React component, so we can use hooks here
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { isRowSelected, onRowSelectionChange } = useHeaderRowSelection()
-
-    return (
-      <SelectCellHeader
-        aria-label="Select All"
-        tabIndex={props.tabIndex}
-        value={isRowSelected}
-        onChange={(checked) => onRowSelectionChange({ checked })}
-      />
-    )
-  },
-  renderCell: (props: RenderCellProps<SupaRow>) => {
-    // [Alaister] formatter is actually a valid React component, so we can use hooks here
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { isRowSelected, onRowSelectionChange } = useRowSelection()
-    return (
-      <SelectCellFormatter
-        aria-label="Select"
-        tabIndex={props.tabIndex}
-        value={isRowSelected}
-        row={props.row}
-        onChange={(checked, isShiftClick) => {
-          onRowSelectionChange({ row: props.row, checked, isShiftClick })
-        }}
-        // Stop propagation to prevent row selection
-        onClick={stopPropagation}
-      />
-    )
-  },
-  renderGroupCell: (props: RenderGroupCellProps<SupaRow>) => {
-    // [Alaister] groupFormatter is actually a valid React component, so we can use hooks here
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { isRowSelected, onRowSelectionChange } = useRowSelection()
-    return (
-      <SelectCellFormatter
-        aria-label="Select Group"
-        tabIndex={props.tabIndex}
-        value={isRowSelected}
-        onChange={(checked) => {
-          onRowSelectionChange({
-            row: props.row,
-            checked,
-            isShiftClick: false,
-          })
-        }}
-        // Stop propagation to prevent row selection
-        onClick={stopPropagation}
-      />
-    )
-  },
+  renderHeaderCell: SelectColumnHeaderCell,
+  renderCell: SelectColumnCell,
+  renderGroupCell: SelectColumnGroupCell,
 
   // [Next 18 Refactor] Double check if this is correct
   parent: undefined,

@@ -20,13 +20,13 @@ const tocList: TOCHeader[] = []
 const content = specFile.info.tags.map((tag: { id: string; title: string }, id: number) => {
   tocList.push({ id: `${id}`, text: tag.title, link: `${tag.id}-config`, level: 2 })
   return (
-    <div>
+    <div key={tag.id}>
       <Heading tag="h2">{tag.title} Config</Heading>
       {specFile.parameters
         .filter((param: Parameter) => param.tags && param.tags[0] === tag.id)
         .map((parameter: Parameter, id: number) => {
           tocList.push({ id: `${id}`, text: parameter.id, link: `#${parameter.id}`, level: 3 })
-          return <Info parameter={parameter} />
+          return <Info key={parameter.id} parameter={parameter} />
         })}
     </div>
   )

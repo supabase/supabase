@@ -252,6 +252,137 @@ export function getAvatarUrl(user: User): string | undefined {
   }
 }
 
+interface UserGridCellProps {
+  row: any
+  col: UsersTableColumn
+  users: User[]
+  onSelectDeleteUser: (user: User) => void
+}
+
+function UserGridCell({ row, col, users, onSelectDeleteUser }: UserGridCellProps) {
+  const { isRowSelected, onRowSelectionChange } = useRowSelection()
+
+  const value = row?.[col.id]
+  const user = users?.find((u: User) => u.id === row.id)
+  const formattedValue =
+    value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
+      ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
+      : Array.isArray(value)
+        ? col.id === 'providers'
+          ? value
+              .map((x: string) => {
+                const meta = PROVIDERS_SCHEMAS.find(
+                  (y) => ('key' in y && y.key === x) || y.title.toLowerCase() === x
+                )
+                return meta?.title
+              })
+              .join(', ')
+          : value.join(', ')
+        : value
+  const isConfirmed = !!user?.confirmed_at
+
+  if (col.id === 'img') {
+    return (
+      <div className="flex items-center justify-center gap-x-2">
+        <Checkbox_Shadcn_
+          checked={isRowSelected}
+          onClick={(e) => {
+            e.stopPropagation()
+            onRowSelectionChange({
+              row,
+              checked: !isRowSelected,
+              isShiftClick: e.shiftKey,
+            })
+          }}
+        />
+        <div
+          className={cn(
+            'flex items-center justify-center w-6 h-6 rounded-full bg-center bg-cover bg-no-repeat',
+            !row.img ? 'bg-selection' : 'border'
+          )}
+          style={{ backgroundImage: row.img ? `url('${row.img}')` : 'none' }}
+        >
+          {!row.img && <UserIcon size={12} />}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <ContextMenu_Shadcn_>
+      <ContextMenuTrigger_Shadcn_ asChild>
+        <div
+          className={cn(
+            'w-full flex items-center text-xs',
+            col.id.includes('provider') ? 'capitalize' : ''
+          )}
+        >
+          {col.id === 'providers' &&
+            row.provider_icons.map((icon: string, idx: number) => {
+              const provider = row.providers[idx]
+              return (
+                <div
+                  key={`${user?.id}-${provider}-wrapper`}
+                  className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
+                  style={{
+                    marginLeft: idx === 0 ? 0 : `-8px`,
+                    zIndex: row.provider_icons.length - idx,
+                  }}
+                >
+                  <img
+                    key={`${user?.id}-${provider}`}
+                    width={16}
+                    src={icon}
+                    alt={`${provider} auth icon`}
+                    className={cn(
+                      (provider === 'github' || provider === 'x') && 'dark:invert'
+                    )}
+                  />
+                </div>
+              )
+            })}
+          {col.id === 'last_sign_in_at' && !isConfirmed ? (
+            <p className="text-foreground-lighter">Waiting for verification</p>
+          ) : (
+            <p className={cn(col.id === 'providers' && 'ml-1')}>
+              {formattedValue === null ? '-' : formattedValue}
+            </p>
+          )}
+        </div>
+      </ContextMenuTrigger_Shadcn_>
+      <ContextMenuContent_Shadcn_ onClick={(e) => e.stopPropagation()}>
+        <ContextMenuItem_Shadcn_
+          className="gap-x-2"
+          onFocusCapture={(e) => e.stopPropagation()}
+          onSelect={() => {
+            const value =
+              col.id === 'providers'
+                ? Array.isArray(row.providers)
+                  ? row.providers.join(', ')
+                  : String(row.providers ?? formattedValue ?? '-')
+                : formattedValue
+            copyToClipboard(value)
+          }}
+        >
+          <Copy size={12} />
+          <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
+        </ContextMenuItem_Shadcn_>
+        <ContextMenuSeparator_Shadcn_ />
+        <ContextMenuItem_Shadcn_
+          className="gap-x-2"
+          onFocusCapture={(e) => e.stopPropagation()}
+          onSelect={() => {
+            if (user) onSelectDeleteUser(user)
+          }}
+        >
+          <Trash size={12} />
+          <span>Delete user</span>
+        </ContextMenuItem_Shadcn_>
+      </ContextMenuContent_Shadcn_>
+    </ContextMenu_Shadcn_>
+  )
+}
+
 export const formatUserColumns = ({
   specificFilterColumn,
   columns,
@@ -296,127 +427,9 @@ export const formatUserColumns = ({
           />
         )
       },
-      renderCell: ({ row }) => {
-        // This is actually a valid React component, so we can use hooks here
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const { isRowSelected, onRowSelectionChange } = useRowSelection()
-
-        const value = row?.[col.id]
-        const user = users?.find((u) => u.id === row.id)
-        const formattedValue =
-          value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
-            ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
-            : Array.isArray(value)
-              ? col.id === 'providers'
-                ? value
-                    .map((x) => {
-                      const meta = PROVIDERS_SCHEMAS.find(
-                        (y) => ('key' in y && y.key === x) || y.title.toLowerCase() === x
-                      )
-                      return meta?.title
-                    })
-                    .join(', ')
-                : value.join(', ')
-              : value
-        const isConfirmed = !!user?.confirmed_at
-
-        if (col.id === 'img') {
-          return (
-            <div className="flex items-center justify-center gap-x-2">
-              <Checkbox_Shadcn_
-                checked={isRowSelected}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onRowSelectionChange({
-                    row,
-                    checked: !isRowSelected,
-                    isShiftClick: e.shiftKey,
-                  })
-                }}
-              />
-              <div
-                className={cn(
-                  'flex items-center justify-center w-6 h-6 rounded-full bg-center bg-cover bg-no-repeat',
-                  !row.img ? 'bg-selection' : 'border'
-                )}
-                style={{ backgroundImage: row.img ? `url('${row.img}')` : 'none' }}
-              >
-                {!row.img && <UserIcon size={12} />}
-              </div>
-            </div>
-          )
-        }
-
-        return (
-          <ContextMenu_Shadcn_>
-            <ContextMenuTrigger_Shadcn_ asChild>
-              <div
-                className={cn(
-                  'w-full flex items-center text-xs',
-                  col.id.includes('provider') ? 'capitalize' : ''
-                )}
-              >
-                {/* [Joshen] Not convinced this is the ideal way to display the icons, but for now */}
-                {col.id === 'providers' &&
-                  row.provider_icons.map((icon: string, idx: number) => {
-                    const provider = row.providers[idx]
-                    return (
-                      <div
-                        key={`${user?.id}-${provider}-wrapper`}
-                        className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
-                        style={{
-                          marginLeft: idx === 0 ? 0 : `-8px`,
-                          zIndex: row.provider_icons.length - idx,
-                        }}
-                      >
-                        <img
-                          key={`${user?.id}-${provider}`}
-                          width={16}
-                          src={icon}
-                          alt={`${provider} auth icon`}
-                          className={cn(
-                            (provider === 'github' || provider === 'x') && 'dark:invert'
-                          )}
-                        />
-                      </div>
-                    )
-                  })}
-                {col.id === 'last_sign_in_at' && !isConfirmed ? (
-                  <p className="text-foreground-lighter">Waiting for verification</p>
-                ) : (
-                  <p className={cn(col.id === 'providers' && 'ml-1')}>
-                    {formattedValue === null ? '-' : formattedValue}
-                  </p>
-                )}
-              </div>
-            </ContextMenuTrigger_Shadcn_>
-            <ContextMenuContent_Shadcn_ onClick={(e) => e.stopPropagation()}>
-              <ContextMenuItem_Shadcn_
-                className="gap-x-2"
-                onFocusCapture={(e) => e.stopPropagation()}
-                onSelect={() => {
-                  const value = col.id === 'providers' ? row.providers.join(', ') : formattedValue
-                  copyToClipboard(value)
-                }}
-              >
-                <Copy size={12} />
-                <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuSeparator_Shadcn_ />
-              <ContextMenuItem_Shadcn_
-                className="gap-x-2"
-                onFocusCapture={(e) => e.stopPropagation()}
-                onSelect={() => {
-                  if (user) onSelectDeleteUser(user)
-                }}
-              >
-                <Trash size={12} />
-                <span>Delete user</span>
-              </ContextMenuItem_Shadcn_>
-            </ContextMenuContent_Shadcn_>
-          </ContextMenu_Shadcn_>
-        )
-      },
+      renderCell: ({ row }) => (
+        <UserGridCell row={row} col={col} users={users} onSelectDeleteUser={onSelectDeleteUser} />
+      ),
     }
     return res
   })

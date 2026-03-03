@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Link from 'next/link'
 
 import { ChevronLeft } from 'lucide-react'
@@ -5,50 +6,50 @@ import { BASE_PATH } from '~/lib/constants'
 import clientLibsCommon from '~/spec/common-cli.yml' with { type: 'yml' }
 import * as NavItems from './NavigationMenu.constants'
 
+const FunctionLink = ({
+  title,
+  id,
+  icon,
+}: {
+  title: string
+  name: string
+  id: string
+  icon?: string
+}) => {
+  return (
+    <li key={id} className="function-link-item text-foreground-lighter leading-3">
+      <Link
+        href={`#${id}`}
+        className="cursor-pointer transition text-foreground-lighter text-sm hover:text-brand-link flex gap-3"
+      >
+        {icon && <img className="w-3" src={`${BASE_PATH}${icon}`} alt="" />}
+        {title}
+      </Link>
+    </li>
+  )
+}
+
+const SideMenuTitle = ({ title }: { title: string }) => {
+  return (
+    <span
+      className="
+  font-mono text-xs uppercase
+  text-foreground font-medium
+  tracking-wider
+  mb-3
+  "
+    >
+      {title}
+    </span>
+  )
+}
+
+const Divider = () => {
+  return <div className="h-px w-full bg-border my-3"></div>
+}
+
 const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   const menu = NavItems[id]
-
-  const FunctionLink = ({
-    title,
-    id,
-    icon,
-  }: {
-    title: string
-    name: string
-    id: string
-    icon?: string
-  }) => {
-    return (
-      <li key={id} className="function-link-item text-foreground-lighter leading-3">
-        <Link
-          href={`#${id}`}
-          className="cursor-pointer transition text-foreground-lighter text-sm hover:text-brand-link flex gap-3"
-        >
-          {icon && <img className="w-3" src={`${BASE_PATH}${icon}`} />}
-          {title}
-        </Link>
-      </li>
-    )
-  }
-
-  const SideMenuTitle = ({ title }: { title: string }) => {
-    return (
-      <span
-        className="
-    font-mono text-xs uppercase
-    text-foreground font-medium
-    tracking-wider
-    mb-3
-    "
-      >
-        {title}
-      </span>
-    )
-  }
-
-  const Divider = () => {
-    return <div className="h-px w-full bg-border my-3"></div>
-  }
 
   const MenuSections = [
     {
@@ -113,6 +114,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
           <img
             src={`${BASE_PATH}` + (menu.icon ?? `/img/icons/menu/${id}.svg`)}
             className="w-5 rounded"
+            alt=""
           />
 
           <h2 className={['text-foreground ', !menu.title && 'capitalize'].join(' ')}>
@@ -122,16 +124,16 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
         <ul className="function-link-list">
           {MenuSections.map((section) => {
             return (
-              <>
+              <Fragment key={section.key}>
                 <Divider />
                 <SideMenuTitle title={section.label} />
 
                 {clientLibsCommon.commands
                   .filter((x) => x.product === section.key)
-                  .map((x, index) => {
-                    return <FunctionLink {...x} />
+                  .map((x) => {
+                    return <FunctionLink key={x.id} {...x} />
                   })}
-              </>
+              </Fragment>
             )
           })}
 

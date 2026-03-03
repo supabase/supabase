@@ -64,8 +64,6 @@ const formSchema = z.object({
   apiKey: z.string().optional(),
 })
 
-const fakeApiKey = 'sk_live_51H3x4mpl3_4nd_53cur3_k3y_1234567890'
-
 export default function FormPatternsPageLayout() {
   const uploadButtonRef = useRef<HTMLInputElement>(null)
   const fileUploadRef = useRef<HTMLInputElement>(null)
@@ -91,7 +89,7 @@ export default function FormPatternsPageLayout() {
       password: '',
       duration: 10,
       redirectUris: [{ value: '' }],
-      apiKey: fakeApiKey,
+      apiKey: '',
     },
   })
 

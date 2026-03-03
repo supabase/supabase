@@ -56,6 +56,26 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
   )
 }
 
+const SelectAllCheckbox = ({
+  columnFiles,
+  selectedFilesFromColumn,
+  onSelectAllItemsInColumn,
+  index,
+}: {
+  columnFiles: StorageItemWithColumn[]
+  selectedFilesFromColumn: StorageItemWithColumn[]
+  onSelectAllItemsInColumn: (index: number) => void
+  index: number
+}) => (
+  <Checkbox
+    label=""
+    className="-mt-0.5"
+    checked={columnFiles.length !== 0 && selectedFilesFromColumn.length === columnFiles.length}
+    disabled={columnFiles.length === 0}
+    onChange={() => onSelectAllItemsInColumn(index)}
+  />
+)
+
 export interface FileExplorerColumnProps {
   index?: number
   column: StorageColumn
@@ -136,16 +156,6 @@ export const FileExplorerColumn = ({
     }
   }
 
-  const SelectAllCheckbox = () => (
-    <Checkbox
-      label=""
-      className="-mt-0.5"
-      checked={columnFiles.length !== 0 && selectedFilesFromColumn.length === columnFiles.length}
-      disabled={columnFiles.length === 0}
-      onChange={() => onSelectAllItemsInColumn(index)}
-    />
-  )
-
   const getItemKey = useCallback(
     (index: number) => {
       const item = columnItems[index]
@@ -192,7 +202,12 @@ export const FileExplorerColumn = ({
         >
           {columnFiles.length > 0 ? (
             <>
-              <SelectAllCheckbox />
+              <SelectAllCheckbox
+                columnFiles={columnFiles}
+                selectedFilesFromColumn={selectedFilesFromColumn}
+                onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+                index={index}
+              />
               <p className="text-sm text-foreground-light">Select all {columnFiles.length} files</p>
             </>
           ) : (
@@ -205,7 +220,12 @@ export const FileExplorerColumn = ({
       {snap.view === STORAGE_VIEWS.LIST && (
         <div className="sticky top-0 py-2 z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5">
           <div className="flex w-[40%] min-w-[250px] items-center">
-            <SelectAllCheckbox />
+            <SelectAllCheckbox
+              columnFiles={columnFiles}
+              selectedFilesFromColumn={selectedFilesFromColumn}
+              onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+              index={index}
+            />
             <p className="text-sm">Name</p>
           </div>
           <p className="w-[11%] min-w-[100px] text-sm">Size</p>

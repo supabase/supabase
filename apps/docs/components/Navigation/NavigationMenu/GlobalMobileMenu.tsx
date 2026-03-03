@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Dispatch, Fragment, SetStateAction, useEffect } from 'react'
+import { Dispatch, Fragment, SetStateAction, useEffect, useRef } from 'react'
 import { useKey } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
@@ -57,11 +57,12 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
                 .filter((item) => item.enabled !== false)
                 .map((item) =>
                   !item.href ? (
-                    <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
+                    <div key={item.label} className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
                       {item.label}
                     </div>
                   ) : (
                     <MenuItem
+                      key={item.label}
                       href={item.href}
                       title={item.label}
                       community={item.community}
@@ -94,7 +95,7 @@ const Menu = () => (
     chevronAlign="right"
   >
     {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section) => (
-      <AccordionMenuItem section={section} />
+      <AccordionMenuItem key={section[0].label} section={section} />
     ))}
   </Accordion>
 )
@@ -110,10 +111,14 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
 
   const { navigationLogo } = getCustomContent(['navigation:logo'])
 
-  // Close mobile menu on route change
+  const prevPathnameRef = useRef(pathname)
+
   useEffect(() => {
-    setOpen(false)
-  }, [pathname])
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname
+      setOpen(false)
+    }
+  }, [pathname, setOpen])
 
   useKey('Escape', () => setOpen(false))
 

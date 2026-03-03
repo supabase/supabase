@@ -21,6 +21,25 @@ type User = {
  *
  * @returns A React element that renders the configured DataGrid with row selection and sample rows.
  */
+function CheckboxCell({ row }: { row: User }) {
+  const { isRowSelected, onRowSelectionChange } = useRowSelection()
+  return (
+    <div className="flex items-center justify-center h-full">
+      <Checkbox_Shadcn_
+        checked={isRowSelected}
+        onClick={(e) => {
+          e.stopPropagation()
+          onRowSelectionChange({
+            row,
+            checked: !isRowSelected,
+            isShiftClick: e.shiftKey,
+          })
+        }}
+      />
+    </div>
+  )
+}
+
 export default function DataGridDemo() {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
 
@@ -31,26 +50,7 @@ export default function DataGridDemo() {
       width: 50,
       resizable: false,
       headerCellClass: 'border-default border-r border-b',
-      renderCell: ({ row }) => {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const { isRowSelected, onRowSelectionChange } = useRowSelection()
-
-        return (
-          <div className="flex items-center justify-center h-full">
-            <Checkbox_Shadcn_
-              checked={isRowSelected}
-              onClick={(e) => {
-                e.stopPropagation()
-                onRowSelectionChange({
-                  row,
-                  checked: !isRowSelected,
-                  isShiftClick: e.shiftKey,
-                })
-              }}
-            />
-          </div>
-        )
-      },
+      renderCell: CheckboxCell,
     },
     {
       key: 'name',
