@@ -175,6 +175,7 @@ export const Destinations = () => {
             <Button
               type="default"
               icon={<Plus />}
+              disabled={!newDestinationDefaultType}
               onClick={() => setDestinationType(newDestinationDefaultType)}
             >
               Add destination

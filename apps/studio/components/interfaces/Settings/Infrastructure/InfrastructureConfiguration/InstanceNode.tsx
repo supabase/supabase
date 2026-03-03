@@ -346,7 +346,6 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40" side="bottom" align="end">
             <DropdownMenuItem
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
               onClick={() => {
                 setConnect({ showConnect: true, source: id })
@@ -356,10 +355,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               View connection string
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="gap-x-2"
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
-            >
+            <DropdownMenuItem className="gap-x-2">
               <Link href={`/project/${ref}/database/replication/replica/${id}`}>
                 Manage replica
               </Link>
