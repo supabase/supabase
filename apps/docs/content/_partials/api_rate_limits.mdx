@@ -57,6 +57,12 @@ Some endpoints have stricter rate limits than the standard 120 requests per minu
 
 **Note:** The `GET /v1/projects/:ref/database/context` endpoint has dual rate limiting. You can make up to 10 requests per minute, but also no more than 1 request per second to prevent burst traffic.
 
+Some endpoints have the standard 120 requests per minute but with different timeout durations:
+
+| Endpoint                                        | Limit          | Duration   | Reason                                               |
+| ------------------------------------------------| -------------- | ---------- | ---------------------------------------------------- |
+| `POST /v1/projects/:ref/database/migrations`    | 120 requests   | 3 minutes  | Database migrations may require more processing time |
+
 ### Best practices
 
 - **Monitor rate limit headers** - Check the `X-RateLimit-Remaining` header to see how many requests you have left. When it approaches 0, slow down your requests to avoid hitting the limit.
