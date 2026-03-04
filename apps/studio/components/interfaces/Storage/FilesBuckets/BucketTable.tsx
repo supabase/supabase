@@ -5,15 +5,13 @@ import {
   VirtualizedTableHeader,
   VirtualizedTableRow,
 } from 'components/ui/VirtualizedTable'
-import { type Bucket } from 'data/storage/buckets-query'
+import { Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Badge, cn, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-
-import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
@@ -85,7 +83,6 @@ export const BucketTableRow = ({
 }: BucketTableRowProps) => {
   const router = useRouter()
   const { getPolicyCount } = useBucketPolicyCount()
-  const snap = useStorageExplorerStateSnapshot()
 
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
@@ -121,10 +118,7 @@ export const BucketTableRow = ({
 
       <BucketTableCell>
         <p
-          className={cn(
-            'whitespace-nowrap',
-            bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'
-          )}
+          className={`whitespace-nowrap ${bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'}`}
         >
           {bucket.file_size_limit
             ? formatBytes(bucket.file_size_limit)
