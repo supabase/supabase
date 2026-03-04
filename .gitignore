@@ -157,3 +157,6 @@ keys.json
 
 # Playwright MCP
 .playwright-mcp/*
+
+# Application
+**/.superset/**
