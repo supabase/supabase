@@ -5,13 +5,14 @@ import {
   VirtualizedTableHeader,
   VirtualizedTableRow,
 } from 'components/ui/VirtualizedTable'
-import { Bucket } from 'data/storage/buckets-query'
+import { type Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { type KeyboardEvent, type MouseEvent } from 'react'
+import { Badge, cn, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -95,7 +96,7 @@ export const BucketTableRow = ({
     router
   )
 
-  const handleNavigation = (event: React.MouseEvent | React.KeyboardEvent) => {
+  const handleNavigation = (event: MouseEvent | KeyboardEvent) => {
     // Reset the Storage Explorer state here to avoid race conditions with loading effects in StorageExplorer
     snap.setSelectedBucket(bucket)
     handleBucketNavigation(event)
@@ -127,7 +128,10 @@ export const BucketTableRow = ({
 
       <BucketTableCell>
         <p
-          className={`whitespace-nowrap ${bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'}`}
+          className={cn(
+            'whitespace-nowrap',
+            bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'
+          )}
         >
           {bucket.file_size_limit
             ? formatBytes(bucket.file_size_limit)
