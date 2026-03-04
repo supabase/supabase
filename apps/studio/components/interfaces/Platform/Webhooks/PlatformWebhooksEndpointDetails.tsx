@@ -16,6 +16,19 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { formatDate, statusBadgeVariant } from './PlatformWebhooksView.utils'
 
+interface DetailItemProps {
+  label: string
+  children: React.ReactNode
+  ddClassName?: string
+}
+
+const DetailItem = ({ label, children, ddClassName = 'text-sm' }: DetailItemProps) => (
+  <div className="space-y-1">
+    <dt className="text-sm text-foreground-lighter">{label}</dt>
+    <dd className={ddClassName}>{children}</dd>
+  </div>
+)
+
 interface PlatformWebhooksEndpointDetailsProps {
   deliverySearch: string
   filteredDeliveries: WebhookDelivery[]
@@ -31,6 +44,8 @@ export const PlatformWebhooksEndpointDetails = ({
   onDeliverySearchChange,
   onOpenDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
+  const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
+
   return (
     <div className="space-y-16">
       <div className="space-y-4">
@@ -38,63 +53,49 @@ export const PlatformWebhooksEndpointDetails = ({
         <Card className="overflow-hidden">
           <CardContent>
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
-              <div className="space-y-1">
-                <dt className="text-sm text-foreground-lighter">URL</dt>
-                <dd className="text-sm break-all">{selectedEndpoint.url}</dd>
-              </div>
+              <DetailItem label="URL" ddClassName="text-sm break-all">
+                {selectedEndpoint.url}
+              </DetailItem>
 
-              <div className="space-y-1">
-                <dt className="text-sm text-foreground-lighter">Description</dt>
-                <dd className="text-sm">{selectedEndpoint.description || '-'}</dd>
-              </div>
+              <DetailItem label="Description">
+                {selectedEndpoint.description || '-'}
+              </DetailItem>
 
-              <div className="space-y-1">
-                <dt className="text-sm text-foreground-lighter">Event types</dt>
-                <dd className="flex flex-wrap gap-2">
-                  {(selectedEndpoint.eventTypes.includes('*')
-                    ? ['All events (*)']
-                    : selectedEndpoint.eventTypes
-                  ).map((eventType) => (
-                    <code
-                      key={eventType}
-                      className="text-code-inline rounded-md border px-3 py-1.5 text-2xs"
-                    >
-                      {eventType}
-                    </code>
-                  ))}
-                </dd>
-              </div>
+              <DetailItem label="Event types" ddClassName="flex flex-wrap gap-2">
+                {(selectedEndpoint.eventTypes.includes('*')
+                  ? ['All events (*)']
+                  : selectedEndpoint.eventTypes
+                ).map((eventType) => (
+                  <code
+                    key={eventType}
+                    className="text-code-inline rounded-md border px-3 py-1.5 text-2xs"
+                  >
+                    {eventType}
+                  </code>
+                ))}
+              </DetailItem>
 
-              <div className="space-y-1">
-                <dt className="text-sm text-foreground-lighter">Custom headers</dt>
-                <dd className="text-sm">
-                  {selectedEndpoint.customHeaders.length === 0
-                    ? '-'
-                    : (
-                      <div className="rounded-md border divide-y">
-                        {selectedEndpoint.customHeaders.map((header) => (
-                          <div key={header.id} className="px-3 py-3 font-mono font-medium text-xs flex items-center gap-2 flex-wrap">
-                            <code className="text-code_block-4">{header.key}:</code>
-
-                            <code className="">{header.value}</code>
-                          </div>
-                        ))}
+              {hasCustomHeaders && (
+                <DetailItem label="Custom headers">
+                  <div className="rounded-md border divide-y">
+                    {selectedEndpoint.customHeaders.map((header) => (
+                      <div
+                        key={header.id}
+                        className="px-3 py-3 font-mono font-medium text-xs flex items-center gap-2 flex-wrap"
+                      >
+                        <code className="text-code_block-4">{header.key}:</code>
+                        <code className="">{header.value}</code>
                       </div>
-                    )}
-                </dd>
-              </div>
+                    ))}
+                  </div>
+                </DetailItem>
+              )}
 
-              <div className="space-y-1">
-                <dt className="text-sm text-foreground-lighter">Created by</dt>
-                <dd className="text-sm">{selectedEndpoint.createdBy}</dd>
-              </div>
+              <DetailItem label="Created by">{selectedEndpoint.createdBy}</DetailItem>
 
-              <div className="space-y-1">
-                <dt className="text-sm text-foreground-lighter">Created at</dt>
-                <dd className="text-sm">
-                  <TimestampInfo className="text-sm" utcTimestamp={selectedEndpoint.createdAt} />
-                </dd>
-              </div>
+              <DetailItem label="Created at">
+                <TimestampInfo className="text-sm" utcTimestamp={selectedEndpoint.createdAt} />
+              </DetailItem>
             </dl>
           </CardContent>
         </Card>
@@ -146,7 +147,7 @@ export const PlatformWebhooksEndpointDetails = ({
                         {delivery.eventType}
                       </code>
                     </TableCell>
-                    <TableCell>{delivery.responseCode ?? '-'}</TableCell>
+                    <TableCell>{delivery.responseCode ?? '–'}</TableCell>
                     <TableCell>{formatDate(delivery.attemptAt)}</TableCell>
                   </TableRow>
                 ))
