@@ -17,6 +17,7 @@ import {
   goalCompletionScorer,
   urlValidityScorer,
 } from './scorer'
+import manifest from './scorer-manifest.json'
 
 const projectId = process.env.BRAINTRUST_PROJECT_ID
 if (!projectId && process.env.IS_PUSH) throw new Error('BRAINTRUST_PROJECT_ID is not set')
@@ -27,23 +28,23 @@ const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
 const prefix = branch ? `${branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()}-` : ''
 const metadata = branch ? { gitBranch: branch } : undefined
 
-const scorers = [
-  { slug: 'goal-completion', name: 'Goal Completion', handler: goalCompletionScorer },
-  { slug: 'conciseness', name: 'Conciseness', handler: concisenessScorer },
-  { slug: 'completeness', name: 'Completeness', handler: completenessScorer },
-  { slug: 'docs-faithfulness', name: 'Docs Faithfulness', handler: docsFaithfulnessScorer },
-  { slug: 'correctness', name: 'Correctness', handler: correctnessScorer },
-  { slug: 'url-validity', name: 'URL Validity', handler: urlValidityScorer },
-]
+const handlers = {
+  'goal-completion': goalCompletionScorer,
+  'conciseness': concisenessScorer,
+  'completeness': completenessScorer,
+  'docs-faithfulness': docsFaithfulnessScorer,
+  'correctness': correctnessScorer,
+  'url-validity': urlValidityScorer,
+}
 
 // @ts-expect-error - Project ID is only required at build-time
 const project = braintrust.projects.create({ id: projectId })
 
-for (const { slug, name, handler } of scorers) {
+for (const { slug, name } of manifest) {
   project.scorers.create({
     slug: `${prefix}${slug}`,
     name,
-    handler,
+    handler: handlers[slug as keyof typeof handlers],
     ifExists: 'replace',
     metadata,
   })

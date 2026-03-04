@@ -67,7 +67,11 @@ jobs:
 
       - name: Push scorers to staging
         if: steps.changed.outputs.skip != 'true'
-        run: cd apps/studio && pnpm evals:push
+        id: push
+        run: |
+          cd apps/studio && pnpm evals:push
+          slugs=$(jq -r '[.[].slug] | join(",")' evals/scorer-manifest.json)
+          echo "slugs=$slugs" >> $GITHUB_OUTPUT
         env:
           BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
           BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_STAGING_PROJECT_ID }}
@@ -77,6 +81,7 @@ jobs:
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         env:
           BRAINTRUST_STAGING_PROJECT_ID: ${{ secrets.BRAINTRUST_STAGING_PROJECT_ID }}
+          SCORER_SLUGS: ${{ steps.push.outputs.slugs }}
         with:
           script: |
             const prNumber = context.payload.pull_request?.number ?? Number(context.payload.inputs?.pr_number)
@@ -84,7 +89,7 @@ jobs:
             const prefix = branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()
             const stagingUrl = 'https://www.braintrust.dev/app/supabase.io/p/Assistant%20(Staging%20Scorers)/scorers'
 
-            const slugs = ['goal-completion', 'conciseness', 'completeness', 'docs-faithfulness', 'correctness', 'url-validity']
+            const slugs = process.env.SCORER_SLUGS.split(',')
             const slugList = slugs.map(s => `- \`${prefix}-${s}\``).join('\n')
 
             const sha = context.sha.slice(0, 7)
