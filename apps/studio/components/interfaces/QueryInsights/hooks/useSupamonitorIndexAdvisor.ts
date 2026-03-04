@@ -8,7 +8,10 @@ import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformanc
 
 function isEligibleQuery(query: string): boolean {
   const lower = query.trim().toLowerCase()
-  return lower.startsWith('select') || lower.startsWith('with')
+  if (!lower.startsWith('select') && !lower.startsWith('with')) return false
+  // Dollar-quoting breaks the single-quoted SQL embedding in getIndexAdvisorResult
+  if (query.includes('$')) return false
+  return true
 }
 
 export function useSupamonitorIndexAdvisor(rows: QueryPerformanceRow[]): QueryPerformanceRow[] {
@@ -32,6 +35,7 @@ export function useSupamonitorIndexAdvisor(rows: QueryPerformanceRow[]): QueryPe
         }),
       enabled: isIndexAdvisorEnabled && !!project?.ref,
       retry: false,
+      staleTime: Infinity,
     })),
   })
 
