@@ -1,20 +1,16 @@
-import type { CustomProvider } from './customProviders.types'
+import type { CustomOAuthProvider } from '@supabase/auth-js'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
-
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 interface NewCustomProviderBannerProps {
-  provider: CustomProvider & { client_secret?: string }
+  provider: CustomOAuthProvider & { client_secret?: string }
   onClose: () => void
 }
 
-export const NewCustomProviderBanner = ({
-  provider,
-  onClose,
-}: NewCustomProviderBannerProps) => {
+export const NewCustomProviderBanner = ({ provider, onClose }: NewCustomProviderBannerProps) => {
   return (
     <Admonition
       type="default"

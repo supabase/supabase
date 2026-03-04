@@ -1,9 +1,5 @@
+import type { CustomOAuthProvider } from '@supabase/auth-js'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -31,16 +27,20 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateOrUpdateCustomProviderSheet } from './CreateOrUpdateCustomProviderSheet'
-import type { CustomProvider } from './customProviders.types'
 import {
   CUSTOM_PROVIDER_ENABLED_OPTIONS,
   CUSTOM_PROVIDER_TYPE_OPTIONS,
   filterCustomProviders,
-  getCustomProviderLimit,
   getNextPlanForCustomProviders,
 } from './customProviders.utils'
 import { DeleteCustomProviderModal } from './DeleteCustomProviderModal'
 import { NewCustomProviderBanner } from './NewCustomProviderBanner'
+import AlertError from '@/components/ui/AlertError'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useOAuthCustomProvidersQuery } from '@/data/oauth-custom-providers/oauth-custom-providers-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const CUSTOM_PROVIDERS_SORT_VALUES = [
   'name:asc',
@@ -61,33 +61,51 @@ type CustomProvidersSortOrder = CustomProvidersSort extends `${string}:${infer O
   ? Order
   : unknown
 
+const NewProviderButton = ({
+  canCreateProvider,
+  setShowCreateSheet,
+}: {
+  canCreateProvider: boolean
+  setShowCreateSheet: (show: boolean) => void
+}) => {
+  return (
+    <Button
+      type="primary"
+      disabled={!canCreateProvider}
+      icon={<Plus />}
+      onClick={() => setShowCreateSheet(true)}
+      className="flex-grow"
+    >
+      New Provider
+    </Button>
+  )
+}
+
 export const CustomAuthProvidersList = () => {
   const { ref: projectRef } = useParams()
 
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: authConfig, isPending: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
-  const isCustomProvidersEnabled = true
-  const providerLimit = getCustomProviderLimit(organization?.plan?.id)
   const nextPlan = getNextPlanForCustomProviders(organization?.plan?.id)
-  // const isCustomProvidersEnabled = !!authConfig?.OAUTH_CUSTOM_PROVIDERS_ENABLED
-
-  console.log('authConfig', authConfig)
+  const isCustomProvidersEnabled = !!authConfig?.CUSTOM_OAUTH_ENABLED
+  const providerLimit = authConfig?.CUSTOM_OAUTH_MAX_PROVIDERS || 0
 
   const [newCustomProvider, setNewCustomProvider] = useState<
-    (CustomProvider & { client_secret?: string }) | undefined
+    (CustomOAuthProvider & { client_secret?: string }) | undefined
   >(undefined)
   const [selectedProviderToEdit, setSelectedProviderToEdit] = useState<string | null>(null)
   const [selectedProviderToDelete, setSelectedProviderToDelete] = useState<string | null>(null)
   const [filteredProviderTypes, setFilteredProviderTypes] = useState<string[]>([])
   const [filteredEnabledStatuses, setFilteredEnabledStatuses] = useState<string[]>([])
 
-  // Mock data - in real implementation this would come from API
-  const customProviders: any[] = useMemo(() => [], [])
-  const providerCount = customProviders.length
+  const {
+    data: customProviders,
+    isLoading: isPending,
+    isError,
+    error,
+  } = useOAuthCustomProvidersQuery({ projectRef })
+  const providerCount = customProviders?.length ?? 0
   const atProviderLimit = providerLimit !== Infinity && providerCount >= providerLimit
-  const isLoading = false
-  const isError = false
-  const error = null
 
   const [showCreateSheet, setShowCreateSheet] = useQueryState(
     'new',
@@ -99,7 +117,7 @@ export const CustomAuthProvidersList = () => {
     if (showCreateSheet && (!isCustomProvidersEnabled || atProviderLimit)) {
       setShowCreateSheet(false)
     }
-  }, [showCreateSheet, atProviderLimit, setShowCreateSheet])
+  }, [showCreateSheet, atProviderLimit, isCustomProvidersEnabled, setShowCreateSheet])
 
   const [filterString, setFilterString] = useState<string>('')
 
@@ -109,18 +127,18 @@ export const CustomAuthProvidersList = () => {
   )
 
   const providerToEdit = useMemo(
-    () => customProviders.find((p) => p.id === selectedProviderToEdit),
+    () => customProviders?.find((p) => p.id === selectedProviderToEdit),
     [customProviders, selectedProviderToEdit]
   )
 
   const providerToDelete = useMemo(
-    () => customProviders.find((p) => p.id === selectedProviderToDelete),
+    () => customProviders?.find((p) => p.id === selectedProviderToDelete),
     [customProviders, selectedProviderToDelete]
   )
 
   const filteredAndSortedCustomProviders = useMemo(() => {
     const filtered = filterCustomProviders({
-      providers: customProviders,
+      providers: customProviders ?? [],
       searchString: filterString,
       providerTypes: filteredProviderTypes,
       enabledStatuses: filteredEnabledStatuses,
@@ -182,8 +200,6 @@ export const CustomAuthProvidersList = () => {
   }
 
   const handleDeleteProvider = (_providerId: string) => {
-    // Mock implementation
-    toast.success('Provider deleted successfully')
     setSelectedProviderToDelete(null)
   }
 
@@ -192,21 +208,7 @@ export const CustomAuthProvidersList = () => {
   const isCreateOrUpdateSheetVisible = isCreateMode || isEditMode
   const canCreateProvider = isCustomProvidersEnabled && !atProviderLimit
 
-  const NewProviderButton = () => {
-    return (
-      <Button
-        type="primary"
-        disabled={!canCreateProvider}
-        icon={<Plus />}
-        onClick={() => setShowCreateSheet(true)}
-        className="flex-grow"
-      >
-        New Provider
-      </Button>
-    )
-  }
-
-  if (isAuthConfigLoading || (isCustomProvidersEnabled && isLoading)) {
+  if (isAuthConfigLoading || (isCustomProvidersEnabled && isPending)) {
     return <GenericSkeletonLoader />
   }
 
@@ -271,7 +273,10 @@ export const CustomAuthProvidersList = () => {
             {!isCustomProvidersEnabled || atProviderLimit ? (
               <HoverCard openDelay={0}>
                 <HoverCardTrigger>
-                  <NewProviderButton />
+                  <NewProviderButton
+                    canCreateProvider={canCreateProvider}
+                    setShowCreateSheet={setShowCreateSheet}
+                  />
                 </HoverCardTrigger>
                 <HoverCardContent
                   side="bottom"
@@ -292,7 +297,10 @@ export const CustomAuthProvidersList = () => {
                 </HoverCardContent>
               </HoverCard>
             ) : (
-              <NewProviderButton />
+              <NewProviderButton
+                canCreateProvider={canCreateProvider}
+                setShowCreateSheet={setShowCreateSheet}
+              />
             )}
           </div>
         </div>
@@ -420,9 +428,7 @@ export const CustomAuthProvidersList = () => {
       <DeleteCustomProviderModal
         visible={!!providerToDelete}
         selectedProvider={providerToDelete}
-        setVisible={setSelectedProviderToDelete}
-        onDelete={handleDeleteProvider}
-        isLoading={false}
+        onClose={() => setSelectedProviderToDelete(null)}
       />
     </>
   )

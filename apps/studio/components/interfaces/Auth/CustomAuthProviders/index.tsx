@@ -10,7 +10,7 @@ import {
 
 import { CustomAuthProvidersList } from './CustomAuthProvidersList'
 
-const CustomAuthProviders = () => {
+export const CustomAuthProviders = () => {
   return (
     <PageSection id="custom-providers">
       <PageSectionMeta>
@@ -30,5 +30,3 @@ const CustomAuthProviders = () => {
     </PageSection>
   )
 }
-
-export default CustomAuthProviders

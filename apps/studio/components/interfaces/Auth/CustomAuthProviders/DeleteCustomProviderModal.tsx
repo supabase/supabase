@@ -1,32 +1,44 @@
-import type { CustomProvider } from './customProviders.types'
+import type { CustomOAuthProvider } from '@supabase/auth-js'
+import { useParams } from 'common'
+import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useOAuthCustomProviderDeleteMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-delete-mutation'
 
 interface DeleteCustomProviderModalProps {
   visible: boolean
-  selectedProvider?: CustomProvider
-  setVisible: (value: string | null) => void
-  onDelete: (providerId: string) => void
-  isLoading: boolean
+  selectedProvider?: CustomOAuthProvider
+  onClose: () => void
 }
 
 export const DeleteCustomProviderModal = ({
   visible,
   selectedProvider,
-  setVisible,
-  onDelete,
-  isLoading,
+  onClose,
 }: DeleteCustomProviderModalProps) => {
-  const onConfirmDeleteProvider = () => {
-    if (selectedProvider) {
-      onDelete(selectedProvider.id)
-    }
+  const { ref: projectRef } = useParams()
+  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
+  const { mutate, isPending } = useOAuthCustomProviderDeleteMutation({
+    onSuccess: () => {
+      toast.success('Custom provider deleted successfully')
+      onClose()
+    },
+  })
+
+  const onConfirmDelete = () => {
+    mutate({
+      identifier: selectedProvider?.id,
+      projectRef,
+      clientEndpoint,
+    })
   }
 
   return (
     <ConfirmationModal
-      variant={'destructive'}
+      variant="destructive"
       size="medium"
-      loading={isLoading}
+      loading={isPending}
       visible={visible}
       title={
         <>
@@ -36,8 +48,8 @@ export const DeleteCustomProviderModal = ({
       }
       confirmLabel="Confirm delete"
       confirmLabelLoading="Deleting..."
-      onCancel={() => setVisible(null)}
-      onConfirm={() => onConfirmDeleteProvider()}
+      onCancel={() => onClose()}
+      onConfirm={() => onConfirmDelete()}
       alert={{
         title: 'This action cannot be undone',
         description:
@@ -49,9 +61,7 @@ export const DeleteCustomProviderModal = ({
         <li className="list-disc ml-6">
           Any users authenticating with this provider will lose access
         </li>
-        <li className="list-disc ml-6">
-          This provider is no longer in use by any applications
-        </li>
+        <li className="list-disc ml-6">This provider is no longer in use by any applications</li>
       </ul>
     </ConfirmationModal>
   )

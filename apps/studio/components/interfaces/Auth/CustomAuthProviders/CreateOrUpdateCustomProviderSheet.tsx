@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { CustomOAuthProvider } from '@supabase/auth-js'
 import { useParams } from 'common'
-import { FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useProjectApiUrl } from 'data/config/project-endpoint-query'
 import { X } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -33,12 +32,13 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import type { CustomProvider } from './customProviders.types'
+import { FormSectionLabel } from '@/components/ui/Forms/FormSection'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 interface CreateOrUpdateCustomProviderSheetProps {
   visible: boolean
-  providerToEdit?: CustomProvider
-  onSuccess: (provider: CustomProvider) => void
+  providerToEdit?: CustomOAuthProvider
+  onSuccess: (provider: CustomOAuthProvider) => void
   onCancel: () => void
 }
 
@@ -65,7 +65,7 @@ const FormSchema = z
     userinfo_url: z.union([z.string().url(), z.literal('')]).default(''),
     jwks_uri: z.union([z.string().url(), z.literal('')]).default(''),
     discovery_url: z.union([z.string().url(), z.literal('')]).default(''),
-    scopes: z.string(),
+    scopes: z.array(z.string()).default([]),
     callback_url: z.string().optional(), // Readonly display from project endpoint, not part of payload
   })
   .superRefine((data, ctx) => {
@@ -93,7 +93,7 @@ const initialValues = {
   userinfo_url: '',
   jwks_uri: '',
   discovery_url: '',
-  scopes: '',
+  scopes: [],
   client_id: '',
   client_secret: '',
   email_optional: false,
@@ -149,7 +149,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
           userinfo_url: providerToEdit.userinfo_url,
           jwks_uri: providerToEdit.jwks_uri,
           discovery_url: providerToEdit.discovery_url,
-          scopes: providerToEdit.scopes,
+          scopes: providerToEdit.scopes || [],
         })
       } else {
         form.reset(initialValues)
@@ -197,13 +197,13 @@ export const CreateOrUpdateCustomProviderSheet = ({
     }
 
     // Mock implementation - in real app this would call the API
-    const mockProvider: CustomProvider = {
+    const mockProvider: CustomOAuthProvider = {
       id: providerToEdit?.id || `mock-${Date.now()}`,
       provider_type: data.provider_type,
       identifier,
       name: data.name,
       client_id: isEditMode ? (data.client_id ?? '').trim() : '',
-      scopes: data.scopes || '',
+      scopes: data.scopes || [],
       issuer: data.issuer,
       pkce_enabled: true,
       enabled: true,

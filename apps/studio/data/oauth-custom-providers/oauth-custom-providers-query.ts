@@ -28,7 +28,11 @@ export async function getOAuthCustomProviders({
   if (error) {
     let newError = error
     console.log(newError)
-    if (newError.status === 404) {
+    if (
+      newError.message.startsWith(
+        'AuthUnknownError: JSON.parse: unexpected non-whitespace character'
+      )
+    ) {
       newError = new AuthError('Custom providers are not enabled for this project')
     }
     handleError(newError)

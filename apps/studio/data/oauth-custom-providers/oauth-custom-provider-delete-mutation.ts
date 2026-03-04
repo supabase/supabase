@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { useAuthConfigQuery } from '../auth/auth-config-query'
+import { useProjectApiUrl } from '../config/project-endpoint-query'
+import { oAuthCustomProvidersKeys } from './keys'
 import { handleError } from '@/data/fetchers'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
-
-import { oAuthCustomProvidersKeys } from './keys'
 
 export type OAuthCustomProviderDeleteVariables = {
   identifier: string | undefined
@@ -23,7 +24,7 @@ export async function deleteOAuthCustomProvider({
   if (!identifier) throw new Error('Provider identifier is required')
 
   const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
-  const { data, error } = await supabaseClient.auth.admin.customProviders.deleteProvider(identifier)
+  const { error } = await supabaseClient.auth.admin.customProviders.deleteProvider(identifier)
 
   if (error) handleError(error)
   return null

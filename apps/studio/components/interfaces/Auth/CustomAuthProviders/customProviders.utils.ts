@@ -1,10 +1,4 @@
-import type { CustomProvider } from './customProviders.types'
-
-export function getCustomProviderLimit(planId: string | undefined): number {
-  if (planId === 'free') return 3
-  if (planId === 'pro') return 10
-  return Infinity
-}
+import type { CustomOAuthProvider } from '@supabase/auth-js'
 
 /** Next plan to upgrade to for more custom providers: Free → Pro, Pro → Team */
 export function getNextPlanForCustomProviders(planId: string | undefined): 'Pro' | 'Team' | null {
@@ -42,7 +36,7 @@ export function filterCustomProviders({
   providerTypes,
   enabledStatuses,
 }: {
-  providers: CustomProvider[]
+  providers: CustomOAuthProvider[]
   searchString: string
   providerTypes: string[]
   enabledStatuses: string[]
