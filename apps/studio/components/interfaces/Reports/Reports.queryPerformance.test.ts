@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { PRESET_CONFIG } from './Reports.constants'
 import { Presets } from './Reports.types'
 
@@ -32,18 +33,20 @@ describe('QUERY_PERFORMANCE SQL queries', () => {
   describe('WHERE clause composition with user filters', () => {
     const userWhere = "WHERE auth.rolname in ('postgres')"
 
-    it.each(['mostFrequentlyInvoked', 'mostTimeConsuming', 'slowestExecutionTime', 'unified'] as const)(
-      '%s: user filters appended with AND (no duplicate WHERE)',
-      (name) => {
-        const sql = queries[name].sql([], userWhere, undefined)
-        // Should not have two WHERE keywords in a row / duplicate WHERE
-        expect(sql).not.toMatch(/WHERE\s+.*WHERE/s)
-        // User filter condition should be present
-        expect(sql).toContain("auth.rolname in ('postgres')")
-        // Should use AND to join base filter and user filter
-        expect(sql).toMatch(/calls > 0\s+AND/)
-      }
-    )
+    it.each([
+      'mostFrequentlyInvoked',
+      'mostTimeConsuming',
+      'slowestExecutionTime',
+      'unified',
+    ] as const)('%s: user filters appended with AND (no duplicate WHERE)', (name) => {
+      const sql = queries[name].sql([], userWhere, undefined)
+      // Should not have two WHERE keywords in a row / duplicate WHERE
+      expect(sql).not.toMatch(/WHERE\s+.*WHERE/s)
+      // User filter condition should be present
+      expect(sql).toContain("auth.rolname in ('postgres')")
+      // Should use AND to join base filter and user filter
+      expect(sql).toMatch(/calls > 0\s+AND/)
+    })
 
     it('queryMetrics: user filters appended with AND (no duplicate WHERE in FROM clause)', () => {
       const sql = queries.queryMetrics.sql([], userWhere, undefined)
@@ -55,15 +58,18 @@ describe('QUERY_PERFORMANCE SQL queries', () => {
       expect(sql).not.toMatch(/FROM[\s\S]*WHERE[\s\S]*WHERE[\s\S]*WHERE/s)
     })
 
-    it.each(['mostFrequentlyInvoked', 'mostTimeConsuming', 'slowestExecutionTime', 'unified', 'queryMetrics'] as const)(
-      '%s: no trailing junk when no user filters',
-      (name) => {
-        const sql = queries[name].sql([], undefined, undefined)
-        // Should not have a dangling undefined or 'WHERE' with nothing after the base filter
-        expect(sql).not.toContain('undefined')
-        expect(sql).not.toMatch(/calls > 0\s+AND\s+(ORDER|LIMIT|$)/im)
-      }
-    )
+    it.each([
+      'mostFrequentlyInvoked',
+      'mostTimeConsuming',
+      'slowestExecutionTime',
+      'unified',
+      'queryMetrics',
+    ] as const)('%s: no trailing junk when no user filters', (name) => {
+      const sql = queries[name].sql([], undefined, undefined)
+      // Should not have a dangling undefined or 'WHERE' with nothing after the base filter
+      expect(sql).not.toContain('undefined')
+      expect(sql).not.toMatch(/calls > 0\s+AND\s+(ORDER|LIMIT|$)/im)
+    })
   })
 
   describe('slowQueriesCount bug fix', () => {
