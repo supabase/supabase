@@ -1,6 +1,8 @@
 'use client'
 
+import { Check, Copy, ExternalLink } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 import { isFeatureEnabled } from 'common'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
@@ -15,7 +17,73 @@ interface TOCHeader {
   level: number
 }
 
-const GuidesTableOfContents = ({ className, video }: { className?: string; video?: string }) => {
+function AiTools({ className }: { className?: string }) {
+  const [copied, setCopied] = useState(false)
+  const url = window.location
+
+  async function copyMarkdown() {
+    const mdUrl = `${url}.md`
+    console.log(mdUrl)
+    try {
+      const res = await fetch(mdUrl)
+      const text = await res.text()
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (e) {
+      console.error('Failed to copy markdown', e)
+    }
+  }
+
+  return (
+    <section className={cn(className)} aria-labelledby="ask-ai-title">
+      <h3 id="ask-ai-title" className="block font-mono uppercase text-xs text-foreground-light mb-3">
+        AI Tools
+      </h3>
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={copyMarkdown}
+          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
+        >
+          {copied ? (
+            <Check size={14} strokeWidth={1.5} className="text-brand" />
+          ) : (
+            <Copy size={14} strokeWidth={1.5} />
+          )}
+          {copied ? 'Copied!' : 'Copy as Markdown'}
+        </button>
+        <a
+          href={`https://chatgpt.com/?hint=search&q=Read from ${url} so I can ask questions about its contents`}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+        >
+          <ExternalLink size={14} strokeWidth={1.5} />
+          Ask ChatGPT
+        </a>
+        <a
+          href={`https://claude.ai/new?q=Read from ${url} so I can ask questions about its contents`}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+        >
+          <ExternalLink size={14} strokeWidth={1.5} />
+          Ask Claude
+        </a>
+      </div>
+    </section>
+  )
+}
+
+const GuidesSidebar = ({
+  className,
+  video,
+  hideToc,
+}: {
+  className?: string
+  video?: string
+  hideToc?: boolean
+}) => {
   const pathname = usePathname()
   const { toc } = useTocAnchors()
 
@@ -36,7 +104,10 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
             <Feedback key={pathname} />
           </div>
         )}
-        {toc.length !== 0 && (
+        <div className="pl-5">
+          <AiTools key={pathname} />
+        </div>
+        {!hideToc && toc.length !== 0 && (
           <Toc className="-ml-[calc(0.25rem+6px)]">
             <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
               On this page
@@ -51,5 +122,6 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
   )
 }
 
-export default GuidesTableOfContents
+export default GuidesSidebar
+export { GuidesSidebar }
 export type { TOCHeader }
