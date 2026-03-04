@@ -270,7 +270,9 @@ export const LogTable = ({
     }
   }
 
-  columns = [checkboxColumn, ...columns]
+  if (columns.length > 0) {
+    columns = [checkboxColumn, ...columns]
+  }
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
     (key, props) => {
