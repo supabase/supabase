@@ -40,5 +40,10 @@ const scorers = [
 const project = braintrust.projects.create({ id: projectId })
 
 for (const { slug, name, handler } of scorers) {
-  project.scorers.create({ slug: `${prefix}${slug}`, name: `${namePrefix}${name}`, handler, ifExists: 'replace' })
+  project.scorers.create({
+    slug: `${prefix}${slug}`,
+    name: `${namePrefix}${name}`,
+    handler,
+    ifExists: 'replace',
+  })
 }
