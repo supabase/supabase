@@ -1,20 +1,20 @@
+import { ACCESS_TOKEN_RESOURCES } from 'components/interfaces/Account/AccessTokens/AccessToken.constants'
+import { formatAccessText } from 'components/interfaces/Account/AccessTokens/AccessToken.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { ChevronDown, RotateCcw, X } from 'lucide-react'
 import { Path, PathValue } from 'react-hook-form'
-import { ChevronDown } from 'lucide-react'
 import {
   Button,
+  Checkbox_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Checkbox_Shadcn_,
   WarningIcon,
 } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { X, RotateCcw } from 'lucide-react'
-import { ACCESS_TOKEN_RESOURCES } from '../../../AccessToken.constants'
+
+import { PermissionResourceSelector } from './PermissionResourceSelector'
 import { PermissionRow, PermissionsFormValues, PermissionsProps } from './Permissions.types'
 import { sortActions } from './Permissions.utils'
-import { formatAccessText } from '../../../AccessToken.utils'
-import { PermissionResourceSelector } from './PermissionResourceSelector'
 
 export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({
   setValue,

@@ -1,32 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { indexOf } from 'lodash'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -34,10 +19,8 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Skeleton,
-  Switch,
-  WarningIcon,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -50,32 +33,25 @@ import {
 import { z } from 'zod'
 
 import { HardenAPIModal } from './HardenAPIModal'
+import { FormActions } from '@/components/ui/Forms/FormActions'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-const formSchema = z
-  .object({
-    dbSchema: z.array(z.string()),
-    dbExtraSearchPath: z.array(z.string()),
-    maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
-    dbPool: z
-      .number()
-      .min(0, 'Must be more than 0')
-      .max(1000, "Can't be more than 1000")
-      .optional()
-      .nullable(),
-    enableDataApi: z.boolean(),
-  })
-  .refine(
-    (data) => {
-      if (data.enableDataApi && data.dbSchema.length === 0) {
-        return false
-      }
-      return true
-    },
-    {
-      message: 'Must have at least one schema if Data API is enabled',
-      path: ['dbSchema'],
-    }
-  )
+const formSchema = z.object({
+  dbSchema: z.array(z.string()),
+  dbExtraSearchPath: z.array(z.string()),
+  maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
+  dbPool: z
+    .number()
+    .min(0, 'Must be more than 0')
+    .max(1000, "Can't be more than 1000")
+    .optional()
+    .nullable(),
+})
 
 export const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
@@ -128,16 +104,18 @@ export const PostgrestConfig = () => {
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
-  const dbSchema = config?.db_schema ? config?.db_schema.split(',').map((x) => x.trim()) : []
-  const defaultValues = {
-    dbSchema,
-    maxRows: config?.max_rows,
-    dbExtraSearchPath: (config?.db_extra_search_path ?? '')
-      .split(',')
-      .map((x) => x.trim())
-      .filter((x) => x.length > 0 && allSchemas.find((y) => y.name === x)),
-    dbPool: config?.db_pool,
-  }
+  const defaultValues = useMemo(() => {
+    const dbSchema = config?.db_schema ? config?.db_schema.split(',').map((x) => x.trim()) : []
+    return {
+      dbSchema,
+      maxRows: config?.max_rows,
+      dbExtraSearchPath: (config?.db_extra_search_path ?? '')
+        .split(',')
+        .map((x) => x.trim())
+        .filter((x) => x.length > 0 && allSchemas.find((y) => y.name === x)),
+      dbPool: config?.db_pool,
+    }
+  }, [config, allSchemas])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -160,10 +138,9 @@ export const PostgrestConfig = () => {
         }
       }) ?? []
 
-  function resetForm() {
-    const enableDataApi = config?.db_schema ? true : false
-    form.reset({ ...defaultValues, enableDataApi })
-  }
+  const resetForm = useCallback(() => {
+    form.reset({ ...defaultValues })
+  }, [form, defaultValues])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!projectRef) return console.error('Project ref is required') // is this needed ?
@@ -179,91 +156,26 @@ export const PostgrestConfig = () => {
 
   useEffect(() => {
     if (config && isSuccessSchemas) {
-      /**
-       * Checks if enableDataApi should be enabled or disabled
-       * based on the db_schema value being empty string
-       */
       resetForm()
     }
-  }, [config, isSuccessSchemas])
-
-  const isDataApiEnabledInForm = form.getValues('enableDataApi')
+  }, [config, isSuccessSchemas, resetForm])
 
   return (
-    <Card id="postgrest-config">
-      <CardHeader className="flex-row items-center justify-between">
-        Data API Settings
-        <div className="flex items-center gap-x-2">
-          <DocsButton href={`${DOCS_URL}/guides/database/connecting-to-postgres#data-apis`} />
-          <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
-            Harden Data API
-          </Button>
-        </div>
-      </CardHeader>
-      <Form_Shadcn_ {...form}>
-        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-          {isLoading ? (
-            <CardContent>
-              <GenericSkeletonLoader />
-            </CardContent>
-          ) : isError ? (
-            <CardContent>
-              <Admonition type="destructive" title="Failed to retrieve API settings" />
-            </CardContent>
-          ) : (
-            <>
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="enableDataApi"
-                  render={({ field }) => (
-                    <FormItem_Shadcn_ className="space-y-4">
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Enable Data API"
-                        description="When enabled you will be able to use any Supabase client library and PostgREST endpoints with any schema configured below."
-                      >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            size="large"
-                            disabled={!canUpdatePostgrestConfig}
-                            checked={field.value}
-                            onCheckedChange={(value) => {
-                              field.onChange(value)
-                              if (!value) {
-                                form.setValue('enableDataApi', false)
-                                form.setValue('dbSchema', [])
-                              } else {
-                                form.setValue('enableDataApi', true)
-                                form.setValue('dbSchema', dbSchema)
-                              }
-                            }}
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-
-                      {!field.value && (
-                        <Alert_Shadcn_ variant="warning">
-                          <WarningIcon />
-                          <AlertTitle_Shadcn_>No schemas can be queried</AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
-                            <p>
-                              With this setting disabled, you will not be able to query any schemas
-                              via the Data API.
-                            </p>
-                            <p>
-                              You will see errors from the Postgrest endpoint
-                              <code className="text-code-inline">/rest/v1/</code>.
-                            </p>
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      )}
-                    </FormItem_Shadcn_>
-                  )}
-                />
-              </CardContent>
-              <Collapsible_Shadcn_ open={form.getValues('enableDataApi')}>
-                <CollapsibleContent_Shadcn_ className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+    <PageSection id="postgrest-config" className="first:pt-0">
+      <PageSectionContent>
+        <Card className="mb-4">
+          <Form_Shadcn_ {...form}>
+            <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+              {isLoading ? (
+                <CardContent>
+                  <GenericSkeletonLoader />
+                </CardContent>
+              ) : isError ? (
+                <CardContent>
+                  <Admonition type="destructive" title="Failed to retrieve API settings" />
+                </CardContent>
+              ) : (
+                <>
                   <CardContent>
                     <FormField_Shadcn_
                       control={form.control}
@@ -285,7 +197,7 @@ export const PostgrestConfig = () => {
                                 onValuesChange={field.onChange}
                                 values={field.value}
                                 size="small"
-                                disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                                disabled={!canUpdatePostgrestConfig}
                               >
                                 <MultiSelectorTrigger
                                   mode="inline-combobox"
@@ -366,7 +278,7 @@ export const PostgrestConfig = () => {
                                 onValuesChange={field.onChange}
                                 values={field.value}
                                 size="small"
-                                disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                                disabled={!canUpdatePostgrestConfig}
                               >
                                 <MultiSelectorTrigger
                                   mode="inline-combobox"
@@ -412,7 +324,7 @@ export const PostgrestConfig = () => {
                               <PrePostTab postTab="rows">
                                 <Input_Shadcn_
                                   size="small"
-                                  disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                                  disabled={!canUpdatePostgrestConfig}
                                   {...field}
                                   type="number"
                                   onChange={(e) => field.onChange(Number(e.target.value))}
@@ -439,7 +351,7 @@ export const PostgrestConfig = () => {
                               <PrePostTab postTab="connections">
                                 <Input_Shadcn_
                                   size="small"
-                                  disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                                  disabled={!canUpdatePostgrestConfig}
                                   {...field}
                                   type="number"
                                   placeholder="Configured automatically"
@@ -457,28 +369,44 @@ export const PostgrestConfig = () => {
                       )}
                     />
                   </CardContent>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
-            </>
-          )}
-        </form>
-      </Form_Shadcn_>
-      <CardFooter className="border-t">
-        <FormActions
-          form={formId}
-          isSubmitting={isUpdating}
-          hasChanges={form.formState.isDirty}
-          handleReset={resetForm}
-          disabled={!canUpdatePostgrestConfig}
-          helper={
-            isPermissionsLoaded && !canUpdatePostgrestConfig
-              ? "You need additional permissions to update your project's API settings"
-              : undefined
-          }
-        />
-      </CardFooter>
+                </>
+              )}
+            </form>
+          </Form_Shadcn_>
+          <CardFooter className="border-t">
+            <FormActions
+              form={formId}
+              isSubmitting={isUpdating}
+              hasChanges={form.formState.isDirty}
+              handleReset={resetForm}
+              disabled={!canUpdatePostgrestConfig}
+              helper={
+                isPermissionsLoaded && !canUpdatePostgrestConfig
+                  ? "You need additional permissions to update your project's API settings"
+                  : undefined
+              }
+            />
+          </CardFooter>
+        </Card>
+        <Card className="mb-4">
+          <CardContent>
+            <FormItemLayout
+              isReactForm={false}
+              layout="flex-row-reverse"
+              label="Harden Data API"
+              description="Expose a custom schema instead of the public schema"
+            >
+              <div className="flex gap-2 items-center justify-end">
+                <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
+                  Harden Data API
+                </Button>
+              </div>
+            </FormItemLayout>
+          </CardContent>
+        </Card>
+      </PageSectionContent>
 
       <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />
-    </Card>
+    </PageSection>
   )
 }

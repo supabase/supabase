@@ -1,4 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { compact, isEqual, noop } from 'lodash'
 import {
   Check,
@@ -15,11 +19,6 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -34,6 +33,7 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
+
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 
 const VIEW_OPTIONS = [
@@ -457,6 +457,7 @@ export const FileExplorerHeader = ({
               icon={<Search />}
               actions={[
                 <Button
+                  key="cancel"
                   size="tiny"
                   type="text"
                   icon={<X />}

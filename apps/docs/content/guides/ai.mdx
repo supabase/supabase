@@ -31,7 +31,7 @@ Check out all of the AI [templates and examples](https://github.com/supabase/sup
 {/* <!-- vale off --> */}
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {examples.map((x) => (
+  {aiExamples.map((x) => (
     <div className="col-span-4" key={x.href}>
       <Link href={x.href} passHref>
         <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
@@ -42,40 +42,6 @@ Check out all of the AI [templates and examples](https://github.com/supabase/sup
   ))}
 </div>
 
-export const examples = [
-  {
-    name: 'Headless Vector Search',
-    description: 'A toolkit to perform vector similarity search on your knowledge base embeddings.',
-    href: '/guides/ai/examples/headless-vector-search',
-  },
-  {
-    name: 'Image Search with OpenAI CLIP',
-    description: 'Implement image search with the OpenAI CLIP Model and Supabase Vector.',
-    href: '/guides/ai/examples/image-search-openai-clip',
-  },
-  {
-    name: 'Hugging Face inference',
-    description: 'Generate image captions using Hugging Face.',
-    href: '/guides/ai/examples/huggingface-image-captioning',
-  },
-  {
-    name: 'OpenAI completions',
-    description: 'Generate GPT text completions using OpenAI in Edge Functions.',
-    href: '/guides/ai/examples/openai',
-  },
-  {
-    name: 'Building ChatGPT Plugins',
-    description: 'Use Supabase as a Retrieval Store for your ChatGPT plugin.',
-    href: '/guides/ai/examples/building-chatgpt-plugins',
-  },
-  {
-    name: 'Vector search with Next.js and OpenAI',
-    description:
-      'Learn how to build a ChatGPT-style doc search powered by Next.js, OpenAI, and Supabase.',
-    href: '/guides/ai/examples/nextjs-vector-search',
-  },
-]
-
 {/* <!-- vale on --> */}
 
 ## Integrations
@@ -83,7 +49,7 @@ export const examples = [
 {/* <!-- vale off --> */}
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {integrations.map((x) => (
+  {aiIntegrations.map((x) => (
     <div className="col-span-4" key={x.href}>
       <Link href={x.href} passHref>
         <GlassPanel title={x.name}>{x.description}</GlassPanel>
@@ -91,38 +57,6 @@ export const examples = [
     </div>
   ))}
 </div>
-
-export const integrations = [
-  {
-    name: 'OpenAI',
-    description:
-      'OpenAI is an AI research and deployment company. Supabase provides a simple way to use OpenAI in your applications.',
-    href: '/guides/ai/examples/building-chatgpt-plugins',
-  },
-  {
-    name: 'Amazon Bedrock',
-    description:
-      'A fully managed service that offers a choice of high-performing foundation models from leading AI companies.',
-    href: '/guides/ai/integrations/amazon-bedrock',
-  },
-  {
-    name: 'Hugging Face',
-    description:
-      "Hugging Face is an open-source provider of NLP technologies. Supabase provides a simple way to use Hugging Face's models in your applications.",
-    href: '/guides/ai/hugging-face',
-  },
-  {
-    name: 'LangChain',
-    description:
-      'LangChain is a language-agnostic, open-source, and self-hosted API for text translation, summarization, and sentiment analysis.',
-    href: '/guides/ai/langchain',
-  },
-  {
-    name: 'LlamaIndex',
-    description: 'LlamaIndex is a data framework for your LLM applications.',
-    href: '/guides/ai/integrations/llamaindex',
-  },
-]
 
 {/* <!-- vale on --> */}
 

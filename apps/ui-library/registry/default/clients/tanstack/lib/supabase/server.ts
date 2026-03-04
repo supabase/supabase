@@ -1,14 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
-import { parseCookies, setCookie } from '@tanstack/react-start/server'
+import { getCookies, setCookie } from '@tanstack/react-start/server'
 
 export function createClient() {
   return createServerClient(
     process.env.VITE_SUPABASE_URL!,
-    process.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
-          return Object.entries(parseCookies()).map(
+          return Object.entries(getCookies()).map(
             ([name, value]) =>
               ({
                 name,

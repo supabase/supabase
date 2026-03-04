@@ -1,10 +1,11 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
@@ -40,7 +41,6 @@ const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
 
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()
@@ -135,7 +135,7 @@ const IntegrationPage: NextPageWithLayout = () => {
     return null
   }
 
-  if (id === 'stripe_sync_engine' && !stripeSyncEnabled) {
+  if (id === 'data_api' && !IS_PLATFORM) {
     return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
   }
 

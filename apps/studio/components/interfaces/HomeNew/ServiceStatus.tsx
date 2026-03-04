@@ -1,22 +1,22 @@
-import dayjs from 'dayjs'
-import { ChevronRight, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
+import dayjs from 'dayjs'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { InfoIcon, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
+import { ChevronRight, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { cn, InfoIcon, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+
 import {
+  extractDbSchema,
   ProjectServiceStatus,
   StatusIcon,
   StatusMessage,
-  extractDbSchema,
 } from '../Home/ServiceStatus'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
@@ -224,10 +224,11 @@ export const ServiceStatus = () => {
         currentBranch?.status === 'RUNNING_MIGRATIONS' ||
         isMigrationLoading))
 
+  const isProjectComingUp = ['COMING_UP', 'UNKNOWN'].includes(project?.status ?? '')
+
   const anyUnhealthy = services.some((service) => service.status === 'UNHEALTHY')
-  const anyComingUp = services.some((service) => service.status === 'COMING_UP')
-  // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
-  const showSpinnerIcon = project?.status === 'COMING_UP'
+  const anyComingUp =
+    isProjectComingUp || services.some((service) => service.status === 'COMING_UP')
 
   const getOverallStatusLabel = (): string => {
     if (isLoadingChecks) return 'Checking...'
@@ -243,7 +244,8 @@ export const ServiceStatus = () => {
       <PopoverTrigger_Shadcn_>
         <SingleStat
           icon={
-            showSpinnerIcon ? (
+            // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
+            isProjectComingUp ? (
               <Loader2 className="animate-spin" size={18} />
             ) : (
               <div className="grid grid-cols-3 gap-1">
@@ -288,7 +290,11 @@ export const ServiceStatus = () => {
                   <StatusMessage
                     isLoading={service.isLoading}
                     isProjectNew={isProjectNew}
-                    status={service.status}
+                    status={
+                      isProjectComingUp && service.status === 'UNHEALTHY'
+                        ? 'COMING_UP'
+                        : service.status
+                    }
                   />
                 </p>
               </div>

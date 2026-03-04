@@ -1,17 +1,17 @@
+import { useParams } from 'common'
+import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { ExternalLink, Settings } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
+
 import { APIKeys } from './APIKeys'
 import { GetStartedHero } from './GetStartedHero'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export const NewProjectPanel = () => {
   const { ref } = useParams()
@@ -222,7 +222,7 @@ export const NewProjectPanel = () => {
           </div>
           <div className="flex items-center space-x-2">
             <Button asChild type="default" icon={<Settings size={16} strokeWidth={1.5} />}>
-              <Link href={`/project/${ref}/settings/api`}>API settings</Link>
+              <Link href={`/project/${ref}/settings/api-keys`}>API Keys settings</Link>
             </Button>
             <DocsButton href={`${DOCS_URL}/guides/database/api`} />
           </div>

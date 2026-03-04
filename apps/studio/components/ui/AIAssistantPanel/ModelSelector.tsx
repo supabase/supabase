@@ -1,7 +1,5 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useState } from 'react'
-
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useRouter } from 'next/router'
 import {
@@ -18,6 +16,7 @@ import {
   TooltipTrigger,
   Tooltip,
 } from 'ui'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 interface ModelSelectorProps {
   selectedModel: 'gpt-5' | 'gpt-5-mini'
@@ -27,16 +26,17 @@ interface ModelSelectorProps {
 export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorProps) => {
   const router = useRouter()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('assistant.advance_model')
 
   const [open, setOpen] = useState(false)
 
-  const canAccessProModels = organization?.plan?.id !== 'free'
   const slug = organization?.slug ?? '_'
 
   const upgradeHref = `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=ai-assistant-model`
 
   const handleSelectModel = (model: 'gpt-5' | 'gpt-5-mini') => {
-    if (model === 'gpt-5' && !canAccessProModels) {
+    if (model === 'gpt-5' && !hasAccessToAdvanceModel) {
       setOpen(false)
       void router.push(upgradeHref)
       return
@@ -75,7 +75,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                 className="flex justify-between"
               >
                 <span>gpt-5</span>
-                {canAccessProModels ? (
+                {hasAccessToAdvanceModel ? (
                   selectedModel === 'gpt-5' ? (
                     <Check className="h-3.5 w-3.5" />
                   ) : null

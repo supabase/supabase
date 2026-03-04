@@ -1,13 +1,12 @@
-import dayjs from 'dayjs'
-import { ArrowUpDown, X } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import dayjs from 'dayjs'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { ArrowUpDown, X } from 'lucide-react'
 import Link from 'next/link'
+import { useMemo } from 'react'
 import {
   Badge,
   Button,
@@ -16,11 +15,11 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Select_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -37,6 +36,7 @@ export type ChartConfig = {
   yKey: string
   showLabels?: boolean
   showGrid?: boolean
+  logScale?: boolean
 }
 
 const getCumulativeResults = (results: Results, config: ChartConfig) => {
@@ -132,10 +132,10 @@ export const ChartConfig = ({
   }
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
-      <ResizablePanel className="p-4 h-full" defaultSize={75}>
+    <ResizablePanelGroup orientation="horizontal" className="flex-grow h-full">
+      <ResizablePanel className="p-4 h-full" defaultSize="75">
         {!hasConfig ? (
-          <ResizablePanel className="p-4 h-full" defaultSize={75}>
+          <ResizablePanel className="p-4 h-full" defaultSize="75">
             <NoDataPlaceholder
               size="normal"
               title="Configure your chart"
@@ -173,8 +173,8 @@ export const ChartConfig = ({
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel
-        defaultSize={25}
-        minSize={15}
+        defaultSize="25"
+        minSize="15"
         className="px-3 py-3 space-y-4 !overflow-y-auto"
       >
         <div className="flex justify-between items-center h-5">

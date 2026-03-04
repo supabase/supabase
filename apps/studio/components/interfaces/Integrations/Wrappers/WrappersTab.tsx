@@ -1,16 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { HTMLProps, ReactNode, useCallback, useState } from 'react'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { HTMLProps, ReactNode, useCallback, useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { CreateWrapperSheet } from './CreateWrapperSheet'
-import DeleteWrapperModal from './DeleteWrapperModal'
 import { WRAPPERS } from './Wrappers.constants'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import { WrapperTable } from './WrapperTable'
@@ -18,7 +17,6 @@ import { WrapperTable } from './WrapperTable'
 export const WrappersTab = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [selectedWrapperForDelete, setSelectedWrapperForDelete] = useState<FDW | null>(null)
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
 
   const { can: canCreateWrapper } = useAsyncCheckPermissions(
@@ -104,12 +102,6 @@ export const WrappersTab = () => {
   return (
     <Container>
       <WrapperTable />
-      {selectedWrapperForDelete && (
-        <DeleteWrapperModal
-          selectedWrapper={selectedWrapperForDelete}
-          onClose={() => setSelectedWrapperForDelete(null)}
-        />
-      )}
       <CloseConfirmationModal {...closeConfirmationModalProps} />
     </Container>
   )

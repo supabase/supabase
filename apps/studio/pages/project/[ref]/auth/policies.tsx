@@ -1,10 +1,5 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Search, X } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
@@ -17,8 +12,7 @@ import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from 'components/ui/AlertError'
 import { BannerRlsEventTrigger } from 'components/ui/BannerStack/Banners/BannerRlsEventTrigger'
-import { BannerStack } from 'components/ui/BannerStack/BannerStack'
-import { BannerStackProvider, useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
+import { useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { SchemaSelector } from 'components/ui/SchemaSelector'
@@ -30,6 +24,10 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { Search, X } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
@@ -369,10 +367,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
 AuthPoliciesPage.getLayout = (page) => (
   <DefaultLayout>
-    <BannerStackProvider>
-      <AuthLayout>{page}</AuthLayout>
-      <BannerStack />
-    </BannerStackProvider>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 

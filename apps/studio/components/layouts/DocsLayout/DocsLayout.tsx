@@ -11,7 +11,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
 import { ProjectLayout } from '../ProjectLayout'
-import { generateDocsMenu } from './DocsLayout.utils'
+import { generateDocsMenu, getActivePage } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
@@ -34,8 +34,11 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
 
     const { page, rpc, resource } = router.query
-    if (!page && !resource && !rpc) return 'introduction'
-    return (page || rpc || resource || '') as string
+    return getActivePage({
+      page: page as string | undefined,
+      resource: resource as string | undefined,
+      rpc: rpc as string | undefined,
+    })
   }
 
   if (error) {

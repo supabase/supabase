@@ -1,14 +1,13 @@
 import parser from 'cron-parser'
+import { useDatabaseCronJobRunCommandMutation } from 'data/database-cron-jobs/database-cron-job-run-mutation'
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import dayjs from 'dayjs'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Copy, Edit, Minus, MoreVertical, Play, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useDatabaseCronJobRunCommandMutation } from 'data/database-cron-jobs/database-cron-job-run-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   Button,
@@ -150,7 +149,7 @@ export const CronJobTableCell = ({
               onClick={(e) => e.stopPropagation()}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-60 space-y-1">
+          <DropdownMenuContent align="end" className="w-44 space-y-1">
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <DropdownMenuItem

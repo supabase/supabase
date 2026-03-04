@@ -15,7 +15,7 @@ export const ConnectButton = ({ buttonType = 'default' }: ConnectButtonProps) =>
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const [_, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   return (
     <ButtonTooltip

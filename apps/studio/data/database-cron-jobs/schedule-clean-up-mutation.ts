@@ -6,7 +6,7 @@ import type { ResponseError, UseCustomMutationOptions } from 'types'
 import {
   getScheduleDeleteCronJobRunDetailsKey,
   getScheduleDeleteCronJobRunDetailsSql,
-} from '../sql/queries/delete-cron-job-run-details'
+} from './database-cron-jobs.sql'
 
 export type ScheduleCronJobRunDetailsCleanupVariables = {
   projectRef: string

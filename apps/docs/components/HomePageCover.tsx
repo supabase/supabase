@@ -60,7 +60,7 @@ const HomePageCover = (props) => {
       tooltip: 'TanStack Start',
       icon: '/docs/img/icons/tanstack-icon',
       href: '/guides/getting-started/quickstarts/tanstack',
-      hasLightIcon: false,
+      hasLightIcon: true,
     },
     {
       tooltip: 'Vue',

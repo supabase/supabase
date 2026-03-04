@@ -1,5 +1,4 @@
-import { ActiveInput } from './hooks'
-import { FilterBarAction, FilterGroup, FilterProperty } from './types'
+import { ActiveInputState, FilterBarAction, FilterGroup, FilterProperty, MenuItem } from './types'
 import {
   findConditionByPath,
   isCustomOptionObject,
@@ -7,19 +6,8 @@ import {
   isFilterOptionObject,
 } from './utils'
 
-export type MenuItem = {
-  value: string
-  label: string
-  icon?: React.ReactNode
-  isCustom?: boolean
-  customOption?: (props: any) => React.ReactElement
-  isAction?: boolean
-  action?: FilterBarAction
-  actionInputValue?: string
-}
-
 export function buildOperatorItems(
-  activeInput: Extract<ActiveInput, { type: 'operator' }> | null,
+  activeInput: Extract<ActiveInputState, { type: 'operator' }> | null,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
   hasTypedSinceFocus: boolean = true
@@ -46,9 +34,14 @@ export function buildOperatorItems(
     })
     .map((op) => {
       if (isFilterOperatorObject(op)) {
-        return { value: op.value, label: `${op.label} (${op.value})` }
+        return {
+          value: op.value,
+          label: op.label,
+          group: op.group,
+          operatorSymbol: op.value,
+        }
       }
-      return { value: op, label: op }
+      return { value: op, label: op, operatorSymbol: op }
     })
 }
 
@@ -89,7 +82,7 @@ export function buildPropertyItems(params: {
 }
 
 export function buildValueItems(
-  activeInput: Extract<ActiveInput, { type: 'value' }> | null,
+  activeInput: Extract<ActiveInputState, { type: 'value' }> | null,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
   propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>,

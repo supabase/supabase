@@ -217,6 +217,10 @@ const AddNewSecretForm = () => {
                           <Input
                             {...field}
                             placeholder="e.g. CLIENT_KEY"
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            data-bwignore
                             onPaste={(e) => handlePaste(e.nativeEvent)}
                           />
                         </FormControl_Shadcn_>

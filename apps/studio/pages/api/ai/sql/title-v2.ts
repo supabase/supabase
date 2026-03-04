@@ -1,10 +1,9 @@
 import { generateObject } from 'ai'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 const titleSchema = z.object({
   title: z
@@ -39,7 +38,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { model, error: modelError } = await getModel({
+    const {
+      model,
+      error: modelError,
+      providerOptions,
+    } = await getModel({
       provider: 'openai',
       routingKey: 'sql',
     })
@@ -50,6 +53,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const result = await generateObject({
       model,
+      providerOptions,
       schema: titleSchema,
       prompt: source`
         Generate a short title and summarized description for this Postgres SQL snippet:

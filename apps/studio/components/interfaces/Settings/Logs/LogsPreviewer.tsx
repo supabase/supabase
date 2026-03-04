@@ -1,13 +1,9 @@
-import dayjs from 'dayjs'
-import { Rewind } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import dayjs from 'dayjs'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
@@ -15,19 +11,23 @@ import useSingleLog from 'hooks/analytics/useSingleLog'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { Rewind } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import LogTable from './LogTable'
-import { DatePickerValue } from './Logs.DatePickers'
+
 import {
-  LOGS_TABLES,
   LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LOGS_TABLES,
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from './Logs.constants'
+import { DatePickerValue } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
+import { LogTable } from './LogTable'
 import UpgradePrompt from './UpgradePrompt'
 
 /**

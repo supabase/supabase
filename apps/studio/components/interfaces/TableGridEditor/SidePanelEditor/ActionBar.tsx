@@ -70,39 +70,46 @@ export const ActionBar = ({
   useHotKey(handleSave, 'Enter', { enabled: visible })
 
   return (
-    <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
-      <Button type="default" htmlType="button" onClick={closePanel} disabled={isRunning || loading}>
-        {backButtonLabel}
-      </Button>
-
+    <div className="flex w-full items-center gap-3 border-t border-default px-3 py-4">
       {children}
 
-      {applyFunction !== undefined ? (
-        // Old solution, necessary when loading is handled by this component itself
+      <div className="flex items-center gap-3 ml-auto">
         <Button
-          onClick={onSelectApply}
-          disabled={disableApply || isRunning || loading}
-          loading={isRunning || loading}
+          type="default"
+          htmlType="button"
+          onClick={closePanel}
+          disabled={isRunning || loading}
         >
-          <span>{applyButtonLabel}</span>
-          <span className="ml-2 text-xs text-foreground-lighter">{modKeyLabel}↵</span>
+          {backButtonLabel}
         </Button>
-      ) : !hideApply ? (
-        // New solution, when using the Form component, loading is handled by the Form itself
-        // Does not require applyFunction() callback
-        <Button
-          disabled={loading || disableApply}
-          loading={loading}
-          data-testid="action-bar-save-row"
-          htmlType="submit"
-          form={formId}
-        >
-          <span>{applyButtonLabel}</span>
-          <span className="ml-2 text-xs text-foreground-lighter">{modKeyLabel}↵</span>
-        </Button>
-      ) : (
-        <div />
-      )}
+
+        {applyFunction !== undefined ? (
+          // Old solution, necessary when loading is handled by this component itself
+          <Button
+            onClick={onSelectApply}
+            disabled={disableApply || isRunning || loading}
+            loading={isRunning || loading}
+          >
+            <span>{applyButtonLabel}</span>
+            <span className="ml-2 text-xs text-foreground-lighter">{modKeyLabel}↵</span>
+          </Button>
+        ) : !hideApply ? (
+          // New solution, when using the Form component, loading is handled by the Form itself
+          // Does not require applyFunction() callback
+          <Button
+            disabled={loading || disableApply}
+            loading={loading}
+            data-testid="action-bar-save-row"
+            htmlType="submit"
+            form={formId}
+          >
+            <span>{applyButtonLabel}</span>
+            <span className="ml-2 text-xs text-foreground-lighter">{modKeyLabel}↵</span>
+          </Button>
+        ) : (
+          <div />
+        )}
+      </div>
     </div>
   )
 }

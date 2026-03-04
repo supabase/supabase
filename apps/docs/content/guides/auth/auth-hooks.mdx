@@ -42,7 +42,7 @@ A [Postgres function](/docs/guides/database/functions) can be configured as a ho
 </TabPanel>
 <TabPanel id="http" label="HTTP Endpoint">
 
-A HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSON response. You can use any HTTP endpoint as a Hook, including an endpoint in your application. The easiest way to create a HTTP hook is to create a [Supabase Edge Function](/docs/guides/functions/quickstart).
+An HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSON response. You can use any HTTP endpoint as a Hook, including an endpoint in your application. The easiest way to create an HTTP hook is to create a [Supabase Edge Function](/docs/guides/functions/quickstart).
 
 </TabPanel>
 </Tabs>
@@ -97,7 +97,7 @@ HTTP Hooks in Supabase follow the [Standard Webhooks Specification](https://www.
 
 When the request is made to the HTTP hook, you should use the [Standard Webhooks libraries](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries) to verify these headers.
 
-When a HTTP hook is created, the secret generated should be of the `v1,whsec_<base64-secret>` format:
+When an HTTP hook is created, the secret generated should be of the `v1,whsec_<base64-secret>` format:
 
 - `v1` denotes the version of the hook
 - `whsec_` signifies that the secret is symmetric
@@ -303,7 +303,7 @@ Here's an example:
 }
 ```
 
-Errors returned from a Postgres Hook are not retry-able. When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
+Errors returned from a Postgres Hook are not retry-able. When an error is returned, the error is propagated from the hook to Supabase Auth and translated into an HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
 
 </TabPanel>
 

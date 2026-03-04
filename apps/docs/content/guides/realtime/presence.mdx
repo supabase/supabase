@@ -20,6 +20,12 @@ When any client subscribes, disconnects, or updates their presence payload, Supa
 - **`join`** — a new client has started tracking presence
 - **`leave`** — a client has stopped tracking presence
 
+<Admonition type="note" title="Sync event behavior">
+
+During a `sync` event, you may receive `join` and `leave` events simultaneously, even though no users are actually joining or leaving. This is expected behavior—Presence reconciles its local state with the server state, which can trigger these events as part of the synchronization process. This reflects state reconciliation, not real user movement.
+
+</Admonition>
+
 The complete presence state returned by `presenceState()` looks like this:
 
 ```json

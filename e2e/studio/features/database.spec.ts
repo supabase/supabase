@@ -644,9 +644,9 @@ test.describe.serial('Database', () => {
       if (exists) {
         await page.getByRole('button', { name: databaseRoleName }).getByRole('button').click()
         await page.getByRole('menuitem', { name: 'Delete' }).click()
-        await page.getByRole('button', { name: 'Confirm' }).click()
+        await page.getByRole('button', { name: 'Submit' }).click()
         await expect(
-          page.getByText(`Successfully deleted role: ${databaseRoleName}`),
+          page.getByText(`Successfully deleted role`),
           'Delete confirmation toast should be visible'
         ).toBeVisible({ timeout: 50000 })
       }
@@ -667,10 +667,10 @@ test.describe.serial('Database', () => {
       await page.getByRole('button', { name: databaseRoleName }).getByRole('button').click()
       await page.getByRole('menuitem', { name: 'Delete' }).click()
       const roleDeleteWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=roles-delete')
-      await page.getByRole('button', { name: 'Confirm' }).click()
+      await page.getByRole('button', { name: 'Submit' }).click()
       await roleDeleteWait
       await expect(
-        page.getByText(`Successfully deleted role: ${databaseRoleName}`),
+        page.getByText(`Successfully deleted role`),
         'Delete confirmation toast should be visible'
       ).toBeVisible({ timeout: 50000 })
     })
@@ -723,7 +723,7 @@ test.describe.serial('Database Enumerated Types', () => {
       await page.getByRole('menuitem', { name: 'Delete type' }).click()
       await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
       await page.getByRole('button', { name: 'Confirm delete' }).click()
-      await expect(page.getByText(`Successfully deleted "${databaseEnumName}"`)).toBeVisible()
+      await expect(page.getByText(`Successfully deleted type "${databaseEnumName}"`)).toBeVisible()
     }
 
     // create a new enum
@@ -758,7 +758,7 @@ test.describe.serial('Database Enumerated Types', () => {
     await page.getByRole('menuitem', { name: 'Delete type' }).click()
     await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
     await page.getByRole('button', { name: 'Confirm delete' }).click()
-    await expect(page.getByText(`Successfully deleted "${databaseEnumName}"`)).toBeVisible({
+    await expect(page.getByText(`Successfully deleted type "${databaseEnumName}"`)).toBeVisible({
       timeout: 50000,
     })
   })

@@ -118,7 +118,7 @@ export const FirstLevelNav = (): ReactNode => {
           }
           onClick={() => snap.setShowProjectApiDocs(false)}
         >
-          <Link className="!justify-start" href={`/project/${ref}/api/graphiql`}>
+          <Link className="!justify-start" href={`/project/${ref}/integrations/graphiql`}>
             GraphiQL
           </Link>
         </Button>

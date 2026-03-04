@@ -1,10 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -13,7 +9,10 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+import * as z from 'zod'
 
 // Shared schema definition
 export const AIOptInSchema = z.object({
@@ -36,7 +35,7 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
     'organizations'
   )
 
-  const [_, setUpdatedOptInSinceMCP] = useLocalStorageQuery(
+  const [, setUpdatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
     false
   )
