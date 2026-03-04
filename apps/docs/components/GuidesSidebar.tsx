@@ -19,16 +19,10 @@ interface TOCHeader {
 
 function AiTools({ className }: { className?: string }) {
   const [copied, setCopied] = useState(false)
-  let url = ''
-
-  // Safe check for server side rendering.
-  try {
-    const urlParts = new URL(`${window.location}`)
-    url = urlParts.origin + urlParts.pathname
-  } catch (error) {}
+  const path = usePathname()
 
   async function copyMarkdown() {
-    const mdUrl = `${url}.md`
+    const mdUrl = `/docs/${path}.md`
 
     try {
       const res = await fetch(mdUrl)
@@ -62,7 +56,7 @@ function AiTools({ className }: { className?: string }) {
           {copied ? 'Copied!' : 'Copy as Markdown'}
         </button>
         <a
-          href={`https://chatgpt.com/?hint=search&q=Read from ${url} so I can ask questions about its contents`}
+          href={`https://chatgpt.com/?hint=search&q=Read from https://supabase.com/docs${path} so I can ask questions about its contents`}
           target="_blank"
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
@@ -71,7 +65,7 @@ function AiTools({ className }: { className?: string }) {
           Ask ChatGPT
         </a>
         <a
-          href={`https://claude.ai/new?q=Read from ${url} so I can ask questions about its contents`}
+          href={`https://claude.ai/new?q=Read from https://supabase.com/docs${path} so I can ask questions about its contents`}
           target="_blank"
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
