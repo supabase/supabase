@@ -260,7 +260,7 @@ export function FilterCondition({
     <div
       ref={wrapperRef}
       className={cn(
-        'flex items-stretch px-0 bg-muted group shrink-0',
+        'flex items-stretch px-0 py-1 bg-muted group shrink-0',
         variant === 'pill' ? 'rounded border' : 'border-r',
         isHighlighted && 'ring-2 ring-primary'
       )}
@@ -371,7 +371,7 @@ export function FilterCondition({
       </Popover_Shadcn_>
       <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
         <PopoverAnchor_Shadcn_ asChild>
-          <div className="relative inline-block max-w-[150px]">
+          <div className="relative inline-block max-w-[180px]">
             <Input_Shadcn_
               ref={valueRef}
               type="text"
@@ -439,7 +439,7 @@ export function FilterCondition({
         icon={
           <X
             strokeWidth={1}
-            size={10}
+            size={12}
             className="group-hover:text-foreground text-foreground-lighter"
           />
         }

@@ -359,7 +359,7 @@ export function FilterBarRoot({
 
   return (
     <FilterBarContext.Provider value={contextValue}>
-      <div ref={rootRef} data-filterbar-root className="h-full min-h-[26px] flex items-stretch">
+      <div ref={rootRef} data-filterbar-root className="h-full min-h-[32px] flex items-stretch">
         {children}
       </div>
     </FilterBarContext.Provider>
