@@ -430,6 +430,7 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
+  -- skip queries that were never actually executed
   WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by statements.calls desc'}
   limit 20`,
@@ -440,6 +441,7 @@ select
         -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
+-- compute total time once up front so we don't need a window function over all rows
 with grand_total as (
   select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
   from pg_stat_statements where calls > 0
@@ -477,6 +479,7 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
+  -- skip queries that were never actually executed
   WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by total_time desc'}
   limit 20`,
@@ -523,6 +526,7 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
+  -- skip queries that were never actually executed
   WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by max_time desc'}
   limit 20`,
@@ -547,6 +551,7 @@ select
         -- reports-query-performance-unified
         set search_path to public, extensions;
 
+        -- compute total time once up front so we don't need a window function over all rows
         with grand_total as (
           select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
           from pg_stat_statements where calls > 0
@@ -578,6 +583,7 @@ select
             ) as prop_total_time
           from pg_stat_statements as statements
             inner join pg_authid as auth on statements.userid = auth.oid
+          -- skip queries that were never actually executed
           WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
           ${orderBy || 'order by total_time desc'}
           limit 50
@@ -623,7 +629,9 @@ select
 
         -- Count of slow queries (> 1 second average)
         SELECT count(*) as slow_queries_count
+        -- alias needed to reference columns in WHERE
         FROM pg_stat_statements as statements
+        -- skip never-executed queries; mean_exec_time > 1000ms = avg over 1 second
         WHERE statements.calls > 0 AND statements.mean_exec_time > 1000;`,
       },
       queryMetrics: {
@@ -643,6 +651,7 @@ select
             ), 0
           ) || '%' as cache_hit_rate
         FROM pg_stat_statements as statements
+        -- skip queries that were never actually executed
         WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
         ${orderBy || ''}`,
       },
