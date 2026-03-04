@@ -1,4 +1,4 @@
-name: Push scorers to Braintrust
+name: Deploy Braintrust scorers
 
 on:
   push:
