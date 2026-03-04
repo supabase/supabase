@@ -136,10 +136,6 @@ const IntegrationPage: NextPageWithLayout = () => {
     return null
   }
 
-  if (id === 'data_api' && !IS_PLATFORM) {
-    return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
-  }
-
   if (id === 'stripe_sync_engine' && !stripeSyncEnabled) {
     return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
   }

@@ -20,7 +20,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const responseObj: components['schemas']['GetPostgrestConfigResponse'] = {
     db_anon_role: 'anon',
     db_extra_search_path: 'public',
-    db_schema: 'public, storage',
+    db_schema: process.env.PGRST_DB_SCHEMAS ?? 'public,storage,graphql_public',
     jwt_secret:
       process.env.AUTH_JWT_SECRET ?? 'super-secret-jwt-token-with-at-least-32-characters-long',
     max_rows: 100,

@@ -40,6 +40,7 @@ import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const formSchema = z.object({
   dbSchema: z.array(z.string()),
@@ -98,8 +99,9 @@ export const PostgrestConfig = () => {
     'pgsodium',
     'pgsodium_masks',
   ]
-  const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
+  const { can: canUpdatePostgrestConfigPermission, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+  const canUpdatePostgrestConfig = IS_PLATFORM && canUpdatePostgrestConfigPermission
 
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
@@ -373,40 +375,44 @@ export const PostgrestConfig = () => {
               )}
             </form>
           </Form_Shadcn_>
-          <CardFooter className="border-t">
-            <FormActions
-              form={formId}
-              isSubmitting={isUpdating}
-              hasChanges={form.formState.isDirty}
-              handleReset={resetForm}
-              disabled={!canUpdatePostgrestConfig}
-              helper={
-                isPermissionsLoaded && !canUpdatePostgrestConfig
-                  ? "You need additional permissions to update your project's API settings"
-                  : undefined
-              }
-            />
-          </CardFooter>
+          {IS_PLATFORM && (
+            <CardFooter className="border-t">
+              <FormActions
+                form={formId}
+                isSubmitting={isUpdating}
+                hasChanges={form.formState.isDirty}
+                handleReset={resetForm}
+                disabled={!canUpdatePostgrestConfig}
+                helper={
+                  isPermissionsLoaded && !canUpdatePostgrestConfigPermission
+                    ? "You need additional permissions to update your project's API settings"
+                    : undefined
+                }
+              />
+            </CardFooter>
+          )}
         </Card>
-        <Card className="mb-4">
-          <CardContent>
-            <FormItemLayout
-              isReactForm={false}
-              layout="flex-row-reverse"
-              label="Harden Data API"
-              description="Expose a custom schema instead of the public schema"
-            >
-              <div className="flex gap-2 items-center justify-end">
-                <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
-                  Harden Data API
-                </Button>
-              </div>
-            </FormItemLayout>
-          </CardContent>
-        </Card>
+        {IS_PLATFORM && (
+          <Card className="mb-4">
+            <CardContent>
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex-row-reverse"
+                label="Harden Data API"
+                description="Expose a custom schema instead of the public schema"
+              >
+                <div className="flex gap-2 items-center justify-end">
+                  <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
+                    Harden Data API
+                  </Button>
+                </div>
+              </FormItemLayout>
+            </CardContent>
+          </Card>
+        )}
       </PageSectionContent>
 
-      <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />
+      {IS_PLATFORM && <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />}
     </PageSection>
   )
 }
