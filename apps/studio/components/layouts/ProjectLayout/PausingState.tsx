@@ -1,12 +1,17 @@
 import { Circle, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { Project, useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Badge } from 'ui'
+import { Badge, Button } from 'ui'
+
+const LONG_RUNNING_STATE_THRESHOLD_MINUTES = 10
+const LONG_RUNNING_STATE_THRESHOLD_MS = LONG_RUNNING_STATE_THRESHOLD_MINUTES * 60 * 1000
 
 export interface PausingStateProps {
   project: Project
@@ -15,6 +20,7 @@ export interface PausingStateProps {
 export const PausingState = ({ project }: PausingStateProps) => {
   const { ref } = useParams()
   const [startPolling, setStartPolling] = useState(false)
+  const [isTakingLongerThanExpected, setIsTakingLongerThanExpected] = useState(false)
 
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
@@ -45,8 +51,18 @@ export const PausingState = ({ project }: PausingStateProps) => {
   ])
 
   useEffect(() => {
-    setTimeout(() => setStartPolling(true), 4000)
+    const timeoutId = setTimeout(() => setStartPolling(true), 4000)
+    return () => clearTimeout(timeoutId)
   }, [])
+
+  useEffect(() => {
+    if (isTakingLongerThanExpected) return
+    const timeoutId = setTimeout(
+      () => setIsTakingLongerThanExpected(true),
+      LONG_RUNNING_STATE_THRESHOLD_MS
+    )
+    return () => clearTimeout(timeoutId)
+  }, [isTakingLongerThanExpected])
 
   return (
     <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
@@ -73,9 +89,26 @@ export const PausingState = ({ project }: PausingStateProps) => {
               </div>
               <p className="text-center">Pausing {project.name}</p>
               <p className="text-center text-sm text-foreground-light">
-                You may restore your project anytime thereafter, and your data will be restored to
-                when it was initially paused.
+                {isTakingLongerThanExpected
+                  ? `This is taking longer than usual. Contact support if your project is still pausing after ${LONG_RUNNING_STATE_THRESHOLD_MINUTES} minutes.`
+                  : 'Your project is being paused now. This usually takes a few minutes. While paused, your data stays safe, and you can turn the project back on anytime.'}
               </p>
+              {isTakingLongerThanExpected && (
+                <div className="flex justify-center">
+                  <Button asChild type="default">
+                    <SupportLink
+                      queryParams={{
+                        category: SupportCategories.DATABASE_UNRESPONSIVE,
+                        projectRef: project.ref,
+                        subject: 'Project stuck in pausing state',
+                        message: `Project "${project.name}" has remained in a pausing state for over ${LONG_RUNNING_STATE_THRESHOLD_MINUTES} minutes.`,
+                      }}
+                    >
+                      Contact support
+                    </SupportLink>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>

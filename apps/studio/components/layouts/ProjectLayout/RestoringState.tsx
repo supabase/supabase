@@ -12,6 +12,10 @@ import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+
+const LONG_RUNNING_STATE_THRESHOLD_MINUTES = 10
+const LONG_RUNNING_STATE_THRESHOLD_MS = LONG_RUNNING_STATE_THRESHOLD_MINUTES * 60 * 1000
 
 const RestoringState = () => {
   const { ref } = useParams()
@@ -19,6 +23,7 @@ const RestoringState = () => {
 
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
+  const [isTakingLongerThanExpected, setIsTakingLongerThanExpected] = useState(false)
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
@@ -43,6 +48,15 @@ const RestoringState = () => {
       setIsCompleted(true)
     }
   }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
+
+  useEffect(() => {
+    if (isTakingLongerThanExpected) return
+    const timeoutId = setTimeout(
+      () => setIsTakingLongerThanExpected(true),
+      LONG_RUNNING_STATE_THRESHOLD_MS
+    )
+    return () => clearTimeout(timeoutId)
+  }, [isTakingLongerThanExpected])
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
@@ -106,21 +120,33 @@ const RestoringState = () => {
                     size of your database. Your project will be offline while the restoration is
                     running.
                   </p>
+                  {isTakingLongerThanExpected && (
+                    <Admonition
+                      type="warning"
+                      title="This is taking longer than usual"
+                      layout="responsive"
+                      description="Contact support if this project remains in a restoring state."
+                      actions={
+                        <Button asChild type="default">
+                          <SupportLink
+                            queryParams={{
+                              category: SupportCategories.DATABASE_UNRESPONSIVE,
+                              projectRef: project?.ref ?? ref,
+                              subject: 'Project stuck in restoring state',
+                              message: `Project "${project?.name ?? 'Unknown project'}" (ref: ${project?.ref ?? ref ?? 'unknown'}) has remained in a restoring state for over ${LONG_RUNNING_STATE_THRESHOLD_MINUTES} minutes.`,
+                            }}
+                          >
+                            Contact support
+                          </SupportLink>
+                        </Button>
+                      }
+                      className="!mt-5"
+                    />
+                  )}
                 </div>
               </div>
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-              <Button asChild type="default">
-                <SupportLink
-                  queryParams={{
-                    category: SupportCategories.DATABASE_UNRESPONSIVE,
-                    projectRef: project?.ref,
-                    subject: 'Ongoing restoration for project',
-                  }}
-                >
-                  Contact support
-                </SupportLink>
-              </Button>
               <ButtonTooltip
                 type="default"
                 icon={<Download />}
