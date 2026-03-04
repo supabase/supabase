@@ -4,20 +4,20 @@ import { Button } from 'ui'
 
 const page: GoPageInput = {
   template: 'lead-gen',
-  slug: 'stripe/contest',
+  slug: 'accenture-reinvention-2026/contest',
   metadata: {
-    title: 'Win an iPhone 17 Pro Max | Supabase at Stripe Sessions',
+    title: 'Win an iPhone Pro Max | Supabase at Accenture AI & Data Conference (ReinventionX) 2026',
     description:
-      'Create a Supabase account and load data for a 1-in-10 chance to win an iPhone 17 Pro Max. Stripe Sessions 2026.',
+      'Create a Supabase account and load data for a chance to win an iPhone Pro Max. Accenture AI & Data Conference (ReinventionX) 2026.',
   },
   hero: {
-    title: 'Win an iPhone 17 Pro Max',
-    subtitle: 'Supabase at Stripe Sessions 2026',
+    title: 'Win an iPhone Pro Max',
+    subtitle: 'Supabase at Accenture AI & Data Conference 2026',
     description:
-      "Great meeting you at Stripe Sessions. Try Supabase if you haven't already -- it's Postgres with all the tools you need to build AI-native applications. We're running a sweepstakes and you have a 1-in-10 chance of winning. Those are better odds than anywhere else!",
+      'Your team is already building with AI tools. Supabase is the production backend that turns those prototypes into secure, scalable applications. Try it out -- create an account, load some data, and you could win an iPhone Pro Max.',
     image: {
       src: '/images/landing-pages/stripe-sessions/iphone17-pro-max.png',
-      alt: 'Orange iPhone 17 Pro Max',
+      alt: 'iPhone Pro Max',
       width: 400,
       height: 500,
     },
@@ -37,9 +37,9 @@ const page: GoPageInput = {
       children: (
         <div className="flex flex-col items-center gap-6">
           <ol className="flex flex-col gap-4 text-foreground-light text-lg list-decimal list-inside">
-            <li>Create a Supabase account with your email address</li>
+            <li>Create a Supabase account with the same email where you got our post-event note</li>
             <li>Load data into a Supabase database</li>
-            <li>Complete these steps by Monday, May 11, 2026 at 12:00 PM PST</li>
+            <li>Complete these steps by Monday, May 4, 2026 at 12:00 PM PST</li>
           </ol>
           <Button asChild type="default" size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>
