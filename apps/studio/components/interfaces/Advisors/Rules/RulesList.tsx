@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useExecuteRuleMutation, type ExecuteRuleResult } from 'data/advisors/alerts-query'
 import {
   useAdvisorRulesQuery,
   useCreateRuleMutation,
@@ -13,6 +14,7 @@ import {
   Edit,
   Info,
   MoreVertical,
+  Play,
   Plus,
   Search,
   ShieldCheck,
@@ -66,6 +68,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
+import { RuleTemplates } from './RuleTemplates'
+
 const severityIcons: Record<string, typeof AlertOctagon> = {
   critical: AlertOctagon,
   warning: AlertTriangle,
@@ -101,6 +105,7 @@ export function RulesList() {
 
   const updateMutation = useUpdateRuleMutation(projectRef)
   const deleteMutation = useDeleteRuleMutation(projectRef)
+  const executeMutation = useExecuteRuleMutation(projectRef)
 
   const filteredRules = useMemo(() => {
     const list = rules ?? []
@@ -138,6 +143,8 @@ export function RulesList() {
             New Rule
           </Button>
         </div>
+
+        <RuleTemplates existingRuleNames={(rules ?? []).map((r) => r.name)} />
 
         <Card>
           <Table>
@@ -222,6 +229,41 @@ export function RulesList() {
                           <Button type="default" className="px-1" icon={<MoreVertical />} />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent side="bottom" align="end" className="w-48">
+                          <DropdownMenuItem
+                            className="space-x-2"
+                            onClick={() => {
+                              executeMutation.mutate(rule.id, {
+                                onSuccess: (result: ExecuteRuleResult) => {
+                                  switch (result.status) {
+                                    case 'alert_created':
+                                      toast.success(
+                                        `Found ${result.rowCount} result${result.rowCount !== 1 ? 's' : ''} — alert created. Check Alerts page.`
+                                      )
+                                      break
+                                    case 'no_findings':
+                                      toast.info('Rule executed successfully — no issues found')
+                                      break
+                                    case 'cooldown':
+                                      toast.warning(
+                                        `Found ${result.rowCount} result${result.rowCount !== 1 ? 's' : ''} but cooldown is active — skipped alert creation`
+                                      )
+                                      break
+                                    case 'rule_not_found':
+                                      toast.warning('Rule not found or is disabled')
+                                      break
+                                    default:
+                                      toast.success('Rule executed')
+                                  }
+                                },
+                                onError: (err) =>
+                                  toast.error(`Rule execution failed: ${err.message}`),
+                              })
+                            }}
+                          >
+                            <Play size={12} />
+                            <p>Run now</p>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="space-x-2"
                             onClick={() => {

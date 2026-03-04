@@ -1,6 +1,6 @@
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ChannelsList } from 'components/interfaces/Advisors/Channels/ChannelsList'
+import { AdvisorsOverview } from 'components/interfaces/Advisors/Overview/AdvisorsOverview'
 import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -12,15 +12,15 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-const AdvisorChannelsPage: NextPageWithLayout = () => {
+const AdvisorsOverviewPage: NextPageWithLayout = () => {
   return (
     <>
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Notifications</PageHeaderTitle>
+            <PageHeaderTitle>Advisors</PageHeaderTitle>
             <PageHeaderDescription>
-              Set up email, Slack, or webhook channels to get alerted about issues.
+              Monitor your project's health, security, and performance.
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
@@ -29,7 +29,7 @@ const AdvisorChannelsPage: NextPageWithLayout = () => {
       <PageContainer size="large">
         <PageSection>
           <PageSectionContent>
-            <ChannelsList />
+            <AdvisorsOverview />
           </PageSectionContent>
         </PageSection>
       </PageContainer>
@@ -37,10 +37,10 @@ const AdvisorChannelsPage: NextPageWithLayout = () => {
   )
 }
 
-AdvisorChannelsPage.getLayout = (page) => (
+AdvisorsOverviewPage.getLayout = (page) => (
   <DefaultLayout>
-    <AdvisorsLayout title="Notifications">{page}</AdvisorsLayout>
+    <AdvisorsLayout title="Advisors">{page}</AdvisorsLayout>
   </DefaultLayout>
 )
 
-export default AdvisorChannelsPage
+export default AdvisorsOverviewPage

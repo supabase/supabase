@@ -17,6 +17,8 @@ export const EmptyAdvisor = ({ activeTab, hasFilters, onClearFilters }: EmptyAdv
         return 'No security issues detected'
       case 'performance':
         return 'No performance issues detected'
+      case 'issues':
+        return 'No open issues'
       case 'messages':
         return 'No messages'
       default:
@@ -32,6 +34,8 @@ export const EmptyAdvisor = ({ activeTab, hasFilters, onClearFilters }: EmptyAdv
         return 'Congrats! There are no security issues detected for this project'
       case 'performance':
         return 'Congrats! There are no performance issues detected for this project'
+      case 'issues':
+        return 'No open issues from monitoring rules. Configure rules to start detecting issues.'
       case 'messages':
         return 'Messages alert you of upcoming changes or potential issues with your project'
       default:

@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { FilterPopover } from 'components/ui/FilterPopover'
 import { useAdvisorIssuesQuery, useUpdateIssueMutation } from 'data/advisors/issues-query'
 import type { AdvisorIssue, AdvisorSeverity, IssueStatus } from 'data/advisors/types'
 import {
@@ -11,6 +12,7 @@ import {
   Info,
   MoreVertical,
   Search,
+  X,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -31,9 +33,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tabs_Shadcn_ as Tabs,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -47,22 +46,39 @@ const severityConfig: Record<
   info: { icon: Info, badgeVariant: 'default' },
 }
 
-type StatusFilter = 'active' | 'resolved' | 'all'
+const ACTIVE_STATUSES = ['open', 'acknowledged', 'snoozed']
+
+const STATUS_FILTER_OPTIONS = [
+  { name: 'Open', value: 'open' },
+  { name: 'Acknowledged', value: 'acknowledged' },
+  { name: 'Snoozed', value: 'snoozed' },
+  { name: 'Resolved', value: 'resolved' },
+  { name: 'Dismissed', value: 'dismissed' },
+]
+
+const SEVERITY_FILTER_OPTIONS = [
+  { name: 'Critical', value: 'critical' },
+  { name: 'Warning', value: 'warning' },
+  { name: 'Info', value: 'info' },
+]
 
 export function IssuesList() {
   const { ref: projectRef } = useParams()
   const { data: issues, isLoading } = useAdvisorIssuesQuery(projectRef)
   const updateMutation = useUpdateIssueMutation(projectRef)
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
+  const [filteredStatuses, setFilteredStatuses] = useState<string[]>(ACTIVE_STATUSES)
+  const [filteredSeverities, setFilteredSeverities] = useState<string[]>([])
   const [filterString, setFilterString] = useState('')
 
   const filteredIssues = useMemo(() => {
     let list = issues ?? []
 
-    if (statusFilter === 'active') {
-      list = list.filter((i) => ['open', 'acknowledged', 'snoozed'].includes(i.status))
-    } else if (statusFilter === 'resolved') {
-      list = list.filter((i) => ['resolved', 'dismissed'].includes(i.status))
+    if (filteredStatuses.length > 0) {
+      list = list.filter((i) => filteredStatuses.includes(i.status))
+    }
+
+    if (filteredSeverities.length > 0) {
+      list = list.filter((i) => filteredSeverities.includes(i.severity))
     }
 
     if (filterString) {
@@ -76,11 +92,21 @@ export function IssuesList() {
     }
 
     return list
-  }, [issues, statusFilter, filterString])
+  }, [issues, filteredStatuses, filteredSeverities, filterString])
 
-  const activeCount = (issues ?? []).filter((i) =>
-    ['open', 'acknowledged', 'snoozed'].includes(i.status)
-  ).length
+  const activeCount = (issues ?? []).filter((i) => ACTIVE_STATUSES.includes(i.status)).length
+
+  const hasActiveFilters =
+    filterString.length > 0 ||
+    filteredSeverities.length > 0 ||
+    (filteredStatuses.length > 0 &&
+      JSON.stringify(filteredStatuses.sort()) !== JSON.stringify([...ACTIVE_STATUSES].sort()))
+
+  const handleResetFilters = () => {
+    setFilterString('')
+    setFilteredStatuses(ACTIVE_STATUSES)
+    setFilteredSeverities([])
+  }
 
   const handleStatusChange = (issue: AdvisorIssue, status: IssueStatus) => {
     updateMutation.mutate(
@@ -93,8 +119,8 @@ export function IssuesList() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-2">
           <Input
             placeholder="Search issues"
             size="tiny"
@@ -103,17 +129,42 @@ export function IssuesList() {
             className="w-full lg:w-52"
             onChange={(e) => setFilterString(e.target.value)}
           />
-          <p className="text-sm text-foreground-lighter whitespace-nowrap">
-            {activeCount} open issue{activeCount !== 1 ? 's' : ''}
-          </p>
+          <FilterPopover
+            name="Status"
+            options={STATUS_FILTER_OPTIONS}
+            labelKey="name"
+            valueKey="value"
+            activeOptions={filteredStatuses}
+            labelClass="text-xs text-foreground-light"
+            maxHeightClass="h-[240px]"
+            className="w-44"
+            onSaveFilters={setFilteredStatuses}
+          />
+          <FilterPopover
+            name="Severity"
+            options={SEVERITY_FILTER_OPTIONS}
+            labelKey="name"
+            valueKey="value"
+            activeOptions={filteredSeverities}
+            labelClass="text-xs text-foreground-light"
+            maxHeightClass="h-[160px]"
+            className="w-44"
+            onSaveFilters={setFilteredSeverities}
+          />
+          {hasActiveFilters && (
+            <Button
+              type="default"
+              size="tiny"
+              className="px-1"
+              icon={<X />}
+              onClick={handleResetFilters}
+            />
+          )}
         </div>
-        <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
-          <TabsList>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="resolved">Resolved</TabsTrigger>
-            <TabsTrigger value="all">All</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <p className="text-sm text-foreground-lighter whitespace-nowrap">
+          {filteredIssues.length} issue{filteredIssues.length !== 1 ? 's' : ''}
+          {activeCount > 0 && ` (${activeCount} open)`}
+        </p>
       </div>
 
       {filteredIssues.length === 0 ? (
@@ -121,7 +172,7 @@ export function IssuesList() {
           <CheckCircle2 className="h-8 w-8 mb-2 text-brand" />
           <p className="text-sm font-medium text-foreground">All clear!</p>
           <p className="text-sm text-foreground-lighter mt-1">
-            No {statusFilter === 'active' ? 'open' : ''} issues found.
+            No matching issues found.
           </p>
         </Card>
       ) : (

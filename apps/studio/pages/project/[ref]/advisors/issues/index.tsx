@@ -2,12 +2,38 @@ import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { IssuesList } from 'components/interfaces/Advisors/Issues/IssuesList'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const AdvisorIssuesPage: NextPageWithLayout = () => {
   return (
-    <div className="mx-auto w-full max-w-7xl flex flex-col gap-y-8 px-5 py-6">
-      <IssuesList />
-    </div>
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Issues</PageHeaderTitle>
+            <PageHeaderDescription>
+              Track and resolve problems detected by monitoring rules.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
+            <IssuesList />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 

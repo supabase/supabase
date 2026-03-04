@@ -20,6 +20,7 @@ import {
 } from 'ui'
 
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
+import { AdvisorsV2Preview } from './AdvisorsV2Preview'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
@@ -42,6 +43,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]: <QueueOperationsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]: <TableFilterBarPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISORS_V2]: <AdvisorsV2Preview />,
 }
 
 export const FeaturePreviewModal = () => {

@@ -7,7 +7,7 @@ import {
   useUpdateChannelMutation,
 } from 'data/advisors/channels-query'
 import type { AdvisorChannel } from 'data/advisors/types'
-import { Bell, Edit, Globe, Mail, MessageSquare, MoreVertical, Plus, Trash } from 'lucide-react'
+import { Bell, Edit, ExternalLink, Globe, Mail, MessageSquare, MoreVertical, Plus, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -89,16 +89,31 @@ export function ChannelsList() {
         </div>
 
         {(channels ?? []).length === 0 ? (
-          <Card className="flex flex-col items-center justify-center py-12">
-            <Bell className="h-8 w-8 mb-2 text-foreground-lighter" />
-            <p className="text-sm text-foreground">No notification channels configured</p>
-            <p className="text-sm text-foreground-lighter mt-1">
-              Add email, Slack, or webhook channels to get notified about issues.
-            </p>
-            <Button className="mt-4" icon={<Plus />} onClick={() => setShowCreateDialog(true)}>
-              Add Channel
-            </Button>
-          </Card>
+          <div className="flex flex-col gap-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <ChannelTypeCard
+                icon={<MessageSquare className="h-5 w-5 text-foreground-lighter" />}
+                title="Slack"
+                description="Get alerted in your team's Slack channel when issues are detected."
+                featured
+                onSetup={() => setShowCreateDialog(true)}
+              />
+              <ChannelTypeCard
+                icon={<Mail className="h-5 w-5 text-foreground-lighter" />}
+                title="Email"
+                description="Receive email notifications for critical and warning issues."
+                onSetup={() => setShowCreateDialog(true)}
+              />
+              <ChannelTypeCard
+                icon={<Globe className="h-5 w-5 text-foreground-lighter" />}
+                title="Webhook"
+                description="Send alerts to any HTTP endpoint for custom integrations."
+                onSetup={() => setShowCreateDialog(true)}
+              />
+            </div>
+
+            <SlackMessagePreview />
+          </div>
         ) : (
           <Card>
             <Table>
@@ -447,5 +462,87 @@ function ChannelFormDialog({
         </Form_Shadcn_>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function ChannelTypeCard({
+  icon,
+  title,
+  description,
+  featured,
+  onSetup,
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+  featured?: boolean
+  onSetup: () => void
+}) {
+  return (
+    <Card className={`flex flex-col ${featured ? 'border-brand-500/50' : ''}`}>
+      <div className="flex flex-col gap-3 p-4 flex-1">
+        <div className="flex items-start gap-3">
+          <div className={`rounded-lg p-2 shrink-0 ${featured ? 'bg-brand-200/20' : 'bg-surface-200'}`}>
+            {icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium text-foreground">{title}</p>
+              {featured && <Badge variant="default">Recommended</Badge>}
+            </div>
+            <p className="text-xs text-foreground-lighter mt-0.5">{description}</p>
+          </div>
+        </div>
+        <div className="mt-auto pt-2">
+          <Button type={featured ? 'primary' : 'default'} size="tiny" icon={<Plus className="h-3 w-3" />} onClick={onSetup}>
+            Set up {title}
+          </Button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function SlackMessagePreview() {
+  return (
+    <Card>
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-medium text-foreground-lighter">Slack Message Preview</p>
+          <a
+            href="https://api.slack.com/messaging/webhooks"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-foreground-lighter hover:text-foreground inline-flex items-center gap-1"
+          >
+            Slack webhook docs <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
+        <div className="rounded-lg border border-default bg-surface-100 p-4 font-sans text-sm">
+          <div className="flex items-start gap-3">
+            <div className="rounded bg-brand-400 p-1 shrink-0">
+              <Bell className="h-3 w-3 text-white" />
+            </div>
+            <div className="space-y-1">
+              <p className="font-semibold text-foreground">
+                Supabase Advisors
+              </p>
+              <p className="text-foreground-lighter leading-relaxed">
+                <span className="font-medium text-destructive-600">CRITICAL</span>{' '}
+                <span className="font-medium">Table &ldquo;users&rdquo; has no RLS enabled</span>
+              </p>
+              <p className="text-xs text-foreground-muted">
+                Row Level Security is not enabled on the &ldquo;users&rdquo; table, exposing all rows via the API.
+              </p>
+              <div className="flex gap-2 pt-1">
+                <span className="text-xs text-brand font-medium cursor-pointer hover:underline">View in Dashboard</span>
+                <span className="text-xs text-foreground-muted">&middot;</span>
+                <span className="text-xs text-foreground-lighter">Just now</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
   )
 }

@@ -317,8 +317,8 @@ $$;
 -- SQL rules always work. Edge function rules need pg_net + vault.
 -- =============================================================================
 
-create or replace function _supabase_advisors.execute_rule(p_rule_id uuid)
-returns void
+create or replace function _supabase_advisors.execute_rule(p_rule_id uuid, p_force boolean default false)
+returns text
 language plpgsql
 security definer
 as $$
@@ -326,6 +326,7 @@ declare
   v_rule record;
   v_row record;
   v_rows jsonb := '[]'::jsonb;
+  v_row_count integer := 0;
   v_supabase_url text;
   v_service_role_key text;
   v_dedup_key text;
@@ -334,87 +335,104 @@ declare
   v_alert_desc text;
   v_last_alert_at timestamptz;
   v_has_pg_net boolean;
+  v_sql text;
+  v_set_stmt text;
 begin
   select * into v_rule
     from _supabase_advisors.rules
     where id = p_rule_id and is_enabled = true;
 
-  if not found then return; end if;
+  if not found then return 'rule_not_found'; end if;
 
   if v_rule.sql_query is not null then
-    for v_row in execute v_rule.sql_query
-    loop
-      v_rows := v_rows || to_jsonb(v_row);
+    v_sql := trim(v_rule.sql_query);
+
+    -- Extract and execute any SET LOCAL statements before the main query.
+    -- Splinter rules use "set local search_path = '';" as a prefix.
+    while v_sql ~* '^\s*set\s+' loop
+      v_set_stmt := substring(v_sql from '^\s*[^;]*;');
+      execute v_set_stmt;
+      v_sql := trim(substring(v_sql from length(v_set_stmt) + 1));
     end loop;
 
-    if jsonb_array_length(v_rows) > 0 then
-      v_dedup_key := 'rule_' || p_rule_id::text;
+    for v_row in execute v_sql
+    loop
+      v_rows := v_rows || to_jsonb(v_row);
+      v_row_count := v_row_count + 1;
+    end loop;
 
+    if v_row_count = 0 then
+      return 'no_findings';
+    end if;
+
+    v_dedup_key := 'rule_' || p_rule_id::text;
+
+    if not p_force then
       select max(a.triggered_at) into v_last_alert_at
         from _supabase_advisors.alerts a
         where a.rule_id = p_rule_id;
 
       if v_last_alert_at is not null
          and v_last_alert_at > now() - make_interval(secs => v_rule.cooldown_seconds) then
-        return;
+        return 'cooldown:' || v_row_count;
       end if;
-
-      v_alert_title := v_rule.title;
-      v_alert_desc := v_rule.description || E'\n\nQuery results:\n' || jsonb_pretty(v_rows);
-
-      select id into v_issue_id
-        from _supabase_advisors.issues
-        where dedup_key = v_dedup_key
-          and status in ('open', 'acknowledged', 'snoozed')
-        limit 1;
-
-      if v_issue_id is null then
-        insert into _supabase_advisors.issues (
-          title, description, severity, category, dedup_key,
-          suggested_actions, metadata
-        ) values (
-          v_alert_title, v_rule.description, v_rule.severity, v_rule.category,
-          v_dedup_key,
-          coalesce(
-            case when v_rule.remediation is not null
-              then jsonb_build_array(jsonb_build_object('type', 'link', 'label', 'View remediation', 'url', v_rule.remediation))
-              else '[]'::jsonb
-            end,
-            '[]'::jsonb
-          ),
-          v_rule.metadata
-        )
-        returning id into v_issue_id;
-      else
-        update _supabase_advisors.issues
-        set alert_count = alert_count + 1,
-            last_triggered_at = now(),
-            severity = case
-              when v_rule.severity = 'critical' then 'critical'
-              when severity = 'critical' then 'critical'
-              when v_rule.severity = 'warning' then 'warning'
-              else severity
-            end
-        where id = v_issue_id;
-      end if;
-
-      insert into _supabase_advisors.alerts (
-        rule_id, issue_id, severity, category, title, description,
-        signal_snapshot, metadata
-      ) values (
-        p_rule_id, v_issue_id, v_rule.severity, v_rule.category,
-        v_alert_title, v_alert_desc,
-        jsonb_build_object('query_results', v_rows),
-        v_rule.metadata
-      );
     end if;
 
+    v_alert_title := v_rule.title;
+    v_alert_desc := v_rule.description || E'\n\nQuery results:\n' || jsonb_pretty(v_rows);
+
+    select id into v_issue_id
+      from _supabase_advisors.issues
+      where dedup_key = v_dedup_key
+        and status in ('open', 'acknowledged', 'snoozed')
+      limit 1;
+
+    if v_issue_id is null then
+      insert into _supabase_advisors.issues (
+        title, description, severity, category, dedup_key,
+        suggested_actions, metadata
+      ) values (
+        v_alert_title, v_rule.description, v_rule.severity, v_rule.category,
+        v_dedup_key,
+        coalesce(
+          case when v_rule.remediation is not null
+            then jsonb_build_array(jsonb_build_object('type', 'link', 'label', 'View remediation', 'url', v_rule.remediation))
+            else '[]'::jsonb
+          end,
+          '[]'::jsonb
+        ),
+        v_rule.metadata
+      )
+      returning id into v_issue_id;
+    else
+      update _supabase_advisors.issues
+      set alert_count = alert_count + 1,
+          last_triggered_at = now(),
+          severity = case
+            when v_rule.severity = 'critical' then 'critical'
+            when severity = 'critical' then 'critical'
+            when v_rule.severity = 'warning' then 'warning'
+            else severity
+          end
+      where id = v_issue_id;
+    end if;
+
+    insert into _supabase_advisors.alerts (
+      rule_id, issue_id, severity, category, title, description,
+      signal_snapshot, metadata
+    ) values (
+      p_rule_id, v_issue_id, v_rule.severity, v_rule.category,
+      v_alert_title, v_alert_desc,
+      jsonb_build_object('query_results', v_rows),
+      v_rule.metadata
+    );
+
+    return 'alert_created:' || v_row_count;
+
   elsif v_rule.edge_function_name is not null then
-    -- pg_net + vault required for edge function invocation
     select exists(select 1 from pg_extension where extname = 'pg_net') into v_has_pg_net;
     if not v_has_pg_net then
-      raise notice 'pg_net not available — skipping edge function rule %', p_rule_id;
-      return;
+      return 'pg_net_unavailable';
     end if;
 
     begin
@@ -423,13 +441,11 @@ begin
       select decrypted_secret into v_service_role_key
         from vault.decrypted_secrets where name = 'service_role_key' limit 1;
     exception when others then
-      raise notice 'vault not available — skipping edge function rule %', p_rule_id;
-      return;
+      return 'vault_unavailable';
     end;
 
     if v_supabase_url is null or v_service_role_key is null then
-      raise warning 'Missing vault secrets for rule %', p_rule_id;
-      return;
+      return 'missing_secrets';
     end if;
 
     perform net.http_post(
@@ -444,7 +460,10 @@ begin
         'description', v_rule.description
       )
     );
+    return 'edge_function_called';
   end if;
+
+  return 'no_source';
 end;
 $$;
 

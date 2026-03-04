@@ -16,7 +16,7 @@ import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
 
 const ProjectLints: NextPageWithLayout = () => {
-  const { preset, id } = useParams()
+  const { ref, preset, id } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   // need to maintain a list of filters for each tab

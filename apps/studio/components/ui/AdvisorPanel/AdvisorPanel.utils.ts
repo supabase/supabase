@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
-import { Gauge, Inbox, Shield } from 'lucide-react'
+import { AlertCircle, Gauge, Inbox, Shield } from 'lucide-react'
 
 import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import type { AdvisorIssue } from 'data/advisors/types'
 import { Lint } from 'data/lint/lint-query'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import type { AdvisorItem } from './AdvisorPanel.types'
@@ -20,12 +21,24 @@ export const getAdvisorItemDisplayTitle = (item: AdvisorItem): string => {
       lintInfoMap.find((info) => info.name === lint.name)?.title || item.title.replace(/[`\\]/g, '')
     )
   }
+  if (item.source === 'issue') {
+    return item.title
+  }
   return item.title.replace(/[`\\]/g, '')
+}
+
+export const getIssueEntityString = (issue: AdvisorIssue | null): string | undefined => {
+  if (!issue) return undefined
+  const parts: string[] = []
+  if (issue.category) parts.push(issue.category)
+  if (issue.alert_count > 0) parts.push(`${issue.alert_count} alert${issue.alert_count !== 1 ? 's' : ''}`)
+  return parts.length > 0 ? parts.join(' · ') : undefined
 }
 
 export const tabIconMap: Record<Exclude<AdvisorTab, 'all'>, React.ElementType> = {
   security: Shield,
   performance: Gauge,
+  issues: AlertCircle,
   messages: Inbox,
 }
 

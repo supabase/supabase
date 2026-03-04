@@ -24,6 +24,7 @@ interface AdvisorFiltersProps {
   onStatusFiltersChange: (filters: string[]) => void
   onClose: () => void
   isPlatform?: boolean
+  isV2?: boolean
 }
 
 export const AdvisorFilters = ({
@@ -35,6 +36,7 @@ export const AdvisorFilters = ({
   onStatusFiltersChange,
   onClose,
   isPlatform = false,
+  isV2 = false,
 }: AdvisorFiltersProps) => {
   return (
     <div className="border-b overflow-x-auto">
@@ -50,6 +52,11 @@ export const AdvisorFilters = ({
             <TabsTrigger_Shadcn_ value="performance" className="h-full text-xs">
               Performance
             </TabsTrigger_Shadcn_>
+            {isV2 && (
+              <TabsTrigger_Shadcn_ value="issues" className="h-full text-xs">
+                Issues
+              </TabsTrigger_Shadcn_>
+            )}
             {isPlatform && (
               <TabsTrigger_Shadcn_
                 value="messages"

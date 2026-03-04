@@ -1,4 +1,7 @@
+import { useIsAdvisorsV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useAdvisorIssuesQuery, useUpdateIssueMutation } from 'data/advisors/issues-query'
+import type { AdvisorIssue, IssueStatus } from 'data/advisors/types'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import {
   Notification,
@@ -48,8 +51,11 @@ const notificationPriorityToSeverity = (priority: string | null | undefined): Ad
   }
 }
 
+const ACTIVE_ISSUE_STATUSES = ['open', 'acknowledged', 'snoozed']
+
 export const AdvisorPanel = () => {
   const track = useTrack()
+  const isV2 = useIsAdvisorsV2Enabled()
   const {
     activeTab,
     severityFilters,
@@ -79,6 +85,14 @@ export const AdvisorPanel = () => {
     { projectRef: project?.ref },
     { enabled: isSidebarOpen && hasProjectRef && activeTab !== 'messages' }
   )
+
+  const {
+    data: advisorIssuesData,
+    isPending: isIssuesLoading,
+    isError: isIssuesError,
+  } = useAdvisorIssuesQuery(project?.ref, {
+    enabled: isV2 && isSidebarOpen && hasProjectRef,
+  })
 
   // Notifications should always load when sidebar is open (shown in both 'all' and 'messages' tabs)
   const shouldLoadNotifications = isSidebarOpen && IS_PLATFORM
@@ -114,6 +128,7 @@ export const AdvisorPanel = () => {
   )
 
   const { mutate: updateNotifications } = useNotificationsV2UpdateMutation()
+  const updateIssueMutation = useUpdateIssueMutation(project?.ref)
 
   const notifications = useMemo(() => {
     return notificationsData?.pages.flatMap((page) => page) ?? []
@@ -168,8 +183,24 @@ export const AdvisorPanel = () => {
     })
   }, [notifications])
 
+  const issueItems = useMemo<AdvisorItem[]>(() => {
+    if (!isV2 || !advisorIssuesData) return []
+
+    return advisorIssuesData
+      .filter((issue) => ACTIVE_ISSUE_STATUSES.includes(issue.status))
+      .map((issue): AdvisorItem => ({
+        id: issue.id,
+        title: issue.title,
+        severity: issue.severity,
+        createdAt: dayjs(issue.last_triggered_at).valueOf(),
+        tab: 'issues' as const,
+        source: 'issue' as const,
+        original: issue,
+      }))
+  }, [isV2, advisorIssuesData])
+
   const combinedItems = useMemo<AdvisorItem[]>(() => {
-    const all = [...lintItems, ...notificationItems]
+    const all = [...lintItems, ...notificationItems, ...issueItems]
 
     return all.sort((a, b) => {
       const severityDiff = severityOrder[a.severity] - severityOrder[b.severity]
@@ -180,7 +211,7 @@ export const AdvisorPanel = () => {
 
       return a.title.localeCompare(b.title)
     })
-  }, [lintItems, notificationItems])
+  }, [lintItems, notificationItems, issueItems])
 
   const filteredItems = useMemo<AdvisorItem[]>(() => {
     return combinedItems.filter((item) => {
@@ -226,8 +257,9 @@ export const AdvisorPanel = () => {
   const isLintsActuallyLoading =
     isSidebarOpen && hasProjectRef && activeTab !== 'messages' && isLintsLoading
   const isNotificationsActuallyLoading = shouldLoadNotifications && isNotificationsLoading
-  const isLoading = isLintsActuallyLoading || isNotificationsActuallyLoading
-  const isError = isLintsError || isNotificationsError
+  const isIssuesActuallyLoading = isV2 && isSidebarOpen && hasProjectRef && isIssuesLoading
+  const isLoading = isLintsActuallyLoading || isNotificationsActuallyLoading || isIssuesActuallyLoading
+  const isError = isLintsError || isNotificationsError || (isV2 && isIssuesError)
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as AdvisorTab)
@@ -274,6 +306,10 @@ export const AdvisorPanel = () => {
     updateNotifications({ ids: [id], status })
   }
 
+  const handleUpdateIssueStatus = (issueId: string, status: IssueStatus) => {
+    updateIssueMutation.mutate({ issueId, status })
+  }
+
   const handleClearAllFilters = () => {
     clearSeverityFilters()
     resetNotificationFilters()
@@ -296,6 +332,7 @@ export const AdvisorPanel = () => {
                 item={selectedItem}
                 projectRef={project?.ref ?? ''}
                 onUpdateNotificationStatus={handleUpdateNotificationStatus}
+                onUpdateIssueStatus={handleUpdateIssueStatus}
               />
             ) : (
               <div className="px-6 py-8">
@@ -324,6 +361,7 @@ export const AdvisorPanel = () => {
             }}
             onClose={handleClose}
             isPlatform={IS_PLATFORM}
+            isV2={isV2}
           />
           <div className="flex-1 overflow-y-auto">
             <AdvisorPanelBody

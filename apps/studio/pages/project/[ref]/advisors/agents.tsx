@@ -2,12 +2,38 @@ import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { AgentsList } from 'components/interfaces/Advisors/Agents/AgentsList'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const AdvisorAgentsPage: NextPageWithLayout = () => {
   return (
-    <div className="mx-auto w-full max-w-7xl flex flex-col gap-y-8 px-5 py-6">
-      <AgentsList />
-    </div>
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>AI Agents</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure AI assistants that can analyze issues and suggest fixes.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
+            <AgentsList />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 

@@ -1,5 +1,8 @@
 import { useParams } from 'common'
 import { useAdvisorIssueDetailQuery, useUpdateIssueMutation } from 'data/advisors/issues-query'
+import { useAdvisorRulesQuery } from 'data/advisors/rules-query'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { AdvisorAlert, AdvisorSeverity, IssueStatus } from 'data/advisors/types'
 import {
   AlertOctagon,
@@ -10,8 +13,11 @@ import {
   Eye,
   EyeOff,
   Info,
+  Play,
+  RefreshCw,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button, Card, CardContent } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -53,6 +59,110 @@ function AlertTimelineItem({ alert }: { alert: AdvisorAlert }) {
   )
 }
 
+function RerunCheckButton({ ruleId, projectRef }: { ruleId: string | null; projectRef: string }) {
+  const { data: rules } = useAdvisorRulesQuery(projectRef)
+  const { data: project } = useSelectedProjectQuery()
+  const connectionString = project?.connectionString
+  const [checking, setChecking] = useState(false)
+  const [result, setResult] = useState<'pass' | 'fail' | null>(null)
+
+  const rule = rules?.find((r) => r.id === ruleId)
+
+  if (!rule?.sql_query) return null
+
+  const handleRerun = async () => {
+    if (!connectionString) return
+    setChecking(true)
+    setResult(null)
+    try {
+      const { result: rows } = await executeSql({
+        projectRef,
+        connectionString,
+        sql: rule.sql_query!,
+        queryKey: ['advisor-rerun-check', rule.id],
+      })
+      const hasIssues = Array.isArray(rows) && rows.length > 0
+      setResult(hasIssues ? 'fail' : 'pass')
+      if (hasIssues) {
+        toast.error('Issue still detected')
+      } else {
+        toast.success('Check passed — issue appears resolved')
+      }
+    } catch {
+      toast.error('Failed to run check')
+    } finally {
+      setChecking(false)
+    }
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium text-foreground">Verify Fix</p>
+            <p className="text-xs text-foreground-lighter">
+              Re-run the rule's SQL check to confirm the issue is resolved.
+            </p>
+          </div>
+          <Button
+            type="default"
+            size="small"
+            loading={checking}
+            onClick={handleRerun}
+            icon={<RefreshCw className="h-3 w-3" />}
+          >
+            Re-run Check
+          </Button>
+        </div>
+        {result === 'pass' && (
+          <div className="mt-3 flex items-center gap-2 text-brand">
+            <CheckCircle2 className="h-4 w-4" />
+            <span className="text-sm font-medium">Passed — no issues found</span>
+          </div>
+        )}
+        {result === 'fail' && (
+          <div className="mt-3 flex items-center gap-2 text-destructive-600">
+            <AlertOctagon className="h-4 w-4" />
+            <span className="text-sm font-medium">Still detected — issue persists</span>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+function ResolutionSteps({ isActive }: { isActive: boolean }) {
+  if (!isActive) return null
+
+  const steps = [
+    { num: 1, label: 'Understand', description: 'Review the alert timeline and description' },
+    { num: 2, label: 'Fix', description: 'Apply a suggested action or ask AI for help' },
+    { num: 3, label: 'Verify', description: 'Re-run the check to confirm the fix worked' },
+  ]
+
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <p className="text-xs font-medium text-foreground-lighter mb-3">Resolution Steps</p>
+        <div className="flex gap-4">
+          {steps.map((step, i) => (
+            <div key={step.num} className="flex items-start gap-2 flex-1">
+              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-surface-200 text-foreground-lighter text-xs font-medium shrink-0">
+                {step.num}
+              </div>
+              <div>
+                <p className="text-xs font-medium text-foreground">{step.label}</p>
+                <p className="text-xs text-foreground-lighter">{step.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export function IssueDetail() {
   const { ref: projectRef, id: issueId } = useParams()
   const { data: issue, isLoading } = useAdvisorIssueDetailQuery(projectRef, issueId)
@@ -79,6 +189,9 @@ export function IssueDetail() {
   const sev = severityConfig[issue.severity] ?? severityConfig.info
   const SeverityIcon = sev.icon
   const isActive = ['open', 'acknowledged', 'snoozed'].includes(issue.status)
+
+  const firstAlert = issue.alerts?.[0]
+  const ruleId = firstAlert?.rule_id ?? null
 
   return (
     <div className="mx-auto w-full max-w-7xl flex flex-col gap-y-6 px-5 py-6">
@@ -134,8 +247,10 @@ export function IssueDetail() {
         </div>
       </div>
 
+      <ResolutionSteps isActive={isActive} />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardContent className="p-0">
               <div className="px-6 py-3 border-b border-default">
@@ -158,6 +273,8 @@ export function IssueDetail() {
 
         <div className="space-y-6">
           <IssueActions issue={issue} />
+
+          <RerunCheckButton ruleId={ruleId} projectRef={projectRef!} />
 
           {issue.description && (
             <Card>

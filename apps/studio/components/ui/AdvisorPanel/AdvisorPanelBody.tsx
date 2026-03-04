@@ -1,3 +1,4 @@
+import type { AdvisorIssue } from 'data/advisors/types'
 import { Lint } from 'data/lint/lint-query'
 import { Notification } from 'data/notifications/notifications-v2-query'
 import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
@@ -9,6 +10,7 @@ import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   formatItemDate,
   getAdvisorItemDisplayTitle,
+  getIssueEntityString,
   getLintEntityString,
   severityBadgeVariants,
   severityColorClasses,
@@ -96,16 +98,18 @@ export const AdvisorPanelBody = ({
           const SeverityIcon = tabIconMap[item.tab as Exclude<AdvisorTab, 'all'>]
           const severityClass = severityColorClasses[item.severity]
           const isNotification = item.source === 'notification'
+          const isIssue = item.source === 'issue'
           const notification = isNotification ? (item.original as Notification) : null
           const isUnread = notification?.status === 'new'
-          const lint = !isNotification ? (item.original as Lint) : null
+          const lint = item.source === 'lint' ? (item.original as Lint) : null
+          const issue = isIssue ? (item.original as AdvisorIssue) : null
 
-          // Primary text: issue type for lint items, title for notifications
           const primaryText = getAdvisorItemDisplayTitle(item)
 
-          // Secondary text: entity for lint items when no date, date for notifications
           const hasDate = !!item.createdAt
-          const entityString = getLintEntityString(lint)
+          const entityString = isIssue
+            ? getIssueEntityString(issue)
+            : getLintEntityString(lint)
 
           return (
             <div key={`${item.source}-${item.id}`} className="border-b">

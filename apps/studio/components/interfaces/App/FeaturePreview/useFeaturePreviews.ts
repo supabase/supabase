@@ -92,5 +92,14 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isPlatformOnly: false,
       isDefaultOptIn: tableEditorNewFilterBar,
     },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISORS_V2,
+      name: 'Advisors V2',
+      discussionsUrl: undefined,
+      enabled: true,
+      isNew: true,
+      isPlatformOnly: true,
+      isDefaultOptIn: false,
+    },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

@@ -1,3 +1,4 @@
+import { useIsAdvisorsV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -14,6 +15,7 @@ interface AdvisorsSidebarMenuProps {
 export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
   const { data: project } = useSelectedProjectQuery()
   const { toggleSidebar } = useSidebarManagerSnapshot()
+  const advisorsV2 = useIsAdvisorsV2Enabled()
 
   const handleOpenAdvisor = () => {
     toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
@@ -33,7 +35,7 @@ export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
         }
       />
 
-      <ProductMenu page={page} menu={generateAdvisorsMenu(project)} />
+      <ProductMenu page={page} menu={generateAdvisorsMenu(project, { advisorsV2 })} />
     </div>
   )
 }

@@ -56,6 +56,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { AgentPresetsCards } from './AgentPresets'
 import { TOOL_CATALOG, TOOL_NAMES } from './tool-catalog'
 
 const AgentFormSchema = z.object({
@@ -94,23 +95,25 @@ export function AgentsList() {
         </div>
 
         {(agents ?? []).length === 0 ? (
-          <Card className="flex flex-col items-center justify-center py-12">
-            <Bot className="h-8 w-8 mb-2 text-foreground-lighter" />
-            <p className="text-sm text-foreground">No agents configured</p>
-            <p className="text-sm text-foreground-lighter mt-1">
-              Create AI agents to analyze issues and suggest fixes.
-            </p>
-            <Button
-              className="mt-4"
-              icon={<Plus />}
-              onClick={() => {
-                setEditingAgent(null)
-                setShowSheet(true)
-              }}
-            >
-              Create Agent
-            </Button>
-          </Card>
+          <div className="space-y-6">
+            <AgentPresetsCards />
+            <Card className="flex flex-col items-center justify-center py-8">
+              <Bot className="h-6 w-6 mb-2 text-foreground-lighter" />
+              <p className="text-sm text-foreground-lighter">
+                Or create a custom agent from scratch.
+              </p>
+              <Button
+                className="mt-4"
+                icon={<Plus />}
+                onClick={() => {
+                  setEditingAgent(null)
+                  setShowSheet(true)
+                }}
+              >
+                Create Custom Agent
+              </Button>
+            </Card>
+          </div>
         ) : (
           <Card>
             <Table>

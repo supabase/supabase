@@ -1,6 +1,6 @@
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ChannelsList } from 'components/interfaces/Advisors/Channels/ChannelsList'
+import { AlertsList } from 'components/interfaces/Advisors/Alerts/AlertsList'
 import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -12,15 +12,16 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-const AdvisorChannelsPage: NextPageWithLayout = () => {
+const AdvisorAlertsPage: NextPageWithLayout = () => {
   return (
     <>
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Notifications</PageHeaderTitle>
+            <PageHeaderTitle>Alerts</PageHeaderTitle>
             <PageHeaderDescription>
-              Set up email, Slack, or webhook channels to get alerted about issues.
+              Raw alert log showing every time a monitoring rule fires. Each alert is linked to the
+              issue it created or updated.
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
@@ -29,7 +30,7 @@ const AdvisorChannelsPage: NextPageWithLayout = () => {
       <PageContainer size="large">
         <PageSection>
           <PageSectionContent>
-            <ChannelsList />
+            <AlertsList />
           </PageSectionContent>
         </PageSection>
       </PageContainer>
@@ -37,10 +38,10 @@ const AdvisorChannelsPage: NextPageWithLayout = () => {
   )
 }
 
-AdvisorChannelsPage.getLayout = (page) => (
+AdvisorAlertsPage.getLayout = (page) => (
   <DefaultLayout>
-    <AdvisorsLayout title="Notifications">{page}</AdvisorsLayout>
+    <AdvisorsLayout title="Alerts">{page}</AdvisorsLayout>
   </DefaultLayout>
 )
 
-export default AdvisorChannelsPage
+export default AdvisorAlertsPage

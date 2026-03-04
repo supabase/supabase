@@ -1,3 +1,4 @@
+import { useIsAdvisorsV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { createLintSummaryPrompt, EntityTypeIcon } from 'components/interfaces/Linter/Linter.utils'
@@ -5,9 +6,10 @@ import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAdvisorIssuesQuery } from 'data/advisors/issues-query'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useTrack } from 'lib/telemetry/track'
-import { Activity, ExternalLink, Shield } from 'lucide-react'
+import { Activity, AlertOctagon, AlertTriangle, ArrowRight, ExternalLink, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import { useAdvisorStateSnapshot } from 'state/advisor-state'
@@ -40,8 +42,10 @@ interface SlowQuery {
 
 export const AdvisorWidget = () => {
   const { ref: projectRef } = useParams()
+  const isV2 = useIsAdvisorsV2Enabled()
   const [selectedTab, setSelectedTab] = useState<'security' | 'performance'>('security')
   const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: advisorIssues } = useAdvisorIssuesQuery(projectRef)
   const { data: slowestQueriesData, isLoading: isLoadingSlowestQueries } = useQueryPerformanceQuery(
     {
       preset: 'slowestExecutionTime',
@@ -200,6 +204,11 @@ export const AdvisorWidget = () => {
     )
   }
 
+  const activeAdvisorIssues = (advisorIssues ?? []).filter((i) =>
+    ['open', 'acknowledged', 'snoozed'].includes(i.status)
+  )
+  const criticalAdvisorIssues = activeAdvisorIssues.filter((i) => i.severity === 'critical')
+
   return (
     <div className="@container">
       {isLoadingLints ? (
@@ -207,6 +216,26 @@ export const AdvisorWidget = () => {
       ) : (
         <div className="flex justify-between items-center mb-6">{titleContent}</div>
       )}
+
+      {activeAdvisorIssues.length > 0 && (
+        <Link href={`/project/${projectRef}/advisors/issues`} className="block mb-4">
+          <Card className={`${criticalAdvisorIssues.length > 0 ? 'border-destructive-500/50 bg-destructive-200/10' : 'border-warning-500/50 bg-warning-200/10'} hover:border-foreground-muted transition-colors`}>
+            <CardContent className="flex items-center gap-3 p-3">
+              {criticalAdvisorIssues.length > 0 ? (
+                <AlertOctagon className="h-4 w-4 text-destructive-600 shrink-0" />
+              ) : (
+                <AlertTriangle className="h-4 w-4 text-warning-600 shrink-0" />
+              )}
+              <span className="text-sm text-foreground flex-1">
+                {activeAdvisorIssues.length} active advisor issue{activeAdvisorIssues.length !== 1 ? 's' : ''}
+                {criticalAdvisorIssues.length > 0 && ` (${criticalAdvisorIssues.length} critical)`}
+              </span>
+              <ArrowRight className="h-3 w-3 text-foreground-lighter" />
+            </CardContent>
+          </Card>
+        </Link>
+      )}
+
       <div className="grid grid-cols-1 @xl:grid-cols-2 gap-4">
         <Card className="h-80">
           <Tabs value={selectedTab} className="h-full flex flex-col">
@@ -245,12 +274,18 @@ export const AdvisorWidget = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: `Open ${selectedTab} Advisor`,
+                    text: isV2 ? 'Open Advisors' : `Open ${selectedTab} Advisor`,
                     className: 'capitalize',
                   },
                 }}
               >
-                <Link href={`/project/${projectRef}/advisors/${selectedTab}`} />
+                <Link
+                  href={
+                    isV2
+                      ? `/project/${projectRef}/advisors`
+                      : `/project/${projectRef}/advisors/${selectedTab}`
+                  }
+                />
               </ButtonTooltip>
             </CardHeader>
             <CardContent className="!p-0 mt-0 flex-1 overflow-y-auto">
