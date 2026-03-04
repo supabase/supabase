@@ -1,0 +1,120 @@
+name: Deploy Braintrust preview scorers
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number (for posting comment)
+        required: false
+        type: number
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  push-scorers:
+    name: Push preview scorers
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'preview-scorers')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Check for scorer file changes
+        id: changed
+        # On labeled or workflow_dispatch events, always push. On synchronize, only push if scorer files changed.
+        run: |
+          if [[ "${{ github.event_name }}" == "synchronize" ]]; then
+            changed=$(git diff --name-only origin/master...HEAD | grep -E 'evals/scorer' || true)
+            if [ -z "$changed" ]; then
+              echo "No scorer files changed, skipping push"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            else
+              echo "skip=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install pnpm
+        if: steps.changed.outputs.skip != 'true'
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        if: steps.changed.outputs.skip != 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        if: steps.changed.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Push scorers to staging
+        if: steps.changed.outputs.skip != 'true'
+        run: cd apps/studio && IS_PUSH=true pnpm braintrust push evals/scorer-online.ts
+        env:
+          BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
+          BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_STAGING_PROJECT_ID }}
+
+      - name: Post PR comment
+        if: steps.changed.outputs.skip != 'true' && (github.event.pull_request.number || github.event.inputs.pr_number)
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        env:
+          BRAINTRUST_STAGING_PROJECT_ID: ${{ secrets.BRAINTRUST_STAGING_PROJECT_ID }}
+        with:
+          script: |
+            const prNumber = context.payload.pull_request?.number ?? Number(context.payload.inputs?.pr_number)
+            const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
+            const prefix = branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()
+            const stagingUrl = `https://www.braintrust.dev/app/object?object_type=project_functions&object_id=${process.env.BRAINTRUST_STAGING_PROJECT_ID}`
+
+            const slugs = ['goal-completion', 'conciseness', 'completeness', 'docs-faithfulness', 'correctness', 'url-validity']
+            const slugList = slugs.map(s => `- \`${prefix}-${s}\``).join('\n')
+
+            const marker = '<!-- preview-scorers-bot -->'
+            const body = `${marker}
+            ### Braintrust Preview Scorers
+
+            Deployed scorers for branch \`${branch}\` to [Assistant Staging Scorers](${stagingUrl}):
+
+            ${slugList}`
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            })
+
+            const existing = comments.find(c => c.body?.includes(marker))
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              })
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              })
+            }

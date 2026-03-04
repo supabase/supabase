@@ -21,6 +21,12 @@ import {
 const projectId = process.env.BRAINTRUST_PROJECT_ID
 if (!projectId && process.env.IS_PUSH) throw new Error('BRAINTRUST_PROJECT_ID is not set')
 
+// When running in CI, prefix scorers with the branch name to avoid collisions between PRs
+// in the staging project. GITHUB_HEAD_REF is set on PR events, GITHUB_REF_NAME on push/dispatch.
+const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
+const prefix = branch ? `${branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()}-` : ''
+const namePrefix = branch ? `[${branch}] ` : ''
+
 const scorers = [
   { slug: 'goal-completion', name: 'Goal Completion', handler: goalCompletionScorer },
   { slug: 'conciseness', name: 'Conciseness', handler: concisenessScorer },
@@ -34,5 +40,5 @@ const scorers = [
 const project = braintrust.projects.create({ id: projectId })
 
 for (const { slug, name, handler } of scorers) {
-  project.scorers.create({ slug, name, handler, ifExists: 'replace' })
+  project.scorers.create({ slug: `${prefix}${slug}`, name: `${namePrefix}${name}`, handler, ifExists: 'replace' })
 }

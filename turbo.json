@@ -104,6 +104,8 @@
         "SITE_NAME",
         "VERCEL_URL",
         "IS_PUSH",
+        "GITHUB_HEAD_REF",
+        "GITHUB_REF_NAME",
         "IS_THROTTLED",
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
