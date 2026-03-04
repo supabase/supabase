@@ -12,14 +12,15 @@ You can read about the initial announcement [here](/blog/log-drains) and vote fo
 
 The following table lists the supported destinations and the required setup configuration:
 
-| Destination           | Transport Method | Configuration                                                                          |
-| --------------------- | ---------------- | -------------------------------------------------------------------------------------- |
-| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers                                      |
-| Datadog               | HTTP             | API Key <br /> Region                                                                  |
-| Loki                  | HTTP             | URL <br /> Headers                                                                     |
-| Sentry                | HTTP             | DSN                                                                                    |
-| Amazon S3             | AWS SDK          | S3 Bucket <br/> Region <br/> Access Key ID <br/> Secret Access Key <br/> Batch Timeout |
-| OTLP                  | HTTP             | Endpoint <br /> Protocol <br/> Gzip <br /> Headers                                     |
+| Destination | Transport Method | Configuration |
+| --- | --- | --- |
+| [Generic HTTP endpoint](#generic-http-endpoint) | HTTP | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
+| [Datadog logs](#datadog-logs) | HTTP | API Key <br /> Region |
+| [Loki](#loki) | HTTP | URL <br /> Headers <br /> [Dedicated setup guide](/docs/guides/telemetry/log-drains/loki) |
+| [Sentry](#sentry) | HTTP | DSN |
+| [Axiom](#axiom) | HTTP | Dataset <br/> API token |
+| [Amazon S3](#amazon-s3) | AWS SDK | S3 Bucket <br/> Region <br/> Access Key ID <br/> Secret Access Key <br/> Batch Timeout |
+| [OpenTelemetry protocol (OTLP)](#opentelemetry-protocol-otlp) | HTTP | Endpoint <br /> Protocol <br/> Gzip <br /> Headers |
 
 HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
 
@@ -189,15 +190,9 @@ If you are interested in other log drains, upvote them [here](https://github.com
 
 ## Loki
 
-Logs sent to the Loki HTTP API are specifically formatted according to the HTTP API requirements. See the official Loki HTTP API documentation for [more details](https://grafana.com/docs/loki/latest/reference/loki-http-api/#ingest-logs).
+The Loki integration forwards Supabase logs to Loki-compatible endpoints (including Grafana Cloud) using the Loki HTTP API format.
 
-Events are batched with a maximum of 250 events per request.
-
-The log source and product name will be used as stream labels.
-
-The `event_message` and `timestamp` fields will be dropped from the events to avoid duplicate data.
-
-Loki must be configured to accept **structured metadata**, and it is advised to increase the default maximum number of structured metadata fields to at least 500 to accommodate large log event payloads of different products.
+For full setup steps, verification queries, and operational guidance, see [Log Drains with Loki](/docs/guides/telemetry/log-drains/loki).
 
 ## Sentry
 
