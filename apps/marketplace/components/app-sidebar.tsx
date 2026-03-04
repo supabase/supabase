@@ -65,7 +65,7 @@ export function AppSidebar({ partners, ...props }: AppSidebarProps) {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {currentPartner.reviewer ? (
+              {currentPartner.partnerRole === 'reviewer' || currentPartner.partnerRole === 'admin' ? (
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild

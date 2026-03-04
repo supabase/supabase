@@ -22,6 +22,10 @@ import { z } from 'zod'
 
 import { createItemDraftAction, updateItemDraftAction } from '@/app/protected/actions'
 import { ItemFilesUploader, type ItemPreviewFile } from '@/components/item-files-uploader'
+import {
+  normalizeTemplatePath,
+  shouldIgnoreTemplatePath,
+} from '@/lib/marketplace/template-package'
 import { createClient } from '@/lib/supabase/client'
 
 export type ItemFile = {
@@ -71,6 +75,8 @@ type SubmitResult = {
   partnerSlug: string
 }
 
+const EMPTY_ITEM_FILES: ItemFile[] = []
+
 const itemTypeEnum = z.enum(['template', 'oauth'])
 
 function areStringArraysEqual(left: string[], right: string[]) {
@@ -91,27 +97,6 @@ function getTemplatePathSegments(pathOrUrl: string) {
   const trimmed = pathOrUrl.trim()
   if (!trimmed) return []
   return trimmed.split('/').filter(Boolean)
-}
-
-function isIgnoredTemplatePath(path: string) {
-  const normalized = path.replace(/^\/+/, '')
-  const segments = normalized.split('/').filter(Boolean)
-  if (segments.length === 0) return true
-
-  if (segments[0] === '__MACOSX') return true
-  const fileName = segments[segments.length - 1] ?? ''
-  if (fileName.toLowerCase() === '.ds_store') return true
-  if (fileName.startsWith('._')) return true
-
-  return false
-}
-
-function normalizeTemplatePath(path: string, rootPrefix: string | null) {
-  const stripped = path.replace(/^\/+/, '')
-  if (!rootPrefix) return stripped
-  if (stripped === rootPrefix) return ''
-  const prefix = `${rootPrefix}/`
-  return stripped.startsWith(prefix) ? stripped.slice(prefix.length) : stripped
 }
 
 function buildTemplateTree(paths: string[]) {
@@ -190,7 +175,7 @@ export function ItemForm(props: ItemFormProps) {
   const isCreateMode = props.mode === 'create'
   const item = props.mode === 'edit' ? props.item : null
   const itemId = isCreateMode ? submitResult?.itemId : item?.id
-  const initialFiles = props.mode === 'edit' ? props.initialFiles : []
+  const initialFiles = props.mode === 'edit' ? props.initialFiles : EMPTY_ITEM_FILES
   const fieldsDisabled = isPending || isWaitingForAutoUpload
   const initialFilesFieldValue = useMemo(
     () =>
@@ -321,7 +306,7 @@ export function ItemForm(props: ItemFormProps) {
       const arrayBuffer = await templateZipFile.arrayBuffer()
       const zip = await JSZip.loadAsync(arrayBuffer)
       const entries = Object.values(zip.files).filter(
-        (entry) => !entry.dir && !isIgnoredTemplatePath(entry.name)
+        (entry) => !entry.dir && !shouldIgnoreTemplatePath(entry.name)
       )
       const topLevelDirs = new Set(entries.map((entry) => entry.name.split('/')[0]).filter(Boolean))
       const rootPrefix = topLevelDirs.size === 1 ? Array.from(topLevelDirs)[0] ?? null : null

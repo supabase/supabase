@@ -9,14 +9,27 @@ create type public.marketplace_review_status as enum (
   'approved',
   'rejected'
 );
+create type public.marketplace_partner_role as enum (
+  'partner',
+  'reviewer',
+  'admin'
+);
 
 -- Helper predicates for RLS
-create function public.is_supabase_team_member()
+create function public.is_admin_member()
 returns boolean
 language sql
 stable
+security definer
+set search_path = public
 as $$
-  select coalesce(lower(auth.jwt() ->> 'email') like '%@supabase.io', false);
+  select exists (
+    select 1
+    from public.partner_members pm
+    inner join public.partners p on p.id = pm.partner_id
+    where pm.user_id = auth.uid()
+      and p.role = 'admin'
+  );
 $$;
 
 -- Partners represent companies/projects that publish marketplace items.
@@ -24,7 +37,7 @@ create table public.partners (
   id bigint generated always as identity primary key,
   slug text not null unique,
   title text not null,
-  reviewer boolean not null default false,
+  role public.marketplace_partner_role not null default 'partner',
   description text,
   website text,
   logo_url text,
@@ -91,7 +104,7 @@ as $$
     from public.partner_members pm
     inner join public.partners p on p.id = pm.partner_id
     where pm.user_id = auth.uid()
-      and p.reviewer = true
+      and p.role = 'reviewer'
   );
 $$;
 
@@ -259,7 +272,7 @@ create policy "partners_select"
   on public.partners
   for select
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or public.is_partner_member(id)
     or public.is_reviewer_member()
   );
@@ -268,7 +281,7 @@ create policy "partners_insert"
   on public.partners
   for insert
   with check (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or (auth.uid() is not null and created_by = auth.uid())
   );
 
@@ -276,11 +289,11 @@ create policy "partners_update"
   on public.partners
   for update
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or public.is_partner_member(id)
   )
   with check (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or public.is_partner_member(id)
   );
 
@@ -288,7 +301,7 @@ create policy "partners_delete"
   on public.partners
   for delete
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or public.is_partner_member(id)
   );
 
@@ -297,16 +310,16 @@ create policy "partner_members_select"
   on public.partner_members
   for select
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or user_id = auth.uid()
     or public.is_partner_member(partner_id)
   );
 
-create policy "partner_members_modify_supabase_only"
+create policy "partner_members_modify_admin_only"
   on public.partner_members
   for all
-  using (public.is_supabase_team_member())
-  with check (public.is_supabase_team_member());
+  using (public.is_admin_member())
+  with check (public.is_admin_member());
 
 create policy "partner_members_insert_creator_as_admin"
   on public.partner_members
@@ -335,7 +348,7 @@ create policy "items_select"
   on public.items
   for select
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or public.is_partner_member(partner_id)
     or public.is_reviewer_member()
   );
@@ -344,7 +357,7 @@ create policy "items_insert"
   on public.items
   for insert
   with check (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or (
       public.is_partner_member(partner_id)
       and submitted_by = auth.uid()
@@ -355,11 +368,11 @@ create policy "items_update"
   on public.items
   for update
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or public.is_partner_member(partner_id)
   )
   with check (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or public.is_partner_member(partner_id)
   );
 
@@ -367,28 +380,28 @@ create policy "items_delete"
   on public.items
   for delete
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or public.is_partner_member(partner_id)
   );
 
--- Categories: readable by anyone, writable by Supabase team.
+-- Categories: readable by anyone, writable by admin members.
 create policy "categories_select_all"
   on public.categories
   for select
   using (true);
 
-create policy "categories_modify_supabase_only"
+create policy "categories_modify_admin_only"
   on public.categories
   for all
-  using (public.is_supabase_team_member())
-  with check (public.is_supabase_team_member());
+  using (public.is_admin_member())
+  with check (public.is_admin_member());
 
 -- Category item mappings: partner members can manage mappings for their own items.
 create policy "category_items_select"
   on public.category_items
   for select
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -401,7 +414,7 @@ create policy "category_items_insert"
   on public.category_items
   for insert
   with check (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -414,7 +427,7 @@ create policy "category_items_update"
   on public.category_items
   for update
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -423,7 +436,7 @@ create policy "category_items_update"
     )
   )
   with check (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -436,7 +449,7 @@ create policy "category_items_delete"
   on public.category_items
   for delete
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -450,7 +463,7 @@ create policy "item_files_select"
   on public.item_files
   for select
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -463,7 +476,7 @@ create policy "item_files_insert"
   on public.item_files
   for insert
   with check (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -476,7 +489,7 @@ create policy "item_files_update"
   on public.item_files
   for update
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -485,7 +498,7 @@ create policy "item_files_update"
     )
   )
   with check (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -498,7 +511,7 @@ create policy "item_files_delete"
   on public.item_files
   for delete
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or exists (
       select 1
       from public.items i
@@ -512,7 +525,7 @@ create policy "item_reviews_select"
   on public.item_reviews
   for select
   using (
-    public.is_supabase_team_member()
+    public.is_admin_member()
     or public.is_reviewer_member()
     or exists (
       select 1
@@ -551,42 +564,16 @@ create policy "item_reviews_update_reviewer"
   using (public.is_reviewer_member())
   with check (public.is_reviewer_member());
 
-create policy "item_reviews_update_partner_request"
-  on public.item_reviews
-  for update
-  using (
-    exists (
-      select 1
-      from public.items i
-      where i.id = item_reviews.item_id
-        and public.is_partner_member(i.partner_id)
-    )
-  )
-  with check (
-    exists (
-      select 1
-      from public.items i
-      where i.id = item_reviews.item_id
-        and public.is_partner_member(i.partner_id)
-    )
-    and status = 'pending_review'
-    and featured = false
-    and reviewed_by is null
-    and reviewed_at is null
-    and review_notes is null
-    and published_at is null
-  );
-
 create policy "item_reviews_delete_reviewer"
   on public.item_reviews
   for delete
   using (public.is_reviewer_member());
 
--- Column-level permissions: reviewer assignment is managed manually by service role.
-revoke insert (reviewer) on table public.partners from anon, authenticated;
-revoke update (reviewer) on table public.partners from anon, authenticated;
-grant insert (reviewer) on table public.partners to service_role;
-grant update (reviewer) on table public.partners to service_role;
+-- Column-level permissions: partner role assignment is managed manually by service role.
+revoke insert (role) on table public.partners from anon, authenticated;
+revoke update (role) on table public.partners from anon, authenticated;
+grant insert (role) on table public.partners to service_role;
+grant update (role) on table public.partners to service_role;
 
 revoke all on function public.add_partner_member(bigint, text, text) from public;
 grant execute on function public.add_partner_member(bigint, text, text) to authenticated;

@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { hasEnvVars } from '../utils'
+import { shouldBypassAuth, shouldRedirectToLogin } from './proxy-rules'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -16,7 +17,7 @@ export async function updateSession(request: NextRequest) {
 
   // Auth pages don't need session-refresh middleware logic and skipping it here
   // avoids unnecessary cookie churn on login/signup routes.
-  if (request.nextUrl.pathname.startsWith('/auth')) {
+  if (shouldBypassAuth(request.nextUrl.pathname)) {
     return supabaseResponse
   }
 
@@ -54,7 +55,7 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
 
-  if (request.nextUrl.pathname !== '/' && !user && !request.nextUrl.pathname.startsWith('/login')) {
+  if (shouldRedirectToLogin(request.nextUrl.pathname, Boolean(user))) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { MarketplaceItem, type MarketplaceItemFile } from 'ui-patterns/MarketplaceItem'
 
 import { ReviewDecisionForm } from './review-decision-form'
+import { deriveReviewDecisionDefaults } from '@/lib/marketplace/review-state'
 import { createClient } from '@/lib/supabase/server'
 
 type ReviewDetailPageProps = {
@@ -22,11 +23,15 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
 
   const { data: reviewerPartner, error: reviewerPartnerError } = await supabase
     .from('partners')
-    .select('id, slug, title, reviewer')
+    .select('id, slug, title, role')
     .eq('slug', partnerslug)
     .maybeSingle()
 
-  if (reviewerPartnerError || !reviewerPartner || !reviewerPartner.reviewer) {
+  if (
+    reviewerPartnerError ||
+    !reviewerPartner ||
+    (reviewerPartner.role !== 'reviewer' && reviewerPartner.role !== 'admin')
+  ) {
     notFound()
   }
 
@@ -43,15 +48,7 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
   }
 
   const latestReview = Array.isArray(item.review) ? item.review[0] : item.review
-  const latestStatus =
-    latestReview?.status === 'approved' ||
-    latestReview?.status === 'rejected' ||
-    latestReview?.status === 'draft' ||
-    latestReview?.status === 'pending_review'
-      ? latestReview.status
-      : 'pending_review'
-  const latestFeatured = latestReview?.featured ?? false
-  const latestNotes = latestReview?.review_notes ?? ''
+  const reviewDefaults = deriveReviewDecisionDefaults(latestReview)
 
   const { data: itemFiles, error: itemFilesError } = await supabase
     .from('item_files')
@@ -87,11 +84,7 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
           title={item.title}
           partnerTitle={(item.partner as { title?: string } | null)?.title ?? 'Unknown partner'}
           itemId={item.id}
-          defaultValues={{
-            status: latestStatus,
-            featured: latestFeatured,
-            reviewNotes: latestNotes,
-          }}
+          defaultValues={reviewDefaults}
         />
       </section>
 

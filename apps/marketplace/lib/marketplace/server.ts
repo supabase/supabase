@@ -4,8 +4,8 @@ export type PartnerSidebarData = {
   id: number
   slug: string
   title: string
-  role: 'member' | 'admin'
-  reviewer: boolean
+  membershipRole: 'member' | 'admin'
+  partnerRole: 'partner' | 'reviewer' | 'admin'
   items: Array<{
     id: number
     slug: string
@@ -29,7 +29,7 @@ export async function getMarketplaceSidebarData() {
 
   const { data: memberships, error: membershipError } = await supabase
     .from('partner_members')
-    .select('role, partner:partners(id, slug, title, reviewer)')
+    .select('role, partner:partners(id, slug, title, role)')
     .eq('user_id', user.id)
 
   if (membershipError) {
@@ -40,15 +40,15 @@ export async function getMarketplaceSidebarData() {
   for (const entry of memberships ?? []) {
     const partnerValue = Array.isArray(entry.partner) ? entry.partner[0] : entry.partner
     const partner = partnerValue as
-      | { id: number; slug: string; title: string; reviewer: boolean }
+      | { id: number; slug: string; title: string; role: 'partner' | 'reviewer' | 'admin' }
       | null
     if (!partner) continue
     partnerMap.set(partner.id, {
       id: partner.id,
       slug: partner.slug,
       title: partner.title,
-      role: entry.role === 'admin' ? 'admin' : 'member',
-      reviewer: partner.reviewer,
+      membershipRole: entry.role === 'admin' ? 'admin' : 'member',
+      partnerRole: partner.role,
       items: [],
     })
   }
@@ -80,6 +80,8 @@ export async function getMarketplaceSidebarData() {
   const partners = Array.from(partnerMap.values()).sort((a, b) =>
     a.title.localeCompare(b.title)
   )
-  const isReviewerMember = partners.some((partner) => partner.reviewer)
+  const isReviewerMember = partners.some(
+    (partner) => partner.partnerRole === 'reviewer' || partner.partnerRole === 'admin'
+  )
   return { user, partners, isReviewerMember }
 }

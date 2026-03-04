@@ -48,6 +48,8 @@ type ItemEditorSplitViewProps =
       }
     }
 
+const EMPTY_PREVIEW_FILES: MarketplaceItemFile[] = []
+
 function toPreviewFiles(initialFiles: ItemFile[]): MarketplaceItemFile[] {
   return initialFiles.map((file) => {
     const fileName = file.file_path.split('/').pop() ?? file.file_path
@@ -107,11 +109,12 @@ export function ItemEditorSplitView(props: ItemEditorSplitViewProps) {
         }
 
   const [previewValues, setPreviewValues] = useState<ItemFormValues>(baseValues)
+  const editInitialFiles = props.mode === 'edit' ? props.initialFiles : null
   const initialPreviewFiles = useMemo(() => {
     if (props.initialPreviewFiles) return props.initialPreviewFiles
-    if (props.mode === 'edit') return toPreviewFiles(props.initialFiles)
-    return []
-  }, [props])
+    if (editInitialFiles) return toPreviewFiles(editInitialFiles)
+    return EMPTY_PREVIEW_FILES
+  }, [editInitialFiles, props.initialPreviewFiles])
   const [previewFiles, setPreviewFiles] = useState<MarketplaceItemFile[]>(initialPreviewFiles)
 
   useEffect(() => {

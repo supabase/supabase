@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
 import { ThemeProvider } from 'next-themes'
 
-import './globals.css'
 import '../../studio/styles/typography.scss'
+
 import { customFont, sourceCodePro } from './fonts'
+
+import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -31,7 +33,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
+      <body className="antialiased bg-background">
         <ThemeProvider
           attribute="class"
           themes={['dark', 'light', 'classic-dark']}

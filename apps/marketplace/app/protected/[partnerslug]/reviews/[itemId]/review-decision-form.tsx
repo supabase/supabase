@@ -25,6 +25,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import { saveItemReviewAction } from '@/app/protected/actions'
+import { buildReviewDecisionFormData } from '@/lib/marketplace/review-form'
 
 const reviewStatusEnum = z.enum(['pending_review', 'approved', 'rejected', 'draft'])
 
@@ -82,14 +83,13 @@ export function ReviewDecisionForm({
     setError(null)
     setSuccess(null)
 
-    const formData = new FormData()
-    formData.set('partnerSlug', partnerSlug)
-    formData.set('itemId', String(itemId))
-    formData.set('status', parsed.data.status)
-    formData.set('reviewNotes', parsed.data.reviewNotes ?? '')
-    if (parsed.data.featured) {
-      formData.set('featured', 'on')
-    }
+    const formData = buildReviewDecisionFormData({
+      partnerSlug,
+      itemId,
+      status: parsed.data.status,
+      reviewNotes: parsed.data.reviewNotes,
+      featured: parsed.data.featured,
+    })
 
     startTransition(async () => {
       try {

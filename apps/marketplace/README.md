@@ -17,6 +17,39 @@
 </p>
 <br/>
 
+## Marketplace testing
+
+Marketplace production-readiness coverage is organized into four layers:
+
+- Unit tests for pure parsing/validation/transition helpers under `lib/marketplace` and `lib/supabase`.
+- Integration tests for server actions and server-side data loading boundaries.
+- Component tests for high-risk forms and editor/upload UX.
+- A smoke journey test for the core partner -> item -> review lifecycle.
+
+### Run tests
+
+From this package:
+
+```bash
+pnpm test
+pnpm test:watch
+pnpm test:smoke
+```
+
+From repo root:
+
+```bash
+pnpm test:marketplace
+pnpm test:marketplace:smoke
+```
+
+### Test patterns
+
+- Keep branching business rules in pure modules (`lib/marketplace/*`) and test them with deterministic unit tests.
+- Mock Supabase boundaries in action/data-loader tests; validate both happy paths and policy/error paths.
+- Prefer small component tests that verify behavior contracts (validation, payload mapping, state transitions) rather than implementation details.
+- When introducing new flows, add at least one smoke-path assertion to avoid regressions in the core submit/review journey.
+
 ## Features
 
 - Works across the entire [Next.js](https://nextjs.org) stack

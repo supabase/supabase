@@ -12,6 +12,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { ReviewsFilters } from './reviews-filters'
+import { mapReviewRows, parseReviewsFilters } from '@/lib/marketplace/reviews-list'
 import { createClient } from '@/lib/supabase/server'
 
 type ReviewsPageProps = {
@@ -29,33 +30,24 @@ type ReviewsPageProps = {
       }>
 }
 
-const REVIEW_STATUSES = ['pending_review', 'approved', 'rejected', 'draft'] as const
-
 export default async function ReviewsPage({ params, searchParams }: ReviewsPageProps) {
   const { partnerslug } = params
   const supabase = await createClient()
   const resolvedSearchParams = searchParams ? await searchParams : undefined
-  const requestedStatus = resolvedSearchParams?.status ?? 'pending_review'
-  const statusFilter =
-    requestedStatus === 'all' ||
-    REVIEW_STATUSES.some((status) => status === requestedStatus)
-      ? requestedStatus
-      : 'pending_review'
-  const itemIdFilter = resolvedSearchParams?.itemId?.trim() ?? ''
-  const parsedItemIdFilter = Number(itemIdFilter)
-  const hasValidItemIdFilter =
-    itemIdFilter.length > 0 &&
-    Number.isInteger(parsedItemIdFilter) &&
-    Number.isFinite(parsedItemIdFilter) &&
-    parsedItemIdFilter > 0
+  const { statusFilter, itemIdFilter, parsedItemIdFilter, hasValidItemIdFilter } =
+    parseReviewsFilters(resolvedSearchParams)
 
   const { data: currentPartner, error: currentPartnerError } = await supabase
     .from('partners')
-    .select('id, slug, title, reviewer')
+    .select('id, slug, title, role')
     .eq('slug', partnerslug)
     .maybeSingle()
 
-  if (currentPartnerError || !currentPartner || !currentPartner.reviewer) {
+  if (
+    currentPartnerError ||
+    !currentPartner ||
+    (currentPartner.role !== 'reviewer' && currentPartner.role !== 'admin')
+  ) {
     notFound()
   }
 
@@ -98,26 +90,11 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
     throw new Error(reviewPartnersError.message)
   }
 
-  const partnerTitleById = new Map((reviewPartners ?? []).map((partner) => [partner.id, partner.title]))
+  const partnerTitleById = new Map(
+    (reviewPartners ?? []).map((partner) => [partner.id, partner.title])
+  )
 
-  const reviewRows = (reviews ?? [])
-    .map((review) => {
-      const item = Array.isArray(review.item) ? review.item[0] : review.item
-
-      if (!item?.id || !item.slug || !item.title) {
-        return null
-      }
-
-      return {
-        reviewId: review.item_id,
-        itemId: item.id,
-        itemSlug: item.slug,
-        itemTitle: item.title,
-        partnerTitle: partnerTitleById.get(item.partner_id) ?? 'Unknown partner',
-        status: review.status ?? 'pending_review',
-      }
-    })
-    .filter((row): row is NonNullable<typeof row> => row !== null)
+  const reviewRows = mapReviewRows(reviews ?? [], partnerTitleById)
 
   return (
     <>
@@ -126,7 +103,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
           <PageHeaderSummary>
             <PageHeaderTitle>Reviews</PageHeaderTitle>
             <PageHeaderDescription>
-              Pending items from all partners are listed here for reviewer partners.
+              Review marketplace items submitted from all partners
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>

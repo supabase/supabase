@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import type { MarketplaceItemFile } from 'ui-patterns/MarketplaceItem'
 
 import { ItemEditorSplitView } from '@/components/item-editor-split-view'
+import { deriveOpenReviewState } from '@/lib/marketplace/review-state'
 import { createClient } from '@/lib/supabase/server'
 
 type EditItemPageProps = {
@@ -64,15 +65,9 @@ export default async function EditItemPage({ params }: EditItemPageProps) {
     throw new Error(latestReviewError.message)
   }
 
-  const hasOpenReview =
-    latestReview?.status === 'pending_review' || latestReview?.status === 'draft'
-  const isApproved = latestReview?.status === 'approved'
-  const openReviewStatusLabel =
-    latestReview?.status === 'pending_review'
-      ? 'Pending review'
-      : latestReview?.status === 'draft'
-        ? 'Draft'
-        : null
+  const { hasOpenReview, isApproved, openReviewStatusLabel } = deriveOpenReviewState(
+    latestReview?.status
+  )
 
   const previewFiles: MarketplaceItemFile[] = (itemFiles ?? []).map((file, index) => {
     const fileName = file.file_path.split('/').pop() ?? file.file_path
