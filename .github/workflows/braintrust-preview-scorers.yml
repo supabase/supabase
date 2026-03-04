@@ -3,12 +3,6 @@ name: Deploy Braintrust preview scorers
 on:
   pull_request:
     types: [labeled, synchronize]
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: PR number (for posting comment)
-        required: false
-        type: number
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -21,7 +15,7 @@ permissions:
 jobs:
   push-scorers:
     name: Push preview scorers
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'preview-scorers')
+    if: contains(github.event.pull_request.labels.*.name, 'preview-scorers')
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -34,7 +28,7 @@ jobs:
 
       - name: Check for scorer file changes
         id: changed
-        # On labeled or workflow_dispatch events, always push. On synchronize, only push if scorer files changed.
+        # On labeled events, always push. On synchronize, only push if scorer files changed.
         run: |
           if [[ "${{ github.event_name }}" == "synchronize" ]]; then
             changed=$(git diff --name-only origin/master...HEAD | grep -E 'evals/scorer' || true)
@@ -77,15 +71,15 @@ jobs:
           BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_STAGING_PROJECT_ID }}
 
       - name: Post PR comment
-        if: steps.changed.outputs.skip != 'true' && (github.event.pull_request.number || github.event.inputs.pr_number)
+        if: steps.changed.outputs.skip != 'true'
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         env:
           BRAINTRUST_STAGING_PROJECT_ID: ${{ secrets.BRAINTRUST_STAGING_PROJECT_ID }}
           SCORER_SLUGS: ${{ steps.push.outputs.slugs }}
         with:
           script: |
-            const prNumber = context.payload.pull_request?.number ?? Number(context.payload.inputs?.pr_number)
-            const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
+            const prNumber = context.payload.pull_request.number
+            const branch = process.env.GITHUB_HEAD_REF
             const prefix = branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()
             const stagingUrl = 'https://www.braintrust.dev/app/supabase.io/p/Assistant%20(Staging%20Scorers)/scorers'
 
