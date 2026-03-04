@@ -265,6 +265,8 @@ export function useFlag<T = boolean>(name: string) {
   const flagStore = useFeatureFlags()
   const store = flagStore.configcat
 
+  if (name === 'defaultToReadReplicaConnectionString') return false
+
   // Flag store is empty means config cat is not loaded yet, return false
   if (isObjectEmpty(store)) {
     return false

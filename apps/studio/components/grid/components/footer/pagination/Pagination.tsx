@@ -102,6 +102,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   )
   const count = data?.count ?? 0
   const hasCountData = count >= 0
+  const isEstimateCount = data?.is_estimate ?? false
   const countString = data?.is_estimate ? formatEstimatedCount(count) : count.toLocaleString()
   const maxPages = Math.ceil(count / tableEditorSnap.rowsPerPage)
   const totalPages = count > 0 ? maxPages : 1
@@ -182,12 +183,16 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   }, [page])
 
   useEffect(() => {
-    console.log({ rowsCountEstimate })
-    if (id !== undefined && rowsCountEstimate) {
-      snap.setEnforceExactCount(rowsCountEstimate <= THRESHOLD_COUNT)
+    if (
+      id !== undefined &&
+      isSuccess &&
+      count >= 0 &&
+      count <= THRESHOLD_COUNT &&
+      isEstimateCount
+    ) {
+      snap.setEnforceExactCount(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, rowsCountEstimate])
+  }, [count, isEstimateCount, id, isSuccess, snap])
 
   useEffect(() => {
     // If the count query encountered a timeout error with exact count
@@ -197,8 +202,6 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError, snap.enforceExactCount, error?.code])
-
-  console.log({ count, hasCountData, check: snap.enforceExactCount })
 
   // [Joshen] One to revisit if we can consolidate this and the main return statement
   if (isForeignTableSelected) {

@@ -81,7 +81,7 @@ select
     when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}')` : 'estimate'}
     else (${countBaseSql})
   end as count,
-  estimate = -1 or estimate > ${THRESHOLD_COUNT} as is_estimate
+  estimate > ${THRESHOLD_COUNT} as is_estimate
 from approximation;
 `.trim()
 
