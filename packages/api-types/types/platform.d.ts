@@ -4645,6 +4645,7 @@ export interface components {
     }
     AccountRequestDetailsDto: {
       email: string
+      email_matches: boolean
       expires_at: string
       id: string
       name?: string
