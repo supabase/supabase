@@ -7,7 +7,6 @@ import {
   ChevronDown,
   TextSearch,
   ArrowRight,
-  Loader2,
   Eye,
   EyeOff,
 } from 'lucide-react'
@@ -16,7 +15,6 @@ import { useParams } from 'common'
 // eslint-disable-next-line no-restricted-imports
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import {
-  AiIconAnimation,
   Button,
   CodeBlock,
   Tabs_Shadcn_,
@@ -29,6 +27,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -64,6 +63,7 @@ import { wrapWithRollback } from 'data/sql/utils/transaction'
 import type { QueryPlanRow } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import type { ClassifiedQuery } from '../QueryInsightsHealth/QueryInsightsHealth.types'
 import { QueryInsightsDetailSheet } from './QueryInsightsDetailSheet'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 
 interface QueryInsightsTableProps {
   data: QueryPerformanceRow[]
@@ -623,7 +623,7 @@ export const QueryInsightsTable = ({
       {
         key: 'calls',
         name: 'Calls',
-        minWidth: 100,
+        minWidth: 110,
         resizable: true,
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
@@ -647,9 +647,34 @@ export const QueryInsightsTable = ({
         },
       },
       {
+        key: 'mean_time',
+        name: 'Mean time',
+        minWidth: 110,
+        resizable: true,
+        headerCellClass: 'cursor-default',
+        renderHeaderCell: () => (
+          <div className="flex items-center text-xs w-full">
+            <p className="!text-foreground font-medium">Mean time</p>
+          </div>
+        ),
+        renderCell: (props) => {
+          const value = (props.row as ClassifiedQuery).mean_time
+          return (
+            <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
+              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
+                <p className={cn(value === 0 && 'text-foreground-lighter')}>
+                  {formatDuration(value)}
+                </p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        },
+      },
+      {
         key: 'actions',
         name: 'Actions',
-        minWidth: 300,
         resizable: false,
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
@@ -661,59 +686,85 @@ export const QueryInsightsTable = ({
           const row = props.row as ClassifiedQuery
           return (
             <div className="flex items-center gap-2 justify-end w-full h-full">
-              <Button
-                type="default"
-                size="tiny"
-                onClick={(e: React.MouseEvent) => {
-                  e.stopPropagation()
-                  handleGoToLogs()
-                }}
-              >
-                Go to Logs
-              </Button>
-              {(row.issueType === 'index' || row.issueType === 'slow') && (
+              {!row.issueType && (
                 <Button
                   type="default"
                   size="tiny"
-                  icon={
-                    explainLoadingQuery === row.query ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : undefined
-                  }
                   onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
-                    setSelectedTriageRow(props.rowIdx)
-                    setSheetView('explain')
+                    handleGoToLogs()
                   }}
                 >
-                  Explain
+                  Go to Logs
                 </Button>
               )}
               {row.issueType === 'index' && (
-                <Button
-                  type="primary"
-                  size="tiny"
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation()
-                    setSelectedTriageRow(props.rowIdx)
-                    setSheetView('indexes')
-                  }}
-                >
-                  Create Index
-                </Button>
+                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    type="primary"
+                    size="tiny"
+                    className="rounded-r-none border-r-0"
+                    onClick={() => {
+                      setSelectedTriageRow(props.rowIdx)
+                      setSheetView('indexes')
+                    }}
+                  >
+                    Create Index
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="primary"
+                        size="tiny"
+                        className="rounded-l-none px-1"
+                        icon={<ChevronDown size={12} />}
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem onClick={() => handleGoToLogs()} className="gap-2">
+                        Go to Logs
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedTriageRow(props.rowIdx)
+                          setSheetView('explain')
+                        }}
+                        className="gap-2"
+                      >
+                        Explain
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               )}
               {(row.issueType === 'error' || row.issueType === 'slow') && (
-                <Button
-                  type="default"
-                  size="tiny"
-                  icon={<AiIconAnimation size={14} />}
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation()
-                    handleAiSuggestedFix(row)
-                  }}
-                >
-                  Fix with AI
-                </Button>
+                <div onClick={(e) => e.stopPropagation()}>
+                  <AiAssistantDropdown
+                    label="Fix with AI"
+                    buildPrompt={() => buildQueryInsightFixPrompt(row).prompt}
+                    onOpenAssistant={() => handleAiSuggestedFix(row)}
+                    copyLabel="Copy Markdown"
+                    extraDropdownItems={
+                      <>
+                        <DropdownMenuItem onClick={() => handleGoToLogs()} className="gap-2">
+                          Go to Logs
+                        </DropdownMenuItem>
+                        {row.issueType === 'slow' && (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedTriageRow(props.rowIdx)
+                              setSheetView('explain')
+                            }}
+                            className="gap-2"
+                          >
+                            Explain
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                      </>
+                    }
+                  />
+                </div>
               )}
             </div>
           )
