@@ -2862,6 +2862,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
+        { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
       ],
     },
