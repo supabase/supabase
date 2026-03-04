@@ -50,6 +50,7 @@ import { tryParseJson } from '@/lib/helpers'
 import { lookupMime } from '@/lib/mime'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import { ResponseError } from '@/types'
+import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 
 type UploadProgress = {
   percentage: number
