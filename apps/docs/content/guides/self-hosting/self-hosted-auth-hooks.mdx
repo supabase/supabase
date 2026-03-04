@@ -133,7 +133,7 @@ Postgres function hooks do not require secrets — the function runs inside the 
 ### 3. Restart the auth service
 
 ```sh
-docker compose up -d auth
+docker compose up -d --force-recreate --no-deps auth
 ```
 
 ### 4. Verify
@@ -206,7 +206,7 @@ GOTRUE_HOOK_SEND_EMAIL_SECRETS: ${HOOK_SEND_EMAIL_SECRETS}
 ### 5. Restart
 
 ```sh
-docker compose up -d auth functions
+docker compose up -d --force-recreate --no-deps auth functions
 ```
 
 ## Hook-specific setup
