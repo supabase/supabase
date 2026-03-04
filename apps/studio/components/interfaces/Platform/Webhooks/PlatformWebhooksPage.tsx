@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
 
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -17,6 +18,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Label_Shadcn_,
   copyToClipboard,
 } from 'ui'
@@ -283,16 +288,36 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
             <>
               <Button
                 type="default"
+                icon={<Pencil size={14} />}
                 onClick={() => {
                   setEditEnabledOverride(null)
                   setPanel('edit')
                 }}
               >
+
                 Edit
               </Button>
-              <Button type="danger" onClick={() => setEndpointIdPendingDelete(selectedEndpoint.id)}>
-                Delete
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" icon={<EllipsisVertical />} className="w-7" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" side="bottom" className="w-48">
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    onClick={() => setShowRegenerateSecretConfirm(true)}
+                  >
+                    <RotateCw size={14} />
+                    <span>Regenerate secret</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    onClick={() => setEndpointIdPendingDelete(selectedEndpoint.id)}
+                  >
+                    <Trash2 size={14} />
+                    <span>Delete endpoint</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : undefined
         }
@@ -326,7 +351,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                   setDeliveryDetailsTab('event')
                   setDeliveryId(id)
                 }}
-                onRegenerateSecret={() => setShowRegenerateSecretConfirm(true)}
               />
             )}
           </PageSectionContent>
