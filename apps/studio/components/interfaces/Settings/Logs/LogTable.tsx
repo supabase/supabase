@@ -193,7 +193,7 @@ export const LogTable = ({
       }
       return (
         <div
-          className="absolute group inset-0 flex justify-center pl-2 items-center cursor-pointer"
+          className="absolute group inset-0 flex justify-center px-2 items-center cursor-pointer"
           onClick={(e) => {
             e.stopPropagation()
             toggle()

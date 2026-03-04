@@ -37,7 +37,7 @@ export function MultiSelectActionBar({
       className="flex items-center gap-2 px-3 py-1.5 border-b bg-surface-200 text-sm sticky top-0 z-10"
       style={{ height: 40 }}
     >
-      <span className="text-foreground-light font-mono">
+      <span className="text-foreground-light font-mono text-xs">
         {count} row{count !== 1 ? 's' : ''} selected
       </span>
 
@@ -76,7 +76,8 @@ export function MultiSelectActionBar({
           size="tiny"
           icon={<XIcon size={12} />}
           onClick={onClear}
-          className="text-foreground-lighter hover:text-foreground"
+          title="Clear selection"
+          className="text-foreground-lighter px-1.5 hover:text-foreground"
         />
       </div>
     </div>
