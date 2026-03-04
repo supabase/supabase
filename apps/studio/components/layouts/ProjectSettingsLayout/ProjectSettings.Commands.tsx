@@ -11,9 +11,10 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   const router = useRouter()
   const setIsOpen = useSetCommandMenuOpen()
-  let { ref } = useParams()
+  let { ref, slug } = useParams()
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   ref ||= '_'
+  slug ||= '_'
 
   const { projectSettingsLogDrains, projectSettingsCustomDomains, authenticationSignInProviders } =
     useIsFeatureEnabled([
@@ -51,6 +52,12 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
               id: 'nav-project-settings-webhooks',
               name: 'Project Webhooks',
               route: `/project/${ref}/settings/webhooks`,
+              defaultHidden: true,
+            } as IRouteCommand,
+            {
+              id: 'nav-organization-settings-webhooks',
+              name: 'Organization Webhooks',
+              route: `/org/${slug}/webhooks`,
               defaultHidden: true,
             } as IRouteCommand,
           ]
@@ -158,6 +165,6 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           ]
         : []),
     ],
-    { ...options, deps: [platformWebhooksEnabled, ref] }
+    { ...options, deps: [platformWebhooksEnabled, ref, slug] }
   )
 }
