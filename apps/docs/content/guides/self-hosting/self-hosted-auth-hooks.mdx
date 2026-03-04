@@ -28,10 +28,10 @@ The Auth service (GoTrue) can call a **hook** at specific lifecycle events durin
 
 Hooks support two URI schemes:
 
-| Scheme            | Format                                         | When to use                                      |
-| ----------------- | ---------------------------------------------- | ------------------------------------------------ |
-| `pg-functions://` | `pg-functions://postgres/schema/function_name` | Postgres functions (recommended for self-hosted) |
-| `https://`        | `https://example.com/hook`                     | External HTTP endpoints                          |
+| Scheme                  | Format                                         | When to use                                      |
+| ----------------------- | ---------------------------------------------- | ------------------------------------------------ |
+| `pg-functions://`       | `pg-functions://postgres/schema/function_name` | Postgres functions (recommended for self-hosted) |
+| `http://` or `https://` | `https://example.com/hook`                     | External HTTP endpoints                          |
 
 <Admonition type="tip">
 
@@ -75,7 +75,7 @@ This example enables the **Custom Access Token** hook using a Postgres function 
 
 ### 1. Create the Postgres function
 
-Connect to your database and run:
+You can execute the following SQL from the Supabase dashboard SQL editor, or by connecting to your database using a PostgreSQL client such as psql.
 
 ```sql name=custom_access_token_hook.sql
 create or replace function public.custom_access_token_hook(event jsonb)
@@ -120,7 +120,7 @@ revoke execute on function public.custom_access_token_hook
 In the `auth` service `environment:` block, uncomment:
 
 ```yaml name=docker-compose.yml
-GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: 'true'
+GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: "true"
 GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI: 'pg-functions://postgres/public/custom_access_token_hook'
 ```
 
@@ -188,19 +188,33 @@ echo "v1,whsec_${SECRET}"
 
 Copy the output (e.g., `v1,whsec_abc123...`).
 
-### 3. Configure in `.env`
+### 3. Configure in `.env` file
 
 ```bash name=.env
 HOOK_SEND_EMAIL_URI=http://host.docker.internal:8000/functions/v1/email_sender
 HOOK_SEND_EMAIL_SECRETS=v1,whsec_your-generated-secret
 ```
 
-### 4. Uncomment in `docker-compose.yml`
+### 4. Add environment variables in `docker-compose.yml`
+
+Add the following environment variables to the auth & functions services.
+
+<Admonition type="note">
+
+For brevity, only the updated fields are shown.
+
+</Admonition>
 
 ```yaml name=docker-compose.yml
-GOTRUE_HOOK_SEND_EMAIL_ENABLED: 'true'
-GOTRUE_HOOK_SEND_EMAIL_URI: ${HOOK_SEND_EMAIL_URI}
-GOTRUE_HOOK_SEND_EMAIL_SECRETS: ${HOOK_SEND_EMAIL_SECRETS}
+services:
+  auth:
+    environment:
+      GOTRUE_HOOK_SEND_EMAIL_ENABLED: "true"
+      GOTRUE_HOOK_SEND_EMAIL_URI: ${HOOK_SEND_EMAIL_URI}
+      GOTRUE_HOOK_SEND_EMAIL_SECRETS: ${HOOK_SEND_EMAIL_SECRETS}
+  functions:
+    environment:
+      SEND_EMAIL_HOOK_SECRET: ${HOOK_SEND_EMAIL_SECRETS}
 ```
 
 ### 5. Restart
