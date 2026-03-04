@@ -93,8 +93,7 @@ export const useUnifiedLogsPreview = () => {
 
 export const useIsBranching2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const gitlessBranchingEnabled = useFlag('gitlessBranching')
-  return gitlessBranchingEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
@@ -105,8 +104,7 @@ export const useIsPgDeltaDiffEnabled = () => {
 
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const advisorRulesEnabled = useFlag('advisorRules')
-  return advisorRulesEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
 export const useIsQueueOperationsEnabled = () => {
