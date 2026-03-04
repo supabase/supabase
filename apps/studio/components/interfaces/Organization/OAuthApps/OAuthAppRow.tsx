@@ -37,14 +37,6 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
 
   return (
     <TableRow>
-      <TableCell className="w-[30px]">
-        <div
-          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center"
-          style={{ backgroundImage: app.icon ? `url('${app.icon}')` : 'none' }}
-        >
-          {!!app.icon ? '' : `${app.name[0]}`}
-        </div>
-      </TableCell>
       <TableCell>
         <p title={app.name} className="truncate">
           {app.name}
