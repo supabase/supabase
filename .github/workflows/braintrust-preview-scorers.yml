@@ -97,9 +97,11 @@ jobs:
             const body = `${marker}
             ### Braintrust Preview Scorers
 
-            Deployed scorers for branch \`${branch}\` (${sha}) to [Assistant (Staging Scorers)](${stagingUrl}):
+            Deployed scorers to [Assistant (Staging Scorers)](${stagingUrl}):
 
-            ${slugList}`
+            ${slugList}
+
+            Commit: ${sha}`
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
