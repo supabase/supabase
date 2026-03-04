@@ -1,17 +1,21 @@
 import type { GoPageInput } from 'marketing'
 
-import exampleLeadGen from './lead-gen/example-lead-gen'
-import exampleLegal from './legal/example-legal'
-import exampleThankYou from './thank-you/example-thank-you'
+import byocEarlyAccess from './pre-release/byoc-early-access'
 import boltWebinar from './webinar/bolt-webinar'
 import boltWebinarThankYou from './webinar/bolt-webinar-thank-you'
+import contestRules from './legal/contest-rules'
+import stripeExecDinner from './events/stripe-exec-dinner'
+import stripeExecDinnerThankYou from './events/stripe-exec-dinner-thank-you'
+import stripeSessionsContest from './events/stripe-sessions-contest'
 
 const pages: GoPageInput[] = [
-  exampleLeadGen,
-  exampleThankYou,
-  exampleLegal,
-  boltWebinar,
-  boltWebinarThankYou,
+  byocEarlyAccess,
+  contestRules,
+  boltWebinar, // remove after March 31, 2026
+  boltWebinarThankYou, // remove after March 31, 2026
+  stripeExecDinner,
+  stripeExecDinnerThankYou,
+  stripeSessionsContest,
 ]
 
 export default pages

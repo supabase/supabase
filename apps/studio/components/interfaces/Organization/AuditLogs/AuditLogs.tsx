@@ -163,7 +163,7 @@ export const AuditLogs = () => {
 
   if (isLogsNotAvailableBasedOnPlan) {
     return (
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection isFullWidth>
           <UpgradeToPro
             plan="Team"
@@ -179,7 +179,7 @@ export const AuditLogs = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection isFullWidth>
           <div className="space-y-4 flex flex-col">
             {showFilters && (

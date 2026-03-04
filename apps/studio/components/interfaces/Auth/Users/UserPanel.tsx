@@ -1,10 +1,9 @@
-import { X } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
-
 import { useUserQuery } from 'data/auth/user-query'
 import { User } from 'data/auth/users-infinite-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { X } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import {
   Button,
   cn,
@@ -18,6 +17,7 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
 import { PANEL_PADDING } from './Users.constants'
@@ -57,7 +57,7 @@ export const UserPanel = () => {
   return (
     <>
       <ResizableHandle withHandle />
-      <ResizablePanel defaultSize="30" maxSize="45" minSize="30" className="bg-studio border-t">
+      <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
         <Button
           type="text"
           className="absolute top-3 right-3 px-1"

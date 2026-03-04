@@ -1,12 +1,10 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { useShowNewReplicaPanel } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/use-show-new-replica'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from 'lib/constants'
-import { timeout } from 'lib/helpers'
 import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -17,18 +15,18 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   ButtonProps,
+  cn,
+  Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 
 interface DatabaseSelectorProps {
@@ -54,9 +52,7 @@ export const DatabaseSelector = ({
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
-  const { setShowNewReplicaPanel } = useShowNewReplicaPanel()
 
-  const unifiedReplication = useFlag('unifiedReplication')
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const state = useDatabaseSelectorStateSnapshot()
@@ -74,9 +70,7 @@ export const DatabaseSelector = ({
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
 
-  const newReplicaURL = unifiedReplication
-    ? `/project/${projectRef}/database/replication?type=Read+Replica`
-    : `/project/${projectRef}/settings/infrastructure`
+  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
 
   useEffect(() => {
     if (_selectedDatabaseId) state.setSelectedDatabaseId(_selectedDatabaseId)
@@ -229,12 +223,6 @@ export const DatabaseSelector = ({
                       setOpen(false)
                       // [Joshen] This is used in the Connect UI which is available across all pages
                       setShowConnect(false)
-
-                      // [Joshen] Adding a short timeout to compensate for the shift in focus
-                      // the replica panel from a "portal" based component (e.g dialog, sheet, dropdown, etc)
-                      // Although I'd prefer if there's a better way to resolve this
-                      await timeout(50)
-                      if (!unifiedReplication) setShowNewReplicaPanel(true)
                     }}
                     className="w-full flex items-center gap-2"
                   >

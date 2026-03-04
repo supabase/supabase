@@ -6,8 +6,8 @@ import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 import { AiIconAnimation, ButtonGroup, ButtonGroupItem } from 'ui'
 
-import type { HelpOptionId } from './HelpDropdown.constants'
-import { HELP_OPTION_IDS } from './HelpDropdown.constants'
+import type { HelpOptionId } from './HelpPanel.constants'
+import { HELP_OPTION_IDS } from './HelpPanel.constants'
 
 const DISCORD_URL = 'https://discord.supabase.com'
 const STATUS_URL = 'https://status.supabase.com'
