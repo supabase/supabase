@@ -4,7 +4,7 @@ import { QUERY_PERFORMANCE_CHART_TABS } from './QueryPerformance.constants'
 import { Loader2 } from 'lucide-react'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import type { ChartDataPoint } from './QueryPerformance.types'
+import type { ChartDataPoint } from '../QueryInsights/QueryInsights.types'
 
 interface QueryPerformanceChartProps {
   dateRange?: {
