@@ -1,5 +1,6 @@
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAdvisorIssuesQuery } from 'data/advisors/issues-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { Lightbulb } from 'lucide-react'
 import { useMemo } from 'react'
@@ -13,6 +14,10 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
 
+  const { data: advisorIssues } = useAdvisorIssuesQuery(projectRef, {
+    enabled: !!projectRef,
+  })
+
   const { data: notificationsData } = useNotificationsV2Query({
     filters: {},
     limit: 20,
@@ -23,8 +28,15 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const hasUnreadNotifications = notifications.some((x) => x.status === 'new')
   const hasCriticalNotifications = notifications.some((x) => x.priority === 'Critical')
 
+  const openAdvisorIssues = (advisorIssues ?? []).filter((i) =>
+    ['open', 'acknowledged', 'snoozed'].includes(i.status)
+  )
+  const hasCriticalAdvisorIssues = openAdvisorIssues.some((i) => i.severity === 'critical')
+  const hasOpenAdvisorIssues = openAdvisorIssues.length > 0
+
   const hasCriticalIssues =
     hasCriticalNotifications ||
+    hasCriticalAdvisorIssues ||
     (Array.isArray(lints) && lints.some((lint) => lint.level === 'ERROR'))
 
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
@@ -61,7 +73,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
       </ButtonTooltip>
       {hasCriticalIssues ? (
         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-destructive" />
-      ) : hasUnreadNotifications ? (
+      ) : hasUnreadNotifications || hasOpenAdvisorIssues ? (
         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand" />
       ) : null}
     </div>

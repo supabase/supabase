@@ -11,6 +11,12 @@ export const generateAdvisorsMenu = (project?: Project): ProductMenuGroup[] => {
       title: 'Advisors',
       items: [
         {
+          name: 'Issues',
+          key: 'issues',
+          url: `/project/${ref}/advisors/issues`,
+          items: [],
+        },
+        {
           name: 'Security Advisor',
           key: 'security',
           url: `/project/${ref}/advisors/security`,
@@ -31,6 +37,23 @@ export const generateAdvisorsMenu = (project?: Project): ProductMenuGroup[] => {
         },
       ],
     },
+    {
+      title: 'Monitoring',
+      items: [
+        {
+          name: 'Rules',
+          key: 'monitoring-rules',
+          url: `/project/${ref}/advisors/monitoring-rules`,
+          items: [],
+        },
+        {
+          name: 'Agents',
+          key: 'agents',
+          url: `/project/${ref}/advisors/agents`,
+          items: [],
+        },
+      ],
+    },
     ...(IS_PLATFORM
       ? [
           {
@@ -42,9 +65,27 @@ export const generateAdvisorsMenu = (project?: Project): ProductMenuGroup[] => {
                 url: `/project/${ref}/advisors/rules/security`,
                 items: [],
               },
+              {
+                name: 'Channels',
+                key: 'channels',
+                url: `/project/${ref}/advisors/channels`,
+                items: [],
+              },
             ],
           },
         ]
-      : []),
+      : [
+          {
+            title: 'Configuration',
+            items: [
+              {
+                name: 'Channels',
+                key: 'channels',
+                url: `/project/${ref}/advisors/channels`,
+                items: [],
+              },
+            ],
+          },
+        ]),
   ]
 }
