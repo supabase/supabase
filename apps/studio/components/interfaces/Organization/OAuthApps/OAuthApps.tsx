@@ -105,27 +105,24 @@ export const OAuthApps = () => {
     isError: isErrorAuthorizedApps,
   } = useAuthorizedAppsQuery({ slug })
 
-  const sortedAuthorizedApps = useMemo(
-    () => {
-      const [sortColumn, sortOrder] = authorizedAppsSort.split(':') as [
-        AuthorizedAppsSortColumn,
-        AuthorizedAppsSortOrder,
-      ]
-      const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+  const sortedAuthorizedApps = useMemo(() => {
+    const [sortColumn, sortOrder] = authorizedAppsSort.split(':') as [
+      AuthorizedAppsSortColumn,
+      AuthorizedAppsSortOrder,
+    ]
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
 
-      return [...(authorizedApps ?? [])].sort((a, b) => {
-        if (sortColumn === 'authorized') {
-          return (
-            (new Date(a.authorized_at).getTime() - new Date(b.authorized_at).getTime()) *
-            orderMultiplier
-          )
-        }
+    return [...(authorizedApps ?? [])].sort((a, b) => {
+      if (sortColumn === 'authorized') {
+        return (
+          (new Date(a.authorized_at).getTime() - new Date(b.authorized_at).getTime()) *
+          orderMultiplier
+        )
+      }
 
-        return 0
-      })
-    },
-    [authorizedApps, authorizedAppsSort]
-  )
+      return 0
+    })
+  }, [authorizedApps, authorizedAppsSort])
   const hasPublishedApps = (publishedApps?.length ?? 0) > 0
   const hasAuthorizedApps = (authorizedApps?.length ?? 0) > 0
 
@@ -136,7 +133,9 @@ export const OAuthApps = () => {
     ]
 
     if (currentColumn === column) {
-      setPublishedAppsSort((currentOrder === 'asc' ? `${column}:desc` : `${column}:asc`) as PublishedAppsSort)
+      setPublishedAppsSort(
+        (currentOrder === 'asc' ? `${column}:desc` : `${column}:asc`) as PublishedAppsSort
+      )
     } else {
       setPublishedAppsSort(`${column}:asc` as PublishedAppsSort)
     }
