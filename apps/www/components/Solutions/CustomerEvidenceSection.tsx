@@ -26,7 +26,7 @@ const CustomerEvidenceSection = ({
     <div className="text-center max-w-3xl mx-auto mb-12">
       <h2 className="text-2xl sm:text-3xl lg:text-4xl text-foreground-lighter">{heading}</h2>
     </div>
-    <div className="grid md:grid-cols-2 gap-0 max-w-5xl mx-auto rounded-lg border overflow-hidden divide-x">
+    <div className="grid md:grid-cols-2 gap-0 max-w-5xl mx-auto rounded-lg border overflow-hidden [&>*+*]:border-t md:[&>*+*]:border-t-0 md:[&>*:nth-child(odd)]:border-r md:[&>*:nth-child(n+3)]:border-t">
       {customers.map((customer) => (
         <div key={customer.name} className="p-6 md:p-8 flex flex-col">
           {customer.logo && (
