@@ -208,13 +208,17 @@ export const filterWebhookDeliveries = (
 }
 
 export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
-  const [state, setState] = useState<PlatformWebhooksState>(() => deepClone(getPersistedMockState(scope)))
+  const [state, setState] = useState<PlatformWebhooksState>(() =>
+    deepClone(getPersistedMockState(scope))
+  )
 
   useEffect(() => {
     setState(deepClone(getPersistedMockState(scope)))
   }, [scope])
 
-  const applyStateUpdate = (updater: (previous: PlatformWebhooksState) => PlatformWebhooksState) => {
+  const applyStateUpdate = (
+    updater: (previous: PlatformWebhooksState) => PlatformWebhooksState
+  ) => {
     setState((previous) => {
       const next = updater(previous)
       persistedMockStateByScope[scope] = next

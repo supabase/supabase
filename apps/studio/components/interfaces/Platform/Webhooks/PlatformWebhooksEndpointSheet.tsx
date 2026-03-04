@@ -280,8 +280,8 @@ export const PlatformWebhooksEndpointSheet = ({
                           >
                             <div className="space-y-0.5">
                               <p className="text-sm text-foreground">Enable endpoint</p>
-                              <p className="text-sm text-foreground-light">
-                                Disabled endpoints won’t receive deliveries.
+                              <p className="text-sm text-foreground-lighter">
+                                Disabled endpoints won’t receive deliveries
                               </p>
                             </div>
                             <FormControl_Shadcn_>
@@ -333,7 +333,7 @@ export const PlatformWebhooksEndpointSheet = ({
                     render={({ field }) => {
                       const subscribeAllId = 'subscribe-all-events'
                       return (
-                        <div className="rounded-md border bg-surface-100 overflow-hidden">
+                        <div className="rounded-md border bg-surface-100   overflow-hidden">
                           <Label
                             htmlFor={subscribeAllId}
                             className={cn(
@@ -365,8 +365,7 @@ export const PlatformWebhooksEndpointSheet = ({
                               />
                             </FormControl_Shadcn_>
                             <span className="text-sm text-foreground">
-                              Subscribe to all events{' '}
-                              <code className="text-code-inline">(*)</code>
+                              Subscribe to all events <code className="text-code-inline">(*)</code>
                             </span>
                           </Label>
                         </div>

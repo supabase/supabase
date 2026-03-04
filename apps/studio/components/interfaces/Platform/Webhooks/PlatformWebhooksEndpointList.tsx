@@ -177,7 +177,9 @@ export const PlatformWebhooksEndpointList = ({
                   </TableCell>
                   <TableCell>
                     <TimestampInfo className="text-sm" utcTimestamp={endpoint.createdAt} />
-                    <p className="text-xs text-foreground-lighter mt-0.5">by {endpoint.createdBy}</p>
+                    <p className="text-xs text-foreground-lighter mt-0.5">
+                      by {endpoint.createdBy}
+                    </p>
                   </TableCell>
                   <TableCell className="text-right">
                     <div

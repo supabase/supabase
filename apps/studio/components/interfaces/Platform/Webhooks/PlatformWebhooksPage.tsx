@@ -140,7 +140,10 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
   useEffect(() => {
     if (!pendingCreatedEndpointId) return
-    if (endpointId !== pendingCreatedEndpointId || selectedEndpoint?.id === pendingCreatedEndpointId) {
+    if (
+      endpointId !== pendingCreatedEndpointId ||
+      selectedEndpoint?.id === pendingCreatedEndpointId
+    ) {
       setPendingCreatedEndpointId(null)
     }
   }, [endpointId, pendingCreatedEndpointId, selectedEndpoint])
@@ -298,7 +301,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                   setPanel('edit')
                 }}
               >
-
                 Edit
               </Button>
               <DropdownMenu>
@@ -440,9 +442,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
             <AlertDialogTitle>Signing secret</AlertDialogTitle>
             <AlertDialogDescription>
               Use this secret to verify webhook signatures using the{' '}
-              <InlineLink href="https://www.standardwebhooks.com/">
-                Standard Webhooks
-              </InlineLink>{' '}
+              <InlineLink href="https://www.standardwebhooks.com/">Standard Webhooks</InlineLink>{' '}
               specification.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -454,7 +454,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 copy
                 readOnly
                 value={signingSecretReveal?.signingSecret ?? ''}
-                onChange={() => { }}
+                onChange={() => {}}
                 onCopy={() => toast.success('Copied signing secret')}
               />
             </div>

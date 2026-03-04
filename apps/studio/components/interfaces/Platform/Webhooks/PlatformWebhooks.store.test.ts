@@ -28,7 +28,11 @@ describe('PlatformWebhooks.store', () => {
 
   it('creates endpoint with deterministic options', () => {
     const state = createInitialPlatformWebhooksState('project')
-    const { state: next, endpoint, signingSecret } = createWebhookEndpoint(
+    const {
+      state: next,
+      endpoint,
+      signingSecret,
+    } = createWebhookEndpoint(
       state,
       {
         name: '',

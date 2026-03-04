@@ -59,9 +59,7 @@ export const PlatformWebhooksEndpointDetails = ({
                 {selectedEndpoint.url}
               </DetailItem>
 
-              <DetailItem label="Description">
-                {selectedEndpoint.description || '-'}
-              </DetailItem>
+              <DetailItem label="Description">{selectedEndpoint.description || '-'}</DetailItem>
 
               <DetailItem label="Event types" ddClassName="flex flex-wrap gap-2">
                 {(selectedEndpoint.eventTypes.includes('*')
@@ -145,9 +143,7 @@ export const PlatformWebhooksEndpointDetails = ({
                       <Badge variant={statusBadgeVariant[delivery.status]}>{delivery.status}</Badge>
                     </TableCell>
                     <TableCell>
-                      <code className="text-code-inline">
-                        {delivery.eventType}
-                      </code>
+                      <code className="text-code-inline">{delivery.eventType}</code>
                     </TableCell>
                     <TableCell>
                       {delivery.responseCode ? (

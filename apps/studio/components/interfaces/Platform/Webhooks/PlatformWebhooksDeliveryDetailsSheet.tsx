@@ -21,10 +21,7 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import type { WebhookDelivery } from './PlatformWebhooks.types'
-import {
-  formatDeliveryStatus,
-  statusBadgeVariant,
-} from './PlatformWebhooksView.utils'
+import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'
 
 interface PlatformWebhooksDeliveryDetailsSheetProps {
   deliveryAttempt: number | null
