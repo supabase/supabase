@@ -372,7 +372,7 @@ export const LogTable = ({
       const logData = data.find((x) => x.id === selectedLogId)
       if (logData) setSelectedRow(logData)
     }
-  }, [isLoading])
+  }, [isLoading, data, selectedRow, selectedLogId])
 
   // Clear multi-select when a new query starts loading
   useEffect(() => {
