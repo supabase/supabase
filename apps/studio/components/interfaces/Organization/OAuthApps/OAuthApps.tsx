@@ -3,7 +3,6 @@ import { Check, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CopyButton from 'components/ui/CopyButton'
@@ -24,6 +23,7 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { AuthorizedAppRow } from './AuthorizedAppRow'
 import { DeleteAppModal } from './DeleteAppModal'
@@ -96,6 +96,22 @@ export const OAuthApps = () => {
     isError: isErrorAuthorizedApps,
   } = useAuthorizedAppsQuery({ slug })
 
+  const authorizedAppsWithMock = useMemo(() => {
+    const mockAuthorizedApp: AuthorizedApp = {
+      id: 'mock-authorized-1',
+      app_id: 'com.example.mock',
+      icon: null,
+      name: 'Example Integration',
+      website: 'https://example.com',
+      created_by: 'dev@example.com',
+      authorized_at: new Date().toISOString(),
+    }
+
+    return process.env.NODE_ENV === 'development'
+      ? [...(authorizedApps ?? []), mockAuthorizedApp]
+      : (authorizedApps ?? [])
+  }, [authorizedApps])
+
   const sortedAuthorizedApps = useMemo(
     () => {
       const [sortColumn, sortOrder] = authorizedAppsSort.split(':') as [
@@ -104,7 +120,7 @@ export const OAuthApps = () => {
       ]
       const orderMultiplier = sortOrder === 'asc' ? 1 : -1
 
-      return [...(authorizedApps ?? [])].sort((a, b) => {
+      return [...authorizedAppsWithMock].sort((a, b) => {
         if (sortColumn === 'authorized') {
           return (
             (new Date(a.authorized_at).getTime() - new Date(b.authorized_at).getTime()) *
@@ -115,10 +131,10 @@ export const OAuthApps = () => {
         return 0
       })
     },
-    [authorizedApps, authorizedAppsSort]
+    [authorizedAppsSort, authorizedAppsWithMock]
   )
   const hasPublishedApps = (publishedApps?.length ?? 0) > 0
-  const hasAuthorizedApps = (authorizedApps?.length ?? 0) > 0
+  const hasAuthorizedApps = authorizedAppsWithMock.length > 0
 
   const handlePublishedSortChange = (column: PublishedAppsSortColumn) => {
     const [currentColumn, currentOrder] = publishedAppsSort.split(':') as [
@@ -150,8 +166,8 @@ export const OAuthApps = () => {
 
   return (
     <>
-      <ScaffoldContainer className="px-6 xl:px-10">
-        <ScaffoldSection isFullWidth className="flex flex-col gap-y-16">
+      <PageContainer size="default" className="pt-8 pb-16">
+        <div className="flex flex-col gap-y-16">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
               <div>
@@ -173,7 +189,7 @@ export const OAuthApps = () => {
                   },
                 }}
               >
-                Add application
+                Publish app
               </ButtonTooltip>
             </div>
 
@@ -386,8 +402,8 @@ export const OAuthApps = () => {
               )}
             </div>
           </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+        </div>
+      </PageContainer>
 
       <PublishAppSidePanel
         visible={showPublishModal}
