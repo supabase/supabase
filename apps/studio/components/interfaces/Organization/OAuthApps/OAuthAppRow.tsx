@@ -37,6 +37,14 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
 
   return (
     <TableRow>
+      <TableCell className="w-[62px] min-w-[62px] max-w-[62px]">
+        <div
+          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center text-xs"
+          style={{ backgroundImage: app.icon ? `url('${app.icon}')` : 'none' }}
+        >
+          {!!app.icon ? '' : `${app.name[0]}`}
+        </div>
+      </TableCell>
       <TableCell>
         <p title={app.name} className="truncate">
           {app.name}
@@ -44,7 +52,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-x-2">
-          <p className="font-mono truncate" title={app.client_id}>
+          <p className="text-xs font-mono truncate" title={app.client_id}>
             {app.client_id}
           </p>
           <CopyButton type="default" iconOnly text={app.client_id ?? ''} className="px-1" />

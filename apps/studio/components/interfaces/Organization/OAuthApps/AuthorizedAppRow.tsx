@@ -13,11 +13,23 @@ export interface AuthorizedAppRowProps {
 export const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps) => {
   return (
     <TableRow>
-      <TableCell>{app.name}</TableCell>
+      <TableCell className="w-[62px] min-w-[62px] max-w-[62px]">
+        <div
+          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center text-xs"
+          style={{ backgroundImage: app.icon ? `url('${app.icon}')` : 'none' }}
+        >
+          {!!app.icon ? '' : `${app.name[0]}`}
+        </div>
+      </TableCell>
+      <TableCell>
+        <p className="truncate" title={app.name}>
+          {app.name}
+        </p>
+      </TableCell>
       <TableCell>{app.created_by}</TableCell>
       <TableCell>
         <div className="flex items-center gap-x-2">
-          <p className="font-mono truncate" title={app.app_id}>
+          <p className="text-xs font-mono truncate" title={app.app_id}>
             {app.app_id}
           </p>
           <CopyButton iconOnly type="default" text={app.app_id} className="px-1" />
