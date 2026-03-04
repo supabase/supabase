@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash2 } from 'lucide-react'
-import { useEffect } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
-import * as z from 'zod'
 import { InlineLink } from 'components/ui/InlineLink'
+import { Trash2 } from 'lucide-react'
+import { useEffect, useMemo } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import {
   Button,
   Checkbox_Shadcn_ as Checkbox,
+  cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -23,6 +23,8 @@ import {
   TextArea_Shadcn_ as Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import type {
   UpsertWebhookEndpointInput,
   WebhookEndpoint,
@@ -59,6 +61,47 @@ export type EndpointFormValues = z.infer<typeof endpointFormSchema>
 
 const toEventTypes = (values: EndpointFormValues) =>
   values.subscribeAll ? ['*'] : values.eventTypes
+
+type EventTypeGroup = {
+  id: string
+  label: string
+  eventTypes: string[]
+}
+
+const buildEventTypeGroups = (scope: WebhookScope, eventTypes: string[]): EventTypeGroup[] => {
+  if (scope === 'project') {
+    return [{ id: 'project', label: 'Project events', eventTypes }]
+  }
+
+  const organizationEvents = eventTypes.filter((eventType) => eventType.startsWith('organization.'))
+  const projectEvents = eventTypes.filter((eventType) => eventType.startsWith('project.'))
+  const ungroupedEvents = eventTypes.filter(
+    (eventType) => !eventType.startsWith('organization.') && !eventType.startsWith('project.')
+  )
+
+  return [
+    { id: 'organization', label: 'Organization events', eventTypes: organizationEvents },
+    { id: 'project', label: 'Project events', eventTypes: projectEvents },
+    { id: 'other', label: 'Other events', eventTypes: ungroupedEvents },
+  ].filter((group) => group.eventTypes.length > 0)
+}
+
+const toggleEventType = (selectedEventTypes: string[], eventType: string, checked: boolean) => {
+  if (checked) return [...new Set([...selectedEventTypes, eventType])]
+  return selectedEventTypes.filter((value) => value !== eventType)
+}
+
+const toggleEventTypeGroup = (
+  selectedEventTypes: string[],
+  groupedEventTypes: string[],
+  checked: boolean
+) => {
+  if (checked) return [...new Set([...selectedEventTypes, ...groupedEventTypes])]
+  return selectedEventTypes.filter((value) => !groupedEventTypes.includes(value))
+}
+
+const toControlId = (prefix: string, value: string) =>
+  `${prefix}-${value.replace(/[^a-zA-Z0-9_-]/g, '-')}`
 
 export const toEndpointPayload = (values: EndpointFormValues): UpsertWebhookEndpointInput => ({
   name: '',
@@ -109,8 +152,11 @@ export const PlatformWebhooksEndpointSheet = ({
     name: 'customHeaders',
   })
 
-  const selectedEventTypes = form.watch('eventTypes')
   const subscribeAll = form.watch('subscribeAll')
+  const groupedEventTypes = useMemo(
+    () => buildEventTypeGroups(scope, eventTypes),
+    [scope, eventTypes]
+  )
 
   useEffect(() => {
     if (!visible) return
@@ -141,7 +187,7 @@ export const PlatformWebhooksEndpointSheet = ({
   }, [enabledOverride, endpoint, form, visible])
 
   return (
-    <Sheet open={visible} onOpenChange={onClose} >
+    <Sheet open={visible} onOpenChange={onClose}>
       <SheetContent showClose={false} size="default" className="flex flex-col gap-0">
         <SheetHeader>
           <SheetTitle>{mode === 'create' ? 'Create endpoint' : 'Edit endpoint'}</SheetTitle>
@@ -175,12 +221,21 @@ export const PlatformWebhooksEndpointSheet = ({
                   name="description"
                   render={({ field }) => (
                     <FormItemLayout
-                      label={<>Description <span className="text-foreground-muted">(optional)</span></>}
+                      label={
+                        <>
+                          Description <span className="text-foreground-muted">(optional)</span>
+                        </>
+                      }
                       layout="vertical"
                       className="gap-1"
                     >
                       <FormControl_Shadcn_>
-                        <Textarea {...field} rows={4} placeholder="Optional description for this endpoint" className="resize-none" />
+                        <Textarea
+                          {...field}
+                          rows={4}
+                          placeholder="Optional description for this endpoint"
+                          className="resize-none"
+                        />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -190,17 +245,31 @@ export const PlatformWebhooksEndpointSheet = ({
                   <FormField_Shadcn_
                     control={form.control}
                     name="enabled"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        label="Enable endpoint"
-                        description="Disabled endpoints won’t receive deliveries."
-                        layout="flex"
-                      >
-                        <FormControl_Shadcn_>
-                          <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
+                    render={({ field }) => {
+                      const enabledId = 'enabled-endpoint'
+                      return (
+                        <div className="rounded-md border bg-surface-100">
+                          <Label
+                            htmlFor={enabledId}
+                            className="flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3"
+                          >
+                            <div className="space-y-0.5">
+                              <p className="text-sm text-foreground">Enable endpoint</p>
+                              <p className="text-sm text-foreground-light">
+                                Disabled endpoints won’t receive deliveries.
+                              </p>
+                            </div>
+                            <FormControl_Shadcn_>
+                              <Switch
+                                id={enabledId}
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl_Shadcn_>
+                          </Label>
+                        </div>
+                      )
+                    }}
                   />
                 )}
               </div>
@@ -215,13 +284,17 @@ export const PlatformWebhooksEndpointSheet = ({
                       <>
                         Project events are triggered when any project in this organization matches
                         the event type. Add a{' '}
-                        <InlineLink href="/project/_/settings/webhooks">project endpoint</InlineLink>{' '}
+                        <InlineLink href="/project/_/settings/webhooks">
+                          project endpoint
+                        </InlineLink>{' '}
                         to listen to events on an individual project only.
                       </>
                     ) : (
                       <>
                         Project events are triggered for this project only. Add an{' '}
-                        <InlineLink href={`/org/${orgSlug ?? '_'}/webhooks`}>organization endpoint</InlineLink>{' '}
+                        <InlineLink href={`/org/${orgSlug ?? '_'}/webhooks`}>
+                          organization endpoint
+                        </InlineLink>{' '}
                         to listen to events from any project in your organization.
                       </>
                     )
@@ -232,49 +305,123 @@ export const PlatformWebhooksEndpointSheet = ({
                   <FormField_Shadcn_
                     control={form.control}
                     name="subscribeAll"
-                    render={({ field }) => (
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={(checked) => field.onChange(!!checked)}
-                        />
-                        <Label>Subscribe to all events <code className="ml-1 text-code-inline">(*)</code></Label>
-                      </div>
-                    )}
+                    render={({ field }) => {
+                      const subscribeAllId = 'subscribe-all-events'
+                      return (
+                        <div className="rounded-md border">
+                          <Label
+                            htmlFor={subscribeAllId}
+                            className={cn(
+                              'flex w-full cursor-pointer items-center gap-3 px-4 py-3',
+                              field.value && 'bg-surface-200'
+                            )}
+                          >
+                            <FormControl_Shadcn_>
+                              <Checkbox
+                                id={subscribeAllId}
+                                checked={field.value}
+                                onCheckedChange={(checked) => field.onChange(!!checked)}
+                              />
+                            </FormControl_Shadcn_>
+                            <span className="text-sm text-foreground">
+                              Subscribe to all of the below events{' '}
+                              <code className="text-code-inline">(*)</code>
+                            </span>
+                          </Label>
+                        </div>
+                      )
+                    }}
                   />
 
                   {!subscribeAll && (
                     <FormField_Shadcn_
                       control={form.control}
                       name="eventTypes"
-                      render={({ field }) => (
-                        <FormControl_Shadcn_>
-                          <div className="space-y-2">
-                            {eventTypes.map((eventType) => {
-                              const checked = selectedEventTypes.includes(eventType)
-                              return (
-                                <div key={eventType} className="flex items-center gap-2">
-                                  <Checkbox
-                                    checked={checked}
-                                    onCheckedChange={(next) => {
-                                      if (next) {
-                                        field.onChange([
-                                          ...new Set([...selectedEventTypes, eventType]),
-                                        ])
-                                      } else {
-                                        field.onChange(
-                                          selectedEventTypes.filter((value) => value !== eventType)
+                      render={({ field }) => {
+                        const selectedTypes = field.value ?? []
+
+                        return (
+                          <FormControl_Shadcn_>
+                            <div className="space-y-3">
+                              {groupedEventTypes.map((group) => {
+                                const selectedInGroup = group.eventTypes.filter((eventType) =>
+                                  selectedTypes.includes(eventType)
+                                )
+                                const allSelected =
+                                  selectedInGroup.length === group.eventTypes.length
+
+                                return (
+                                  <div key={group.id} className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-2">
+                                        <p className="text-sm text-foreground-light">
+                                          {group.label}
+                                        </p>
+                                        {selectedInGroup.length > 0 && (
+                                          <span className="text-xs text-foreground-muted">
+                                            {selectedInGroup.length}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {group.eventTypes.length > 1 && (
+                                        <Button
+                                          type="text"
+                                          htmlType="button"
+                                          className="h-auto p-0"
+                                          onClick={() => {
+                                            field.onChange(
+                                              toggleEventTypeGroup(
+                                                selectedTypes,
+                                                group.eventTypes,
+                                                !allSelected
+                                              )
+                                            )
+                                          }}
+                                        >
+                                          {allSelected ? 'Clear all' : 'Select all'}
+                                        </Button>
+                                      )}
+                                    </div>
+
+                                    <div className="overflow-hidden rounded-md border divide-y">
+                                      {group.eventTypes.map((eventType) => {
+                                        const checked = selectedTypes.includes(eventType)
+                                        const eventTypeId = toControlId('event-type', eventType)
+
+                                        return (
+                                          <Label
+                                            key={eventType}
+                                            htmlFor={eventTypeId}
+                                            className={cn(
+                                              'flex w-full cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-200',
+                                              checked && 'bg-surface-200'
+                                            )}
+                                          >
+                                            <Checkbox
+                                              id={eventTypeId}
+                                              checked={checked}
+                                              onCheckedChange={(next) => {
+                                                field.onChange(
+                                                  toggleEventType(
+                                                    selectedTypes,
+                                                    eventType,
+                                                    Boolean(next)
+                                                  )
+                                                )
+                                              }}
+                                            />
+                                            <code className="text-code-inline">{eventType}</code>
+                                          </Label>
                                         )
-                                      }
-                                    }}
-                                  />
-                                  <Label><code className="text-code-inline">{eventType}</code></Label>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </FormControl_Shadcn_>
-                      )}
+                                      })}
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </FormControl_Shadcn_>
+                        )
+                      }}
                     />
                   )}
                 </FormItemLayout>
@@ -284,44 +431,57 @@ export const PlatformWebhooksEndpointSheet = ({
 
               <div className="px-5 space-y-3">
                 <FormItemLayout
-                  label={<>Custom headers <span className="text-foreground-muted">(optional)</span></>}
+                  label={
+                    <>
+                      Custom headers <span className="text-foreground-muted">(optional)</span>
+                    </>
+                  }
                   description="Optional HTTP headers sent with every delivery."
                   layout="vertical"
                   className="gap-3"
                 >
-                  {fields.length === 0 && (
-                    <p className="text-sm text-foreground-light">No custom headers.</p>
+
+                  {fields.length > 0 && (
+                    <div className="overflow-hidden rounded-md border divide-y mb-3 bg-surface-100">
+                      {fields.map((customHeaderField, index) => (
+                        <div key={customHeaderField.id} className="px-3 py-3">
+                          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-center">
+                            <FormField_Shadcn_
+                              control={form.control}
+                              name={`customHeaders.${index}.key`}
+                              render={({ field }) => (
+                                <FormControl_Shadcn_>
+                                  <InputField {...field} placeholder="Header name" className="font-mono text-xs" />
+                                </FormControl_Shadcn_>
+                              )}
+                            />
+                            <FormField_Shadcn_
+                              control={form.control}
+                              name={`customHeaders.${index}.value`}
+                              render={({ field }) => (
+                                <FormControl_Shadcn_>
+                                  <InputField {...field} placeholder="Header value" className="font-mono text-xs" />
+                                </FormControl_Shadcn_>
+                              )}
+                            />
+                            <Button
+                              type="text"
+                              htmlType="button"
+                              onClick={() => remove(index)}
+                              icon={<Trash2 size={14} />}
+                              className="justify-self-start sm:justify-self-auto h-full"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   )}
 
-                  {fields.map((field, index) => (
-                    <div key={field.id} className="grid grid-cols-[1fr_1fr_auto] gap-2">
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name={`customHeaders.${index}.key`}
-                        render={({ field }) => (
-                          <FormControl_Shadcn_>
-                            <InputField {...field} placeholder="Header name" />
-                          </FormControl_Shadcn_>
-                        )}
-                      />
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name={`customHeaders.${index}.value`}
-                        render={({ field }) => (
-                          <FormControl_Shadcn_>
-                            <InputField {...field} placeholder="Header value" />
-                          </FormControl_Shadcn_>
-                        )}
-                      />
-                      <Button
-                        type="text"
-                        onClick={() => remove(index)}
-                        icon={<Trash2 size={14} />}
-                      />
-                    </div>
-                  ))}
-
-                  <Button type="default" onClick={() => append({ key: '', value: '' })}>
+                  <Button
+                    type="default"
+                    htmlType="button"
+                    onClick={() => append({ key: '', value: '' })}
+                  >
                     Add header
                   </Button>
                 </FormItemLayout>
