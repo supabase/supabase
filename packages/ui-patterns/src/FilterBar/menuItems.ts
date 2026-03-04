@@ -81,6 +81,19 @@ export function buildPropertyItems(params: {
   return items
 }
 
+export function buildPropertyChangeItems(params: {
+  filterProperties: FilterProperty[]
+  currentPropertyName: string
+  inputValue: string
+}): MenuItem[] {
+  const { filterProperties, currentPropertyName, inputValue } = params
+
+  return filterProperties
+    .filter((prop) => prop.name !== currentPropertyName)
+    .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
+    .map((prop) => ({ value: prop.name, label: prop.label }))
+}
+
 export function buildValueItems(
   activeInput: Extract<ActiveInputState, { type: 'value' }> | null,
   activeFilters: FilterGroup,
