@@ -1,5 +1,5 @@
-import https from 'node:https'
 import http from 'node:http'
+import https from 'node:https'
 import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
 import { EvalCase, EvalScorer } from 'braintrust'
@@ -284,7 +284,13 @@ export const urlValidityScorer: EvalScorer<
       const parsed = new URL(url)
       const lib = parsed.protocol === 'https:' ? https : http
       const req = lib.request(
-        { hostname: parsed.hostname, path: parsed.pathname + parsed.search, method: 'HEAD', rejectUnauthorized: false, signal: AbortSignal.timeout(5000) },
+        {
+          hostname: parsed.hostname,
+          path: parsed.pathname + parsed.search,
+          method: 'HEAD',
+          rejectUnauthorized: false, // required: Braintrust lambda has incomplete CA cert store
+          signal: AbortSignal.timeout(5000),
+        },
         (res) => {
           res.resume()
           if (res.statusCode && res.statusCode < 400) {
