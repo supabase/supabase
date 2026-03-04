@@ -70,7 +70,7 @@ jobs:
         id: push
         run: |
           cd apps/studio && pnpm evals:push
-          slugs=$(jq -r '[.[].slug] | join(",")' evals/scorer-manifest.json)
+          slugs=$(jq -r '[.[].slug] | join(",")' evals/scorer-online-manifest.json)
           echo "slugs=$slugs" >> $GITHUB_OUTPUT
         env:
           BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
