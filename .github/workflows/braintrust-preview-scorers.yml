@@ -91,7 +91,7 @@ jobs:
             const body = `${marker}
             ### Braintrust Preview Scorers
 
-            Deployed scorers for branch \`${branch}\` to [Assistant Staging Scorers](${stagingUrl}):
+            Deployed scorers for branch \`${branch}\` to [Assistant (Staging Scorers)](${stagingUrl}):
 
             ${slugList}`
 
