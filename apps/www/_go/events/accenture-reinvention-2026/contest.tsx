@@ -14,7 +14,7 @@ const page: GoPageInput = {
     title: 'Win an iPhone Pro Max',
     subtitle: 'Supabase at Accenture AI & Data Conference 2026',
     description:
-      "Your team is already building with AI tools. Supabase is the production backend that turns those prototypes into secure, scalable applications. Try it out -- create an account, load some data, and you could win an iPhone Pro Max.",
+      'Your team is already building with AI tools. Supabase is the production backend that turns those prototypes into secure, scalable applications. Try it out -- create an account, load some data, and you could win an iPhone Pro Max.',
     image: {
       src: '/images/landing-pages/stripe-sessions/iphone17-pro-max.png',
       alt: 'iPhone Pro Max',

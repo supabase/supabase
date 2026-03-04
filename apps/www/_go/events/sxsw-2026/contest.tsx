@@ -7,14 +7,13 @@ const page: GoPageInput = {
   slug: 'sxsw-2026/contest',
   metadata: {
     title: 'Win a MacBook Neo | Supabase x Dreambase at SXSW 2026',
-    description:
-      'Sign up for Supabase and Dreambase for a chance to win a MacBook Neo. SXSW 2026.',
+    description: 'Sign up for Supabase and Dreambase for a chance to win a MacBook Neo. SXSW 2026.',
   },
   hero: {
     title: 'Win a MacBook Neo',
     subtitle: 'Supabase x Dreambase at SXSW 2026',
     description:
-      "Thanks for stopping by the Supabase x Dreambase party at SXSW. Supabase and Dreambase have partnered to run a sweepstakes -- sign up for both Supabase and Dreambase, load some data, and you could walk away with a new MacBook Neo.",
+      'Thanks for stopping by the Supabase x Dreambase party at SXSW. Supabase and Dreambase have partnered to run a sweepstakes -- sign up for both Supabase and Dreambase, load some data, and you could walk away with a new MacBook Neo.',
     image: {
       src: '/images/landing-pages/sxsw-2026/macbook-neo.png',
       alt: 'MacBook Neo in four colors',
@@ -37,7 +36,10 @@ const page: GoPageInput = {
       children: (
         <div className="flex flex-col items-center gap-6">
           <ol className="flex flex-col gap-4 text-foreground-light text-lg list-decimal list-inside">
-            <li>Create a Supabase account with the same email address where you got our post-event note</li>
+            <li>
+              Create a Supabase account with the same email address where you got our post-event
+              note
+            </li>
             <li>Create a Dreambase account using the same email address</li>
             <li>Load data into a Supabase database</li>
             <li>Complete these steps by Monday, March 30, 2026 at 12:00 PM PST</li>

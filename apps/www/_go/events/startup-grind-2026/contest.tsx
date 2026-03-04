@@ -14,7 +14,7 @@ const page: GoPageInput = {
     title: 'Win an iPhone Pro Max',
     subtitle: 'Supabase at Startup Grind 2026',
     description:
-      "Great meeting you at Startup Grind. Supabase gives you Postgres with auth, storage, edge functions, and real-time -- everything you need to ship your product faster. Try it out and you could win an iPhone Pro Max.",
+      'Great meeting you at Startup Grind. Supabase gives you Postgres with auth, storage, edge functions, and real-time -- everything you need to ship your product faster. Try it out and you could win an iPhone Pro Max.',
     image: {
       src: '/images/landing-pages/stripe-sessions/iphone17-pro-max.png',
       alt: 'iPhone Pro Max',
