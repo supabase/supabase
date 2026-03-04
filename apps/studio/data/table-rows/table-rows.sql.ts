@@ -15,6 +15,8 @@ export const getTableRowsCountSql = ({
 }: GetTableRowsCountArgs & { isUsingReadReplica?: boolean }) => {
   if (!table) return ``
 
+  console.log({ enforceExactCount, isUsingReadReplica })
+
   if (enforceExactCount) {
     const query = new Query()
     let queryChains = query.from(table.name, table.schema ?? undefined).count()
@@ -55,11 +57,11 @@ with approximation as (
 )
 select 
   case 
-    when estimate = -1 then (select -1)
+    when estimate = -1 then (${countBaseSql})
     when estimate > ${THRESHOLD_COUNT} then (select -1)
     else (${countBaseSql})
   end as count,
-  estimate = -1 or estimate > ${THRESHOLD_COUNT} as is_estimate
+  estimate > ${THRESHOLD_COUNT} as is_estimate
 from approximation;
 `.trim()
 

@@ -182,11 +182,12 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   }, [page])
 
   useEffect(() => {
-    if (id !== undefined) {
-      snap.setEnforceExactCount(rowsCountEstimate !== null && rowsCountEstimate <= THRESHOLD_COUNT)
+    console.log({ rowsCountEstimate })
+    if (id !== undefined && rowsCountEstimate) {
+      snap.setEnforceExactCount(rowsCountEstimate <= THRESHOLD_COUNT)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [id, rowsCountEstimate])
 
   useEffect(() => {
     // If the count query encountered a timeout error with exact count
@@ -196,6 +197,8 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError, snap.enforceExactCount, error?.code])
+
+  console.log({ count, hasCountData, check: snap.enforceExactCount })
 
   // [Joshen] One to revisit if we can consolidate this and the main return statement
   if (isForeignTableSelected) {
@@ -325,9 +328,11 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
                   icon={<HelpCircle />}
                   onClick={() => {
                     // Show warning if either NOT a table entity, or table rows estimate is beyond threshold
-                    if (rowsCountEstimate === null || count > THRESHOLD_COUNT) {
+                    if (rowsCountEstimate === null || count === -1 || count > THRESHOLD_COUNT) {
                       setIsConfirmFetchExactCountModalOpen(true)
-                    } else snap.setEnforceExactCount(true)
+                    } else {
+                      snap.setEnforceExactCount(true)
+                    }
                   }}
                 />
               </TooltipTrigger>
