@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown'
 import { CodeBlock } from 'ui'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
-import { type TOCHeader } from '~/components/GuidesTableOfContents'
+import { type TOCHeader } from '~/components/GuidesSidebar'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
