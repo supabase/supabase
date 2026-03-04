@@ -97,6 +97,13 @@ export const BucketTableRow = ({
   )
 
   const handleNavigation = (event: MouseEvent | KeyboardEvent) => {
+    const isKeyboardNav =
+      event.type === 'keydown' &&
+      ((event as React.KeyboardEvent).key === 'Enter' || (event as React.KeyboardEvent).key === ' ')
+    const isMouseEvent = ['click', 'auxclick'].includes(event.type)
+
+    if (!isKeyboardNav && !isMouseEvent) return
+
     // Reset the Storage Explorer state here to avoid race conditions with loading effects in StorageExplorer
     snap.setSelectedBucket(bucket)
     handleBucketNavigation(event)
