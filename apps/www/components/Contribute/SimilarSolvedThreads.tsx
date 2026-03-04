@@ -1,8 +1,16 @@
 'use client'
 
+import { submitSimilarThreadFeedback, updateSimilarThreadFeedback } from '~/app/contribute/actions'
+import type {
+  SimilarSolvedThread,
+  SimilarThreadFeedbackReaction,
+  ThreadSource,
+} from '~/types/contribute'
+import { ChevronDown, ThumbsDown, ThumbsUp } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Badge,
+  Button,
   Card,
   CardContent,
   CardFooter,
@@ -17,20 +25,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   Label_Shadcn_,
-  Button,
+  TextArea_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-  TextArea_Shadcn_,
 } from 'ui'
-import { ChevronDown, ThumbsUp, ThumbsDown } from 'lucide-react'
-import type {
-  SimilarSolvedThread,
-  SimilarThreadFeedbackReaction,
-  ThreadSource,
-} from '~/types/contribute'
-import { submitSimilarThreadFeedback, updateSimilarThreadFeedback } from '~/app/contribute/actions'
+
 import { ChannelIcon } from './Icons'
 
 function getChannelFromUrl(url: string): ThreadSource {
@@ -106,7 +107,7 @@ const SimilarThreadCard = ({
 }
 
 export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedThreadsProps) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(true)
   const [submittedReaction, setSubmittedReaction] = useState<SimilarThreadFeedbackReaction | null>(
     null
   )
@@ -168,7 +169,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
           onClick={() => setIsExpanded((prev) => !prev)}
           className="flex w-full items-center gap-1.5 px-[var(--card-padding-x)] py-4 text-left text-xs font-mono uppercase text-card-foreground"
         >
-          Related solved threads
+          Related threads
           <span className="text-foreground-muted tabular-nums font-normal">({threads.length})</span>
           <ChevronDown
             className={`h-3.5 w-3.5 text-foreground-lighter transition-transform duration-200 ${
