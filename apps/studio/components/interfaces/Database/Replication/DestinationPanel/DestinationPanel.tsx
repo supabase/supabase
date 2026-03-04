@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
@@ -34,7 +33,6 @@ interface DestinationPanelProps {
 
 export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPanelProps) => {
   const enablePgReplicate = useIsETLPrivateAlpha()
-  const unifiedReplication = useFlag('unifiedReplication')
   const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
 
   const [urlDestinationType, setDestinationType] = useQueryState(
@@ -97,11 +95,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
-        <SheetContent
-          size="default"
-          showClose={false}
-          className={cn(unifiedReplication ? 'md:!w-[850px]' : 'md:!w-[700px]')}
-        >
+        <SheetContent size="default" showClose={false} className="md:!w-[850px]">
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
               <SheetTitle>{editMode ? 'Edit destination' : 'Create a new destination'}</SheetTitle>
@@ -118,7 +112,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
 
             {destinationType === 'Read Replica' ? (
               <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
-            ) : unifiedReplication && !enablePgReplicate ? (
+            ) : !enablePgReplicate ? (
               <SheetSection>
                 <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
                   <div className="flex flex-col gap-y-1">
@@ -147,7 +141,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                   </div>
                 </div>
               </SheetSection>
-            ) : unifiedReplication && replicationNotEnabled ? (
+            ) : replicationNotEnabled ? (
               <SheetSection>
                 <EnableReplicationCallout
                   className="!p-6"
