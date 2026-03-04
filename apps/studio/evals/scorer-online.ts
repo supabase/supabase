@@ -27,6 +27,7 @@ if (!projectId && process.env.IS_PUSH) throw new Error('BRAINTRUST_PROJECT_ID is
 const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
 const prefix = branch ? `${branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()}-` : ''
 const metadata = branch ? { gitBranch: branch } : undefined
+const description = branch ?? undefined
 
 const handlers = {
   'goal-completion': goalCompletionScorer,
@@ -44,6 +45,7 @@ for (const { slug, name } of manifest) {
   project.scorers.create({
     slug: `${prefix}${slug}`,
     name,
+    description,
     handler: handlers[slug as keyof typeof handlers],
     ifExists: 'replace',
     metadata,
