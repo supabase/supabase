@@ -256,13 +256,12 @@ export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
       applyStateUpdate((prev) => toggleWebhookEndpoint(prev, endpointId, enabled))
     },
     regenerateSecret: (endpointId: string) => {
-      let nextSecret: string | null = null
-      applyStateUpdate((prev) => {
-        const next = regenerateWebhookEndpointSecret(prev, endpointId)
-        nextSecret = next.signingSecret
-        return next.state
-      })
-      return nextSecret
+      const currentState = persistedMockStateByScope[scope] ?? state
+      const next = regenerateWebhookEndpointSecret(currentState, endpointId)
+      if (!next.signingSecret) return null
+
+      applyStateUpdate(() => next.state)
+      return next.signingSecret
     },
   }
 }

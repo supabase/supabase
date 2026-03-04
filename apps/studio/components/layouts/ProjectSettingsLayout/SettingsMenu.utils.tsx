@@ -40,7 +40,7 @@ export const generateSettingsMenu = (
 
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
   const billingEnabled = features?.billing ?? true
-  const platformWebhooksEnabled = features?.platformWebhooks ?? true
+  const platformWebhooksEnabled = features?.platformWebhooks ?? false
 
   return [
     {

@@ -176,4 +176,18 @@ describe('PlatformWebhooks.store', () => {
     expect(persistedEndpoint?.url).toBe(createdEndpointUrl)
     secondMount.unmount()
   })
+
+  it('returns regenerated signing secret from hook action', () => {
+    const hook = renderHook(() => usePlatformWebhooksMockStore('project'))
+    const endpointId = hook.result.current.endpoints[0]?.id
+    expect(endpointId).toBeDefined()
+
+    let regeneratedSecret: string | null = null
+    act(() => {
+      regeneratedSecret = hook.result.current.regenerateSecret(endpointId!)
+    })
+
+    expect(regeneratedSecret).toMatch(/^whsec_[a-f0-9]{16}$/)
+    hook.unmount()
+  })
 })

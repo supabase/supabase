@@ -15,7 +15,8 @@ describe('generateSettingsMenu', () => {
     const menu = generateSettingsMenu(
       'project-ref',
       { status: 'ACTIVE_HEALTHY' } as any,
-      { slug: 'my-org' } as any
+      { slug: 'my-org' } as any,
+      { platformWebhooks: true }
     )
 
     const configurationGroup = menu.find((group) => group.title === 'Configuration')

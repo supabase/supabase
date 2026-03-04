@@ -14,7 +14,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   let { ref, slug } = useParams()
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   ref ||= '_'
-  slug ||= '_'
+  const hasOrgSlug = typeof slug === 'string' && slug.length > 0 && slug !== '_'
 
   const { projectSettingsLogDrains, projectSettingsCustomDomains, authenticationSignInProviders } =
     useIsFeatureEnabled([
@@ -54,12 +54,16 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
               route: `/project/${ref}/settings/webhooks`,
               defaultHidden: true,
             } as IRouteCommand,
-            {
-              id: 'nav-organization-settings-webhooks',
-              name: 'Organization Webhooks',
-              route: `/org/${slug}/webhooks`,
-              defaultHidden: true,
-            } as IRouteCommand,
+            ...(hasOrgSlug
+              ? [
+                  {
+                    id: 'nav-organization-settings-webhooks',
+                    name: 'Organization Webhooks',
+                    route: `/org/${slug}/webhooks`,
+                    defaultHidden: true,
+                  } as IRouteCommand,
+                ]
+              : []),
           ]
         : []),
       {
