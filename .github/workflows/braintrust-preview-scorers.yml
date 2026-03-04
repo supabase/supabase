@@ -87,11 +87,12 @@ jobs:
             const slugs = ['goal-completion', 'conciseness', 'completeness', 'docs-faithfulness', 'correctness', 'url-validity']
             const slugList = slugs.map(s => `- \`${prefix}-${s}\``).join('\n')
 
+            const sha = context.sha.slice(0, 7)
             const marker = '<!-- preview-scorers-bot -->'
             const body = `${marker}
             ### Braintrust Preview Scorers
 
-            Deployed scorers for branch \`${branch}\` to [Assistant (Staging Scorers)](${stagingUrl}):
+            Deployed scorers for branch \`${branch}\` (${sha}) to [Assistant (Staging Scorers)](${stagingUrl}):
 
             ${slugList}`
 
