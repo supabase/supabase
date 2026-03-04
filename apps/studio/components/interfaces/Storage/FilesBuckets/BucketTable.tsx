@@ -13,6 +13,8 @@ import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+
 type BucketTableMode = 'standard' | 'virtualized'
 
 type BucketTableHeaderProps = {
@@ -83,6 +85,7 @@ export const BucketTableRow = ({
 }: BucketTableRowProps) => {
   const router = useRouter()
   const { getPolicyCount } = useBucketPolicyCount()
+  const snap = useStorageExplorerStateSnapshot()
 
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
@@ -92,14 +95,20 @@ export const BucketTableRow = ({
     router
   )
 
+  const handleNavigation = (event: React.MouseEvent | React.KeyboardEvent) => {
+    // Reset the Storage Explorer state here to avoid race conditions with loading effects in StorageExplorer
+    snap.setSelectedBucket(bucket)
+    handleBucketNavigation(event)
+  }
+
   return (
     <BucketTableRow
       key={bucket.id}
       data-bucket-id={bucket.id}
       className="relative cursor-pointer h-16 group inset-focus"
-      onClick={handleBucketNavigation}
-      onAuxClick={handleBucketNavigation}
-      onKeyDown={handleBucketNavigation}
+      onClick={handleNavigation}
+      onAuxClick={handleNavigation}
+      onKeyDown={handleNavigation}
       tabIndex={0}
     >
       <BucketTableCell className="w-2 pr-1">
