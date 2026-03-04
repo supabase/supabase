@@ -1,9 +1,12 @@
 import { useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { useAdvisorIssueDetailQuery, useUpdateIssueMutation } from 'data/advisors/issues-query'
 import { useAdvisorRulesQuery } from 'data/advisors/rules-query'
+import type { AdvisorAlert, AdvisorRule, AdvisorSeverity, IssueStatus } from 'data/advisors/types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { AdvisorAlert, AdvisorSeverity, IssueStatus } from 'data/advisors/types'
+import { useTrack } from 'lib/telemetry/track'
 import {
   AlertOctagon,
   AlertTriangle,
@@ -13,24 +16,47 @@ import {
   Eye,
   EyeOff,
   Info,
-  Play,
   RefreshCw,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Badge, Button, Card, CardContent } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import { IssueActions } from './IssueActions'
+import { createIssueSummaryPrompt } from './IssueDetail.utils'
 
 const severityConfig: Record<
   AdvisorSeverity,
-  { icon: typeof AlertOctagon; color: string; bg: string; badgeVariant: 'destructive' | 'warning' | 'default' }
+  {
+    icon: typeof AlertOctagon
+    color: string
+    bg: string
+    badgeVariant: 'destructive' | 'warning' | 'default'
+  }
 > = {
-  critical: { icon: AlertOctagon, color: 'text-destructive-600', bg: 'bg-destructive-200', badgeVariant: 'destructive' },
-  warning: { icon: AlertTriangle, color: 'text-warning-600', bg: 'bg-warning-200', badgeVariant: 'warning' },
-  info: { icon: Info, color: 'text-foreground-lighter', bg: 'bg-surface-200', badgeVariant: 'default' },
+  critical: {
+    icon: AlertOctagon,
+    color: 'text-destructive-600',
+    bg: 'bg-destructive-200',
+    badgeVariant: 'destructive',
+  },
+  warning: {
+    icon: AlertTriangle,
+    color: 'text-warning-600',
+    bg: 'bg-warning-200',
+    badgeVariant: 'warning',
+  },
+  info: {
+    icon: Info,
+    color: 'text-foreground-lighter',
+    bg: 'bg-surface-200',
+    badgeVariant: 'default',
+  },
 }
 
 function AlertTimelineItem({ alert }: { alert: AdvisorAlert }) {
@@ -43,7 +69,7 @@ function AlertTimelineItem({ alert }: { alert: AdvisorAlert }) {
         <SeverityIcon className={`h-3 w-3 ${sev.color}`} />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-foreground">{alert.title}</p>
+        <p className="text-sm  text-foreground">{alert.title}</p>
         {alert.description && (
           <p className="mt-1 text-xs text-foreground-lighter whitespace-pre-wrap line-clamp-3">
             {alert.description}
@@ -98,16 +124,16 @@ function RerunCheckButton({ ruleId, projectRef }: { ruleId: string | null; proje
   return (
     <Card>
       <CardContent className="p-4">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col justify-between gap-3">
           <div>
-            <p className="text-sm font-medium text-foreground">Verify Fix</p>
+            <p className="text-sm  text-foreground">Verify Fix</p>
             <p className="text-xs text-foreground-lighter">
               Re-run the rule's SQL check to confirm the issue is resolved.
             </p>
           </div>
           <Button
             type="default"
-            size="small"
+            size="tiny"
             loading={checking}
             onClick={handleRerun}
             icon={<RefreshCw className="h-3 w-3" />}
@@ -118,13 +144,13 @@ function RerunCheckButton({ ruleId, projectRef }: { ruleId: string | null; proje
         {result === 'pass' && (
           <div className="mt-3 flex items-center gap-2 text-brand">
             <CheckCircle2 className="h-4 w-4" />
-            <span className="text-sm font-medium">Passed — no issues found</span>
+            <span className="text-sm ">Passed — no issues found</span>
           </div>
         )}
         {result === 'fail' && (
           <div className="mt-3 flex items-center gap-2 text-destructive-600">
             <AlertOctagon className="h-4 w-4" />
-            <span className="text-sm font-medium">Still detected — issue persists</span>
+            <span className="text-sm ">Still detected — issue persists</span>
           </div>
         )}
       </CardContent>
@@ -144,15 +170,15 @@ function ResolutionSteps({ isActive }: { isActive: boolean }) {
   return (
     <Card>
       <CardContent className="p-4">
-        <p className="text-xs font-medium text-foreground-lighter mb-3">Resolution Steps</p>
+        <p className="text-xs  text-foreground-lighter mb-3">Resolution Steps</p>
         <div className="flex gap-4">
           {steps.map((step, i) => (
             <div key={step.num} className="flex items-start gap-2 flex-1">
-              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-surface-200 text-foreground-lighter text-xs font-medium shrink-0">
+              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-foreground text-background text-xs  shrink-0">
                 {step.num}
               </div>
               <div>
-                <p className="text-xs font-medium text-foreground">{step.label}</p>
+                <p className="text-xs  text-foreground">{step.label}</p>
                 <p className="text-xs text-foreground-lighter">{step.description}</p>
               </div>
             </div>
@@ -166,7 +192,11 @@ function ResolutionSteps({ isActive }: { isActive: boolean }) {
 export function IssueDetail() {
   const { ref: projectRef, id: issueId } = useParams()
   const { data: issue, isLoading } = useAdvisorIssueDetailQuery(projectRef, issueId)
+  const { data: rules } = useAdvisorRulesQuery(projectRef)
   const updateMutation = useUpdateIssueMutation(projectRef)
+  const track = useTrack()
+  const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const handleStatusChange = (status: IssueStatus) => {
     if (!issueId) return
@@ -192,6 +222,23 @@ export function IssueDetail() {
 
   const firstAlert = issue.alerts?.[0]
   const ruleId = firstAlert?.rule_id ?? null
+  const rule: AdvisorRule | undefined = rules?.find((r) => r.id === ruleId)
+
+  const handleAskAssistant = () => {
+    track('advisor_assistant_button_clicked', {
+      origin: 'issue_detail',
+      advisorCategory: issue.category,
+      advisorType: rule?.name ?? 'unknown',
+      advisorLevel: issue.severity,
+    })
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    snap.newChat({
+      name: 'Analyze issue',
+      initialMessage: createIssueSummaryPrompt(issue, rule),
+    })
+  }
+
+  const buildPromptForCopy = () => createIssueSummaryPrompt(issue, rule)
 
   return (
     <div className="mx-auto w-full max-w-7xl flex flex-col gap-y-6 px-5 py-6">
@@ -213,34 +260,67 @@ export function IssueDetail() {
               <Badge variant="default">{issue.category}</Badge>
               <span className="capitalize">{issue.status}</span>
               <span>&middot;</span>
-              <span>{issue.alert_count} alert{issue.alert_count !== 1 ? 's' : ''}</span>
+              <span>
+                {issue.alert_count} alert{issue.alert_count !== 1 ? 's' : ''}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="flex gap-1 shrink-0">
+          <AiAssistantDropdown
+            label="Ask Assistant"
+            buildPrompt={buildPromptForCopy}
+            onOpenAssistant={handleAskAssistant}
+            telemetrySource="issue_detail"
+          />
           {isActive && issue.status !== 'acknowledged' && (
-            <Button type="outline" size="tiny" icon={<Eye className="h-3 w-3" />} onClick={() => handleStatusChange('acknowledged')}>
+            <Button
+              type="outline"
+              size="tiny"
+              icon={<Eye className="h-3 w-3" />}
+              onClick={() => handleStatusChange('acknowledged')}
+            >
               Acknowledge
             </Button>
           )}
           {isActive && (
-            <Button type="outline" size="tiny" icon={<Clock className="h-3 w-3" />} onClick={() => handleStatusChange('snoozed')}>
+            <Button
+              type="outline"
+              size="tiny"
+              icon={<Clock className="h-3 w-3" />}
+              onClick={() => handleStatusChange('snoozed')}
+            >
               Snooze
             </Button>
           )}
           {isActive && (
-            <Button type="default" size="tiny" icon={<CheckCircle2 className="h-3 w-3" />} onClick={() => handleStatusChange('resolved')}>
+            <Button
+              type="default"
+              size="tiny"
+              icon={<CheckCircle2 className="h-3 w-3" />}
+              onClick={() => handleStatusChange('resolved')}
+            >
               Resolve
             </Button>
           )}
           {!isActive && issue.status === 'resolved' && (
-            <Button type="outline" size="tiny" icon={<AlertTriangle className="h-3 w-3" />} onClick={() => handleStatusChange('open')}>
+            <Button
+              type="outline"
+              size="tiny"
+              icon={<AlertTriangle className="h-3 w-3" />}
+              onClick={() => handleStatusChange('open')}
+            >
               Reopen
             </Button>
           )}
           {isActive && (
-            <Button type="text" size="tiny" icon={<EyeOff className="h-3 w-3" />} onClick={() => handleStatusChange('dismissed')}>
+            <Button
+              type="text"
+              size="tiny"
+              icon={<EyeOff className="h-3 w-3" />}
+              onClick={() => handleStatusChange('dismissed')}
+            >
               Dismiss
             </Button>
           )}
@@ -249,14 +329,14 @@ export function IssueDetail() {
 
       <ResolutionSteps isActive={isActive} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="lg:col-span-1 space-y-6">
           <Card>
             <CardContent className="p-0">
-              <div className="px-6 py-3 border-b border-default">
-                <h3 className="text-sm font-medium text-foreground">Alert Timeline</h3>
+              <div className="px-4 py-3 border-b border-default">
+                <h3 className="text-sm  text-foreground">Alert Timeline</h3>
               </div>
-              <div className="px-6">
+              <div className="px-4">
                 {issue.alerts && issue.alerts.length > 0 ? (
                   <div className="divide-y divide-default">
                     {issue.alerts.map((alert) => (
@@ -272,14 +352,14 @@ export function IssueDetail() {
         </div>
 
         <div className="space-y-6">
-          <IssueActions issue={issue} />
+          <IssueActions issue={issue} rule={rule} />
 
           <RerunCheckButton ruleId={ruleId} projectRef={projectRef!} />
 
           {issue.description && (
             <Card>
-              <CardContent className="p-6">
-                <h3 className="text-sm font-medium text-foreground mb-2">Description</h3>
+              <CardContent className="p-4">
+                <h3 className="text-sm  text-foreground mb-2">Description</h3>
                 <p className="text-sm text-foreground-lighter whitespace-pre-wrap">
                   {issue.description}
                 </p>
@@ -288,38 +368,50 @@ export function IssueDetail() {
           )}
 
           <Card>
-            <CardContent className="p-6">
-              <h3 className="text-sm font-medium text-foreground mb-3">Details</h3>
-              <dl className="space-y-2 text-sm">
+            <CardContent className="p-4">
+              <h3 className="text-sm text-foreground mb-3">Details</h3>
+              <dl className="space-y-2 text-xs">
                 <div className="flex justify-between">
                   <dt className="text-foreground-lighter">Status</dt>
-                  <dd className="text-foreground font-medium capitalize">{issue.status}</dd>
+                  <dd className="text-foreground  capitalize">{issue.status}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-foreground-lighter">Category</dt>
-                  <dd className="text-foreground font-medium capitalize">{issue.category}</dd>
+                  <dd className="text-foreground  capitalize">{issue.category}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-foreground-lighter">Alerts</dt>
-                  <dd className="text-foreground font-medium">{issue.alert_count}</dd>
+                  <dd className="text-foreground ">{issue.alert_count}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-foreground-lighter">First seen</dt>
-                  <dd className="text-foreground font-medium">
-                    <TimestampInfo utcTimestamp={issue.first_triggered_at} labelFormat="D MMM YYYY" className="text-sm" />
+                  <dd className="text-foreground ">
+                    <TimestampInfo
+                      utcTimestamp={issue.first_triggered_at}
+                      labelFormat="D MMM YYYY HH:mm"
+                      className="text-xs font-mono"
+                    />
                   </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-foreground-lighter">Last seen</dt>
-                  <dd className="text-foreground font-medium">
-                    <TimestampInfo utcTimestamp={issue.last_triggered_at} labelFormat="D MMM YYYY" className="text-sm" />
+                  <dd className="text-foreground">
+                    <TimestampInfo
+                      utcTimestamp={issue.last_triggered_at}
+                      labelFormat="D MMM YYYY HH:mm"
+                      className="text-xs font-mono"
+                    />
                   </dd>
                 </div>
                 {issue.resolved_at && (
                   <div className="flex justify-between">
                     <dt className="text-foreground-lighter">Resolved</dt>
-                    <dd className="text-foreground font-medium">
-                      <TimestampInfo utcTimestamp={issue.resolved_at} labelFormat="D MMM YYYY" className="text-sm" />
+                    <dd className="text-foreground">
+                      <TimestampInfo
+                        utcTimestamp={issue.resolved_at}
+                        labelFormat="D MMM YYYY"
+                        className="text-xs font-mono"
+                      />
                     </dd>
                   </div>
                 )}

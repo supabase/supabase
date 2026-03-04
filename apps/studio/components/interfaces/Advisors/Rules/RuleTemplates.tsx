@@ -1,6 +1,8 @@
 import { useParams } from 'common'
 import { useCreateRuleMutation } from 'data/advisors/rules-query'
-import { DollarSign, ShieldCheck, Zap } from 'lucide-react'
+import { DOCS_URL } from 'lib/constants'
+import { DollarSign, ExternalLink, LayoutTemplate, ShieldCheck, Zap } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button, Card, CardContent } from 'ui'
@@ -13,17 +15,45 @@ const categoryIcons = {
   cost: DollarSign,
 } as const
 
+const ADVISORS_DOCS_URL = `${DOCS_URL}/guides/database/database-advisors`
+
 export function RuleTemplates({ existingRuleNames }: { existingRuleNames: string[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-      {ALL_TEMPLATES.map((template) => (
-        <TemplateCard
-          key={template.id}
-          template={template}
-          existingRuleNames={existingRuleNames}
-        />
-      ))}
-    </div>
+    <Card className="border-dashed">
+      <CardContent className="p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2">
+            <div className="rounded-lg bg-surface-200 p-2">
+              <LayoutTemplate className="h-4 w-4 text-foreground-lighter" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-foreground">Rule Templates</h3>
+              <p className="text-xs text-foreground-lighter">
+                Quick-start rule packs you can apply. Customize after adding.
+              </p>
+            </div>
+          </div>
+          <Link
+            href={ADVISORS_DOCS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-brand hover:text-brand-600 transition-colors shrink-0"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            View more templates
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {ALL_TEMPLATES.map((template) => (
+            <TemplateCard
+              key={template.id}
+              template={template}
+              existingRuleNames={existingRuleNames}
+            />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -57,14 +87,19 @@ function TemplateCard({
   }
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col border-surface-200">
       <CardContent className="flex flex-col gap-3 p-4 flex-1">
         <div className="flex items-start gap-3">
           <div className="rounded-lg bg-surface-200 p-2 shrink-0">
             <Icon className="h-4 w-4 text-foreground-lighter" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground">{template.name}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-medium text-foreground">{template.name}</p>
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal">
+                Template
+              </Badge>
+            </div>
             <p className="text-xs text-foreground-lighter mt-0.5">{template.description}</p>
           </div>
         </div>

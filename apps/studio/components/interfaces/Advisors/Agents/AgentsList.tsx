@@ -8,8 +8,8 @@ import {
   useUpdateAgentMutation,
 } from 'data/advisors/agents-query'
 import type { AdvisorAgent } from 'data/advisors/types'
-import { Bot, Edit, Info, MoreVertical, Plus, Trash } from 'lucide-react'
-import { useState } from 'react'
+import { Bot, ChevronDown, ChevronRight, Edit, Info, MoreVertical, Plus, Trash } from 'lucide-react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -57,7 +57,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { AgentPresetsCards } from './AgentPresets'
-import { TOOL_CATALOG, TOOL_NAMES } from './tool-catalog'
+import { AgentTasksList } from './AgentTasksList'
+import { TOOL_CATALOG } from './tool-catalog'
 
 const AgentFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -73,6 +74,7 @@ export function AgentsList() {
   const [showSheet, setShowSheet] = useState(false)
   const [editingAgent, setEditingAgent] = useState<AdvisorAgent | null>(null)
   const [deletingAgent, setDeletingAgent] = useState<AdvisorAgent | null>(null)
+  const [expandedAgentId, setExpandedAgentId] = useState<string | null>(null)
 
   const deleteMutation = useDeleteAgentMutation(projectRef)
 
@@ -128,78 +130,99 @@ export function AgentsList() {
               <TableBody>
                 {(agents ?? []).map((agent) => {
                   const agentTasks = (tasks ?? []).filter((t) => t.agent_id === agent.id)
+                  const isExpanded = expandedAgentId === agent.id
                   return (
-                    <TableRow key={agent.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Bot className="h-4 w-4 text-foreground-lighter shrink-0" />
-                          <div className="min-w-0">
-                            <span className="text-sm text-foreground">{agent.name}</span>
-                            {agent.summary && (
-                              <p className="text-xs text-foreground-lighter truncate max-w-xs">
-                                {agent.summary}
-                              </p>
+                    <React.Fragment key={agent.id}>
+                      <TableRow>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Bot className="h-4 w-4 text-foreground-lighter shrink-0" />
+                            <div className="min-w-0">
+                              <span className="text-sm text-foreground">{agent.name}</span>
+                              {agent.summary && (
+                                <p className="text-xs text-foreground-lighter truncate max-w-xs">
+                                  {agent.summary}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {agent.tools.length > 0 ? (
+                              <TooltipProvider>
+                                {agent.tools.slice(0, 3).map((tool) => {
+                                  const def = TOOL_CATALOG.find((t) => t.name === tool)
+                                  return (
+                                    <Tooltip key={tool}>
+                                      <TooltipTrigger asChild>
+                                        <Badge variant="default">{tool}</Badge>
+                                      </TooltipTrigger>
+                                      {def && <TooltipContent>{def.description}</TooltipContent>}
+                                    </Tooltip>
+                                  )
+                                })}
+                              </TooltipProvider>
+                            ) : (
+                              <span className="text-xs text-foreground-muted">None</span>
+                            )}
+                            {agent.tools.length > 3 && (
+                              <Badge variant="default">+{agent.tools.length - 3}</Badge>
                             )}
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {agent.tools.length > 0 ? (
-                            <TooltipProvider>
-                              {agent.tools.slice(0, 3).map((tool) => {
-                                const def = TOOL_CATALOG.find((t) => t.name === tool)
-                                return (
-                                  <Tooltip key={tool}>
-                                    <TooltipTrigger asChild>
-                                      <Badge variant="default">{tool}</Badge>
-                                    </TooltipTrigger>
-                                    {def && <TooltipContent>{def.description}</TooltipContent>}
-                                  </Tooltip>
-                                )
-                              })}
-                            </TooltipProvider>
-                          ) : (
-                            <span className="text-xs text-foreground-muted">None</span>
-                          )}
-                          {agent.tools.length > 3 && (
-                            <Badge variant="default">+{agent.tools.length - 3}</Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-foreground-lighter">
-                          {agentTasks.length} task{agentTasks.length !== 1 ? 's' : ''}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button type="default" className="px-1" icon={<MoreVertical />} />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent side="bottom" align="end" className="w-48">
-                            <DropdownMenuItem
-                              className="space-x-2"
-                              onClick={() => {
-                                setEditingAgent(agent)
-                                setShowSheet(true)
-                              }}
-                            >
-                              <Edit size={12} />
-                              <p>Edit agent</p>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="space-x-2"
-                              onClick={() => setDeletingAgent(agent)}
-                            >
-                              <Trash size={12} />
-                              <p>Delete agent</p>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                        </TableCell>
+                        <TableCell>
+                          <button
+                            type="button"
+                            className="flex items-center gap-1.5 text-sm text-foreground-lighter hover:text-foreground transition-colors"
+                            onClick={() =>
+                              setExpandedAgentId(isExpanded ? null : agent.id)
+                            }
+                          >
+                            {isExpanded ? (
+                              <ChevronDown size={14} />
+                            ) : (
+                              <ChevronRight size={14} />
+                            )}
+                            {agentTasks.length} task{agentTasks.length !== 1 ? 's' : ''}
+                          </button>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button type="default" className="px-1" icon={<MoreVertical />} />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent side="bottom" align="end" className="w-48">
+                              <DropdownMenuItem
+                                className="space-x-2"
+                                onClick={() => {
+                                  setEditingAgent(agent)
+                                  setShowSheet(true)
+                                }}
+                              >
+                                <Edit size={12} />
+                                <p>Edit agent</p>
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="space-x-2"
+                                onClick={() => setDeletingAgent(agent)}
+                              >
+                                <Trash size={12} />
+                                <p>Delete agent</p>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                      {isExpanded && (
+                        <tr>
+                          <td colSpan={4} className="p-0">
+                            <AgentTasksList agentId={agent.id} projectRef={projectRef!} />
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   )
                 })}
               </TableBody>
@@ -297,7 +320,7 @@ function AgentEditorSheet({
 
   return (
     <Sheet open={visible} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent size="default" className="flex flex-col gap-0" onOpenAutoFocus={handleOpen}>
+      <SheetContent size="lg" className="flex flex-col gap-0" onOpenAutoFocus={handleOpen}>
         <SheetHeader>
           <SheetTitle>{isEditing ? 'Edit Agent' : 'Create Agent'}</SheetTitle>
         </SheetHeader>

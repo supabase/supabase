@@ -124,6 +124,8 @@ export function RulesList() {
   return (
     <>
       <div className="flex flex-col gap-y-4">
+        <RuleTemplates existingRuleNames={(rules ?? []).map((r) => r.name)} />
+
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
           <Input
             placeholder="Search rules"
@@ -143,8 +145,6 @@ export function RulesList() {
             New Rule
           </Button>
         </div>
-
-        <RuleTemplates existingRuleNames={(rules ?? []).map((r) => r.name)} />
 
         <Card>
           <Table>

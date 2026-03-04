@@ -17,4 +17,6 @@ export const advisorKeys = {
     ['projects', projectRef, 'advisor-channels'] as const,
   conversations: (projectRef: string | undefined, issueId?: string) =>
     ['projects', projectRef, 'advisor-conversations', issueId] as const,
+  taskConversations: (projectRef: string | undefined, taskId?: string) =>
+    ['projects', projectRef, 'advisor-task-conversations', taskId] as const,
 }

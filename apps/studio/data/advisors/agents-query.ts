@@ -3,7 +3,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { advisorKeys } from './keys'
 import { S, literal } from './advisors-fetch'
-import type { AdvisorAgent, AdvisorAgentTask } from './types'
+import type { AdvisorAgent, AdvisorAgentTask, AdvisorConversation } from './types'
 
 export function useAdvisorAgentsQuery(
   projectRef?: string,
@@ -219,6 +219,62 @@ export function useDeleteAgentTaskMutation(projectRef?: string) {
       })
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: advisorKeys.agentTasks(projectRef) })
+    },
+  })
+}
+
+// Task Conversations (run history)
+
+export function useTaskConversationsQuery(
+  projectRef?: string,
+  taskId?: string,
+  options?: { enabled?: boolean }
+) {
+  const { data: project } = useSelectedProjectQuery()
+  const connectionString = project?.connectionString
+
+  return useQuery<AdvisorConversation[]>({
+    queryKey: advisorKeys.taskConversations(projectRef, taskId),
+    queryFn: async ({ signal }) => {
+      const { result } = await executeSql<AdvisorConversation[]>(
+        {
+          projectRef,
+          connectionString,
+          sql: `
+            SELECT c.*,
+              (SELECT count(*)::int FROM ${S}.conversation_messages WHERE conversation_id = c.id) as message_count
+            FROM ${S}.conversations c
+            WHERE c.task_id = ${literal(taskId)}
+            ORDER BY c.updated_at DESC
+            LIMIT 20
+          `,
+          queryKey: advisorKeys.taskConversations(projectRef, taskId),
+        },
+        signal
+      )
+      return result ?? []
+    },
+    enabled: (options?.enabled ?? true) && !!projectRef && !!connectionString && !!taskId,
+  })
+}
+
+export function useExecuteAgentTaskMutation(projectRef?: string) {
+  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
+  const connectionString = project?.connectionString
+
+  return useMutation({
+    mutationFn: async (taskId: string) => {
+      await executeSql({
+        projectRef,
+        connectionString,
+        sql: `SELECT ${S}.execute_agent_task(${literal(taskId)}::uuid)`,
+        queryKey: ['advisor-execute-agent-task'],
+      })
+    },
+    onSuccess: (_data, taskId) => {
+      queryClient.invalidateQueries({ queryKey: advisorKeys.taskConversations(projectRef, taskId) })
       queryClient.invalidateQueries({ queryKey: advisorKeys.agentTasks(projectRef) })
     },
   })

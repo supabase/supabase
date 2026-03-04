@@ -1,11 +1,11 @@
+import { useParams } from 'common'
 import { useIsAdvisorsV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import { useParams } from 'common'
-import { useAdvisorIssuesQuery } from 'data/advisors/issues-query'
-import { useAdvisorRulesQuery } from 'data/advisors/rules-query'
 import { useAdvisorAgentsQuery } from 'data/advisors/agents-query'
 import { useAdvisorChannelsQuery } from 'data/advisors/channels-query'
+import { useAdvisorIssuesQuery } from 'data/advisors/issues-query'
+import { useAdvisorRulesQuery } from 'data/advisors/rules-query'
 import type { AdvisorIssue } from 'data/advisors/types'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import {
@@ -27,6 +27,7 @@ import {
 import Link from 'next/link'
 import { Badge, Button, Card, CardContent } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { QuickSetupCard } from './QuickSetupCard'
 
 function HealthScoreBanner({
@@ -62,8 +63,7 @@ function HealthScoreBanner({
     const parts: string[] = []
     if (critical.length > 0)
       parts.push(`${critical.length} critical issue${critical.length !== 1 ? 's' : ''}`)
-    if (lintErrors > 0)
-      parts.push(`${lintErrors} lint error${lintErrors !== 1 ? 's' : ''}`)
+    if (lintErrors > 0) parts.push(`${lintErrors} lint error${lintErrors !== 1 ? 's' : ''}`)
 
     const extras: string[] = []
     if (warnings.length > 0)
@@ -82,9 +82,7 @@ function HealthScoreBanner({
               {parts.join(' and ')} need attention
             </p>
             <p className="text-xs text-foreground-lighter">
-              {extras.length > 0
-                ? `Plus ${extras.join(' and ')}. `
-                : ''}
+              {extras.length > 0 ? `Plus ${extras.join(' and ')}. ` : ''}
               Review the Security and Performance advisors to keep your project healthy.
             </p>
           </div>
@@ -92,7 +90,7 @@ function HealthScoreBanner({
             <Button
               asChild
               type="default"
-              size="small"
+              size="tiny"
               iconRight={<ArrowRight className="h-3 w-3" />}
             >
               <Link href={`/project/${projectRef}/advisors/issues`}>View issues</Link>
@@ -127,7 +125,7 @@ function HealthScoreBanner({
             <Button
               asChild
               type="default"
-              size="small"
+              size="tiny"
               iconRight={<ArrowRight className="h-3 w-3" />}
             >
               <Link href={`/project/${projectRef}/advisors/issues`}>View issues</Link>
@@ -390,11 +388,7 @@ function LintFindingsSummary({
                 {warnings.length} warning{warnings.length !== 1 ? 's' : ''}
               </Badge>
             )}
-            {infos.length > 0 && (
-              <Badge variant="default">
-                {infos.length} info
-              </Badge>
-            )}
+            {infos.length > 0 && <Badge variant="default">{infos.length} info</Badge>}
           </span>
         </h3>
         <Button
@@ -478,9 +472,7 @@ function QuickLinks({ projectRef }: { projectRef: string }) {
               <Zap className="h-5 w-5 text-foreground-lighter shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-foreground">Performance Advisor</p>
-                <p className="text-xs text-foreground-lighter">
-                  Identify performance bottlenecks
-                </p>
+                <p className="text-xs text-foreground-lighter">Identify performance bottlenecks</p>
               </div>
             </CardContent>
           </Card>
@@ -504,10 +496,7 @@ export function AdvisorsOverview() {
     isPending: lintsLoading,
     isRefetching: lintsRefetching,
     refetch: refetchLints,
-  } = useProjectLintsQuery(
-    { projectRef },
-    { enabled: !!isV2 }
-  )
+  } = useProjectLintsQuery({ projectRef }, { enabled: !!isV2 })
 
   const isLoading = issuesLoading || rulesLoading || (isV2 && lintsLoading)
 
@@ -561,8 +550,8 @@ export function AdvisorsOverview() {
       {isV2 && allLints.length > 0 && (
         <div id="lint-findings">
           <p className="text-xs text-foreground-lighter mb-3">
-            Lint findings are real-time checks from the Security and Performance Advisors.
-            Click a finding to see full details and remediation steps.
+            Lint findings are real-time checks from the Security and Performance Advisors. Click a
+            finding to see full details and remediation steps.
           </p>
           <LintFindingsSummary
             lints={allLints}

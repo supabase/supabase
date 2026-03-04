@@ -1,9 +1,10 @@
 import { useParams } from 'common'
-import { useCreateAgentMutation } from 'data/advisors/agents-query'
+import { useCreateAgentMutation, useCreateAgentTaskMutation } from 'data/advisors/agents-query'
 import { Bot, ShieldCheck, Zap, AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button, Card, CardContent } from 'ui'
+import { getTaskPresetsForAgent } from './task-presets'
 
 export interface AgentPreset {
   id: string
@@ -69,6 +70,7 @@ Prioritize speed and clarity. Use bullet points and action items.`,
 export function AgentPresetsCards() {
   const { ref: projectRef } = useParams()
   const createMutation = useCreateAgentMutation(projectRef)
+  const createTaskMutation = useCreateAgentTaskMutation(projectRef)
 
   return (
     <div className="space-y-3">
@@ -77,7 +79,12 @@ export function AgentPresetsCards() {
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {AGENT_PRESETS.map((preset) => (
-          <PresetCard key={preset.id} preset={preset} createMutation={createMutation} />
+          <PresetCard
+            key={preset.id}
+            preset={preset}
+            createMutation={createMutation}
+            createTaskMutation={createTaskMutation}
+          />
         ))}
       </div>
     </div>
@@ -87,9 +94,11 @@ export function AgentPresetsCards() {
 function PresetCard({
   preset,
   createMutation,
+  createTaskMutation,
 }: {
   preset: AgentPreset
   createMutation: ReturnType<typeof useCreateAgentMutation>
+  createTaskMutation: ReturnType<typeof useCreateAgentTaskMutation>
 }) {
   const [creating, setCreating] = useState(false)
   const Icon = preset.icon
@@ -97,14 +106,33 @@ function PresetCard({
   const handleCreate = async () => {
     setCreating(true)
     try {
-      await createMutation.mutateAsync({
+      const agent = await createMutation.mutateAsync({
         name: preset.name,
         summary: preset.summary,
         system_prompt: preset.system_prompt,
         tools: preset.tools,
       })
-      toast.success(`"${preset.name}" agent created`)
-    } catch (err) {
+
+      if (agent?.id) {
+        const taskPresets = getTaskPresetsForAgent(preset.id)
+        await Promise.all(
+          taskPresets.map((tp) =>
+            createTaskMutation.mutateAsync({
+              agent_id: agent.id,
+              name: tp.name,
+              description: tp.description,
+              schedule: tp.schedule,
+              is_unique: tp.is_unique,
+              enabled: tp.enabled,
+            })
+          )
+        )
+      }
+
+      const taskCount = getTaskPresetsForAgent(preset.id).length
+      const taskMsg = taskCount > 0 ? ` with ${taskCount} scheduled task${taskCount !== 1 ? 's' : ''}` : ''
+      toast.success(`"${preset.name}" agent created${taskMsg}`)
+    } catch {
       toast.error('Failed to create agent')
     } finally {
       setCreating(false)
@@ -125,6 +153,9 @@ function PresetCard({
         </div>
         <div className="flex items-center gap-2 mt-auto pt-2">
           <Badge variant="default">{preset.tools.length} tools</Badge>
+          <Badge variant="outline">
+            {getTaskPresetsForAgent(preset.id).length} tasks
+          </Badge>
           <Button type="default" size="tiny" loading={creating} onClick={handleCreate}>
             Create agent
           </Button>

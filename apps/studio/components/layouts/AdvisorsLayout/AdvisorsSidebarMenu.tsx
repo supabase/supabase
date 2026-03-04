@@ -23,7 +23,7 @@ export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
 
   return (
     <div className="pb-12 relative">
-      <FeaturePreviewSidebarPanel
+      {/* <FeaturePreviewSidebarPanel
         className="mx-4 mt-4"
         title="Moving to the toolbar"
         description="Advisors are now available in the top toolbar for quicker access across the dashboard."
@@ -33,7 +33,7 @@ export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
             Try it now
           </Button>
         }
-      />
+      /> */}
 
       <ProductMenu page={page} menu={generateAdvisorsMenu(project, { advisorsV2 })} />
     </div>

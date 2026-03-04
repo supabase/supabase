@@ -1,7 +1,9 @@
 import { useParams } from 'common'
 import { useUpdateIssueMutation } from 'data/advisors/issues-query'
-import type { AdvisorIssue, SuggestedAction } from 'data/advisors/types'
+import type { AdvisorIssue, AdvisorRule, SuggestedAction } from 'data/advisors/types'
 import {
+  ArrowRight,
+  BookOpen,
   CheckCircle2,
   Code,
   ExternalLink,
@@ -11,8 +13,11 @@ import {
   Wrench,
   Zap,
 } from 'lucide-react'
-import { useState } from 'react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 import { Badge, Button } from 'ui'
+
+import { getKnownIssueInfo, type KnownIssueInfo } from './IssueDetail.utils'
 
 interface RemediationConfig {
   icon: typeof ShieldCheck
@@ -65,11 +70,11 @@ function RemediationActionCard({
         href={action.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-3 p-3 rounded-lg border border-default hover:bg-surface-100 transition-colors"
+        className="flex items-center gap-2 p-3 rounded-lg border border-default hover:bg-surface-100 transition-colors"
       >
         <ExternalLink className="h-4 w-4 text-foreground-lighter shrink-0" />
         <div className="flex-1">
-          <p className="text-sm font-medium">{action.label}</p>
+          <p className="text-sm">{action.label}</p>
           <p className="text-xs text-foreground-muted truncate">{action.url}</p>
         </div>
         <Badge variant="default" className="text-xs shrink-0">
@@ -82,10 +87,10 @@ function RemediationActionCard({
   if (action.type === 'sql' && action.sql) {
     return (
       <div className="rounded-lg border border-default p-3 space-y-2">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Code className="h-4 w-4 text-foreground-lighter shrink-0" />
           <div className="flex-1">
-            <p className="text-sm font-medium">{action.label}</p>
+            <p className="text-sm">{action.label}</p>
           </div>
           <div className="flex gap-1 shrink-0">
             <Button
@@ -116,23 +121,60 @@ function RemediationActionCard({
   }
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg border border-default hover:bg-surface-100 transition-colors">
+    <div className="flex items-center gap-2 p-3 rounded-lg border border-default hover:bg-surface-100 transition-colors">
       <Info className="h-4 w-4 text-foreground-lighter shrink-0" />
       <p className="text-sm flex-1">{action.label}</p>
     </div>
   )
 }
 
+function KnownIssueActionsCard({ info }: { info: KnownIssueInfo }) {
+  return (
+    <div className="space-y-2">
+      <h4 className="text-xs text-foreground-lighter">Quick Actions</h4>
+      <Link
+        href={info.navLink}
+        className="flex items-center gap-2 p-3 rounded-lg border border-default hover:bg-surface-100 transition-colors"
+      >
+        <ArrowRight className="h-4 w-4 text-foreground-lighter shrink-0" />
+        <p className="text-sm flex-1">{info.navLinkText}</p>
+        <Badge variant="default" className="text-xs shrink-0">
+          Go
+        </Badge>
+      </Link>
+      <a
+        href={info.docsLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 p-3 rounded-lg border border-default hover:bg-surface-100 transition-colors"
+      >
+        <BookOpen className="h-4 w-4 text-foreground-lighter shrink-0" />
+        <p className="text-sm flex-1">View Documentation</p>
+        <Badge variant="default" className="text-xs shrink-0">
+          Docs
+        </Badge>
+      </a>
+    </div>
+  )
+}
+
 export function IssueActions({
   issue,
+  rule,
   onActionApplied,
 }: {
   issue: AdvisorIssue
+  rule?: AdvisorRule
   onActionApplied?: () => void
 }) {
   const { ref: projectRef } = useParams()
   const updateMutation = useUpdateIssueMutation(projectRef)
   const hasActions = issue.suggested_actions.length > 0
+
+  const knownInfo = useMemo<KnownIssueInfo | null>(() => {
+    if (!rule?.name || !projectRef) return null
+    return getKnownIssueInfo(rule.name, projectRef, issue.metadata)
+  }, [rule?.name, projectRef, issue.metadata])
 
   const handleApply = async (action: SuggestedAction) => {
     const newActionsTaken = [
@@ -148,34 +190,36 @@ export function IssueActions({
     onActionApplied?.()
   }
 
-  if (!hasActions) return null
+  if (!hasActions && !knownInfo) return null
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium flex items-center gap-2">
+      <h3 className="text-sm flex items-center gap-2">
         <Wrench className="h-4 w-4" />
         Recommended Actions
       </h3>
-      <div className="space-y-2">
-        {issue.suggested_actions.map((action, i) => (
-          <RemediationActionCard
-            key={i}
-            action={action}
-            issue={issue}
-            onApply={handleApply}
-          />
-        ))}
-      </div>
+
+      {knownInfo && <KnownIssueActionsCard info={knownInfo} />}
+
+      {hasActions && (
+        <div className="space-y-2">
+          {issue.suggested_actions.map((action, i) => (
+            <RemediationActionCard key={i} action={action} issue={issue} onApply={handleApply} />
+          ))}
+        </div>
+      )}
 
       {issue.actions_taken.length > 0 && (
         <div className="mt-4">
-          <h4 className="text-xs font-medium text-foreground-lighter mb-2">Actions Taken</h4>
+          <h4 className="text-xs text-foreground-lighter mb-2">Actions Taken</h4>
           <div className="space-y-1">
             {issue.actions_taken.map((action, i) => (
               <div key={i} className="flex items-center gap-2 text-xs text-foreground-lighter">
                 <CheckCircle2 className="h-3 w-3 text-brand" />
                 <span>{action.label}</span>
-                <span className="text-foreground-muted">· {new Date(action.taken_at).toLocaleDateString()}</span>
+                <span className="text-foreground-muted">
+                  · {new Date(action.taken_at).toLocaleDateString()}
+                </span>
               </div>
             ))}
           </div>
