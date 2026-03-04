@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, Package2, Plus, Settings2, ShieldCheck } from 'lucide-react'
+import { Package2, Plus, Settings2, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import * as React from 'react'
@@ -35,7 +35,6 @@ export function AppSidebar({ partners, ...props }: AppSidebarProps) {
     title: item.title,
     href: `/protected/${currentPartner.slug}/items/${item.slug}`,
   }))
-  const overviewHref = `/protected/${currentPartner.slug}`
   const settingsHref = `/protected/${currentPartner.slug}/settings`
   const reviewsHref = `/protected/${currentPartner.slug}/reviews`
   const newItemHref = `/protected/${currentPartner.slug}/items/new`
@@ -50,14 +49,6 @@ export function AppSidebar({ partners, ...props }: AppSidebarProps) {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Overview" isActive={pathname === overviewHref}>
-                  <Link href={overviewHref}>
-                    <Home size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                    <span>Overview</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Settings" isActive={pathname === settingsHref}>
                   <Link href={settingsHref}>
                     <Settings2 size={16} strokeWidth={1.5} className="text-foreground-lighter" />
@@ -65,30 +56,35 @@ export function AppSidebar({ partners, ...props }: AppSidebarProps) {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {currentPartner.partnerRole === 'reviewer' || currentPartner.partnerRole === 'admin' ? (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip="Reviews"
-                    isActive={pathname === reviewsHref || pathname.startsWith(`${reviewsHref}/`)}
-                  >
-                    <Link href={reviewsHref}>
-                      <ShieldCheck
-                        size={16}
-                        strokeWidth={1.5}
-                        className="text-foreground-lighter"
-                      />
-                      <span>Reviews</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ) : null}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {currentPartner.partnerRole === 'reviewer' || currentPartner.partnerRole === 'admin' ? (
+          <SidebarGroup>
+            <SidebarGroupLabel className="heading-meta text-foreground-lighter">
+              Reviewer
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip="Inbox"
+                    isActive={pathname === reviewsHref || pathname.startsWith(`${reviewsHref}/`)}
+                  >
+                    <Link href={reviewsHref}>
+                      <ShieldCheck size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                      <span>Inbox</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ) : null}
         <SidebarGroup>
           <SidebarGroupLabel className="heading-meta text-foreground-lighter">
-            Marketplace Items
+            Marketplace items
           </SidebarGroupLabel>
           <SidebarGroupAction
             asChild
