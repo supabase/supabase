@@ -19,7 +19,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "module": "esnext",
     "plugins": [
       {
@@ -34,7 +34,8 @@
     "**/*.tsx",
     "pages/guides/append-test.js",
     ".next/types/**/*.ts",
-    "./../../packages/ui/src/**/*.d.ts"
+    "./../../packages/ui/src/**/*.d.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules", "examples"]
 }

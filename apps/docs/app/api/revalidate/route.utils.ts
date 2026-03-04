@@ -91,7 +91,7 @@ export async function _handleRevalidateRequest(request: NextRequest) {
   }
 
   result.tags.forEach((tag) => {
-    revalidateTag(tag)
+    revalidateTag(tag, 'default')
   })
 
   return new Response(null, {
