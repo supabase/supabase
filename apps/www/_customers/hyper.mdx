@@ -1,0 +1,141 @@
+---
+name: Hyper
+title: Hyper builds AI marketing agents on Supabase
+# Use meta_title to add a custom meta title. Otherwise it defaults to '{name} | Supabase Customer Stories':
+# meta_title:
+description: Hyper is an AI-native marketing platform with agents that operate across the entire marketing workflow. Supabase gives their three-person team the database platform to do it at enterprise scale.
+# Use meta_description to add a custom meta description. Otherwise it defaults to {description}:
+meta_description: How Hyper's three-person team built an AI marketing platform with agents that handle ads, SEO, and analytics — powered by Supabase at enterprise scale.
+author: prashant
+author_title: Prashant Sridharan
+author_url: https://github.com/CoolAssPuppy
+author_image_url: https://avatars.githubusercontent.com/u/914007?v=4
+logo: /images/customers/logos/hyper.svg
+logo_inverse: /images/customers/logos/light/hyper.svg
+tags:
+  - supabase
+date: '2025-12-19'
+company_url: https://www.hyperfx.ai
+misc:
+  - { label: 'Company size', text: 'Pre-seed startup, 3 founders' }
+  - { label: 'Use case', text: 'Multi-tenant AI agent platform for marketing agencies and SMBs' }
+about: AI-native marketing platform with agents that handle paid ads, SEO, analytics, and operations end to end. Connects to 80+ tools with built-in SEO and AI search data. Built for agencies managing hundreds of client accounts, SMBs running ads in-house, and founders launching their first campaign.
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['ai', 'saas']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'startup'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'North America'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database', 'auth']
+---
+
+<Quote img="elliot-fleck-hyper.jpeg" caption="Elliot Fleck, Co-founder, Hyper">
+  AI lowers the cost to start companies. Every company needs marketing. They'll all choose the best
+  tool, the one that does it for them. We believe the next decade will be won by entrepreneurs and
+  lean teams, and they'll use Hyper to do it.
+</Quote>
+
+[Hyper](https://www.hyperfx.ai) is an AI-native marketing platform with agents that handle paid ads, SEO, analytics, and operations, end to end. Campaigns across Meta, Google, TikTok, and LinkedIn. SEO and content strategy. Cross-platform reporting. The platform connects to 80+ tools and includes built-in capabilities most companies pay separately for: SEO and AI search data on par with SEMrush and Profound, managed databases per workspace, and a native file system where both users and agents can organize assets.
+
+Hyper is built for anyone who needs marketing — agencies managing hundreds of client accounts, SMBs running ads in-house, founders launching their first campaign. Founded by Elliot Fleck, Themba Mahlangu, and Jasper Shine, the company is building for a market they see as massive and inevitable.
+
+## The challenge
+
+Marketing is fragmented. Every platform — Meta, Google, Shopify, ESPs — has its own dashboard, its own metrics, its own API. Pulling that data into a single view is one of the biggest pain points in the industry — not just because it's tedious and fragile, but because without that context, you can't act correctly. Every decision depends on seeing the full picture. And it's getting harder. How people find products is changing — search to social feeds to AI assistants — tracking is noisier, and execution breaks down as complexity grows.
+
+Without a unified action system and data layer, problems go unnoticed. A broken campaign. A budget overspend. A drop in conversions that nobody catches for weeks.
+
+<Quote img="elliot-fleck-hyper.jpeg" caption="Elliot Fleck, Co-founder, Hyper">
+  Whether you're a first-time founder or an agency managing hundreds of accounts, your data is spread
+  across every platform — and no one knows if something is broken until weeks later. Agents on Hyper
+  consolidate all of it and catch problems immediately, like an expert watching everything 24/7. AI is
+  changing how work gets done — people want to say 'launch this' and 'run analysis and email me the
+  report,' not do it themselves.
+</Quote>
+
+## Why they chose Supabase
+
+Hyper needed a database platform that could handle multi-tenant data at scale, give both technical and non-technical team members direct visibility, and work well with AI agents. Supabase checked every box.
+
+The Supabase dashboard sits directly on top of the database. Elliot checks signup numbers by opening a table and sorting by date. Themba verifies a data sync by looking at the same table. No internal admin dashboards to build. No secondary tooling to maintain.
+
+<Quote img="themba-mahlangu-hyper.jpeg" caption="Themba Mahlangu, Co-founder, Hyper">
+  What sets Supabase apart is its UI. I can get in there and look at the database. Elliot, as the
+  non-technical co-founder, can also get in there and really dig deep without having to consult me
+  about anything.
+</Quote>
+
+Beyond the database, Supabase gives Hyper a full platform to grow into. Auth, Realtime, and Storage are all available without adding new vendors or stitching together separate services.
+
+<Quote img="elliot-fleck-hyper.jpeg" caption="Elliot Fleck, Co-founder, Hyper">
+  It's clear what Supabase is building for. They're building databases and features in the age of
+  super intelligence. Fantastic community, amazing developer documentation. If you're a startup looking
+  to build the next unicorn or just a lifestyle business, it's the easiest way to get started and
+  scale.
+</Quote>
+
+## The solution
+
+Hyper built a real-time data pipeline that automatically syncs cross-platform marketing data into Supabase — Meta, Google Ads, GA4, Search Console and more. Each customer gets their own managed Supabase database with only their data, and all they have to do is connect their account. No setup, no Supermetrics, no ETL, no warehouse configuration. It's the entire marketing data stack, simplified into one product that does all the heavy lifting.
+
+From there, agents run SQL to analyze marketing data, spin up customizable dashboards, and surface insights. No intermediate layer, no stale cache — agents query the real data directly.
+
+<Quote img="elliot-fleck-hyper.jpeg" caption="Elliot Fleck, Co-founder, Hyper">
+  Rather than going out in real time to each platform to get insights, agents write SQL to query the
+  data themselves. Agents are great at writing SQL. It's way more efficient. A literal 100x cost
+  reduction compared with if the agent were to go out and try to get that data.
+</Quote>
+
+Asking an agent to call APIs across five ad platforms in real time is slow, expensive, and often impossible at scale. But an agent can write a SQL query against a synced database and get the answer in seconds. The data stays close, structured, and queryable. Agents reason over it with SQL rather than wrestling with rate-limited APIs.
+
+When agents query Supabase, they hit the same tables that the founders and customers inspect in the dashboard. No ETL pipeline introducing drift. No caching layer serving stale results. The source of truth is the same for humans and agents. As the founders put it, "AI agents know Supabase like the back of their hand."
+
+<Quote img="elliot-fleck-hyper.jpeg" caption="Elliot Fleck, Co-founder, Hyper">
+  If you're getting the data from one place and visualizing it elsewhere, there's always going to be
+  a question mark. With Supabase, any user, whether they're technical or non-technical, can easily
+  jump in and see what's going on.
+</Quote>
+
+The result is a platform where agents operate like experts. Whether the user is a seasoned marketer or a first-time business owner, the agents generate reports, optimize campaigns, and flag issues automatically.
+
+## The results
+
+With Supabase as the system of record, Hyper gives agents a 360° marketing OS — unifying data, integrations, and intelligence into one product they can operate instantly, from analytics to real execution. Agents catch what's changing, diagnose opportunities and issues, and take omnichannel action immediately — across paid ads, SEO, reporting, and beyond.
+
+- 100x cost reduction in data retrieval by having agents query SQL instead of calling platform APIs in real time
+- 80+ tool integrations connected through a single data pipeline
+- Per-customer managed databases with isolated data for each client
+- Continuous data sync across all connected ad platforms and data sources (real-time + scheduled)
+
+## What's next
+
+Hyper's next phase is built on Supabase for Platforms. The architecture creates two layers.
+
+The first layer handles the heavy internal workload: the pipeline that syncs ad platform data for agencies and powers the AI agents that analyze it. This runs on larger Supabase instances.
+
+The second layer changes the product. Each agency's end clients get their own isolated database through Supabase for Platforms. Today, agencies use Hyper to expose reporting dashboards for their clients. With Supabase for Platforms, they can expose full applications.
+
+<Quote img="themba-mahlangu-hyper.jpeg" caption="Themba Mahlangu, Co-founder, Hyper">
+  Supabase for Platforms opens up a path for our customers beyond just dashboards. They can expose
+  richer apps. We can take advantage of all the features that Supabase for Platforms offers, like
+  Storage, like rich authentication, for their end users.
+</Quote>
+
+Supabase for Platforms handles the backend infrastructure: per-customer databases, isolated storage, and authentication logic that would have taken at least two weeks to build, even with pre-built libraries. It also provides frontend components that plug directly into Hyper's app. That frees the team to focus on what sits on top: the agents, the dashboards, and the workflows their customers actually see.
+
+The vision goes further. If marketing agencies can spin up websites for their end clients through Hyper, all powered by Supabase for Platforms, that opens an entirely new competitive front.
+
+<Quote img="elliot-fleck-hyper.jpeg" caption="Elliot Fleck, Co-founder, Hyper">
+  With Supabase for Platforms, anyone can come into Hyper and launch a marketing agency from scratch.
+  Build a website, set up authentication and contact forms, create a funnel. In under 15 minutes you
+  have a live agency with AI agents that intake clients and run their marketing end to end.
+</Quote>
+
+That is what happens when you give a product team a platform that handles databases, auth, storage, and real-time out of the box. They stop building infrastructure and start building the thing they set out to build.
+
+<Quote img="elliot-fleck-hyper.jpeg" caption="Elliot Fleck, Co-founder, Hyper">
+  I will get on a podcast and talk about how much I love Supabase and the whole experience. With
+  Supabase we can move fast and build things that delight our customers without having to worry
+  about infrastructure.
+</Quote>
