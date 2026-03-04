@@ -18,22 +18,22 @@ import ProjectWebhooksSettings from 'pages/project/[ref]/settings/webhooks'
 
 describe('Platform webhooks routes', () => {
   it('renders organization list page', () => {
-    render(<OrgWebhooksSettings />)
+    render(<OrgWebhooksSettings dehydratedState={{}} />)
     expect(screen.getByText('scope:organization;endpoint:')).toBeInTheDocument()
   })
 
   it('renders organization endpoint page', () => {
-    render(<OrgWebhookEndpointSettings />)
+    render(<OrgWebhookEndpointSettings dehydratedState={{}} />)
     expect(screen.getByText('scope:organization;endpoint:test-endpoint-1')).toBeInTheDocument()
   })
 
   it('renders project list page', () => {
-    render(<ProjectWebhooksSettings />)
+    render(<ProjectWebhooksSettings dehydratedState={{}} />)
     expect(screen.getByText('scope:project;endpoint:')).toBeInTheDocument()
   })
 
   it('renders project endpoint page', () => {
-    render(<ProjectWebhookEndpointSettings />)
+    render(<ProjectWebhookEndpointSettings dehydratedState={{}} />)
     expect(screen.getByText('scope:project;endpoint:test-endpoint-1')).toBeInTheDocument()
   })
 })
