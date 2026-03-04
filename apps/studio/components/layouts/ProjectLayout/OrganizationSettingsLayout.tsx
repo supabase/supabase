@@ -66,6 +66,11 @@ export const generateOrganizationSettingsSections = ({
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
+    {
+      key: 'private-apps',
+      label: 'Private Apps',
+      href: `/org/${slug}/private-apps`,
+    },
   ]
 
   const complianceLinks = [
@@ -99,7 +104,7 @@ export const generateOrganizationSettingsSections = ({
       heading: 'Connections',
       links: connectionsLinks.map((item) => ({
         ...item,
-        isActive: currentPath === item.href,
+        isActive: currentPath === item.href || currentPath.startsWith(item.href + '/'),
       })),
     },
     {
