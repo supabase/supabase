@@ -400,11 +400,11 @@ select
     -- mean_time,
     coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows,
     statements.rows as rows_read,
-    case 
-      when (statements.shared_blks_hit + statements.shared_blks_read) > 0 
+    case
+      when (statements.shared_blks_hit + statements.shared_blks_read) > 0
       then round(
-        (statements.shared_blks_hit * 100.0) / 
-        (statements.shared_blks_hit + statements.shared_blks_read), 
+        (statements.shared_blks_hit * 100.0) /
+        (statements.shared_blks_hit + statements.shared_blks_read),
         2
       )
       else 0
@@ -430,7 +430,7 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  ${where || ''}
+  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by statements.calls desc'}
   limit 20`,
       },
@@ -440,6 +440,10 @@ select
         -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
+with grand_total as (
+  select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
+  from pg_stat_statements where calls > 0
+)
 select
     auth.rolname,
     statements.query,
@@ -448,7 +452,7 @@ select
     statements.mean_exec_time + statements.mean_plan_time as mean_time,
     coalesce(
       ((statements.total_exec_time + statements.total_plan_time) /
-        nullif(sum(statements.total_exec_time + statements.total_plan_time) OVER(), 0)) *
+        (select v from grand_total)) *
         100,
       0
     ) as prop_total_time${
@@ -473,7 +477,7 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  ${where || ''}
+  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by total_time desc'}
   limit 20`,
       },
@@ -519,7 +523,7 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  ${where || ''}
+  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by max_time desc'}
   limit 20`,
       },
@@ -543,7 +547,11 @@ select
         -- reports-query-performance-unified
         set search_path to public, extensions;
 
-        with base as (
+        with grand_total as (
+          select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
+          from pg_stat_statements where calls > 0
+        ),
+        base as (
           select
             auth.rolname,
             statements.query,
@@ -564,13 +572,13 @@ select
             end as cache_hit_rate,
             coalesce(
               ((statements.total_exec_time + statements.total_plan_time) /
-                nullif(sum(statements.total_exec_time + statements.total_plan_time) OVER(), 0)) *
+                (select v from grand_total)) *
                 100,
               0
             ) as prop_total_time
           from pg_stat_statements as statements
             inner join pg_authid as auth on statements.userid = auth.oid
-          ${where || ''}
+          WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
           ${orderBy || 'order by total_time desc'}
           limit 50
         ),
@@ -615,28 +623,27 @@ select
 
         -- Count of slow queries (> 1 second average)
         SELECT count(*) as slow_queries_count
-        FROM pg_stat_statements 
-        WHERE statements.mean_exec_time > 1000;`,
+        FROM pg_stat_statements as statements
+        WHERE statements.calls > 0 AND statements.mean_exec_time > 1000;`,
       },
       queryMetrics: {
         queryType: 'db',
         sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
         -- reports-query-performance-metrics
         set search_path to public, extensions;
-      
-        SELECT 
+
+        SELECT
           COALESCE(ROUND(AVG(statements.rows::numeric / NULLIF(statements.calls, 0)), 1), 0) as avg_rows_per_call,
           COUNT(*) FILTER (WHERE statements.total_exec_time + statements.total_plan_time > 1000) as slow_queries,
           COALESCE(
             ROUND(
-              SUM(statements.shared_blks_hit) * 100.0 / 
-              NULLIF(SUM(statements.shared_blks_hit + statements.shared_blks_read), 0), 
+              SUM(statements.shared_blks_hit) * 100.0 /
+              NULLIF(SUM(statements.shared_blks_hit + statements.shared_blks_read), 0),
               2
             ), 0
           ) || '%' as cache_hit_rate
         FROM pg_stat_statements as statements
-        WHERE statements.calls > 0
-        ${where || ''}
+        WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
         ${orderBy || ''}`,
       },
     },
