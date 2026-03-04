@@ -1,14 +1,16 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import {
   useAdvisorAgentsQuery,
-  useCreateAgentMutation,
-  useUpdateAgentMutation,
-  useDeleteAgentMutation,
   useAdvisorAgentTasksQuery,
+  useCreateAgentMutation,
+  useDeleteAgentMutation,
+  useUpdateAgentMutation,
 } from 'data/advisors/agents-query'
 import type { AdvisorAgent } from 'data/advisors/types'
-import { Bot, Edit, MoreVertical, Plus, Trash } from 'lucide-react'
+import { Bot, Edit, Info, MoreVertical, Plus, Trash } from 'lucide-react'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -19,9 +21,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Separator,
   Sheet,
@@ -37,19 +39,30 @@ import {
   TableHeader,
   TableRow,
   Textarea,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+
+import { TOOL_CATALOG, TOOL_NAMES } from './tool-catalog'
 
 const AgentFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   summary: z.string().optional(),
   system_prompt: z.string().optional(),
-  tools: z.string().optional(),
+  tools: z.array(z.string()),
 })
 
 export function AgentsList() {
@@ -130,11 +143,19 @@ export function AgentsList() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {agent.tools.length > 0 ? (
-                            agent.tools.slice(0, 3).map((tool) => (
-                              <Badge key={tool} variant="default">
-                                {tool}
-                              </Badge>
-                            ))
+                            <TooltipProvider>
+                              {agent.tools.slice(0, 3).map((tool) => {
+                                const def = TOOL_CATALOG.find((t) => t.name === tool)
+                                return (
+                                  <Tooltip key={tool}>
+                                    <TooltipTrigger asChild>
+                                      <Badge variant="default">{tool}</Badge>
+                                    </TooltipTrigger>
+                                    {def && <TooltipContent>{def.description}</TooltipContent>}
+                                  </Tooltip>
+                                )
+                              })}
+                            </TooltipProvider>
                           ) : (
                             <span className="text-xs text-foreground-muted">None</span>
                           )}
@@ -237,7 +258,7 @@ function AgentEditorSheet({
 
   const form = useForm<z.infer<typeof AgentFormSchema>>({
     resolver: zodResolver(AgentFormSchema),
-    defaultValues: { name: '', summary: '', system_prompt: '', tools: '' },
+    defaultValues: { name: '', summary: '', system_prompt: '', tools: [] },
   })
 
   const handleOpen = () => {
@@ -246,7 +267,7 @@ function AgentEditorSheet({
         name: agent.name,
         summary: agent.summary ?? '',
         system_prompt: agent.system_prompt ?? '',
-        tools: agent.tools.join(', '),
+        tools: agent.tools ?? [],
       })
     } else {
       form.reset()
@@ -254,16 +275,11 @@ function AgentEditorSheet({
   }
 
   const onSubmit = async (values: z.infer<typeof AgentFormSchema>) => {
-    const toolsArray = (values.tools ?? '')
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean)
-
     const payload = {
       name: values.name,
       summary: values.summary,
       system_prompt: values.system_prompt,
-      tools: toolsArray,
+      tools: values.tools,
     }
 
     if (isEditing && agent) {
@@ -343,11 +359,63 @@ function AgentEditorSheet({
                   <FormItemLayout
                     layout="horizontal"
                     label="Tools"
-                    description="Comma-separated list of available MCP tools"
+                    description="MCP tools this agent can use"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="listAlerts, getAlert, commentOnAlert" />
-                    </FormControl_Shadcn_>
+                    <div className="space-y-3 w-full">
+                      <MultiSelector
+                        onValuesChange={field.onChange}
+                        values={field.value}
+                        size="small"
+                      >
+                        <MultiSelectorTrigger
+                          mode="inline-combobox"
+                          label="Select tools..."
+                          badgeLimit="wrap"
+                          showIcon={false}
+                          deletableBadge
+                        />
+                        <MultiSelectorContent>
+                          <MultiSelectorList>
+                            {TOOL_CATALOG.map((tool) => (
+                              <MultiSelectorItem key={tool.name} value={tool.name}>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono text-xs">{tool.name}</span>
+                                  <span className="text-foreground-lighter text-xs">
+                                    — {tool.description}
+                                  </span>
+                                </div>
+                              </MultiSelectorItem>
+                            ))}
+                          </MultiSelectorList>
+                        </MultiSelectorContent>
+                      </MultiSelector>
+
+                      {field.value.length > 0 && (
+                        <div className="rounded border border-default p-3 space-y-2">
+                          <p className="text-xs font-medium text-foreground-lighter">
+                            Selected tools ({field.value.length})
+                          </p>
+                          {field.value.map((toolName: string) => {
+                            const def = TOOL_CATALOG.find((t) => t.name === toolName)
+                            return (
+                              <div key={toolName} className="flex items-start gap-2">
+                                <Info className="h-3 w-3 mt-0.5 text-foreground-muted shrink-0" />
+                                <div>
+                                  <span className="font-mono text-xs text-foreground">
+                                    {toolName}
+                                  </span>
+                                  {def && (
+                                    <p className="text-xs text-foreground-lighter">
+                                      {def.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </FormItemLayout>
                 )}
               />
