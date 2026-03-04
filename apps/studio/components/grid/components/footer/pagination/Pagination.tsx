@@ -183,18 +183,6 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   }, [page])
 
   useEffect(() => {
-    if (
-      id !== undefined &&
-      isSuccess &&
-      count >= 0 &&
-      count <= THRESHOLD_COUNT &&
-      isEstimateCount
-    ) {
-      snap.setEnforceExactCount(true)
-    }
-  }, [count, isEstimateCount, id, isSuccess, snap])
-
-  useEffect(() => {
     // If the count query encountered a timeout error with exact count
     // turn off the exact count to rely on approximate
     if (isError && snap.enforceExactCount && error?.code === 408) {
