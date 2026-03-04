@@ -27,7 +27,9 @@ export default async function EditItemPage({ params }: EditItemPageProps) {
 
   const { data: item, error: itemError } = await supabase
     .from('items')
-    .select('id, slug, title, summary, content, type, link, updated_at')
+    .select(
+      'id, slug, title, summary, content, type, url, registry_item_url, documentation_url, updated_at'
+    )
     .eq('partner_id', partner.id)
     .eq('slug', slug)
     .maybeSingle()
@@ -54,7 +56,7 @@ export default async function EditItemPage({ params }: EditItemPageProps) {
 
   const { data: latestReview, error: latestReviewError } = await supabase
     .from('item_reviews')
-    .select('status')
+    .select('status, review_notes')
     .eq('item_id', item.id)
     .maybeSingle()
 
@@ -96,6 +98,7 @@ export default async function EditItemPage({ params }: EditItemPageProps) {
         isApproved,
         hasOpenReview,
         latestReviewStatus: latestReview?.status ?? null,
+        latestReviewNotes: latestReview?.review_notes ?? null,
         openReviewStatusLabel,
       }}
     />

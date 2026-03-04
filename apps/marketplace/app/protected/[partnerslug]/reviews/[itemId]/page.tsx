@@ -33,7 +33,7 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
   const { data: item, error: itemError } = await supabase
     .from('items')
     .select(
-      'id, slug, title, summary, link, content, type, updated_at, partner:partners(id, slug, title), review:item_reviews(status, featured, review_notes, reviewed_at)'
+      'id, slug, title, summary, url, registry_item_url, documentation_url, content, type, updated_at, partner:partners(id, slug, title), review:item_reviews(status, featured, review_notes, reviewed_at)'
     )
     .eq('id', parsedItemId)
     .maybeSingle()
@@ -117,21 +117,41 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
               title={item.title || 'Untitled item'}
               summary={item.summary}
               content={item.content}
+              primaryActionUrl={item.type === 'template' ? item.registry_item_url : item.url}
               files={marketplaceFiles}
               partnerName={(item.partner as { title?: string } | null)?.title}
               lastUpdatedAt={item.updated_at}
               type={item.type}
               metaFields={[
+                ...(item.type === 'oauth'
+                  ? [
+                      {
+                        label: 'Listing URL',
+                        value: item.url ? (
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline underline-offset-2"
+                          >
+                            {item.url}
+                          </a>
+                        ) : (
+                          'No URL provided'
+                        ),
+                      },
+                    ]
+                  : []),
                 {
-                  label: 'Listing URL',
-                  value: item.link ? (
+                  label: 'Documentation URL',
+                  value: item.documentation_url ? (
                     <a
-                      href={item.link}
+                      href={item.documentation_url}
                       target="_blank"
                       rel="noreferrer"
                       className="underline underline-offset-2"
                     >
-                      {item.link}
+                      {item.documentation_url}
                     </a>
                   ) : (
                     'No URL provided'

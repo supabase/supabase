@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import JSZip from 'jszip'
 
 import { createClient } from '@/lib/supabase/server'
 
@@ -35,6 +36,138 @@ function parseNumberList(formData: FormData, key: string) {
         })
     )
   )
+}
+
+function parseOptionalString(formData: FormData, key: string) {
+  const raw = formData.get(key)
+  if (typeof raw !== 'string') return null
+  const trimmed = raw.trim()
+  return trimmed ? trimmed : null
+}
+
+function parseTemplateZip(formData: FormData) {
+  const raw = formData.get('templateZip')
+  if (!(raw instanceof File) || raw.size === 0) {
+    return null
+  }
+  return raw
+}
+
+function normalizeTemplatePath(path: string, rootPrefix: string | null) {
+  const stripped = path.replace(/^\/+/, '')
+  if (!rootPrefix) return stripped
+  if (stripped === rootPrefix) return ''
+  const prefix = `${rootPrefix}/`
+  return stripped.startsWith(prefix) ? stripped.slice(prefix.length) : stripped
+}
+
+function shouldIgnoreTemplateEntry(path: string) {
+  const normalized = path.replace(/^\/+/, '')
+  const segments = normalized.split('/').filter(Boolean)
+  if (segments.length === 0) return true
+
+  // Ignore macOS/system artifacts commonly present in ZIP archives.
+  if (segments[0] === '__MACOSX') return true
+  const fileName = segments[segments.length - 1] ?? ''
+  if (fileName.toLowerCase() === '.ds_store') return true
+  if (fileName.startsWith('._')) return true
+
+  return false
+}
+
+async function uploadTemplatePackage({
+  zipFile,
+  supabase,
+  partnerId,
+  itemId,
+}: {
+  zipFile: File
+  supabase: Awaited<ReturnType<typeof createClient>>
+  partnerId: number
+  itemId: number
+}) {
+  const arrayBuffer = await zipFile.arrayBuffer()
+  const zip = await JSZip.loadAsync(arrayBuffer)
+  const entries = Object.values(zip.files).filter(
+    (entry) => !entry.dir && !shouldIgnoreTemplateEntry(entry.name)
+  )
+
+  if (entries.length === 0) {
+    throw new Error('Template package must contain files')
+  }
+
+  const topLevelDirs = new Set(entries.map((entry) => entry.name.split('/')[0]).filter(Boolean))
+  const rootPrefix = topLevelDirs.size === 1 ? Array.from(topLevelDirs)[0] ?? null : null
+
+  const normalizedEntries = entries
+    .map((entry) => ({
+      entry,
+      relativePath: normalizeTemplatePath(entry.name, rootPrefix),
+    }))
+    .filter((entry) => entry.relativePath.length > 0)
+
+  const hasRegistry = normalizedEntries.some((entry) => entry.relativePath === 'registry-item.json')
+  const hasFunctions = normalizedEntries.some((entry) => entry.relativePath.startsWith('functions/'))
+  const hasSchemas = normalizedEntries.some((entry) => entry.relativePath.startsWith('schemas/'))
+
+  if (!hasRegistry || !hasFunctions || !hasSchemas) {
+    throw new Error(
+      'Template package must include registry-item.json plus files in functions/ and schemas/'
+    )
+  }
+
+  const basePath = `${partnerId}/items/${itemId}/template`
+
+  const listStorageFilesRecursively = async (prefix = ''): Promise<string[]> => {
+    const targetPath = prefix ? `${basePath}/${prefix}` : basePath
+    const { data, error } = await supabase.storage.from('item_files').list(targetPath, {
+      limit: 1000,
+      sortBy: { column: 'name', order: 'asc' },
+    })
+
+    if (error || !data) return []
+
+    const nested = await Promise.all(
+      data.map(async (entry) => {
+        const isDirectory = entry.metadata == null
+        const nextPrefix = prefix ? `${prefix}/${entry.name}` : entry.name
+        if (isDirectory) {
+          return listStorageFilesRecursively(nextPrefix)
+        }
+        return [`${basePath}/${nextPrefix}`]
+      })
+    )
+
+    return nested.flat()
+  }
+
+  const existingTemplatePaths = await listStorageFilesRecursively()
+  if (existingTemplatePaths.length > 0) {
+    const { error: removeError } = await supabase.storage.from('item_files').remove(existingTemplatePaths)
+    if (removeError) {
+      throw new Error(removeError.message)
+    }
+  }
+
+  for (const normalizedEntry of normalizedEntries) {
+    const blob = await normalizedEntry.entry.async('blob')
+    const objectPath = `${basePath}/${normalizedEntry.relativePath}`
+    const { error } = await supabase.storage.from('item_files').upload(objectPath, blob, {
+      upsert: true,
+      contentType: blob.type || undefined,
+    })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+  }
+
+  const registryFilePath = `${basePath}/registry-item.json`
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from('item_files').getPublicUrl(registryFilePath)
+
+  return publicUrl
 }
 
 export async function createPartnerAction(formData: FormData) {
@@ -175,8 +308,15 @@ export async function createItemDraftAction(formData: FormData) {
   const slugInput = formData.get('slug')
   const summary = formData.get('summary')
   const content = formData.get('content')
-  const type = parseRequiredString(formData, 'type')
-  const link = parseRequiredString(formData, 'link')
+  const rawType = parseRequiredString(formData, 'type')
+  const type = rawType === 'oauth' ? 'oauth' : rawType === 'template' ? 'template' : null
+  const url = parseOptionalString(formData, 'url')
+  const templateZip = parseTemplateZip(formData)
+  const documentationUrl = formData.get('documentationUrl')
+  const normalizedDocumentationUrl =
+    typeof documentationUrl === 'string' && documentationUrl.trim()
+      ? documentationUrl.trim()
+      : null
   const intentRaw = formData.get('intent')
   const intent = intentRaw === 'request_review' ? 'request_review' : 'save'
   const slugSource = typeof slugInput === 'string' && slugInput.trim() ? slugInput : title
@@ -184,6 +324,15 @@ export async function createItemDraftAction(formData: FormData) {
 
   if (!slug) {
     throw new Error('Item slug cannot be empty')
+  }
+  if (!type) {
+    throw new Error('Invalid item type')
+  }
+  if (type === 'oauth' && !url) {
+    throw new Error('OAuth items require a listing URL')
+  }
+  if (type === 'template' && !templateZip) {
+    throw new Error('Template items require a template ZIP package')
   }
 
   const { data: item, error } = await supabase
@@ -195,7 +344,9 @@ export async function createItemDraftAction(formData: FormData) {
       summary: typeof summary === 'string' ? summary : null,
       content: typeof content === 'string' ? content : null,
       type,
-      link,
+      url: type === 'oauth' ? url : null,
+      registry_item_url: null,
+      documentation_url: normalizedDocumentationUrl,
       submitted_by: user.id,
     })
     .select('id, slug')
@@ -203,6 +354,23 @@ export async function createItemDraftAction(formData: FormData) {
 
   if (error || !item) {
     throw new Error(error?.message ?? 'Unable to create item')
+  }
+
+  if (type === 'template' && templateZip) {
+    const registryItemUrl = await uploadTemplatePackage({
+      zipFile: templateZip,
+      supabase,
+      partnerId,
+      itemId: item.id,
+    })
+    const { error: templateUrlError } = await supabase
+      .from('items')
+      .update({ registry_item_url: registryItemUrl })
+      .eq('id', item.id)
+
+    if (templateUrlError) {
+      throw new Error(templateUrlError.message)
+    }
   }
 
   if (intent === 'request_review') {
@@ -248,13 +416,22 @@ export async function updateItemDraftAction(formData: FormData) {
   }
 
   const itemId = Number(parseRequiredString(formData, 'itemId'))
+  const partnerId = Number(parseRequiredString(formData, 'partnerId'))
   const partnerSlug = parseRequiredString(formData, 'partnerSlug')
   const name = parseRequiredString(formData, 'name')
   const slugInput = formData.get('slug')
   const summary = formData.get('summary')
   const content = formData.get('content')
-  const link = parseRequiredString(formData, 'link')
-  const type = parseRequiredString(formData, 'type')
+  const url = parseOptionalString(formData, 'url')
+  const templateZip = parseTemplateZip(formData)
+  const existingRegistryItemUrl = parseOptionalString(formData, 'existingRegistryItemUrl')
+  const documentationUrl = formData.get('documentationUrl')
+  const normalizedDocumentationUrl =
+    typeof documentationUrl === 'string' && documentationUrl.trim()
+      ? documentationUrl.trim()
+      : null
+  const rawType = parseRequiredString(formData, 'type')
+  const type = rawType === 'oauth' ? 'oauth' : rawType === 'template' ? 'template' : null
   const removedFileIds = parseNumberList(formData, 'removedFileIds[]')
 
   const slugSource = typeof slugInput === 'string' && slugInput.trim() ? slugInput : name
@@ -263,6 +440,25 @@ export async function updateItemDraftAction(formData: FormData) {
   if (!slug) {
     throw new Error('Item slug cannot be empty')
   }
+  if (!type) {
+    throw new Error('Invalid item type')
+  }
+  if (type === 'oauth' && !url) {
+    throw new Error('OAuth items require a listing URL')
+  }
+  if (type === 'template' && !templateZip && !existingRegistryItemUrl) {
+    throw new Error('Template items require a template ZIP package')
+  }
+
+  const templateRegistryUrl =
+    type === 'template' && templateZip
+      ? await uploadTemplatePackage({
+          zipFile: templateZip,
+          supabase,
+          partnerId,
+          itemId,
+        })
+      : existingRegistryItemUrl
 
   const { data: item, error } = await supabase
     .from('items')
@@ -271,8 +467,10 @@ export async function updateItemDraftAction(formData: FormData) {
       slug,
       summary: typeof summary === 'string' ? summary : null,
       content: typeof content === 'string' ? content : null,
-      link,
+      url: type === 'oauth' ? url : null,
+      documentation_url: normalizedDocumentationUrl,
       type,
+      registry_item_url: type === 'template' ? templateRegistryUrl : null,
     })
     .eq('id', itemId)
     .select('slug')

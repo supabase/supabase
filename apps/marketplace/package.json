@@ -21,6 +21,7 @@
     "@supabase/supabase-js": "catalog:",
     "class-variance-authority": "*",
     "clsx": "^2.1.1",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.436.0",
     "next": "catalog:",
     "next-themes": "^0.4.6",

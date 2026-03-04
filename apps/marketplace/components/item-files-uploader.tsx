@@ -62,7 +62,7 @@ export function ItemFilesUploader({
 
   const storagePath = useMemo(() => {
     if (!itemId) return undefined
-    return `${partnerId}/items/${itemId}`
+    return `${partnerId}/items/${itemId}/files`
   }, [itemId, partnerId])
 
   const upload = useSupabaseUpload({

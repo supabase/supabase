@@ -1,10 +1,12 @@
 'use client'
 
+import JSZip from 'jszip'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
+  flattenTree,
   Form_Shadcn_ as Form,
   FormControl_Shadcn_ as FormControl,
   FormField_Shadcn_ as FormField,
@@ -12,12 +14,15 @@ import {
   RadioGroupStacked,
   RadioGroupStackedItem,
   TextArea_Shadcn_ as TextArea,
+  TreeView,
+  TreeViewItem,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import { createItemDraftAction, updateItemDraftAction } from '@/app/protected/actions'
 import { ItemFilesUploader, type ItemPreviewFile } from '@/components/item-files-uploader'
+import { createClient } from '@/lib/supabase/client'
 
 export type ItemFile = {
   id: number
@@ -37,7 +42,9 @@ export type ItemInfo = {
   summary: string | null
   content: string | null
   type: string
-  link: string
+  url: string | null
+  registry_item_url: string | null
+  documentation_url: string | null
 }
 
 type BaseProps = {
@@ -66,13 +73,99 @@ type SubmitResult = {
 
 const itemTypeEnum = z.enum(['template', 'oauth'])
 
+function areStringArraysEqual(left: string[], right: string[]) {
+  if (left.length !== right.length) return false
+  return left.every((value, index) => value === right[index])
+}
+
+type TemplateTreeNode = {
+  name: string
+  children: TemplateTreeNode[]
+  metadata?: {
+    sourcePath: string
+    isFile: boolean
+  }
+}
+
+function getTemplatePathSegments(pathOrUrl: string) {
+  const trimmed = pathOrUrl.trim()
+  if (!trimmed) return []
+  return trimmed.split('/').filter(Boolean)
+}
+
+function isIgnoredTemplatePath(path: string) {
+  const normalized = path.replace(/^\/+/, '')
+  const segments = normalized.split('/').filter(Boolean)
+  if (segments.length === 0) return true
+
+  if (segments[0] === '__MACOSX') return true
+  const fileName = segments[segments.length - 1] ?? ''
+  if (fileName.toLowerCase() === '.ds_store') return true
+  if (fileName.startsWith('._')) return true
+
+  return false
+}
+
+function normalizeTemplatePath(path: string, rootPrefix: string | null) {
+  const stripped = path.replace(/^\/+/, '')
+  if (!rootPrefix) return stripped
+  if (stripped === rootPrefix) return ''
+  const prefix = `${rootPrefix}/`
+  return stripped.startsWith(prefix) ? stripped.slice(prefix.length) : stripped
+}
+
+function buildTemplateTree(paths: string[]) {
+  const root: TemplateTreeNode[] = []
+
+  paths.forEach((path) => {
+    const segments = getTemplatePathSegments(path)
+    if (segments.length === 0) return
+
+    let cursor = root
+    segments.forEach((segment, index) => {
+      const isLeaf = index === segments.length - 1
+      const existing = cursor.find((node) => node.name === segment)
+      if (existing) {
+        if (isLeaf) {
+          existing.metadata = { sourcePath: path, isFile: true }
+        }
+        cursor = existing.children
+        return
+      }
+
+      const nextNode: TemplateTreeNode = {
+        name: segment,
+        children: [],
+        metadata: isLeaf ? { sourcePath: path, isFile: true } : { sourcePath: path, isFile: false },
+      }
+      cursor.push(nextNode)
+      cursor = nextNode.children
+    })
+  })
+
+  return root
+}
+
 const itemFormSchema = z.object({
   title: z.string().min(1, 'Item name is required'),
   slug: z.string().optional(),
   summary: z.string().optional(),
   content: z.string().optional(),
   type: itemTypeEnum,
-  link: z.string().url('Enter a valid URL'),
+  url: z
+    .string()
+    .optional()
+    .refine((value) => !value || Boolean(z.string().url().safeParse(value).success), {
+      message: 'Enter a valid URL',
+    }),
+  documentation_url: z
+    .string()
+    .optional()
+    .refine((value) => !value || Boolean(z.string().url().safeParse(value).success), {
+      message: 'Enter a valid URL',
+    }),
+  files: z.array(z.string()),
+  template_files: z.array(z.string()),
 })
 
 export type ItemFormValues = z.infer<typeof itemFormSchema>
@@ -86,14 +179,27 @@ export function ItemForm(props: ItemFormProps) {
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null)
   const [isWaitingForAutoUpload, setIsWaitingForAutoUpload] = useState(false)
   const [removedFileIds, setRemovedFileIds] = useState<number[]>([])
+  const [templateZipFile, setTemplateZipFile] = useState<File | null>(null)
+  const [existingTemplateFiles, setExistingTemplateFiles] = useState<string[]>([])
+  const [selectedTemplateFiles, setSelectedTemplateFiles] = useState<string[]>([])
+  const [initialTemplateFilesFieldValue, setInitialTemplateFilesFieldValue] = useState<string[]>([])
+  const templateZipInputRef = useRef<HTMLInputElement>(null)
   const submitIntentRef = useRef<'save' | 'request_review'>('save')
+  const supabase = useMemo(() => createClient(), [])
 
   const isCreateMode = props.mode === 'create'
   const item = props.mode === 'edit' ? props.item : null
   const itemId = isCreateMode ? submitResult?.itemId : item?.id
   const initialFiles = props.mode === 'edit' ? props.initialFiles : []
   const fieldsDisabled = isPending || isWaitingForAutoUpload
-
+  const initialFilesFieldValue = useMemo(
+    () =>
+      initialFiles
+        .slice()
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((file) => file.file_path),
+    [initialFiles]
+  )
   const defaultValues = useMemo<ItemFormValues>(
     () => ({
       title: item?.title ?? '',
@@ -101,9 +207,21 @@ export function ItemForm(props: ItemFormProps) {
       summary: item?.summary ?? '',
       content: item?.content ?? '',
       type: item?.type === 'oauth' ? 'oauth' : 'template',
-      link: item?.link ?? '',
+      url: item?.url ?? '',
+      documentation_url: item?.documentation_url ?? '',
+      files: initialFilesFieldValue,
+      template_files: [],
     }),
-    [item?.content, item?.link, item?.slug, item?.summary, item?.title, item?.type]
+    [
+      initialFilesFieldValue,
+      item?.content,
+      item?.documentation_url,
+      item?.slug,
+      item?.summary,
+      item?.title,
+      item?.type,
+      item?.url,
+    ]
   )
 
   const form = useForm<ItemFormValues>({
@@ -112,10 +230,127 @@ export function ItemForm(props: ItemFormProps) {
   })
   const onValuesChange = props.onValuesChange
   const onPreviewFilesChange = props.onPreviewFilesChange
+  const handlePreviewFilesChange = useCallback(
+    (files: ItemPreviewFile[]) => {
+      const normalizedFiles = files
+        .map((file) => file.description ?? file.name)
+        .slice()
+        .sort((a, b) => a.localeCompare(b))
+      const normalizedInitialFiles = initialFilesFieldValue
+        .slice()
+        .sort((a, b) => a.localeCompare(b))
+
+      form.setValue('files', normalizedFiles, {
+        shouldDirty: !areStringArraysEqual(normalizedFiles, normalizedInitialFiles),
+        shouldTouch: true,
+      })
+      onPreviewFilesChange?.(files)
+    },
+    [form, initialFilesFieldValue, onPreviewFilesChange]
+  )
 
   useEffect(() => {
     form.reset(defaultValues)
   }, [defaultValues, form])
+
+  useEffect(() => {
+    if (isCreateMode || item?.type !== 'template' || !itemId) {
+      setExistingTemplateFiles([])
+      setSelectedTemplateFiles([])
+      setInitialTemplateFilesFieldValue([])
+      form.setValue('template_files', [], {
+        shouldDirty: false,
+        shouldTouch: false,
+      })
+      return
+    }
+
+    let isCancelled = false
+    const basePath = `${props.partner.id}/items/${itemId}/template`
+
+    const loadTemplateFiles = async () => {
+      const listRecursive = async (prefix = ''): Promise<string[]> => {
+        const targetPath = prefix ? `${basePath}/${prefix}` : basePath
+        const { data, error } = await supabase.storage.from('item_files').list(targetPath, {
+          limit: 1000,
+          sortBy: { column: 'name', order: 'asc' },
+        })
+
+        if (error || !data) return []
+
+        const nested = await Promise.all(
+          data.map(async (entry) => {
+            const isDirectory = entry.metadata == null
+            const nextPrefix = prefix ? `${prefix}/${entry.name}` : entry.name
+            if (isDirectory) {
+              return listRecursive(nextPrefix)
+            }
+            return [nextPrefix]
+          })
+        )
+
+        return nested.flat()
+      }
+
+      const files = await listRecursive()
+      if (isCancelled) return
+
+      setExistingTemplateFiles(files)
+      setInitialTemplateFilesFieldValue(files)
+      form.setValue('template_files', files, {
+        shouldDirty: false,
+        shouldTouch: false,
+      })
+    }
+
+    void loadTemplateFiles()
+
+    return () => {
+      isCancelled = true
+    }
+  }, [form, isCreateMode, item?.type, itemId, props.partner.id, supabase])
+
+  useEffect(() => {
+    if (!templateZipFile) {
+      setSelectedTemplateFiles([])
+      return
+    }
+
+    let isCancelled = false
+    const parseZip = async () => {
+      const arrayBuffer = await templateZipFile.arrayBuffer()
+      const zip = await JSZip.loadAsync(arrayBuffer)
+      const entries = Object.values(zip.files).filter(
+        (entry) => !entry.dir && !isIgnoredTemplatePath(entry.name)
+      )
+      const topLevelDirs = new Set(entries.map((entry) => entry.name.split('/')[0]).filter(Boolean))
+      const rootPrefix = topLevelDirs.size === 1 ? Array.from(topLevelDirs)[0] ?? null : null
+      const normalized = entries
+        .map((entry) => normalizeTemplatePath(entry.name, rootPrefix))
+        .filter((entry) => entry.length > 0)
+        .sort((a, b) => a.localeCompare(b))
+
+      if (isCancelled) return
+      setSelectedTemplateFiles(normalized)
+      form.setValue('template_files', normalized, {
+        shouldDirty: true,
+        shouldTouch: true,
+      })
+    }
+
+    void parseZip().catch(() => {
+      if (isCancelled) return
+      setSelectedTemplateFiles([])
+      form.setValue('template_files', [], {
+        shouldDirty: true,
+        shouldTouch: true,
+      })
+    })
+
+    return () => {
+      isCancelled = true
+    }
+  }, [form, templateZipFile])
 
   useEffect(() => {
     if (!onValuesChange) return
@@ -128,7 +363,12 @@ export function ItemForm(props: ItemFormProps) {
         summary: value.summary ?? '',
         content: value.content ?? '',
         type: value.type === 'oauth' ? 'oauth' : 'template',
-        link: value.link ?? '',
+        url: value.url ?? '',
+        documentation_url: value.documentation_url ?? '',
+        files: (value.files ?? []).filter((entry): entry is string => typeof entry === 'string'),
+        template_files: (value.template_files ?? []).filter(
+          (entry): entry is string => typeof entry === 'string'
+        ),
       })
     })
 
@@ -153,6 +393,22 @@ export function ItemForm(props: ItemFormProps) {
     setError(null)
     setSuccess(null)
 
+    if (parsed.data.type === 'template') {
+      const hasExistingRegistryFile = Boolean(item?.registry_item_url)
+      if (isCreateMode && !templateZipFile) {
+        setError('Upload a template ZIP package that includes registry-item.json.')
+        return
+      }
+      if (!isCreateMode && !templateZipFile && !hasExistingRegistryFile) {
+        setError('Upload a template ZIP package that includes registry-item.json.')
+        return
+      }
+    }
+    if (parsed.data.type === 'oauth' && !parsed.data.url?.trim()) {
+      setError('OAuth items require a listing URL.')
+      return
+    }
+
     const formData = new FormData()
     const intent = submitIntentRef.current
     const trimmedSlug = parsed.data.slug?.trim()
@@ -162,9 +418,14 @@ export function ItemForm(props: ItemFormProps) {
     formData.set('slug', trimmedSlug ?? '')
     formData.set('summary', parsed.data.summary ?? '')
     formData.set('type', parsed.data.type)
-    formData.set('link', parsed.data.link)
+    formData.set('url', parsed.data.type === 'oauth' ? parsed.data.url ?? '' : '')
+    formData.set('documentationUrl', parsed.data.documentation_url ?? '')
     formData.set('content', parsed.data.content ?? '')
     formData.set('intent', intent)
+    formData.set('existingRegistryItemUrl', item?.registry_item_url ?? '')
+    if (templateZipFile && parsed.data.type === 'template') {
+      formData.set('templateZip', templateZipFile)
+    }
 
     if (isCreateMode) {
       formData.set('title', parsed.data.title)
@@ -203,6 +464,15 @@ export function ItemForm(props: ItemFormProps) {
   const handleCancel = () => {
     form.reset(defaultValues)
     setRemovedFileIds([])
+    setTemplateZipFile(null)
+    setSelectedTemplateFiles([])
+    if (templateZipInputRef.current) {
+      templateZipInputRef.current.value = ''
+    }
+    form.setValue('template_files', initialTemplateFilesFieldValue, {
+      shouldDirty: false,
+      shouldTouch: false,
+    })
     setError(null)
     setSuccess(null)
   }
@@ -227,6 +497,17 @@ export function ItemForm(props: ItemFormProps) {
   const titleLabel = isCreateMode ? 'Item name' : 'Item name'
   const slugLabel = isCreateMode ? 'Slug (optional)' : 'Slug'
   const isDirty = form.formState.isDirty
+  const itemType = form.watch('type')
+  const hasExistingTemplateFiles = existingTemplateFiles.length > 0
+  const templateFilesForTree =
+    selectedTemplateFiles.length > 0 || templateZipFile
+      ? selectedTemplateFiles
+      : existingTemplateFiles
+  const hasTemplateFilesForTree = templateFilesForTree.length > 0
+  const templateTreeData = useMemo(
+    () => flattenTree({ name: '', children: buildTemplateTree(templateFilesForTree) }),
+    [templateFilesForTree]
+  )
 
   return (
     <Form {...form}>
@@ -371,22 +652,126 @@ export function ItemForm(props: ItemFormProps) {
               />
             </div>
 
+            {itemType === 'oauth' ? (
+              <div className="p-6 pt-0">
+                <FormField
+                  control={form.control}
+                  name="url"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="vertical"
+                      label="Listing URL"
+                      description="External URL for installation docs or listing destination."
+                    >
+                      <FormControl>
+                        <Input
+                          id="item-url"
+                          type="url"
+                          placeholder="https://example.com"
+                          required
+                          disabled={fieldsDisabled}
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
+            ) : (
+              <div className="p-6 pt-0">
+                <FormItemLayout
+                  layout="vertical"
+                  label={
+                    hasExistingTemplateFiles ? (
+                      <span className="inline-flex w-full items-center justify-between gap-3">
+                        <span>Template package (.zip)</span>
+                        <Button
+                          htmlType="button"
+                          type="outline"
+                          disabled={fieldsDisabled}
+                          className="h-6 px-2 text-xs"
+                          onClick={(event) => {
+                            event.preventDefault()
+                            event.stopPropagation()
+                            templateZipInputRef.current?.click()
+                          }}
+                        >
+                          Replace
+                        </Button>
+                      </span>
+                    ) : (
+                      'Template package (.zip)'
+                    )
+                  }
+                  description="Upload a zip containing registry-item.json, functions/, and schemas/."
+                >
+                  <Input
+                    id="item-template-zip"
+                    type="file"
+                    accept=".zip,application/zip"
+                    disabled={fieldsDisabled}
+                    ref={templateZipInputRef}
+                    className={hasExistingTemplateFiles ? 'sr-only' : undefined}
+                    onChange={(event) => {
+                      const nextFile = event.target.files?.[0]
+                      setTemplateZipFile(nextFile ?? null)
+                      const nextTemplateFiles = nextFile ? [] : initialTemplateFilesFieldValue
+                      form.setValue('template_files', nextTemplateFiles, {
+                        shouldDirty: Boolean(nextFile),
+                        shouldTouch: true,
+                      })
+                    }}
+                  />
+                  {hasTemplateFilesForTree ? (
+                    <div className="mt-2 rounded-md border">
+                      <TreeView
+                        data={templateTreeData}
+                        aria-label="Template files"
+                        className="w-full py-1"
+                        nodeRenderer={({
+                          element,
+                          isBranch,
+                          isExpanded,
+                          getNodeProps,
+                          level,
+                          isSelected,
+                        }) => (
+                          <TreeViewItem
+                            {...getNodeProps()}
+                            isExpanded={isExpanded}
+                            isBranch={isBranch}
+                            isSelected={isSelected}
+                            level={level}
+                            name={element.name}
+                          />
+                        )}
+                      />
+                    </div>
+                  ) : null}
+                  {templateZipFile ? (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Selected package: {templateZipFile.name}
+                    </p>
+                  ) : null}
+                </FormItemLayout>
+              </div>
+            )}
+
             <div className="p-6 pt-0">
               <FormField
                 control={form.control}
-                name="link"
+                name="documentation_url"
                 render={({ field }) => (
                   <FormItemLayout
                     layout="vertical"
-                    label="Link"
-                    description="External URL for installation docs or listing destination."
+                    label="Documentation URL (optional)"
+                    description="Direct link to setup or API documentation for this item."
                   >
                     <FormControl>
                       <Input
-                        id="item-link"
+                        id="item-documentation-url"
                         type="url"
-                        placeholder="https://example.com"
-                        required
+                        placeholder="https://example.com/docs"
                         disabled={fieldsDisabled}
                         {...field}
                       />
@@ -412,7 +797,7 @@ export function ItemForm(props: ItemFormProps) {
                     disabled={fieldsDisabled}
                     onRemovedFileIdsChange={setRemovedFileIds}
                     onAutoUploadComplete={handleAutoUploadComplete}
-                    onPreviewFilesChange={onPreviewFilesChange}
+                    onPreviewFilesChange={handlePreviewFilesChange}
                   />
                 </div>
               </FormItemLayout>
@@ -430,7 +815,7 @@ export function ItemForm(props: ItemFormProps) {
             ) : null}
           </div>
 
-          <div className="shrink-0 border-t p-6">
+          <div className="shrink-0 border-t py-4 px-6">
             <div className="flex justify-end gap-3">
               {isDirty && (
                 <Button

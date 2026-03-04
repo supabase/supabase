@@ -215,7 +215,7 @@ export function ReviewDecisionForm({
               </Button>
             ) : null}
             <Button type="primary" htmlType="submit" disabled={!isDirty || isPending}>
-              {isPending ? 'Saving...' : 'Save review'}
+              {isPending ? 'Sending...' : 'Send review'}
             </Button>
           </CardFooter>
         </Card>

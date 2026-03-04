@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { cn, NavMenu, NavMenuItem } from 'ui'
+import { Button, cn, NavMenu, NavMenuItem } from 'ui'
 
 import { PageContainer } from '../PageContainer'
 import {
   PageHeader,
+  PageHeaderAside,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderNavigationTabs,
@@ -41,6 +42,7 @@ export type MarketplaceItemProps = {
   partnerName?: string
   lastUpdatedAt?: string | Date | null
   type?: string | null
+  primaryActionUrl?: string | null
   metaFields?: MarketplaceItemMetaField[]
   tabs?: MarketplaceItemTab[]
   className?: string
@@ -64,6 +66,7 @@ export function MarketplaceItem({
   partnerName,
   lastUpdatedAt,
   type,
+  primaryActionUrl,
   metaFields,
   tabs = [],
   className,
@@ -105,6 +108,15 @@ export function MarketplaceItem({
             <PageHeaderTitle>{title}</PageHeaderTitle>
             <PageHeaderDescription>{summary || 'No summary provided.'}</PageHeaderDescription>
           </PageHeaderSummary>
+          {primaryActionUrl ? (
+            <PageHeaderAside>
+              <Button asChild type="primary" size="small">
+                <a href={primaryActionUrl} target="_blank" rel="noreferrer">
+                  Install
+                </a>
+              </Button>
+            </PageHeaderAside>
+          ) : null}
         </PageHeaderMeta>
         <PageHeaderNavigationTabs>
           <NavMenu>

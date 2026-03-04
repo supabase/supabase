@@ -174,11 +174,17 @@ create table public.items (
   summary text,
   content text, -- markdown body
   type public.marketplace_item_type not null,
-  link text not null,
+  url text,
+  registry_item_url text,
+  documentation_url text,
   submitted_by uuid references auth.users (id) on delete set null default auth.uid(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint items_slug_format check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
+  constraint items_slug_format check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
+  constraint items_type_destination_check check (
+    (type = 'oauth' and url is not null and registry_item_url is null)
+    or (type = 'template' and url is null)
+  )
 );
 
 -- Marketplace categories (e.g. auth, analytics, cms, etc).
@@ -255,6 +261,7 @@ create policy "partners_select"
   using (
     public.is_supabase_team_member()
     or public.is_partner_member(id)
+    or public.is_reviewer_member()
   );
 
 create policy "partners_insert"
