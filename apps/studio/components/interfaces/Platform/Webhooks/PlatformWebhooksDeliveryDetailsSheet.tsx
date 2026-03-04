@@ -1,5 +1,7 @@
 import { Copy } from 'lucide-react'
 
+import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import {
   AlertDialog,
   Badge,
@@ -17,11 +19,10 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import type { WebhookDelivery } from './PlatformWebhooks.types'
 import {
-  formatDate,
   formatDeliveryStatus,
-  responseCodeBadgeVariant,
   statusBadgeVariant,
 } from './PlatformWebhooksView.utils'
 
@@ -80,15 +81,19 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Timestamp</p>
-                    <p className="text-sm text-foreground">
-                      {formatDate(selectedDelivery.attemptAt)}
-                    </p>
+                    <TimestampInfo className="text-sm" utcTimestamp={selectedDelivery.attemptAt} />
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Response code</p>
-                    <Badge variant={responseCodeBadgeVariant(selectedDelivery.responseCode)}>
-                      {selectedDelivery.responseCode ?? '-'}
-                    </Badge>
+                    {selectedDelivery.responseCode ? (
+                      <DataTableColumnStatusCode
+                        value={selectedDelivery.responseCode}
+                        level={getStatusLevel(selectedDelivery.responseCode)}
+                        className="text-xs"
+                      />
+                    ) : (
+                      <span className="text-xs text-foreground-muted">–</span>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -117,9 +122,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Event timestamp</p>
-                    <p className="text-sm text-foreground">
-                      {formatDate(selectedDelivery.attemptAt)}
-                    </p>
+                    <TimestampInfo className="text-sm" utcTimestamp={selectedDelivery.attemptAt} />
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
@@ -149,9 +152,15 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Response code</p>
-                    <Badge variant={responseCodeBadgeVariant(selectedDelivery.responseCode)}>
-                      {selectedDelivery.responseCode ?? '-'}
-                    </Badge>
+                    {selectedDelivery.responseCode ? (
+                      <DataTableColumnStatusCode
+                        value={selectedDelivery.responseCode}
+                        level={getStatusLevel(selectedDelivery.responseCode)}
+                        className="text-xs"
+                      />
+                    ) : (
+                      <span className="text-xs text-foreground-muted">–</span>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">

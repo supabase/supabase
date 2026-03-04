@@ -20,10 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
-import { formatDate } from './PlatformWebhooksView.utils'
 
 interface PlatformWebhooksEndpointListProps {
   filteredEndpoints: WebhookEndpoint[]
@@ -177,7 +176,7 @@ export const PlatformWebhooksEndpointList = ({
                     {formatEventCount(endpoint.eventTypes)}
                   </TableCell>
                   <TableCell>
-                    <p>{formatDate(endpoint.createdAt)}</p>
+                    <TimestampInfo className="text-sm" utcTimestamp={endpoint.createdAt} />
                     <p className="text-xs text-foreground-lighter mt-0.5">by {endpoint.createdBy}</p>
                   </TableCell>
                   <TableCell className="text-right">

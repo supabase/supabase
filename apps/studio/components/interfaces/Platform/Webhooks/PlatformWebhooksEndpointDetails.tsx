@@ -1,5 +1,7 @@
 import { Search } from 'lucide-react'
 
+import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import {
   Badge,
   Card,
@@ -14,7 +16,7 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
-import { formatDate, statusBadgeVariant } from './PlatformWebhooksView.utils'
+import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 
 interface DetailItemProps {
   label: string
@@ -51,7 +53,7 @@ export const PlatformWebhooksEndpointDetails = ({
       <div className="space-y-4">
         <h2 className="text-foreground text-xl">Overview</h2>
         <Card className="overflow-hidden">
-          <CardContent>
+          <CardContent className="pb-5">
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
               <DetailItem label="URL" ddClassName="text-sm break-all">
                 {selectedEndpoint.url}
@@ -77,11 +79,11 @@ export const PlatformWebhooksEndpointDetails = ({
 
               {hasCustomHeaders && (
                 <DetailItem label="Custom headers">
-                  <div className="rounded-md border divide-y">
+                  <div className="rounded-md border divide-y divide-border">
                     {selectedEndpoint.customHeaders.map((header) => (
                       <div
                         key={header.id}
-                        className="px-3 py-3 font-mono font-medium text-xs flex items-center gap-2 flex-wrap"
+                        className="px-2 py-2 font-mono font-medium text-xs flex items-center gap-2 flex-wrap"
                       >
                         <code className="text-code_block-4">{header.key}:</code>
                         <code className="">{header.value}</code>
@@ -121,7 +123,7 @@ export const PlatformWebhooksEndpointDetails = ({
                 <TableHead>Status</TableHead>
                 <TableHead>Event type</TableHead>
                 <TableHead>Response</TableHead>
-                <TableHead>Attempt at</TableHead>
+                <TableHead>Attempted</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -147,8 +149,20 @@ export const PlatformWebhooksEndpointDetails = ({
                         {delivery.eventType}
                       </code>
                     </TableCell>
-                    <TableCell>{delivery.responseCode ?? '–'}</TableCell>
-                    <TableCell>{formatDate(delivery.attemptAt)}</TableCell>
+                    <TableCell>
+                      {delivery.responseCode ? (
+                        <DataTableColumnStatusCode
+                          value={delivery.responseCode}
+                          level={getStatusLevel(delivery.responseCode)}
+                          className="text-xs"
+                        />
+                      ) : (
+                        <span className="text-xs text-foreground-muted">–</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <TimestampInfo className="text-sm" utcTimestamp={delivery.attemptAt} />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
