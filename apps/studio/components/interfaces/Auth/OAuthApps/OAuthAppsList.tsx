@@ -4,7 +4,7 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
 import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
@@ -75,7 +75,7 @@ export const OAuthAppsList = () => {
   const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
+  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
   const {
     data,
     error,
@@ -457,8 +457,8 @@ export const OAuthAppsList = () => {
         onConfirm={() => {
           regenerateSecret({
             projectRef,
+            clientEndpoint,
             clientId: selectedApp?.client_id,
-            clientEndpoint: endpointData?.endpoint,
           })
           setShowRegenerateDialog(false)
         }}
