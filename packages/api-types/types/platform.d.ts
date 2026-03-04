@@ -4337,6 +4337,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/stripe/product/provisioning/account_requests/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get account request details */
+    get: operations['AccountRequestsController_getAccountRequest']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/product/provisioning/account_requests/{id}/confirm': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Confirm account request (from Studio) */
+    post: operations['AccountRequestsController_confirmAccountRequest']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/stripe/setup-intent': {
     parameters: {
       query?: never
@@ -4609,6 +4643,22 @@ export interface components {
       scope?: 'V0'
       token_alias: string
     }
+    AccountRequestDetailsDto: {
+      email: string
+      expires_at: string
+      id: string
+      name?: string
+      orchestrator: {
+        stripe?: {
+          account: string
+          organization?: string
+        }
+        type: string
+      }
+      scopes?: string[]
+      /** @enum {string} */
+      status: 'pending' | 'complete' | 'expired'
+    }
     AddAwsAccountToPrivateLinkBody: {
       account_name?: string
       aws_account_id: string
@@ -4789,6 +4839,10 @@ export interface components {
       name: string
       payment_intent_id: string
       size?: string
+    }
+    ConfirmResponseDto: {
+      organization_slug: string
+      success: boolean
     }
     ConfirmSubscriptionChangeBody: {
       payment_intent_id: string
@@ -5148,7 +5202,12 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
+          billing_partner:
+            | 'fly'
+            | 'aws_marketplace'
+            | 'vercel_marketplace'
+            | 'stripe_product'
+            | null
           id: number
           is_owner: boolean
           name: string
@@ -5200,8 +5259,6 @@ export interface components {
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
-        | 'pico'
-        | 'nano'
         | 'micro'
         | 'small'
         | 'medium'
@@ -5226,7 +5283,7 @@ export interface components {
        * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
        */
-      postgres_engine?: '13' | '14' | '15' | '17' | '17-oriole'
+      postgres_engine?: '15' | '17' | '17-oriole'
       /** @description Provider region selection. Only one of db_region or region_selection can be specified. */
       region_selection?:
         | {
@@ -6499,7 +6556,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -6703,6 +6760,8 @@ export interface components {
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
       AUDIT_LOG_DISABLE_POSTGRES: boolean | null
+      CUSTOM_OAUTH_ENABLED: boolean
+      CUSTOM_OAUTH_MAX_PROVIDERS: number
       DB_MAX_POOL_SIZE: number | null
       /** @enum {string|null} */
       DB_MAX_POOL_SIZE_UNIT: 'connections' | 'percent' | null
@@ -7143,7 +7202,9 @@ export interface components {
             | 'auth.user_sessions'
             | 'auth.leaked_password_protection'
             | 'auth.advanced_auth_settings'
+            | 'auth.performance_settings'
             | 'backup.retention_days'
+            | 'backup.restore_to_new_project'
             | 'function.max_count'
             | 'function.size_limit_mb'
             | 'realtime.max_concurrent_users'
@@ -7158,6 +7219,7 @@ export interface components {
             | 'project_pausing'
             | 'project_cloning'
             | 'assistant.advance_model'
+            | 'integrations.github_connections'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -7505,7 +7567,7 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
       id: number
       is_owner: boolean
       name: string
@@ -7568,7 +7630,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -9818,6 +9880,7 @@ export interface components {
     UpdateGoTrueConfigBody: {
       API_MAX_REQUEST_DURATION?: number | null
       AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
+      CUSTOM_OAUTH_ENABLED?: boolean
       DB_MAX_POOL_SIZE?: number | null
       /** @enum {string|null} */
       DB_MAX_POOL_SIZE_UNIT?: 'connections' | 'percent' | null
@@ -17173,7 +17236,9 @@ export interface operations {
           | 'auth.user_sessions'
           | 'auth.leaked_password_protection'
           | 'auth.advanced_auth_settings'
+          | 'auth.performance_settings'
           | 'backup.retention_days'
+          | 'backup.restore_to_new_project'
           | 'function.max_count'
           | 'function.size_limit_mb'
           | 'realtime.max_concurrent_users'
@@ -17188,6 +17253,7 @@ export interface operations {
           | 'project_pausing'
           | 'project_cloning'
           | 'assistant.advance_model'
+          | 'integrations.github_connections'
       }
       header?: never
       path?: never
@@ -22735,8 +22801,6 @@ export interface operations {
       query: {
         cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
         desired_instance_size?:
-          | 'pico'
-          | 'nano'
           | 'micro'
           | 'small'
           | 'medium'
@@ -26357,6 +26421,48 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OverdueInvoiceCount'][]
+        }
+      }
+    }
+  }
+  AccountRequestsController_getAccountRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AccountRequestDetailsDto']
+        }
+      }
+    }
+  }
+  AccountRequestsController_confirmAccountRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ConfirmResponseDto']
         }
       }
     }
