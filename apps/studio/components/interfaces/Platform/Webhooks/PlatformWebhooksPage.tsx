@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
 
 import { useParams } from 'common'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { InlineLink } from 'components/ui/InlineLink'
 import { Admonition } from 'ui-patterns'
 import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -61,6 +62,9 @@ interface PlatformWebhooksPageProps {
 export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPageProps) => {
   const router = useRouter()
   const { slug, ref } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery({
+    enabled: scope === 'project',
+  })
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   const {
     endpoints,
@@ -94,7 +98,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const scopeDescription =
     scope === 'organization'
       ? 'Organization-level webhook endpoints and deliveries'
-      : 'Webhook endpoints scoped to this project'
+      : 'Webhook endpoints specific to this project'
   const fallbackHref =
     scope === 'organization' ? `/org/${slug}/general` : `/project/${ref}/settings/general`
 
@@ -372,6 +376,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       <PlatformWebhooksEndpointSheet
         visible={isEndpointSheetOpen}
         mode={panel === 'create' ? 'create' : 'edit'}
+        scope={scope}
+        orgSlug={scope === 'project' ? selectedOrganization?.slug : undefined}
         endpoint={panel === 'edit' ? selectedEndpoint ?? undefined : undefined}
         enabledOverride={panel === 'edit' ? editEnabledOverride : null}
         eventTypes={eventTypeOptions}

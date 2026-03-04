@@ -3,7 +3,7 @@ import { Trash2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
-
+import { InlineLink } from 'components/ui/InlineLink'
 import {
   Button,
   Checkbox_Shadcn_ as Checkbox,
@@ -23,7 +23,11 @@ import {
   TextArea_Shadcn_ as Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import type { UpsertWebhookEndpointInput, WebhookEndpoint } from './PlatformWebhooks.types'
+import type {
+  UpsertWebhookEndpointInput,
+  WebhookEndpoint,
+  WebhookScope,
+} from './PlatformWebhooks.types'
 
 const endpointFormSchema = z
   .object({
@@ -68,6 +72,8 @@ export const toEndpointPayload = (values: EndpointFormValues): UpsertWebhookEndp
 interface EndpointSheetProps {
   visible: boolean
   mode: 'create' | 'edit'
+  scope: WebhookScope
+  orgSlug?: string
   endpoint?: WebhookEndpoint
   enabledOverride?: boolean | null
   eventTypes: string[]
@@ -78,6 +84,8 @@ interface EndpointSheetProps {
 export const PlatformWebhooksEndpointSheet = ({
   visible,
   mode,
+  scope,
+  orgSlug,
   endpoint,
   enabledOverride,
   eventTypes,
@@ -133,8 +141,8 @@ export const PlatformWebhooksEndpointSheet = ({
   }, [enabledOverride, endpoint, form, visible])
 
   return (
-    <Sheet open={visible} onOpenChange={onClose}>
-      <SheetContent size="default" className="flex flex-col gap-0">
+    <Sheet open={visible} onOpenChange={onClose} >
+      <SheetContent showClose={false} size="default" className="flex flex-col gap-0">
         <SheetHeader>
           <SheetTitle>{mode === 'create' ? 'Create endpoint' : 'Edit endpoint'}</SheetTitle>
         </SheetHeader>
@@ -167,12 +175,12 @@ export const PlatformWebhooksEndpointSheet = ({
                   name="description"
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Description (optional)"
+                      label={<>Description <span className="text-foreground-muted">(optional)</span></>}
                       layout="vertical"
                       className="gap-1"
                     >
                       <FormControl_Shadcn_>
-                        <Textarea {...field} rows={3} />
+                        <Textarea {...field} rows={4} placeholder="Optional description for this endpoint" className="resize-none" />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -200,28 +208,46 @@ export const PlatformWebhooksEndpointSheet = ({
               <Separator />
 
               <div className="px-5 space-y-3">
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="subscribeAll"
-                  render={({ field }) => (
-                    <FormItemLayout label="Event types" layout="vertical" className="gap-3">
+                <FormItemLayout
+                  label="Event types"
+                  description={
+                    scope === 'organization' ? (
+                      <>
+                        Project events are triggered when any project in this organization matches
+                        the event type. Add a{' '}
+                        <InlineLink href="/project/_/settings/webhooks">project endpoint</InlineLink>{' '}
+                        to listen to events on an individual project only.
+                      </>
+                    ) : (
+                      <>
+                        Project events are triggered for this project only. Add an{' '}
+                        <InlineLink href={`/org/${orgSlug ?? '_'}/webhooks`}>organization endpoint</InlineLink>{' '}
+                        to listen to events from any project in your organization.
+                      </>
+                    )
+                  }
+                  layout="vertical"
+                  className="gap-3"
+                >
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="subscribeAll"
+                    render={({ field }) => (
                       <div className="flex items-center gap-2">
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={(checked) => field.onChange(!!checked)}
                         />
-                        <Label>Subscribe to all events (*)</Label>
+                        <Label>Subscribe to all events <code className="ml-1 text-code-inline">(*)</code></Label>
                       </div>
-                    </FormItemLayout>
-                  )}
-                />
+                    )}
+                  />
 
-                {!subscribeAll && (
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="eventTypes"
-                    render={({ field }) => (
-                      <FormItemLayout layout="vertical" className="gap-2">
+                  {!subscribeAll && (
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="eventTypes"
+                      render={({ field }) => (
                         <FormControl_Shadcn_>
                           <div className="space-y-2">
                             {eventTypes.map((eventType) => {
@@ -242,24 +268,24 @@ export const PlatformWebhooksEndpointSheet = ({
                                       }
                                     }}
                                   />
-                                  <Label>{eventType}</Label>
+                                  <Label><code className="text-code-inline">{eventType}</code></Label>
                                 </div>
                               )
                             })}
                           </div>
                         </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                )}
+                      )}
+                    />
+                  )}
+                </FormItemLayout>
               </div>
 
               <Separator />
 
               <div className="px-5 space-y-3">
                 <FormItemLayout
-                  label="Custom headers (optional)"
-                  description="Headers sent with each delivery."
+                  label={<>Custom headers <span className="text-foreground-muted">(optional)</span></>}
+                  description="Optional HTTP headers sent with every delivery."
                   layout="vertical"
                   className="gap-3"
                 >
