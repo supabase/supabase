@@ -69,7 +69,9 @@ Confirm your provider and credentials appear in the output.
 
 <Admonition type="note">
 
-For providers other than Twilio, add the provider-specific `GOTRUE_SMS_*` lines manually to `docker-compose.yml`.
+Auth includes built-in integrations for Twilio, Twilio Verify, MessageBird, TextLocal, and Vonage. For providers other than Twilio, add the provider-specific `GOTRUE_SMS_*` lines manually to `docker-compose.yml`.
+
+If you want to use a regional SMS Provider, you can implement the [Send SMS Hook](/docs/guides/self-hosting/self-hosted-auth-hooks#hook-specific-setup).
 
 </Admonition>
 
@@ -219,4 +221,5 @@ If users see "rate limit exceeded" errors, check `SMS_MAX_FREQUENCY` (minimum in
 
 - [Multi-Factor Authentication (Phone)](/docs/guides/auth/auth-mfa/phone)
 - [Multi-Factor Authentication (TOTP)](/docs/guides/auth/auth-mfa/totp)
+- [Self-hosted Auth hooks](/docs/guides/self-hosting/self-hosted-auth-hooks)
 - [Auth server on GitHub](https://github.com/supabase/auth) (check README and `example.env`)
