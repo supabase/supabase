@@ -5,6 +5,7 @@
  *   - sqlSyntaxScorer, sqlIdentifierQuotingScorer: use libpg-query (WASM),
  *     which esbuild cannot bundle for Braintrust's remote infra.
  *   - toolUsageScorer: requires expected.requiredTools, offline-eval-only.
+ *   - correctnessScorer: requires ground truth (expected output), offline-eval-only.
  */
 
 import braintrust from 'braintrust'
@@ -12,12 +13,11 @@ import braintrust from 'braintrust'
 import {
   completenessScorer,
   concisenessScorer,
-  correctnessScorer,
   docsFaithfulnessScorer,
   goalCompletionScorer,
   urlValidityScorer,
 } from './scorer'
-import manifest from './scorer-manifest.json'
+import manifest from './scorer-online-manifest.json'
 
 const projectId = process.env.BRAINTRUST_PROJECT_ID
 if (!projectId && process.env.IS_PUSH) throw new Error('BRAINTRUST_PROJECT_ID is not set')
@@ -34,7 +34,6 @@ const handlers = {
   conciseness: concisenessScorer,
   completeness: completenessScorer,
   'docs-faithfulness': docsFaithfulnessScorer,
-  correctness: correctnessScorer,
   'url-validity': urlValidityScorer,
 }
 
