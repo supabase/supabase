@@ -143,7 +143,7 @@ All S3 operations performed with the Session Token are scoped to the authenticat
 To authenticate with S3 using a Session Token, use the following credentials:
 
 - access_key_id: `STORAGE_TENANT_ID` environment variable in `.env` file
-- secret_access_key: `anonKey`
+- secret_access_key: `ANON_KEY` environment variable in `.env` file
 - session_token: `valid jwt token`
 
 For example, using the `aws-sdk` library:
@@ -161,7 +161,7 @@ const client = new S3Client({
   endpoint: 'http://supabase.example.com:8000/storage/v1/s3',
   credentials: {
     accessKeyId: 'STORAGE_TENANT_ID',
-    secretAccessKey: 'anonKey',
+    secretAccessKey: 'ANON_KEY',
     sessionToken: session.access_token,
   },
 })
