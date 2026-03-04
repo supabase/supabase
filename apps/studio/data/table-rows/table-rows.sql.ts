@@ -7,6 +7,12 @@ import {
 import { GetTableRowsCountArgs } from './table-rows-count-query'
 import { formatFilterValue } from './utils'
 
+/**
+ * [Joshen] Initially check reltuples from pg_class for an estimate of row count on the table
+ * - If reltuples = -1, table never been analyzed, assume small table -> return exact count
+ * - If reltuples exceeds threshold, return estimate count
+ * - Else return exact count
+ */
 export const getTableRowsCountSql = ({
   table,
   filters = [],
@@ -14,8 +20,6 @@ export const getTableRowsCountSql = ({
   isUsingReadReplica = false,
 }: GetTableRowsCountArgs & { isUsingReadReplica?: boolean }) => {
   if (!table) return ``
-
-  console.log({ enforceExactCount, isUsingReadReplica })
 
   if (enforceExactCount) {
     const query = new Query()
@@ -57,7 +61,6 @@ with approximation as (
 )
 select 
   case 
-    when estimate = -1 then (${countBaseSql})
     when estimate > ${THRESHOLD_COUNT} then (select -1)
     else (${countBaseSql})
   end as count,
@@ -77,7 +80,6 @@ with approximation as (
 )
 select 
   case 
-    when estimate = -1 then (select pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}'))
     when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}')` : 'estimate'}
     else (${countBaseSql})
   end as count,
