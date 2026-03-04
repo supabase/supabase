@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, X } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -35,7 +34,6 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { MOCK_AUTHORIZED_OAUTH_APPS, MOCK_PUBLISHED_OAUTH_APPS } from './OAuthApps.mock'
 import { AuthorizedAppRow } from './AuthorizedAppRow'
 import { DeleteAppModal } from './DeleteAppModal'
 import { OAuthAppRow } from './OAuthAppRow'
@@ -56,7 +54,6 @@ export const OAuthApps = () => {
   type AuthorizedAppsSortOrder = 'asc' | 'desc'
 
   const { slug } = useParams()
-  const router = useRouter()
   const [showPublishModal, setShowPublishModal] = useState(false)
   const [createdApp, setCreatedApp] = useState<OAuthAppCreateResponse>()
   const [selectedAppToUpdate, setSelectedAppToUpdate] = useState<OAuthApp>()
@@ -64,15 +61,6 @@ export const OAuthApps = () => {
   const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
   const [publishedAppsSort, setPublishedAppsSort] = useState<PublishedAppsSort>('created:asc')
   const [authorizedAppsSort, setAuthorizedAppsSort] = useState<AuthorizedAppsSort>('authorized:asc')
-
-  const mockOAuthAppsParam = useMemo(() => {
-    const queryParam = router.query.mock_oauth_apps
-    return Array.isArray(queryParam) ? queryParam[0] : queryParam
-  }, [router.query.mock_oauth_apps])
-  const isMockOAuthAppsEnabled =
-    process.env.NEXT_PUBLIC_STUDIO_OAUTH_APPS_MOCK === 'true' ||
-    mockOAuthAppsParam === '1' ||
-    mockOAuthAppsParam === 'true'
 
   const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -82,7 +70,6 @@ export const OAuthApps = () => {
     PermissionAction.CREATE,
     'approved_oauth_apps'
   )
-  const canViewOAuthApps = canReadOAuthApps || isMockOAuthAppsEnabled
 
   const {
     data: publishedApps,
@@ -90,11 +77,7 @@ export const OAuthApps = () => {
     isPending: isLoadingPublishedApps,
     isSuccess: isSuccessPublishedApps,
     isError: isErrorPublishedApps,
-  } = useOAuthAppsQuery({ slug }, { enabled: canViewOAuthApps })
-  const displayedPublishedApps = useMemo(
-    () => (isMockOAuthAppsEnabled ? MOCK_PUBLISHED_OAUTH_APPS : publishedApps ?? []),
-    [isMockOAuthAppsEnabled, publishedApps]
-  )
+  } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps })
 
   const sortedPublishedApps = useMemo(() => {
     const [sortColumn, sortOrder] = publishedAppsSort.split(':') as [
@@ -103,7 +86,7 @@ export const OAuthApps = () => {
     ]
     const orderMultiplier = sortOrder === 'asc' ? 1 : -1
 
-    return [...displayedPublishedApps].sort((a, b) => {
+    return [...(publishedApps ?? [])].sort((a, b) => {
       if (sortColumn === 'created') {
         return (
           (new Date(a.created_at ?? '').getTime() - new Date(b.created_at ?? '').getTime()) *
@@ -113,7 +96,7 @@ export const OAuthApps = () => {
 
       return 0
     })
-  }, [displayedPublishedApps, publishedAppsSort])
+  }, [publishedApps, publishedAppsSort])
 
   const {
     data: authorizedApps,
@@ -121,10 +104,6 @@ export const OAuthApps = () => {
     isSuccess: isSuccessAuthorizedApps,
     isError: isErrorAuthorizedApps,
   } = useAuthorizedAppsQuery({ slug })
-  const displayedAuthorizedApps = useMemo(
-    () => (isMockOAuthAppsEnabled ? MOCK_AUTHORIZED_OAUTH_APPS : authorizedApps ?? []),
-    [authorizedApps, isMockOAuthAppsEnabled]
-  )
 
   const sortedAuthorizedApps = useMemo(() => {
     const [sortColumn, sortOrder] = authorizedAppsSort.split(':') as [
@@ -133,7 +112,7 @@ export const OAuthApps = () => {
     ]
     const orderMultiplier = sortOrder === 'asc' ? 1 : -1
 
-    return [...displayedAuthorizedApps].sort((a, b) => {
+    return [...(authorizedApps ?? [])].sort((a, b) => {
       if (sortColumn === 'authorized') {
         return (
           (new Date(a.authorized_at).getTime() - new Date(b.authorized_at).getTime()) *
@@ -143,9 +122,9 @@ export const OAuthApps = () => {
 
       return 0
     })
-  }, [authorizedAppsSort, displayedAuthorizedApps])
-  const hasPublishedApps = displayedPublishedApps.length > 0
-  const hasAuthorizedApps = displayedAuthorizedApps.length > 0
+  }, [authorizedApps, authorizedAppsSort])
+  const hasPublishedApps = (publishedApps?.length ?? 0) > 0
+  const hasAuthorizedApps = (authorizedApps?.length ?? 0) > 0
   const avatarHeadClass = 'w-[62px] min-w-[62px] max-w-[62px]'
   const avatarHeadCollapsedClass = 'w-0 min-w-0 max-w-0 p-0'
 
@@ -209,17 +188,17 @@ export const OAuthApps = () => {
             </PageSectionAside>
           </PageSectionMeta>
           <PageSectionContent className="space-y-4">
-            {(isLoadingPublishedApps || isLoadingPermissions) && !isMockOAuthAppsEnabled ? (
+            {isLoadingPublishedApps || isLoadingPermissions ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
                 <ShimmeringLoader className="w-1/2" />
               </div>
-            ) : !canViewOAuthApps ? (
+            ) : !canReadOAuthApps ? (
               <NoPermission resourceText="view OAuth apps" />
             ) : null}
 
-            {isErrorPublishedApps && !isMockOAuthAppsEnabled && (
+            {isErrorPublishedApps && (
               <AlertError
                 error={publishedAppsError}
                 subject="Failed to retrieve published OAuth apps"
@@ -270,7 +249,7 @@ export const OAuthApps = () => {
               </div>
             )}
 
-            {(isSuccessPublishedApps || isMockOAuthAppsEnabled) && (
+            {isSuccessPublishedApps && (
               <Card>
                 <Table>
                   <TableHeader>
@@ -349,21 +328,19 @@ export const OAuthApps = () => {
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent className="space-y-4">
-            {(isLoadingAuthorizedApps || isLoadingPermissions) && !isMockOAuthAppsEnabled ? (
+            {isLoadingAuthorizedApps || isLoadingPermissions ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
                 <ShimmeringLoader className="w-1/2" />
               </div>
-            ) : !canViewOAuthApps ? (
+            ) : !canReadOAuthApps ? (
               <NoPermission resourceText="view authorized apps" />
             ) : null}
 
-            {isErrorAuthorizedApps && !isMockOAuthAppsEnabled && (
-              <AlertError subject="Failed to retrieve authorized apps" />
-            )}
+            {isErrorAuthorizedApps && <AlertError subject="Failed to retrieve authorized apps" />}
 
-            {(isSuccessAuthorizedApps || isMockOAuthAppsEnabled) && (
+            {isSuccessAuthorizedApps && (
               <Card>
                 <Table>
                   <TableHeader>
