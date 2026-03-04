@@ -4,6 +4,12 @@ import { SLOW_QUERY_THRESHOLD_MS } from '../QueryInsightsHealth/QueryInsightsHea
 import type { IssueType } from '../QueryInsightsHealth/QueryInsightsHealth.types'
 
 export function classifyQuery(row: QueryPerformanceRow): { issueType: IssueType; hint: string } {
+  // undefined means index advisor is still loading — defer classification to avoid
+  // flickering between 'slow' and 'index' as results arrive
+  if (row.index_advisor_result === undefined) {
+    return { issueType: null, hint: '' }
+  }
+
   const advisorErrors = row.index_advisor_result?.errors
   if (advisorErrors && advisorErrors.length > 0) {
     return { issueType: 'error', hint: advisorErrors[0] }

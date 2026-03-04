@@ -623,7 +623,7 @@ export const QueryInsightsTable = ({
       {
         key: 'calls',
         name: 'Calls',
-        minWidth: 110,
+        minWidth: 90,
         resizable: true,
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
@@ -649,7 +649,7 @@ export const QueryInsightsTable = ({
       {
         key: 'mean_time',
         name: 'Mean time',
-        minWidth: 110,
+        minWidth: 90,
         resizable: true,
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
@@ -675,6 +675,7 @@ export const QueryInsightsTable = ({
       {
         key: 'actions',
         name: 'Actions',
+        minWidth: 200,
         resizable: false,
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
