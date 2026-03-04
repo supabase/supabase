@@ -1,10 +1,8 @@
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { BannerComputeWarning } from 'components/ui/BannerStack/Banners/BannerComputeWarning'
 import { BannerIndexAdvisor } from 'components/ui/BannerStack/Banners/BannerIndexAdvisor'
 import { BannerMetricsAPI } from 'components/ui/BannerStack/Banners/BannerMetricsAPI'
 import { useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -27,15 +25,6 @@ const ObservabilityLayoutContent = ({
   const pathname = usePathname()
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
-
-  const { data: resourceWarnings } = useResourceWarningsQuery({ ref }, { staleTime: 1000 * 60 * 5 })
-  const resourceWarning = Array.isArray(resourceWarnings)
-    ? resourceWarnings.find((w) => w.project === ref)
-    : resourceWarnings
-  const hasComputeWarnings =
-    !!resourceWarning?.cpu_exhaustion ||
-    !!resourceWarning?.memory_and_swap_exhaustion ||
-    !!resourceWarning?.disk_io_exhaustion
 
   const [isMetricsBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
@@ -90,20 +79,6 @@ const ObservabilityLayoutContent = ({
     addBanner,
     dismissBanner,
   ])
-
-  useEffect(() => {
-    const isQueryInsightsPage = pathname?.includes('/query-insights')
-    if (isQueryInsightsPage && hasComputeWarnings) {
-      addBanner({
-        id: 'compute-warning-banner',
-        isDismissed: false,
-        content: <BannerComputeWarning />,
-        priority: 4,
-      })
-    } else {
-      dismissBanner('compute-warning-banner')
-    }
-  }, [pathname, hasComputeWarnings, addBanner, dismissBanner])
 
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
