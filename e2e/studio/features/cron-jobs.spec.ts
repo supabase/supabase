@@ -1,55 +1,16 @@
 import { expect, Page } from '@playwright/test'
-import { test } from '../utils/test.js'
+
+import { env } from '../env.config.js'
+import { query } from '../utils/db/client.js'
+import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
+import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 
-const cronJobName = 'pw_cron_test_job'
-
 /**
- * Helper to enable the pg_cron extension if it's not already enabled.
- * Must be called when on the cron overview page.
+ * Helper to navigate to the cron overview page
  */
-const ensurePgCronEnabled = async (page: Page) => {
-  // Wait for the page content to load and the Required extensions section to appear
-  await page.waitForSelector('h1:has-text("Cron")', { timeout: 30000 })
-  await expect(page.getByRole('heading', { name: 'Required extensions' })).toBeVisible({
-    timeout: 30000,
-  })
-
-  // Wait for the page to finish loading the extension status
-  // Look for the listitem containing pg_cron - it will have either "Enable pg_cron" button or "Installed" text
-  const pgCronListItem = page
-    .getByRole('listitem')
-    .filter({ has: page.locator('code:has-text("pg_cron")') })
-  const enableButton = pgCronListItem.getByRole('button', { name: 'Enable pg_cron' })
-  const installedText = pgCronListItem.getByText('Installed')
-  await expect(enableButton.or(installedText)).toBeVisible({ timeout: 30000 })
-
-  // Check if we need to enable pg_cron
-  if ((await enableButton.count()) > 0) {
-    await enableButton.click()
-
-    // Wait for the extension enable modal
-    await expect(page.getByRole('heading', { name: 'Enable pg_cron' })).toBeVisible({
-      timeout: 5000,
-    })
-
-    await page.getByRole('button', { name: 'Enable extension' }).click()
-
-    // Wait for success toast
-    await expect(page.getByText(/Extension.*pg_cron.*is now enabled/)).toBeVisible({
-      timeout: 15000,
-    })
-  }
-
-  await expect(page.getByRole('link', { name: 'Jobs' })).toBeVisible({ timeout: 10000 })
-}
-
-/**
- * Helper to navigate to the cron overview page and ensure pg_cron is enabled.
- */
-const navigateToCronOverviewAndEnable = async (page: Page, ref: string) => {
+const navigateToCronOverview = async (page: Page, ref: string) => {
   await page.goto(toUrl(`/project/${ref}/integrations/cron/overview`))
-  await ensurePgCronEnabled(page)
 }
 
 /**
@@ -87,40 +48,46 @@ const deleteCronJob = async (page: Page, jobName: string) => {
   await expect(jobRow).not.toBeVisible({ timeout: 10000 })
 }
 
+const createJob = async (page: Page, jobName: string) => {
+  // Click create job button
+  await page.getByRole('button', { name: 'Create job' }).click()
+
+  // Wait for the dialog to open
+  await expect(page.getByRole('heading', { name: 'Create a new cron job' })).toBeVisible()
+
+  // Fill in job name using the input name attribute
+  await page.locator('input[name="name"]').fill(jobName)
+
+  // Click the "Every minute" preset button to set schedule
+  await page.getByRole('button', { name: 'Every minute' }).click()
+
+  // Fill in the SQL command using the Monaco editor
+  await page.getByRole('code').click()
+  await page.getByRole('textbox', { name: /Editor content/ }).fill("SELECT 'test';")
+
+  // Save the job
+  await page.getByRole('button', { name: 'Create cron job' }).click()
+
+  // Wait for success toast
+  await expect(page.getByText(/Successfully created cron job/)).toBeVisible({ timeout: 10000 })
+
+  // Verify the job appears in the list
+  await expect(page.getByRole('row', { name: new RegExp(jobName) })).toBeVisible()
+}
+
 test.describe('Cron Jobs Integration', () => {
-  // Run CRUD tests serially since they share database state (pg_cron extension)
-  test.describe.configure({ mode: 'serial' })
+  test.beforeAll(async () => {
+    await withFileOnceSetup(import.meta.url, async () => {
+      await query('create extension if not exists pg_cron;')
+    })
+  })
+
+  test.afterAll(async () => {
+    await releaseFileOnceCleanup(import.meta.url)
+  })
 
   test.describe('Cron Jobs CRUD Operations', () => {
-    let page: Page
-
-    test.beforeAll(async ({ browser, ref }) => {
-      page = await browser.newPage()
-
-      // Navigate to cron overview first to ensure extension is enabled
-      await navigateToCronOverviewAndEnable(page, ref)
-
-      // Navigate to jobs page
-      await navigateToCronJobsPage(page, ref)
-
-      // Clean up any existing test jobs
-      while ((await page.getByRole('row', { name: new RegExp(cronJobName) }).count()) > 0) {
-        await deleteCronJob(page, cronJobName)
-      }
-    })
-
-    test.afterAll(async () => {
-      // Clean up test jobs
-      try {
-        while ((await page.getByRole('row', { name: new RegExp(cronJobName) }).count()) > 0) {
-          await deleteCronJob(page, cronJobName)
-        }
-      } catch {
-        // Ignore cleanup errors
-      }
-    })
-
-    test('can view cron jobs page', async ({ ref }) => {
+    test('can view cron jobs page', async ({ page, ref }) => {
       await navigateToCronJobsPage(page, ref)
 
       // Verify the page elements
@@ -129,37 +96,26 @@ test.describe('Cron Jobs Integration', () => {
       await expect(page.getByPlaceholder('Search for a job')).toBeVisible()
     })
 
-    test('can create a new cron job', async ({ ref }) => {
+    test('can create a new cron job', async ({ page, ref }) => {
+      const cronJobName = 'pw_cron_create_job'
       await navigateToCronJobsPage(page, ref)
-
-      // Click create job button
-      await page.getByRole('button', { name: 'Create job' }).click()
-
-      // Wait for the dialog to open
-      await expect(page.getByRole('heading', { name: 'Create a new cron job' })).toBeVisible()
-
-      // Fill in job name using the input name attribute
-      await page.locator('input[name="name"]').fill(cronJobName)
-
-      // Click the "Every minute" preset button to set schedule
-      await page.getByRole('button', { name: 'Every minute' }).click()
-
-      // Fill in the SQL command using the Monaco editor
-      await page.getByRole('code').click()
-      await page.getByRole('textbox', { name: /Editor content/ }).fill("SELECT 'test';")
-
-      // Save the job
-      await page.getByRole('button', { name: 'Create cron job' }).click()
-
-      // Wait for success toast
-      await expect(page.getByText(/Successfully created cron job/)).toBeVisible({ timeout: 10000 })
-
-      // Verify the job appears in the list
-      await expect(page.getByRole('row', { name: new RegExp(cronJobName) })).toBeVisible()
+      await using _ = await withSetupCleanup(async () => {
+          await createJob(page, cronJobName)
+        }, async () => {
+          await deleteCronJob(page, cronJobName)
+        }
+      )
     })
 
-    test('can search for cron jobs', async ({ ref }) => {
+    test('can search for cron jobs', async ({ page, ref }) => {
+      const cronJobName = 'pw_cron_search_job'
       await navigateToCronJobsPage(page, ref)
+      await using _ = await withSetupCleanup(async () => {
+          await createJob(page, cronJobName)
+        }, async () => {
+          await deleteCronJob(page, cronJobName)
+        }
+      )
 
       // Search for the test job
       const searchInput = page.getByPlaceholder('Search for a job')
@@ -181,8 +137,15 @@ test.describe('Cron Jobs Integration', () => {
       await searchInput.press('Enter')
     })
 
-    test('can edit a cron job', async ({ ref }) => {
+    test('can edit a cron job', async ({ page, ref }) => {
+      const cronJobName = 'pw_cron_edit_job'
       await navigateToCronJobsPage(page, ref)
+      await using _ = await withSetupCleanup(async () => {
+          await createJob(page, cronJobName)
+        }, async () => {
+          await deleteCronJob(page, cronJobName)
+        }
+      )
 
       // Find the test job row and right-click to open context menu
       const jobRow = page.getByRole('row', { name: new RegExp(cronJobName) })
@@ -205,8 +168,15 @@ test.describe('Cron Jobs Integration', () => {
       await expect(page.getByText(/Successfully updated cron job/)).toBeVisible({ timeout: 10000 })
     })
 
-    test('can view cron job run history', async ({ ref }) => {
+    test('can view cron job run history', async ({ page, ref }) => {
+      const cronJobName = 'pw_cron_history_job'
       await navigateToCronJobsPage(page, ref)
+      await using _ = await withSetupCleanup(async () => {
+          await createJob(page, cronJobName)
+        }, async () => {
+          await deleteCronJob(page, cronJobName)
+        }
+      )
 
       // Click on the job row to view history (click on the name cell, not the action button)
       const jobRow = page.getByRole('row', { name: new RegExp(cronJobName) })
@@ -222,21 +192,10 @@ test.describe('Cron Jobs Integration', () => {
       await page.goBack()
       await page.waitForLoadState('networkidle')
     })
-
-    test('can delete a cron job', async ({ ref }) => {
-      await navigateToCronJobsPage(page, ref)
-
-      // Delete the test job
-      await deleteCronJob(page, cronJobName)
-
-      // Verify the job is no longer in the list
-      await expect(page.getByRole('row', { name: new RegExp(cronJobName) })).not.toBeVisible()
-    })
   })
 
   test.describe('Cron Jobs Page Features', () => {
     test('refresh button reloads cron jobs', async ({ page, ref }) => {
-      await navigateToCronOverviewAndEnable(page, ref)
       await navigateToCronJobsPage(page, ref)
 
       // Click refresh - it should not throw an error
@@ -247,7 +206,9 @@ test.describe('Cron Jobs Integration', () => {
     })
 
     test('navigation tabs work correctly', async ({ page, ref }) => {
-      await navigateToCronOverviewAndEnable(page, ref)
+      console.log('test')
+      await navigateToCronOverview(page, ref)
+      await navigateToCronJobsPage(page, ref)
 
       // Click on Jobs tab
       await page.getByRole('link', { name: 'Jobs' }).click()
@@ -267,33 +228,24 @@ test.describe('Cron Jobs Integration', () => {
 })
 
 test.describe('High Query Cost Banner', () => {
-  const testJobName = 'pw_high_cost_test_job'
-
-  test.describe.configure({ mode: 'serial' })
+  test.beforeAll(async () => {
+    await withFileOnceSetup(import.meta.url, async () => {
+      await query('create extension if not exists pg_cron;')
+    })
+  })
 
   test('shows banner and still displays cron jobs when query cost exceeds threshold', async ({
     page,
     ref,
   }) => {
-    // First ensure pg_cron is enabled
-    await navigateToCronOverviewAndEnable(page, ref)
+    const testJobName = 'pw_high_cost_test_job'
     await navigateToCronJobsPage(page, ref)
-
-    // Check if test job already exists (from previous test run)
-    const existingTestJob = page.getByRole('row', { name: new RegExp(testJobName) })
-    const jobExists = (await existingTestJob.count()) > 0
-
-    // Create a test cron job only if it doesn't exist
-    if (!jobExists) {
-      await page.getByRole('button', { name: 'Create job' }).click()
-      await expect(page.getByRole('heading', { name: 'Create a new cron job' })).toBeVisible()
-      await page.locator('input[name="name"]').fill(testJobName)
-      await page.getByRole('button', { name: 'Every minute' }).click()
-      await page.getByRole('code').click()
-      await page.getByRole('textbox', { name: /Editor content/ }).fill("SELECT 'high_cost_test';")
-      await page.getByRole('button', { name: 'Create cron job' }).click()
-      await expect(page.getByText(/Successfully created cron job/)).toBeVisible({ timeout: 10000 })
-    }
+    await using _ = await withSetupCleanup(async () => {
+        await createJob(page, testJobName)
+      }, async () => {
+        await deleteCronJob(page, testJobName)
+      }
+    )
 
     // Now set up the mock for the EXPLAIN query (preflight check) to return high cost
     // This simulates the scenario where cron.job_run_details is too large
@@ -311,7 +263,9 @@ test.describe('High Query Cost Banner', () => {
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify([
-            { 'QUERY PLAN': 'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)' },
+            {
+              'QUERY PLAN': 'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)',
+            },
           ]),
         })
       } else {
@@ -356,7 +310,9 @@ test.describe('High Query Cost Banner', () => {
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify([
-            { 'QUERY PLAN': 'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)' },
+            {
+              'QUERY PLAN': 'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)',
+            },
           ]),
         })
       } else {
@@ -382,9 +338,7 @@ test.describe('High Query Cost Banner', () => {
     ).toBeVisible()
 
     // Should explain the issue
-    await expect(
-      page.getByText(/the estimated query cost exceeds safety thresholds/)
-    ).toBeVisible()
+    await expect(page.getByText(/the estimated query cost exceeds safety thresholds/)).toBeVisible()
 
     // Should show Step 1 with cleanup options
     await expect(page.getByText('Step 1: Delete older entries')).toBeVisible()
@@ -417,7 +371,9 @@ test.describe('High Query Cost Banner', () => {
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify([
-            { 'QUERY PLAN': 'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)' },
+            {
+              'QUERY PLAN': 'Nested Loop Left Join  (cost=0.00..500000.00 rows=1000000 width=100)',
+            },
           ]),
         })
       } else {
