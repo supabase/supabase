@@ -15,10 +15,10 @@ export type GetIndexAdvisorResultVariables = {
 const IndexAdvisorResultSchema = z.object({
   errors: z.array(z.string()),
   index_statements: z.array(z.string()),
-  startup_cost_before: z.number().nullable(),
-  startup_cost_after: z.number().nullable(),
-  total_cost_before: z.number().nullable(),
-  total_cost_after: z.number().nullable(),
+  startup_cost_before: z.number().nullable().transform((v) => v ?? 0),
+  startup_cost_after: z.number().nullable().transform((v) => v ?? 0),
+  total_cost_before: z.number().nullable().transform((v) => v ?? 0),
+  total_cost_after: z.number().nullable().transform((v) => v ?? 0),
 })
 
 export type GetIndexAdvisorResultResponse = z.infer<typeof IndexAdvisorResultSchema>
