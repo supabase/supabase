@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import AlertError from 'components/ui/AlertError'
 import { cn, Tooltip, TooltipContent, TooltipTrigger, Button } from 'ui'
 import {
@@ -40,11 +39,11 @@ import {
   getAuthSuccessRates,
   getMetricValues,
 } from './OverviewUsage.constants'
-import { getStatusColor } from 'components/ui/DataTable/DataTable.utils'
 import { AiIconAnimation } from 'ui'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { StatusCode } from 'ui-patterns'
 
 const StatCard = ({
   title,
@@ -315,26 +314,12 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         header: 'Request',
                         className: 'w-auto !pr-0',
                         render: (row) => {
-                          const level = getStatusLevel(row.status_code)
-                          const colors = getStatusColor(level)
                           return (
-                            <div className="flex items-center gap-2">
-                              <span className="flex-shrink-0 flex items-center text-xs font-mono">
-                                <span className="select-text py-0.5 px-2 text-center rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0">
-                                  {row.method}
-                                </span>
-                                <span
-                                  className={cn(
-                                    'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums',
-                                    colors.text,
-                                    colors.bg,
-                                    colors.border
-                                  )}
-                                >
-                                  {row.status_code}
-                                </span>
-                              </span>
-                            </div>
+                            <StatusCode
+                              method={row.method}
+                              statusCode={row.status_code}
+                              align="left"
+                            />
                           )
                         },
                       },
