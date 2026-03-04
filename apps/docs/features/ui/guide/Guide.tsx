@@ -3,7 +3,7 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { cn } from 'ui'
 
-import GuidesTableOfContents from '~/components/GuidesTableOfContents'
+import GuidesTableOfContents from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { type GuideFrontmatter } from '~/lib/docs'
 
