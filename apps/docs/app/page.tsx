@@ -223,7 +223,7 @@ const HomePage = () => (
       <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
         <div className="col-span-4">
           <h2 id="postgres-integrations" className="scroll-mt-24 m-0">
-            Postgres Modules
+            Modules
           </h2>
         </div>
         <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
