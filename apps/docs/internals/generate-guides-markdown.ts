@@ -42,27 +42,24 @@ function dedentBlock(text: string): string {
  * Remaining JSX tags inside the body are later stripped by stripJsxTags.
  */
 function convertStepHike(content: string): string {
-  return content.replace(
-    /<StepHikeCompact>([\s\S]*?)<\/StepHikeCompact>/g,
-    (_, body) => {
-      const items: string[] = []
-      const stepRe = /<StepHikeCompact\.Step[^>]*>([\s\S]*?)<\/StepHikeCompact\.Step>/g
-      let stepNum = 1
-      let m: RegExpExecArray | null
-      while ((m = stepRe.exec(body)) !== null) {
-        const stepBody = m[1]
-        const titleMatch = stepBody.match(/<StepHikeCompact\.Details[^>]+title="([^"]*)"/)
-        const title = titleMatch ? titleMatch[1] : ''
-        // Dedent the entire step body so nested JSX indentation is removed.
-        // Remaining component tags (Details, Code, Admonition…) are stripped later.
-        const inner = dedentBlock(stepBody).trim()
-        const item = title ? `${stepNum}. **${title}**\n\n${inner}` : `${stepNum}. ${inner}`
-        items.push(item)
-        stepNum++
-      }
-      return items.join('\n\n')
+  return content.replace(/<StepHikeCompact>([\s\S]*?)<\/StepHikeCompact>/g, (_, body) => {
+    const items: string[] = []
+    const stepRe = /<StepHikeCompact\.Step[^>]*>([\s\S]*?)<\/StepHikeCompact\.Step>/g
+    let stepNum = 1
+    let m: RegExpExecArray | null
+    while ((m = stepRe.exec(body)) !== null) {
+      const stepBody = m[1]
+      const titleMatch = stepBody.match(/<StepHikeCompact\.Details[^>]+title="([^"]*)"/)
+      const title = titleMatch ? titleMatch[1] : ''
+      // Dedent the entire step body so nested JSX indentation is removed.
+      // Remaining component tags (Details, Code, Admonition…) are stripped later.
+      const inner = dedentBlock(stepBody).trim()
+      const item = title ? `${stepNum}. **${title}**\n\n${inner}` : `${stepNum}. ${inner}`
+      items.push(item)
+      stepNum++
     }
-  )
+    return items.join('\n\n')
+  })
 }
 
 /**
@@ -142,7 +139,9 @@ async function generate() {
         output = header ? `${header}\n\n${processed}` : processed
       } catch (err) {
         warnings++
-        console.warn(`[warn] Failed to process ${filePath}: ${err instanceof Error ? err.message : err}`)
+        console.warn(
+          `[warn] Failed to process ${filePath}: ${err instanceof Error ? err.message : err}`
+        )
         // Fall back to raw file content so the route still serves something
         try {
           output = await fs.promises.readFile(filePath, 'utf8')

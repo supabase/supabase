@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import { cn } from 'ui'
 
 import Breadcrumbs from '~/components/Breadcrumbs'
-import GuidesSidebar from '~/components/GuidesTableOfContents'
+import GuidesSidebar from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'

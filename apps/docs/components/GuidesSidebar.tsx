@@ -19,25 +19,33 @@ interface TOCHeader {
 
 function AiTools({ className }: { className?: string }) {
   const [copied, setCopied] = useState(false)
-  const url = window.location
+  let url: string | Location = ''
+
+  // Safe check for server side rendering.
+  try {
+    url = window.location
+  } catch (error) {}
 
   async function copyMarkdown() {
     const mdUrl = `${url}.md`
-    console.log(mdUrl)
+
     try {
       const res = await fetch(mdUrl)
       const text = await res.text()
       await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (e) {
-      console.error('Failed to copy markdown', e)
+    } catch (error) {
+      console.error('Failed to copy markdown', error)
     }
   }
 
   return (
     <section className={cn(className)} aria-labelledby="ask-ai-title">
-      <h3 id="ask-ai-title" className="block font-mono uppercase text-xs text-foreground-light mb-3">
+      <h3
+        id="ask-ai-title"
+        className="block font-mono uppercase text-xs text-foreground-light mb-3"
+      >
         AI Tools
       </h3>
       <div className="flex flex-col gap-2">
@@ -86,9 +94,7 @@ const GuidesSidebar = ({
 }) => {
   const pathname = usePathname()
   const { toc } = useTocAnchors()
-
   const showFeedback = isFeatureEnabled('feedback:docs')
-
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
