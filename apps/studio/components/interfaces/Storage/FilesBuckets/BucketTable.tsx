@@ -11,7 +11,6 @@ import { formatBytes } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { type KeyboardEvent, type MouseEvent } from 'react'
 import { Badge, cn, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -96,27 +95,14 @@ export const BucketTableRow = ({
     router
   )
 
-  const handleNavigation = (event: MouseEvent | KeyboardEvent) => {
-    const isKeyboardNav =
-      event.type === 'keydown' &&
-      ((event as React.KeyboardEvent).key === 'Enter' || (event as React.KeyboardEvent).key === ' ')
-    const isMouseEvent = ['click', 'auxclick'].includes(event.type)
-
-    if (!isKeyboardNav && !isMouseEvent) return
-
-    // Reset the Storage Explorer state here to avoid race conditions with loading effects in StorageExplorer
-    snap.setSelectedBucket(bucket)
-    handleBucketNavigation(event)
-  }
-
   return (
     <BucketTableRow
       key={bucket.id}
       data-bucket-id={bucket.id}
       className="relative cursor-pointer h-16 group inset-focus"
-      onClick={handleNavigation}
-      onAuxClick={handleNavigation}
-      onKeyDown={handleNavigation}
+      onClick={handleBucketNavigation}
+      onAuxClick={handleBucketNavigation}
+      onKeyDown={handleBucketNavigation}
       tabIndex={0}
     >
       <BucketTableCell className="w-2 pr-1">

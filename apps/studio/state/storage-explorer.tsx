@@ -1,7 +1,7 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
@@ -82,11 +82,13 @@ function createStorageExplorerState({
   connectionString,
   resumableUploadUrl,
   clientEndpoint,
+  bucketId,
 }: {
   projectRef: string
   connectionString: string
   resumableUploadUrl: string
   clientEndpoint: string
+  bucketId?: string
 }) {
   const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
   const { view, sortBy, sortByOrder, sortBucket } =
@@ -95,6 +97,7 @@ function createStorageExplorerState({
 
   const state = proxy({
     projectRef,
+    bucketId,
     connectionString,
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
@@ -1864,10 +1867,13 @@ const StorageExplorerStateContext = createContext<StorageExplorerState>(
 
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
+  const { data: bucket } = useSelectedBucket()
+
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
+  const bucketRef = useRef(bucket?.id)
 
   const {
     storageEndpoint,
@@ -1883,13 +1889,20 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   useEffect(() => {
     const hasDataReady = !!project?.ref
     const storeAlreadyLoaded = state.projectRef === project?.ref
+    const hasBucketChanged = bucket?.id !== bucketRef.current
 
-    if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
+    if (
+      !isPaused &&
+      hasDataReady &&
+      isSuccessSettings &&
+      (!storeAlreadyLoaded || hasBucketChanged)
+    ) {
       const clientEndpoint = storageEndpoint ?? hostEndpoint ?? ''
       const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
       setState(
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
+          bucketId: bucket?.id,
           connectionString: project.connectionString ?? '',
           resumableUploadUrl,
           clientEndpoint,
@@ -1897,6 +1910,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
       )
     }
   }, [
+    bucket?.id,
     state.projectRef,
     project?.ref,
     project?.connectionString,
