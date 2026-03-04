@@ -82,7 +82,7 @@ jobs:
             const prNumber = context.payload.pull_request?.number ?? Number(context.payload.inputs?.pr_number)
             const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
             const prefix = branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()
-            const stagingUrl = 'https://www.braintrust.dev/app/supabase.io/p/Assistant%20(Staging%20Scorers)/functions'
+            const stagingUrl = 'https://www.braintrust.dev/app/supabase.io/p/Assistant%20(Staging%20Scorers)/scorers'
 
             const slugs = ['goal-completion', 'conciseness', 'completeness', 'docs-faithfulness', 'correctness', 'url-validity']
             const slugList = slugs.map(s => `- \`${prefix}-${s}\``).join('\n')
