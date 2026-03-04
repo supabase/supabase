@@ -31,10 +31,10 @@ const description = branch ?? undefined
 
 const handlers = {
   'goal-completion': goalCompletionScorer,
-  'conciseness': concisenessScorer,
-  'completeness': completenessScorer,
+  conciseness: concisenessScorer,
+  completeness: completenessScorer,
   'docs-faithfulness': docsFaithfulnessScorer,
-  'correctness': correctnessScorer,
+  correctness: correctnessScorer,
   'url-validity': urlValidityScorer,
 }
 
