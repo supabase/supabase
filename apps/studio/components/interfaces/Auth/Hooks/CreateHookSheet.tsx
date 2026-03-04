@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from 'components/ui/DocsButton'
 import FunctionSelector from 'components/ui/FunctionSelector'
@@ -422,17 +422,20 @@ export const CreateHookSheet = ({
                       )}
                     />
                   </div>
-                  <div className="h-72 w-full gap-3 flex flex-col">
-                    <p className="text-sm text-foreground-light px-5">
-                      The following statements will be executed on the selected function:
-                    </p>
-                    <CodeEditor
-                      id="postgres-hook-editor"
-                      isReadOnly={true}
-                      language="pgsql"
-                      value={statements.join('\n\n')}
-                    />
-                  </div>
+
+                  {statements.length > 0 && (
+                    <div className="h-72 w-full gap-3 flex flex-col">
+                      <p className="text-sm text-foreground-light px-5">
+                        The following statements will be executed on the selected function:
+                      </p>
+                      <CodeEditor
+                        isReadOnly
+                        id="postgres-hook-editor"
+                        language="pgsql"
+                        value={statements.join('\n\n')}
+                      />
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="flex flex-col gap-4 px-5">

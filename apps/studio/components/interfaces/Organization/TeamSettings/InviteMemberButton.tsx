@@ -72,12 +72,12 @@ export const InviteMemberButton = () => {
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
 
-  const getInviteFormDefaults = () => ({
+  const defaultValues = {
     email: '',
     role: orgScopedRoles.find((role) => role.name === 'Developer')?.id.toString() ?? '',
     applyToOrg: true,
     projectRef: '',
-  })
+  }
 
   const { hasAccess: hasAccessToSso } = useCheckEntitlements('auth.platform.sso')
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
@@ -140,7 +140,7 @@ export const InviteMemberButton = () => {
     mode: 'onSubmit',
     reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
-    defaultValues: getInviteFormDefaults(),
+    defaultValues,
   })
 
   const { applyToOrg, projectRef, email } = form.watch()
@@ -238,7 +238,7 @@ export const InviteMemberButton = () => {
   const closeInviteDialog = () => {
     setProjectDropdownOpen(false)
     setIsOpen(false)
-    form.reset(getInviteFormDefaults())
+    form.reset(defaultValues)
   }
 
   const {
