@@ -4,7 +4,12 @@ import { NextResponse } from 'next/server'
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params
-  const filePath = path.join(process.cwd(), 'public/docs/guides', `${slug.join('/')}.md`)
+  const baseDir = path.join(process.cwd(), 'public/docs/guides')
+  const filePath = path.join(baseDir, `${slug.join('/')}.md`)
+
+  if (!filePath.startsWith(baseDir + path.sep) && filePath !== baseDir) {
+    return new NextResponse('Not found', { status: 404 })
+  }
 
   try {
     const content = await fs.readFile(filePath, 'utf-8')

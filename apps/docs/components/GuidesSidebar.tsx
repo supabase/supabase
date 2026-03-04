@@ -19,11 +19,12 @@ interface TOCHeader {
 
 function AiTools({ className }: { className?: string }) {
   const [copied, setCopied] = useState(false)
-  let url: string | Location = ''
+  let url = ''
 
   // Safe check for server side rendering.
   try {
-    url = window.location
+    const urlParts = new URL(`${window.location}`)
+    url = urlParts.origin + urlParts.pathname
   } catch (error) {}
 
   async function copyMarkdown() {
