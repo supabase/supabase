@@ -3,12 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import {
-  Button,
-  cn,
-  Input_Shadcn_,
-  Label_Shadcn_,
-} from 'ui'
+import { Button, cn, Input_Shadcn_, Label_Shadcn_ } from 'ui'
 
 import { createClient } from '@/lib/supabase/client'
 
@@ -51,15 +46,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Create your account</h1>
-        <p className="text-sm text-muted-foreground">Sign up to continue to Marketplace</p>
-      </div>
-
-      <form
-        onSubmit={handleSignUp}
-        className="flex flex-col gap-4 rounded-xl border bg-background p-6 shadow-sm"
-      >
+      <form onSubmit={handleSignUp} className="flex flex-col gap-4">
         <div className="grid gap-2">
           <Label_Shadcn_ htmlFor="email">Email</Label_Shadcn_>
           <Input_Shadcn_
@@ -94,17 +81,14 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button className="w-full" disabled={isLoading}>
           {isLoading ? 'Creating account...' : 'Create account'}
         </Button>
       </form>
 
-      <div className="text-center text-sm">
-        <span className="text-muted-foreground">Already have an account?</span>{' '}
-        <Link
-          href="/auth/login"
-          className="underline transition text-foreground hover:text-muted-foreground"
-        >
+      <div className="text-center text-sm text-foreground-light">
+        <span>Already have an account?</span>{' '}
+        <Link href="/auth/login" className="text-link">
           Sign in
         </Link>
       </div>

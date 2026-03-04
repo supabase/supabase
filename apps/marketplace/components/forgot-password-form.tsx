@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, cn, Input_Shadcn_, Label_Shadcn_ } from 'ui'
+import { Button, cn, Input_Shadcn_, Label_Shadcn_ } from 'ui'
 import { createClient } from '@/lib/supabase/client'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
@@ -35,54 +35,48 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       {success ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive a password reset
-              email.
-            </p>
-          </CardContent>
-        </Card>
+        <>
+          <p className="text-sm text-muted-foreground">
+            If you registered using your email and password, you will receive a password reset
+            email.
+          </p>
+          <div className="self-center text-sm">
+            <Link
+              href="/auth/login"
+              className="underline transition text-foreground hover:text-muted-foreground"
+            >
+              Back to sign in
+            </Link>
+          </div>
+        </>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your password
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label_Shadcn_ htmlFor="email">Email</Label_Shadcn_>
-                  <Input_Shadcn_
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Sending...' : 'Send reset email'}
-                </Button>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{' '}
-                <Link href="/auth/login" className="underline underline-offset-4">
-                  Login
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+        <form onSubmit={handleForgotPassword} className="flex flex-col gap-6">
+          <div className="grid gap-2">
+            <Label_Shadcn_ htmlFor="email">Email</Label_Shadcn_>
+            <Input_Shadcn_
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Sending...' : 'Send reset email'}
+          </Button>
+
+          <div className="self-center text-sm">
+            <span className="text-muted-foreground">Already have an account?</span>{' '}
+            <Link
+              href="/auth/login"
+              className="underline transition text-foreground hover:text-muted-foreground"
+            >
+              Sign in
+            </Link>
+          </div>
+        </form>
       )}
     </div>
   )

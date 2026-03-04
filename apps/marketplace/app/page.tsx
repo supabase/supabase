@@ -1,58 +1,66 @@
-import { DeployButton } from "@/components/deploy-button";
-import { EnvVarWarning } from "@/components/env-var-warning";
-import { AuthButton } from "@/components/auth-button";
-import { Hero } from "@/components/hero";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
-import Link from "next/link";
-import { Suspense } from "react";
+import Link from 'next/link'
+import { Button } from 'ui'
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-20 items-center">
-        <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-          <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-            <div className="flex gap-5 items-center font-semibold">
-              <Link href={"/"}>Next.js Supabase Starter</Link>
-              <div className="flex items-center gap-2">
-                <DeployButton />
-              </div>
-            </div>
-            {!hasEnvVars ? (
-              <EnvVarWarning />
-            ) : (
-              <Suspense>
-                <AuthButton />
-              </Suspense>
-            )}
-          </div>
-        </nav>
-        <div className="flex-1 flex flex-col gap-20 max-w-5xl p-5">
-          <Hero />
-          <main className="flex-1 flex flex-col gap-6 px-4">
-            <h2 className="font-medium text-xl mb-4">Next steps</h2>
-            {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-          </main>
-        </div>
-
-        <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
-          <p>
-            Powered by{" "}
-            <a
-              href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-              target="_blank"
-              className="font-bold hover:underline"
-              rel="noreferrer"
+    <main className="min-h-screen flex items-center justify-center px-6">
+      <section className="w-full max-w-xl space-y-6 text-center">
+        <svg
+          aria-label="Supabase"
+          width="22"
+          height="22"
+          viewBox="0 0 22 22"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-[24px] w-[24px] mx-auto"
+        >
+          <path
+            d="M12.7828 20.9736C12.2224 21.6713 11.0863 21.289 11.0728 20.3982L10.8754 7.36788H19.7364C21.3414 7.36788 22.2365 9.2008 21.2385 10.4437L12.7828 20.9736Z"
+            fill="url(#paint0_linear_marketplace_header_logo)"
+          />
+          <path
+            d="M12.7828 20.9736C12.2224 21.6713 11.0863 21.289 11.0728 20.3982L10.8754 7.36788H19.7364C21.3414 7.36788 22.2365 9.2008 21.2385 10.4437L12.7828 20.9736Z"
+            fill="url(#paint1_linear_marketplace_header_logo)"
+            fillOpacity="0.2"
+          />
+          <path
+            d="M9.17895 0.00677839C9.7393 -0.69101 10.8754 -0.308673 10.8889 0.582223L10.9755 13.6125H2.22528C0.620264 13.6125 -0.274897 11.7795 0.72316 10.5367L9.17895 0.00677839Z"
+            fill="#3ECF8E"
+          />
+          <defs>
+            <linearGradient
+              id="paint0_linear_marketplace_header_logo"
+              x1="10.8754"
+              y1="10.257"
+              x2="18.7239"
+              y2="13.5861"
+              gradientUnits="userSpaceOnUse"
             >
-              Supabase
-            </a>
-          </p>
-          <ThemeSwitcher />
-        </footer>
-      </div>
+              <stop stopColor="#249361" />
+              <stop offset="1" stopColor="#3ECF8E" />
+            </linearGradient>
+            <linearGradient
+              id="paint1_linear_marketplace_header_logo"
+              x1="7.38382"
+              y1="5.53017"
+              x2="10.9125"
+              y2="12.2482"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop />
+              <stop offset="1" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <h1 className="text-4xl font-semibold tracking-tight">Supabase Parter Portal</h1>
+        <p className="text-base text-foreground/70">
+          Join our partner program to publish your offering, get discovered by developers, and
+          manage everything in one place.
+        </p>
+        <Button size="large" asChild>
+          <Link href="/auth/sign-up">Become a partner</Link>
+        </Button>
+      </section>
     </main>
-  );
+  )
 }
