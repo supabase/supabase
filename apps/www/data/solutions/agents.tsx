@@ -327,13 +327,22 @@ const data: () => {
           cta: { label: 'Read the case study', href: '/customers/humata' },
         },
         {
-          name: 'Chatbase',
-          logo: '/images/customers/logos/chatbase.png',
+          name: 'Hyper',
+          logo: '/images/customers/logos/hyper.svg',
           highlights: [
-            'One of the most successful single-founder AI products',
-            'Built entirely on Supabase',
+            'AI marketing agents across the entire workflow',
+            'Three-person team building at enterprise scale',
           ],
-          cta: { label: 'Read the case study', href: '/customers/chatbase' },
+          cta: { label: 'Read the case study', href: '/customers/hyper' },
+        },
+        {
+          name: 'Brevo',
+          logo: '/images/customers/logos/brevo.svg',
+          highlights: [
+            'AI-powered sales workflows without engineering tickets',
+            'CRM connected to AI agents via Supabase MCP',
+          ],
+          cta: { label: 'Read the case study', href: '/customers/brevo' },
         },
         {
           name: 'Markprompt',
