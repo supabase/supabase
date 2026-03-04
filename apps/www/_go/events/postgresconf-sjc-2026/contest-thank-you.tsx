@@ -4,11 +4,11 @@ import { Button } from 'ui'
 
 const page: GoPageInput = {
   template: 'thank-you',
-  slug: 'pgworld-sjc-2026/contest/thank-you',
+  slug: 'postgresconf-sjc-2026/contest/thank-you',
   metadata: {
-    title: "You're entered | Supabase at Postgres World 2026",
+    title: "You're entered | Supabase at PostgresConf San Jose 2026",
     description:
-      'Thanks for entering the Supabase contest at Postgres World San Jose 2026. Good luck!',
+      'Thanks for entering the Supabase contest at PostgresConf San Jose 2026. Good luck!',
   },
   hero: {
     title: 'Thanks for entering',

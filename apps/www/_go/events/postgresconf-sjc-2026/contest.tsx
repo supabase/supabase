@@ -4,15 +4,15 @@ import { Button } from 'ui'
 
 const page: GoPageInput = {
   template: 'lead-gen',
-  slug: 'pgworld-sjc-2026/contest',
+  slug: 'postgresconf-sjc-2026/contest',
   metadata: {
-    title: 'Win an iPhone Pro Max | Supabase at Postgres World 2026',
+    title: 'Win an iPhone Pro Max | Supabase at PostgresConf San Jose 2026',
     description:
-      'Sign up for Supabase and enter the contest for a chance to win an iPhone Pro Max. Postgres World San Jose 2026.',
+      'Sign up for Supabase and enter the contest for a chance to win an iPhone Pro Max. PostgresConf San Jose 2026.',
   },
   hero: {
     title: 'Win an iPhone Pro Max',
-    subtitle: 'Supabase at Postgres World 2026',
+    subtitle: 'Supabase at PostgresConf San Jose 2026',
     description:
       "Supabase is Postgres with batteries included -- auth, storage, edge functions, vectors, and real-time, all built on top of the database you already know. Sign up, load some data, and enter below for a chance to win an iPhone Pro Max.",
     image: {
@@ -93,12 +93,12 @@ const page: GoPageInput = {
         },
       ],
       submitLabel: 'Enter contest',
-      successRedirect: '/go/pgworld-sjc-2026/contest/thank-you',
+      successRedirect: '/go/postgresconf-sjc-2026/contest/thank-you',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy) and the [Official Rules](/go/contest-rules).',
       crm: {
         hubspot: {
-          formGuid: 'PLACEHOLDER_HUBSPOT_FORM_GUID',
+          formGuid: '1f508323-bd39-497d-b4bf-4978a50d9248',
           fieldMap: {
             first_name: 'firstname',
             last_name: 'lastname',
@@ -109,7 +109,7 @@ const page: GoPageInput = {
             'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
         },
         customerio: {
-          event: 'contest_entered',
+          event: 'event_attended',
           profileMap: {
             email_address: 'email',
             first_name: 'first_name',
@@ -117,7 +117,7 @@ const page: GoPageInput = {
             company_name: 'company_name',
           },
           staticProperties: {
-            event_name: 'Postgres World San Jose 2026',
+            event_name: 'PostgresConf San Jose 2026',
           },
         },
       },

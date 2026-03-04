@@ -9,8 +9,8 @@ import stripeExecDinnerThankYou from './events/stripe-sessions-2026/exec-dinner-
 import stripeSessionsContest from './events/stripe-sessions-2026/contest'
 import sxswContest from './events/sxsw-2026/contest'
 import accentureContest from './events/accenture-reinvention-2026/contest'
-import pgworldContest from './events/pgworld-sjc-2026/contest'
-import pgworldContestThankYou from './events/pgworld-sjc-2026/contest-thank-you'
+import postgresconfContest from './events/postgresconf-sjc-2026/contest'
+import postgresconfContestThankYou from './events/postgresconf-sjc-2026/contest-thank-you'
 import startupGrindContest from './events/startup-grind-2026/contest'
 
 const pages: GoPageInput[] = [
@@ -23,8 +23,8 @@ const pages: GoPageInput[] = [
   stripeSessionsContest, // remove after May 31, 2026
   sxswContest, // remove after April 30, 2026
   accentureContest, // remove after May 31, 2026
-  pgworldContest, // remove after May 31, 2026
-  pgworldContestThankYou, // remove after May 31, 2026
+  postgresconfContest, // remove after May 31, 2026
+  postgresconfContestThankYou, // remove after May 31, 2026
   startupGrindContest, // remove after May 31, 2026
 ]
 
