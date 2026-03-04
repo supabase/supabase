@@ -52,8 +52,8 @@ export default function Home() {
             </linearGradient>
           </defs>
         </svg>
-        <h1 className="text-4xl font-semibold tracking-tight">Supabase Parter Portal</h1>
-        <p className="text-base text-foreground/70">
+        <h1 className="heading-title">Supabase Partner Portal</h1>
+        <p className="text-foreground-light">
           Join our partner program to publish your offering, get discovered by developers, and
           manage everything in one place.
         </p>
