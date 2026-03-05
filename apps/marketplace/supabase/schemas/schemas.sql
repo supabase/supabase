@@ -108,6 +108,22 @@ as $$
   );
 $$;
 
+create function public.is_review_manager_member()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.partner_members pm
+    inner join public.partners p on p.id = pm.partner_id
+    where pm.user_id = auth.uid()
+      and p.role in ('reviewer', 'admin')
+  );
+$$;
+
 create function public.item_latest_review_is_approved(target_item_id bigint)
 returns boolean
 language sql
@@ -430,6 +446,7 @@ create policy "category_items_select"
   for select
   using (
     public.is_admin_member()
+    or public.is_reviewer_member()
     or exists (
       select 1
       from public.items i
@@ -443,6 +460,7 @@ create policy "category_items_insert"
   for insert
   with check (
     public.is_admin_member()
+    or public.is_reviewer_member()
     or exists (
       select 1
       from public.items i
@@ -456,6 +474,7 @@ create policy "category_items_update"
   for update
   using (
     public.is_admin_member()
+    or public.is_reviewer_member()
     or exists (
       select 1
       from public.items i
@@ -465,6 +484,7 @@ create policy "category_items_update"
   )
   with check (
     public.is_admin_member()
+    or public.is_reviewer_member()
     or exists (
       select 1
       from public.items i
@@ -478,6 +498,7 @@ create policy "category_items_delete"
   for delete
   using (
     public.is_admin_member()
+    or public.is_reviewer_member()
     or exists (
       select 1
       from public.items i
@@ -561,7 +582,7 @@ create policy "item_files_select_published_item_with_latest_approved_review"
     )
   );
 
--- Item reviews: partners can view their own status, reviewer partners can modify.
+-- Item reviews: partners can view their own status, reviewer/admin partners can modify.
 create policy "item_reviews_select"
   on public.item_reviews
   for select
@@ -579,7 +600,7 @@ create policy "item_reviews_select"
 create policy "item_reviews_insert_reviewer"
   on public.item_reviews
   for insert
-  with check (public.is_reviewer_member());
+  with check (public.is_review_manager_member());
 
 create policy "item_reviews_insert_partner_request"
   on public.item_reviews
@@ -602,13 +623,13 @@ create policy "item_reviews_insert_partner_request"
 create policy "item_reviews_update_reviewer"
   on public.item_reviews
   for update
-  using (public.is_reviewer_member())
-  with check (public.is_reviewer_member());
+  using (public.is_review_manager_member())
+  with check (public.is_review_manager_member());
 
 create policy "item_reviews_delete_reviewer"
   on public.item_reviews
   for delete
-  using (public.is_reviewer_member());
+  using (public.is_review_manager_member());
 
 -- Column-level permissions: partner role assignment is managed manually by service role.
 revoke insert (role) on table public.partners from anon, authenticated;

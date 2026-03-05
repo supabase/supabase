@@ -1,6 +1,6 @@
 'use client'
 
-import { Package2, Settings2, ShieldCheck } from 'lucide-react'
+import { Package2, Settings2, ShieldCheck, Tags } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import * as React from 'react'
@@ -38,9 +38,11 @@ export function AppSidebar({ partners, ...props }: AppSidebarProps) {
   const settingsHref = `/protected/${currentPartner.slug}/settings`
   const itemsHref = `/protected/${currentPartner.slug}/items`
   const reviewsHref = `/protected/${currentPartner.slug}/reviews`
+  const categoriesHref = `/protected/${currentPartner.slug}/categories`
   const isItemsActive = pathname === itemsHref || pathname.startsWith(`${itemsHref}/`)
   const showInbox =
     currentPartner.partnerRole === 'reviewer' || currentPartner.partnerRole === 'admin'
+  const showCategories = currentPartner.partnerRole === 'admin'
 
   return (
     <Sidebar {...props} collapsible="icon">
@@ -72,6 +74,22 @@ export function AppSidebar({ partners, ...props }: AppSidebarProps) {
                 <Link href={reviewsHref}>
                   <ShieldCheck size={16} strokeWidth={1.5} className="text-foreground-lighter" />
                   <span className="sr-only">Inbox</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ) : null}
+          {showCategories ? (
+            <SidebarMenuItem className="flex w-full justify-center">
+              <SidebarMenuButton
+                asChild
+                tooltip="Categories"
+                isActive={
+                  pathname === categoriesHref || pathname.startsWith(`${categoriesHref}/`)
+                }
+              >
+                <Link href={categoriesHref}>
+                  <Tags size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <span className="sr-only">Categories</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -16,6 +16,7 @@ import {
   TextArea_Shadcn_ as TextArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
 import { saveItemReviewAction } from '@/app/protected/actions'
@@ -27,6 +28,7 @@ const reviewFormSchema = z.object({
   status: reviewStatusEnum,
   featured: z.boolean(),
   reviewNotes: z.string().optional(),
+  categories: z.array(z.string()),
 })
 
 type ReviewFormValues = z.infer<typeof reviewFormSchema>
@@ -38,13 +40,19 @@ type ReviewDecisionFormProps = {
     status: z.infer<typeof reviewStatusEnum>
     featured: boolean
     reviewNotes: string
+    categories: string[]
   }
+  categoryOptions: Array<{
+    id: number
+    title: string
+  }>
 }
 
 export function ReviewDecisionForm({
   partnerSlug,
   itemId,
   defaultValues,
+  categoryOptions,
 }: ReviewDecisionFormProps) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -54,6 +62,7 @@ export function ReviewDecisionForm({
     defaultValues,
   })
   const isDirty = form.formState.isDirty
+  const categoryIdByTitle = new Map(categoryOptions.map((option) => [option.title, option.id]))
 
   const onSubmit = (values: ReviewFormValues) => {
     const parsed = reviewFormSchema.safeParse(values)
@@ -79,6 +88,9 @@ export function ReviewDecisionForm({
       status: parsed.data.status,
       reviewNotes: parsed.data.reviewNotes,
       featured: parsed.data.featured,
+      categoryIds: parsed.data.categories
+        .map((categoryTitle) => categoryIdByTitle.get(categoryTitle))
+        .filter((categoryId): categoryId is number => Number.isInteger(categoryId)),
     })
 
     startTransition(async () => {
@@ -153,6 +165,43 @@ export function ReviewDecisionForm({
                         onCheckedChange={field.onChange}
                         disabled={isPending}
                       />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </div>
+
+            <div className="p-6 pt-0">
+              <FormField
+                control={form.control}
+                name="categories"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="vertical"
+                    label="Categories"
+                    description="Assign this item to one or more marketplace categories."
+                  >
+                    <FormControl>
+                      <MultiSelector
+                        values={field.value}
+                        onValuesChange={field.onChange}
+                        disabled={isPending}
+                      >
+                        <MultiSelector.Trigger
+                          label="Select categories..."
+                          badgeLimit="wrap"
+                          mode="inline-combobox"
+                        />
+                        <MultiSelector.Content>
+                          <MultiSelector.List>
+                            {categoryOptions.map((category) => (
+                              <MultiSelector.Item key={category.id} value={category.title}>
+                                {category.title}
+                              </MultiSelector.Item>
+                            ))}
+                          </MultiSelector.List>
+                        </MultiSelector.Content>
+                      </MultiSelector>
                     </FormControl>
                   </FormItemLayout>
                 )}

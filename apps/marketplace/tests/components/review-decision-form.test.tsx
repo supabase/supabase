@@ -22,7 +22,8 @@ describe('ReviewDecisionForm', () => {
       <ReviewDecisionForm
         partnerSlug="acme"
         itemId={1}
-        defaultValues={{ status: 'pending_review', featured: false, reviewNotes: '' }}
+        defaultValues={{ status: 'pending_review', featured: false, reviewNotes: '', categories: [] }}
+        categoryOptions={[]}
       />
     )
 

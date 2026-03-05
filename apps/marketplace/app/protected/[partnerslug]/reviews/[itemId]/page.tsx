@@ -65,6 +65,36 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
   const latestReview = Array.isArray(item.review) ? item.review[0] : item.review
   const reviewDefaults = deriveReviewDecisionDefaults(latestReview)
 
+  const { data: categories, error: categoriesError } = await supabase
+    .from('categories')
+    .select('id, title')
+    .order('title', { ascending: true })
+
+  if (categoriesError) {
+    throw new Error(categoriesError.message)
+  }
+
+  const { data: assignedCategoryRows, error: assignedCategoryRowsError } = await supabase
+    .from('category_items')
+    .select('category:categories(title)')
+    .eq('item_id', item.id)
+
+  if (assignedCategoryRowsError) {
+    throw new Error(assignedCategoryRowsError.message)
+  }
+
+  const assignedCategoryTitles = (assignedCategoryRows ?? [])
+    .map((entry) => {
+      const category = Array.isArray(entry.category) ? entry.category[0] : entry.category
+      return category?.title
+    })
+    .filter((title): title is string => typeof title === 'string')
+
+  const reviewFormDefaults = {
+    ...reviewDefaults,
+    categories: assignedCategoryTitles,
+  }
+
   const { data: itemFiles, error: itemFilesError } = await supabase
     .from('item_files')
     .select('id, file_path, sort_order')
@@ -119,7 +149,8 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
           <ReviewDecisionForm
             partnerSlug={partnerslug}
             itemId={item.id}
-            defaultValues={reviewDefaults}
+            defaultValues={reviewFormDefaults}
+            categoryOptions={categories ?? []}
           />
         </section>
 

@@ -230,6 +230,98 @@ export async function addPartnerMemberAction(formData: FormData) {
   redirect(`/protected/${partnerSlug}/settings`)
 }
 
+export async function createCategoryAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const title = parseRequiredString(formData, 'title')
+  const description = parseOptionalString(formData, 'description')
+  const slug = slugify(title)
+
+  if (!slug) {
+    throw new Error('Category slug cannot be empty')
+  }
+
+  const { data: partner, error: partnerError } = await supabase
+    .from('partners')
+    .select('id')
+    .eq('slug', partnerSlug)
+    .eq('role', 'admin')
+    .maybeSingle()
+
+  if (partnerError || !partner) {
+    throw new Error('Only admin partners can manage categories')
+  }
+
+  const { error } = await supabase.from('categories').insert({
+    slug,
+    title,
+    description,
+  })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  revalidatePath(`/protected/${partnerSlug}/categories`)
+  revalidatePath(`/protected/${partnerSlug}/reviews`)
+}
+
+export async function updateCategoryAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const categoryId = Number(parseRequiredString(formData, 'categoryId'))
+  const title = parseRequiredString(formData, 'title')
+  const description = parseOptionalString(formData, 'description')
+  const slug = slugify(title)
+
+  if (!slug) {
+    throw new Error('Category slug cannot be empty')
+  }
+
+  const { data: partner, error: partnerError } = await supabase
+    .from('partners')
+    .select('id')
+    .eq('slug', partnerSlug)
+    .eq('role', 'admin')
+    .maybeSingle()
+
+  if (partnerError || !partner) {
+    throw new Error('Only admin partners can manage categories')
+  }
+
+  const { error } = await supabase
+    .from('categories')
+    .update({
+      slug,
+      title,
+      description,
+    })
+    .eq('id', categoryId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  revalidatePath(`/protected/${partnerSlug}/categories`)
+  revalidatePath(`/protected/${partnerSlug}/reviews`)
+}
+
 export async function createItemAction(formData: FormData) {
   const created = await createItemDraftAction(formData)
   redirect(`/protected/${created.partnerSlug}/items/${created.itemSlug}`)
@@ -524,6 +616,7 @@ export async function saveItemReviewAction(formData: FormData) {
   const status = parseRequiredString(formData, 'status')
   const reviewNotes = formData.get('reviewNotes')
   const featured = formData.get('featured') === 'on'
+  const categoryIds = parseNumberList(formData, 'categoryIds[]')
   if (!isReviewStatus(status)) {
     throw new Error('Invalid review status')
   }
@@ -542,6 +635,47 @@ export async function saveItemReviewAction(formData: FormData) {
 
   if (error) {
     throw new Error(error.message)
+  }
+
+  const { data: existingCategoryItems, error: existingCategoryItemsError } = await supabase
+    .from('category_items')
+    .select('category_id')
+    .eq('item_id', itemId)
+
+  if (existingCategoryItemsError) {
+    throw new Error(existingCategoryItemsError.message)
+  }
+
+  const existingCategoryIds = new Set((existingCategoryItems ?? []).map((entry) => entry.category_id))
+  const nextCategoryIds = new Set(categoryIds)
+  const categoryIdsToInsert = categoryIds.filter((categoryId) => !existingCategoryIds.has(categoryId))
+  const categoryIdsToDelete = Array.from(existingCategoryIds).filter(
+    (categoryId) => !nextCategoryIds.has(categoryId)
+  )
+
+  if (categoryIdsToDelete.length > 0) {
+    const { error: deleteCategoryItemsError } = await supabase
+      .from('category_items')
+      .delete()
+      .eq('item_id', itemId)
+      .in('category_id', categoryIdsToDelete)
+
+    if (deleteCategoryItemsError) {
+      throw new Error(deleteCategoryItemsError.message)
+    }
+  }
+
+  if (categoryIdsToInsert.length > 0) {
+    const { error: insertCategoryItemsError } = await supabase.from('category_items').insert(
+      categoryIdsToInsert.map((categoryId) => ({
+        item_id: itemId,
+        category_id: categoryId,
+      }))
+    )
+
+    if (insertCategoryItemsError) {
+      throw new Error(insertCategoryItemsError.message)
+    }
   }
 
   revalidatePath(`/protected/${partnerSlug}/reviews`)

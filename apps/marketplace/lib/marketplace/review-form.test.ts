@@ -10,6 +10,7 @@ describe('review-form utils', () => {
       status: 'approved',
       reviewNotes: 'Looks good',
       featured: true,
+      categoryIds: [3, 8],
     })
 
     expect(formData.get('partnerSlug')).toBe('acme')
@@ -17,5 +18,6 @@ describe('review-form utils', () => {
     expect(formData.get('status')).toBe('approved')
     expect(formData.get('reviewNotes')).toBe('Looks good')
     expect(formData.get('featured')).toBe('on')
+    expect(formData.getAll('categoryIds[]')).toEqual(['3', '8'])
   })
 })
