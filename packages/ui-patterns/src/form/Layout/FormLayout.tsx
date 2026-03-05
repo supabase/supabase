@@ -1,5 +1,4 @@
 import { cva } from 'class-variance-authority'
-import { motion } from 'framer-motion'
 import React from 'react'
 import {
   cn,
@@ -328,7 +327,7 @@ export const FormLayout = React.forwardRef<
         </p>
       ) : null
 
-    const LabelContents = () => (
+    const labelContents = (
       <>
         {beforeLabel && (
           <span
@@ -376,7 +375,7 @@ export const FormLayout = React.forwardRef<
                   data-formlayout-id="formLabel"
                   htmlFor={props.name || id}
                 >
-                  <LabelContents />
+                  {labelContents}
                 </FormLabel_Shadcn_>
               ) : (
                 <Label_Shadcn_
@@ -384,7 +383,7 @@ export const FormLayout = React.forwardRef<
                   data-formlayout-id="label"
                   htmlFor={props.name || id}
                 >
-                  <LabelContents />
+                  {labelContents}
                 </Label_Shadcn_>
               )}
               {labelOptional && (
