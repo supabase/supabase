@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-
 import { Button, cn, Input_Shadcn_, Label_Shadcn_ } from 'ui'
+
 import { createClient } from '@/lib/supabase/client'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
@@ -63,7 +63,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button htmlType="submit" className="w-full" disabled={isLoading}>
             {isLoading ? 'Sending...' : 'Send reset email'}
           </Button>
 
