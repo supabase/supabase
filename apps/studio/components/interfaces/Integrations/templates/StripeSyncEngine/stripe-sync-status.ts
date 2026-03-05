@@ -3,11 +3,7 @@ import type {
   StripeSyncStateData,
 } from 'data/database-integrations/stripe/sync-state-query'
 import type { Schema } from 'data/database/schemas-query'
-import {
-  SchemaInstallationStatus,
-  STRIPE_SCHEMA_COMMENT_PREFIX,
-  StripeSchemaComment,
-} from 'stripe-experiment-sync/supabase'
+import { SchemaInstallationStatus, StripeSchemaComment } from 'stripe-experiment-sync/supabase'
 
 /**
  * Complete Stripe Sync status including schema, installation state, and sync state
@@ -30,10 +26,6 @@ export function findStripeSchema(schemas: Schema[] | undefined): Schema | undefi
   return schemas?.find((s) => s.name === 'stripe')
 }
 
-function isStripeSyncSchema(schema: Schema | undefined): boolean {
-  return !!schema?.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX)
-}
-
 export function isInstalled(status: SchemaInstallationStatus): boolean {
   return status === 'installed'
 }
@@ -43,11 +35,11 @@ export function isUninstalled(status: SchemaInstallationStatus): boolean {
 }
 
 export function hasInstallError(status: SchemaInstallationStatus): boolean {
-  return status === 'install_error'
+  return status === 'install error'
 }
 
 export function hasUninstallError(status: SchemaInstallationStatus): boolean {
-  return status === 'uninstall_error'
+  return status === 'uninstall error'
 }
 
 export function hasError(status: SchemaInstallationStatus): boolean {
