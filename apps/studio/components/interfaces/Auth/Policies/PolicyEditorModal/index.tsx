@@ -1,3 +1,4 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import useLatest from 'hooks/misc/useLatest'
@@ -10,6 +11,7 @@ import { Modal } from 'ui'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
   PolicyFormField,
+  PolicyForReview,
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
 } from '../Policies.types'
@@ -18,7 +20,7 @@ import {
   createPayloadForUpdatePolicy,
   createSQLPolicy,
 } from '../Policies.utils'
-import PolicyEditor from '../PolicyEditor'
+import { PolicyEditor } from '../PolicyEditor'
 import { PolicyReview } from '../PolicyReview'
 import PolicySelection from '../PolicySelection'
 import PolicyTemplates from '../PolicyTemplates'
@@ -30,7 +32,7 @@ interface PolicyEditorModalProps {
   visible?: boolean
   schema?: string
   table?: string
-  selectedPolicyToEdit: any
+  selectedPolicyToEdit?: PostgresPolicy
   showAssistantPreview?: boolean
   onSelectCancel: () => void
   onCreatePolicy: (payload: PostgresPolicyCreatePayload) => Promise<boolean>
@@ -38,11 +40,11 @@ interface PolicyEditorModalProps {
   onSaveSuccess: () => void
 }
 
-const PolicyEditorModal = ({
+export const PolicyEditorModal = ({
   visible = false,
   schema = '',
   table = '',
-  selectedPolicyToEdit = {},
+  selectedPolicyToEdit,
   showAssistantPreview = false,
   onSelectCancel = noop,
   onCreatePolicy,
@@ -71,7 +73,7 @@ const PolicyEditorModal = ({
   const [policyFormFields, setPolicyFormFields] = useState<PolicyFormField>(
     initializedPolicyFormFields
   )
-  const [policyStatementForReview, setPolicyStatementForReview] = useState<any>('')
+  const [policyStatementForReview, setPolicyStatementForReview] = useState<PolicyForReview>()
   const [isDirty, setIsDirty] = useState(false)
 
   const { confirmOnClose, modalProps } = useConfirmOnClose({
@@ -132,6 +134,7 @@ const PolicyEditorModal = ({
 
   const onUpdatePolicyFormFields = (field: Partial<PolicyFormField>) => {
     setIsDirty(true)
+    console.log('UPDATE')
     if (field.name && field.name.length > 63) return
     setPolicyFormFields({ ...policyFormFields, ...field })
   }
@@ -139,6 +142,9 @@ const PolicyEditorModal = ({
   const validatePolicyFormFields = () => {
     const { name, definition, check, command } = policyFormFields
 
+    if (!selectedPolicyToEdit) {
+      return toast.error('Unable to find policy')
+    }
     if (name.length === 0) {
       return toast.error('Please provide a name for your policy')
     }
@@ -221,7 +227,7 @@ const PolicyEditorModal = ({
             templatesNote="* References a specific column in the table"
             onUseTemplate={onUseTemplate}
           />
-        ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
+        ) : view === POLICY_MODAL_VIEWS.REVIEW && !!policyStatementForReview ? (
           <PolicyReview
             policy={policyStatementForReview}
             onSelectBack={onViewEditor}
@@ -232,5 +238,3 @@ const PolicyEditorModal = ({
     </Modal>
   )
 }
-
-export default PolicyEditorModal
