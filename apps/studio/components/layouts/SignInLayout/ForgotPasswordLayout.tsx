@@ -41,7 +41,7 @@ const ForgotPasswordLayout = ({
                       ? `${BASE_PATH}/img/supabase-dark.svg`
                       : `${BASE_PATH}/img/supabase-light.svg`
                   }
-                  alt=""
+                  alt="Supabase Logo"
                   height={24}
                   width={120}
                 />
