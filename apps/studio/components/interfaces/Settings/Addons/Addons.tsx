@@ -27,6 +27,7 @@ import dayjs from 'dayjs'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
+  useIsAwsCloudProvider,
   useIsOrioleDbInAws,
   useIsProjectActive,
   useSelectedProjectQuery,
@@ -52,6 +53,7 @@ export const Addons = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
+  const isAws = useIsAwsCloudProvider()
   const isProjectActive = useIsProjectActive()
   const isOrioleDbInAws = useIsOrioleDbInAws()
 
@@ -409,13 +411,17 @@ export const Addons = () => {
                         <ProjectUpdateDisabledTooltip
                           projectUpdateDisabled={projectUpdateDisabled}
                           projectNotActive={!isProjectActive}
+                          projectNotAwsProvider={!isAws}
                         >
                           <Button
                             type="default"
                             className="mt-2 pointer-events-auto"
                             onClick={() => setPanel('ipv4')}
                             disabled={
-                              !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
+                              !isAws ||
+                              !isProjectActive ||
+                              projectUpdateDisabled ||
+                              !(canUpdateIPv4 || ipv4)
                             }
                           >
                             Change dedicated IPv4 address

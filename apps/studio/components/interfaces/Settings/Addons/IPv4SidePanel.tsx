@@ -17,14 +17,7 @@ import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
-import {
-  Button,
-  Label_Shadcn_,
-  RadioGroup_Shadcn_,
-  RadioGroupItem_Shadcn_,
-  SidePanel,
-  cn,
-} from 'ui'
+import { Button, RadioGroup_Shadcn_, RadioGroupLargeItem_Shadcn_, SidePanel, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
@@ -69,12 +62,10 @@ const IPv4SidePanel = () => {
   const availableOptions =
     (addons?.available_addons ?? []).find((addon) => addon.type === 'ipv4')?.variants ?? []
 
-  const isFreePlan = organization?.plan?.id === 'free'
   const { hasAccess: hasAccessToIPv4, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('ipv4')
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
-  const isPgBouncerEnabled = !isFreePlan
 
   const ipv4Options = [
     {
@@ -88,7 +79,6 @@ const IPv4SidePanel = () => {
           <p className="text-foreground-light translate-y-[1px] text-sm">/ month</p>
         </>
       ),
-      disabled: false,
       priceRowClassName: 'mt-2',
     },
     ...availableOptions.map((option) => ({
@@ -104,7 +94,6 @@ const IPv4SidePanel = () => {
           <p className="text-foreground-light translate-y-[0.5px]">/ month / database</p>
         </>
       ),
-      disabled: !hasAccessToIPv4 || !isAws,
       priceRowClassName: 'mt-3',
     })),
   ]
@@ -177,52 +166,42 @@ const IPv4SidePanel = () => {
             />
           )}
 
-          <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
-            <RadioGroup_Shadcn_
-              name="ipv4"
-              value={selectedOption}
-              onValueChange={setSelectedOption}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
-              {ipv4Options.map((option) => (
-                <div
-                  key={option.id}
-                  className={cn(
-                    'w-full rounded-md border p-0 transition-colors',
-                    selectedOption === option.value
-                      ? 'border-foreground bg-selection ring-1 ring-border'
-                      : 'border-default hover:border-control'
-                  )}
-                >
-                  <div className="flex items-start">
-                    <RadioGroupItem_Shadcn_
-                      value={option.value}
-                      id={option.id}
-                      disabled={option.disabled}
-                      className="sr-only aspect-auto h-0 w-0 border-0 p-0 overflow-hidden"
-                    />
-                    <Label_Shadcn_
-                      htmlFor={option.id}
-                      className="cursor-pointer flex-1 font-normal min-w-0"
-                    >
-                      <div className="px-4 py-3">
-                        <p className="text-sm font-medium">{option.title}</p>
-                        <p className="text-foreground-light text-sm mt-1">{option.description}</p>
-                        <div
-                          className={cn(
-                            'flex items-center space-x-1 text-sm',
-                            option.priceRowClassName
-                          )}
-                        >
-                          {option.priceContent}
-                        </div>
+          {isAws && (
+            <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
+              <RadioGroup_Shadcn_
+                name="ipv4"
+                value={selectedOption}
+                onValueChange={setSelectedOption}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
+                {ipv4Options.map((option) => (
+                  <RadioGroupLargeItem_Shadcn_
+                    key={option.id}
+                    value={option.value}
+                    label=""
+                    showIndicator={false}
+                    className={cn(
+                      'w-full gap-0 p-0 shadow-none bg-transparent cursor-pointer text-left',
+                      'border-default hover:border-control hover:bg-transparent'
+                    )}
+                  >
+                    <div className="px-4 py-3">
+                      <p className="text-sm font-medium">{option.title}</p>
+                      <p className="text-foreground-light text-sm mt-1">{option.description}</p>
+                      <div
+                        className={cn(
+                          'flex items-center space-x-1 text-sm',
+                          option.priceRowClassName
+                        )}
+                      >
+                        {option.priceContent}
                       </div>
-                    </Label_Shadcn_>
-                  </div>
-                </div>
-              ))}
-            </RadioGroup_Shadcn_>
-          </div>
+                    </div>
+                  </RadioGroupLargeItem_Shadcn_>
+                ))}
+              </RadioGroup_Shadcn_>
+            </div>
+          )}
 
           {hasChanges && (
             <>
