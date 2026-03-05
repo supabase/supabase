@@ -40,8 +40,7 @@ import { useOAuthCustomProviderUpdateMutation } from '@/data/oauth-custom-provid
 interface CreateOrUpdateCustomProviderSheetProps {
   visible: boolean
   providerToEdit?: CustomOAuthProvider
-  onSuccess: (provider: CustomOAuthProvider) => void
-  onCancel: () => void
+  onClose: () => void
 }
 
 const FormSchema = z
@@ -58,8 +57,8 @@ const FormSchema = z
       .min(1, 'Please provide a name for your custom provider')
       .max(100, 'Name must be less than 100 characters'),
     provider_type: z.enum(['oidc', 'oauth2']).default('oidc'),
-    client_id: z.string().optional(), // Only in edit mode; provided after entity is created
-    client_secret: z.string().optional(),
+    client_id: z.string(),
+    client_secret: z.string(),
     email_optional: z.boolean().default(false),
     issuer: z.string().url('Please provide a valid URL'),
     authorization_url: z.union([z.string().url(), z.literal('')]).default(''),
@@ -67,7 +66,8 @@ const FormSchema = z
     userinfo_url: z.union([z.string().url(), z.literal('')]).default(''),
     jwks_uri: z.union([z.string().url(), z.literal('')]).default(''),
     discovery_url: z.union([z.string().url(), z.literal('')]).default(''),
-    scopes: z.array(z.string()).default([]),
+    // comma-separated scopes in the form, will be transformed to array when sending
+    scopes: z.string().default(''),
     callback_url: z.string().optional(), // Readonly display from project endpoint, not part of payload
   })
   .superRefine((data, ctx) => {
@@ -95,7 +95,7 @@ const initialValues = {
   userinfo_url: '',
   jwks_uri: '',
   discovery_url: '',
-  scopes: [],
+  scopes: '',
   client_id: '',
   client_secret: '',
   email_optional: false,
@@ -106,8 +106,8 @@ const initialValues = {
 export const CreateOrUpdateCustomProviderSheet = ({
   visible,
   providerToEdit,
-  onSuccess,
-  onCancel,
+
+  onClose,
 }: CreateOrUpdateCustomProviderSheetProps) => {
   const isEditMode = !!providerToEdit
   const { ref: projectRef } = useParams()
@@ -133,7 +133,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
           userinfo_url: providerToEdit.userinfo_url,
           jwks_uri: providerToEdit.jwks_uri,
           discovery_url: providerToEdit.discovery_url,
-          scopes: providerToEdit.scopes || [],
+          scopes: (providerToEdit.scopes || []).join(', '),
         })
       } else {
         form.reset(initialValues)
@@ -142,13 +142,13 @@ export const CreateOrUpdateCustomProviderSheet = ({
   }, [visible, providerToEdit, form])
 
   const { mutate: createCustomProvider } = useOAuthCustomProviderCreateMutation({
-    onSuccess: (createdProvider) => {
-      onSuccess(createdProvider)
+    onSuccess: () => {
+      onClose()
     },
   })
   const { mutate: updateCustomProvider } = useOAuthCustomProviderUpdateMutation({
-    onSuccess: (updatedProvider) => {
-      onSuccess(updatedProvider)
+    onSuccess: () => {
+      onClose()
     },
   })
 
@@ -199,7 +199,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
         clientEndpoint: undefined,
         name: data.name,
         client_id: data.client_id,
-        scopes: data.scopes,
+        scopes: data.scopes.split(',').map((s) => s.trim()),
         issuer: data.issuer,
         pkce_enabled: true,
         enabled: true,
@@ -222,9 +222,9 @@ export const CreateOrUpdateCustomProviderSheet = ({
         clientEndpoint: endpointData!,
         provider_type: data.provider_type,
         name: data.name,
-        client_id: isEditMode ? (data.client_id ?? '').trim() : '',
-        client_secret: isEditMode ? (data.client_secret ?? '').trim() : '',
-        scopes: data.scopes || [],
+        client_id: data.client_id,
+        client_secret: data.client_secret,
+        scopes: data.scopes.split(',').map((s) => s.trim()),
         issuer: data.issuer,
         pkce_enabled: true,
         enabled: true,
@@ -243,15 +243,15 @@ export const CreateOrUpdateCustomProviderSheet = ({
     }
   }
 
-  const onClose = () => {
+  const onCloseSheet = () => {
     form.reset(initialValues)
-    onCancel()
+    onClose()
   }
 
   const isManualConfiguration = form.watch('provider_type') === 'oauth2'
 
   return (
-    <Sheet open={visible} onOpenChange={() => onCancel()}>
+    <Sheet open={visible} onOpenChange={() => onCloseSheet()}>
       <SheetContent
         size="lg"
         showClose={false}
@@ -461,35 +461,31 @@ export const CreateOrUpdateCustomProviderSheet = ({
                 </SheetSection>
               </>
             )}
-            {isEditMode && (
-              <>
-                <Separator />
-                <SheetSection className="flex-grow px-5 space-y-4">
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="client_id"
-                    render={({ field }) => (
-                      <FormItemLayout layout="horizontal" label="Client ID">
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_ {...field} placeholder="Client ID" />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="client_secret"
-                    render={({ field }) => (
-                      <FormItemLayout layout="horizontal" label="Client Secret">
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_ {...field} type="password" placeholder="Client secret" />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                </SheetSection>
-              </>
-            )}
+            <Separator />
+            <SheetSection className="flex-grow px-5 space-y-4">
+              <FormField_Shadcn_
+                control={form.control}
+                name="client_id"
+                render={({ field }) => (
+                  <FormItemLayout layout="horizontal" label="Client ID">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ {...field} placeholder="Client ID" />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+              <FormField_Shadcn_
+                control={form.control}
+                name="client_secret"
+                render={({ field }) => (
+                  <FormItemLayout layout="horizontal" label="Client Secret">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ {...field} type="password" placeholder="Client secret" />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </SheetSection>
             <Separator />
             <SheetSection className="flex-grow px-5 space-y-4">
               <FormField_Shadcn_
@@ -551,7 +547,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
           </form>
         </Form_Shadcn_>
         <SheetFooter>
-          <Button type="default" onClick={onClose}>
+          <Button type="default" onClick={onCloseSheet}>
             Cancel
           </Button>
           <Button htmlType="submit" form={FORM_ID}>

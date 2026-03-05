@@ -1,9 +1,7 @@
-import type { CustomOAuthProvider } from '@supabase/auth-js'
 import { useParams } from 'common'
 import { Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -34,7 +32,6 @@ import {
   getNextPlanForCustomProviders,
 } from './customProviders.utils'
 import { DeleteCustomProviderModal } from './DeleteCustomProviderModal'
-import { NewCustomProviderBanner } from './NewCustomProviderBanner'
 import AlertError from '@/components/ui/AlertError'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
@@ -90,9 +87,6 @@ export const CustomAuthProvidersList = () => {
   const isCustomProvidersEnabled = !!authConfig?.CUSTOM_OAUTH_ENABLED
   const providerLimit = authConfig?.CUSTOM_OAUTH_MAX_PROVIDERS || 0
 
-  const [newCustomProvider, setNewCustomProvider] = useState<
-    (CustomOAuthProvider & { client_secret?: string }) | undefined
-  >(undefined)
   const [selectedProviderToEdit, setSelectedProviderToEdit] = useState<string | null>(null)
   const [selectedProviderToDelete, setSelectedProviderToDelete] = useState<string | null>(null)
   const [filteredProviderTypes, setFilteredProviderTypes] = useState<string[]>([])
@@ -199,13 +193,8 @@ export const CustomAuthProvidersList = () => {
     }
   }
 
-  const handleDeleteProvider = (_providerId: string) => {
-    setSelectedProviderToDelete(null)
-  }
-
-  const isCreateMode = showCreateSheet && isCustomProvidersEnabled
-  const isEditMode = !!providerToEdit
-  const isCreateOrUpdateSheetVisible = isCreateMode || isEditMode
+  const isCreateOrUpdateSheetVisible =
+    isCustomProvidersEnabled && (showCreateSheet || !!providerToEdit)
   const canCreateProvider = isCustomProvidersEnabled && !atProviderLimit
 
   if (isAuthConfigLoading || (isCustomProvidersEnabled && isPending)) {
@@ -219,12 +208,6 @@ export const CustomAuthProvidersList = () => {
   return (
     <>
       <div className="flex flex-col gap-y-4">
-        {newCustomProvider?.client_secret && (
-          <NewCustomProviderBanner
-            provider={newCustomProvider}
-            onClose={() => setNewCustomProvider(undefined)}
-          />
-        )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
             <Input
@@ -409,17 +392,7 @@ export const CustomAuthProvidersList = () => {
       <CreateOrUpdateCustomProviderSheet
         visible={isCreateOrUpdateSheetVisible}
         providerToEdit={providerToEdit}
-        onSuccess={(provider) => {
-          const isCreating = !providerToEdit
-          setShowCreateSheet(false)
-          setSelectedProviderToEdit(null)
-          // Show banner for new providers with client secret
-          if (isCreating) {
-            // In mock mode, add a fake client_secret for the banner
-            setNewCustomProvider({ ...provider, client_secret: 'mock_secret_' + Date.now() })
-          }
-        }}
-        onCancel={() => {
+        onClose={() => {
           setShowCreateSheet(false)
           setSelectedProviderToEdit(null)
         }}

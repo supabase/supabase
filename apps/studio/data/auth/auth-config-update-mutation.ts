@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { authKeys } from './keys'
 
 export type AuthConfigUpdateVariables = {
