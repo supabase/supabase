@@ -29,10 +29,6 @@
   @apply bg-white text-gray-800;
 }
 
-.sbui-select:focus {
-  box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
-}
-
 .sbui-select--error {
   @apply border-red-500;
 }

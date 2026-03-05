@@ -24,10 +24,6 @@
 /* background-image: none;
 } */
 
-.sbui-listbox:focus {
-  box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
-}
-
 .sbui-listbox--error {
   @apply border-red-500;
 }

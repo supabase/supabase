@@ -23,11 +23,6 @@
   margin: 0;
 }
 
-.sbui-inputnumber:focus {
-  box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
-  outline: 0;
-}
-
 .sbui-inputnumber--error {
   @apply border-red-500;
 }
@@ -42,10 +37,6 @@
 
 .sbui-inputnumber-nav {
   @apply hidden;
-}
-
-.sbui-inputnumber:focus + .sbui-inputnumber-nav {
-  @apply block;
 }
 
 .sbui-inputnumber-button {

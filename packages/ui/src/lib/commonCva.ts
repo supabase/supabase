@@ -21,14 +21,15 @@ const defaults = {
   placeholder: 'placeholder-border-stronger',
   focus: `
     outline-none
-    focus:ring-current focus:ring-2
+    focus-visible:ring-2
+    focus-visible:ring-ring
+    focus-visible:ring-offset-2
   `,
   'focus-visible': `
     outline-none
-    transition-all
-    outline-0
-    focus-visible:outline-4
-    focus-visible:outline-offset-1
+    focus-visible:ring-2
+    focus-visible:ring-ring
+    focus-visible:ring-offset-2
   `,
   size: {
     // buttons, inputs, input labels use these sizes
@@ -69,3 +70,24 @@ export const sizeVariants = cva('', {
     },
   },
 })
+
+/**
+ * Standard focus ring utility - use for most interactive elements
+ */
+export const focusRing = `
+  focus-visible:outline-none
+  focus-visible:ring-2
+  focus-visible:ring-ring
+  focus-visible:ring-offset-2
+  focus-visible:ring-offset-background
+`
+
+/**
+ * Inset focus ring utility - use when offset would overlap adjacent elements
+ */
+export const focusRingInset = `
+  focus-visible:outline-none
+  focus-visible:ring-2
+  focus-visible:ring-ring
+  focus-visible:ring-inset
+`

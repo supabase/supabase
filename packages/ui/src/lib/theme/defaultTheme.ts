@@ -24,14 +24,15 @@ const defaults = {
   placeholder: 'placeholder-foreground-muted',
   focus: `
     outline-none
-    focus:ring-current focus:ring-2
+    focus-visible:ring-2
+    focus-visible:ring-ring
+    focus-visible:ring-offset-2
   `,
   'focus-visible': `
     outline-none
-    transition-all
-    outline-0
-    focus-visible:outline-4
-    focus-visible:outline-offset-1
+    focus-visible:ring-2
+    focus-visible:ring-ring
+    focus-visible:ring-offset-2
   `,
   size: {
     // buttons, inputs, input labels use these sizes
@@ -130,9 +131,10 @@ export default {
           cursor-pointer
 
           outline-none
-          focus-visible:ring-1
+          focus-visible:ring-2
+          focus-visible:ring-ring
+          focus-visible:ring-offset-2
           focus-visible:z-10
-          ring-foreground-light
         `,
         content: `
           data-open:animate-slide-down
@@ -168,9 +170,10 @@ export default {
           bg-transparent
 
           outline-none
-          focus-visible:ring-1
+          focus-visible:ring-2
+          focus-visible:ring-ring
+          focus-visible:ring-offset-2
           focus-visible:z-10
-          ring-foreground-light
 
           transition-colors
           hover:bg-background
@@ -341,10 +344,10 @@ export default {
         space-x-2
         text-center
         transition
-        focus:outline-none
-        focus-visible:ring
-        focus-visible:ring-foreground-muted
-        focus-visible:border-foreground-muted
+        focus-visible:outline-none
+        focus-visible:ring-2
+        focus-visible:ring-ring
+        focus-visible:ring-offset-2
       `,
       inactive: `
         hover:text-foreground
@@ -367,10 +370,10 @@ export default {
         shadow-sm
         rounded
         border
-        focus:outline-none
-        focus-visible:ring
-        focus-visible:ring-foreground-muted
-        focus-visible:border-foreground-muted
+        focus-visible:outline-none
+        focus-visible:ring-2
+        focus-visible:ring-ring
+        focus-visible:ring-offset-2
         `,
       inactive: `
         bg-background
@@ -395,10 +398,10 @@ export default {
         transition
         shadow-sm
         rounded-full
-        focus:outline-none
-        focus-visible:ring
-        focus-visible:ring-foreground-muted
-        focus-visible:border-foreground-muted
+        focus-visible:outline-none
+        focus-visible:ring-2
+        focus-visible:ring-ring
+        focus-visible:ring-offset-2
         `,
       inactive: `
         bg-surface-200 hover:bg-surface-300
@@ -437,7 +440,6 @@ export default {
       focus-visible:shadow-md
       ${defaults.focus}
       focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
       ${defaults.placeholder}
       group
     `,
@@ -449,7 +451,6 @@ export default {
       error: `
         bg-destructive-200
         border border-destructive-500
-        focus:ring-destructive-400
         placeholder:text-destructive-400
        `,
     },
@@ -481,7 +482,6 @@ export default {
       focus-visible:shadow-md
       ${defaults.focus}
       focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
       ${defaults.placeholder}
 
       appearance-none
@@ -495,7 +495,6 @@ export default {
       error: `
         bg-destructive-200
         border border-destructive-500
-        focus:ring-destructive-400
         placeholder:text-destructive-400
        `,
     },
@@ -527,7 +526,6 @@ export default {
       focus-visible:shadow-md
       ${defaults.focus}
       focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
       ${defaults.placeholder}
 
       appearance-none
@@ -541,7 +539,6 @@ export default {
       error: `
         bg-destructive-200
         border border-destructive-500
-        focus:ring-destructive-400
         placeholder:text-destructive-400
        `,
     },
@@ -578,7 +575,6 @@ export default {
     base: `
       bg-transparent
       ${defaults.focus}
-      focus:ring-border-muted
       text-brand
       border-strong
       shadow-sm
@@ -637,7 +633,6 @@ export default {
     base: `
       absolute
       ${defaults.focus}
-      focus:ring-brand-400
       border-strong
 
       text-brand
@@ -941,7 +936,6 @@ export default {
       cursor-pointer
       transition-colors ease-in-out duration-200
       ${defaults.focus}
-      focus:!ring-border
       bg-foreground-muted/40
 
       hover:bg-foreground-muted/60
@@ -1082,10 +1076,10 @@ export default {
       bg-transparent
       p-0
       outline-none
-      outline-offset-1
       transition-all
-      focus:outline-4
-      focus:outline-border-control
+      focus-visible:ring-2
+      focus-visible:ring-ring
+      focus-visible:ring-offset-2
     `,
     content: `
       z-40
@@ -1141,7 +1135,7 @@ export default {
         cursor-pointer
         flex space-x-3 items-center
         outline-none
-        focus-visible:ring-1 ring-foreground-muted focus-visible:z-10
+        focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:z-10
         group
       `,
       content: {
@@ -1299,7 +1293,6 @@ export default {
       focus-visible:shadow-md
       ${defaults.focus}
       focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
       ${defaults.placeholder}
       indent-px
       transition-all
@@ -1313,13 +1306,12 @@ export default {
         border border-control
 
         aria-expanded:border-foreground-muted
-        aria-expanded:ring-border-muted
+        aria-expanded:ring-ring
         aria-expanded:ring-2
         `,
       error: `
         bg-destructive-200
         border border-destructive-500
-        focus:ring-destructive-400
         placeholder:text-destructive-400
        `,
     },
