@@ -269,7 +269,15 @@ export const urlValidityScorer: EvalScorer<
   Expected
 > = async ({ output }) => {
   const responseText = extractTextOnly(output.steps)
-  const urls = extractUrls(responseText, { excludeCodeBlocks: true, excludeTemplates: true })
+  const allUrls = extractUrls(responseText, { excludeCodeBlocks: true, excludeTemplates: true })
+  const urls = allUrls.filter((url) => {
+    try {
+      const { hostname } = new URL(url)
+      return hostname === 'supabase.com' || hostname.endsWith('.supabase.com')
+    } catch {
+      return false
+    }
+  })
 
   // Skip if no URLs found
   if (urls.length === 0) {
