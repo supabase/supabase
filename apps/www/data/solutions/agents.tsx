@@ -1,3 +1,11 @@
+import { CubeIcon } from '@heroicons/react/outline'
+import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
+import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import { frameworks } from 'components/Hero/HeroFrameworks'
+import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
+import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import {
   Check,
   ClipboardCheck,
@@ -11,25 +19,15 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
+import { Image } from 'ui'
 
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import { getSharedSections } from './shared-sections'
 import {
   FrameworkLink,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-import { getSharedSections } from './shared-sections'
-import { Image } from 'ui'
-
-import { useSendTelemetryEvent } from 'lib/telemetry'
 
 const data: () => {
   metadata: Metadata
@@ -79,7 +77,9 @@ const data: () => {
         <>
           One platform for your agents.
           <br />
-          <span className="text-foreground block">Memory, tools, and data in one place.</span>
+          <span className="text-foreground block text-balance">
+            Memory, tools, and data in one place.
+          </span>
         </>
       ),
       subheader: [
@@ -116,7 +116,7 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"Supabase is great because it has everything. I don\'t need a different solution for authentication, a different solution for database, or a different solution for storage."',
+        text: "Supabase is great because it has everything. I don't need a different solution for authentication, a different solution for database, or a different solution for storage.",
         author: 'Yasser Elsaid',
         role: 'Founder, Chatbase',
         link: '/customers/chatbase',
@@ -327,13 +327,22 @@ const data: () => {
           cta: { label: 'Read the case study', href: '/customers/humata' },
         },
         {
-          name: 'Chatbase',
-          logo: '/images/customers/logos/chatbase.png',
+          name: 'Hyper',
+          logo: '/images/customers/logos/hyper.svg',
           highlights: [
-            'One of the most successful single-founder AI products',
-            'Built entirely on Supabase',
+            'AI marketing agents across the entire workflow',
+            'Three-person team building at enterprise scale',
           ],
-          cta: { label: 'Read the case study', href: '/customers/chatbase' },
+          cta: { label: 'Read the case study', href: '/customers/hyper' },
+        },
+        {
+          name: 'Brevo',
+          logo: '/images/customers/logos/brevo.svg',
+          highlights: [
+            'AI-powered sales workflows without engineering tickets',
+            'CRM connected to AI agents via Supabase MCP',
+          ],
+          cta: { label: 'Read the case study', href: '/customers/brevo' },
         },
         {
           name: 'Markprompt',

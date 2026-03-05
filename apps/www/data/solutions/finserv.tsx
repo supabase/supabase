@@ -1,3 +1,10 @@
+import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
+import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import { frameworks } from 'components/Hero/HeroFrameworks'
+import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
+import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import {
   Check,
   ClipboardCheck,
@@ -11,26 +18,17 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Image } from 'ui'
 
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import MainProducts from '../MainProducts'
+import { getSharedSections } from './shared-sections'
 import {
   FrameworkLink,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-import { getSharedSections } from './shared-sections'
-import MainProducts from '../MainProducts'
-import { Image } from 'ui'
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-
-import { useSendTelemetryEvent } from 'lib/telemetry'
 
 const data: () => {
   metadata: Metadata
@@ -77,7 +75,9 @@ const data: () => {
       title: 'Supabase for Financial Services',
       h1: (
         <>
-          <span className="block text-foreground">Secure, compliant financial applications</span>
+          <span className="block text-foreground text-balance">
+            Secure, compliant financial applications
+          </span>
           <span className="block md:ml-0">without the complexity.</span>
         </>
       ),
@@ -115,7 +115,7 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"We wanted a backend that could accelerate our development while maintaining security and scalability. Supabase stood out due to its automation, integrations, and ecosystem."',
+        text: 'We wanted a backend that could accelerate our development while maintaining security and scalability. Supabase stood out due to its automation, integrations, and ecosystem.',
         author: 'Raunak Kathuria',
         role: 'VP of Engineering, Deriv',
         link: '/customers/deriv',
@@ -294,15 +294,15 @@ const data: () => {
           highlights: ['Building financial applications on Supabase'],
           cta: { label: 'Read the case study', href: '/customers/rally' },
         },
-        {
-          name: 'Xendit',
-          logo: '/images/customers/logos/xendit.png',
-          highlights: [
-            'Full solution shipped to production in less than one week',
-            'Payment processor with transaction verification',
-          ],
-          cta: { label: 'Read the case study', href: '/customers/xendit' },
-        },
+        // {
+        //   name: 'Xendit',
+        //   logo: '/images/customers/logos/xendit.png',
+        //   highlights: [
+        //     'Full solution shipped to production in less than one week',
+        //     'Payment processor with transaction verification',
+        //   ],
+        //   cta: { label: 'Read the case study', href: '/customers/xendit' },
+        // },
       ],
     },
   }
