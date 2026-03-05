@@ -98,19 +98,28 @@ Sentry.init({
   // Enable performance monitoring
   tracesSampleRate: 1.0, // Capture 100% of transactions for performance monitoring
 
-  integrations: (() => {
-    const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
-    if (!thirdPartyErrorFilterIntegration) return []
+  replaysSessionSampleRate: 0.1, // Record 10% of all sessions
+  replaysOnErrorSampleRate: 1.0, // Record 100% of sessions that contain any error
 
-    // Drop errors whose stack trace only contains third-party frames (browser extensions,
-    // injected scripts, etc.). This uses build-time code annotation via the applicationKey
-    // in next.config.js to reliably distinguish our code from third-party code.
-    return [
-      thirdPartyErrorFilterIntegration({
-        filterKeys: ['supabase-studio'],
-        behaviour: 'drop-error-if-exclusively-contains-third-party-frames',
-      }),
-    ]
+  integrations: (() => {
+    const integrations: any[] = []
+
+    const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
+    if (thirdPartyErrorFilterIntegration) {
+      // Drop errors whose stack trace only contains third-party frames (browser extensions,
+      // injected scripts, etc.). This uses build-time code annotation via the applicationKey
+      // in next.config.js to reliably distinguish our code from third-party code.
+      integrations.push(
+        thirdPartyErrorFilterIntegration({
+          filterKeys: ['supabase-studio'],
+          behaviour: 'drop-error-if-exclusively-contains-third-party-frames',
+        })
+      )
+    }
+
+    integrations.push(Sentry.replayIntegration())
+
+    return integrations
   })(),
 
   // Only capture errors originating from our own code.
