@@ -15,15 +15,12 @@ import {
   BreadcrumbPage_Shadcn_ as BreadcrumbPage,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
+  cn,
   CodeBlock,
-  Sheet,
-  SheetContent,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import {
   PageHeader,
   PageHeaderAside,
@@ -65,6 +62,7 @@ export const CronJobPage = () => {
   const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
 
   const [isDirty, setIsDirty] = useState(false)
+
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
@@ -192,25 +190,22 @@ export const CronJobPage = () => {
 
       <PreviousRunsTab />
 
-      <Sheet open={isEditSheetOpen} onOpenChange={handleOpenChange}>
-        <SheetContent size="lg">
-          {job && (
-            <CreateCronJobSheet
-              selectedCronJob={{
-                jobname: job.jobname,
-                schedule: job.schedule,
-                active: job.active,
-                command: job.command,
-              }}
-              supportsSeconds={true}
-              onDirty={setIsDirty}
-              onClose={() => setIsEditSheetOpen(false)}
-              onCloseWithConfirmation={confirmOnClose}
-            />
-          )}
-        </SheetContent>
-      </Sheet>
-      <DiscardChangesConfirmationDialog {...modalProps} />
+      {job && (
+        <CreateCronJobSheet
+          open={isEditSheetOpen}
+          selectedCronJob={{
+            jobname: job.jobname,
+            schedule: job.schedule,
+            active: job.active,
+            command: job.command,
+          }}
+          supportsSeconds={true}
+          onDirty={setIsDirty}
+          onClose={() => setIsEditSheetOpen(false)}
+          onCloseWithConfirmation={confirmOnClose}
+        />
+      )}
+      {/* <DiscardChangesConfirmationDialog {...modalProps} /> */}
     </>
   )
 }

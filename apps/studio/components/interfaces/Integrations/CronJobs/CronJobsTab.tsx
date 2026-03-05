@@ -14,8 +14,7 @@ import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { MouseEvent, UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { LoadingLine, Sheet, SheetContent } from 'ui'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { LoadingLine } from 'ui'
 
 import { formatCronJobColumns } from './CronJobs.utils'
 import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
@@ -192,21 +191,15 @@ export const CronjobsTab = () => {
 
       <DeleteCronJob />
 
-      <Sheet
+      <CreateCronJobSheet
         open={!!createCronJobSheetShown || !!cronJobForEditing}
-        onOpenChange={handleOpenChange}
-      >
-        <SheetContent size="default" tabIndex={undefined}>
-          <CreateCronJobSheet
-            selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
-            supportsSeconds={supportsSeconds}
-            onDirty={setIsDirty}
-            onClose={onClose}
-            onCloseWithConfirmation={confirmOnClose}
-          />
-        </SheetContent>
-      </Sheet>
-      <DiscardChangesConfirmationDialog {...modalProps} />
+        selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
+        supportsSeconds={supportsSeconds}
+        onDirty={setIsDirty}
+        onClose={onClose}
+        onCloseWithConfirmation={confirmOnClose}
+      />
+      {/* <DiscardChangesConfirmationDialog {...modalProps} /> */}
     </>
   )
 }
