@@ -1,0 +1,143 @@
+---
+title: Database Functions and Triggers
+description: SQL functions, trigger patterns, and business logic
+---
+
+Postgres lets you write functions that run inside the database itself. Combined with triggers — which call functions automatically when data changes — you can move important business logic out of your application code and into the database, where it runs reliably regardless of how data is inserted or updated.
+
+## What is a database function?
+
+A database function is a reusable block of SQL that you can call by name. Think of it like a function in any programming language — it takes inputs, does some work, and optionally returns a result. The difference is that it runs inside the database, right next to your data.
+
+The key question is: **should this logic live in the database or in my application?** A good way to think about it — if the logic is about protecting or transforming your data, and it should run no matter how the data gets written (your app, the Dashboard, a migration, a different app entirely), it belongs in a database function. If the logic is about your UI, your user experience, or coordinating things outside the database (like redirecting a user or showing a toast notification), it belongs in your application.
+
+**Database concerns** — these should always happen, regardless of which client wrote the data:
+
+- Every order must have a total greater than zero
+- `updated_at` should be set whenever a row changes
+- A profile row should be created when a user signs up
+
+**Application concerns** — these are about the user's experience, not the integrity of the data:
+
+- Show a success message after placing an order
+- Redirect to the dashboard after sign-in
+- Disable the submit button while the form is saving
+
+This distinction becomes intuitive once you start building a real project — you'll quickly feel which logic belongs where.
+
+## Writing your first function
+
+Here's a simple function that returns a greeting:
+
+```sql
+create or replace function hello(name text)
+returns text
+language sql
+as $$
+  select 'Hello, ' || name || '!';
+$$;
+```
+
+Call it like this:
+
+```sql
+select hello('Supabase');
+-- Returns: Hello, Supabase!
+```
+
+## What is a trigger?
+
+A trigger tells Postgres: "whenever this thing happens to this table, run this function." The "thing" is an event — an insert, update, or delete — and the function is called a **trigger function**.
+
+Triggers are powerful because they run automatically. You don't need to remember to call them from your application code — any insert, update, or delete on the table will fire the trigger, whether it comes from your app, the Dashboard, or a migration script.
+
+## Writing a trigger function
+
+A trigger function is a regular function with two special properties:
+
+1. It returns `trigger` (not a normal data type)
+2. It has access to special variables like `new` (the new row) and `old` (the old row)
+
+Say you have an `employees` table and you want to automatically set the `start_date` to today whenever a new employee is added:
+
+```sql
+create or replace function set_employee_start_date()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.start_date = current_date;
+  return new;
+end;
+$$;
+```
+
+The function sets `new.start_date` to today's date and returns the modified row. Postgres will use this returned value as the actual row that gets written. It doesn't matter whether the employee was added from your HR app, a CSV import, or a manual insert in the SQL editor — the start date is always set.
+
+## Attaching a trigger
+
+Once you have a trigger function, you attach it to a table:
+
+```sql
+create trigger on_employee_insert
+  before insert on employees
+  for each row
+  execute function set_employee_start_date();
+```
+
+Now every time a new row is inserted into `employees`, the `start_date` is automatically set — even if the insert didn't include it.
+
+## Before vs after triggers
+
+Triggers can run at two different moments:
+
+- **`before`** — runs before the row is saved. You can modify the data (like setting `start_date`) or reject the operation entirely by raising an error.
+- **`after`** — runs after the row is already saved. You can't change the data, but you can react to it — like inserting a record into an activity log or updating a count in another table.
+
+The employee example above is a `before` trigger because it needs to modify the row before it's written. If you wanted to log that a new employee was added, you'd use an `after` trigger instead.
+
+## A common Supabase pattern: create a profile on sign-up
+
+One trigger you'll see in almost every Supabase project is one that creates a profile row when a new user signs up:
+
+```sql
+create or replace function handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  insert into public.profiles (id, display_name)
+  values (new.id, new.raw_user_meta_data ->> 'display_name');
+  return new;
+end;
+$$;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function handle_new_user();
+```
+
+This fires after a new row appears in `auth.users` (which happens when someone signs up) and creates a matching row in your `profiles` table.
+
+## Calling functions from the client
+
+You can call any `public` schema function from your application using the Supabase client library:
+
+```js
+const { data, error } = await supabase.rpc('get_todo_count', {
+  uid: userId,
+})
+```
+
+The `.rpc()` method calls a Postgres function by name and passes the arguments. This is useful when the logic is better expressed in SQL or when you want it to live in the database.
+
+## Database functions vs Edge Functions
+
+Both let you run custom logic, but they're for different purposes:
+
+- **Database functions** run inside Postgres, right next to your data. They're great for data operations, triggers, and RLS helpers. But they can't make network requests — they can't call Stripe, send an email, or hit an external API. They are great for things like calculating totals, setting default values, or validating data.
+- **Edge Functions** run on a separate TypeScript runtime. They can do anything a server can do — call APIs, process webhooks, send emails. But they add a network round trip when they need to access your database. They are great for things like sending emails, processing webhooks, or calling external APIs.
+
+In many apps you'll use both. A trigger might insert a row into a `notifications` table, and an Edge Function picks it up and sends the actual email.

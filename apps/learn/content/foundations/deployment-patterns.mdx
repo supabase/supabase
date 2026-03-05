@@ -1,0 +1,152 @@
+---
+title: Deployment Patterns
+description: Environment promotion, CI/CD, and rollback procedures
+---
+
+During development, you work against a local Supabase instance. When it's time to ship, you need a reliable process for getting your changes into production. This chapter covers how to structure your environments, automate deployments, and roll back when something goes wrong.
+
+## Environment strategy
+
+Most teams use at least two environments:
+
+- **Local** — your development machine, running `supabase start`. This is where you write and test changes.
+- **Production** — the live Supabase project your users connect to.
+
+As your team grows, a staging environment between local and production becomes valuable:
+
+- **Staging** — a separate Supabase project that mirrors production. You deploy here first to catch issues before they reach users.
+
+Each environment is its own Supabase project with its own database, API keys, and configuration. Your app uses environment variables to switch between them:
+
+```
+# .env.local
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-local-publishable-key
+
+# .env.production
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-production-publishable-key
+```
+
+## Database migrations in CI/CD
+
+The earlier chapter on migrations covered creating and running migrations locally. For production, you want migrations to run automatically as part of your deployment pipeline.
+
+### Linking to your project
+
+First, link your local project to your production Supabase project:
+
+```bash
+supabase link --project-ref your-project-ref
+```
+
+The project ref is in your Dashboard URL.
+
+### Pushing migrations
+
+Deploy pending migrations to production:
+
+```bash
+supabase db push
+```
+
+This runs any migrations that haven't been applied to the remote database yet. It's safe to run multiple times — migrations that have already been applied are skipped.
+
+### Automating with GitHub Actions
+
+A common pattern is to run migrations automatically when you merge to your main branch:
+
+```yaml
+name: Deploy Migrations
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - run: supabase db push
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+```
+
+Store your project ref and access token as GitHub secrets. Now every merge to main automatically deploys database changes.
+
+### Edge Functions in CI/CD
+
+You can deploy Edge Functions in the same pipeline:
+
+```yaml
+      - run: supabase functions deploy
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+```
+
+## Deployment flow
+
+A typical deployment flow looks like:
+
+1. **Develop locally** — write code and migrations, test against your local Supabase instance
+2. **Create a PR** — push your branch and open a pull request
+3. **Review** — teammates review the code and migration SQL
+4. **Merge to main** — triggers the CI/CD pipeline
+5. **Migrations run** — the pipeline pushes migrations to production (or staging first)
+6. **App deploys** — your frontend/backend hosting (Vercel, Netlify, etc.) picks up the new code
+
+The database migration and the app deployment should happen close together. If your migration adds a new column, the app code that reads from it should deploy at the same time. Structuring migrations to be backward-compatible (additive changes first, removals later) helps avoid mismatches.
+
+## Rollback procedures
+
+Sometimes a deployment breaks something. How you roll back depends on what went wrong.
+
+### Bad application code
+
+If the issue is in your app code (not the database), roll back the app deployment through your hosting platform. Most platforms (Vercel, Netlify, etc.) let you redeploy a previous version with one click.
+
+### Bad migration
+
+Database migrations are harder to roll back because they change the schema. A few strategies:
+
+- **Write a reverse migration** — create a new migration that undoes the changes (add back the dropped column, remove the new index, etc.). This is the safest approach.
+- **Restore from backup** — if the migration caused data loss or corruption, restore from a backup or use PITR (covered in the previous chapter).
+- **Fix forward** — sometimes it's faster to write a new migration that fixes the problem than to try to reverse it.
+
+### Making migrations safer
+
+The best rollback strategy is avoiding the need for one:
+
+- **Test migrations locally first** — run them against your local database and verify the results
+- **Use staging** — apply migrations to a staging environment before production
+- **Make additive changes** — add new columns, tables, and functions before removing old ones. Deploy the code that uses them, then clean up the old schema in a later migration.
+- **Avoid destructive changes in production** — don't drop columns or tables unless you're sure they're no longer needed. Renaming a column is a drop + add, which can break running code.
+
+## Seed data
+
+For local development and staging, you often need test data. Supabase supports a seed file at `supabase/seed.sql` that runs after migrations when you start a fresh local instance:
+
+```sql
+-- supabase/seed.sql
+insert into public.profiles (id, display_name)
+values
+  ('00000000-0000-0000-0000-000000000001', 'Test User'),
+  ('00000000-0000-0000-0000-000000000002', 'Admin User');
+
+insert into public.todos (user_id, task, is_complete)
+values
+  ('00000000-0000-0000-0000-000000000001', 'Try Supabase', false),
+  ('00000000-0000-0000-0000-000000000001', 'Build something', false);
+```
+
+This gives every developer on the team a consistent starting point. Don't run seed data against production.

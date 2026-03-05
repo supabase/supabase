@@ -1,0 +1,84 @@
+---
+title: Backup and Recovery
+description: Backup policies, PITR, and disaster recovery
+---
+
+Data loss is one of the worst things that can happen to a production app. Supabase provides automatic backups and point-in-time recovery so you can restore your database if something goes wrong — a bad migration, an accidental delete, or a bug that corrupts data.
+
+## Automatic backups
+
+Supabase automatically backs up your database on a regular schedule. The frequency depends on your plan:
+
+- **Free tier** — no automatic backups
+- **Pro plan** — daily backups, retained for 7 days
+- **Team and Enterprise** — daily backups with longer retention
+
+Backups capture the entire database — all schemas, tables, data, functions, triggers, and extensions. They're taken automatically and don't require any action from you.
+
+You can view available backups in the Dashboard under **Database > Backups**. Each backup shows when it was taken and its size.
+
+## Restoring from a backup
+
+If you need to restore, you can do it from the Dashboard. A restore replaces your current database with the backup, so everything in the database reverts to the state it was in when the backup was taken.
+
+Before restoring, be aware:
+
+- **It's a full replacement** — you can't selectively restore a single table. The entire database is rolled back.
+- **Changes after the backup are lost** — any data written between the backup time and now will be gone.
+- **Downtime** — there will be a brief period of downtime during the restore.
+
+For most situations, a daily backup is sufficient. But if you need finer-grained recovery, that's where point-in-time recovery comes in.
+
+## Point-in-time recovery (PITR)
+
+PITR lets you restore your database to any specific moment in time — not just when a backup was taken. If a bad migration ran at 2:15 PM, you can restore to 2:14 PM and lose only one minute of data instead of an entire day.
+
+PITR works by continuously streaming write-ahead logs (WAL) from your database. These logs record every change, so Supabase can replay them to reconstruct the database at any point.
+
+PITR is available on Pro plans and above (as an add-on) and on Team/Enterprise plans. You enable it in the Dashboard under **Database > Backups > Point in Time Recovery**.
+
+### When to use PITR vs regular backups
+
+- **Regular backups** — good enough for most apps. If you can tolerate losing up to a day of data in the worst case, daily backups are fine.
+- **PITR** — necessary when data loss needs to be measured in minutes, not hours. Important for apps with high-value transactions, financial data, or data that's hard to recreate.
+
+## Manual exports
+
+Beyond automated backups, you can export your database manually at any time using `pg_dump`:
+
+```bash
+pg_dump -h db.your-project.supabase.co -U postgres -d postgres > backup.sql
+```
+
+This creates a SQL file you can store wherever you want — version control, cloud storage, a local drive. It's useful for:
+
+- **Pre-migration safety** — dump the database before running a risky migration
+- **Moving data** — export from one project and import into another
+- **Archival** — keep a copy outside of Supabase
+
+To restore from a dump:
+
+```bash
+psql -h db.your-project.supabase.co -U postgres -d postgres < backup.sql
+```
+
+## Data portability
+
+Since Supabase is built on standard Postgres, your data is fully portable. You can:
+
+- **Export with pg_dump** and import into any Postgres database
+- **Use logical replication** to stream data to another Postgres instance
+- **Download Storage files** through the API or Dashboard
+
+There's no proprietary format or lock-in. If you ever need to move away from Supabase, your data comes with you.
+
+## Disaster recovery planning
+
+Backups are only useful if you've thought about when and how to use them. A few things to plan for:
+
+- **Bad migration** — a migration drops a column or table by accident. If you have PITR, restore to just before the migration ran. If not, restore the latest daily backup.
+- **Accidental delete** — a user or admin deletes data they shouldn't have. Same approach — restore from backup or PITR.
+- **Application bug** — a bug writes bad data to the database. This is harder because you might not notice immediately. PITR helps if you catch it quickly; daily backups help if you catch it within the retention window.
+- **Compromised credentials** — if your Secret Key is exposed, rotate it immediately in the Dashboard. If unauthorized changes were made, restore from a backup taken before the compromise.
+
+The key is knowing these options exist *before* you need them, so you're not figuring it out during a crisis.

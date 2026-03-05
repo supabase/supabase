@@ -1,0 +1,85 @@
+---
+title: When to Choose Supabase
+description: Ideal use cases, comparisons with alternatives, and migration considerations
+---
+
+Supabase gives you a production-grade backend that you can setup in minutes. This page covers the types of projects where Supabase really shines and how it compares to other tools you may be evaluating.
+
+## Ideal use cases
+
+### Rapid prototyping and MVPs
+
+Supabase lets you go from zero to a working backend in minutes. You get a Postgres database, authentication, file storage, and auto-generated APIs out of the box. If your goal is to validate an idea quickly, Supabase removes the need to stitch together multiple services or write boilerplate server code.
+
+### Startups and small teams
+
+For teams without dedicated backend engineers, Supabase acts as a full backend-as-a-service. You can build and ship features using just a frontend framework (like Next.js or Flutter) and Supabase's client libraries. As your team grows, you still have full access to Postgres — nothing is hidden behind a proprietary abstraction.
+
+### Agencies and freelancers
+
+If you build apps for clients regularly, Supabase provides a consistent, repeatable stack. Spin up a new project for each client, use Row Level Security for multi-tenant setups, and manage everything from the dashboard or CLI.
+
+### AI and vector applications
+
+Supabase supports `pgvector` natively, which makes it a natural choice for AI-powered applications like semantic search, recommendation engines, and retrieval-augmented generation (RAG). You can store embeddings alongside your relational data in the same database.
+
+### Apps that need realtime features
+
+If your app requires live updates — chat, notifications, collaborative editing, dashboards — Supabase Realtime lets you subscribe to database changes over WebSockets without setting up a separate pub/sub system.
+
+## Adopt Supabase incrementally
+
+You don't have to use everything at once. Most people start with the database and add services as they need them:
+
+1. **Database** — start with Postgres and the auto-generated REST API
+2. **Auth** — add sign-up, login, and user management when you're ready
+3. **Realtime** — subscribe to database changes for live updates
+4. **Storage** — upload and serve files when your app needs it
+5. **Edge Functions** — add server-side logic without managing a server
+
+Each service works independently. You can use Supabase Auth with an external database, or use the database without ever touching Storage. There's no locked-in adoption path.
+
+## When Supabase might not be the best fit
+
+No tool is perfect for every scenario. Consider alternatives if:
+
+- **You need a non-relational data model.** Supabase is built on Postgres. If your workload is better suited to a document database (like MongoDB) or a graph database, Supabase may add unnecessary friction.
+- **You need full control over your server infrastructure.** Supabase is a managed platform. If you need to run custom background workers, long-running processes, or fine-tune every aspect of your server, a self-managed backend may be more appropriate (though Supabase can be self-hosted).
+- **Your team already has a mature backend.** If you already have a production backend with established patterns, adding Supabase may introduce complexity without enough benefit.
+
+### Supabase vs a custom backend
+
+Building your own backend with Express, Django, or Rails gives you maximum flexibility. But it also means you're responsible for auth, file storage, realtime, database hosting, connection pooling, and API design. Supabase handles all of that for you.
+
+## Cost considerations
+
+Supabase has a generous free tier that works well for hobby projects and prototyping. The Pro plan starts at $25/month per project and covers most production workloads for small-to-medium apps. We have many customers running their app on both the free and Pro tiers.
+
+Key things to understand about pricing:
+
+- Once on the Pro tier, you pay per project — not per user or per request. There isn't a per-seat fee for your team.
+- **Database size, compute, storage, and bandwidth** are the main scaling dimensions.
+- **Edge Function invocations** and **Realtime connections** have their own limits on each tier.
+- You still get 2 free projects on the free tier after you've upgraded to Pro.
+
+For most builders, the free tier is more than enough to learn, build, and ship a project.
+
+## Migrating to Supabase
+
+Because Supabase is built on standard Postgres, migrating in (or out) is straightforward compared to proprietary platforms.
+
+### Coming from Firebase
+
+Supabase provides a [Firebase migration guide](https://supabase.com/docs/guides/migrations/firebase) that walks through converting Firestore data to relational tables, migrating Firebase Auth users, and moving files from Firebase Storage.
+
+### Coming from another Postgres host
+
+If you're already on Postgres (Heroku, Railway, Render, etc.), migration is mostly a `pg_dump` and `pg_restore`. Your SQL, schemas, and data types carry over directly.
+
+### Coming from a custom backend
+
+You can adopt Supabase incrementally. Start by using just the database, then layer on auth, storage, or realtime as needed. You don't have to go all-in on day one.
+
+## Summary
+
+Choose Supabase when you want to move fast without giving up the power of a real relational database. It's best suited for teams that value simplicity, open standards, and Postgres. If you're just starting out, Supabase gives you a production-grade backend with almost no setup — and because it's all Postgres under the hood, you're learning transferable skills, not a proprietary API.

@@ -1,0 +1,154 @@
+---
+title: RLS Fundamentals
+description: Understanding Row Level Security and how to write policies
+---
+
+Row Level Security (RLS) is how you control who can see and modify data in your Supabase database. Instead of writing access control logic in your application code, you define it as policies directly on your tables. Every query — whether it comes from your frontend, a server, or the Supabase Dashboard — is filtered through these policies.
+
+This is one of the most important concepts in Supabase. Because your database is exposed through the API, RLS is what stands between your data and the outside world.
+
+## How RLS works
+
+By default, when you enable RLS on a table, **no one can access any rows**. All access is blocked until you add policies that explicitly grant it for specific operations and conditions.
+
+### Enabling RLS
+
+```sql
+alter table public.todos enable row level security;
+```
+
+After this, every query against the `todos` table is filtered through policies. If there are no policies, every query returns zero rows (for reads) or is rejected (for writes).
+
+### Creating a policy
+
+A policy defines who can do what. Here's a simple one:
+
+```sql
+create policy "Users can read their own todos"
+on public.todos
+for select
+using (user_id = auth.uid());
+```
+
+This says: for `SELECT` queries on the `todos` table, only return rows where `user_id` matches the current user's ID. Every other row is invisible.
+
+## Policy types
+
+Policies apply to specific operations. You can create separate policies for each:
+
+- **`for select`** — controls which rows can be read
+- **`for insert`** — controls which rows can be created
+- **`for update`** — controls which rows can be modified
+- **`for delete`** — controls which rows can be removed
+- **`for all`** — applies to every operation (useful for simple cases)
+
+If a table has multiple policies for the same operation, they're combined with OR — a row is accessible if **any** matching policy allows it.
+
+## USING vs WITH CHECK
+
+Policies have two clauses, and understanding the difference matters:
+
+- **`using`** — filters which *existing* rows are visible. Used for `SELECT`, `UPDATE`, and `DELETE`.
+- **`with check`** — validates *new or modified* data. Used for `INSERT` and `UPDATE`.
+
+For `SELECT` and `DELETE`, you only need `using`. For `INSERT`, you only need `with check`. For `UPDATE`, you can use both — `using` controls which rows can be selected for updating, and `with check` validates the new values.
+
+```sql
+-- Users can only update their own todos, and can't reassign them to someone else
+create policy "Users can update their own todos"
+on public.todos
+for update
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
+```
+
+The `using` clause ensures they can only target their own rows. The `with check` clause ensures they can't change `user_id` to someone else's ID.
+
+## Auth helper functions
+
+Supabase provides functions you can use inside policies to access information about the current request:
+
+### auth.uid()
+
+Returns the current user's UUID, extracted from the JWT. This is the most commonly used function in policies:
+
+```sql
+using (user_id = auth.uid())
+```
+
+If the request is unauthenticated (made with the Publishable Key and no user token), `auth.uid()` returns `null`.
+
+### auth.jwt()
+
+Returns the full JWT payload as JSON. Useful when you need to check something beyond just the user ID — like a custom claim:
+
+```sql
+using ((auth.jwt() -> 'user_role')::text = '"admin"')
+```
+
+### auth.role()
+
+Returns the role of the current request — either `authenticated` (signed-in user) or `anon` (no user token):
+
+```sql
+using (auth.role() = 'authenticated')
+```
+
+### A performance tip
+
+When using `auth.uid()` or `auth.jwt()` in policies, wrap them in a subselect. This tells Postgres to evaluate the function once per query rather than once per row:
+
+```sql
+-- Better performance: evaluated once
+using (user_id = (select auth.uid()))
+
+-- Works but slower on large tables: evaluated per row
+using (user_id = auth.uid())
+```
+
+For small tables the difference is negligible, but on tables with many rows it can matter.
+
+## Putting it together
+
+Here's a complete example for a `todos` table where users can manage their own todos and read public ones:
+
+```sql
+create table public.todos (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  task text not null,
+  is_complete boolean default false,
+  is_public boolean default false,
+  created_at timestamptz default now()
+);
+
+alter table public.todos enable row level security;
+
+-- Anyone can read public todos
+create policy "Public todos are visible to everyone"
+on public.todos for select
+using (is_public = true);
+
+-- Users can read their own todos (public or private)
+create policy "Users can read their own todos"
+on public.todos for select
+using (user_id = (select auth.uid()));
+
+-- Users can create todos for themselves
+create policy "Users can create their own todos"
+on public.todos for insert
+with check (user_id = (select auth.uid()));
+
+-- Users can update their own todos
+create policy "Users can update their own todos"
+on public.todos for update
+using (user_id = (select auth.uid()))
+with check (user_id = (select auth.uid()));
+
+-- Users can delete their own todos
+create policy "Users can delete their own todos"
+on public.todos for delete
+using (user_id = (select auth.uid()));
+```
+
+This is the foundation of data access control in Supabase. The next chapter covers more advanced patterns — team-based access, admin roles, multi-tenancy, and common pitfalls to watch out for.

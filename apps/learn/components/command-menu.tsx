@@ -17,6 +17,7 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   DialogProps,
+  DialogTitle,
 } from 'ui'
 
 export function CommandMenu({ ...props }: DialogProps) {
@@ -69,6 +70,7 @@ export function CommandMenu({ ...props }: DialogProps) {
         </kbd>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
+        <DialogTitle className="sr-only">Command Menu</DialogTitle>
         <CommandInput_Shadcn_ placeholder="Type a command or search..." />
         <CommandList_Shadcn_>
           <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>

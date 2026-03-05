@@ -24,4 +24,6 @@ const nextConfig = {
   },
 }
 
-export default withContentlayer(nextConfig)
+const config = withContentlayer(nextConfig)
+
+export { config as default }

@@ -6,7 +6,7 @@ interface AppLayoutProps {
   children: React.ReactNode
 }
 
-export default function AppLayout({ children }: AppLayoutProps) {
+const AppLayout = ({ children }: AppLayoutProps) => {
   return (
     <>
       {/* main container */}
@@ -15,7 +15,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <main className="flex-1 max-w-site mx-auto w-full p-0">
           {/* {children} */}
           <div className="border-b">
-            <div className="flex-1 items-start md:grid md:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)]">
+            <div className="flex-1 items-start md:grid md:grid-cols-[320px_minmax(0,1fr)] lg:grid-cols-[360px_minmax(0,1fr)]">
               <Sidebar />
               <div vaul-drawer-wrapper="">
                 <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
@@ -29,3 +29,5 @@ export default function AppLayout({ children }: AppLayoutProps) {
     </>
   )
 }
+
+export { AppLayout as default }

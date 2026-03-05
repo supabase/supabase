@@ -1,0 +1,198 @@
+---
+title: User Management
+description: User profiles, email templates, and administration
+---
+
+Once users can sign up and sign in, the next question is: how do you manage them? This chapter covers the practical side of working with users — storing profile data, customizing the emails they receive, configuring password and security settings, and performing admin tasks like updating or deleting accounts.
+
+## User profiles and metadata
+
+Supabase Auth stores a user record in `auth.users` when someone signs up, but that table is managed by the Auth service — you shouldn't write to it directly. For any app-specific data like display names, avatars, or preferences, the standard pattern is to create a `profiles` table in your `public` schema.
+
+### Creating a profiles table
+
+```sql
+create table public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  display_name text,
+  avatar_url text,
+  bio text,
+  created_at timestamptz default now()
+);
+
+alter table public.profiles enable row level security;
+
+create policy "Users can read any profile"
+on public.profiles for select
+using (true);
+
+create policy "Users can update their own profile"
+on public.profiles for update
+using (id = auth.uid());
+```
+
+The `id` column references `auth.users(id)`, so each profile is tied to exactly one user. The `on delete cascade` means if a user is deleted from Auth, their profile is automatically cleaned up.
+
+### Automatically creating a profile on sign-up
+
+You don't want users to manually create their profile row. A database trigger can handle this automatically:
+
+```sql
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+as $$
+begin
+  insert into public.profiles (id, display_name, avatar_url)
+  values (
+    new.id,
+    new.raw_user_meta_data ->> 'full_name',
+    new.raw_user_meta_data ->> 'avatar_url'
+  );
+  return new;
+end;
+$$;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+```
+
+When a user signs up — whether with email, Google, GitHub, or any other method — this trigger fires and creates a profile row. If the sign-up method provides metadata (like a name and avatar from a social provider), it's pulled in automatically.
+
+### User metadata
+
+Supabase Auth stores two types of metadata on the user object:
+
+- **`raw_user_meta_data`** — data that the user can update themselves (via `supabase.auth.updateUser()`). This is where social providers store profile info like name and avatar.
+- **`raw_app_meta_data`** — data that only the server or admin API can update. Useful for things like roles or internal flags that users shouldn't be able to change.
+
+You can update user metadata from your app:
+
+```js
+const { error } = await supabase.auth.updateUser({
+  data: {
+    display_name: 'Alice',
+    favorite_color: 'blue',
+  },
+})
+```
+
+This updates `raw_user_meta_data`. The data is available on the user object and in the JWT, so you can access it without querying your profiles table. For most apps, a combination of metadata (for lightweight data) and a profiles table (for richer data) works well.
+
+## Email templates
+
+Supabase sends emails for several authentication events — confirmation, password reset, magic links, and email changes. You can customize these templates in the Dashboard under **Authentication > Email Templates**.
+
+Each template supports variables that Supabase replaces with actual values:
+
+- `{{ .ConfirmationURL }}` — the link the user should click
+- `{{ .Token }}` — the OTP code (for code-based flows)
+- `{{ .SiteURL }}` — your configured site URL
+- `{{ .Email }}` — the user's email address
+
+For example, a custom confirmation email might look like:
+
+```html
+<h2>Welcome!</h2>
+<p>Click the link below to confirm your email address:</p>
+<p><a href="{{ .ConfirmationURL }}">Confirm email</a></p>
+```
+
+### Redirect URLs in emails
+
+The links in authentication emails redirect users back to your app. You configure the base URL in the Dashboard under **Authentication > URL Configuration**. For local development this is typically `http://localhost:3000`, and for production it's your actual domain.
+
+You can also specify a redirect URL per request. For example, after a password reset, you might want to send the user to a specific page:
+
+```js
+const { error } = await supabase.auth.resetPasswordForEmail('user@example.com', {
+  redirectTo: 'https://yourapp.com/update-password',
+})
+```
+
+### Custom SMTP
+
+By default, Supabase sends emails from its built-in email service, which works for development but has rate limits. For production, you'll want to configure a custom SMTP provider (like Resend, Postmark, or SendGrid) in the Dashboard under **Project Settings > Auth**. This gives you higher send limits, better deliverability, and emails that come from your own domain.
+
+## Password policies and security settings
+
+Supabase provides several settings to control password and session behavior. These are configured in the Dashboard under **Authentication > Providers > Email** and **Authentication > Settings**.
+
+### Password strength
+
+You can set a minimum password length (the default is 6 characters). For production apps, a minimum of 8 characters is a reasonable starting point. Supabase also supports the HaveIBeenPwned integration, which checks passwords against a database of known breaches and rejects any that appear in it.
+
+### Session lifetime
+
+You can control how long sessions last:
+
+- **JWT expiry** — how long an access token is valid before it needs to be refreshed (default: 1 hour)
+- **Refresh token lifetime** — how long a refresh token is valid before the user needs to sign in again
+
+Shorter lifetimes are more secure but require more frequent token refreshes. The defaults work well for most apps.
+
+### Rate limiting
+
+Supabase applies rate limits to authentication endpoints to prevent abuse — things like brute-force password attempts or spamming sign-up emails. The defaults are reasonable, but you can adjust them in the Dashboard if needed.
+
+## User administration
+
+As your app grows, you'll need to manage users from the admin side — viewing accounts, updating information, or removing users.
+
+### The Dashboard
+
+The simplest way to manage users is through the Supabase Dashboard under **Authentication > Users**. From there you can:
+
+- Browse and search users
+- View a user's metadata, identities, and sessions
+- Manually confirm a user's email
+- Delete a user
+- Send a password reset email
+
+### The Admin API
+
+For programmatic access, the Supabase client library has admin methods that require the Secret Key (not the Publishable Key). These should only be used in server-side code — never expose the Secret Key to the browser.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY
+)
+```
+
+With the admin client, you can manage users programmatically:
+
+```js
+// List users
+const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers()
+
+// Get a specific user
+const { data: { user }, error } = await supabaseAdmin.auth.admin.getUserById(userId)
+
+// Update a user
+const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+  email: 'newemail@example.com',
+  user_metadata: { role: 'admin' },
+})
+
+// Delete a user
+const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
+```
+
+### Inviting users
+
+If your app requires users to be invited rather than signing up on their own, you can send invite emails through the admin API:
+
+```js
+const { error } = await supabaseAdmin.auth.admin.inviteUserByEmail('newuser@example.com')
+```
+
+This sends an email with a sign-up link. When the user clicks it, they're taken to your app to set their password and complete their account.
+
+### A note on the Secret Key
+
+The Secret Key bypasses Row Level Security entirely. Any request made with it has full read and write access to your database. This is why it should only be used in trusted server environments — API routes, server actions, background jobs, or admin scripts. Never include it in client-side code or expose it in environment variables that are bundled into your frontend.

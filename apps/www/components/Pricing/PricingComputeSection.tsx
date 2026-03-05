@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ChevronDownIcon } from '@heroicons/react/outline'
@@ -58,7 +56,7 @@ const PricingComputeSection = () => {
       <hr className="border-0 border-t" />
       <div className="flex flex-col">
         <div
-          className="relative w-full overflow-hidden transition-all !ease-[cubic-bezier(.76,0,.23,1)] duration-300"
+          className="relative w-full overflow-hidden transition-all !ease-[.76,0,.23,1] duration-300"
           style={{ height: showTable ? `${height}px` : '200px' }}
         >
           <div

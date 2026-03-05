@@ -1,0 +1,83 @@
+---
+title: Advanced Authentication
+description: MFA, SSO, custom claims, and identity linking
+---
+
+The previous chapters covered the authentication methods you'll use in most apps. As your app grows — or as your users' security needs increase — Supabase offers several features that go beyond basic sign-in. You don't need any of these on day one, but it's worth knowing they exist so you can reach for them when the time comes.
+
+## Multi-factor authentication (MFA)
+
+Multi-factor authentication adds a second step to sign-in. After entering their password, the user also provides a time-based code from an authenticator app like Google Authenticator or 1Password. This means a stolen password alone isn't enough to access an account.
+
+Supabase supports TOTP-based MFA (the kind where you scan a QR code and get a 6-digit code that rotates every 30 seconds). The flow looks like this:
+
+1. **Enroll** — the user scans a QR code with their authenticator app. Your app gets this QR code from `supabase.auth.mfa.enroll()`.
+2. **Challenge and verify** — at sign-in, after the password step, your app asks for the 6-digit code and verifies it with `supabase.auth.mfa.verify()`.
+3. **Session upgrade** — once verified, the session is upgraded to **AAL2** (Authenticator Assurance Level 2). You can write RLS policies that require AAL2 for sensitive operations, so even a valid session token can't access protected data without completing MFA.
+
+The key thing to understand is that MFA integrates with Row Level Security. You're not just adding a UI step — you're enforcing the second factor at the database level.
+
+## Single Sign-On (SSO)
+
+Single Sign-On lets users sign in through their organization's identity provider — like Okta, Microsoft Entra ID, or Google Workspace. Instead of entering a password in your app, they're redirected to their company's login page, authenticate there, and are redirected back with an active session.
+
+This is most relevant for B2B apps selling to enterprise customers. The benefits for the customer are:
+
+- **Centralized access** — their IT team controls who can access your app through their existing identity system
+- **Automatic deprovisioning** — when an employee leaves and their corporate account is disabled, they lose access to your app too
+- **Familiar experience** — employees sign in the same way they do for every other work tool
+
+Setting up SSO involves coordinating with the customer's IT team to exchange SAML metadata. It's configured through the Supabase Management API or CLI. From the user's perspective, your app just calls `supabase.auth.signInWithSSO({ domain: 'company.com' })` and Supabase handles the rest.
+
+## Role-based access control (RBAC)
+
+Many apps need to know not just *who* a user is, but *what they're allowed to do*. Is this user an admin? A member of a specific team? Allowed to access billing?
+
+The most straightforward approach is a table that maps users to roles:
+
+```sql
+create table public.user_roles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  role text not null,
+  unique(user_id, role)
+);
+```
+
+Then you reference it in RLS policies:
+
+```sql
+create policy "Admins can manage all posts"
+on posts for all
+using (
+  exists (
+    select 1 from public.user_roles
+    where user_id = auth.uid()
+    and role = 'admin'
+  )
+);
+```
+
+This works well for most apps. For apps that need to optimize further, Supabase also supports **custom JWT claims** — embedding role information directly in the access token so it's available on every request without a database lookup. This is a more advanced pattern that involves a database hook function, so it's worth exploring once you're comfortable with the table-based approach.
+
+## Identity linking
+
+A single user might sign in with email and password on their laptop and Google on their phone. Identity linking connects multiple authentication methods to one user account, so they don't end up with separate accounts and separate data.
+
+Supabase handles the most common case automatically — if a user signs up with email and later signs in with a social provider that has the same verified email, both identities are linked to the same user record.
+
+You can also let users explicitly connect additional providers from within your app using `supabase.auth.linkIdentity()`. This is useful for account settings pages where a user might want to add Google sign-in to an existing email/password account, or disconnect a provider they no longer use.
+
+The important thing is that regardless of how a user signs in, their UUID stays the same. All their data, RLS policies, and foreign keys continue to work as expected.
+
+## When to adopt these features
+
+These features layer on top of the basics. A typical progression looks like:
+
+- **Start simple** — email/password and maybe one social provider
+- **Add MFA** — when your app handles sensitive data or your users request it
+- **Add SSO** — when you start selling to organizations that require it
+- **Add RBAC** — when "who can do what" gets more complex than "is this their data?"
+- **Support identity linking** — when your users want flexibility in how they sign in
+
+Start with what your users need today. Everything here will be waiting when you're ready for it.

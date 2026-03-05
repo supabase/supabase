@@ -1,0 +1,133 @@
+---
+title: Broadcast
+description: Low-latency messaging between clients
+---
+
+Broadcast lets connected clients send messages to each other in real time — without touching the database. One client sends an event, and every other client subscribed to the same channel receives it instantly. This is useful for things that are ephemeral and high-frequency: typing indicators, cursor positions, live reactions, or game state.
+
+## How it's different from Database Changes
+
+Database Changes fires when a row in your database is inserted, updated, or deleted. Broadcast skips the database entirely — messages go from one client to the Realtime server and then directly to other clients on the same channel.
+
+This makes Broadcast faster (no database write or read) and lighter (nothing is persisted). The tradeoff is that Broadcast messages aren't stored anywhere — if a client isn't connected when a message is sent, they miss it.
+
+## Sending and receiving messages
+
+### Listening for events
+
+Subscribe to a channel and listen for a specific event name:
+
+```js
+const channel = supabase
+  .channel('room-123')
+  .on('broadcast', { event: 'cursor-move' }, (payload) => {
+    console.log('Cursor moved:', payload)
+  })
+  .subscribe()
+```
+
+The event name (`cursor-move`) is whatever you choose. You can have multiple event types on the same channel — `cursor-move`, `typing`, `reaction` — each with its own listener.
+
+### Sending events
+
+Once subscribed, any client on the channel can send events:
+
+```js
+channel.send({
+  type: 'broadcast',
+  event: 'cursor-move',
+  payload: {
+    userId: user.id,
+    x: 340,
+    y: 120,
+  },
+})
+```
+
+Every other client listening for `cursor-move` on this channel receives the payload. The sender does not receive their own event by default.
+
+### Receiving your own events
+
+If you want the sender to also receive the event (useful for keeping local state in sync), enable `self` when creating the channel:
+
+```js
+const channel = supabase.channel('room-123', {
+  config: { broadcast: { self: true } },
+})
+```
+
+## Channel naming
+
+Channel names are just strings, and you choose whatever convention makes sense. A few common patterns:
+
+- **`room:{id}`** — for chat rooms or collaborative spaces
+- **`game:{id}`** — for multiplayer game sessions
+- **`document:{id}`** — for collaborative editing
+- **`user:{id}`** — for user-specific notifications
+
+Keep channel names scoped to the context. A channel per chat room, a channel per document, a channel per game session. This keeps the event volume manageable and makes it easy to subscribe and unsubscribe as users navigate your app.
+
+## Acknowledgments
+
+By default, `send()` fires and forgets — the message is dispatched but you don't get confirmation that the server received it. If you need acknowledgment, enable `ack` on the channel:
+
+```js
+const channel = supabase.channel('room-123', {
+  config: { broadcast: { ack: true } },
+})
+```
+
+With acknowledgment enabled, `send()` returns a status:
+
+```js
+const result = await channel.send({
+  type: 'broadcast',
+  event: 'cursor-move',
+  payload: { x: 340, y: 120 },
+})
+
+// result is 'ok' if the server received it
+```
+
+This is useful when delivery matters — like in a turn-based game where you need to know an action was received before proceeding.
+
+## Throttling high-frequency events
+
+Some events happen very frequently — cursor movements fire on every mouse move, potentially dozens of times per second. Sending every single event can hit rate limits and waste bandwidth for small movements that aren't visually meaningful.
+
+A good practice is to throttle or debounce before sending:
+
+```js
+let lastSent = 0
+
+function handleMouseMove(e) {
+  const now = Date.now()
+  if (now - lastSent < 50) return // max ~20 events/second
+  lastSent = now
+
+  channel.send({
+    type: 'broadcast',
+    event: 'cursor-move',
+    payload: { x: e.clientX, y: e.clientY },
+  })
+}
+```
+
+20 events per second is more than enough for smooth cursor tracking. Adjust the interval based on how frequently the data meaningfully changes.
+
+## Use cases
+
+Broadcast works best for data that is:
+
+- **Ephemeral** — you don't need to store it
+- **Frequent** — it changes often enough that polling isn't practical
+- **Multi-user** — multiple clients need to see the same updates
+
+Common examples:
+
+- **Typing indicators** — show "Alice is typing..." in a chat
+- **Cursor positions** — show other users' cursors in a collaborative tool
+- **Live reactions** — emoji reactions that appear and fade during a livestream
+- **Game state** — player positions, actions, and scores in a multiplayer game
+
+For anything that needs to be persisted (chat messages, document edits, scores), use a database write and subscribe with Database Changes instead. Broadcast is for the live, in-the-moment stuff.

@@ -1,0 +1,104 @@
+---
+title: Security Considerations
+description: Rate limiting, token storage, and audit logging
+---
+
+Authentication gives your app the ability to identify users, but there's more to security than just signing people in. This chapter covers the things that are easy to overlook — protecting against abuse, storing tokens safely, handling OAuth securely, and keeping a record of what's happening in your system.
+
+## Rate limiting and bot protection
+
+Authentication endpoints are a target for abuse. Bots can try to brute-force passwords, spam sign-up emails, or flood your magic link endpoint. Supabase applies built-in rate limits to auth endpoints to mitigate this, but there are additional steps you can take.
+
+### Built-in rate limits
+
+Supabase rate limits authentication requests by default. If a single IP sends too many sign-in attempts, sign-up requests, or OTP requests in a short window, subsequent requests are temporarily blocked. You can view and adjust these limits in the Dashboard under **Authentication > Rate Limits**.
+
+The defaults are sensible for most apps, but if you're seeing legitimate users get blocked (for example, in a corporate environment where many users share an IP), you may need to adjust them.
+
+### CAPTCHA
+
+For public-facing sign-up and sign-in forms, adding a CAPTCHA is one of the most effective ways to stop automated abuse. Supabase has built-in support for hCaptcha and Cloudflare Turnstile.
+
+You enable CAPTCHA in the Dashboard under **Authentication > Bot and Abuse Protection**, then include the CAPTCHA token when calling auth methods:
+
+```js
+const { error } = await supabase.auth.signUp({
+  email: 'user@example.com',
+  password: 'their-password',
+  options: {
+    captchaToken: token, // from your CAPTCHA widget
+  },
+})
+```
+
+CAPTCHA is especially worth enabling on sign-up and password reset endpoints, since those trigger emails — and email abuse can affect your sender reputation.
+
+## Secure token storage
+
+When a user signs in, Supabase returns an access token and a refresh token. How you store these matters, because a stolen token means someone else can act as that user.
+
+### Browser apps
+
+The Supabase client library stores the session in `localStorage` by default. This is simple and works across page refreshes, but `localStorage` is accessible to any JavaScript running on the page — including third-party scripts. For most apps this is fine, but if you're concerned about XSS (cross-site scripting) attacks, there are a couple of things to keep in mind:
+
+- **Sanitize user input** — XSS is the real risk here. If an attacker can inject JavaScript into your page, they can read `localStorage`. The best defense is preventing XSS in the first place.
+- **Use a server-side approach** — for apps with strict security requirements, you can handle authentication on the server and store tokens in HTTP-only cookies, which aren't accessible to client-side JavaScript. The Supabase SSR package (`@supabase/ssr`) supports this pattern.
+
+### Server-rendered apps
+
+If your app uses server-side rendering (Next.js, SvelteKit, Nuxt, etc.), the recommended approach is to use the `@supabase/ssr` package. This stores the session in cookies rather than `localStorage`, which means:
+
+- The token is sent with every request to your server automatically
+- You can use HTTP-only cookies to prevent client-side JavaScript from accessing the token
+- The session is available during server-side rendering, so you can check authentication before the page loads
+
+### Mobile apps
+
+On mobile, the Supabase client libraries use the platform's secure storage by default — Keychain on iOS and Keystore on Android. These are encrypted storage systems managed by the operating system and are significantly more secure than plain storage.
+
+## Audit logging
+
+For apps that handle sensitive data or need to meet compliance requirements, keeping a record of authentication events is important. Supabase provides several levels of visibility into what's happening.
+
+### Auth logs in the Dashboard
+
+The Dashboard shows authentication logs under **Authentication > Logs**. You can see sign-in attempts (successful and failed), sign-ups, password resets, and other auth events. This is useful for debugging issues ("why can't this user sign in?") and for spotting suspicious patterns (many failed attempts for the same email).
+
+### Postgres audit trails
+
+Since Supabase Auth stores its data in your Postgres database, you can build your own audit trail using database triggers. For example, you could log every time a user's email changes or a new session is created:
+
+```sql
+create table public.auth_audit_log (
+  id bigint generated always as identity primary key,
+  event_type text not null,
+  user_id uuid references auth.users(id),
+  metadata jsonb,
+  created_at timestamptz default now()
+);
+```
+
+Then create triggers on the relevant `auth` tables to capture changes. This gives you a permanent, queryable record of authentication events that you control.
+
+### What to log
+
+Not every auth event needs to be logged. Focus on the ones that matter for security and compliance:
+
+- **Failed sign-in attempts** — can indicate brute-force attacks or a user who needs help
+- **Password changes and resets** — important for account security audits
+- **Email or phone changes** — could indicate account takeover if the user didn't initiate it
+- **MFA enrollment and unenrollment** — changes to security posture
+- **Admin actions** — any time the Secret Key is used to modify a user
+
+## A security checklist
+
+Here's a quick checklist of things to verify before going to production:
+
+- **RLS is enabled** on every table that contains user data
+- **The Secret Key** is only used in server-side code, never exposed to the client
+- **Email confirmation** is turned on so users verify their email before gaining access
+- **CAPTCHA** is enabled on sign-up and password reset forms
+- **Redirect URLs** are configured to only allow your actual domains (not `localhost` in production)
+- **Password minimum length** is set to something reasonable (8+ characters)
+- **Rate limits** are reviewed and appropriate for your expected traffic
+- **Custom SMTP** is configured so emails come from your domain and aren't rate-limited by the default sender

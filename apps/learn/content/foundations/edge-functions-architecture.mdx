@@ -1,0 +1,133 @@
+---
+title: Edge Functions Fundamentals
+description: What Edge Functions are, how to create them, and how to deploy them
+---
+
+Supabase gives you a database, auth, storage, and real-time subscriptions — but it doesn't give you a server. There's no Node.js process running somewhere that you can SSH into and run custom code on. For most apps this is fine — the client library and RLS handle data access, and the database handles logic with functions and triggers. But sometimes you need a trusted server-side environment: calling a third-party API with a secret key, processing a webhook, validating a payment, or running logic that doesn't belong in the browser.
+
+Edge Functions fill that gap. They're server-side functions that run on Deno, a modern JavaScript and TypeScript runtime. You write your code, deploy it with the Supabase CLI, and it runs globally — close to your users for low latency. No server to manage, no infrastructure to configure.
+
+Because Edge Functions are part of the Supabase ecosystem, they have built-in access to everything else in your project. You can query your database, read and write files in Storage, manage users through Auth, and use the full Supabase client library — all with your project's URL and keys available automatically as environment variables. They're a first-class part of the platform.
+
+A basic Edge Function looks like this:
+
+```ts
+Deno.serve(async (req) => {
+  const { name } = await req.json()
+
+  return new Response(JSON.stringify({ message: `Hello, ${name}!` }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+That's a complete function. It receives an HTTP request, does something with it, and returns a response. No framework, no boilerplate — just a request handler.
+
+## Creating a function
+
+Use the Supabase CLI to create a new function:
+
+```bash
+supabase functions new hello-world
+```
+
+This creates a file at `supabase/functions/hello-world/index.ts`. Each function lives in its own folder under `supabase/functions/`.
+
+## Local development
+
+You can run Edge Functions locally alongside your local Supabase stack:
+
+```bash
+supabase functions serve
+```
+
+This starts a local server that watches for changes and reloads automatically. Your functions are available at `http://localhost:54321/functions/v1/function-name`.
+
+To test a function:
+
+```bash
+curl -i --location --request POST 'http://localhost:54321/functions/v1/hello-world' \
+  --header 'Authorization: Bearer your-publishable-key' \
+  --header 'Content-Type: application/json' \
+  --data '{"name": "World"}'
+```
+
+Or call it from your app using the Supabase client:
+
+```js
+const { data, error } = await supabase.functions.invoke('hello-world', {
+  body: { name: 'World' },
+})
+```
+
+The client library automatically includes the user's auth token, so the function knows who's calling it.
+
+## Environment variables and secrets
+
+Edge Functions need secrets for things like API keys. You set them with the CLI:
+
+```bash
+supabase secrets set STRIPE_SECRET_KEY=sk_live_...
+```
+
+Then access them in your function:
+
+```ts
+const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
+```
+
+For local development, create a `.env` file in your `supabase` directory:
+
+```
+STRIPE_SECRET_KEY=sk_test_...
+```
+
+Secrets are encrypted and only available to your functions at runtime. Never hardcode secrets in your function code.
+
+Your Supabase project URL and keys are available automatically — you don't need to set them as secrets:
+
+```ts
+const supabaseUrl = Deno.env.get('SUPABASE_URL')
+const supabasePublishableKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY')
+const supabaseSecretKey = Deno.env.get('SUPABASE_SECRET_KEY')
+```
+
+## Deploying
+
+Deploy a function with:
+
+```bash
+supabase functions deploy hello-world
+```
+
+This uploads your function to Supabase's infrastructure. Once deployed, it's available at `https://your-project.supabase.co/functions/v1/hello-world`.
+
+To deploy all functions at once:
+
+```bash
+supabase functions deploy
+```
+
+## Deno and imports
+
+Since Edge Functions run on Deno (not Node.js), imports work a bit differently. You import from URLs or use npm specifiers:
+
+```ts
+// Import from npm
+
+// Import from the Deno standard library
+import { crypto } from 'jsr:@std/crypto'
+import Stripe from 'npm:stripe@17'
+```
+
+If you know JavaScript or TypeScript, you already know how to write Edge Functions — Deno uses the same language, the same syntax, and most npm packages work without changes. You don't need to learn a new ecosystem.
+
+## Resource limits
+
+Edge Functions have some limits to be aware of:
+
+- **Timeout** — functions have a maximum execution time (default is 60 seconds). For long-running tasks, consider breaking the work into smaller chunks or using a background job pattern.
+- **Memory** — there's a memory limit per function invocation. This is generous for most use cases but can matter if you're processing large files or datasets in memory.
+- **Payload size** — request and response bodies have size limits. For large file uploads, consider uploading directly to Storage instead of passing through a function.
+
+These limits are designed for request-response workloads — an incoming request, some processing, and a response. Edge Functions aren't meant for long-running background processes.

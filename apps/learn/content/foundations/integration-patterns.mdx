@@ -1,0 +1,208 @@
+---
+title: Integration Patterns
+description: Common storage implementation patterns
+---
+
+This chapter walks through a few common patterns for integrating Supabase Storage into your app. Each one combines concepts from the previous chapters — buckets, RLS policies, file operations, and image transformations — into a practical implementation.
+
+## User avatars
+
+Avatars are one of the most common uses for Storage. The pattern is straightforward: one public bucket, one file per user, overwritten when they update their photo.
+
+### Setup
+
+Create a public bucket and add policies:
+
+```sql
+-- Allow anyone to view avatars
+create policy "Avatars are publicly viewable"
+on storage.objects for select
+using (bucket_id = 'avatars');
+
+-- Users can upload and update their own avatar
+create policy "Users can upload their own avatar"
+on storage.objects for insert
+with check (
+  bucket_id = 'avatars'
+  and (select auth.uid())::text = (storage.foldername(name))[1]
+);
+
+create policy "Users can update their own avatar"
+on storage.objects for update
+using (
+  bucket_id = 'avatars'
+  and (select auth.uid())::text = (storage.foldername(name))[1]
+);
+```
+
+### Upload
+
+Store each avatar at a predictable path using the user's ID:
+
+```js
+const { error } = await supabase.storage
+  .from('avatars')
+  .upload(`${user.id}/avatar.jpg`, file, {
+    upsert: true,
+  })
+```
+
+Using `upsert: true` means uploading a new photo replaces the old one. Using a consistent filename like `avatar.jpg` means you always know the path without querying.
+
+### Display
+
+Since the bucket is public and the path is predictable, you can build the URL without a database query:
+
+```js
+const { data } = supabase.storage
+  .from('avatars')
+  .getPublicUrl(`${user.id}/avatar.jpg`, {
+    transform: { width: 100, height: 100 },
+  })
+```
+
+You can store the avatar URL in your `profiles` table too, which makes it easy to include in queries that return user data.
+
+## Document management
+
+For apps that handle user documents — invoices, contracts, exports — you need a private bucket with per-user access.
+
+### Setup
+
+Create a private bucket with user-scoped policies:
+
+```sql
+create policy "Users can manage their own documents"
+on storage.objects for select
+using (
+  bucket_id = 'documents'
+  and (select auth.uid())::text = (storage.foldername(name))[1]
+);
+
+create policy "Users can upload documents"
+on storage.objects for insert
+with check (
+  bucket_id = 'documents'
+  and (select auth.uid())::text = (storage.foldername(name))[1]
+);
+
+create policy "Users can delete their own documents"
+on storage.objects for delete
+using (
+  bucket_id = 'documents'
+  and (select auth.uid())::text = (storage.foldername(name))[1]
+);
+```
+
+### Tracking files in the database
+
+For documents, you'll usually want to track metadata in your own table — the original filename, a description, who uploaded it, and when:
+
+```sql
+create table public.documents (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  storage_path text not null,
+  original_filename text not null,
+  description text,
+  created_at timestamptz default now()
+);
+```
+
+When a user uploads a file, you store both the file and a database record:
+
+```js
+const storagePath = `${user.id}/${crypto.randomUUID()}-${file.name}`
+
+const { error: uploadError } = await supabase.storage
+  .from('documents')
+  .upload(storagePath, file)
+
+const { error: dbError } = await supabase
+  .from('documents')
+  .insert({
+    user_id: user.id,
+    storage_path: storagePath,
+    original_filename: file.name,
+    description: 'Quarterly report',
+  })
+```
+
+Using a UUID in the storage path avoids collisions if a user uploads multiple files with the same name.
+
+### Serving private files
+
+When a user wants to view or download a document, generate a signed URL:
+
+```js
+const { data } = await supabase.storage
+  .from('documents')
+  .createSignedUrl(document.storage_path, 3600)
+```
+
+## Media galleries
+
+For apps that display collections of images — product photos, portfolios, social media — you need to handle uploads, generate thumbnails, and display grids efficiently.
+
+### Upload with organized paths
+
+Organize by entity (a project, album, or post) so files are grouped logically:
+
+```js
+const path = `${projectId}/${crypto.randomUUID()}.jpg`
+
+const { error } = await supabase.storage
+  .from('media')
+  .upload(path, file)
+```
+
+### Thumbnail grids
+
+Use image transformations to serve thumbnails for the grid and full-size images when a user clicks through:
+
+```js
+// Thumbnail for the grid
+const thumb = supabase.storage
+  .from('media')
+  .getPublicUrl(path, {
+    transform: { width: 300, height: 300 },
+  })
+
+// Full size for the detail view
+const full = supabase.storage
+  .from('media')
+  .getPublicUrl(path)
+```
+
+### Listing a gallery
+
+Combine a database query (for metadata and ordering) with storage URLs:
+
+```js
+const { data: photos } = await supabase
+  .from('photos')
+  .select('id, storage_path, caption, created_at')
+  .eq('album_id', albumId)
+  .order('created_at', { ascending: false })
+
+const gallery = photos.map((photo) => ({
+  ...photo,
+  thumbnailUrl: supabase.storage
+    .from('media')
+    .getPublicUrl(photo.storage_path, {
+      transform: { width: 300, height: 300 },
+    }).data.publicUrl,
+}))
+```
+
+## A general pattern
+
+Across all these examples, the same structure repeats:
+
+1. **Create a bucket** with the right visibility (public or private)
+2. **Write RLS policies** that match your folder structure to user identity
+3. **Upload files** to predictable paths based on user ID or entity ID
+4. **Track metadata** in a database table when you need to query, search, or display file information
+5. **Serve files** with public URLs or signed URLs, using image transformations when needed
+
+Start with this pattern and adjust as your app's needs evolve.

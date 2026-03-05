@@ -1,0 +1,93 @@
+---
+title: Client Considerations
+description: Sizing, cost, SLAs, and compliance
+---
+
+This chapter covers the operational side of running a Supabase project in production — choosing the right compute size, understanding costs, knowing what support is available, and meeting compliance requirements.
+
+## Compute sizing
+
+Every Supabase project runs on a dedicated compute instance that hosts your Postgres database. The size of this instance determines how many connections you can handle, how much memory is available for caching, and how fast queries execute.
+
+### Choosing a size
+
+Supabase offers several compute tiers. The right one depends on your workload:
+
+- **Starter / Micro** — fine for development, prototyping, and low-traffic apps. Limited connections and memory.
+- **Small / Medium** — good for apps with moderate traffic. Enough headroom for most production workloads.
+- **Large and above** — for high-traffic apps, large datasets, or compute-intensive queries (like vector search over millions of rows).
+
+The key metrics to watch when deciding:
+
+- **CPU usage** — if it's consistently above 70-80%, your queries are competing for processing time. Optimize queries first, then upgrade if needed.
+- **Memory** — more memory means Postgres can cache more data in shared buffers, reducing disk reads. If your dataset is much larger than your available memory, queries against uncached data will be slow.
+- **Connections** — each compute tier has a maximum number of direct connections. If you're hitting the limit, use the connection pooler before upgrading.
+
+You can change your compute size at any time in the Dashboard under **Project Settings > Compute**. Upgrades involve a brief restart.
+
+### Don't over-provision
+
+Start with a smaller instance and upgrade when you see actual bottlenecks. It's easy to go up; going down is just as easy. Paying for a large instance from day one when your app has 50 users is unnecessary.
+
+## Cost estimation
+
+Supabase pricing has a few components:
+
+- **Compute** — the database instance, billed by the hour based on the tier
+- **Storage** — database storage and file storage, billed by GB
+- **Bandwidth** — data transferred out (API responses, file downloads), billed by GB
+- **Edge Function invocations** — billed by the number of executions
+- **Realtime** — billed by peak concurrent connections and messages
+
+The free tier is generous for development and small projects. The Pro plan ($25/month) includes a base amount of compute, storage, and bandwidth that covers most apps.
+
+### Keeping costs down
+
+- **Optimize queries** — slow queries use more compute. A well-indexed query that runs in 5ms costs less than an unindexed one that runs in 500ms.
+- **Use image transformations wisely** — transformed images are cached, but the first request generates the transformation. Don't generate dozens of sizes you don't need.
+- **Clean up unused data** — old logs, expired sessions, and orphaned files take up storage.
+- **Use the connection pooler** — it lets you serve more users from a smaller compute tier by sharing connections efficiently.
+
+## Support tiers
+
+Supabase offers different levels of support depending on your plan:
+
+- **Free** — community support through GitHub Discussions and Discord
+- **Pro** — email support with standard response times
+- **Team** — priority support with faster response times
+- **Enterprise** — dedicated support with SLAs, a designated support contact, and custom agreements
+
+For production apps where downtime costs money, the Team or Enterprise plan gives you faster access to help when something goes wrong.
+
+## Compliance
+
+If your app handles sensitive data or operates in a regulated industry, you may need to meet specific compliance requirements.
+
+### SOC 2
+
+Supabase is SOC 2 Type II certified, which means an independent auditor has verified that Supabase has controls in place for security, availability, and confidentiality. If your customers ask whether your infrastructure is SOC 2 compliant, it is.
+
+### HIPAA
+
+For apps that handle protected health information (PHI) in the US, Supabase offers HIPAA compliance on the Team and Enterprise plans. This includes a Business Associate Agreement (BAA) and additional safeguards for data handling.
+
+### GDPR
+
+Supabase is GDPR compliant for handling data of EU residents. Supabase provides a Data Processing Agreement (DPA) and supports data residency in the EU (you can choose an EU region when creating your project).
+
+For your app to be GDPR compliant, you also need to handle user data correctly on your side — providing data export on request, honoring deletion requests, and being transparent about data usage.
+
+### Data residency
+
+When you create a Supabase project, you choose a region. Your database and stored files live in that region. If you have data residency requirements (data must stay in the EU, or in the US), choose the appropriate region at project creation.
+
+Available regions span North America, Europe, Asia Pacific, and South America. Check the Dashboard for the current list.
+
+## Planning for growth
+
+A few things to think about as your app scales:
+
+- **Start on the Pro plan** before you have real users. The free tier has limitations (pausing after inactivity, no backups) that aren't appropriate for production.
+- **Monitor before optimizing** — don't guess where bottlenecks are. Use the Dashboard metrics, slow query logs, and EXPLAIN ANALYZE.
+- **Scale compute vertically first** — upgrading your instance is the simplest way to handle more load. Add read replicas when vertical scaling isn't enough.
+- **Keep your team informed** — make sure everyone knows how to check the Dashboard, read logs, and restore from a backup. Don't let this knowledge live with one person.

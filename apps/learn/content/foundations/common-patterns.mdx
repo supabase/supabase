@@ -1,0 +1,209 @@
+---
+title: Edge Functions Patterns
+description: Database access, webhooks, CORS, and common use cases
+---
+
+This chapter covers the patterns you'll use most often with Edge Functions — connecting to your database, handling webhooks, dealing with CORS, and managing errors.
+
+## Connecting to your database
+
+Inside an Edge Function, you create a Supabase client just like you would in your app. The connection details are available as environment variables:
+
+```ts
+import { createClient } from 'npm:@supabase/supabase-js@2'
+
+Deno.serve(async (req) => {
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!)
+
+  const { data, error } = await supabase.from('todos').select('*')
+
+  return new Response(JSON.stringify(data), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+### Acting as the calling user
+
+If the function is called by a signed-in user, you can pass their auth token to the Supabase client so the query respects RLS:
+
+```ts
+Deno.serve(async (req) => {
+  const authHeader = req.headers.get('Authorization')
+
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!, {
+    global: { headers: { Authorization: authHeader! } },
+  })
+
+  // This query respects RLS — only returns the user's own data
+  const { data } = await supabase.from('todos').select('*')
+
+  return new Response(JSON.stringify(data), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+When you call a function with `supabase.functions.invoke()`, the client library includes the auth header automatically.
+
+### Using the Secret Key
+
+For operations that need to bypass RLS — like admin tasks or processing webhooks where there's no user context — use the Secret Key:
+
+```ts
+const supabaseAdmin = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_SECRET_KEY')!
+)
+
+// This bypasses RLS
+const { data } = await supabaseAdmin.from('users').select('*')
+```
+
+Use this sparingly and only when you genuinely need elevated access.
+
+## Webhook receivers
+
+Edge Functions are a natural fit for receiving webhooks from third-party services. You point the service at your function's URL — `https://your-project.supabase.co/functions/v1/your-function` — and it sends events there. The function receives the webhook payload, verifies it, and processes it.
+
+### Stripe webhook example
+
+```ts
+import Stripe from 'npm:stripe@17'
+
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
+const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')!
+
+Deno.serve(async (req) => {
+  const body = await req.text()
+  const signature = req.headers.get('stripe-signature')!
+
+  // Verify the webhook came from Stripe
+  const event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
+
+  // Handle the event
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object
+      // Update your database, send a confirmation email, etc.
+      break
+    }
+  }
+
+  return new Response(JSON.stringify({ received: true }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+The key parts: read the raw body, verify the signature (so you know it actually came from Stripe), then process the event. This pattern works for any service that sends webhooks — GitHub, Resend, Clerk, etc.
+
+### Generic webhook pattern
+
+For services without a verification library, you can verify a shared secret:
+
+```ts
+Deno.serve(async (req) => {
+  const secret = req.headers.get('x-webhook-secret')
+  if (secret !== Deno.env.get('WEBHOOK_SECRET')) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
+  const payload = await req.json()
+  // Process the webhook...
+
+  return new Response('OK')
+})
+```
+
+## Scheduled tasks
+
+You can trigger Edge Functions on a schedule using `pg_cron` and `pg_net` in your database. This is useful for periodic tasks like sending digest emails, cleaning up old data, or syncing with external services.
+
+```sql
+select cron.schedule(
+  'daily-cleanup',
+  '0 3 * * *', -- every day at 3am UTC
+  $$
+  select net.http_post(
+    url := 'https://your-project.supabase.co/functions/v1/daily-cleanup',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key')
+    )
+  );
+  $$
+);
+```
+
+The database calls your function on a cron schedule. The function does its work and returns a response.
+
+## CORS handling
+
+If your Edge Function is called from a browser (not through the Supabase client library), you need to handle CORS. Browsers send a preflight `OPTIONS` request before the actual request, and your function needs to respond to both.
+
+```ts
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+Deno.serve(async (req) => {
+  // Handle preflight request
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  // Your actual logic
+  const data = { message: 'Hello' }
+
+  return new Response(JSON.stringify(data), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+})
+```
+
+If you're only calling functions through `supabase.functions.invoke()`, you don't need to worry about CORS — the client library handles it.
+
+## Error handling
+
+A good practice is to wrap your function logic in a try/catch and return meaningful error responses:
+
+```ts
+Deno.serve(async (req) => {
+  try {
+    const { email } = await req.json()
+
+    if (!email) {
+      return new Response(JSON.stringify({ error: 'Email is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Do something...
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (err) {
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+})
+```
+
+Return appropriate HTTP status codes — `400` for bad input, `401` for unauthorized, `500` for unexpected errors. This makes it easier to handle errors on the client side.
+
+## When to use an Edge Function
+
+Edge Functions are the right tool when you need:
+
+- **Secret access** — calling a third-party API that requires a key you can't expose to the browser
+- **Webhook handling** — receiving and processing events from external services
+- **Server-side validation** — enforcing business logic that shouldn't be bypassable from the client
+- **Data transformation** — aggregating data from multiple sources before returning it to the client
+- **Scheduled tasks** — running periodic jobs triggered by a cron schedule
+
+For simple data access that RLS can protect, you don't need an Edge Function — the client library and RLS policies handle it. Edge Functions are for the cases where you need server-side logic.

@@ -1,0 +1,224 @@
+---
+title: Schema Design for Supabase
+description: Table design patterns, relationships, and schema organization
+---
+
+Your database schema is the foundation of everything else in Supabase — your auto-generated APIs, Row Level Security policies, Realtime subscriptions, and client queries all flow directly from how you design your tables. Getting this right early saves you significant refactoring later.
+
+## Thinking in tables
+
+A relational database stores data in tables — rows and columns, like a spreadsheet with strict rules. Each table represents one type of thing (users, posts, projects), and you connect them using relationships. The power of this approach is **enforced consistency**. You can tell Postgres that every post must have a title, or that every post must belong to a real user — and the database will reject any data that breaks those rules. You define the rules once in your schema, and the database handles the rest.
+
+The general principle: **store each type of thing in its own table, and use relationships to connect them**. A blog post and its author are separate things — they get separate tables. The way you connect them is with a **foreign key** — a column in one table that points to a row in another. For example, a `posts` table might have a `user_id` column that points to the `users` table. That's the foreign key, and it's how Postgres knows which user wrote which post.
+
+## Choosing primary keys
+
+Every table needs a primary key. In Supabase, you'll typically choose between two approaches:
+
+### Auto-incrementing identity columns
+
+```sql
+create table todos (
+  id bigint primary key generated always as identity,
+  title text not null,
+  is_complete boolean default false,
+  created_at timestamptz default now()
+);
+```
+
+Identity columns are simple, readable, and great for internal data. The `generated always as identity` syntax tells Postgres to handle the values automatically — you never set them yourself.
+
+### UUIDs
+
+```sql
+create table profiles (
+  id uuid primary key default gen_random_uuid(),
+  display_name text,
+  avatar_url text
+);
+```
+
+UUIDs are useful when you need IDs that are globally unique across systems, or when you don't want sequential IDs exposed in URLs (since sequential IDs make it easy to guess other records). They also work well in distributed systems and when merging data from multiple sources.
+
+**Which should you use?** For most Supabase apps, either works fine. UUIDs are the more common choice because they pair naturally with `auth.users`, which uses UUIDs for user IDs. If you're referencing users in your tables (and you almost certainly are), UUIDs keep things consistent.
+
+## Modeling relationships
+
+### One-to-many
+
+The most common relationship. A user has many posts. A project has many tasks. You model this by adding a foreign key column to the "many" side:
+
+```sql
+create table posts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users (id)
+    on delete cascade not null,
+  title text not null,
+  body text,
+  created_at timestamptz default now()
+);
+```
+
+The `references auth.users(id)` part creates a foreign key — Postgres won't let you insert a post with a `user_id` that doesn't exist in `auth.users`. The `on delete cascade` means if a user is deleted, their posts are automatically removed too.
+
+Other `on delete` options:
+
+- `on delete restrict` — prevent deleting the parent if children exist
+- `on delete set null` — set the foreign key to `null` when the parent is deleted
+- `on delete set default` — set the foreign key to its default value
+
+Choose based on your domain. Cascade is common for owned data (user's posts), restrict for referenced data (an order's product), and set null when the relationship is optional.
+
+### One-to-one
+
+Sometimes a record has exactly one related record. A common pattern in Supabase is a `profiles` table that extends `auth.users`:
+
+```sql
+create table profiles (
+  id uuid primary key references auth.users (id)
+    on delete cascade,
+  display_name text,
+  bio text,
+  avatar_url text
+);
+```
+
+Here the `id` is both the primary key and a foreign key to `auth.users`. This guarantees a one-to-one relationship — each profile belongs to exactly one user, and the profile uses the same ID as the user.
+
+### Many-to-many
+
+When records on both sides can relate to multiple records on the other side, you need a **join table**. For example, users can belong to many organizations, and organizations can have many users:
+
+```sql
+create table organizations (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  created_at timestamptz default now()
+);
+
+create table organization_members (
+  user_id uuid references auth.users (id)
+    on delete cascade,
+  organization_id uuid references organizations (id)
+    on delete cascade,
+  role text not null default 'member',
+  joined_at timestamptz default now(),
+  primary key (user_id, organization_id)
+);
+```
+
+The join table `organization_members` has a composite primary key — the combination of `user_id` and `organization_id` must be unique, which prevents duplicate memberships. The join table is also a great place to store metadata about the relationship itself, like the user's `role` within the organization.
+
+## Choosing data types
+
+Choosing the right column type matters — it affects validation, storage, and what you can do in queries. For a full guide to the types you'll use most often (`text`, `integer`, `boolean`, `timestamptz`, `uuid`, `jsonb`, arrays, and more), see [Essential Postgres Data Types](/foundations/essential-postgres-data-types).
+
+## Defaults and constraints
+
+Good defaults and constraints reduce the amount of validation you need in application code:
+
+```sql
+create table projects (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  slug text not null unique,
+  is_archived boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+```
+
+- `not null` — prevents missing data at the database level
+- `default` — provides sensible values so inserts can omit columns
+- `unique` — enforces uniqueness (like a slug or email)
+- `check` — validates values against a condition
+
+These constraints are enforced by Postgres regardless of how data is inserted — through the API, a migration, or a direct SQL connection. This is far more reliable than validating only in your application code.
+
+## Schema organization
+
+Supabase uses several schemas internally. Understanding them helps you stay organized:
+
+- **`public`** — your application tables live here by default. This is the schema exposed by the auto-generated REST API.
+- **`auth`** — managed by Supabase Auth. Contains `auth.users` and related session data. You can read from it (to reference users in foreign keys and RLS policies) but shouldn't write to it directly.
+- **`storage`** — managed by Supabase Storage. Contains bucket and object metadata.
+- **`extensions`** — a good place to install Postgres extensions to keep your `public` schema clean.
+
+### Custom schemas
+
+For larger applications, you might create additional schemas to organize internal or admin logic:
+
+```sql
+create schema if not exists private;
+
+create table private.internal_settings (
+  key text primary key,
+  value jsonb not null
+);
+```
+
+Tables in custom schemas are **not** automatically exposed through the auto-generated REST API by default, which makes them useful for data that should only be accessed server-side. You can expose additional schemas through the API if needed in your project's API settings.
+
+If you're just starting, you can ignore this section and just use the `public` schema for your tables.
+
+## Indexes
+
+Imagine a 600-page cookbook. You want to make pancakes and need to find the recipe. You could start at page 1 and flip through every recipe until you eventually find it. That works, but it's slow, and the bigger the book gets, the longer it takes. Instead, you go to the back of the book and check the index, which tells you "Pancakes → page 248," and you jump straight to the recipe. The index doesn't contain the recipe itself — it only tells you where the recipe lives.
+
+A database works the same way. Without an index, the database reads every row looking for matches. With an index, the database jumps directly to the matching rows. An index is not your data; it's a shortcut to your data, and the larger the table becomes, the more valuable that shortcut gets.
+
+Postgres creates indexes automatically for primary keys and unique constraints. For other queries, you may need to add indexes manually to keep things fast as your data grows.
+
+```sql
+-- Speed up lookups by user
+create index on posts (user_id);
+
+-- Speed up filtering by status
+create index on tasks (status);
+
+-- Speed up text search
+create index on posts using gin (to_tsvector('english', title || ' ' || body));
+```
+
+A good rule of thumb: if you frequently filter or sort on a column, it probably needs an index. But don't index everything — each index Postgres maintains must also be updated on inserts and updates, which can cause performance issues later. Start simple and add indexes when you notice slow queries in the Dashboard's Query Performance view.
+
+## A practical example
+
+Here's a schema for a simple project management app that brings together the patterns from this page:
+
+```sql
+-- Users extend auth.users with a profile
+create table profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  display_name text,
+  avatar_url text
+);
+
+-- Projects belong to a user
+create table projects (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid references auth.users(id) on delete cascade not null,
+  name text not null,
+  slug text not null unique,
+  created_at timestamptz not null default now()
+);
+
+-- Tasks belong to a project, optionally assigned to a user
+create table tasks (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid references projects(id) on delete cascade not null,
+  assigned_to uuid references auth.users(id) on delete set null,
+  title text not null,
+  status text not null default 'todo'
+    check (status in ('todo', 'in_progress', 'done')),
+  created_at timestamptz not null default now()
+);
+
+-- Index the columns we know we'll filter or sort on
+create index on projects (owner_id);
+create index on tasks (project_id);
+create index on tasks (assigned_to);
+create index on tasks (status);
+```
+
+This gives you a clean, normalized schema with enforced relationships, sensible defaults, and indexes on the columns you'll query most. From here, you'd add RLS policies to control access and start querying through the auto-generated API.

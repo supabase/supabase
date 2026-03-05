@@ -156,7 +156,7 @@ export const Doc = defineDocumentType(() => ({
   computedFields,
 }))
 
-export default makeSource({
+const config = makeSource({
   contentDirPath: './content',
   documentTypes: [Doc],
   mdx: {
@@ -252,3 +252,5 @@ export default makeSource({
     ],
   },
 })
+
+export { config as default }

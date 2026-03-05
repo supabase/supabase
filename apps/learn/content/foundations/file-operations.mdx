@@ -1,0 +1,184 @@
+---
+title: File Operations
+description: Upload, download, and file management
+---
+
+This chapter covers the day-to-day operations you'll perform with Supabase Storage — uploading files, downloading them, listing contents, and managing file metadata.
+
+## Uploading files
+
+### Standard upload
+
+The simplest way to upload a file:
+
+```js
+const { data, error } = await supabase.storage
+  .from('documents')
+  .upload('reports/quarterly.pdf', file)
+```
+
+The first argument is the path (including any folder structure), and the second is the file itself — a `File` object from an input element, a `Blob`, or a `Buffer` in Node.js.
+
+By default, if a file already exists at that path, the upload fails. You can overwrite it by passing `upsert: true`:
+
+```js
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .upload('user-123/profile.jpg', file, {
+    upsert: true,
+  })
+```
+
+### Setting content type
+
+Supabase infers the MIME type from the file, but you can set it explicitly:
+
+```js
+const { data, error } = await supabase.storage
+  .from('documents')
+  .upload('data/export.csv', file, {
+    contentType: 'text/csv',
+  })
+```
+
+This matters for how the browser handles the file when it's downloaded — whether it displays it inline or triggers a download.
+
+### Resumable uploads
+
+For large files, standard uploads can be unreliable — a dropped connection means starting over. Resumable uploads solve this by breaking the file into chunks and tracking progress. If the connection drops, the upload picks up where it left off.
+
+```js
+const { data, error } = await supabase.storage
+  .from('videos')
+  .upload('user-123/recording.mp4', file, {
+    duplex: 'half',
+  })
+```
+
+Supabase uses the TUS protocol for resumable uploads. This is handled by the client library — you don't need to implement the protocol yourself. Resumable uploads are especially useful for files over 6MB or in mobile environments where connections are less stable.
+
+### Uploading from a form
+
+A typical file upload from an HTML form:
+
+```js
+const fileInput = document.getElementById('file-input')
+const file = fileInput.files[0]
+
+const { data, error } = await supabase.storage
+  .from('uploads')
+  .upload(`${user.id}/${file.name}`, file)
+```
+
+Using the user's ID as a folder prefix keeps files organized and makes it easy to write RLS policies based on the path.
+
+## Downloading files
+
+### Direct download
+
+```js
+const { data, error } = await supabase.storage
+  .from('documents')
+  .download('reports/quarterly.pdf')
+```
+
+This returns the file as a `Blob`. You can create a download link from it:
+
+```js
+const url = URL.createObjectURL(data)
+const a = document.createElement('a')
+a.href = url
+a.download = 'quarterly.pdf'
+a.click()
+```
+
+### Serving files with URLs
+
+For most cases, you'll serve files via URLs rather than downloading them in JavaScript. Public files have permanent URLs, and private files use signed URLs:
+
+```js
+// Public file
+const { data } = supabase.storage
+  .from('avatars')
+  .getPublicUrl('user-123/profile.jpg')
+
+// Private file (temporary URL)
+const { data } = await supabase.storage
+  .from('documents')
+  .createSignedUrl('reports/quarterly.pdf', 3600)
+```
+
+Both return a URL you can use in `<img>` tags, `<a>` links, or anywhere else.
+
+## Listing files
+
+You can list the contents of a bucket or folder:
+
+```js
+const { data, error } = await supabase.storage
+  .from('documents')
+  .list('reports')
+```
+
+This returns an array of objects with metadata like `name`, `id`, `created_at`, and `metadata`. You can use options to control the results:
+
+```js
+const { data, error } = await supabase.storage
+  .from('documents')
+  .list('reports', {
+    limit: 20,
+    offset: 0,
+    sortBy: { column: 'created_at', order: 'desc' },
+  })
+```
+
+The `list` method only returns files at the specified path level — it doesn't recurse into subfolders. Subfolders appear as items with `id: null` in the results, so you can build a file browser by listing each level as the user navigates.
+
+## Moving and copying files
+
+You can move a file to a new path (effectively renaming it):
+
+```js
+const { error } = await supabase.storage
+  .from('documents')
+  .move('old-path/file.pdf', 'new-path/file.pdf')
+```
+
+Or copy it:
+
+```js
+const { error } = await supabase.storage
+  .from('documents')
+  .copy('original/file.pdf', 'backup/file.pdf')
+```
+
+Both work within the same bucket. Moving a file changes its path; copying creates a duplicate.
+
+## Deleting files
+
+Delete a single file or multiple files at once:
+
+```js
+// Single file
+const { error } = await supabase.storage
+  .from('documents')
+  .remove(['reports/quarterly.pdf'])
+
+// Multiple files
+const { error } = await supabase.storage
+  .from('documents')
+  .remove(['file1.pdf', 'file2.pdf', 'file3.pdf'])
+```
+
+The `remove` method always takes an array, even for a single file. Deleting a file is permanent — there's no trash or undo.
+
+## Folder organization
+
+Since folders are just part of the file path, you have flexibility in how you organize things. A few common patterns:
+
+- **By user** — `{user_id}/filename.jpg` — simple, works well with RLS policies
+- **By user and type** — `{user_id}/avatars/profile.jpg`, `{user_id}/documents/resume.pdf`
+- **By date** — `2024/03/15/upload.jpg` — useful for media or logs
+- **By entity** — `projects/{project_id}/assets/logo.png` — ties files to your data model
+
+Pick a structure that matches how you'll query and control access. The path is what your RLS policies will check, so keep it predictable.

@@ -1,0 +1,239 @@
+---
+title: Essential Postgres Data Types
+description: Standard types, JSON/JSONB, arrays, and UUIDs
+---
+
+Every column in a Postgres table has a **data type** — it tells the database what kind of value to expect. Choosing the right type means Postgres can validate your data, store it efficiently, and give you useful operations for querying it.
+
+This page covers the ones you'll use in the vast majority of Supabase applications.
+
+## Text
+
+Use `text` for any string data — names, titles, descriptions, URLs, long-form content. Postgres handles text of any length efficiently, so there's no need to worry about setting a character limit in most cases.
+
+```sql
+create table posts (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  body text,
+  url text
+);
+```
+
+You might see `varchar(255)` in tutorials or other databases. In Postgres, `text` and `varchar` perform identically — `text` is just simpler because you don't need to pick an arbitrary length.
+
+## Numbers
+
+Postgres has several numeric types. Here are the ones you'll use most:
+
+- **`integer`** — whole numbers, up to about 2.1 billion. Good for counts, quantities, and most numeric columns.
+- **`bigint`** — whole numbers with a much larger range. Used for auto-incrementing IDs (`generated always as identity`) and anything that might exceed 2 billion.
+- **`numeric`** — exact decimal numbers. Use this for money, prices, or anything where floating point rounding would be a problem.
+- **`real`** / **`double precision`** — floating point numbers. Fine for scientific data or approximate values, but avoid them for money since they can introduce tiny rounding errors (e.g., `0.1 + 0.2` might not equal `0.3`).
+
+```sql
+create table products (
+  id bigint primary key generated always as identity,
+  name text not null,
+  quantity integer not null default 0,
+  price numeric(10, 2) not null
+);
+```
+
+The `numeric(10, 2)` means up to 10 digits total, with 2 after the decimal point — perfect for prices like `9999.99`.
+
+## Booleans
+
+A `boolean` column stores `true` or `false`. Simple and clear:
+
+```sql
+create table todos (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  is_complete boolean not null default false
+);
+```
+
+Use `not null default false` (or `default true`) so you always have a definite value rather than a confusing three-state column where `null` means "unknown."
+
+## Dates and timestamps
+
+Postgres has two main time-related types:
+
+- **`date`** — a calendar date with no time component (`2026-02-11`)
+- **`timestamptz`** — a full date and time with time zone awareness (`2026-02-11T14:30:00+00:00`)
+
+```sql
+create table events (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  event_date date not null,
+  created_at timestamptz not null default now()
+);
+```
+
+### Always use `timestamptz`, not `timestamp`
+
+This is important. Postgres has two timestamp types:
+
+- `timestamptz` (timestamp **with** time zone) — stores the value in UTC internally and converts it to the correct time zone on output
+- `timestamp` (timestamp **without** time zone) — stores the raw value with no time zone context
+
+Without the time zone, you get subtle bugs when your app server, database, and users are in different time zones. A value like `2026-02-11 14:30:00` stored without a time zone could mean different moments in time depending on who's reading it.
+
+Use `timestamptz` for everything. The `now()` function returns a `timestamptz` by default.
+
+## UUIDs
+
+A UUID (Universally Unique Identifier) is a 128-bit value that looks like `a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11`. Postgres can generate them natively:
+
+```sql
+create table profiles (
+  id uuid primary key default gen_random_uuid(),
+  display_name text,
+  avatar_url text
+);
+```
+
+The `gen_random_uuid()` function generates a new random UUID for each row. You don't need to enable any extensions — this function is built into modern Postgres.
+
+UUIDs are the most common primary key type in Supabase apps because `auth.users` uses UUIDs for user IDs. If your tables reference users (and they almost certainly will), using UUIDs for your own primary keys keeps things consistent.
+
+### UUIDs vs auto-incrementing IDs
+
+You can also use auto-incrementing integer IDs:
+
+```sql
+create table todos (
+  id bigint primary key generated always as identity,
+  title text not null
+);
+```
+
+This gives you simple, sequential IDs like 1, 2, 3. They're readable and compact, but they do reveal information — someone can guess that record 42 probably exists if they know record 41 does. UUIDs don't have this problem since they're random.
+
+For most Supabase apps, UUIDs are the better default.
+
+## JSON and JSONB
+
+Sometimes you need to store flexible or semi-structured data that doesn't fit neatly into fixed columns. Postgres has two JSON types:
+
+- **`json`** — stores JSON as raw text. Postgres validates the syntax but doesn't optimize it.
+- **`jsonb`** — stores JSON in a binary format that's faster to query and can be indexed.
+
+**Always use `jsonb`** unless you have a specific reason not to. It's faster for reads and supports powerful query operators.
+
+```sql
+create table user_settings (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  preferences jsonb not null default '{}'::jsonb
+);
+```
+
+You can query into JSONB columns using the `->` and `->>` operators:
+
+```sql
+-- Get the "theme" key as a JSON value
+select preferences -> 'theme' from user_settings;
+
+-- Get the "theme" key as plain text
+select preferences ->> 'theme' from user_settings;
+
+-- Filter rows where theme is "dark"
+select *
+from user_settings
+where preferences ->> 'theme' = 'dark';
+```
+
+### When to use JSONB vs separate columns
+
+Use JSONB when:
+
+- The shape of the data varies between rows (user preferences, form responses, API payloads)
+- You're storing metadata that doesn't need its own columns
+- The structure might change frequently and you don't want a migration every time
+
+Use regular columns when:
+
+- You query or filter on the value often (columns with indexes are much faster)
+- The data has a consistent structure across all rows
+- You want Postgres to enforce types and constraints (JSONB won't stop you from storing a number where you expect a string)
+
+A common pattern is to use columns for the core data you query on, and a JSONB column for everything else:
+
+```sql
+create table orders (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  status text not null default 'pending',
+  total numeric(10, 2) not null,
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+```
+
+Here, `status` and `total` are columns because you'll filter and sort on them. `metadata` is JSONB because it might hold different things for different orders — shipping details, discount codes, notes from support.
+
+## Arrays
+
+Postgres can store arrays of any type. This is useful when a row needs multiple values for a single field:
+
+```sql
+create table posts (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  tags text[] default '{}',
+  created_at timestamptz not null default now()
+);
+```
+
+Insert and query arrays like this:
+
+```sql
+-- Insert with tags
+insert into posts (title, tags)
+values ('Getting started with Supabase', array['supabase', 'postgres', 'tutorial']);
+
+-- Find posts with a specific tag
+select * from posts where 'supabase' = any(tags);
+
+-- Find posts that have all of these tags
+select * from posts where tags @> array['supabase', 'postgres'];
+```
+
+### When to use arrays vs a separate table
+
+Arrays are convenient for simple lists of values like tags, categories, or roles. But if you need to store additional data about each item (like when a tag was added, or who added it), use a separate table with a foreign key instead. Arrays also can't enforce that values exist in another table the way foreign keys can.
+
+A good rule of thumb: if the items are just simple values and you don't need to query them individually, arrays work well. If each item is its own "thing" with properties, it deserves its own table.
+
+## Enums
+
+When a column should only allow a specific set of values — like a status field with `todo`, `in_progress`, and `done` — you need a way to enforce that.
+
+Postgres has a native `enum` type, but it has a significant limitation: you can add new values (and rename them in Postgres 10+), but you can't remove values without recreating the type. For most applications, a `text` column with a **check constraint** is simpler and more flexible:
+
+```sql
+create table tasks (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  status text not null default 'todo' check (status in ('todo', 'in_progress', 'done'))
+);
+```
+
+This gives you the same validation — Postgres will reject any value not in the list — but you can easily update the allowed values in a future migration. No special type to manage.
+
+## Quick reference
+
+| Use case               | Recommended type               | Notes                                     |
+| ---------------------- | ------------------------------ | ----------------------------------------- |
+| Short or long text     | `text`                         | No need for `varchar` in most cases       |
+| Whole numbers          | `integer` or `bigint`          | `bigint` for IDs and large counts         |
+| Money / prices         | `numeric`                      | Exact precision, no rounding errors       |
+| True / false           | `boolean`                      | Always add `not null default`             |
+| Calendar dates         | `date`                         | Date only, no time                        |
+| Date and time          | `timestamptz`                  | Always use `timestamptz`, not `timestamp` |
+| Unique identifiers     | `uuid`                         | Use `gen_random_uuid()` for defaults      |
+| Flexible / varied data | `jsonb`                        | Binary JSON, indexable and queryable      |
+| Simple lists           | `text[]`, `integer[]`, etc.    | Good for tags, roles, categories          |
+| Fixed set of values    | `text` with `check` constraint | More flexible than native `enum`          |

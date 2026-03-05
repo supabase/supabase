@@ -38,7 +38,7 @@ interface RootLayoutProps {
   children: React.ReactNode
 }
 
-export default async function Layout({ children }: RootLayoutProps) {
+const Layout = async ({ children }: RootLayoutProps) => {
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
@@ -58,3 +58,5 @@ export default async function Layout({ children }: RootLayoutProps) {
     </html>
   )
 }
+
+export { Layout as default }

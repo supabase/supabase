@@ -1,0 +1,135 @@
+---
+title: Monitoring and Observability
+description: Metrics, logs, and database health indicators
+---
+
+Once your app is in production, you need to know what's happening — is the database healthy, are queries fast, is anything failing? This chapter covers the tools Supabase provides for monitoring your project and the signals to watch for.
+
+## The Observability dashboard
+
+The Supabase Dashboard has a dedicated **Observability** section that gives you visibility into every part of your project. It's organized into two groups:
+
+### General
+
+- **Query Performance** — shows your slowest and most frequently run queries, with an Index Advisor that recommends indexes. This is the first place to look when something feels slow.
+- **API Gateway** — request volume, latency, and error rates for your REST and GraphQL APIs. A spike in 500 errors means something is broken; rising latency means queries need attention.
+
+### Product-specific
+
+Each Supabase product has its own observability report:
+
+- **Database** — connection count, CPU and memory usage, database size, and replication lag. Watch connections approaching your plan limit, and sustained high CPU (which usually means slow queries).
+- **Data API** — detailed metrics for your REST and GraphQL endpoints, including response times and status codes.
+- **Auth** — sign-in attempts, sign-ups, token refreshes, and errors.
+- **Edge Functions** — execution counts, durations, and error rates for your functions.
+- **Storage** — request volume and bandwidth for file operations.
+- **Realtime** — WebSocket connections, channel subscriptions, and Broadcast and Presence metrics.
+
+You can also create **Custom Reports** for metrics specific to your app.
+
+Check these regularly, and especially after deployments or traffic spikes.
+
+## Database health indicators
+
+Beyond the Dashboard, Postgres itself exposes useful health information.
+
+### Active connections
+
+```sql
+select count(*)
+from pg_stat_activity
+where state = 'active';
+```
+
+If this number is consistently close to your connection limit, queries will start queuing and your app will feel slow.
+
+### Long-running queries
+
+```sql
+select
+  pid,
+  now() - query_start as duration,
+  query,
+  state
+from pg_stat_activity
+where state != 'idle'
+  and now() - query_start > interval '5 seconds'
+order by duration desc;
+```
+
+Any query running for more than a few seconds is worth investigating. Long-running queries can hold locks and block other operations.
+
+### Table bloat
+
+After many updates and deletes, tables accumulate dead rows that take up space and slow down scans. Postgres cleans these up automatically (autovacuum), but you can check how much dead space exists:
+
+```sql
+select
+  relname as table,
+  n_dead_tup as dead_rows,
+  n_live_tup as live_rows
+from pg_stat_user_tables
+where n_dead_tup > 1000
+order by n_dead_tup desc;
+```
+
+If dead rows are high and not decreasing, autovacuum might be falling behind. This is more common on tables with very high write rates.
+
+### Index usage
+
+Check whether your indexes are actually being used:
+
+```sql
+select
+  relname as table,
+  indexrelname as index,
+  idx_scan as times_used
+from pg_stat_user_indexes
+order by idx_scan asc;
+```
+
+An index with zero scans is taking up space and slowing down writes without helping reads. Consider dropping it.
+
+## Logs
+
+Each product-specific observability page includes its own logs. You can see individual requests, errors, and events for the Database, Data API, Auth, Edge Functions, Storage, and Realtime — all from the same Observability section.
+
+### Filtering logs
+
+You can filter logs by time range, status code, and search terms. For debugging a specific issue, start with the time window when the problem occurred and filter by error status codes (4xx or 5xx).
+
+### Slow query logging
+
+Postgres logs queries that exceed a configurable duration threshold. This is one of the most useful things to monitor in production — it tells you exactly which queries are slow without needing to run EXPLAIN on each one manually. You can configure the threshold in the Dashboard under **Database > Settings**.
+
+## Alerting
+
+For critical issues, you don't want to wait until someone checks the Dashboard. Supabase supports alerting for key metrics:
+
+- **Database approaching storage limit** — avoid unexpected downtime
+- **High CPU usage** — usually means slow queries or an under-sized compute instance
+- **High connection count** — approaching the limit
+- **High error rate** — something is failing for users
+
+You can configure alerts in the Dashboard. For more advanced monitoring, you can integrate with third-party tools.
+
+## Third-party monitoring
+
+If you need more detailed monitoring — custom dashboards, historical trends, or correlation with your application metrics — you can connect Supabase to external monitoring tools. Common options include:
+
+- **Grafana** — for custom dashboards over Postgres metrics
+- **Datadog** — for unified application and infrastructure monitoring
+- **PgHero** — a simple tool specifically for Postgres performance monitoring
+
+These typically connect to your database via the read replica (to avoid affecting production performance) and query `pg_stat_*` views for metrics.
+
+## What to monitor day-to-day
+
+You don't need to watch everything all the time. Focus on:
+
+- **Error rates** — are API requests failing? Check the API logs.
+- **Latency** — are response times increasing? Check slow query logs and CPU usage.
+- **Storage** — is the database growing faster than expected? Check database size.
+- **Connections** — are you approaching the limit? Check active connections.
+
+Everything else is for debugging when something goes wrong. Set up alerts for the critical metrics and check the Dashboard periodically for trends.

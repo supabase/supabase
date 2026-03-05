@@ -1,0 +1,101 @@
+---
+title: Security Hardening
+description: Network security, secrets management, and locking down your project
+---
+
+Earlier chapters covered authentication security (CAPTCHA, token storage, MFA) and Row Level Security for data access. This chapter focuses on hardening the infrastructure around your project — network security, managing secrets, and reducing your attack surface for production.
+
+## Network security
+
+### SSL enforcement
+
+All connections to Supabase are encrypted with SSL by default. The API, database, and Dashboard all use HTTPS. For direct database connections, SSL is enforced so data is encrypted in transit.
+
+You don't need to configure this — it's on by default. If you're connecting from a tool that requires you to specify SSL, use `sslmode=require`.
+
+### IP restrictions
+
+By default, your Supabase API is accessible from any IP address. For production apps where you know exactly which servers need access, you can restrict database connections to specific IP addresses or CIDR ranges.
+
+This is configured in the Dashboard under **Database > Network Restrictions**. It's especially useful for server-to-server connections — your API server or background job runner connects from a known IP, and everything else is blocked.
+
+Note that IP restrictions apply to direct database connections, not to the REST API (which is already protected by RLS and API keys).
+
+### Custom domains
+
+By default, your project's API is available at `your-project.supabase.co`. For production apps, you can configure a custom domain (like `api.yourapp.com`) so that your Supabase endpoints are served from your own domain. This is better for branding and makes it less obvious that you're using Supabase, which can reduce targeted attacks.
+
+Custom domains are configured in the Dashboard under **Project Settings > Custom Domains**.
+
+## API keys and the Secret Key
+
+Your project has two main keys:
+
+- **Publishable Key** — safe to use in client-side code. Requests made with this key are subject to RLS policies. This is what your browser app uses.
+- **Secret Key** — bypasses RLS entirely. Only use this in server-side code (API routes, Edge Functions, background jobs). Never expose it in your frontend, never commit it to version control, and never share it in logs or error messages.
+
+If you suspect a key has been compromised, you can rotate it in the Dashboard under **Project Settings > API**. Rotating a key immediately invalidates the old one, so make sure your app is updated to use the new key before (or immediately after) rotating.
+
+## Secrets management
+
+Beyond API keys, your app likely has other secrets — third-party API keys, webhook signing secrets, SMTP credentials. Best practices:
+
+- **Use environment variables** — never hardcode secrets in your code
+- **Use the Supabase secrets store** for Edge Functions (`supabase secrets set`)
+- **Use your hosting platform's secrets manager** for your frontend/backend (Vercel, Netlify, etc.)
+- **Don't commit `.env` files** — add them to `.gitignore`
+- **Rotate secrets periodically** — especially if team members leave or a secret may have been exposed
+
+## Reducing your attack surface
+
+### Disable unused features
+
+If your app doesn't use certain features, consider disabling them to reduce your attack surface:
+
+- **Disable email sign-ups** if you only use social providers
+- **Disable anonymous sign-in** if you don't need it
+- **Remove unused OAuth providers** — each enabled provider is a potential entry point
+
+### Restrict redirect URLs
+
+For OAuth and magic links, Supabase sends users to a redirect URL after authentication. Make sure only your actual domains are in the allowed list (**Authentication > URL Configuration**). Remove `localhost` entries before going to production — or at minimum, be aware they're there.
+
+### Use RLS everywhere
+
+Every table that contains user data should have RLS enabled. It's easy to forget when creating a new table, so make it a habit to enable RLS immediately:
+
+```sql
+create table public.new_table (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id),
+  data text
+);
+
+alter table public.new_table enable row level security;
+```
+
+A table without RLS is accessible to anyone with your Publishable Key. This is the most common security mistake in Supabase projects.
+
+## Database roles and permissions
+
+Supabase creates several database roles, each with different levels of access:
+
+- **`anon`** — the role used for unauthenticated requests. Only has access to data permitted by RLS policies.
+- **`authenticated`** — the role used for requests with a valid user token. Also subject to RLS.
+- **`service_role`** — bypasses RLS. This is the role used when you connect with the Secret Key.
+- **`postgres`** — the superuser role. Full access to everything. Used by the Dashboard and direct database connections.
+
+You shouldn't need to modify these roles, but understanding them helps when debugging access issues — if a query works in the SQL Editor (which runs as `postgres`) but fails from your app (which runs as `authenticated`), the issue is almost certainly an RLS policy.
+
+## Security checklist for production
+
+- RLS is enabled on all tables with user data
+- Secret Key is only used server-side
+- Publishable Key is used in client code
+- Email confirmation is enabled
+- Redirect URLs only include production domains
+- IP restrictions are configured for direct database access
+- Unused auth providers are disabled
+- `.env` files are in `.gitignore`
+- Secrets are managed through environment variables, not hardcoded
+- API keys are ready to be rotated if needed
