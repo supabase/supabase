@@ -95,6 +95,22 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'no-sniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: `script-src 'unsafe-inline' https://frontend-assets.supabase.com; object-src 'none'; base-uri 'none';`,
+          },
+          {
             key: 'Strict-Transport-Security',
             value:
               process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
