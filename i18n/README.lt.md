@@ -7,11 +7,11 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) yra atvirojo kodo Firebase alternatyva. Kuriame "Firebase" funkcijas naudodami įmonių klasės atvirojo kodo įrankius.
+[Supabase](https://supabase.com) yra atvirojo kodo ,,Firebase" alternatyva. Kuriame ,,Firebase" funkcijas naudodami įmonių-lygmens atvirojo kodo įrankius.
 
 - [x] Prieglobos Postgres duomenų bazė. [Dokumentai](https://supabase.com/docs/guides/database)
-- [x] Autentiškumo nustatymas ir autorizavimas. [Dokumentai](https://supabase.com/docs/guides/auth)
-- [x] Automatiškai generuojamos API.
+- [x] Autentifikacijos nustatymas ir autorizavimas. [Dokumentai](https://supabase.com/docs/guides/auth)
+- [x] Automatiškai generuojami API.
   - [x] REST. [Dokumentai](https://supabase.com/docs/guides/api#rest-api-overview)
   - [x] GraphQL. [Dokumentai](https://supabase.com/docs/guides/api#graphql-api-overview)
   - [x] Realaus laiko prenumeratos. [Dokumentai](https://supabase.com/docs/guides/api#realtime-api-overview)
@@ -25,7 +25,7 @@
 
 ## Dokumentacija
 
-Išsamios dokumentacijos rasite [supabase.com/docs](https://supabase.com/docs)
+Išsamias dokumentacijas rasite [supabase.com/docs](https://supabase.com/docs)
 
 Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](../DEVELOPERS.md)
 
