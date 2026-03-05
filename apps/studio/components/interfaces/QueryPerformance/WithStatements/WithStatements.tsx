@@ -26,6 +26,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { captureQueryPerformanceError } from '../QueryPerformance.utils'
 import { getErrorMessage } from 'lib/get-error-message'
 import { parseAsString, useQueryStates } from 'nuqs'
+import { ResponseError } from 'types'
 
 interface WithStatementsProps {
   queryHitRate: PresetHookResult
@@ -67,7 +68,7 @@ export const WithStatements = ({
   }
 
   const processedData = useMemo(() => {
-    return transformStatementDataToRows(data || [], indexAdvisor === 'true')
+    return transformStatementDataToRows(Array.isArray(data) ? data : [], indexAdvisor === 'true')
   }, [data, indexAdvisor])
 
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
@@ -150,7 +151,24 @@ export const WithStatements = ({
               errorMessage ||
               'An error occurred while loading query performance data. Please try refreshing the page.'
             }
-          />
+          >
+            {(() => {
+              const err = mainQueryError || hitRateError || metricsError
+              if (err instanceof ResponseError && (err.code || err.requestId)) {
+                return (
+                  <p className="mt-1 text-xs font-mono text-foreground-lighter">
+                    {[
+                      err.code && `HTTP ${err.code}`,
+                      err.requestId && `Request ID: ${err.requestId}`,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </p>
+                )
+              }
+              return null
+            })()}
+          </Admonition>
         </div>
       )}
       <QueryPerformanceMetrics />

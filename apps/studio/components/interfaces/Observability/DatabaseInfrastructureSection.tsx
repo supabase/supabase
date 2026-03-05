@@ -26,6 +26,7 @@ type DatabaseInfrastructureSectionProps = {
   isLoading: boolean
   slowQueriesCount?: number
   slowQueriesLoading?: boolean
+  slowQueriesError?: unknown
 }
 
 export const DatabaseInfrastructureSection = ({
@@ -35,6 +36,7 @@ export const DatabaseInfrastructureSection = ({
   isLoading: dbLoading,
   slowQueriesCount = 0,
   slowQueriesLoading = false,
+  slowQueriesError,
 }: DatabaseInfrastructureSectionProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -162,7 +164,15 @@ export const DatabaseInfrastructureSection = ({
               </MetricCardLabel>
             </MetricCardHeader>
             <MetricCardContent>
-              <MetricCardValue>{slowQueriesCount}</MetricCardValue>
+              {slowQueriesError ? (
+                <div className="text-xs text-destructive break-words">
+                  {slowQueriesError && typeof slowQueriesError === 'object' && 'message' in slowQueriesError
+                    ? String((slowQueriesError as { message: unknown }).message)
+                    : 'Error loading data'}
+                </div>
+              ) : (
+                <MetricCardValue>{slowQueriesCount}</MetricCardValue>
+              )}
             </MetricCardContent>
           </MetricCard>
         </Link>

@@ -43,10 +43,11 @@ export const ObservabilityOverview = () => {
 
   const overviewData = useObservabilityOverviewData(projectRef!, interval, refreshKey)
 
-  const { slowQueriesCount, isLoading: slowQueriesLoading } = useSlowQueriesCount(
-    projectRef,
-    refreshKey
-  )
+  const {
+    slowQueriesCount,
+    isLoading: slowQueriesLoading,
+    error: slowQueriesError,
+  } = useSlowQueriesCount(projectRef, refreshKey)
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1)
@@ -173,6 +174,7 @@ export const ObservabilityOverview = () => {
           isLoading={dbServiceData.isLoading}
           slowQueriesCount={slowQueriesCount}
           slowQueriesLoading={slowQueriesLoading}
+          slowQueriesError={slowQueriesError}
         />
 
         <ServiceHealthTable
