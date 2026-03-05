@@ -88,7 +88,8 @@ Follow this [guide on writing Wasm modules in Rust](https://developer.mozilla.or
         wasm-pack build --target deno
         ```
 
-        This will produce a Wasm binary file inside `add-wasm/pkg` directory.
+        This will produce a Wasm binary file (for example `add_wasm_bg.wasm`)
+        inside the `add-wasm/pkg` directory.
 
 
       </StepHikeCompact.Details>
@@ -99,6 +100,16 @@ Follow this [guide on writing Wasm modules in Rust](https://developer.mozilla.or
 ---
 
 ## Calling the Wasm module from the Edge Function
+
+<Admonition type="note">
+
+When using `wasm-pack --target deno`, the generated JavaScript wrapper
+must be imported, which internally loads the `.wasm` binary. Directly
+importing `.wasm` files is not supported in Supabase Edge Functions
+(Deno 1.46) without additional boilerplate.
+
+</Admonition>
+
 
 Update your Edge Function to call the add function from the Wasm module:
 
@@ -129,7 +140,9 @@ Before deploying, ensure the Wasm module is bundled with your function by defini
 
 ```toml
 [functions.wasm-add]
-static_files = [ "./functions/wasm-add/add-wasm/pkg/*"]
+static_files = [
+  "./functions/wasm-add/add-wasm/pkg/add_wasm_bg.wasm"
+]
 ```
 
 Deploy the function by running:
