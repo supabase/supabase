@@ -76,6 +76,30 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
+## (Optional but Recommended) Add email and username claims to the ID token
+
+Some Microsoft accounts—especially older Hotmail or Live accounts—may not return an email address by default in the ID token, which can cause authentication failures in Supabase.
+
+To ensure the email is reliably returned:
+
+1. Go to your App Registration in the [Azure Portal](https://portal.azure.com).
+2. In the left-hand menu, select **Token Configuration**.
+3. Click **+ Add optional claim**.
+4. Select **ID token** as the token type.
+5. Check the following claims:
+   - `email`
+   - `preferred_username`
+6. (Optional) You can also add `xms_edov` to check if the email is verified (see section below).
+7. Enable **Turn on for all account types**.
+8. Click **Add**.
+9. Navigate to **API Permissions** and click **Grant admin consent**.
+
+This step ensures Supabase Auth can extract the user's email from the token payload. Without it, you may encounter this error when logging in:
+
+```text
+500: Error getting user email from external provider
+```
+
 ## Guarding against unverified email domains
 
 Microsoft Entra ID can send out unverified email domains in certain cases. This may open up your project to a vulnerability where a malicious user can impersonate already existing accounts on your project.
