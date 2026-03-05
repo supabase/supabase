@@ -287,7 +287,7 @@ const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
           }
           layout="fill"
           objectFit="contain"
-          alt="OpenAi logo"
+          alt="OpenAI logo"
         />
       </div>
       <LazyMotion features={domAnimation}>
