@@ -361,7 +361,9 @@ export const LogsDatePicker = ({
                   aria-disabled={helper.disabled}
                 ></RadioGroupItem>
                 {helper.text}
-                {showHelperBadge(helper) ? <Lock size={12} className="text-foreground-muted" /> : null}
+                {showHelperBadge(helper) ? (
+                  <Lock size={12} className="text-foreground-muted" />
+                ) : null}
               </Label>
             ))}
           </RadioGroup>
