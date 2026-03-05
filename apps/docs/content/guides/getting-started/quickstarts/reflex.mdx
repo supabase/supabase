@@ -1,0 +1,158 @@
+---
+title: 'Use Supabase with Reflex'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Reflex app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <$Partial path="quickstart_db_setup.mdx" />
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create a Reflex app">
+
+    Create a new directory for your Reflex app, set up a virtual environment, and initialize the project.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      mkdir my-app && cd my-app
+      python3 -m venv venv
+      source venv/bin/activate
+      pip install reflex
+      reflex init
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Install the Supabase client library">
+
+    Install the `supabase-py` client library which provides a convenient interface for working with Supabase from a Python app.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      pip install supabase python-dotenv
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create Environment Variables file">
+
+    Create a `.env` file in your project root and populate it with your Supabase connection variables:
+
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      <$CodeTabs>
+
+        ```text name=.env
+        SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+        ```
+
+      </$CodeTabs>
+
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Query data from the app">
+
+    Replace the contents of `my_app/my_app.py` with the following code, which creates a page that fetches and displays data from your `instruments` table using the Supabase client.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+      ```python name=my_app/my_app.py
+      import os
+      import reflex as rx
+      from supabase import create_client, Client
+      from dotenv import load_dotenv
+
+      load_dotenv()
+
+      supabase: Client = create_client(
+          os.environ.get("SUPABASE_URL"),
+          os.environ.get("SUPABASE_PUBLISHABLE_KEY")
+      )
+
+
+      class State(rx.State):
+          instruments: list[dict] = []
+
+          def load_instruments(self):
+              response = supabase.table("instruments").select("*").execute()
+              self.instruments = response.data
+
+
+      def instrument_item(instrument: dict) -> rx.Component:
+          return rx.list.item(rx.text(instrument["name"]))
+
+
+      def index() -> rx.Component:
+          return rx.container(
+              rx.heading("Instruments", size="7", margin_bottom="16px"),
+              rx.list.unordered(
+                  rx.foreach(State.instruments, instrument_item),
+              ),
+              on_mount=State.load_instruments,
+              padding="40px",
+          )
+
+
+      app = rx.App()
+      app.add_page(index)
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Run the Reflex development server, go to http://localhost:3000 in a browser and you should see the list of instruments.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      reflex run
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)
