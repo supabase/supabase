@@ -78,6 +78,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         - When unsure, default to simple equality comparisons with reasonable values.
         - Values should respect property types: booleans must be true/false, dates should be ISO date strings (YYYY-MM-DD), and numbers must be numbers.
         - If options are provided for a property, choose from those values when appropriate.
+        - The "is" operator is used for NULL checks. Valid values are: null, not null. For boolean columns, true and false are also valid.
 
         User request: "${prompt}"
       `,
