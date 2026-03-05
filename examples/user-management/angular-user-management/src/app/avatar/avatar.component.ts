@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, effect, inject, input, Input, output, signal } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
 
@@ -6,31 +6,36 @@ import { SupabaseService } from '../supabase.service'
   selector: 'app-avatar',
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.css'],
-  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvatarComponent {
-  _avatarUrl: SafeResourceUrl | undefined
-  uploading = false
+  _avatarUrl = signal<SafeResourceUrl | null>(null)
+  uploading = signal(false)
+  avatarUrl = input<string>()
 
-  @Input()
-  set avatarUrl(url: string | null) {
-    if (url) {
-      this.downloadImage(url)
-    }
+  constructor() {
+    effect(() => {
+      const url = this.avatarUrl()
+      if (url) {
+        this.downloadImage(url)
+      }
+    })
   }
 
-  @Output() upload = new EventEmitter<string>()
+  readonly upload = output<string>();
 
-  constructor(
-    private readonly supabase: SupabaseService,
-    private readonly dom: DomSanitizer
-  ) {}
+  private readonly supabase = inject(SupabaseService)
+  private readonly dom = inject(DomSanitizer)
 
   async downloadImage(path: string) {
     try {
       const { data } = await this.supabase.downLoadImage(path)
       if (data instanceof Blob) {
-        this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(URL.createObjectURL(data))
+        const previousUrl = this._avatarUrl()
+        if (previousUrl) {
+          URL.revokeObjectURL(previousUrl.toString())
+        }
+        this._avatarUrl.set(this.dom.bypassSecurityTrustResourceUrl(URL.createObjectURL(data)))
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -41,7 +46,7 @@ export class AvatarComponent {
 
   async uploadAvatar(event: any) {
     try {
-      this.uploading = true
+      this.uploading.set(true)
       if (!event.target.files || event.target.files.length === 0) {
         throw new Error('You must select an image to upload.')
       }
@@ -57,7 +62,7 @@ export class AvatarComponent {
         alert(error.message)
       }
     } finally {
-      this.uploading = false
+      this.uploading.set(false)
     }
   }
 }
