@@ -162,7 +162,7 @@ const getLints = async () => {
 
   if (!Array.isArray(response.data)) {
     throw Error(
-      'Reading a directory, not a file. Should not reach this, solely to appease Typescript.'
+      'Reading a directory, not a file. Should not reach this, solely to appease TypeScript.'
     )
   }
 

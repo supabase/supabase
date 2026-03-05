@@ -23,7 +23,7 @@ export const EXAMPLE_PROJECTS = [
   {
     framework: 'Expo',
     title: 'Expo Starter',
-    description: 'Template bottom tabs with auth flow (Typescript)',
+    description: 'Template bottom tabs with auth flow (TypeScript)',
     url: 'https://github.com/codingki/react-native-expo-template/tree/master/template-typescript-bottom-tabs-supabase-auth-flow',
     type: 'mobile',
   },

@@ -162,7 +162,7 @@ const Examples: Example[] = [
     tags: ['Expo', 'React'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'Expo React Native Starter',
-    description: 'Template bottom tabs with auth flow (Typescript)',
+    description: 'Template bottom tabs with auth flow (TypeScript)',
     author: 'codingki',
     author_url: 'https://github.com/codingki',
     author_img: 'https://avatars.githubusercontent.com/u/39829726',

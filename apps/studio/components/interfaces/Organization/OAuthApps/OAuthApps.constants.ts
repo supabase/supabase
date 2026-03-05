@@ -2,7 +2,7 @@ export const PERMISSIONS_DESCRIPTIONS = {
   ANALYTICS: 'access to analytics logs.',
   AUTH: 'access to auth configurations and SSO providers.',
   DATABASE:
-    'access to Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types.',
+    'access to Postgres configurations, SQL snippets, SSL enforcement configurations and TypeScript schema types.',
   DOMAINS: 'access to custom domains and vanity subdomains.',
   EDGE_FUNCTIONS: 'access to edge functions.',
   ENVIRONMENT: 'access to environments/branches.',

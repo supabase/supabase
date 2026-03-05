@@ -347,7 +347,7 @@ export const days: AdventDay[] = [
       },
       {
         url: '/blog/client-libraries-v2#typescript-v2-updates',
-        label: 'Typescript',
+        label: 'TypeScript',
         icon: (
           <svg
             width="100%"
