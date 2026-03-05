@@ -29,7 +29,8 @@ export function deriveReviewDecisionDefaults(
     | null
     | undefined
 ) {
-  const status = isReviewStatus(latestReview?.status ?? '') ? latestReview!.status! : 'pending_review'
+  const normalizedStatus = latestReview?.status ?? ''
+  const status: ReviewStatus = isReviewStatus(normalizedStatus) ? normalizedStatus : 'pending_review'
   return {
     status,
     featured: latestReview?.featured ?? false,

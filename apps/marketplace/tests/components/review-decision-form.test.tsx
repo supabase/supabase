@@ -20,8 +20,6 @@ describe('ReviewDecisionForm', () => {
     const user = userEvent.setup()
     render(
       <ReviewDecisionForm
-        title="Auth Starter"
-        partnerTitle="Acme"
         partnerSlug="acme"
         itemId={1}
         defaultValues={{ status: 'pending_review', featured: false, reviewNotes: '' }}

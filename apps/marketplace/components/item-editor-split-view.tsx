@@ -1,20 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import {
-  Badge,
-  Button,
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
-} from 'ui'
 import { MarketplaceItem, type MarketplaceItemFile } from 'ui-patterns/MarketplaceItem'
 
-import { requestItemReviewAction } from '@/app/protected/actions'
 import {
   ItemForm,
   type ItemFile,
@@ -36,16 +24,6 @@ type ItemEditorSplitViewProps =
       item: ItemInfo & { updated_at?: string | null }
       initialFiles: ItemFile[]
       initialPreviewFiles?: MarketplaceItemFile[]
-      reviewRequest?: {
-        itemId: number
-        itemSlug: string
-        partnerSlug: string
-        isApproved: boolean
-        hasOpenReview: boolean
-        latestReviewStatus?: string | null
-        latestReviewNotes?: string | null
-        openReviewStatusLabel?: string | null
-      }
     }
 
 const EMPTY_PREVIEW_FILES: MarketplaceItemFile[] = []
@@ -121,94 +99,28 @@ export function ItemEditorSplitView(props: ItemEditorSplitViewProps) {
     setPreviewFiles(initialPreviewFiles)
   }, [initialPreviewFiles])
 
-  const reviewControl =
-    props.mode === 'edit' && props.reviewRequest ? (
-      props.reviewRequest.isApproved ? (
-        <Badge variant="success">Approved</Badge>
-      ) : props.reviewRequest.latestReviewStatus === 'rejected' ? (
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-full"
-            >
-              <Badge variant="destructive">Rejected</Badge>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="space-y-3">
-            <div className="space-y-2 mb-4">
-              <p className="heading-default">Review feedback</p>
-              <p className="text-sm text-foreground-light whitespace-pre-wrap pl-4 border-l-2">
-                {props.reviewRequest.latestReviewNotes?.trim()
-                  ? props.reviewRequest.latestReviewNotes
-                  : 'No rejection reason was provided for this review.'}
-              </p>
-            </div>
-            <div>
-              <form action={requestItemReviewAction}>
-                <input type="hidden" name="itemId" value={props.reviewRequest.itemId} />
-                <input type="hidden" name="itemSlug" value={props.reviewRequest.itemSlug} />
-                <input type="hidden" name="partnerSlug" value={props.reviewRequest.partnerSlug} />
-                <Button htmlType="submit" type="secondary" className="w-full">
-                  Re-request review
-                </Button>
-              </form>
-            </div>
-          </PopoverContent>
-        </Popover>
-      ) : props.reviewRequest.hasOpenReview ? (
-        props.reviewRequest.openReviewStatusLabel ? (
-          <Badge variant="warning">{props.reviewRequest.openReviewStatusLabel}</Badge>
-        ) : (
-          <Badge>Review requested</Badge>
-        )
-      ) : (
-        <form action={requestItemReviewAction}>
-          <input type="hidden" name="itemId" value={props.reviewRequest.itemId} />
-          <input type="hidden" name="itemSlug" value={props.reviewRequest.itemSlug} />
-          <input type="hidden" name="partnerSlug" value={props.reviewRequest.partnerSlug} />
-          <Button htmlType="submit" type="secondary">
-            Request review
-          </Button>
-        </form>
-      )
-    ) : null
-
   return (
     <div className="flex h-full min-h-full min-w-0">
       <section className="w-4xl min-w-2xl overflow-y-auto border-r">
-        <Card className="flex h-full w-full flex-col rounded-none border-none">
-          <CardHeader className="shrink-0 border-b px-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <CardTitle>
-                  {props.mode === 'create' ? 'Create a marketplace item' : 'Edit marketplace item'}
-                </CardTitle>
-                <CardDescription>on behalf of {props.partner.title}</CardDescription>
-              </div>
-              {reviewControl}
-            </div>
-          </CardHeader>
-          <div className="min-h-0 flex-1">
-            {props.mode === 'edit' ? (
-              <ItemForm
-                mode="edit"
-                partner={{ id: props.partner.id, slug: props.partner.slug }}
-                item={props.item}
-                initialFiles={props.initialFiles}
-                onValuesChange={setPreviewValues}
-                onPreviewFilesChange={setPreviewFiles}
-              />
-            ) : (
-              <ItemForm
-                mode="create"
-                partner={{ id: props.partner.id, slug: props.partner.slug }}
-                onValuesChange={setPreviewValues}
-                onPreviewFilesChange={setPreviewFiles}
-              />
-            )}
-          </div>
-        </Card>
+        <div className="min-h-0 flex-1">
+          {props.mode === 'edit' ? (
+            <ItemForm
+              mode="edit"
+              partner={{ id: props.partner.id, slug: props.partner.slug }}
+              item={props.item}
+              initialFiles={props.initialFiles}
+              onValuesChange={setPreviewValues}
+              onPreviewFilesChange={setPreviewFiles}
+            />
+          ) : (
+            <ItemForm
+              mode="create"
+              partner={{ id: props.partner.id, slug: props.partner.slug }}
+              onValuesChange={setPreviewValues}
+              onPreviewFilesChange={setPreviewFiles}
+            />
+          )}
+        </div>
       </section>
 
       <section className="min-w-0 flex-1 h-full p-6 overflow-hidden bg-muted/50">

@@ -1,19 +1,16 @@
 'use client'
 
-import { Package2, Plus, Settings2, ShieldCheck } from 'lucide-react'
+import { Package2, Settings2, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import * as React from 'react'
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from 'ui'
 
 import { type PartnerSidebarData } from '@/lib/marketplace/server'
@@ -24,97 +21,62 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
 
 export function AppSidebar({ partners, ...props }: AppSidebarProps) {
   const pathname = usePathname()
+  const { isMobile, open, setOpen } = useSidebar()
   const [, , partnerSlug = ''] = pathname.split('/')
   const currentPartner = partners.find((partner) => partner.slug === partnerSlug) ?? partners[0]
+
+  React.useEffect(() => {
+    if (!isMobile && open) {
+      setOpen(false)
+    }
+  }, [isMobile, open, setOpen])
 
   if (!currentPartner) {
     return null
   }
 
-  const itemLinks = currentPartner.items.map((item) => ({
-    title: item.title,
-    href: `/protected/${currentPartner.slug}/items/${item.slug}`,
-  }))
   const settingsHref = `/protected/${currentPartner.slug}/settings`
+  const itemsHref = `/protected/${currentPartner.slug}/items`
   const reviewsHref = `/protected/${currentPartner.slug}/reviews`
-  const newItemHref = `/protected/${currentPartner.slug}/items/new`
+  const isItemsActive = pathname === itemsHref || pathname.startsWith(`${itemsHref}/`)
+  const showInbox =
+    currentPartner.partnerRole === 'reviewer' || currentPartner.partnerRole === 'admin'
 
   return (
-    <Sidebar {...props}>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="heading-meta text-foreground-lighter">
-            Partner
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Settings" isActive={pathname === settingsHref}>
-                  <Link href={settingsHref}>
-                    <Settings2 size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        {currentPartner.partnerRole === 'reviewer' || currentPartner.partnerRole === 'admin' ? (
-          <SidebarGroup>
-            <SidebarGroupLabel className="heading-meta text-foreground-lighter">
-              Reviewer
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip="Inbox"
-                    isActive={pathname === reviewsHref || pathname.startsWith(`${reviewsHref}/`)}
-                  >
-                    <Link href={reviewsHref}>
-                      <ShieldCheck size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                      <span>Inbox</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ) : null}
-        <SidebarGroup>
-          <SidebarGroupLabel className="heading-meta text-foreground-lighter">
-            Marketplace items
-          </SidebarGroupLabel>
-          <SidebarGroupAction
-            asChild
-            title="Create item"
-            className="text-foreground-lighter size-4"
-          >
-            <Link href={newItemHref}>
-              <Plus size={14} strokeWidth={1.5} />
-              <span className="sr-only">Create item</span>
-            </Link>
-          </SidebarGroupAction>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {itemLinks.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={item.title}
-                    isActive={pathname === item.href || pathname.startsWith(`${item.href}/`)}
-                  >
-                    <Link href={item.href}>
-                      <Package2 size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+    <Sidebar {...props} collapsible="icon">
+      <SidebarContent className="pt-2">
+        <SidebarMenu className="items-center gap-1">
+          <SidebarMenuItem className="flex w-full justify-center">
+            <SidebarMenuButton asChild tooltip="Settings" isActive={pathname === settingsHref}>
+              <Link href={settingsHref}>
+                <Settings2 size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                <span className="sr-only">Settings</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem className="flex w-full justify-center">
+            <SidebarMenuButton asChild tooltip="Items" isActive={isItemsActive}>
+              <Link href={itemsHref}>
+                <Package2 size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                <span className="sr-only">Items</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          {showInbox ? (
+            <SidebarMenuItem className="flex w-full justify-center">
+              <SidebarMenuButton
+                asChild
+                tooltip="Inbox"
+                isActive={pathname === reviewsHref || pathname.startsWith(`${reviewsHref}/`)}
+              >
+                <Link href={reviewsHref}>
+                  <ShieldCheck size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <span className="sr-only">Inbox</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ) : null}
+        </SidebarMenu>
       </SidebarContent>
     </Sidebar>
   )

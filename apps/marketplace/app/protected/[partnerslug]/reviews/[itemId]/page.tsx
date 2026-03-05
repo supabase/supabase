@@ -1,5 +1,20 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import {
+  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
+  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
+  BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
+  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+} from 'ui'
 import { MarketplaceItem, type MarketplaceItemFile } from 'ui-patterns/MarketplaceItem'
+import {
+  PageHeader,
+  PageHeaderBreadcrumb,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
 import { ReviewDecisionForm } from './review-decision-form'
 import { deriveReviewDecisionDefaults } from '@/lib/marketplace/review-state'
@@ -77,84 +92,105 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
   })
 
   return (
-    <div className="flex h-full min-h-full min-w-0">
-      <section className="min-w-2xl w-4xl overflow-y-auto border-r">
-        <ReviewDecisionForm
-          partnerSlug={partnerslug}
-          title={item.title}
-          partnerTitle={(item.partner as { title?: string } | null)?.title ?? 'Unknown partner'}
-          itemId={item.id}
-          defaultValues={reviewDefaults}
-        />
-      </section>
+    <div className="flex h-full min-h-full min-w-0 flex-col">
+      <PageHeader size="full" className="border-b pb-6 [&>div]:px-6 [&>div]:xl:px-6">
+        <PageHeaderBreadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={`/protected/${partnerslug}/reviews`}>Reviews</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{item.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </PageHeaderBreadcrumb>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>{item.title}</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
 
-      <section className="min-w-0 flex-1 h-full p-6 overflow-hidden bg-muted/20">
-        <div className="rounded-lg border bg-background shadow-sm h-full flex flex-col">
-          <div className="flex items-center h-10 border-b px-4 shrink-0">
-            <div className="flex items-center gap-1.5">
-              <span className="inline-block size-2 rounded-full bg-red-400" />
-              <span className="inline-block size-2 rounded-full bg-yellow-400" />
-              <span className="inline-block size-2 rounded-full bg-green-400" />
+      <div className="flex min-h-0 flex-1 min-w-0">
+        <section className="min-w-2xl w-4xl overflow-y-auto border-r">
+          <ReviewDecisionForm
+            partnerSlug={partnerslug}
+            itemId={item.id}
+            defaultValues={reviewDefaults}
+          />
+        </section>
+
+        <section className="min-w-0 flex-1 h-full p-6 overflow-hidden bg-muted/50">
+          <div className="rounded-lg border bg-background shadow-sm h-full flex flex-col">
+            <div className="flex items-center h-10 border-b px-4 shrink-0">
+              <div className="flex items-center gap-1.5">
+                <span className="inline-block size-2 rounded-full bg-red-400" />
+                <span className="inline-block size-2 rounded-full bg-yellow-400" />
+                <span className="inline-block size-2 rounded-full bg-green-400" />
+              </div>
+              <div className="flex-1 flex justify-center">
+                <span className="text-xs text-muted-foreground bg-muted w-3xl truncate px-3 py-0.5 rounded border font-mono">
+                  {item.slug
+                    ? `https://supabase.com/marketplace/${item.slug}`
+                    : 'https://example.com/listing'}
+                </span>
+              </div>
+              <div className="w-14" />
             </div>
-            <div className="flex-1 flex justify-center">
-              <span className="text-xs text-muted-foreground bg-muted w-3xl truncate px-3 py-0.5 rounded border font-mono">
-                {item.slug
-                  ? `https://supabase.com/marketplace/${item.slug}`
-                  : 'https://example.com/listing'}
-              </span>
+            <div className="flex-1 overflow-y-auto">
+              <MarketplaceItem
+                title={item.title || 'Untitled item'}
+                summary={item.summary}
+                content={item.content}
+                primaryActionUrl={item.type === 'template' ? item.registry_item_url : item.url}
+                files={marketplaceFiles}
+                partnerName={(item.partner as { title?: string } | null)?.title}
+                lastUpdatedAt={item.updated_at}
+                type={item.type}
+                metaFields={[
+                  ...(item.type === 'oauth'
+                    ? [
+                        {
+                          label: 'Listing URL',
+                          value: item.url ? (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline underline-offset-2"
+                            >
+                              {item.url}
+                            </a>
+                          ) : (
+                            'No URL provided'
+                          ),
+                        },
+                      ]
+                    : []),
+                  {
+                    label: 'Documentation URL',
+                    value: item.documentation_url ? (
+                      <a
+                        href={item.documentation_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline underline-offset-2"
+                      >
+                        {item.documentation_url}
+                      </a>
+                    ) : (
+                      'No URL provided'
+                    ),
+                  },
+                ]}
+              />
             </div>
-            <div className="w-14" />
           </div>
-          <div className="flex-1 overflow-y-auto">
-            <MarketplaceItem
-              title={item.title || 'Untitled item'}
-              summary={item.summary}
-              content={item.content}
-              primaryActionUrl={item.type === 'template' ? item.registry_item_url : item.url}
-              files={marketplaceFiles}
-              partnerName={(item.partner as { title?: string } | null)?.title}
-              lastUpdatedAt={item.updated_at}
-              type={item.type}
-              metaFields={[
-                ...(item.type === 'oauth'
-                  ? [
-                      {
-                        label: 'Listing URL',
-                        value: item.url ? (
-                          <a
-                            href={item.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="underline underline-offset-2"
-                          >
-                            {item.url}
-                          </a>
-                        ) : (
-                          'No URL provided'
-                        ),
-                      },
-                    ]
-                  : []),
-                {
-                  label: 'Documentation URL',
-                  value: item.documentation_url ? (
-                    <a
-                      href={item.documentation_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="underline underline-offset-2"
-                    >
-                      {item.documentation_url}
-                    </a>
-                  ) : (
-                    'No URL provided'
-                  ),
-                },
-              ]}
-            />
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   )
 }

@@ -34,6 +34,7 @@ From this package:
 pnpm test
 pnpm test:watch
 pnpm test:smoke
+pnpm vitest --run tests/policies/marketplace-rls.test.ts
 ```
 
 From repo root:
@@ -42,6 +43,26 @@ From repo root:
 pnpm test:marketplace
 pnpm test:marketplace:smoke
 ```
+
+### RLS policy tests
+
+The Marketplace RLS policy suite lives in `tests/policies/marketplace-rls.test.ts` and validates high-impact authorization rules from `supabase/schemas/schemas.sql` (partner data isolation, insert constraints, and reviewer-only moderation updates).
+
+Set these environment variables before running:
+
+```bash
+export SUPABASE_URL="https://<project-ref>.supabase.co"
+export SUPABASE_PUBLISHABLE_KEY="<publishable-or-anon-key>"
+export SERVICE_ROLE_KEY="<service-role-key>"
+```
+
+Then run:
+
+```bash
+pnpm vitest --run tests/policies/marketplace-rls.test.ts
+```
+
+If any of these variables are missing, the suite is skipped by design.
 
 ### Test patterns
 
@@ -108,16 +129,17 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
 4. Rename `.env.example` to `.env.local` and update the following:
 
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
+```env
+NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
+```
 
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+> [!NOTE]
+> This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
+> Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
+> See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
+
+Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
 
 5. You can now run the Next.js local development server:
 

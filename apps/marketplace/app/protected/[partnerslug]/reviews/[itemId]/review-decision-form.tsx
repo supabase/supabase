@@ -4,12 +4,6 @@ import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
   Form_Shadcn_ as Form,
   FormControl_Shadcn_ as FormControl,
   FormField_Shadcn_ as FormField,
@@ -38,8 +32,6 @@ const reviewFormSchema = z.object({
 type ReviewFormValues = z.infer<typeof reviewFormSchema>
 
 type ReviewDecisionFormProps = {
-  title: string
-  partnerTitle: string
   partnerSlug: string
   itemId: number
   defaultValues: {
@@ -50,8 +42,6 @@ type ReviewDecisionFormProps = {
 }
 
 export function ReviewDecisionForm({
-  title,
-  partnerTitle,
   partnerSlug,
   itemId,
   defaultValues,
@@ -112,13 +102,9 @@ export function ReviewDecisionForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full h-full">
-        <Card className="w-full h-full rounded-none border-none flex flex-col">
-          <CardHeader className="shrink-0">
-            <CardTitle>{title}</CardTitle>
-            <CardDescription>{partnerTitle}</CardDescription>
-          </CardHeader>
+        <div className="flex h-full w-full flex-col">
           <div className="flex-1 overflow-y-auto">
-            <CardContent>
+            <div className="p-6">
               <FormField
                 control={form.control}
                 name="status"
@@ -148,9 +134,9 @@ export function ReviewDecisionForm({
                   </FormItemLayout>
                 )}
               />
-            </CardContent>
+            </div>
 
-            <CardContent>
+            <div className="p-6 pt-0">
               <FormField
                 control={form.control}
                 name="featured"
@@ -171,9 +157,9 @@ export function ReviewDecisionForm({
                   </FormItemLayout>
                 )}
               />
-            </CardContent>
+            </div>
 
-            <CardContent>
+            <div className="p-6 pt-0">
               <FormField
                 control={form.control}
                 name="reviewNotes"
@@ -195,30 +181,32 @@ export function ReviewDecisionForm({
                   </FormItemLayout>
                 )}
               />
-            </CardContent>
+            </div>
 
             {error ? (
-              <CardContent>
+              <div className="p-6 pt-0">
                 <p className="text-sm text-destructive">{error}</p>
-              </CardContent>
+              </div>
             ) : null}
             {success ? (
-              <CardContent>
+              <div className="p-6 pt-0">
                 <p className="text-sm text-muted-foreground">{success}</p>
-              </CardContent>
+              </div>
             ) : null}
           </div>
-          <CardFooter className="justify-end gap-3 shrink-0">
-            {isDirty ? (
-              <Button htmlType="button" type="outline" disabled={isPending} onClick={handleCancel}>
-                Cancel
+          <div className="shrink-0 border-t py-4 px-6">
+            <div className="flex justify-end gap-3">
+              {isDirty ? (
+                <Button htmlType="button" type="outline" disabled={isPending} onClick={handleCancel}>
+                  Cancel
+                </Button>
+              ) : null}
+              <Button type="primary" htmlType="submit" disabled={!isDirty || isPending}>
+                {isPending ? 'Sending...' : 'Send review'}
               </Button>
-            ) : null}
-            <Button type="primary" htmlType="submit" disabled={!isDirty || isPending}>
-              {isPending ? 'Sending...' : 'Send review'}
-            </Button>
-          </CardFooter>
-        </Card>
+            </div>
+          </div>
+        </div>
       </form>
     </Form>
   )

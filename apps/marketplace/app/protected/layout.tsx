@@ -17,7 +17,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="flex h-svh w-full flex-col">
         <LayoutHeader
           partners={partners.map((partner) => ({
