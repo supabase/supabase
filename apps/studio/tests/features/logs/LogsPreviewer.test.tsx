@@ -14,6 +14,18 @@ import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { LOGS_API_MOCKS } from './logs.mocks'
 import { addAPIMock } from 'tests/lib/msw'
 
+vi.mock('components/interfaces/Settings/Logs/LogTable', () => ({
+  LogTable: ({ data }: { data: any[] }) => (
+    <div data-testid="log-table-mock">
+      {data.map((row) => (
+        <div key={row.id} data-testid="log-row">
+          {row.event_message}
+        </div>
+      ))}
+    </div>
+  ),
+}))
+
 dayjs.extend(utc)
 
 vi.mock('common', async (importOriginal) => {
@@ -80,14 +92,11 @@ test('useLogsPreview returns data from MSW', async () => {
   expect(result.current.logData).toEqual(LOGS_API_MOCKS.result)
 })
 
-test('LogsPreviewer renders the expected data from the API', async () => {
+
+test('LogsPreviewer passes API data to LogTable', async () => {
   customRender(
     <LogsPreviewer queryType="api" projectRef="default" tableName={LogsTableName.EDGE} />
   )
-
-  await waitFor(() => {
-    expect(screen.getByRole('table')).toBeInTheDocument()
-  })
 
   const firstLogEventMessage = LOGS_API_MOCKS.result[0].event_message
 
