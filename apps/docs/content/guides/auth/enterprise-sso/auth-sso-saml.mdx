@@ -330,6 +330,25 @@ At this time it is not possible to have users without an email address, so SAML 
 
 Most SAML 2.0 identity providers use Lightweight Directory Access Protocol (LDAP) attribute names. However, due to their variability and complexity operators of identity providers are able to customize both the `Name` and attribute value that is sent to Supabase Auth in an assertion. Refer to the identity provider's documentation and contact the operator for details on what attributes are mapped for your project.
 
+### Multi-valued attributes
+
+Some SAML attributes can contain multiple values, such as user groups, roles, or department memberships. By default, Supabase Auth stores only the first value as a string. To store all values as an array, set the `array` property to `true` in your attribute mapping.
+
+For example, to map user groups as an array:
+
+```json
+{
+  "keys": {
+    "groups": {
+      "name": "http://schemas.example.com/ws/identity/claims/groups",
+      "array": true
+    }
+  }
+}
+```
+
+This applies to any multi-valued SAML attributes from various identity providers, such as groups, roles, or custom claims that can have multiple values.
+
 **Accessing the stored attributes**
 
 The stored attributes, once mapped, show up in the access token (a JWT) of the user. If you need to look these values up in the database, you can find them in the `auth.identities` table under the `identity_data` JSON column. Identities created for SSO providers have `sso:<uuid-of-provider>` in the `provider` column, while `id` contains the unique `NameID` of the user account.
