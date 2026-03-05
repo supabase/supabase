@@ -103,7 +103,7 @@ serve(async (req) => {
   // Will create a deal using HubSpot's workflow tool instead of via API
 
   if (!formResponse.ok) {
-    console.log(`Failed to submit form data to HubSpot`, await formResponse.json())
+    console.error(`Failed to submit form data to HubSpot`, await formResponse.json())
     return new Response(`Failed to submit form data to HubSpot`, {
       status: 500,
     })
