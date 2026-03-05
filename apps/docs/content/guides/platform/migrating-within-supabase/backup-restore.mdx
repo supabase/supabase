@@ -197,6 +197,7 @@ breadcrumb: 'Migrations'
 - Setting the `session_replication_role` to `replica` disables all triggers so that columns are not double encrypted.
 - If you have created any [custom roles](/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
 - If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
+- If you get "permission denied" errors for `pgsodium.key` or `vault.secrets` tables during restore, comment out the related `COPY` and `setval` statements for these tables in your `data.sql` file. These system tables are managed internally and cannot be written to directly.
 
 ### Preserving migration history
 
