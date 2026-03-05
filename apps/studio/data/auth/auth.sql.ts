@@ -1,6 +1,6 @@
 import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 
-import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from '../table-rows/table-rows.sql'
+import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from '../table-rows/table-rows-constants'
 
 export function prefixToUUID(prefix: string, max: boolean) {
   const mapped = '00000000-0000-0000-0000-000000000000'
