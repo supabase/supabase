@@ -289,7 +289,7 @@ export const LogsPreviewer = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex flex-col h-full min-h-0">
       <PreviewFilterPanel {...filterPanelProps} />
       {children}
       <div
@@ -331,7 +331,7 @@ export const LogsPreviewer = ({
       </div>
       <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
-        <LoadingOpacity active={isLoading}>
+        <LoadingOpacity active={isLoading} className="min-h-0">
           <LogTable
             projectRef={projectRef}
             isLoading={isLoading}

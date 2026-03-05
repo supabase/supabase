@@ -16,7 +16,7 @@ export const LogPage: NextPageWithLayout = () => {
   if (selectedFunction === undefined || isLoading) return null
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 min-h-0">
       <LogsPreviewer
         condensedLayout
         projectRef={ref as string}

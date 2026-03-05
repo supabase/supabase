@@ -391,7 +391,7 @@ export const LogTable = ({
   if (!data) return null
 
   return (
-    <section className={'h-full flex w-full flex-col flex-1'}>
+    <section className={'h-full flex w-full flex-col flex-1 min-h-0'}>
       {!queryType && <LogsExplorerTableHeader />}
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel
