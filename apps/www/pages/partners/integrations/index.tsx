@@ -149,10 +149,10 @@ function IntegrationPartnersPage(props: Props) {
                   <div className="text-foreground-lighter mb-2 text-sm">Explore more</div>
                   <div className="grid grid-cols-2 gap-8 lg:grid-cols-1">
                     <PartnerLinkBox
-                      href={`/partners/integrations#become-a-partner`}
+                      href="/partners/apply"
                       title="Become a partner"
                       color="brand"
-                      description="Fill out a quick 30 second form to apply to become a partner"
+                      description="Fill out a quick form to apply to become a partner"
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

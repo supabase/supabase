@@ -207,7 +207,7 @@ const Partners = () => {
             </h2>
             <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
               <Button asChild size="medium">
-                <Link href="https://forms.supabase.com/partner" tabIndex={-1}>
+                <Link href="/partners/apply" tabIndex={-1}>
                   Become a Partner
                 </Link>
               </Button>

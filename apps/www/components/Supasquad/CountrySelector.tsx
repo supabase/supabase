@@ -1,10 +1,15 @@
 import {
   Select_Shadcn_ as Select,
   SelectContent_Shadcn_ as SelectContent,
+  SelectGroup_Shadcn_ as SelectGroup,
   SelectItem_Shadcn_ as SelectItem,
+  SelectLabel_Shadcn_ as SelectLabel,
   SelectTrigger_Shadcn_ as SelectTrigger,
   SelectValue_Shadcn_ as SelectValue,
 } from 'ui'
+
+// Common countries shown at the top
+const COMMON_COUNTRY_CODES = ['US', 'GB', 'CA', 'AU', 'DE', 'FR', 'NL', 'IN', 'BR', 'JP']
 
 // Country data with flags and names (alphabetically sorted)
 const countries = [
@@ -168,6 +173,12 @@ export function CountrySelector({
   onValueChange,
   placeholder = 'Select your country',
 }: CountrySelectorProps) {
+  const commonCountries = COMMON_COUNTRY_CODES.map((code) =>
+    countries.find((c) => c.code === code)
+  ).filter(Boolean) as (typeof countries)[number][]
+
+  const otherCountries = countries.filter((c) => !COMMON_COUNTRY_CODES.includes(c.code))
+
   return (
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className="w-full !bg-foreground/[.026]">
@@ -181,11 +192,22 @@ export function CountrySelector({
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
-        {countries.map((country) => (
-          <SelectItem key={country.code} value={country.code}>
-            <span className="flex items-center gap-2">{country.name}</span>
-          </SelectItem>
-        ))}
+        <SelectGroup>
+          <SelectLabel>Common</SelectLabel>
+          {commonCountries.map((country) => (
+            <SelectItem key={country.code} value={country.code}>
+              <span className="flex items-center gap-2">{country.name}</span>
+            </SelectItem>
+          ))}
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>All Countries</SelectLabel>
+          {otherCountries.map((country) => (
+            <SelectItem key={country.code} value={country.code}>
+              <span className="flex items-center gap-2">{country.name}</span>
+            </SelectItem>
+          ))}
+        </SelectGroup>
       </SelectContent>
     </Select>
   )
