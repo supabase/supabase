@@ -965,14 +965,8 @@ const EXTERNAL_PROVIDER_KAKAO = {
     },
     // [TODO] Update docs
     EXTERNAL_KAKAO_CLIENT_ID: {
-      title: 'REST API Key',
+      title: 'Native App Key',
       type: 'string',
-    },
-    // [TODO] Update docs
-    EXTERNAL_KAKAO_SECRET: {
-      title: 'Client Secret Code',
-      type: 'string',
-      isSecret: true,
     },
     EXTERNAL_KAKAO_EMAIL_OPTIONAL: {
       title: 'Allow users without an email',
@@ -985,12 +979,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
     EXTERNAL_KAKAO_ENABLED: boolean().required(),
     EXTERNAL_KAKAO_CLIENT_ID: string().when('EXTERNAL_KAKAO_ENABLED', {
       is: true,
-      then: (schema) => schema.required('REST API Key is required'),
-      otherwise: (schema) => schema,
-    }),
-    EXTERNAL_KAKAO_SECRET: string().when('EXTERNAL_KAKAO_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Client Secret Code is required'),
+      then: (schema) => schema.required('Native App Key is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_KAKAO_EMAIL_OPTIONAL: boolean().optional(),
