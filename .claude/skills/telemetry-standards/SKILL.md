@@ -27,6 +27,12 @@ opened, clicked, submitted, created, removed, updated, retrieved, intended, eval
 - `backup_button_clicked`
 - `sql_query_submitted`
 
+**Common mistakes with corrections:**
+- `database_saved` → `save_button_clicked` or `database_updated` (unapproved verb)
+- `click_backup_button` → `backup_button_clicked` (wrong order)
+- `dashboardViewed` → don't track passive views on page load
+- `component_rendered` → don't track — no user interaction
+
 ## Property Standards
 
 **Casing:** camelCase always
@@ -47,6 +53,8 @@ opened, clicked, submitted, created, removed, updated, retrieved, intended, eval
 - Generic "viewed" or "seen" events — already captured by pageview events
 
 **DO track:** user clicks, form submissions, explicit opens/closes, user-initiated actions.
+
+**Never track PII** (emails, names, IPs, etc.) in event properties.
 
 ## Required Pattern
 
@@ -102,6 +110,31 @@ When a PR adds user-facing interactions (buttons, forms, toggles, modals) **with
 
 When checking property consistency, search `packages/common/telemetry-constants.ts` for similar events and verify property names match.
 
+## Well-Formed Event Examples
+
+```typescript
+track('sql_query_submitted', {
+  queryType: 'select',
+  executionTime: 1234,
+  rowCount: 50,
+})
+
+track('assistant_suggestion_clicked', {
+  assistantType: 'sql',
+  suggestionType: 'optimization',
+})
+
+track('database_connection_clicked', {
+  connectionType: 'direct',
+  source: 'settings_page',
+})
+
+track('backup_button_clicked', {
+  backupType: 'manual',
+  databaseSize: 'large',
+})
+```
+
 ## Implementing New Tracking
 
 To add tracking for a user action:
@@ -119,4 +152,5 @@ To add tracking for a user action:
 - [ ] Event defined in telemetry-constants.ts with accurate `@page`/`@source`
 - [ ] Using `useTrack` hook (not `useSendEventMutation`)
 - [ ] Not tracking passive views/appearances
+- [ ] No PII in event properties (emails, names, IPs, etc.)
 - [ ] Property names consistent with similar events
