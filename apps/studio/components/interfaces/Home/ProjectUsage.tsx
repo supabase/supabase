@@ -10,7 +10,7 @@ import {
 } from 'data/analytics/project-log-stats-query'
 import dayjs from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Auth, Database, Realtime, Storage } from 'icons'
@@ -32,9 +32,11 @@ const ProjectUsage = () => {
     'project_storage:all',
   ])
 
-  const { plan } = useCurrentOrgPlan()
+  const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
+  const retentionDays = getEntitlementMax()
 
-  const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
+  const DEFAULT_INTERVAL: ChartIntervalKey =
+    retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day'
 
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
 
@@ -94,8 +96,6 @@ const ProjectUsage = () => {
         <ChartIntervalDropdown
           value={interval || '1day'}
           onChange={(interval) => setInterval(interval as ProjectLogStatsVariables['interval'])}
-          planId={plan?.id}
-          planName={plan?.name}
           organizationSlug={organization?.slug}
           dropdownAlign="start"
           tooltipSide="right"

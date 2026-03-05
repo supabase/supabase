@@ -10,7 +10,7 @@ import {
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import dayjs from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
@@ -55,9 +55,11 @@ export const ProjectUsageSection = () => {
     'project_auth:all',
     'project_storage:all',
   ])
-  const { plan } = useCurrentOrgPlan()
+  const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
+  const retentionDays = getEntitlementMax()
 
-  const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
+  const DEFAULT_INTERVAL: ChartIntervalKey =
+    retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
@@ -208,8 +210,6 @@ export const ProjectUsageSection = () => {
         <ChartIntervalDropdown
           value={interval}
           onChange={(interval) => setInterval(interval as ChartIntervalKey)}
-          planId={plan?.id}
-          planName={plan?.name}
           organizationSlug={organization?.slug}
           dropdownAlign="end"
           tooltipSide="left"
