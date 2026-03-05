@@ -309,7 +309,7 @@ test.describe('Storage', () => {
     // create a folder and add a file
     await createFolder(page, folderName)
     // Open the folder
-    await page.getByText(folderName).click()
+    await page.getByTitle(folderName).click()
     const filePath = path.join(import.meta.dirname, 'files', fileName)
     await uploadFile(page, filePath, fileName)
 
@@ -317,7 +317,7 @@ test.describe('Storage', () => {
     await page.getByRole('link', { name: 'Files' }).nth(1).click()
     // Navigate to the 2nd bucket
     await navigateToBucket(page, ref, bucketName2)
-    await expect(page.getByText(fileName)).not.toBeVisible()
+    await expect(page.getByTitle(fileName)).not.toBeVisible()
   })
 
   test('can delete a file', async ({ page, ref }) => {
