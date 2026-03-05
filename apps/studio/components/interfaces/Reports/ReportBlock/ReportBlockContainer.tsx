@@ -53,11 +53,11 @@ export const ReportBlockContainer = ({
             ) : (
               <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
-            <div className={cn('flex items-center gap-2 flex-1 transition-opacity')}>
+            <div className={cn('flex items-center gap-2 flex-1 min-w-0 transition-opacity')}>
               <h3 className="heading-meta truncate">{label}</h3>
               {badge && <div className="flex items-center shrink-0">{badge}</div>}
             </div>
-            <div className="flex items-center">{actions}</div>
+            <div className="flex items-center shrink-0">{actions}</div>
           </div>
         </TooltipTrigger>
         {tooltip && (
