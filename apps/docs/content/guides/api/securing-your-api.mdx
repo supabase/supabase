@@ -8,15 +8,13 @@ The data APIs are designed to work with Postgres Row Level Security (RLS). If yo
 
 To control access to your data, you can use [Policies](/docs/guides/auth#policies).
 
-## Enabling row level security
+## Add RLS policies
 
-Any table you create in the `public` schema will be accessible via the Supabase Data API.
-
-To restrict access, enable Row Level Security (RLS) on all tables, views, and functions in the `public` schema. You can then write RLS policies to grant users access to specific database rows or functions based on their authentication token.
+Enable Row Level Security (RLS) on all tables, views, and functions you have exposed via the Data API. You can then write RLS policies to grant users access to specific database rows or functions based on their authentication token.
 
 <Admonition type="danger">
 
-Always enable Row Level Security on tables, views, and functions in the `public` schema to protect your data.
+Always enable Row Level Security on tables, views, and functions you expose via the Data API to protect your data.
 
 </Admonition>
 
@@ -49,13 +47,9 @@ With RLS enabled, you can create Policies that allow or disallow users to access
 
 <Admonition type="danger">
 
-Any table **without RLS enabled** in the `public` schema will be accessible to the public, using the `anon` role. Always make sure that RLS is enabled or that you've got other security measures in place to avoid unauthorized access to your project's data!
+Any exposed table **without RLS enabled** can be accessed by roles with matching Data API grants (for example, `anon`). Always make sure RLS is enabled, or that you've got other controls in place to avoid unauthorized access to your project's data.
 
 </Admonition>
-
-## Disable the API or restrict to custom schema
-
-If you don't use the Data API, or if you don't want to expose the `public` schema, you can either disable it entirely or change the automatically exposed schema to one of your choice. See **[Hardening the Data API](/docs/guides/database/hardening-data-api)** for instructions.
 
 ## Enforce additional rules on each request
 
@@ -66,7 +60,7 @@ Here are some common situations where additional protections are necessary:
 - Enforcing per-IP or per-user rate limits.
 - Checking custom or additional API keys before allowing further access.
 - Rejecting requests after exceeding a quota or requiring payment.
-- Disallowing direct access to certain tables, views or functions in the `public` schema.
+- Disallowing direct access to certain tables, views, or functions in exposed schemas.
 
 You can build these cases in your application by creating a Postgres function that will read information from the request and perform additional checks, such as counting the number of requests received or checking that an API key is already registered in your database before serving the response.
 

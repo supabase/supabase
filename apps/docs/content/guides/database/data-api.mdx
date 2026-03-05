@@ -1,0 +1,43 @@
+---
+title: 'Data API'
+description: 'Quick options for managing Data API exposure and access.'
+---
+
+The Supabase Data API is a standalone server that sits between your application client code and your database. It automatically generates a fully RESTful API based on your database structure, allowing you to interact with your database through HTTP endpoints.
+
+With the Data API, you have granular control over exposure: you can choose to generate API routes for specific tables, individual functions, or even entire schemas—depending on the needs of your application.
+
+**Important:** Any table that is exposed through the Data API should have [Row Level Security (RLS) enabled](/docs/guides/database/postgres/row-level-security) to prevent unauthorized data access.
+
+## Expose specific tables and functions (recommended)
+
+In [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), you can expose specific tables from specific schemas and grant only the privileges each role needs.
+
+```sql
+grant select on table public.your_table to anon;
+grant select, insert, update, delete on table public.your_table to authenticated;
+grant execute on function public.your_function to anon, authenticated;
+```
+
+## Use schema-level defaults for automation
+
+If you need schema-wide automation, expose an entire schema like `public` or `api` and set default privileges for new objects:
+
+```sql
+alter default privileges in schema api
+grant select, insert, update, delete on tables to anon, authenticated;
+
+alter default privileges in schema api
+grant execute on functions to anon, authenticated;
+```
+
+## Disable the Data API completely
+
+If your app never uses Supabase client libraries, REST, or GraphQL data endpoints:
+
+1. Go to [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings).
+1. Turn **Enable Data API** off.
+
+## Learn more
+
+To learn more about the Data API, see the [full guide](/docs/guides/api).

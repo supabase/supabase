@@ -1086,10 +1086,7 @@ export const database: NavMenuConstant = {
           name: 'Column Level Security',
           url: '/guides/database/postgres/column-level-security' as `/${string}`,
         },
-        {
-          name: 'Hardening the Data API',
-          url: '/guides/database/hardening-data-api' as `/${string}`,
-        },
+        { name: 'Data API', url: '/guides/database/data-api' as `/${string}` },
         {
           name: 'Custom Claims & RBAC',
           url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac' as `/${string}`,
@@ -2471,7 +2468,7 @@ export const security: NavMenuConstant = {
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
-        { name: 'Hardening the Data API', url: '/guides/database/hardening-data-api' },
+        { name: 'Data API', url: '/guides/database/data-api' },
       ],
     },
   ],

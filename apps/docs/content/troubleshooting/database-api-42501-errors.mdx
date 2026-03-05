@@ -49,7 +49,7 @@ If you created a custom schema, you will have to give the Database API permissio
 
 If you see an error like `permission denied for table your_table`, the querying role may not have the required privilege for the operation.
 
-By default, tables in the `public` schema are granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` to the `anon` and `authenticated` roles. However, these privileges can be adjusted via the [Dashboard Table Editor](/dashboard/project/_/editor) or via SQL.
+By default, tables in the `public` schema are granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` to the `anon` and `authenticated` roles. However, these privileges can be adjusted in [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings) or via SQL.
 
 To check the current privileges on a table:
 
@@ -75,7 +75,7 @@ grant select, insert, update, delete on table public.your_table to anon, authent
 
 Granting privileges allows access to your table through the Data API, so you should ensure you [enable RLS](/docs/guides/database/postgres/row-level-security) and write appropriate policies to protect your data.
 
-For more information, see [Adjusting table-level privileges](/docs/guides/database/hardening-data-api#adjusting-table-level-privileges).
+For more information, see [Data API](/docs/guides/database/data-api).
 
 </Admonition>
 

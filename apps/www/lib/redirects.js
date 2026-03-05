@@ -26,6 +26,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/storage/image-transformations',
     destination: '/docs/guides/storage/serving/image-transformations',
   },

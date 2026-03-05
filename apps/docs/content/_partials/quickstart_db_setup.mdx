@@ -32,7 +32,7 @@ curl -X POST https://api.supabase.com/v1/projects \
 
 <StepHikeCompact.Details>
 
-When your project is up and running, go to the [Table Editor](/dashboard/project/_/editor), create a new table and insert some data.
+When your project is up and running, go to the [Table Editor](/dashboard/project/_/editor), create a new table and insert some data. Then in [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), expose specific tables (recommended) or an entire schema like `public` or `api` for automation.
 
 Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create an `instruments` table with some sample data.
 
@@ -54,6 +54,9 @@ Alternatively, you can run the following snippet in your project's [SQL Editor](
       ('cello');
 
     alter table instruments enable row level security;
+
+    -- Enable read access for the Data API
+    grant select on public.instruments to anon;
     ```
 
 </StepHikeCompact.Code>

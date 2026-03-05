@@ -33,3 +33,29 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
 
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
+
+### Enable Data API access
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    supabase-csharp uses the Data API to query and mutate your Postgres data. You first need to grant Data API roles permissions to access your tables and functions.
+
+    In [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), expose specific tables (recommended), or an entire schema like `public` or `api` for automation.
+
+    Alternatively, use SQL to grant the required permissions:
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```sql
+    -- Grant access to tables
+    grant all on public.your_table to anon, authenticated, service_role;
+
+    -- Grant access to functions
+    grant execute on function public.your_function to anon, authenticated, service_role;
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>

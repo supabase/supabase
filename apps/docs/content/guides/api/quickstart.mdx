@@ -38,17 +38,20 @@ We'll create a database table called `todos` for storing tasks. This creates a c
         id serial primary key,
         task text
       );
+
+      -- Enable Data API access
+      grant all on public.todos to anon, authenticated, service_role;
       ```
 
       </TabPanel>
       <TabPanel id="dashboard" label="Dashboard">
 
-      <video width="99%" muted playsInline controls={true}>
-        <source
-          src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-create-table-sm.mp4"
-          type="video/mp4"
-        />
-      </video>
+      1. Go to the [Table editor](/dashboard/project/_/editor) page in the Dashboard.
+      2. Click **New Table** and create a table with the name `todos`.
+      3. Click **Save**.
+      4. Click **New Column** and create a column with the name `task` and type `text`.
+      5. Click **Save**.
+      6. In [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), expose specific tables from your schemas (recommended), or an entire schema like `public` or `api` for automation.
 
       </TabPanel>
       </Tabs>
