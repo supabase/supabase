@@ -37,7 +37,7 @@ const page: GoPageInput = {
       children: (
         <div className="flex flex-col items-center gap-6">
           <ol className="flex flex-col gap-4 text-foreground-light text-lg list-decimal list-inside">
-            <li>Create a Supabase account with the same email where you got our post-event note</li>
+            <li>Create a Supabase account with the same email address where you got our post-event note</li>
             <li>Load data into a Supabase database</li>
             <li>Complete these steps by Monday, May 11, 2026 at 12:00 PM PST</li>
           </ol>
