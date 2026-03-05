@@ -88,7 +88,7 @@ const UseCase = ({
               </Button>
             ) : (
               <Button asChild size="tiny" type="default" iconRight={<ArrowUpRight />}>
-                <Link href={useCase.cta.link} target="_blank">
+                <Link href={useCase.cta.link} target="_blank" rel="noreferrer">
                   {useCase.cta.label ?? 'View example'}
                 </Link>
               </Button>
