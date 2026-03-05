@@ -8,6 +8,7 @@ export interface OrgMenuItemProps {
   isActive: boolean
   disabled?: boolean
   onCloseSheet?: () => void
+  onSubmenuClick?: (item: OrgNavItem) => void
 }
 
 export function OrgMenuItem({
@@ -15,25 +16,44 @@ export function OrgMenuItem({
   isActive,
   disabled = false,
   onCloseSheet,
+  onSubmenuClick,
 }: OrgMenuItemProps) {
   const menuButtonClass = cn(
     sidebarMenuButtonVariants({ size: 'default', hasIcon: true }),
     disabled && 'opacity-50 pointer-events-none'
   )
 
+  const content = (
+    <>
+      <span className="flex size-5 shrink-0 items-center justify-center [&>svg]:size-5 [&>svg]:shrink-0">
+        {item.icon}
+      </span>
+      <span className="truncate">{item.label}</span>
+    </>
+  )
+
   return (
     <SidebarMenuItem key={item.key}>
-      <Link
-        href={item.href}
-        onClick={onCloseSheet}
-        data-active={isActive}
-        className={menuButtonClass}
-      >
-        <span className="flex size-5 shrink-0 items-center justify-center [&>svg]:size-5 [&>svg]:shrink-0">
-          {item.icon}
-        </span>
-        <span className="truncate">{item.label}</span>
-      </Link>
+      {onSubmenuClick ? (
+        <button
+          type="button"
+          data-active={isActive}
+          onClick={() => onSubmenuClick?.(item)}
+          disabled={disabled}
+          className={menuButtonClass}
+        >
+          {content}
+        </button>
+      ) : (
+        <Link
+          href={item.href}
+          onClick={onCloseSheet}
+          data-active={isActive}
+          className={menuButtonClass}
+        >
+          {content}
+        </Link>
+      )}
     </SidebarMenuItem>
   )
 }

@@ -6,9 +6,11 @@ import { ProductMenuItem } from './ProductMenuItem'
 interface ProductMenuProps {
   page?: string
   menu: ProductMenuGroup[]
+  /** Called when a menu item link is clicked (e.g. to close a sheet on navigation) */
+  onItemClick?: () => void
 }
 
-export const ProductMenu = ({ page, menu }: ProductMenuProps) => {
+export const ProductMenu = ({ page, menu, onItemClick }: ProductMenuProps) => {
   return (
     <div className="flex flex-col space-y-4">
       <Menu type="pills">
@@ -38,6 +40,7 @@ export const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                         item={item}
                         isActive={isActive}
                         target={item.isExternal ? '_blank' : '_self'}
+                        onClick={onItemClick}
                       />
                     )
                   })}

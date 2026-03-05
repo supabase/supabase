@@ -18,6 +18,22 @@ export function getOrgActiveRoute(pathname: string): string | undefined {
   return segments[orgIndex + 2]
 }
 
+/** Org settings sub-route segments that map to the 'settings' section */
+const ORG_SETTINGS_ROUTES = ['general', 'apps', 'audit', 'documents', 'security', 'sso'] as const
+
+/**
+ * Returns the org section key that has a submenu and matches the current route.
+ * e.g. /org/my-org/general → 'settings', /org/my-org/team → null
+ */
+export function getOrgSectionKeyFromPathname(
+  activeRoute: string | undefined
+): string | null {
+  if (activeRoute && ORG_SETTINGS_ROUTES.includes(activeRoute as any)) {
+    return 'settings'
+  }
+  return null
+}
+
 /**
  * Pure function to determine if an org menu item is active.
  * First item (index 0) is active when activeRoute is undefined (org home).
@@ -33,13 +49,7 @@ export function isOrgMenuActive(
     return activeRoute === undefined
   }
   if (item.key === 'settings') {
-    return (
-      pathname.includes('/general') ||
-      pathname.includes('/apps') ||
-      pathname.includes('/audit') ||
-      pathname.includes('/documents') ||
-      pathname.includes('/security')
-    )
+    return ORG_SETTINGS_ROUTES.some((route) => pathname.includes(`/${route}`))
   }
   return activeRoute === item.key
 }

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getOrgActiveRoute,
+  getOrgSectionKeyFromPathname,
   isOrgMenuActive,
   type OrgNavItem,
 } from './OrgMenuContent.utils'
@@ -61,6 +62,7 @@ describe('isOrgMenuActive', () => {
     expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/audit', undefined)).toBe(true)
     expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/documents', undefined)).toBe(true)
     expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/security', undefined)).toBe(true)
+    expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/sso', undefined)).toBe(true)
   })
 
   it('settings item is not active when pathname has no settings sub-route', () => {
@@ -69,5 +71,27 @@ describe('isOrgMenuActive', () => {
 
   it('item is not active when activeRoute does not match', () => {
     expect(isOrgMenuActive(mockItem('team'), 1, '/org/foo/team', 'usage')).toBe(false)
+  })
+})
+
+describe('getOrgSectionKeyFromPathname', () => {
+  it('returns settings for org settings sub-routes', () => {
+    expect(getOrgSectionKeyFromPathname('general')).toBe('settings')
+    expect(getOrgSectionKeyFromPathname('security')).toBe('settings')
+    expect(getOrgSectionKeyFromPathname('sso')).toBe('settings')
+    expect(getOrgSectionKeyFromPathname('apps')).toBe('settings')
+    expect(getOrgSectionKeyFromPathname('audit')).toBe('settings')
+    expect(getOrgSectionKeyFromPathname('documents')).toBe('settings')
+  })
+
+  it('returns null for non-settings routes', () => {
+    expect(getOrgSectionKeyFromPathname('team')).toBeNull()
+    expect(getOrgSectionKeyFromPathname('integrations')).toBeNull()
+    expect(getOrgSectionKeyFromPathname('billing')).toBeNull()
+    expect(getOrgSectionKeyFromPathname('usage')).toBeNull()
+  })
+
+  it('returns null when activeRoute is undefined', () => {
+    expect(getOrgSectionKeyFromPathname(undefined)).toBeNull()
   })
 })
