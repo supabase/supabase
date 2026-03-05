@@ -68,15 +68,7 @@ const createLucideIcon = (
 ): LucideIcon => {
   const Component = forwardRef<SVGSVGElement, LucideProps>(
     (
-      {
-        color,
-        size = 24,
-        strokeWidth,
-        absoluteStrokeWidth,
-        className = '',
-        children,
-        ...rest
-      },
+      { color, size = 24, strokeWidth, absoluteStrokeWidth, className = '', children, ...rest },
       ref
     ) => {
       return createElement(
