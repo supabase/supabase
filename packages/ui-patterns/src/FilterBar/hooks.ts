@@ -154,7 +154,7 @@ export function useHighlightNavigation(
         setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0))
         return
       }
-      if (e.key === 'Enter' || e.key === 'Tab') {
+      if (e.key === 'Enter') {
         // Edge case: when a filter is highlighted, skip dropdown selection and let fallback handle it
         if (options?.skipEnterWhenFilterHighlighted) {
           if (fallbackKeyDown) fallbackKeyDown(e)

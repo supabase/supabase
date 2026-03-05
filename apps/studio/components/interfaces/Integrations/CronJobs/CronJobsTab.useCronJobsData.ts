@@ -27,6 +27,7 @@ type UseCronJobsDataParams = ConnectionVars & {
 
 interface CronJobsGridState {
   rows: Array<CronJob>
+  queryCost?: number
   isSuccess: boolean
   isLoading: boolean
   error: ResponseError | null
@@ -130,6 +131,7 @@ export function useCronJobsData({
   return {
     grid: {
       rows: cronJobs,
+      queryCost: cronJobsError?.metadata?.cost,
       error: useMinimalQuery ? cronJobsMinimalError : cronJobsError,
       isSuccess: useMinimalQuery ? isCronJobsMinimalSuccess : isCronJobsSuccess,
       isLoading: useMinimalQuery ? isCronJobsMinimalLoading : isCronJobsLoading,

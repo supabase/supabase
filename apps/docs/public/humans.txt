@@ -4,12 +4,14 @@ Supabase is 100% remote.
 
 Aaron Byrne
 Ada Wong
+Adam Mohammed
 Adam Mokan
 AJ Matias
 Akash Manimaran
 Alaister Young
 Alan De Los Santos
 Aleksi Immonen
+Alex Hall
 Alexander Korotkov
 Ali Waseem
 Allan S
@@ -27,6 +29,7 @@ Artur Zakirov
 Artyom Borissov
 Barco Fourie
 Beng Eu
+Benjamin Coenen
 Bo Lu
 Bobbie Soedirgo
 Brendan Stephens
@@ -48,6 +51,7 @@ Chris Ward
 Clayton Kast
 Craig Cannon
 Cuong Do
+Daniel Velázquez Lara
 Danny White
 Darren Cunningham
 Dave Wilson
@@ -79,6 +83,8 @@ Firas El Rachidi
 Francesco Sansalvadore
 Garrett Crowell
 Gerardo Estaba
+Gildas Garcia
+Giuseppe Mandato
 Greg Kress
 Greg P
 Greg Richardson
@@ -100,11 +106,15 @@ Jean-Paul Argudo
 Jeezy
 Jeff Smick
 Jenny Kibiri
+Jeremias Menichelli
 Jess Shears
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joaquim Moreno
 Joel Low
+Joel Martin
+Johan Bergström
 John Pena
 John Schaeffer
 Jon M
@@ -123,6 +133,7 @@ Katerina Skroumpelou
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kevin Strong-Holte
 Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
@@ -132,6 +143,7 @@ Leigh Anne Applewhite
 Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
+Lindsay Moss
 Long Hoang
 Luca Forstner
 Lukas Bernert
@@ -146,6 +158,7 @@ Matthew Hambright
 Matt Johnston
 Matt Rossman
 Matthias Luft
+Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
 Miles Thomas
@@ -172,6 +185,7 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Rodrigo Esteves
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
@@ -180,8 +194,10 @@ Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Sana Cordeaux
 Sara Read
 Sean Oliver
+Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shane E

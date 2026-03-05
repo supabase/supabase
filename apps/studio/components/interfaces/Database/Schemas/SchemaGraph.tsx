@@ -78,7 +78,7 @@ export const SchemaGraph = () => {
   })
 
   const {
-    data: tables,
+    data: tables = [],
     error: errorTables,
     isSuccess: isSuccessTables,
     isPending: isLoadingTables,
@@ -89,6 +89,7 @@ export const SchemaGraph = () => {
     schema: selectedSchema,
     includeColumns: true,
   })
+  const hasNoTables = isSuccessSchemas && tables.length === 0
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
   const [, setStoredPositions] = useLocalStorage(
@@ -221,66 +222,68 @@ export const SchemaGraph = () => {
               selectedSchemaName={selectedSchema}
               onSelectSchema={setSelectedSchema}
             />
-            <div className="flex items-center gap-x-2">
-              <ButtonTooltip
-                type="outline"
-                icon={copied ? <Check /> : <Copy />}
-                onClick={() => {
-                  if (tables) {
-                    copyToClipboard(tablesToSQL(tables))
-                    setCopied(true)
-                  }
-                }}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: (
-                      <div className="max-w-[180px] space-y-2 text-foreground-light">
-                        <p className="text-foreground">Note</p>
-                        <p>
-                          This schema is for context or debugging only. Table order and constraints
-                          may be invalid. Not meant to be run as-is.
-                        </p>
-                      </div>
-                    ),
-                  },
-                }}
-              >
-                Copy as SQL
-              </ButtonTooltip>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <ButtonTooltip
-                    aria-label="Download Schema"
-                    type="default"
-                    loading={isDownloading}
-                    className="px-1.5"
-                    icon={<Download />}
-                    tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-32">
-                  <DropdownMenuItem onClick={() => downloadImage('png')}>
-                    Download as PNG
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => downloadImage('svg')}>
-                    Download as SVG
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <ButtonTooltip
-                type="default"
-                onClick={resetLayout}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'Automatically arrange the layout of all nodes',
-                  },
-                }}
-              >
-                Auto layout
-              </ButtonTooltip>
-            </div>
+            {!hasNoTables && (
+              <div className="flex items-center gap-x-2">
+                <ButtonTooltip
+                  type="outline"
+                  icon={copied ? <Check /> : <Copy />}
+                  onClick={() => {
+                    if (tables) {
+                      copyToClipboard(tablesToSQL(tables))
+                      setCopied(true)
+                    }
+                  }}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: (
+                        <div className="max-w-[180px] space-y-2 text-foreground-light">
+                          <p className="text-foreground">Note</p>
+                          <p>
+                            This schema is for context or debugging only. Table order and
+                            constraints may be invalid. Not meant to be run as-is.
+                          </p>
+                        </div>
+                      ),
+                    },
+                  }}
+                >
+                  Copy as SQL
+                </ButtonTooltip>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <ButtonTooltip
+                      aria-label="Download Schema"
+                      type="default"
+                      loading={isDownloading}
+                      className="px-1.5"
+                      icon={<Download />}
+                      tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-32">
+                    <DropdownMenuItem onClick={() => downloadImage('png')}>
+                      Download as PNG
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => downloadImage('svg')}>
+                      Download as SVG
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <ButtonTooltip
+                  type="default"
+                  onClick={resetLayout}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: 'Automatically arrange the layout of all nodes',
+                    },
+                  }}
+                >
+                  Auto layout
+                </ButtonTooltip>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -297,7 +300,7 @@ export const SchemaGraph = () => {
       )}
       {isSuccessTables && (
         <>
-          {tables.length === 0 ? (
+          {hasNoTables ? (
             <div className="flex items-center justify-center w-full h-full">
               <Admonition
                 type="default"

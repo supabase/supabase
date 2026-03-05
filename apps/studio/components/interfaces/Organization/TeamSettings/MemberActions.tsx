@@ -147,7 +147,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
     deleteInvitation(
       { slug, id: invitedId },
-      { onSuccess: () => toast.success('Successfully revoked the invitation.') }
+      { onSuccess: () => toast.success('Successfully canceled the invitation') }
     )
   }
 
@@ -170,7 +170,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
             content: {
               side: 'bottom',
               text: isPendingInviteAcceptance
-                ? 'Role can only be changed after the user has accepted the invite'
+                ? 'Access can be managed after the invite is accepted'
                 : !canRemoveMember
                   ? 'You need additional permissions to manage this team member'
                   : undefined,

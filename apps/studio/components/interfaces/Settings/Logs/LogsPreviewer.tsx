@@ -27,7 +27,7 @@ import {
 import { DatePickerValue } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
-import LogTable from './LogTable'
+import { LogTable } from './LogTable'
 import UpgradePrompt from './UpgradePrompt'
 
 /**

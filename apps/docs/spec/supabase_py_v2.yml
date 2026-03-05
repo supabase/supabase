@@ -1232,6 +1232,7 @@ functions:
     notes: |
       - This method fetches the user object from the database instead of local session.
       - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
+      - The User model includes the following fields (since v2.28.0): `is_sso_user` (bool, defaults to `False`), `deleted_at` (optional string), and `banned_until` (optional string) in addition to the existing fields.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current existing session
@@ -8476,6 +8477,113 @@ functions:
                   }
               )
           )
+          ```
+
+  - id: from-list-v2
+    title: 'from_.list_v2()'
+    description: |
+      Lists files within a bucket using cursor-based pagination. Returns separate lists for folders and objects along with pagination metadata.
+    notes: |
+      - This method provides cursor-based pagination, which is more efficient for large result sets compared to offset-based pagination in `from_.list()`.
+      - The response separates folders and objects into distinct lists.
+      - Use the `nextCursor` field from the response to paginate through results.
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: options
+        isOptional: true
+        type: SearchV2Options
+        subContent:
+          - name: limit
+            isOptional: true
+            type: number
+            description: The maximum number of results to return.
+          - name: prefix
+            isOptional: true
+            type: string
+            description: Filter results to only objects with keys starting with this prefix.
+          - name: cursor
+            isOptional: true
+            type: string
+            description: The cursor for pagination, obtained from the `nextCursor` field of a previous response.
+          - name: with_delimiter
+            isOptional: true
+            type: bool
+            description: Whether to use delimiter-based folder grouping.
+          - name: sortBy
+            isOptional: true
+            type: SortByV2
+            description: The column to sort by.
+            subContent:
+              - name: column
+                isOptional: true
+                type: '"name" | "updated_at" | "created_at"'
+              - name: order
+                isOptional: true
+                type: '"asc" | "desc"'
+    examples:
+      - id: list-files-v2
+        name: List files with cursor-based pagination
+        code: |
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .list_v2({"limit": 100, "prefix": "folder/"})
+          )
+
+          print(response.objects)  # List of file objects
+          print(response.folders)  # List of folders
+          print(response.hasNext)  # Whether more results exist
+          print(response.nextCursor)  # Use for next page
+          ```
+        response: |
+          ```json
+          {
+            "hasNext": true,
+            "nextCursor": "eyJrZXkiOiJmb2xkZXIvYXZhdGFyMi5wbmcifQ==",
+            "folders": [
+              {
+                "key": "folder/subfolder/",
+                "name": "subfolder"
+              }
+            ],
+            "objects": [
+              {
+                "id": "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
+                "name": "avatar1.png",
+                "key": "folder/avatar1.png",
+                "updated_at": "2024-05-22T23:06:05.580Z",
+                "created_at": "2024-05-22T23:04:34.443Z",
+                "metadata": {
+                  "eTag": "\"c5e8c553235d9af30ef4f6e280790b92\"",
+                  "size": 32175,
+                  "mimetype": "image/png"
+                }
+              }
+            ]
+          }
+          ```
+      - id: paginate-files-v2
+        name: Paginate through all files
+        code: |
+          ```python
+          all_objects = []
+          cursor = None
+
+          while True:
+              options = {"limit": 100}
+              if cursor:
+                  options["cursor"] = cursor
+
+              response = supabase.storage.from_("avatars").list_v2(options)
+              all_objects.extend(response.objects)
+
+              if not response.hasNext:
+                  break
+              cursor = response.nextCursor
           ```
 
   - id: analytics-buckets

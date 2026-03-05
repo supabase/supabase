@@ -731,6 +731,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-database-disk",
+        "title": "Get database disk",
+        "slug": "v1-get-database-disk",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-disk-utilization",
         "title": "Get disk utilization",
         "slug": "v1-get-disk-utilization",
@@ -848,6 +854,12 @@
         "id": "v1-get-realtime-config",
         "title": "Get realtime config",
         "slug": "v1-get-realtime-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-shutdown-realtime",
+        "title": "Shutdown realtime",
+        "slug": "v1-shutdown-realtime",
         "type": "operation"
       },
       {

@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
+
 import 'reactflow/dist/style.css'
 
 import { useParams } from 'common'
@@ -24,17 +25,17 @@ import {
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
-import { type AWS_REGIONS_KEYS } from 'shared-data'
+import { useRouter } from 'next/router'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  cn,
 } from 'ui'
-import DeployNewReplicaPanel from './DeployNewReplicaPanel'
+
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'
 import { SmoothstepEdge } from './Edge'
@@ -43,13 +44,13 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
-import { useShowNewReplicaPanel } from './use-show-new-replica'
 
 interface InstanceConfigurationUIProps {
   diagramOnly?: boolean
 }
 
 const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationUIProps) => {
+  const router = useRouter()
   const reactFlow = useReactFlow()
   const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
@@ -58,12 +59,11 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
 
   const isAws = useIsAwsCloudProvider()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
+  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
-  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
   const [refetchInterval, setRefetchInterval] = useState<number | false>(10000)
-  const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
 
@@ -86,6 +86,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     () => partition(data ?? [], (db) => db.identifier === projectRef),
     [data, projectRef]
   )
+  const numReplicas = useMemo(() => data?.length ?? 0, [data])
 
   const { data: replicasStatuses, isSuccess: isSuccessReplicasStatuses } =
     useReadReplicasStatusesQuery(
@@ -96,7 +97,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
       }
     )
 
-  const numReplicas = useMemo(() => data?.length ?? 0, [data])
   useEffect(() => {
     if (!isSuccessReplicasStatuses) return
     const refetch = async () => {
@@ -241,10 +241,10 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
               <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
                 <div className="flex items-center justify-center">
                   <ButtonTooltip
+                    asChild
                     type="default"
                     disabled={!canManageReplicas || isOrioleDb}
                     className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
-                    onClick={() => setShowNewReplicaPanel(true)}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -256,7 +256,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                       },
                     }}
                   >
-                    Deploy a new replica
+                    <Link href={newReplicaURL}>Deploy a new replica</Link>
                   </ButtonTooltip>
                   {replicas.length > 0 && (
                     <DropdownMenu>
@@ -325,10 +325,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
               </ReactFlow>
             ) : (
               <MapView
-                onSelectDeployNewReplica={(region) => {
-                  setNewReplicaRegion(region)
-                  setShowNewReplicaPanel(true)
-                }}
+                onSelectDeployNewReplica={() => router.push(newReplicaURL)}
                 onSelectRestartReplica={setSelectedReplicaToRestart}
                 onSelectDropReplica={setSelectedReplicaToDrop}
               />
@@ -339,16 +336,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
 
       {!diagramOnly && (
         <>
-          <DeployNewReplicaPanel
-            visible={showNewReplicaPanel}
-            selectedDefaultRegion={newReplicaRegion}
-            onSuccess={() => setRefetchInterval(5000)}
-            onClose={() => {
-              setNewReplicaRegion(undefined)
-              setShowNewReplicaPanel(false)
-            }}
-          />
-
           <DropReplicaConfirmationModal
             selectedReplica={selectedReplicaToDrop}
             onSuccess={() => setRefetchInterval(5000)}

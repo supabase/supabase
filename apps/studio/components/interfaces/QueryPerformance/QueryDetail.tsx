@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { formatSql } from 'lib/formatSql'
@@ -12,10 +11,7 @@ import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn
 
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
-import {
-  QUERY_PERFORMANCE_COLUMNS,
-  QUERY_PERFORMANCE_REPORT_TYPES,
-} from './QueryPerformance.constants'
+import { QUERY_PERFORMANCE_COLUMNS } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
 
@@ -42,8 +38,6 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const track = useTrack()
-
-  const showExplainWithAiInQueryPerformance = useFlag('ShowExplainWithAiInQueryPerformance')
 
   useEffect(() => {
     if (selectedRow !== undefined) {
@@ -88,16 +82,14 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
       <QueryPanelSection className="pt-2 border-b relative">
         <div className="flex items-center justify-between mb-4">
           <h4>Query pattern</h4>
-          {showExplainWithAiInQueryPerformance && (
-            <AiAssistantDropdown
-              label="Explain with AI"
-              buildPrompt={buildPromptForCopy}
-              onOpenAssistant={handleExplainQuery}
-              telemetrySource="query_performance"
-              size="tiny"
-              type="default"
-            />
-          )}
+          <AiAssistantDropdown
+            label="Explain with AI"
+            buildPrompt={buildPromptForCopy}
+            onOpenAssistant={handleExplainQuery}
+            telemetrySource="query_performance"
+            size="tiny"
+            type="default"
+          />
         </div>
         <div
           className={cn(

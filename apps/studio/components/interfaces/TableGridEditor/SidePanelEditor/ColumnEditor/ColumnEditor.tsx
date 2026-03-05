@@ -2,8 +2,8 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import {
-  CONSTRAINT_TYPE,
   Constraint,
+  CONSTRAINT_TYPE,
   useTableConstraintsQuery,
 } from 'data/database/constraints-query'
 import {
@@ -56,6 +56,7 @@ export interface ColumnEditorProps {
       primaryKey?: Constraint
       foreignKeyRelations: ForeignKey[]
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      createMore?: boolean
     },
     resolve: any
   ) => void
@@ -76,6 +77,7 @@ export const ColumnEditor = ({
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  const [createMore, setCreateMore] = useState(false)
   const [placeholder, setPlaceholder] = useState(
     getPlaceholderText(columnFields?.format, columnFields?.name)
   )
@@ -182,8 +184,20 @@ export const ColumnEditor = ({
           primaryKey,
           foreignKeyRelations: fkRelations,
           existingForeignKeyRelations: foreignKeys,
+          createMore,
         }
-        saveChanges(payload, isNewRecord, configuration, resolve)
+        saveChanges(payload, isNewRecord, configuration, (err?: any) => {
+          resolve()
+          if (!err && createMore && isNewRecord) {
+            const freshColumnFields = generateColumnField({
+              schema: selectedTable.schema,
+              table: selectedTable.name,
+            })
+            setColumnFields(freshColumnFields)
+            setFkRelations([])
+            setErrors({})
+          }
+        })
       } else {
         resolve()
       }
@@ -207,7 +221,23 @@ export const ColumnEditor = ({
           closePanel={closePanel}
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
           visible={visible}
-        />
+        >
+          {isNewRecord && (
+            <div className="flex items-center gap-x-2">
+              <Toggle
+                size="tiny"
+                checked={createMore}
+                onChange={() => setCreateMore(!createMore)}
+              />
+              <label
+                className="text-foreground-light text-sm cursor-pointer select-none"
+                onClick={() => setCreateMore(!createMore)}
+              >
+                Create more
+              </label>
+            </div>
+          )}
+        </ActionBar>
       }
     >
       <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>

@@ -11,17 +11,31 @@ const MobileSheetNav: React.FC<{
   children: React.ReactNode
   open?: boolean
   onOpenChange(open: boolean): void
-}> = ({ children, open = false, onOpenChange }) => {
+  className?: string
+  shouldCloseOnRouteChange?: boolean
+  shouldCloseOnViewportResize?: boolean
+}> = ({
+  children,
+  open = false,
+  onOpenChange,
+  className,
+  shouldCloseOnRouteChange = true,
+  shouldCloseOnViewportResize = true,
+}) => {
   const router = useRouter()
   const { width } = useWindowSize()
 
   const pathWithoutQuery = router?.asPath?.split('?')?.[0]
   useEffect(() => {
-    onOpenChange(false)
+    if (shouldCloseOnRouteChange) {
+      onOpenChange(false)
+    }
   }, [pathWithoutQuery])
 
   useEffect(() => {
-    onOpenChange(false)
+    if (shouldCloseOnViewportResize) {
+      onOpenChange(false)
+    }
   }, [width])
 
   return (
@@ -31,7 +45,10 @@ const MobileSheetNav: React.FC<{
         showClose={false}
         size="full"
         side="bottom"
-        className={cn('rounded-t-lg overflow-hidden overflow-y-scroll h-[85dvh] md:max-h-[500px]')}
+        className={cn(
+          'rounded-t-lg bg-background overflow-hidden overflow-y-scroll h-[85dvh] md:max-h-[500px]',
+          className
+        )}
       >
         <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>{children}</ErrorBoundary>
       </SheetContent>
@@ -39,4 +56,5 @@ const MobileSheetNav: React.FC<{
   )
 }
 
+export { MobileSheetNav }
 export default MobileSheetNav

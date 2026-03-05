@@ -2320,7 +2320,7 @@ export interface SidebarOpenedEvent {
     /**
      * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
      */
-    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
+    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel' | 'help-panel'
   }
   groups: TelemetryGroups
 }

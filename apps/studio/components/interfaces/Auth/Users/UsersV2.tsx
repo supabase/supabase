@@ -75,6 +75,7 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -90,7 +91,11 @@ limit 100`
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const {
+    data: project,
+    isPending: isPendingProject,
+    isError: isProjectError,
+  } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
@@ -283,6 +288,7 @@ export const UsersV2 = () => {
     data,
     error,
     isSuccess,
+    isPending,
     isLoading,
     isRefetching,
     isError,
@@ -745,11 +751,11 @@ export const UsersV2 = () => {
         </div>
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
         <ResizablePanelGroup
-          direction="horizontal"
+          orientation="horizontal"
           className="relative flex flex-grow bg-alternative min-h-0"
           autoSaveId="query-performance-layout-v1"
         >
-          <ResizablePanel defaultSize={1}>
+          <ResizablePanel>
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}
@@ -802,7 +808,21 @@ export const UsersV2 = () => {
                       />
                     )
                   },
-                  noRowsFallback: isLoading ? (
+                  noRowsFallback: isPendingProject ? (
+                    <div className="absolute top-14 px-6 w-full">
+                      <GenericSkeletonLoader />
+                    </div>
+                  ) : project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY || isProjectError ? (
+                    <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
+                      <AlertError
+                        subject="Unable to load users"
+                        error={{
+                          message:
+                            'Could not connect to the database. Please check your project status.',
+                        }}
+                      />
+                    </div>
+                  ) : isPending ? (
                     <div className="absolute top-14 px-6 w-full">
                       <GenericSkeletonLoader />
                     </div>
@@ -810,7 +830,7 @@ export const UsersV2 = () => {
                     <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
                       <AlertError subject="Failed to retrieve users" error={error} />
                     </div>
-                  ) : (
+                  ) : isSuccess ? (
                     <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
                       <Users className="text-foreground-lighter" strokeWidth={1} />
                       <div className="text-center">
@@ -826,7 +846,7 @@ export const UsersV2 = () => {
                         </p>
                       </div>
                     </div>
-                  ),
+                  ) : null,
                 }}
               />
             </div>

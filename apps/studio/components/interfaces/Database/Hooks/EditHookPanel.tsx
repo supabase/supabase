@@ -4,7 +4,7 @@ import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Form_Shadcn_, SidePanel } from 'ui'
@@ -97,12 +97,25 @@ export const EditHookPanel = () => {
   )
   const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToEdit)
 
+  // Webhook IDs aren't stable across edits because the update mutation drops and recreates the
+  // trigger, assigning a new ID. This causes a brief window where the old selectedHookIdToEdit
+  // no longer matches any hook, incorrectly triggering the "Webhook not found" toast. Since this
+  // is an edge case, we use an ad-hoc ref to suppress the toast when the panel is closing rather
+  // than a more involved solution
+  const isClosingRef = useRef(false)
+
   const visible = showCreateHookForm || !!selectedHook
+
+  const onClose = () => {
+    isClosingRef.current = true
+    setShowCreateHookForm(false)
+    setSelectedHookIdToEdit(null)
+  }
 
   const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully created new webhook "${res.name}"`)
+      onSuccess: (_, variables) => {
+        toast.success(`Successfully created new webhook "${variables.payload.name}"`)
         onClose()
       },
       onError: (error) => {
@@ -149,17 +162,19 @@ export const EditHookPanel = () => {
     },
   })
 
-  const onClose = () => {
-    setShowCreateHookForm(false)
-    setSelectedHookIdToEdit(null)
-  }
-
   useEffect(() => {
-    if (isSuccess && !!selectedHookIdToEdit && !selectedHook) {
+    if (isSuccess && !!selectedHookIdToEdit && !selectedHook && !isClosingRef.current) {
       toast('Webhook not found')
       setSelectedHookIdToEdit(null)
     }
   }, [isSuccess, selectedHook, selectedHookIdToEdit, setSelectedHookIdToEdit])
+
+  // Reset the closing ref when the panel fully closes
+  useEffect(() => {
+    if (!visible) {
+      isClosingRef.current = false
+    }
+  }, [visible])
 
   // Reset form when panel opens with new selectedHook
   useEffect(() => {
