@@ -44,7 +44,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           <Button
             type="text"
             size="tiny"
-            icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
+            icon={<RefreshCcw className="text-foreground-light" strokeWidth={2} />}
             onClick={retry}
           >
             Retry
@@ -68,7 +68,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           isSnippetOwner ? (
             <Tooltip>
               <TooltipTrigger>
-                <AlertCircle className="text-red-900" size={14} strokeWidth={2} />
+                <AlertCircle className="text-destructive" size={14} strokeWidth={2} />
               </TooltipTrigger>
               <TooltipContent>Failed to save changes</TooltipContent>
             </Tooltip>
