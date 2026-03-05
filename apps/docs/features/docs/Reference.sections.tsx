@@ -549,7 +549,6 @@ async function FunctionSection({
                 <TabsContent_Shadcn_ key={example.id} value={example.id}>
                   <MDXRemoteRefs source={example.code} />
                   <div className="flex flex-col gap-2 mt-2">
-                    {/* Only YAML examples have data/response/description fields */}
                     {'data' in example && !!example.data?.sql && (
                       <CollapsibleDetails title="Data source" content={example.data.sql} />
                     )}
