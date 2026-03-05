@@ -38,11 +38,7 @@ export const WrappersTab = () => {
     : []
 
   const [isDirty, setIsDirty] = useState(false)
-  const {
-    confirmOnClose,
-    handleOpenChange,
-    modalProps: closeConfirmationModalProps,
-  } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: useCallback(() => isDirty, [isDirty]),
     onClose: useCallback(() => {
       setCreateWrapperShown(false)
@@ -106,7 +102,7 @@ export const WrappersTab = () => {
   return (
     <Container>
       <WrapperTable />
-      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </Container>
   )
 }

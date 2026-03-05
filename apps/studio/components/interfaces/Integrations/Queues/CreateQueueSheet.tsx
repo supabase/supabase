@@ -102,11 +102,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
 
   const checkIsDirty = () => form.formState.isDirty
 
-  const {
-    confirmOnClose,
-    handleOpenChange,
-    modalProps: closeConfirmationModalProps,
-  } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty,
     onClose,
   })
@@ -326,7 +322,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
             </Button>
           </SheetFooter>
         </div>
-        <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+        <DiscardChangesConfirmationDialog {...modalProps} />
       </SheetContent>
     </Sheet>
   )

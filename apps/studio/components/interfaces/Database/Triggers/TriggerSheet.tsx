@@ -135,11 +135,7 @@ export const TriggerSheet = ({
   })
   const { function_name, function_schema } = form.watch()
 
-  const {
-    confirmOnClose,
-    handleOpenChange,
-    modalProps: closeConfirmationModalProps,
-  } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
   })
@@ -485,7 +481,7 @@ export const TriggerSheet = ({
             </Button>
           </SheetFooter>
 
-          <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+          <DiscardChangesConfirmationDialog {...modalProps} />
         </SheetContent>
       </Sheet>
 

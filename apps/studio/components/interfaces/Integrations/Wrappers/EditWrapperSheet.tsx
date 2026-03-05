@@ -109,7 +109,7 @@ export const EditWrapperSheet = ({
 
   const checkIsDirty = useCallback(() => hasChangesRef.current, [])
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty,
     onClose,
   })
@@ -398,7 +398,7 @@ export const EditWrapperSheet = ({
         <p className="text-sm text-foreground-light mt-2">Are you sure you want to continue?</p>
       </ConfirmationModal>
 
-      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
 
       <WrapperTableEditor
         visible={isEditingTable}

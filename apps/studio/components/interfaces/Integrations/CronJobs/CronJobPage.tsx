@@ -65,11 +65,7 @@ export const CronJobPage = () => {
   const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
 
   const [isDirty, setIsDirty] = useState(false)
-  const {
-    confirmOnClose,
-    handleOpenChange,
-    modalProps: closeConfirmationModalProps,
-  } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       setIsDirty(false)
@@ -214,7 +210,7 @@ export const CronJobPage = () => {
           )}
         </SheetContent>
       </Sheet>
-      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }

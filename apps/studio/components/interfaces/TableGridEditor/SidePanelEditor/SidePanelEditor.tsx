@@ -229,7 +229,7 @@ export const SidePanelEditor = ({
     }
   )
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isEdited,
     onClose: () => {
       setIsEdited(false)
@@ -1011,7 +1011,7 @@ export const SidePanelEditor = ({
         visible={snap.sidePanel?.type === 'operation-queue'}
         closePanel={snap.closeSidePanel}
       />
-      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }

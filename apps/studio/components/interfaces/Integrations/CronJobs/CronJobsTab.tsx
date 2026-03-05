@@ -142,11 +142,7 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(false)
     cleanPointerEventsNoneOnBody(500)
   }
-  const {
-    confirmOnClose,
-    handleOpenChange,
-    modalProps: closeConfirmationModalProps,
-  } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       setIsDirty(false)
@@ -210,7 +206,7 @@ export const CronjobsTab = () => {
           />
         </SheetContent>
       </Sheet>
-      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }

@@ -87,11 +87,7 @@ export const CreateFunction = ({
   })
   const language = form.watch('language')
 
-  const {
-    confirmOnClose,
-    handleOpenChange,
-    modalProps: closeConfirmationModalProps,
-  } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
   })
@@ -406,7 +402,7 @@ export const CreateFunction = ({
             </Button>
           </SheetFooter>
         </div>
-        <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+        <DiscardChangesConfirmationDialog {...modalProps} />
       </SheetContent>
     </Sheet>
   )

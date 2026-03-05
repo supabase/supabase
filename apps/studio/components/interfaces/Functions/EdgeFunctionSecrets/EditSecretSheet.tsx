@@ -75,11 +75,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
     })
   }
 
-  const {
-    confirmOnClose,
-    handleOpenChange,
-    modalProps: closeConfirmationModalProps,
-  } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose,
   })
@@ -103,7 +99,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
           </Button>
         </SheetFooter>
       </SheetContent>
-      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </Sheet>
   )
 }

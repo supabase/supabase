@@ -45,11 +45,7 @@ export const WrapperOverviewTab = () => {
   })
 
   const [isDirty, setIsDirty] = useState(false)
-  const {
-    confirmOnClose,
-    handleOpenChange,
-    modalProps: closeConfirmationModalProps,
-  } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       setCreateWrapperShown(false)
@@ -157,7 +153,7 @@ export const WrapperOverviewTab = () => {
           />
         </SheetContent>
       </Sheet>
-      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </IntegrationOverviewTab>
   )
 }

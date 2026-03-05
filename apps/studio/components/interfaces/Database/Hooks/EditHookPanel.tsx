@@ -288,7 +288,7 @@ export const EditHookPanel = () => {
 
   // This is intentionally kept outside of the useConfirmOnClose hook to force RHF to update the isDirty state.
   const isDirty = form.formState.isDirty
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => onClose(),
   })
@@ -340,7 +340,7 @@ export const EditHookPanel = () => {
           </form>
         </Form_Shadcn_>
       </SidePanel>
-      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }
