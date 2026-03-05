@@ -1,11 +1,22 @@
 import { Query } from '@supabase/pg-meta/src/query'
-import {
-  COUNT_ESTIMATE_SQL,
-  THRESHOLD_COUNT,
-} from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 
 import { GetTableRowsCountArgs } from './table-rows-count-query'
 import { formatFilterValue } from './utils'
+
+export const THRESHOLD_COUNT = 50000
+
+export const COUNT_ESTIMATE_SQL = /* SQL */ `
+CREATE OR REPLACE FUNCTION pg_temp.count_estimate(
+    query text
+) RETURNS integer LANGUAGE plpgsql AS $$
+DECLARE
+    plan jsonb;
+BEGIN
+    EXECUTE 'EXPLAIN (FORMAT JSON)' || query INTO plan;
+    RETURN plan->0->'Plan'->'Plan Rows';
+END;
+$$;
+`.trim()
 
 /**
  * [Joshen] Initially check reltuples from pg_class for an estimate of row count on the table

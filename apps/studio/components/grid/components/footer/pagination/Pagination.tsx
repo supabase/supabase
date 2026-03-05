@@ -1,4 +1,3 @@
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
@@ -20,6 +19,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DropdownControl } from '../../common/DropdownControl'
 import { formatEstimatedCount } from './Pagination.utils'
+import { THRESHOLD_COUNT } from '@/data/table-rows/table-rows.sql'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
