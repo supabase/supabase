@@ -1,7 +1,3 @@
-import { Search } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
-
 import {
   IntegrationCard,
   IntegrationLoadingCard,
@@ -13,6 +9,9 @@ import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { DOCS_URL } from 'lib/constants'
+import { Search } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useMemo } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -25,9 +24,8 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
-import { useFlag } from 'common'
 
-const FEATURED_INTEGRATIONS = ['cron', 'queues'] // + either stripe_sync_engine or stripe_wrapper depending on feature flag
+const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_sync_engine']
 
 // Featured integration images
 const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
@@ -46,16 +44,6 @@ const IntegrationsPage: NextPageWithLayout = () => {
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
-
-  const isStripeSyncEngineEnabled = useFlag('enableStripeSyncEngineIntegration')
-
-  const featuredIntegrationIds = useMemo(() => {
-    if (isStripeSyncEngineEnabled) {
-      return FEATURED_INTEGRATIONS.concat(['stripe_sync_engine'])
-    } else {
-      return FEATURED_INTEGRATIONS.concat(['stripe_wrapper'])
-    }
-  }, [isStripeSyncEngineEnabled])
 
   const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
     useInstalledIntegrations()
@@ -117,7 +105,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
     }
 
     const featured = filteredAndSortedIntegrations.filter((i) =>
-      featuredIntegrationIds.includes(i.id)
+      FEATURED_INTEGRATIONS.includes(i.id)
     )
 
     const allIntegrations = filteredAndSortedIntegrations // Include all integrations, including featured

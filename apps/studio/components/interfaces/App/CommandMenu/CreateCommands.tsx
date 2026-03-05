@@ -25,13 +25,13 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useMemo } from 'react'
+import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
   useRegisterCommands,
   useRegisterPage,
   useSetCommandMenuOpen,
 } from 'ui-patterns/CommandMenu'
-import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import {
@@ -58,7 +58,6 @@ export function useCreateCommands(options?: CommandOptions) {
     setPage,
     openSidebar,
     snap,
-    authenticationOauth21,
     authEnabled,
     edgeFunctionsEnabled,
     storageEnabled,
@@ -184,7 +183,7 @@ export function useCreateCommands(options?: CommandOptions) {
                   },
                 ]
               : []),
-            ...(IS_PLATFORM && authenticationOauth21
+            ...(IS_PLATFORM
               ? [
                   {
                     id: 'create-oauth-app',
@@ -207,7 +206,6 @@ export function useCreateCommands(options?: CommandOptions) {
       passwordVerificationHook,
       passwordVerificationHookEnabled,
       beforeUserCreatedHook,
-      authenticationOauth21,
     ]
   )
 
