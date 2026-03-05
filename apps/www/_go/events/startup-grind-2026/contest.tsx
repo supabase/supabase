@@ -4,17 +4,17 @@ import { Button } from 'ui'
 
 const page: GoPageInput = {
   template: 'lead-gen',
-  slug: 'stripe/contest',
+  slug: 'startup-grind-2026/contest',
   metadata: {
-    title: 'Win an iPhone 17 Pro Max | Supabase at Stripe Sessions',
+    title: 'Win an iPhone 17 Pro Max | Supabase at Startup Grind 2026',
     description:
-      'Create a Supabase account and load data for a 1-in-10 chance to win an iPhone 17 Pro Max. Stripe Sessions 2026.',
+      'Create a Supabase account and load data for a chance to win an iPhone 17 Pro Max. Startup Grind 2026.',
   },
   hero: {
     title: 'Win an iPhone 17 Pro Max',
-    subtitle: 'Supabase at Stripe Sessions 2026',
+    subtitle: 'Supabase at Startup Grind 2026',
     description:
-      "Great meeting you at Stripe Sessions. Try Supabase if you haven't already -- it's Postgres with all the tools you need to build AI-native applications. We're running a sweepstakes and you have a 1-in-10 chance of winning. Those are better odds than anywhere else!",
+      'Great meeting you at Startup Grind. Supabase gives you Postgres with auth, storage, edge functions, and real-time -- everything you need to ship your product faster. Try it out and you could win an iPhone 17 Pro Max.',
     image: {
       src: '/images/landing-pages/stripe-sessions/iphone17-pro-max.png',
       alt: 'Orange iPhone 17 Pro Max',
@@ -37,7 +37,10 @@ const page: GoPageInput = {
       children: (
         <div className="flex flex-col items-center gap-6">
           <ol className="flex flex-col gap-4 text-foreground-light text-lg list-decimal list-inside">
-            <li>Create a Supabase account with your email address</li>
+            <li>
+              Create a Supabase account with the same email address where you got our post-event
+              note
+            </li>
             <li>Load data into a Supabase database</li>
             <li>Complete these steps by Monday, May 11, 2026 at 12:00 PM PST</li>
           </ol>
