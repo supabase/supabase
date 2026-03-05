@@ -34,7 +34,10 @@ export function useIndexInvalidation() {
   const { invalidate: invalidateTableIndexAdvisor } = useTableIndexAdvisor()
 
   const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
-  const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
+  const orderBy =
+    sort && order && ['asc', 'desc'].includes(order)
+      ? ({ column: sort as QueryPerformanceSort['column'], order: order as 'asc' | 'desc' })
+      : undefined
   const roles = router?.query?.roles ?? []
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
