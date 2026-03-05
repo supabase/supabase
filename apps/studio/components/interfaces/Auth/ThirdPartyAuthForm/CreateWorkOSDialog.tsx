@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -26,8 +25,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 interface CreateWorkOSIntegrationProps {
   visible: boolean
   onClose: () => void
-  // TODO: Remove this if this Dialog is only used for creating.
-  onDelete: () => void
 }
 
 const FORM_ID = 'create-work-os-integration-form'
@@ -50,11 +47,7 @@ const FormSchema = z.object({
 export const CreateWorkOSIntegrationDialog = ({
   visible,
   onClose,
-  onDelete,
 }: CreateWorkOSIntegrationProps) => {
-  // TODO: Remove this if this Dialog is only used for creating.
-  const isCreating = true
-
   const { ref: projectRef } = useParams()
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
@@ -95,9 +88,7 @@ export const CreateWorkOSIntegrationDialog = ({
     <Dialog open={visible} onOpenChange={() => onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="truncate">
-            {isCreating ? `Add new WorkOS connection` : `Update existing WorkOS connection`}
-          </DialogTitle>
+          <DialogTitle className="truncate">Add new WorkOS connection</DialogTitle>
         </DialogHeader>
 
         <Separator />
@@ -152,19 +143,11 @@ export const CreateWorkOSIntegrationDialog = ({
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          {!isCreating && (
-            <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
-                Remove connection
-              </Button>
-            </div>
-          )}
-
           <Button disabled={isPending} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
-            {isCreating ? 'Create connection' : 'Update connection'}
+            Create connection
           </Button>
         </DialogFooter>
       </DialogContent>

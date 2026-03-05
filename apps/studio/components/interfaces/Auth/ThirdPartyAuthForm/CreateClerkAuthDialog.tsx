@@ -27,8 +27,6 @@ interface CreateClerkAuthIntegrationProps {
   visible: boolean
   prod?: boolean
   onClose: () => void
-  // TODO: Remove this if this Dialog is only used for creating.
-  onDelete: () => void
 }
 
 const FORM_ID = 'create-firebase-auth-integration-form'
@@ -56,7 +54,6 @@ const FormSchema = z
 export const CreateClerkAuthIntegrationDialog = ({
   visible,
   onClose,
-  onDelete,
 }: CreateClerkAuthIntegrationProps) => {
   const { ref: projectRef } = useParams()
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({

@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -28,8 +27,6 @@ import { AwsRegionSelector } from './AwsRegionSelector'
 interface CreateAwsCognitoAuthIntegrationProps {
   visible: boolean
   onClose: () => void
-  // TODO: Remove this if this Dialog is only used for creating.
-  onDelete: () => void
 }
 
 const FORM_ID = 'create-aws-cognito-auth-integration-form'
@@ -47,11 +44,7 @@ const FormSchema = z.object({
 export const CreateAwsCognitoAuthIntegrationDialog = ({
   visible,
   onClose,
-  onDelete,
 }: CreateAwsCognitoAuthIntegrationProps) => {
-  // TODO: Remove this if this Dialog is only used for creating.
-  const isCreating = true
-
   const { ref: projectRef } = useParams()
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
@@ -96,11 +89,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
     <Dialog open={visible} onOpenChange={() => onClose()}>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle className="truncate">
-            {isCreating
-              ? `Add new Amazon Cognito Auth connection`
-              : `Update existing Amazon Cognito Auth connection`}
-          </DialogTitle>
+          <DialogTitle className="truncate">Add new Amazon Cognito Auth connection</DialogTitle>
           <DialogDescription>
             By adding an Amazon Cognito Auth connection, you can authenticate users using Amazon
             Cognito User Pools.
@@ -171,19 +160,11 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          {!isCreating && (
-            <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
-                Remove connection
-              </Button>
-            </div>
-          )}
-
           <Button disabled={isPending} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
-            {isCreating ? 'Create connection' : 'Update connection'}
+            Create connection
           </Button>
         </DialogFooter>
       </DialogContent>
