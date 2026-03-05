@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { InlineLink } from 'components/ui/InlineLink'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { ChevronDown, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -150,6 +152,15 @@ export const PlatformWebhooksEndpointSheet = ({
       customHeaders: [],
     },
   })
+  const isDirty = form.formState.isDirty
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: discardChangesModalProps,
+  } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose,
+  })
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -212,7 +223,7 @@ export const PlatformWebhooksEndpointSheet = ({
   }, [eventTypes, form, selectedEventTypes, subscribeAll, visible])
 
   return (
-    <Sheet open={visible} onOpenChange={onClose}>
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent showClose={false} size="default" className="flex flex-col gap-0">
         <SheetHeader>
           <SheetTitle>{mode === 'create' ? 'Create endpoint' : 'Edit endpoint'}</SheetTitle>
@@ -556,7 +567,7 @@ export const PlatformWebhooksEndpointSheet = ({
           </Form_Shadcn_>
         </SheetSection>
         <SheetFooter>
-          <Button type="default" onClick={onClose}>
+          <Button type="default" onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button form="platform-webhook-endpoint-form" htmlType="submit">
@@ -564,6 +575,7 @@ export const PlatformWebhooksEndpointSheet = ({
           </Button>
         </SheetFooter>
       </SheetContent>
+      <DiscardChangesConfirmationDialog {...discardChangesModalProps} />
     </Sheet>
   )
 }
