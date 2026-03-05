@@ -1,0 +1,77 @@
+---
+title: 'FizzBuzz Test'
+description: 'A sample blog post demonstrating the classic FizzBuzz programming challenge and its implementation.'
+categories:
+  - engineering
+tags:
+  - tutorial
+  - programming
+date: '2026-02-10'
+toc_depth: 3
+author: supabase
+---
+
+## Introduction
+
+FizzBuzz is one of the most famous programming challenges, often used in technical interviews to test a developer's basic programming skills. In this post, we'll explore different implementations and discuss why this simple problem remains relevant.
+
+## The Problem
+
+The FizzBuzz problem is straightforward:
+
+- Print numbers from 1 to 100
+- For multiples of 3, print "Fizz" instead of the number
+- For multiples of 5, print "Buzz" instead of the number
+- For multiples of both 3 and 5, print "FizzBuzz"
+
+## Implementation in JavaScript
+
+Here's a classic implementation:
+
+```javascript
+function fizzBuzz(n) {
+  for (let i = 1; i <= n; i++) {
+    if (i % 3 === 0 && i % 5 === 0) {
+      console.log('FizzBuzz')
+    } else if (i % 3 === 0) {
+      console.log('Fizz')
+    } else if (i % 5 === 0) {
+      console.log('Buzz')
+    } else {
+      console.log(i)
+    }
+  }
+}
+
+fizzBuzz(100)
+```
+
+## Implementation in SQL
+
+Since we love PostgreSQL at Supabase, here's how you can implement FizzBuzz using SQL:
+
+```sql
+SELECT
+  CASE
+    WHEN num % 15 = 0 THEN 'FizzBuzz'
+    WHEN num % 3 = 0 THEN 'Fizz'
+    WHEN num % 5 = 0 THEN 'Buzz'
+    ELSE num::text
+  END AS result
+FROM generate_series(1, 100) AS num;
+```
+
+## Why FizzBuzz Matters
+
+While FizzBuzz might seem trivial, it tests several fundamental concepts:
+
+1. **Loop constructs** - Understanding how to iterate
+2. **Conditional logic** - Using if/else statements correctly
+3. **Modulo operator** - Understanding remainders
+4. **Order of conditions** - Checking the most specific condition first
+
+## Conclusion
+
+FizzBuzz remains a timeless programming exercise. Whether you're preparing for interviews or just warming up for a coding session, it's a great way to practice the fundamentals.
+
+Happy coding!
