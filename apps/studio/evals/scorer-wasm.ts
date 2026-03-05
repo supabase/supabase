@@ -65,9 +65,8 @@ export const sqlIdentifierQuotingScorer: EvalScorer<
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Skip invalid SQL - already handled by sqlSyntaxScorer
-      continue
     }
   }
 

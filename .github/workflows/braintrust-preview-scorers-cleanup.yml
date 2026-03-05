@@ -15,13 +15,18 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          ref: ${{ github.head_ref }}
+
       - name: Delete preview scorers from staging
         env:
           BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
           BRAINTRUST_STAGING_PROJECT_ID: ${{ secrets.BRAINTRUST_STAGING_PROJECT_ID }}
         run: |
           BRANCH_SLUG=$(echo "${GITHUB_HEAD_REF}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
-          SLUGS=("goal-completion" "conciseness" "completeness" "docs-faithfulness" "correctness" "url-validity")
+          readarray -t SLUGS < <(jq -r '.[].slug' apps/studio/evals/scorer-online-manifest.json)
 
           for slug in "${SLUGS[@]}"; do
             prefixed="${BRANCH_SLUG}-${slug}"

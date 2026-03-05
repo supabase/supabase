@@ -276,38 +276,39 @@ export const urlValidityScorer: EvalScorer<
     return null
   }
 
-  const errors: string[] = []
-  let validUrls = 0
+  const results = await Promise.all(
+    urls.map(
+      (url) =>
+        new Promise<{ valid: boolean; error?: string }>((resolve) => {
+          const parsed = new URL(url)
+          const lib = parsed.protocol === 'https:' ? https : http
+          const req = lib.request(
+            {
+              hostname: parsed.hostname,
+              path: parsed.pathname + parsed.search,
+              method: 'HEAD',
+              rejectUnauthorized: false, // required: Braintrust lambda has incomplete CA cert store
+              signal: AbortSignal.timeout(5000),
+            },
+            (res) => {
+              res.resume()
+              if (res.statusCode && res.statusCode < 400) {
+                resolve({ valid: true })
+              } else {
+                resolve({ valid: false, error: `${url} returned ${res.statusCode}` })
+              }
+            }
+          )
+          req.on('error', (error) => {
+            resolve({ valid: false, error: `${url} failed: ${error.message}` })
+          })
+          req.end()
+        })
+    )
+  )
 
-  for (const url of urls) {
-    await new Promise<void>((resolve) => {
-      const parsed = new URL(url)
-      const lib = parsed.protocol === 'https:' ? https : http
-      const req = lib.request(
-        {
-          hostname: parsed.hostname,
-          path: parsed.pathname + parsed.search,
-          method: 'HEAD',
-          rejectUnauthorized: false, // required: Braintrust lambda has incomplete CA cert store
-          signal: AbortSignal.timeout(5000),
-        },
-        (res) => {
-          res.resume()
-          if (res.statusCode && res.statusCode < 400) {
-            validUrls++
-          } else {
-            errors.push(`${url} returned ${res.statusCode}`)
-          }
-          resolve()
-        }
-      )
-      req.on('error', (error) => {
-        errors.push(`${url} failed: ${error.message}`)
-        resolve()
-      })
-      req.end()
-    })
-  }
+  const errors = results.flatMap((r) => (r.error ? [r.error] : []))
+  const validUrls = results.filter((r) => r.valid).length
 
   const metadata = {
     urls,

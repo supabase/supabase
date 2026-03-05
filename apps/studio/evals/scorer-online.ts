@@ -27,7 +27,7 @@ if (!projectId && process.env.IS_PUSH) throw new Error('BRAINTRUST_PROJECT_ID is
 const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
 const prefix = branch ? `${branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()}-` : ''
 const metadata = branch ? { gitBranch: branch } : undefined
-const description = branch ?? undefined
+const description = branch
 
 const handlers = {
   'goal-completion': goalCompletionScorer,
