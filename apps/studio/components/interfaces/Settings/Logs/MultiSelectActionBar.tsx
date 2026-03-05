@@ -1,5 +1,5 @@
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { Check, ChevronDown, Copy, X as XIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'

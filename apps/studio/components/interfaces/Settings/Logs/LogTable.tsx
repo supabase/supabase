@@ -25,11 +25,7 @@ import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewCol
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
-import {
-  formatLogsAsJson,
-  formatLogsAsMarkdown,
-  isDefaultLogPreviewFormat,
-} from './Logs.utils'
+import { formatLogsAsJson, formatLogsAsMarkdown, isDefaultLogPreviewFormat } from './Logs.utils'
 import LogSelection from './LogSelection'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
