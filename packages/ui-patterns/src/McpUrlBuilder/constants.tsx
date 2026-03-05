@@ -86,7 +86,7 @@ export const MCP_CLIENTS: McpClient[] = [
     externalDocsUrl: 'https://code.claude.com/docs/en/mcp',
     transformConfig: (config): ClaudeCodeMcpConfig => {
       return {
-        mcpServers: {
+        servers: {
           supabase: {
             type: 'http',
             url: config.mcpServers.supabase.url,
