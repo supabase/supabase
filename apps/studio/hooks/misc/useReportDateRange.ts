@@ -142,14 +142,15 @@ export const useReportDateRange = (
       if (
         storedFrom.isValid() &&
         storedFrom.isAfter(now.subtract(90, 'day')) &&
-        storedFrom.isBefore(now.add(1, 'day'))
+        storedFrom.isBefore(now.add(1, 'day')) &&
+        !maybeShowUpgradePromptIfNotEntitled(timestampStartValue, entitledToAuditLogDays)
       ) {
         return timestampStartValue
       }
     }
     // Return default without setting URL
     return getDefaultHelper().start
-  }, [timestampStartValue, getDefaultHelper])
+  }, [timestampStartValue, getDefaultHelper, entitledToAuditLogDays])
 
   const timestampEnd = useMemo(() => {
     if (timestampEndValue) {
