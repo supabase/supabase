@@ -284,7 +284,7 @@ export const CustomAuthProvidersList = () => {
                   className="text-xs flex flex-col gap-y-2 bg-alternative items-start"
                 >
                   {!isCustomProvidersEnabled ? (
-                    'Custom providers must be enabled in settings'
+                    'Custom providers are not enabled for this project. Please contact support to enable this feature.'
                   ) : (
                     <>
                       <p>You've reached the limit of {providerLimit} providers for your plan.</p>

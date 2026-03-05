@@ -2,11 +2,10 @@ import type { CreateCustomProviderParams } from '@supabase/auth-js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { oAuthCustomProvidersKeys } from './keys'
 import { handleError } from '@/data/fetchers'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
-
-import { oAuthCustomProvidersKeys } from './keys'
 
 export type OAuthCustomProviderCreateVariables = CreateCustomProviderParams & {
   projectRef: string | undefined
@@ -25,7 +24,7 @@ export async function createOAuthCustomProvider({
   const { data, error } = await supabaseClient.auth.admin.customProviders.createProvider(params)
 
   if (error) handleError(error)
-  return data
+  return data!
 }
 
 type OAuthCustomProviderCreateData = Awaited<ReturnType<typeof createOAuthCustomProvider>>

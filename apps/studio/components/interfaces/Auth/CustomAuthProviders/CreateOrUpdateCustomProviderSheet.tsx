@@ -34,6 +34,8 @@ import * as z from 'zod'
 
 import { FormSectionLabel } from '@/components/ui/Forms/FormSection'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useOAuthCustomProviderCreateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-create-mutation'
+import { useOAuthCustomProviderUpdateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
 
 interface CreateOrUpdateCustomProviderSheetProps {
   visible: boolean
@@ -99,25 +101,7 @@ const initialValues = {
   email_optional: false,
 }
 
-/** Mock OIDC discovery response */
-const mockDiscoverySuccess = (baseUrl: string) => ({
-  authorization_endpoint: `${baseUrl.replace(/\/$/, '')}/oauth/authorize`,
-  token_endpoint: `${baseUrl.replace(/\/$/, '')}/oauth/token`,
-  userinfo_endpoint: `${baseUrl.replace(/\/$/, '')}/oauth/userinfo`,
-  jwks_uri: `${baseUrl.replace(/\/$/, '')}/.well-known/jwks.json`,
-})
-
 /** Mock autodiscovery endpoint: simulates success or error (random for demo) */
-async function mockAutodiscovery(
-  discoveryUrl: string
-): Promise<{ success: true; data: ReturnType<typeof mockDiscoverySuccess> } | { success: false }> {
-  await new Promise((r) => setTimeout(r, 600))
-  const baseUrl = discoveryUrl.replace(/\/\.well-known\/openid-configuration\/?$/i, '')
-  if (Math.random() > 0.5) {
-    return { success: true, data: mockDiscoverySuccess(baseUrl) }
-  }
-  return { success: false }
-}
 
 export const CreateOrUpdateCustomProviderSheet = ({
   visible,
@@ -157,32 +141,46 @@ export const CreateOrUpdateCustomProviderSheet = ({
     }
   }, [visible, providerToEdit, form])
 
+  const { mutate: createCustomProvider } = useOAuthCustomProviderCreateMutation({
+    onSuccess: (createdProvider) => {
+      onSuccess(createdProvider)
+    },
+  })
+  const { mutate: updateCustomProvider } = useOAuthCustomProviderUpdateMutation({
+    onSuccess: (updatedProvider) => {
+      onSuccess(updatedProvider)
+    },
+  })
+
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const identifierValue = (data.identifier || '').replace(/^custom:/i, '').trim()
     const identifier = identifierValue ? `custom:${identifierValue}` : ''
 
-    let discoveryData: ReturnType<typeof mockDiscoverySuccess> | null = null
-    if (data.provider_type === 'oidc') {
-      const issuer = data.issuer?.trim()
-      const discoveryUrl = data.discovery_url?.trim()
-      const urlToFetch =
-        discoveryUrl ||
-        (issuer ? `${issuer.replace(/\/$/, '')}/.well-known/openid-configuration` : '')
+    let discoveryData = {
+      authorization_url: data.authorization_url,
+      token_url: data.token_url,
+      userinfo_url: data.userinfo_url,
+      jwks_uri: data.jwks_uri,
+    }
 
-      if (!urlToFetch) {
+    const issuer = data.issuer?.trim()
+    const discoveryUrl =
+      data.discovery_url?.trim() ||
+      (issuer ? `${issuer.replace(/\/$/, '')}/.well-known/openid-configuration` : '')
+    if (data.provider_type === 'oidc') {
+      if (!discoveryUrl) {
         form.setError('issuer', { message: 'Please provide an Issuer URL or Discovery URL' })
         return
       }
 
-      const result = await mockAutodiscovery(urlToFetch)
-      if (!result.success) {
-        const errorField = discoveryUrl ? 'discovery_url' : 'issuer'
-        form.setError(errorField, {
-          message: 'Auto-discovery failed. Check the URL or switch to manual configuration.',
-        })
-        return
+      const baseUrl = discoveryUrl.replace(/\/\.well-known\/openid-configuration\/?$/i, '')
+
+      discoveryData = {
+        authorization_url: `${baseUrl.replace(/\/$/, '')}/oauth/authorize`,
+        token_url: `${baseUrl.replace(/\/$/, '')}/oauth/token`,
+        userinfo_url: `${baseUrl.replace(/\/$/, '')}/oauth/userinfo`,
+        jwks_uri: `${baseUrl.replace(/\/$/, '')}/.well-known/jwks.json`,
       }
-      discoveryData = result.data
     }
 
     if (isEditMode) {
@@ -194,46 +192,55 @@ export const CreateOrUpdateCustomProviderSheet = ({
         form.setError('client_secret', { message: 'Client secret is required' })
         return
       }
-    }
 
-    // Mock implementation - in real app this would call the API
-    const mockProvider: CustomOAuthProvider = {
-      id: providerToEdit?.id || `mock-${Date.now()}`,
-      provider_type: data.provider_type,
-      identifier,
-      name: data.name,
-      client_id: isEditMode ? (data.client_id ?? '').trim() : '',
-      scopes: data.scopes || [],
-      issuer: data.issuer,
-      pkce_enabled: true,
-      enabled: true,
-      email_optional: data.email_optional,
-      ...(data.provider_type === 'oidc' &&
-        discoveryData && {
-          issuer: data.issuer,
-          skip_nonce_check: false,
-          discovery_url:
-            data.discovery_url ||
-            `${data.issuer.replace(/\/$/, '')}/.well-known/openid-configuration`,
-          authorization_url: discoveryData.authorization_endpoint,
-          token_url: discoveryData.token_endpoint,
-          userinfo_url: discoveryData.userinfo_endpoint,
-          jwks_uri: discoveryData.jwks_uri,
-        }),
-      ...(data.provider_type === 'oauth2' && {
+      updateCustomProvider({
+        identifier,
+        projectRef: undefined,
+        clientEndpoint: undefined,
+        name: data.name,
+        client_id: data.client_id,
+        scopes: data.scopes,
+        issuer: data.issuer,
+        pkce_enabled: true,
+        enabled: true,
+        email_optional: data.email_optional,
+        ...(data.provider_type === 'oidc' &&
+          discoveryData && {
+            issuer: data.issuer,
+            skip_nonce_check: false,
+            discovery_url: discoveryUrl,
+          }),
         authorization_url: data.authorization_url,
         token_url: data.token_url,
         userinfo_url: data.userinfo_url,
         jwks_uri: data.jwks_uri,
-      }),
-      created_at: providerToEdit?.created_at || new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      })
+    } else {
+      createCustomProvider({
+        identifier,
+        projectRef: projectRef!,
+        clientEndpoint: endpointData!,
+        provider_type: data.provider_type,
+        name: data.name,
+        client_id: isEditMode ? (data.client_id ?? '').trim() : '',
+        client_secret: isEditMode ? (data.client_secret ?? '').trim() : '',
+        scopes: data.scopes || [],
+        issuer: data.issuer,
+        pkce_enabled: true,
+        enabled: true,
+        email_optional: data.email_optional,
+        ...(data.provider_type === 'oidc' &&
+          discoveryData && {
+            issuer: data.issuer,
+            skip_nonce_check: false,
+            discovery_url: discoveryUrl,
+          }),
+        authorization_url: data.authorization_url,
+        token_url: data.token_url,
+        userinfo_url: data.userinfo_url,
+        jwks_uri: data.jwks_uri,
+      })
     }
-
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    onSuccess(mockProvider)
   }
 
   const onClose = () => {

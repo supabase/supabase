@@ -2,11 +2,10 @@ import type { UpdateCustomProviderParams } from '@supabase/auth-js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { oAuthCustomProvidersKeys } from './keys'
 import { handleError } from '@/data/fetchers'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
-
-import { oAuthCustomProvidersKeys } from './keys'
 
 export type OAuthCustomProviderUpdateVariables = UpdateCustomProviderParams & {
   identifier: string | undefined
@@ -31,7 +30,7 @@ export async function updateOAuthCustomProvider({
   )
 
   if (error) handleError(error)
-  return data
+  return data!
 }
 
 type OAuthCustomProviderUpdateData = Awaited<ReturnType<typeof updateOAuthCustomProvider>>
