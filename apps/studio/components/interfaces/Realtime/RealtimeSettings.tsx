@@ -243,7 +243,7 @@ export const RealtimeSettings = () => {
                                   <>
                                     <p className="prose max-w-full text-sm">
                                       Private mode is {isSettingToPrivate ? 'being ' : ''}
-                                      enabled, but no RLS policies exists on the{' '}
+                                      enabled, but no RLS policies exist on the{' '}
                                       <code className="text-code-inline">
                                         realtime.messages
                                       </code>{' '}
@@ -305,7 +305,7 @@ export const RealtimeSettings = () => {
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Max concurrent clients"
-                          description="Sets maximum number of concurrent clients that can connect to your Realtime service"
+                          description="Sets the maximum number of concurrent clients that can connect to your Realtime service"
                         >
                           <FormControl_Shadcn_>
                             <PrePostTab postTab="clients">
@@ -329,7 +329,7 @@ export const RealtimeSettings = () => {
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Max events per second"
-                          description="Sets maximum number of events per second that can be sent to your Realtime service"
+                          description="Sets the maximum number of events per second that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
                             <PrePostTab postTab="events/s">
@@ -380,7 +380,7 @@ export const RealtimeSettings = () => {
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Max presence events per second"
-                          description="Sets maximum number of presence events per second that can be sent to your Realtime service"
+                          description="Sets the maximum number of presence events per second that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
                             <PrePostTab postTab="events/s">
@@ -431,7 +431,7 @@ export const RealtimeSettings = () => {
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Max payload size in KB"
-                          description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
+                          description="Sets the maximum payload size in KB that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
                             <PrePostTab postTab="KB">
