@@ -1,11 +1,11 @@
 import { Table } from '@tanstack/react-table'
 import { endOfDay, endOfHour, startOfDay, startOfHour } from 'date-fns'
 import {
+  ArrowDownWideNarrow,
+  ArrowUpNarrowWide,
   CalendarClock,
   CalendarDays,
   CalendarSearch,
-  ChevronLeft,
-  ChevronRight,
   Copy,
   Equal,
   Search,
@@ -85,16 +85,14 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               onClick={() => column?.setFilterValue([0, value])}
               className="flex items-center gap-2"
             >
-              {/* FIXME: change icon as it is not clear */}
-              <ChevronLeft size={16} />
+              <ArrowDownWideNarrow size={16} />
               Less or equal than
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => column?.setFilterValue([value, 5000])}
               className="flex items-center gap-2"
             >
-              {/* FIXME: change icon as it is not clear */}
-              <ChevronRight size={16} />
+              <ArrowUpNarrowWide size={16} />
               Greater or equal than
             </DropdownMenuItem>
             <DropdownMenuItem
