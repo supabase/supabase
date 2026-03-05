@@ -68,7 +68,11 @@ export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
-  const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
+  const {
+    hasAccess: hasDedicatedPooler,
+    isLoading: isLoadingEntitlement,
+    isSuccess: isSuccessEntitlement,
+  } = useCheckEntitlements('dedicated_pooler')
   const sharedPoolerPreferred = !hasDedicatedPooler
 
   // URL state management
@@ -176,9 +180,9 @@ export const DatabaseConnectionString = () => {
       : isSuccessSupavisorConfig
 
   const error = poolerError || readReplicasError
-  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
+  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas || isLoadingEntitlement
   const isError = isErrorPoolerConfig || isErrorReadReplicas
-  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
+  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas && isSuccessEntitlement
 
   const sharedPoolerConfig = supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
   const poolingConfiguration = sharedPoolerPreferred ? sharedPoolerConfig : pgbouncerConfig
