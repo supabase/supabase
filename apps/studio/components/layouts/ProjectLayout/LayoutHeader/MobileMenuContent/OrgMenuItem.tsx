@@ -9,6 +9,7 @@ export interface OrgMenuItemProps {
   disabled?: boolean
   onCloseSheet?: () => void
   onSubmenuClick?: (item: OrgNavItem) => void
+  onSelect?: () => void
 }
 
 export function OrgMenuItem({
@@ -17,6 +18,7 @@ export function OrgMenuItem({
   disabled = false,
   onCloseSheet,
   onSubmenuClick,
+  onSelect,
 }: OrgMenuItemProps) {
   const menuButtonClass = cn(
     sidebarMenuButtonVariants({ size: 'default', hasIcon: true }),
@@ -47,7 +49,10 @@ export function OrgMenuItem({
       ) : (
         <Link
           href={item.href}
-          onClick={onCloseSheet}
+          onClick={() => {
+            onSelect?.()
+            onCloseSheet?.()
+          }}
           data-active={isActive}
           className={menuButtonClass}
         >

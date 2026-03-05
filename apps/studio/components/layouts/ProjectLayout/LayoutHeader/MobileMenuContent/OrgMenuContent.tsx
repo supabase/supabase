@@ -5,6 +5,7 @@ import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getPathnameWithoutQuery } from 'lib/pathname.utils'
+import { useTrack } from 'lib/telemetry/track'
 import { Blocks, Boxes, ChartArea, ChevronLeft, Receipt, Settings, Users } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
@@ -38,8 +39,23 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
   const activeRoute = getOrgActiveRoute(pathname)
   const initialSectionKey = getOrgSectionKeyFromPathname(activeRoute)
 
-  const { viewLevel, selectedSectionKey, handleSubmenuClick, handleBackToTop } =
-    useOrgMenuNavigation({ initialSectionKey })
+  const track = useTrack()
+  const {
+    viewLevel,
+    selectedSectionKey,
+    handleSubmenuClick: navigateToSubmenu,
+    handleBackToTop: navigateBackToTop,
+  } = useOrgMenuNavigation({ initialSectionKey })
+
+  const handleSubmenuClick = (item: OrgNavItem) => {
+    track('org_submenu_opened', { itemKey: item.key, itemLabel: item.label })
+    navigateToSubmenu(item)
+  }
+
+  const handleBackToTop = () => {
+    track('org_menu_back_clicked')
+    navigateBackToTop()
+  }
 
   const navMenuItems: OrgNavItem[] = useMemo(
     () => [
@@ -139,6 +155,12 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
                   disabled={disableAccessMfa}
                   onCloseSheet={onCloseSheet}
                   onSubmenuClick={orgItemHasSubmenu(item) ? handleSubmenuClick : undefined}
+                  onSelect={() =>
+                    track('org_menu_item_clicked', {
+                      itemKey: item.key,
+                      itemHref: item.href,
+                    })
+                  }
                 />
               ))}
             </SidebarGroup>
