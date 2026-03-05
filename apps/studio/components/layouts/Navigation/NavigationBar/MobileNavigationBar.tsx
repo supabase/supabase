@@ -1,5 +1,7 @@
 import { useParams } from 'common'
+import { useIsFloatingMobileNavbarEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SidebarContent } from 'components/interfaces/Sidebar'
+import FloatingMobileNavbar from 'components/layouts/Navigation/FloatingMobileNavbar/FloatingMobileNavbar'
 import { IS_PLATFORM } from 'lib/constants'
 import { Menu, Search } from 'lucide-react'
 import Link from 'next/link'
@@ -8,6 +10,9 @@ import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { CommandMenuTrigger, MobileSheetNav } from 'ui-patterns'
 
+import { LocalDropdown } from '../../../interfaces/LocalDropdown'
+import { UserDropdown } from '../../../interfaces/UserDropdown'
+
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
@@ -15,6 +20,7 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
   const router = useRouter()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
+  const showFloatingMobileNavbar = useIsFloatingMobileNavbarEnabled()
 
   return (
     <div className="h-14 w-full flex flex-row md:hidden">
@@ -55,7 +61,7 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
               </div>
             </button>
           </CommandMenuTrigger>
-          {!hideMobileMenu && (
+          {!hideMobileMenu && !showFloatingMobileNavbar && (
             <Button
               title="Menu dropdown button"
               type="default"
@@ -64,11 +70,13 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
               onClick={() => setIsSheetOpen(true)}
             />
           )}
+          {showFloatingMobileNavbar && (IS_PLATFORM ? <UserDropdown /> : <LocalDropdown />)}
         </div>
       </nav>
       <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen} data-state="expanded">
         <SidebarContent />
       </MobileSheetNav>
+      {showFloatingMobileNavbar && <FloatingMobileNavbar hideMobileMenu={hideMobileMenu} />}
     </div>
   )
 }

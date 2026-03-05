@@ -1,4 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { getSupportLinkQueryParams } from 'components/ui/HelpPanel/HelpPanel.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -10,8 +11,6 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, type PropsWithChildren } from 'react'
 import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
-import { getSupportLinkQueryParams } from '../LayoutHeader/HelpPanel/HelpPanel.utils'
-
 const AdvisorPanel = dynamic(() =>
   import('components/ui/AdvisorPanel/AdvisorPanel').then((m) => m.AdvisorPanel)
 )
@@ -22,9 +21,7 @@ const EditorPanel = dynamic(() =>
   import('components/ui/EditorPanel/EditorPanel').then((m) => m.EditorPanel)
 )
 const HelpPanel = dynamic(() =>
-  import('components/layouts/ProjectLayout/LayoutHeader/HelpPanel/HelpPanel').then(
-    (m) => m.HelpPanel
-  )
+  import('components/ui/HelpPanel/HelpPanel').then((m) => m.HelpPanel)
 )
 
 export const SIDEBAR_KEYS = {
