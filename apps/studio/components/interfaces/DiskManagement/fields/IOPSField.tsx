@@ -48,7 +48,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
       control={control}
       name="provisionedIOPS"
       render={({ field }) => {
-        const reccomendedComputeSize = calculateComputeSizeRequiredForIops(watchedIOPS)
+        const recommendedComputeSize = calculateComputeSizeRequiredForIops(watchedIOPS)
         return (
           <FormItemLayout
             layout="horizontal"
@@ -63,11 +63,11 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                     <Button
                       type="default"
                       onClick={() => {
-                        setValue('computeSize', reccomendedComputeSize ?? 'ci_nano')
+                        setValue('computeSize', recommendedComputeSize ?? 'ci_nano')
                         trigger('provisionedIOPS')
                       }}
                     >
-                      Update to {mapAddOnVariantIdToComputeSize(reccomendedComputeSize)}
+                      Update to {mapAddOnVariantIdToComputeSize(recommendedComputeSize)}
                     </Button>
                   }
                 />

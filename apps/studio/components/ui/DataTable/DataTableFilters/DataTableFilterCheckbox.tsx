@@ -67,7 +67,7 @@ export function DataTableFilterCheckbox<TData>({
           </div>
         ) : (
           filterOptions
-            // TODO: we shoudn't sort the options here, instead filterOptions should be sorted by default
+            // TODO: we shouldn't sort the options here, instead filterOptions should be sorted by default
             // .sort((a, b) => a.label.localeCompare(b.label))
             .map((option, index) => {
               const checked = filters.includes(option.value)

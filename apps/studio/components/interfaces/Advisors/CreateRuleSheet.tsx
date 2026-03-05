@@ -141,7 +141,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                     layout="flex-row-reverse"
                     className="px-5"
                     label={`Disable this lint for ${assigned_to === 'all' ? 'project' : 'the assigned member'}`}
-                    description="Toggles the visiblity of this lint in the Advisor reports"
+                    description="Toggles the visibility of this lint in the Advisor reports"
                   >
                     <Tooltip>
                       <TooltipTrigger type="button">
