@@ -15,15 +15,22 @@ export const getViewDefinitionSql = ({ id }: GetViewDefinitionArgs) => {
 
   const sql = /* SQL */ `
     with table_info as (
-      select 
+      select
         n.nspname::text as schema,
         c.relname::text as name,
+        c.reloptions,
         to_regclass(concat('"', n.nspname, '"."', c.relname, '"')) as regclass
       from pg_class c
       join pg_namespace n on n.oid = c.relnamespace
       where c.oid = ${id}
     )
-    select pg_get_viewdef(t.regclass, true) as definition
+    select
+      pg_get_viewdef(t.regclass, true) as definition,
+      case
+        when t.reloptions is not null and array_length(t.reloptions, 1) > 0
+        then array_to_string(t.reloptions, ', ')
+        else null
+      end as options
     from table_info t
   `.trim()
 
@@ -50,10 +57,13 @@ export async function getViewDefinition(
     signal
   )
 
-  return result[0].definition.trim()
+  return {
+    definition: result[0].definition.trim(),
+    options: result[0].options ?? null,
+  }
 }
 
-export type ViewDefinitionData = string
+export type ViewDefinitionData = { definition: string; options: string | null }
 export type ViewDefinitionError = ExecuteSqlError
 
 export const useViewDefinitionQuery = <TData = ViewDefinitionData>(
