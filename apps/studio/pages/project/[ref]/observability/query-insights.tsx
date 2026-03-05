@@ -1,6 +1,5 @@
 import { QueryInsights } from 'components/interfaces/QueryInsights/QueryInsights'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
@@ -8,10 +7,30 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import {
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
+
+const PRESETS = [
+  REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
+  REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS,
+  REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS,
+]
 
 const QueryInsightsReport: NextPageWithLayout = () => {
   const { selectedDateRange, datePickerValue, datePickerHelpers, handleDatePickerChange } =
     useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+
+  const handleSelect = (text: string) => {
+    const helper = datePickerHelpers.find((h) => h.text === text)
+    if (helper) {
+      handleDatePickerChange({ from: helper.calcFrom(), to: helper.calcTo(), isHelper: true, text })
+    }
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -22,16 +41,21 @@ const QueryInsightsReport: NextPageWithLayout = () => {
             href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
           />
           <DatabaseSelector />
-          <LogsDatePicker
-            value={datePickerValue}
-            helpers={datePickerHelpers.filter(
-              (h) =>
-                h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
-                h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
-                h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
-            )}
-            onSubmit={handleDatePickerChange}
-          />
+          <Select_Shadcn_
+            value={datePickerValue.isHelper ? datePickerValue.text : undefined}
+            onValueChange={handleSelect}
+          >
+            <SelectTrigger_Shadcn_ size="tiny" className="w-[120px]">
+              <SelectValue_Shadcn_ />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_ align="end">
+              {PRESETS.map((label) => (
+                <SelectItem_Shadcn_ key={label} value={label}>
+                  {label}
+                </SelectItem_Shadcn_>
+              ))}
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
         </div>
       </div>
       <QueryInsights dateRange={selectedDateRange} />
