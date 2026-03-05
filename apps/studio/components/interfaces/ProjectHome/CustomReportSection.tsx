@@ -15,7 +15,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { SnippetDropdown } from 'components/interfaces/HomeNew/SnippetDropdown'
+import { SnippetDropdown } from 'components/interfaces/ProjectHome/SnippetDropdown'
 import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import type { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'

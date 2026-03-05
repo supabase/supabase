@@ -3,8 +3,8 @@ import {
   sumErrors,
   sumTotal,
   sumWarnings,
-} from '../HomeNew/ProjectUsage.metrics'
-import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
+} from '../ProjectHome/ProjectUsage.metrics'
+import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import { useServiceHealthMetrics } from './useServiceHealthMetrics'
 
 export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'
