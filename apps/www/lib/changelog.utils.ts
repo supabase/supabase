@@ -1,5 +1,5 @@
 // hackery to fix Terry accidentally deleting
-// a bunch of releases and their associted discussions in Dec 2023
+// a bunch of releases and their associated discussions in Dec 2023
 // checks if titles match and grabs this original createdAt timestamp
 export const deletedDiscussions = [
   {
