@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -9,16 +6,18 @@ import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-doma
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { DOCS_URL } from 'lib/constants'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Admonition } from 'ui-patterns/admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
   customDomain: CustomDomainResponse
 }
 
-const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
+export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -134,5 +133,3 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
     </>
   )
 }
-
-export default CustomDomainActivate

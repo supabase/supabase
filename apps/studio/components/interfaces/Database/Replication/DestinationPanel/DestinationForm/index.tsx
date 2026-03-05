@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { CreateAnalyticsBucketSheet } from 'components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -35,6 +35,10 @@ import {
 import { Button, DialogSectionSeparator, Form_Shadcn_, SheetFooter, SheetSection } from 'ui'
 import * as z from 'zod'
 
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+} from '../../useIsETLPrivateAlpha'
 import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
 import { CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
@@ -75,8 +79,8 @@ export const DestinationForm = ({
   const { ref: projectRef } = useParams()
   const { setRequestStatus } = usePipelineRequestStatus()
 
-  const etlEnableBigQuery = useFlag('etlEnableBigQuery')
-  const etlEnableIceberg = useFlag('etlEnableIceberg')
+  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
+  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [isFormInteracting, setIsFormInteracting] = useState(false)

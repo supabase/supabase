@@ -30,6 +30,8 @@ public/sitemap.xml
 # llms.txt (generated)
 public/llms.txt
 public/llms/
+# Generated guide markdown files
+public/docs/
 
 # Copied examples folder
 /examples/
