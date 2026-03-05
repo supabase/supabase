@@ -1751,6 +1751,9 @@ importers:
       shared-data:
         specifier: workspace:*
         version: link:../../packages/shared-data
+      supa-mock:
+        specifier: workspace:*
+        version: link:../../packages/supa-mock
       swiper:
         specifier: ^12.1.2
         version: 12.1.2
@@ -2320,6 +2323,43 @@ importers:
       tsconfig:
         specifier: 'workspace:'
         version: link:../tsconfig
+
+  packages/supa-mock:
+    dependencies:
+      framer-motion:
+        specifier: ^11.0.3
+        version: 11.11.17(@emotion/is-prop-valid@1.2.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      icons:
+        specifier: workspace:*
+        version: link:../icons
+      lucide-react:
+        specifier: '*'
+        version: 0.436.0(react@18.3.1)
+      react:
+        specifier: 'catalog:'
+        version: 18.3.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 18.3.1(react@18.3.1)
+      ui:
+        specifier: workspace:*
+        version: link:../ui
+      ui-patterns:
+        specifier: workspace:*
+        version: link:../ui-patterns
+    devDependencies:
+      '@types/react':
+        specifier: 'catalog:'
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 18.3.0
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.2
 
   packages/tsconfig: {}
 

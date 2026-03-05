@@ -1,0 +1,38 @@
+{
+  "name": "supa-mock",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "exports": {
+    ".": {
+      "import": "./index.tsx",
+      "types": "./index.tsx"
+    }
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "framer-motion": "^11.0.3",
+    "icons": "workspace:*",
+    "lucide-react": "*",
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}

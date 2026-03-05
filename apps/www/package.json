@@ -90,7 +90,8 @@
     "ui-patterns": "workspace:*",
     "use-debounce": "^7.0.1",
     "vanilla-tilt": "1.7.0",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "supa-mock": "workspace:*"
   },
   "devDependencies": {
     "@babel/core": "*",
