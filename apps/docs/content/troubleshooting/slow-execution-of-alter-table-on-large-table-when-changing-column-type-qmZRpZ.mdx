@@ -15,7 +15,7 @@ If you encounter slow execution of the ALTER TABLE operation on a large table wh
    `ALTER TABLE "table_name" ADD COLUMN "new_column_name" new_data_type;`
 
 2. Copy Values from the First Column to the Second:
-  `UPDATE "table_name" SET "new_column_name" = "old_column_name"::new_data_type;`
+   `UPDATE "table_name" SET "new_column_name" = "old_column_name"::new_data_type;`
 
 3. Drop the Old Column:
    `ALTER TABLE "table_name" DROP COLUMN "old_column_name";`
