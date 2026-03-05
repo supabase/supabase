@@ -72,7 +72,7 @@ await Supabase.initialize(
 <TabPanel id="swift" label="Swift (iOS)">
 
 ```swift
-import Clerk
+import ClerkKit
 import Supabase
 
 let supabase = SupabaseClient(
@@ -81,7 +81,7 @@ let supabase = SupabaseClient(
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {
-        try await Clerk.shared.session?.getToken()?.jwt
+        try await Clerk.shared.auth.getToken()
       }
     )
   )
