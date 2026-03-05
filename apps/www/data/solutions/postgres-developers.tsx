@@ -462,8 +462,8 @@ const data: () => {
           icon: '',
           subheading: (
             <>
-              Tap into the <span className="text-foreground">full Posgres ecosystem</span>,
-              including pgvector, PostGIS, pg_stat_statements, and over XX more Postgres extensions.
+              Tap into the <span className="text-foreground">full Postgres ecosystem</span>,
+              including pgvector, PostGIS, pg_stat_statements, and over 50 more Postgres extensions.
             </>
           ),
           image: (
