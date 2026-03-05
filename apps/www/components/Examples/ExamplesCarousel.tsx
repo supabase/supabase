@@ -1,6 +1,6 @@
 import 'swiper/css'
 
-import { useRef } from 'react'
+import { useState } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button, cn } from 'ui'
 import Link from 'next/link'
@@ -24,8 +24,7 @@ const ExamplesCarousel = ({
   cta: CTA
   examples: any[]
 }) => {
-  const prevRef = useRef(null)
-  const nextRef = useRef(null)
+  const [swiperInstance, setSwiperInstance] = useState<SwiperCore | null>(null)
 
   return (
     <div id="examples" className="container">
@@ -48,15 +47,7 @@ const ExamplesCarousel = ({
             delay: 2400,
           }}
           speed={300}
-          navigation={{
-            prevEl: prevRef.current,
-            nextEl: nextRef.current,
-          }}
-          onInit={(swiper: any) => {
-            swiper.params.navigation.prevEl = prevRef.current
-            swiper.params.navigation.nextEl = nextRef.current
-            swiper.navigation.update()
-          }}
+          onSwiper={setSwiperInstance}
           breakpoints={{
             320: {
               slidesPerView: 1.1,
@@ -85,12 +76,14 @@ const ExamplesCarousel = ({
           })}
         </Swiper>
         <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
-          <div ref={prevRef} className={cn('p ml-4 cursor-pointer')}>
+          <button onClick={() => swiperInstance?.slidePrev()} className={cn('p ml-4 cursor-pointer')}>
             <ArrowLeft />
-          </div>
-          <div ref={nextRef} className="p mr-4 cursor-pointer">
+            <span className="sr-only">Slide previous</span>
+          </button>
+          <button onClick={() => swiperInstance?.slideNext()} className="p mr-4 cursor-pointer">
             <ArrowRight />
-          </div>
+            <span className="sr-only">Slide next</span>
+          </button>
         </div>
       </div>
     </div>
