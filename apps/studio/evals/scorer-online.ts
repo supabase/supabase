@@ -8,7 +8,7 @@
  *   - correctnessScorer: requires ground truth (expected output), offline-eval-only.
  */
 
-import braintrust from 'braintrust'
+import braintrust, { type EvalScorer } from 'braintrust'
 
 import {
   completenessScorer,
@@ -16,6 +16,9 @@ import {
   docsFaithfulnessScorer,
   goalCompletionScorer,
   urlValidityScorer,
+  type AssistantEvalInput,
+  type AssistantEvalOutput,
+  type Expected,
 } from './scorer'
 import manifest from './scorer-online-manifest.json'
 
@@ -36,7 +39,7 @@ const handlers = {
   completeness: completenessScorer,
   'docs-faithfulness': docsFaithfulnessScorer,
   'url-validity': urlValidityScorer,
-}
+} satisfies Record<string, EvalScorer<AssistantEvalInput, AssistantEvalOutput, Expected>>
 
 // @ts-expect-error - Project ID is only required at build-time
 const project = braintrust.projects.create({ id: projectId })
