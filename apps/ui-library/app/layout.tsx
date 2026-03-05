@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
 
 import '@/styles/globals.css'
-import { API_URL } from '@/lib/constants'
+
 import { FeatureFlagProvider, TelemetryTagManager } from 'common'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import { Inter } from 'next/font/google'
+
 import { ThemeProvider } from './Providers'
 import { SonnerToaster } from './SonnerToast'
+import { API_URL } from '@/lib/constants'
 
 const inter = Inter({ subsets: ['latin'] })
 

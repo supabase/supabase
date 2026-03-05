@@ -108,7 +108,7 @@ For native mobile applications, you can link an identity using an ID token obtai
 const idToken = 'ID_TOKEN_FROM_GOOGLE'
 const accessToken = 'ACCESS_TOKEN_FROM_GOOGLE'
 
-const { data, error } = await supabase.auth.linkIdentityWithIdToken({
+const { data, error } = await supabase.auth.linkIdentity({
   provider: 'google',
   token: idToken,
   access_token: accessToken,

@@ -1,0 +1,65 @@
+## Rate limits
+
+Rate limits are applied to prevent abuse and ensure fair usage of the Management API. Rate limits are based on a per-user, per-scope model, meaning each user gets independent rate limits for each project and organization they interact with.
+
+### Standard rate limit
+
+| Limit        | Duration | Scope                              |
+| ------------ | -------- | ---------------------------------- |
+| 120 requests | 1 minute | Per user, per project/organization |
+
+When you exceed this rate limit, all subsequent API calls will return a `429 Too Many Requests` response for the remainder of the minute. Once the time window expires, your request quota resets and you can make requests again.
+
+### Rate limit scope
+
+Rate limits are applied with per-user + per-scope isolation:
+
+- **Project scope**: Rate limits apply independently to each project. Requests to one project do not count toward the limit of another project.
+- **Organization scope**: Rate limits apply independently to each organization. Requests to one organization do not count toward the limit of another organization.
+
+This means you can make 120 requests to Project A and 120 requests to Project B within the same minute without hitting rate limits, as they are tracked separately.
+
+### Rate limit response headers
+
+Every API response includes rate limit information in the following headers:
+
+- `X-RateLimit-Limit` - The maximum number of requests allowed in the current time window
+- `X-RateLimit-Remaining` - The number of requests remaining before you hit the rate limit
+- `X-RateLimit-Reset` - The number of milliseconds remaining until your rate limit resets
+
+You can use these headers to monitor your usage and implement proactive rate limit handling before receiving a 429 response.
+
+### How rate limits are tracked
+
+Your requests are identified and tracked using one of the following identifiers, in this order of priority:
+
+1. **OAuth App ID** - If your request is authenticated via an OAuth application
+2. **User ID** - If your request is authenticated with a personal access token
+3. **IP Address** - If your request is unauthenticated (extracted from request headers)
+
+Each identifier is combined with the scope (project or organization) to create a unique tracking key. This ensures that rate limits are isolated per user and per scope, preventing one project or organization from affecting another.
+
+### Endpoint exceptions
+
+Some endpoints have stricter rate limits than the standard 120 requests per minute to prevent abuse of resource-intensive operations:
+
+| Endpoint                                                   | Limit       | Duration | Reason                                              |
+| ---------------------------------------------------------- | ----------- | -------- | --------------------------------------------------- |
+| `GET /v1/projects/:ref/endpoints/logs.all`                 | 30 requests | 1 minute | Analytics log queries are computationally expensive |
+| `GET /v1/projects/:ref/endpoints/usage.api-counts`         | 30 requests | 1 minute | Analytics aggregation is computationally expensive  |
+| `GET /v1/projects/:ref/endpoints/usage.api-requests-count` | 30 requests | 1 minute | Analytics aggregation is computationally expensive  |
+| `GET /v1/projects/:ref/database/context`                   | 10 requests | 1 minute | Database context operations are resource-intensive  |
+| `GET /v1/projects/:ref/database/context`                   | 1 request   | 1 second | Burst limit to prevent rapid successive requests    |
+| `POST /v1/projects/:ref/config/custom-hostname/initialize` | 10 requests | 1 minute | These operations are expensive                      |
+| `POST /v1/projects/:ref/config/custom-hostname/reverify`   | 10 requests | 1 minute | These operations are expensive                      |
+| `DELETE /v1/projects/:ref/config/custom-hostname`          | 10 requests | 1 minute | These operations are expensive                      |
+| `GET /v1/projects/:ref/config/vanity-subdomain`            | 10 requests | 1 minute | These operations are expensive                      |
+
+**Note:** The `GET /v1/projects/:ref/database/context` endpoint has dual rate limiting. You can make up to 10 requests per minute, but also no more than 1 request per second to prevent burst traffic.
+
+### Best practices
+
+- **Monitor rate limit headers** - Check the `X-RateLimit-Remaining` header to see how many requests you have left. When it approaches 0, slow down your requests to avoid hitting the limit.
+- **Implement exponential backoff** - When you receive a 429 response, wait before retrying. You can use the `X-RateLimit-Reset` header (milliseconds) to determine exactly how long to wait.
+- **Batch operations** - Where possible, combine multiple operations into fewer API calls to reduce your request count.
+- **Be mindful of expensive endpoints** - Analytics, database context, and domain endpoints have stricter limits, so use them judiciously.

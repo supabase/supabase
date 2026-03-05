@@ -1,16 +1,8 @@
-import dayjs from 'dayjs'
-import { capitalize } from 'lodash'
-import { BarChart2, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { Fragment, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import {
-  CPUWarnings,
-  DiskIOBandwidthWarnings,
-  RAMWarnings,
-} from 'components/interfaces/Billing/Usage/UsageWarningAlerts'
+import { CPUWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/CPUWarnings'
+import { DiskIOBandwidthWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/DiskIOBandwidthWarnings'
+import { RAMWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/RAMWarnings'
 import UsageBarChart from 'components/interfaces/Organization/Usage/UsageBarChart'
 import {
   ScaffoldContainer,
@@ -19,24 +11,34 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
-import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
+import {
+  InfraMonitoringAttribute,
+  useInfraMonitoringAttributesQuery,
+} from 'data/analytics/infra-monitoring-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import dayjs from 'dayjs'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
+import { capitalize } from 'lodash'
+import { BarChart2, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { Fragment, useMemo, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { Admonition } from 'ui-patterns/admonition'
+
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
-import { useShowNewReplicaPanel } from './InfrastructureConfiguration/use-show-new-replica'
 
 const NON_DEDICATED_IO_RESOURCES = [
   'ci_micro',
@@ -47,6 +49,12 @@ const NON_DEDICATED_IO_RESOURCES = [
   'ci_2xlarge',
 ]
 
+const INFRA_ATTRIBUTES: InfraMonitoringAttribute[] = [
+  'max_cpu_usage',
+  'ram_usage',
+  'disk_io_consumption',
+]
+
 export const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -54,18 +62,19 @@ export const InfrastructureActivity = () => {
   const state = useDatabaseSelectorStateSnapshot()
   const [dateRange, setDateRange] = useState<any>()
 
-  const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
+  const { data: subscription, isPending: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
-  const isFreePlan = organization?.plan?.id === 'free'
+  const { hasAccess: hasAccessToComputeSizes } = useCheckEntitlements(
+    'instances.compute_update_available_sizes'
+  )
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
-
-  const { setShowNewReplicaPanel } = useShowNewReplicaPanel()
 
   const { computeInstance } = getAddons(selectedAddons)
   const hasDedicatedIOResources =
@@ -99,7 +108,7 @@ export const InfrastructureActivity = () => {
   const upgradeUrl =
     organization === undefined
       ? `/`
-      : organization.plan.id === 'free'
+      : hasAccessToComputeSizes
         ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
         : `/project/${projectRef}/settings/addons`
 
@@ -144,35 +153,24 @@ export const InfrastructureActivity = () => {
     }
   }
 
-  const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
-    projectRef,
-    attribute: 'max_cpu_usage',
-    interval,
-    startDate,
-    endDate,
-    dateFormat,
-    databaseIdentifier: state.selectedDatabaseId,
-  })
+  const { data: infraMonitoringData, isPending: isLoadingInfraData } =
+    useInfraMonitoringAttributesQuery({
+      projectRef,
+      attributes: INFRA_ATTRIBUTES,
+      interval,
+      startDate,
+      endDate,
+      databaseIdentifier: state.selectedDatabaseId,
+    })
 
-  const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
-    projectRef,
-    attribute: 'ram_usage',
-    interval,
-    startDate,
-    endDate,
-    dateFormat,
-    databaseIdentifier: state.selectedDatabaseId,
-  })
+  const transformedData = useMemo(() => {
+    if (!infraMonitoringData) return undefined
+    return mapMultiResponseToAnalyticsData(infraMonitoringData, INFRA_ATTRIBUTES, dateFormat)
+  }, [infraMonitoringData, dateFormat])
 
-  const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
-    projectRef,
-    attribute: 'disk_io_consumption',
-    interval,
-    startDate,
-    endDate,
-    dateFormat,
-    databaseIdentifier: state.selectedDatabaseId,
-  })
+  const cpuUsageData = transformedData?.max_cpu_usage
+  const memoryUsageData = transformedData?.ram_usage
+  const ioBudgetData = transformedData?.disk_io_consumption
 
   const hasLatest = dayjs(endDate!).isAfter(dayjs().startOf('day'))
 
@@ -187,15 +185,15 @@ export const InfrastructureActivity = () => {
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
     max_cpu_usage: {
-      isLoading: isLoadingCpuUsageData,
+      isLoading: isLoadingInfraData,
       data: cpuUsageData?.data ?? [],
     },
     ram_usage: {
-      isLoading: isLoadingMemoryUsageData,
+      isLoading: isLoadingInfraData,
       data: memoryUsageData?.data ?? [],
     },
     disk_io_consumption: {
-      isLoading: isLoadingIoBudgetData,
+      isLoading: isLoadingInfraData,
       data: ioBudgetData?.data ?? [],
     },
   }
@@ -214,11 +212,7 @@ export const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-studio z-10">
         <div className="flex items-center gap-x-4">
-          <DatabaseSelector
-            onCreateReplicaClick={() => {
-              setShowNewReplicaPanel(true)
-            }}
-          />
+          <DatabaseSelector />
           {!isLoadingSubscription && (
             <>
               <DateRangePicker
@@ -278,7 +272,7 @@ export const InfrastructureActivity = () => {
                     <>
                       <DiskIOBandwidthWarnings
                         upgradeUrl={upgradeUrl}
-                        isFreePlan={isFreePlan}
+                        hasAccessToComputeSizes={hasAccessToComputeSizes}
                         hasLatest={hasLatest}
                         currentBillingCycleSelected={currentBillingCycleSelected}
                         latestIoBudgetConsumption={latestIoBudgetConsumption}
@@ -338,15 +332,15 @@ export const InfrastructureActivity = () => {
                   )}
                   {attribute.key === 'max_cpu_usage' && (
                     <CPUWarnings
-                      isFreePlan={isFreePlan}
                       upgradeUrl={upgradeUrl}
+                      hasAccessToComputeSizes={hasAccessToComputeSizes}
                       severity={projectResourceWarnings?.cpu_exhaustion}
                     />
                   )}
                   {attribute.key === 'ram_usage' && (
                     <RAMWarnings
-                      isFreePlan={isFreePlan}
                       upgradeUrl={upgradeUrl}
+                      hasAccessToComputeSizes={hasAccessToComputeSizes}
                       severity={projectResourceWarnings?.memory_and_swap_exhaustion}
                     />
                   )}

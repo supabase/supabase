@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-
 import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -8,7 +7,7 @@ import { toast } from 'sonner'
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
-import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
+import { useAPIKeyIdQuery } from 'data/api-keys/api-key-id-query'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -38,6 +37,7 @@ export function ApiKeyPill({
   const {
     data,
     error,
+    isPending: isLoading,
     refetch: refetchApiKey,
   } = useAPIKeyIdQuery(
     {
@@ -48,7 +48,7 @@ export function ApiKeyPill({
     {
       enabled: show, // Only run query when show is true
       staleTime: 0, // Always consider data stale
-      cacheTime: 0, // Don't cache the key data
+      gcTime: 0, // Don't cache the key data
     }
   )
 
@@ -116,9 +116,7 @@ export function ApiKeyPill({
           'w-[100px] sm:w-[140px] md:w-[180px] lg:w-[340px] gap-0 font-mono rounded-full',
           isSecret ? 'overflow-hidden' : '',
           show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
-          'transition-all',
-          'cursor-text',
-          'relative'
+          'transition-all cursor-text relative'
         )}
         style={{ userSelect: 'all' }}
       >
@@ -128,7 +126,9 @@ export function ApiKeyPill({
             <span>{show && data?.api_key ? data?.api_key.slice(15) : '••••••••••••••••'}</span>
           </>
         ) : (
-          <span>{apiKey?.api_key}</span>
+          <span title={apiKey.api_key} className="truncate">
+            {apiKey.api_key}
+          </span>
         )}
       </div>
 
@@ -139,6 +139,7 @@ export function ApiKeyPill({
             <Button
               type="outline"
               className="rounded-full px-2 pointer-events-auto"
+              loading={show && isLoading}
               icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
               onClick={onSubmitToggle}
               disabled={isRestricted}

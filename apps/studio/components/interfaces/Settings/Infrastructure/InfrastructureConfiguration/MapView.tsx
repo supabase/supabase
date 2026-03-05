@@ -276,7 +276,7 @@ const MapView = ({
                                 `(ID: ${formatDatabaseID(database.identifier)})`
                               }`}
                           {database.status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                            <Badge variant="brand">Healthy</Badge>
+                            <Badge variant="success">Healthy</Badge>
                           ) : database.status === REPLICA_STATUS.COMING_UP ? (
                             <Badge>Coming up</Badge>
                           ) : database.status === REPLICA_STATUS.RESTARTING ? (
@@ -315,7 +315,7 @@ const MapView = ({
                               disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
                             >
                               <Link
-                                href={`/project/${ref}/reports/database?db=${database.identifier}&chart=replication-lag`}
+                                href={`/project/${ref}/observability/database?db=${database.identifier}&chart=replication-lag`}
                               >
                                 View replication lag
                               </Link>

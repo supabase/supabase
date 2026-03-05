@@ -1,5 +1,6 @@
 import * as configcat from 'configcat-js'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { getFlags } from './configcat'
 
 vi.mock('data/fetchers', () => ({

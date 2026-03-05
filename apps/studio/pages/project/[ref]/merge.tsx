@@ -6,14 +6,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
-import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
+import { DatabaseDiffPanel } from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
+import { EdgeFunctionsDiffPanel } from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { OutOfDateNotice } from 'components/interfaces/BranchManagement/OutOfDateNotice'
 import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithAI'
-import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { WorkflowLogsCard } from 'components/interfaces/BranchManagement/WorkflowLogsCard'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -22,11 +22,12 @@ import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useBranchMergeDiff } from 'hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -39,22 +40,24 @@ import {
   NavMenu,
   NavMenuItem,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useIsPgDeltaDiffEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, workflow_run_id: currentWorkflowRunId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const pgDeltaDiffEnabled = useIsPgDeltaDiffEnabled()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [workflowFinalStatus, setWorkflowFinalStatus] = useState<string | null>(null)
+  const [workflowFinalStatus, setWorkflowFinalStatus] = useState<'SUCCESS' | 'FAILED' | null>(null)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
 
-  const { data: parentProject } = useProjectByRefQuery(parentProjectRef)
+  const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
 
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
@@ -89,11 +92,11 @@ const MergePage: NextPageWithLayout = () => {
     currentBranchRef: ref,
     parentProjectRef,
     currentBranchConnectionString: project?.connectionString || undefined,
-    parentBranchConnectionString: (parentProject as any)?.connectionString || undefined,
+    parentBranchConnectionString: parentProject?.connectionString || undefined,
     currentBranchCreatedAt: currentBranch?.created_at,
   })
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update branch: ${error.message}`)
     },
@@ -101,10 +104,8 @@ const MergePage: NextPageWithLayout = () => {
 
   const clearDiffsOptimistically = edgeFunctionsDiff.clearDiffsOptimistically
 
-  const currentWorkflowRunId = router.query.workflow_run_id as string | undefined
-
   const handleCurrentBranchWorkflowComplete = useCallback(
-    (status: string) => {
+    (status: 'SUCCESS' | 'FAILED') => {
       setWorkflowFinalStatus(status)
       refetchDiff()
       clearDiffsOptimistically()
@@ -113,7 +114,7 @@ const MergePage: NextPageWithLayout = () => {
   )
 
   const handleParentBranchWorkflowComplete = useCallback(
-    (status: string) => {
+    (status: 'SUCCESS' | 'FAILED') => {
       setWorkflowFinalStatus(status)
       refetchDiff()
       clearDiffsOptimistically()
@@ -140,35 +141,24 @@ const MergePage: NextPageWithLayout = () => {
     ]
   )
 
-  const { currentWorkflowRun: currentBranchWorkflow, workflowRunLogs: currentBranchLogs } =
-    useWorkflowManagement({
-      workflowRunId: currentWorkflowRunId,
-      projectRef: ref,
-      onWorkflowComplete: handleCurrentBranchWorkflowComplete,
-    })
+  const { run: currentBranchWorkflow, logs: currentBranchLogs } = useWorkflowManagement({
+    workflowRunId: currentWorkflowRunId,
+    projectRef: ref,
+    onWorkflowComplete: handleCurrentBranchWorkflowComplete,
+  })
 
-  const { currentWorkflowRun: parentBranchWorkflow, workflowRunLogs: parentBranchLogs } =
-    useWorkflowManagement({
-      workflowRunId: currentWorkflowRunId,
-      projectRef: parentProjectRef,
-      onWorkflowComplete: handleParentBranchWorkflowComplete,
-    })
+  const { run: parentBranchWorkflow, logs: parentBranchLogs } = useWorkflowManagement({
+    workflowRunId: currentWorkflowRunId,
+    projectRef: parentProjectRef,
+    onWorkflowComplete: handleParentBranchWorkflowComplete,
+  })
 
   const currentWorkflowRun = currentBranchWorkflow || parentBranchWorkflow
   const workflowRunLogs = currentBranchLogs || parentBranchLogs
 
-  const hasCurrentWorkflowFailed = workflowFinalStatus
-    ? ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(workflowFinalStatus)
-    : currentWorkflowRun?.status &&
-      ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(currentWorkflowRun.status)
-
-  const hasCurrentWorkflowCompleted = workflowFinalStatus
-    ? workflowFinalStatus === 'FUNCTIONS_DEPLOYED'
-    : currentWorkflowRun?.status === 'FUNCTIONS_DEPLOYED'
-
-  const isWorkflowRunning =
-    currentWorkflowRun?.status === 'RUNNING_MIGRATIONS' ||
-    currentWorkflowRun?.status === 'CREATING_PROJECT'
+  const hasCurrentWorkflowFailed = workflowFinalStatus === 'FAILED'
+  const hasCurrentWorkflowCompleted = workflowFinalStatus === 'SUCCESS'
+  const isWorkflowRunning = currentWorkflowRun?.status === 'RUNNING'
 
   const addWorkflowRun = useCallback(
     (workflowRunId: string) => {
@@ -188,7 +178,7 @@ const MergePage: NextPageWithLayout = () => {
     })
   }, [router])
 
-  const { mutate: pushBranch, isLoading: isPushing } = useBranchPushMutation({
+  const { mutate: pushBranch, isPending: isPushing } = useBranchPushMutation({
     onSuccess: (data) => {
       toast.success('Branch update initiated!')
       if (data?.workflow_run_id) {
@@ -214,7 +204,7 @@ const MergePage: NextPageWithLayout = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
+  const { mutate: mergeBranch, isPending: isMerging } = useBranchMergeMutation({
     onSuccess: (data) => {
       setIsSubmitting(false)
       if (data.workflowRunId) {
@@ -223,7 +213,7 @@ const MergePage: NextPageWithLayout = () => {
 
         // Track successful merge
         sendEvent({
-          action: 'branch_merge_succeeded',
+          action: 'branch_merge_completed',
           properties: {
             branchType: currentBranch?.persistent ? 'persistent' : 'preview',
           },
@@ -255,7 +245,7 @@ const MergePage: NextPageWithLayout = () => {
     },
   })
 
-  const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
+  const { mutate: deleteBranch, isPending: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       toast.success('Branch closed successfully')
       router.push(`/project/${parentProjectRef}/branches`)
@@ -309,21 +299,8 @@ const MergePage: NextPageWithLayout = () => {
       branchProjectRef: ref,
       baseProjectRef: parentProjectRef,
       migration_version: undefined,
+      pgdelta: pgDeltaDiffEnabled,
     })
-  }
-
-  const handleReadyForReview = () => {
-    if (!ref || !parentProjectRef) return
-    updateBranch(
-      {
-        branchRef: ref,
-        projectRef: parentProjectRef,
-        requestReview: true,
-      },
-      {
-        onSuccess: () => toast.success('Successfully marked as ready for review'),
-      }
-    )
   }
 
   const breadcrumbs = useMemo(
@@ -333,7 +310,7 @@ const MergePage: NextPageWithLayout = () => {
         href: `/project/${project?.ref}/branches/merge-requests`,
       },
     ],
-    [parentProjectRef]
+    [project?.ref]
   )
 
   const currentTab = (router.query.tab as string) || 'database'
@@ -382,7 +359,11 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const isMergeDisabled =
-    !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall || isWorkflowRunning
+    !combinedHasChanges ||
+    isCombinedDiffLoading ||
+    isBranchOutOfDateOverall ||
+    isWorkflowRunning ||
+    Boolean(mainBranch?.git_branch)
 
   const primaryActions = (
     <div className="flex items-end gap-2">
@@ -401,7 +382,9 @@ const MergePage: NextPageWithLayout = () => {
                 ? 'No changes to merge'
                 : isWorkflowRunning
                   ? 'Workflow is currently running'
-                  : 'Unable to merge at this time',
+                  : Boolean(mainBranch?.git_branch)
+                    ? 'Deploy to production from GitHub is enabled'
+                    : 'Unable to merge at this time',
             },
           }}
           type="primary"
@@ -417,7 +400,6 @@ const MergePage: NextPageWithLayout = () => {
           type="primary"
           loading={isMerging || isSubmitting}
           onClick={() => setShowConfirmDialog(true)}
-          disabled={isBranchOutOfDateOverall}
           icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
         >
           Merge branch
@@ -462,25 +444,28 @@ const MergePage: NextPageWithLayout = () => {
   )
 
   const pageTitle = () => (
-    <span>
-      Merge{' '}
+    <div className="flex items-center gap-x-2">
+      <span>Merge</span>
+
       <Link href={`/project/${ref}/editor`}>
-        <Badge className="font-mono text-lg gap-1">
+        <Badge className="font-mono text-sm gap-1 px-2">
           <GitBranchIcon strokeWidth={1.5} size={16} className="text-foreground-muted" />
           {currentBranch.name}
         </Badge>
-      </Link>{' '}
-      into{' '}
+      </Link>
+
+      <span>into</span>
+
       <Link
         href={`/project/${mainBranch?.project_ref}/editor`}
         className="font-mono inline-flex gap-4"
       >
-        <Badge className="font-mono text-lg gap-1">
+        <Badge className="font-mono text-sm gap-1 px-2">
           <Shield strokeWidth={1.5} size={16} className="text-warning" />
           {mainBranch?.name || 'main'}
         </Badge>
       </Link>
-    </span>
+    </div>
   )
 
   const pageSubtitle = () => {
@@ -501,7 +486,7 @@ const MergePage: NextPageWithLayout = () => {
       breadcrumbs={breadcrumbs}
       primaryActions={primaryActions}
       size="full"
-      className="border-b-0 pb-0"
+      className="h-full border-b-0 pb-0"
     >
       <div className="border-b">
         <ScaffoldContainer size="full">
@@ -550,8 +535,7 @@ const MergePage: NextPageWithLayout = () => {
                     >
                       <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
                     </Button>
-                  ) : hasCurrentWorkflowCompleted &&
-                    currentWorkflowRun?.id === parentBranchWorkflow?.id ? (
+                  ) : hasCurrentWorkflowCompleted ? (
                     <Button
                       type="default"
                       onClick={handleCloseBranch}
@@ -589,22 +573,20 @@ const MergePage: NextPageWithLayout = () => {
           </NavMenu>
         </ScaffoldContainer>
       </div>
-      <ScaffoldContainer size="full" className="pt-6 pb-12">
-        {currentTab === 'database' ? (
-          <DatabaseDiffPanel
-            diffContent={diffContent}
-            isLoading={isDatabaseDiffLoading || isDatabaseDiffRefetching}
-            error={diffError}
-            showRefreshButton={true}
-            currentBranchRef={ref}
-          />
-        ) : (
-          <EdgeFunctionsDiffPanel
-            diffResults={edgeFunctionsDiff}
-            currentBranchRef={ref}
-            mainBranchRef={parentProjectRef}
-          />
-        )}
+      <ScaffoldContainer size="full" className="flex min-h-0 flex-1 flex-col pt-6 pb-12">
+        <div className="flex min-h-0 flex-1 flex-col">
+          {currentTab === 'database' ? (
+            <DatabaseDiffPanel
+              diffContent={diffContent}
+              isLoading={isDatabaseDiffLoading || isDatabaseDiffRefetching}
+              error={diffError}
+              showRefreshButton={true}
+              currentBranchRef={ref}
+            />
+          ) : (
+            <EdgeFunctionsDiffPanel diffResults={edgeFunctionsDiff} currentBranchRef={ref} />
+          )}
+        </div>
       </ScaffoldContainer>
 
       <ConfirmationModal

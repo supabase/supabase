@@ -1,10 +1,10 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
+import { useEffect, useRef, useState } from 'react'
+import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
@@ -51,8 +51,8 @@ export const TimestampInfo = ({
   utcTimestamp,
   className,
   displayAs = 'local',
-  format = 'DD MMM  HH:mm:ss',
-  labelFormat = 'DD MMM HH:mm:ss',
+  format = 'DD MMM YY HH:mm:ss',
+  labelFormat = 'DD MMM YY HH:mm:ss',
   label,
 }: {
   className?: string

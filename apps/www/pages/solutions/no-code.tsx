@@ -8,6 +8,8 @@ import Quotes from 'components/Solutions/Quotes'
 import SolutionsStickyNav from 'components/SolutionsStickyNav'
 
 import getContent from 'data/solutions/no-code'
+import { getSortedPosts } from '~/lib/posts'
+import { PostTypes } from '~/types/post'
 
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))
 const PlatformStarterSection = dynamic(() => import('components/Solutions/TwoColumnsSection'))

@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-import { debounce } from 'lodash'
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
@@ -8,7 +7,7 @@ import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelInt
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
@@ -18,7 +17,7 @@ import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import passwordStrength from 'lib/password-strength'
+import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
@@ -63,9 +62,11 @@ const CreateProject = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value: string) => checkPasswordStrength(value), 300)
-  ).current
+  async function checkPasswordStrength(value: string) {
+    const { message, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthMessage(message)
+  }
 
   const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
@@ -105,19 +106,13 @@ const CreateProject = () => {
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
-  }
-
-  async function checkPasswordStrength(value: string) {
-    const { message, strength } = await passwordStrength(value)
-    setPasswordStrengthScore(strength)
-    setPasswordStrengthMessage(message)
+    } else checkPasswordStrength(value)
   }
 
   function generatePassword() {
     const password = generateStrongPassword()
     setDbPass(password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
@@ -157,54 +152,59 @@ const CreateProject = () => {
   }
 
   // Wait for the new project to be created before creating the connection
-  useProjectSettingsV2Query(
+  const { data, isSuccess } = useProjectSettingsV2Query(
     { projectRef: newProjectRef },
     {
       enabled: newProjectRef !== undefined,
       // refetch until the project is created
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return ((data?.service_api_keys ?? []).length ?? 0) > 0 ? false : 1000
-      },
-      async onSuccess(data) {
-        const isReady = (data?.service_api_keys ?? []).length > 0
-
-        if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
-          return
-        }
-
-        const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
-
-        try {
-          const { id: connectionId } = await createConnections({
-            organizationIntegrationId: organizationIntegration?.id,
-            connection: {
-              foreign_project_id: foreignProjectId,
-              supabase_project_ref: newProjectRef,
-              integration_id: '0',
-              metadata: {
-                ...projectDetails,
-                supabaseConfig: {
-                  projectEnvVars: {
-                    write: true,
-                  },
-                },
-              },
-            },
-            orgSlug: selectedOrganization?.slug,
-          })
-        } catch (error) {
-          console.error('An error occurred during createConnections:', error)
-          return
-        }
-
-        snapshot.setLoading(false)
-
-        if (next && isVercelUrl(next)) {
-          window.location.href = next
-        }
       },
     }
   )
+  useEffect(() => {
+    if (!isSuccess) return
+    const onSuccessFunc = async () => {
+      const isReady = (data.service_api_keys ?? []).length > 0
+
+      if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
+        return
+      }
+
+      const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
+
+      try {
+        await createConnections({
+          organizationIntegrationId: organizationIntegration?.id,
+          connection: {
+            foreign_project_id: foreignProjectId,
+            supabase_project_ref: newProjectRef,
+            integration_id: '0',
+            metadata: {
+              ...projectDetails,
+              supabaseConfig: {
+                projectEnvVars: {
+                  write: true,
+                },
+              },
+            },
+          },
+          orgSlug: selectedOrganization?.slug,
+        })
+      } catch (error) {
+        console.error('An error occurred during createConnections:', error)
+        return
+      }
+
+      snapshot.setLoading(false)
+
+      if (next && isVercelUrl(next)) {
+        window.location.href = next
+      }
+    }
+    onSuccessFunc()
+  }, [data, isSuccess])
 
   return (
     <div>
@@ -232,7 +232,7 @@ const CreateProject = () => {
           onChange={onDbPassChange}
           descriptionText={
             <PasswordStrengthBar
-              passwordStrengthScore={passwordStrengthScore}
+              passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
               password={dbPass}
               passwordStrengthMessage={passwordStrengthMessage}
               generateStrongPassword={generatePassword}

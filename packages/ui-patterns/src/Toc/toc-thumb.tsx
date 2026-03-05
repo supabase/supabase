@@ -1,8 +1,9 @@
 'use client'
 
-import { type HTMLAttributes, type RefObject, useEffect, useRef } from 'react'
-import * as Primitive from './toc-primitive'
 import { useEffectEvent, useOnChange } from 'common'
+import { useEffect, useRef, type HTMLAttributes, type RefObject } from 'react'
+
+import * as Primitive from './toc-primitive'
 
 export type TOCThumb = [top: number, height: number]
 

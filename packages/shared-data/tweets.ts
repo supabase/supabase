@@ -60,7 +60,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/ukFtCkww_400x400.jpg',
   },
   {
-    text: 'Lately been using Supabase over AWS/ GCP for products to save on costs and rapid builds(Vibe Code) that do not need all the Infra and the hefty costs that come with AWS/ GCP out the door. Great solution overall. Love the new Feature stack thats implemented',
+    text: 'Lately been using Supabase over AWS/ GCP for products to save on costs and rapid builds(Vibe Code) that do not need all the Infra and the hefty costs that come with AWS/ GCP out the door. Great solution overall.',
     url: 'https://x.com/xthemadgeniusx/status/1960049950110384250',
     handle: 'xthemadgeniusx',
     img_url: '/images/twitter-profiles/XE8Oyngj_400x400.jpg',
@@ -78,7 +78,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/GtrVV2dD_400x400.jpg',
   },
   {
-    text: '@supabase is just 🤯 Now I see why a lot of people love using it as a backend for their applications. I am really impressed with how easy it is to set up an Auth and then just code it together for the frontend. @IngoKpp now I see your joy with Supabase #coding #fullstackwebdev',
+    text: '@supabase is just 🤯 Now I see why a lot of people love using it as a backend for their applications. I am really impressed with how easy it is to set up an Auth and then just code it together for the frontend.',
     url: 'https://twitter.com/IxoyeDesign/status/1497473731777728512',
     handle: 'IxoyeDesign',
     img_url: '/images/twitter-profiles/C8opIL-g_400x400.jpg',
@@ -138,7 +138,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/rWX8Jzp5_400x400.jpg',
   },
   {
-    text: 'There are a lot of indie hackers building in public, but it’s rare to see a startup shipping as consistently and transparently as Supabase. Their upcoming March releases look to be 🔥 Def worth a follow! also opened my eyes as to how to value add in open source.',
+    text: 'There are a lot of indie hackers building in public, but it’s rare to see a startup shipping as consistently and transparently as Supabase. Their upcoming March releases look to be 🔥 Def worth a follow!',
     url: 'https://twitter.com/swyx/status/1366685025047994373',
     handle: 'swyx',
     img_url: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
@@ -162,7 +162,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/7NITI8Z3_400x400.jpg',
   },
   {
-    text: 'This community is STRONG and will continue to be the reason why developers flock to @supabase over an alternative. Keep up the good work! ⚡️',
+    text: 'This community is STRONG and will continue to be the reason why developers flock to @supabase over an alternative.',
     url: 'https://twitter.com/_wilhelm__/status/1524074865107488769',
     handle: '_wilhelm__',
     img_url: '/images/twitter-profiles/CvqDy6YF_400x400.jpg',
@@ -174,7 +174,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/bJlKtSxz_400x400.jpg',
   },
   {
-    text: '@supabase Putting a ton of well-explained example API queries in a self-building documentation is just a classy move all around. I also love having GraphQL-style nested queries with traditional SQL filtering. This is pure DX delight. A+++. #backend',
+    text: '@supabase Putting a ton of well-explained example API queries in a self-building documentation is just a classy move all around. I also love having GraphQL-style nested queries with traditional SQL filtering. This is pure DX delight. A+++.',
     url: 'https://twitter.com/CodiferousCoder/status/1522233113207836675',
     handle: 'CodiferousCoder',
     img_url: '/images/twitter-profiles/t37cVLwy_400x400.jpg',
@@ -190,12 +190,6 @@ const tweets = [
     url: 'https://twitter.com/JP__Gallegos/status/1365699468109242374',
     handle: 'JP__Gallegos',
     img_url: '/images/twitter-profiles/1PH2mt6v_400x400.jpg',
-  },
-  {
-    text: 'Check out this amazing product @supabase. A must give try #newidea #opportunity',
-    url: 'https://twitter.com/digitaldaswani/status/1364447219642814464',
-    handle: 'digitaldaswani',
-    img_url: '/images/twitter-profiles/w8HLdlC7_400x400.jpg',
   },
   {
     text: "I gave @supabase a try this weekend and I was able to create a quick dashboard to visualize the data from the PostgreSQL instance. It's super easy to use Supabase's API or the direct DB connection. Check out the tutorial 📖",
@@ -214,12 +208,6 @@ const tweets = [
     url: 'https://twitter.com/razvanilin/status/1363002398738800640',
     handle: 'razvanilin',
     img_url: '/images/twitter-profiles/AiaH9vJ2_400x400.jpg',
-  },
-  {
-    text: "Wait. Is it so easy to write queries for @supabase ? It's like simple SQL stuff!",
-    url: 'https://twitter.com/T0ny_Boy/status/1362911838908911617',
-    handle: 'T0ny_Boy',
-    img_url: '/images/twitter-profiles/UCBhUBZl_400x400.jpg',
   },
   {
     text: 'Jeez, and @supabase have native support for magic link login?! I was going to use http://magic.link for this But if I can get my whole DB + auth + magic link support in one... Awesome',
@@ -256,6 +244,7 @@ const tweets = [
     url: 'https://twitter.com/nerdburn/status/1356857261495214085',
     handle: 'nerdburn',
     img_url: '/images/twitter-profiles/66VSV9Mm_400x400.png',
+    weight: 10,
   },
   {
     text: 'Now things are starting to get interesting! Firebase has long been the obvious choice for many #flutter devs for the ease of use. But their databases are NoSQL, which has its downsides... Seems like @supabase is working on something interesting here!',
@@ -287,6 +276,76 @@ const tweets = [
     handle: '0xBanana',
     img_url: '/images/twitter-profiles/pgHIGqZ0_400x400.jpg',
   },
+  {
+    text: `Very impressed by @supabase's growth. For new startups, they seem to have gone from "promising" to "standard" in remarkably short order.`,
+    url: 'https://x.com/patrickc/status/1979157875600617913',
+    handle: 'patrickc',
+    img_url: '/images/twitter-profiles/_iAaSUQf_400x400.jpg',
+    weight: 10,
+  },
+  {
+    text: `Okay, I finally tried Supabase today and wow... why did I wait so long? 😅 Went from 'how do I even start' to having auth + database + real-time updates working in like 20 minutes. Sometimes the hype is actually justified! #Supabase`,
+    url: 'https://x.com/Aliahsan_sfv/status/1967167095894098210',
+    handle: 'Aliahsan_sfv',
+    img_url: '/images/twitter-profiles/2SQwtv8c_400x400.jpg',
+    weight: 9,
+  },
+  {
+    text: `Supabase is the best product experience I've had in years.\nNot just tech - taste.\nFrom docs to latency to the URL structure that makes you think "oh, that's obvious"\nFeels like every other platform should study how they built it\n@supabase I love you`,
+    url: 'https://x.com/yatsiv_yuriy/status/1979182362480071162',
+    handle: 'yatsiv_yuriy',
+    img_url: '/images/twitter-profiles/Y1swF6ef_400x400.jpg',
+    weight: 9,
+  },
+  {
+    text: "@supabase shout out, their MCP is awesome. It's helping me create better row securities and telling me best practises for setting up a supabase app",
+    url: 'https://x.com/adeelibr/status/1981356783818985774',
+    handle: 'adeelibr',
+    img_url: '/images/twitter-profiles/k0aPYRHF_400x400.jpg',
+    weight: 6,
+  },
 ]
+
+export const getWeightedTweets = (count: number): typeof tweets => {
+  const fallbackWeight = 1
+  const availableTweets = [...tweets]
+  const selectedTweets: typeof tweets = []
+  let remainingWeight = availableTweets.reduce(
+    (sum, tweet) => sum + (tweet.weight ?? fallbackWeight),
+    0
+  )
+
+  for (let i = 0; i < count && availableTweets.length > 0; i++) {
+    // Generate random number between 0 and remainingWeight
+    const random = Math.random() * remainingWeight
+
+    // Find the selected tweet based on cumulative weights
+    let accumulatedWeight = 0
+    let selectedIndex = -1
+
+    for (let j = 0; j < availableTweets.length; j++) {
+      const tweet = availableTweets[j]
+      const weight = tweet.weight ?? fallbackWeight
+      accumulatedWeight += weight
+      if (random <= accumulatedWeight) {
+        selectedTweets.push(tweet)
+        selectedIndex = j
+        break
+      }
+    }
+
+    // Remove the selected tweet and update remaining weight
+    if (selectedIndex !== -1) {
+      const removedWeight = availableTweets[selectedIndex].weight ?? fallbackWeight
+      remainingWeight -= removedWeight
+      availableTweets.splice(selectedIndex, 1)
+    }
+  }
+
+  return selectedTweets
+}
+
+// Sort by weight (highest first), then take first 18 for static pages
+export const topTweets = [...tweets].sort((a, b) => (b.weight ?? 1) - (a.weight ?? 1)).slice(0, 18)
 
 export default tweets

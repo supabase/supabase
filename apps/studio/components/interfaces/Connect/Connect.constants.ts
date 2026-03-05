@@ -127,19 +127,6 @@ export const FRAMEWORKS: ConnectionType[] = [
     guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/reactjs`,
     children: [
       {
-        key: 'create-react-app',
-        label: 'Create React App',
-        icon: 'react',
-        children: [
-          {
-            key: 'supabasejs',
-            label: 'supabase-js',
-            icon: 'supabase',
-            children: [],
-          },
-        ],
-      },
-      {
         key: 'vite',
         label: 'Vite',
         icon: 'vite',
@@ -149,6 +136,19 @@ export const FRAMEWORKS: ConnectionType[] = [
             label: 'Supabase-js',
             children: [],
             icon: 'supabase',
+          },
+        ],
+      },
+      {
+        key: 'create-react-app',
+        label: 'Create React App',
+        icon: 'react',
+        children: [
+          {
+            key: 'supabasejs',
+            label: 'supabase-js',
+            icon: 'supabase',
+            children: [],
           },
         ],
       },
@@ -227,13 +227,41 @@ export const FRAMEWORKS: ConnectionType[] = [
   },
   {
     key: 'refine',
-    label: 'refine',
+    label: 'Refine',
     icon: 'refine',
     guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/refine`,
     children: [
       {
         key: 'supabasejs',
         label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
+    key: 'tanstack',
+    label: 'TanStack Start',
+    icon: 'tanstack',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/tanstack`,
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
+    key: 'flask',
+    label: 'Flask (Python)',
+    icon: 'python',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/flask`,
+    children: [
+      {
+        key: 'supabasepy',
+        label: 'supabase-py',
         children: [],
         icon: 'supabase',
       },
@@ -246,7 +274,7 @@ export const MOBILES: ConnectionType[] = [
     key: 'exporeactnative',
     label: 'Expo React Native',
     icon: 'expo',
-    guideLink: `${DOCS_URL}/guides/getting-started/tutorials/with-expo-react-native`,
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/expo-react-native`,
     children: [
       {
         key: 'supabasejs',
@@ -350,9 +378,36 @@ export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
   { key: 'mobiles', label: 'Mobile Frameworks', obj: MOBILES },
   { key: 'orms', label: 'ORMs', obj: ORMS },
+  { key: 'api-keys', label: 'API Keys', obj: [] },
   { key: 'mcp', label: 'MCP', obj: [] },
 ]
 
 export const PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT =
   'Purchase IPv4 add-on or use Shared Pooler if on a IPv4 network'
 export const IPV4_ADDON_TEXT = 'Connections are IPv4 proxied with IPv4 add-on'
+
+export type ConnectionStringMethod = 'direct' | 'transaction' | 'session'
+
+export const connectionStringMethodOptions: Record<
+  ConnectionStringMethod,
+  { value: string; label: string; description: string }
+> = {
+  direct: {
+    value: 'direct',
+    label: 'Direct connection',
+    description:
+      'Ideal for applications with persistent and long-lived connections, such as those running on virtual machines or long-standing containers.',
+  },
+  transaction: {
+    value: 'transaction',
+    label: 'Transaction pooler',
+    description:
+      'Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated.',
+  },
+  session: {
+    value: 'session',
+    label: 'Session pooler',
+    description:
+      'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.',
+  },
+}

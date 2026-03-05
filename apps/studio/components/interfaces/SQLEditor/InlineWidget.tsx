@@ -1,4 +1,4 @@
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { PropsWithChildren, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 

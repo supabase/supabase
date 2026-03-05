@@ -4,7 +4,7 @@ import { Admonition } from 'ui-patterns'
 
 // [Joshen] In the future, conditionals should be from resource exhaustion endpoint as single source of truth
 interface DiskIOBandwidthWarningsProps {
-  isFreePlan: boolean
+  hasAccessToComputeSizes: boolean
   hasLatest: boolean
   upgradeUrl: string
   currentBillingCycleSelected: boolean
@@ -12,8 +12,8 @@ interface DiskIOBandwidthWarningsProps {
   highestIoBudgetConsumption: number
 }
 
-const DiskIOBandwidthWarnings = ({
-  isFreePlan,
+export const DiskIOBandwidthWarnings = ({
+  hasAccessToComputeSizes,
   hasLatest,
   currentBillingCycleSelected,
   upgradeUrl,
@@ -34,7 +34,7 @@ const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="danger">
               <Link href={upgradeUrl}>
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+                {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -58,7 +58,7 @@ const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="danger">
               <Link href={upgradeUrl}>
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+                {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -81,7 +81,7 @@ const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="warning">
               <Link href={upgradeUrl}>
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+                {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -105,7 +105,7 @@ const DiskIOBandwidthWarnings = ({
             </p>
             <Button asChild type="warning">
               <Link href={upgradeUrl}>
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+                {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
             </Button>
           </>
@@ -116,5 +116,3 @@ const DiskIOBandwidthWarnings = ({
 
   return null
 }
-
-export default DiskIOBandwidthWarnings

@@ -88,7 +88,7 @@ We're committed to our Free Plan - we know the importance of this for testing ho
       {
         number: '25,000',
         text: 'Discord members',
-        url: 'https://discord.com/invite/R7bSpeBSJE',
+        url: 'https://discord.supabase.com',
         icon: <IconDiscord />,
       },
       {

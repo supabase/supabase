@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
+    // @deprecated: use @/ instead of importing from root
     "baseUrl": ".",
     "paths": {
       "contentlayer/generated": ["./.contentlayer/generated"],
+      // ~/ is deprecated, use @/ instead
       "~/*": ["./*"],
+      "@/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"]
     },
     "downlevelIteration": true,

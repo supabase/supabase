@@ -1,19 +1,28 @@
-import { useRouter } from 'next/router'
-
 import { useFlag, useParams } from 'common'
-import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Button, cn, ResizablePanel } from 'ui'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React, { useEffect } from 'react'
+import { Button, cn, ResizablePanel, usePanelRef } from 'ui'
+
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 
 interface FilterSideBarProps {
+  isFilterBarOpen: boolean
+  setIsFilterBarOpen: React.Dispatch<React.SetStateAction<boolean>>
   dateRangeDisabled?: DateRangeDisabled
 }
 
-export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
+export function FilterSideBar({
+  isFilterBarOpen,
+  setIsFilterBarOpen,
+  dateRangeDisabled,
+}: FilterSideBarProps) {
   const router = useRouter()
   const { ref } = useParams()
   const { table } = useDataTable()
@@ -26,18 +35,31 @@ export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
     router.push(`/project/${ref}/logs/explorer`)
   }
 
+  const panelRef = usePanelRef()
+
+  useEffect(() => {
+    if (isFilterBarOpen) {
+      panelRef.current?.expand()
+    } else {
+      panelRef.current?.collapse()
+    }
+  }, [isFilterBarOpen, panelRef])
+
   return (
     <ResizablePanel
-      order={1}
-      maxSize={33}
-      defaultSize={1}
+      panelRef={panelRef}
+      maxSize={512}
+      minSize={256}
       id="panel-left"
-      className={cn(
-        'flex flex-col w-full',
-        'min-w-64 max-w-[32rem]',
-        'group-data-[expanded=false]/controls:hidden',
-        'hidden sm:flex'
-      )}
+      collapsible
+      onResize={(size) => {
+        if (size.inPixels === 0) {
+          setIsFilterBarOpen(false)
+        } else if (!isFilterBarOpen) {
+          setIsFilterBarOpen(true)
+        }
+      }}
+      className={cn('flex flex-col w-full')}
     >
       <div className="border-b border-border px-4 md:top-0">
         <div className="flex h-[48px] items-center justify-between gap-3">
@@ -60,6 +82,25 @@ export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
           />
         )}
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
+        <FeaturePreviewSidebarPanel
+          className="mx-2 my-4"
+          title="Capture your logs"
+          description="Send logs to your preferred observability or storage platform."
+          illustration={
+            <div className="flex items-center gap-4">
+              {LOG_DRAIN_TYPES.filter((t) =>
+                ['datadog', 'sentry', 'webhook', 'loki'].includes(t.value)
+              ).map((type) =>
+                React.cloneElement(type.icon, { height: 20, width: 20, key: type.value })
+              )}
+            </div>
+          }
+          actions={
+            <Button asChild type="default">
+              <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
+            </Button>
+          }
+        />
       </div>
     </ResizablePanel>
   )

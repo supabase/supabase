@@ -47,20 +47,13 @@ export const ReportBlockContainer = ({
             )}
           >
             {showDragHandle ? (
-              <div className="absolute left-3 top-2.5 z-10 opacity-0 transition-opacity group-hover:opacity-100">
-                <GripHorizontal size={16} strokeWidth={1.5} />
-              </div>
+              <GripHorizontal size={16} strokeWidth={1.5} />
             ) : icon ? (
               icon
             ) : (
               <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
-            <div
-              className={cn(
-                'flex items-center gap-2 flex-1 transition-opacity',
-                showDragHandle && 'group-hover:opacity-25'
-              )}
-            >
+            <div className={cn('flex items-center gap-2 flex-1 transition-opacity')}>
               <h3 className="heading-meta truncate">{label}</h3>
               {badge && <div className="flex items-center shrink-0">{badge}</div>}
             </div>

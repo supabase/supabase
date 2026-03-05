@@ -1,0 +1,475 @@
+---
+title: 'Configure Social Login (OAuth) Providers'
+description: 'Set up social login (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
+subtitle: 'Set up social login (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
+---
+
+This guide covers the **server-side configuration** required to enable social login providers on a self-hosted Supabase instance running with Docker Compose. This applies to all OAuth and OIDC-based providers, including third-party identity providers like Keycloak.
+
+## Before you begin
+
+You need:
+
+- A working self-hosted Supabase installation. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker).
+- `API_EXTERNAL_URL` set to the publicly reachable URL of your Supabase instance (e.g., `https://<your-domain>`).
+
+<Admonition type="danger">
+
+HTTPS is strongly recommended in production. Most OAuth providers reject `http://` callback URLs (except `localhost`).
+
+</Admonition>
+
+Your **OAuth callback URL** is built from `API_EXTERNAL_URL`. For example, if `API_EXTERNAL_URL` is `https://<your-domain>`, the callback URL will become:
+
+```
+https://<your-domain>/auth/v1/callback
+```
+
+You will have to register this URL with each OAuth provider.
+
+## OAuth request flow
+
+When a user signs in with an OAuth provider, the following flow occurs:
+
+1. Your app calls `supabase.auth.signInWithOAuth()` and the browser redirects to the Auth service
+2. API gateway (Kong) routes the request to the Auth container (`/auth/v1/authorize`)
+3. Auth redirects the user to the OAuth provider (e.g., Google) for consent
+4. The provider redirects back to `https://<your-domain>/auth/v1/callback`
+5. Auth exchanges the authorization code for tokens and redirects the user to your `SITE_URL` or an allowed redirect URL
+
+## Auth environment variables
+
+The Auth service (GoTrue) uses the prefix `GOTRUE_EXTERNAL_` followed by a provider name for all OAuth configuration. For example, when using Google:
+
+- `GOTRUE_EXTERNAL_GOOGLE_ENABLED`
+- `GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID`
+- `GOTRUE_EXTERNAL_GOOGLE_SECRET`
+- `GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI`
+
+## Step-by-step configuration
+
+The default `.env.example` and `docker-compose.yml` include commented-out placeholders for Google, GitHub, and Azure.
+
+### Step 1: Register your app with the provider
+
+1. Go to the OAuth provider's developer console and create an application.
+2. Set the **authorized redirect URL**, e.g., `https://<your-domain>/auth/v1/callback`
+3. Copy the **client ID** and **client secret** into your `.env` file.
+
+### Step 2: Configure variables in the `.env` file
+
+Uncomment the lines for your provider in `.env` and add your client ID and secret, e.g., for Google:
+
+```
+GOOGLE_ENABLED=true
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_SECRET=your-client-secret
+```
+
+### Step 3: Enable the matching lines in `docker-compose.yml`
+
+Uncomment the corresponding `GOTRUE_EXTERNAL_` lines in the `auth` service's `environment`:
+
+```yaml
+auth:
+  environment:
+    # ... existing variables ...
+    GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
+    GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_SECRET}
+    GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+```
+
+<Admonition type="note">
+
+For providers **not** pre-configured in the files (see the [full provider list](#other-supported-providers) below), add the lines manually following the same pattern: variables in `.env`, passthrough with `GOTRUE_EXTERNAL_PROVIDER_` in `docker-compose.yml`.
+
+</Admonition>
+
+### Step 4: Restart the auth service
+
+```sh
+docker compose up -d --force-recreate --no-deps auth
+```
+
+### Step 5: Verify the configuration
+
+Check that the provider is enabled:
+
+```sh
+curl -H 'apikey: your-anon-key' https://<your-domain>/auth/v1/settings
+```
+
+The response should include your provider under `external`:
+
+```
+{
+  "external": {
+    "google": true
+  }
+}
+```
+
+## Provider-specific setup
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="google"
+>
+
+<TabPanel id="google" label="Google">
+
+**Google Cloud Console setup:**
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create or select a project
+3. Select **Solutions** > **All products** in the navigation menu on the left
+4. Go to **APIs & services** > **OAuth consent screen** and click **Get started**
+5. Follow the configuration steps and add an **External** app
+6. Go to **APIs & Services** > **Credentials**
+7. Click **Create Credentials** > **OAuth client ID**
+8. Set application type to **Web application**
+9. Under **Authorized redirect URIs**, add: `https://<your-domain>/auth/v1/callback`
+10. Click **Create** and copy the client ID and client secret
+
+**`.env`:**
+
+```
+GOOGLE_ENABLED=true
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_SECRET=your-google-client-secret
+```
+
+**`docker-compose.yml`:**
+
+```yaml
+auth:
+  environment:
+    # ... existing variables ...
+    GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
+    GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_SECRET}
+    GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+```
+
+</TabPanel>
+
+<TabPanel id="github" label="GitHub">
+
+**GitHub setup:**
+
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
+2. Click **New OAuth app**
+3. Fill in **Homepage URL**, e.g., `https://<your-domain>`
+4. Set **Authorization callback URL** to: `https://<your-domain>/auth/v1/callback`
+5. Click **Register application**
+6. Copy the client ID, generate and copy a client secret
+
+**`.env`:**
+
+```
+GITHUB_ENABLED=true
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_SECRET=your-github-client-secret
+```
+
+**`docker-compose.yml`:**
+
+```yaml
+auth:
+  environment:
+    # ... existing variables ...
+    GOTRUE_EXTERNAL_GITHUB_ENABLED: ${GITHUB_ENABLED}
+    GOTRUE_EXTERNAL_GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+    GOTRUE_EXTERNAL_GITHUB_SECRET: ${GITHUB_SECRET}
+    GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+```
+
+</TabPanel>
+
+<TabPanel id="azure" label="Azure">
+
+**Azure Portal setup:**
+
+1. Go to [Azure Portal](https://portal.azure.com/)
+2. Go to **All services** > **Identity** > **App registrations** via the navigation menu on the left
+3. Click **New registration**
+4. Add application **Name**
+5. Under **Redirect URI**, select **Web** and enter: `https://<your-domain>/auth/v1/callback`
+6. Click **Register**
+7. Copy the **Application (client) ID**
+8. Click on **Client credentials** > **Add a certificate or secret**
+9. Click on **New client secret** and add a client secret
+10. Copy the secret value (not "secret ID")
+
+**`.env`:**
+
+```
+AZURE_ENABLED=true
+AZURE_CLIENT_ID=your-azure-application-client-id
+AZURE_SECRET=your-azure-client-secret
+## Optional: restrict to a specific tenant (defaults to 'common')
+# AZURE_URL=https://login.microsoftonline.com/your-tenant-id
+```
+
+**`docker-compose.yml`:**
+
+```yaml
+auth:
+  environment:
+    # ... existing variables ...
+    GOTRUE_EXTERNAL_AZURE_ENABLED: ${AZURE_ENABLED}
+    GOTRUE_EXTERNAL_AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+    GOTRUE_EXTERNAL_AZURE_SECRET: ${AZURE_SECRET}
+    GOTRUE_EXTERNAL_AZURE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+    ## Optional: uncomment for tenant-specific Azure login
+    # GOTRUE_EXTERNAL_AZURE_URL: ${AZURE_URL}
+```
+
+</TabPanel>
+
+<TabPanel id="apple" label="Apple">
+
+**Apple Developer setup:**
+
+1. Refer to [Apple Developer documentation](https://developer.apple.com/documentation/signinwithapple/configuring-your-environment-for-sign-in-with-apple) to learn how to enable App ID and create a Services ID
+2. Create a private key for sign in with Apple
+3. Generate a client secret JWT from your private key. See [Apple Developer documentation](https://developer.apple.com/documentation/accountorganizationaldatasharing/creating-a-client-secret) for details.
+
+**`.env`:**
+
+```
+APPLE_ENABLED=true
+APPLE_CLIENT_ID=com.example.your-services-id
+APPLE_SECRET=your-generated-jwt-client-secret
+```
+
+**`docker-compose.yml`:**
+
+```yaml
+auth:
+  environment:
+    # ... existing variables ...
+    GOTRUE_EXTERNAL_APPLE_ENABLED: ${APPLE_ENABLED}
+    GOTRUE_EXTERNAL_APPLE_CLIENT_ID: ${APPLE_CLIENT_ID}
+    GOTRUE_EXTERNAL_APPLE_SECRET: ${APPLE_SECRET}
+    GOTRUE_EXTERNAL_APPLE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+```
+
+<Admonition type="note">
+
+Apple uses `response_mode=form_post` for its OAuth flow. The Auth service handles this automatically - no additional configuration is needed.
+
+</Admonition>
+
+</TabPanel>
+
+<TabPanel id="keycloak" label="Keycloak">
+
+**Keycloak setup:**
+
+1. Open your Keycloak admin console
+2. Select (or create) the realm you want to use
+3. Go to **Clients** > **Create client**
+4. Set **Client type** to **OpenID Connect**
+5. Set **Client ID** (e.g., `supabase`)
+6. On the next screen, enable **Client authentication**
+7. Under **Valid redirect URIs**, add: `https://<your-domain>/auth/v1/callback`
+8. Save, then go to the **Credentials** tab and copy the **Client secret**
+
+**`.env` variables:**
+
+```
+KEYCLOAK_ENABLED=true
+KEYCLOAK_CLIENT_ID=supabase
+KEYCLOAK_SECRET=your-keycloak-client-secret
+## Required: your Keycloak realm URL
+KEYCLOAK_URL=https://keycloak.example.com/realms/myrealm
+```
+
+**`docker-compose.yml` passthrough:**
+
+```yaml
+auth:
+  environment:
+    # ... existing variables ...
+    GOTRUE_EXTERNAL_KEYCLOAK_ENABLED: ${KEYCLOAK_ENABLED}
+    GOTRUE_EXTERNAL_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+    GOTRUE_EXTERNAL_KEYCLOAK_SECRET: ${KEYCLOAK_SECRET}
+    GOTRUE_EXTERNAL_KEYCLOAK_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+    GOTRUE_EXTERNAL_KEYCLOAK_URL: ${KEYCLOAK_URL}
+```
+
+<Admonition type="danger">
+
+`KEYCLOAK_URL` is **required**. It must be the full realm URL (e.g., `https://keycloak.example.com/realms/myrealm`). The Auth service uses this to discover the OIDC endpoints (`.well-known/openid-configuration`). Without it, Keycloak login will not work.
+
+</Admonition>
+
+</TabPanel>
+
+</Tabs>
+
+## Other supported providers
+
+Supabase Auth supports the following OAuth providers:
+
+| Provider          | Env prefix       | Additional variables            | Docs                                                                  |
+| ----------------- | ---------------- | ------------------------------- | --------------------------------------------------------------------- |
+| Apple             | `APPLE_`         | -                               | [Login with Apple](/docs/guides/auth/social-login/auth-apple)         |
+| Azure (Microsoft) | `AZURE_`         | `URL` (tenant URL)              | [Login with Azure](/docs/guides/auth/social-login/auth-azure)         |
+| Bitbucket         | `BITBUCKET_`     | -                               | [Login with Bitbucket](/docs/guides/auth/social-login/auth-bitbucket) |
+| Discord           | `DISCORD_`       | -                               | [Login with Discord](/docs/guides/auth/social-login/auth-discord)     |
+| Facebook          | `FACEBOOK_`      | -                               | [Login with Facebook](/docs/guides/auth/social-login/auth-facebook)   |
+| Figma             | `FIGMA_`         | -                               | [Login with Figma](/docs/guides/auth/social-login/auth-figma)         |
+| GitHub            | `GITHUB_`        | `URL` (for GitHub Enterprise)   | [Login with GitHub](/docs/guides/auth/social-login/auth-github)       |
+| GitLab            | `GITLAB_`        | `URL` (for self-hosted GitLab)  | [Login with GitLab](/docs/guides/auth/social-login/auth-gitlab)       |
+| Google            | `GOOGLE_`        | -                               | [Login with Google](/docs/guides/auth/social-login/auth-google)       |
+| Kakao             | `KAKAO_`         | -                               | [Login with Kakao](/docs/guides/auth/social-login/auth-kakao)         |
+| Keycloak (OIDC)   | `KEYCLOAK_`      | `URL` (realm URL, **required**) | [Login with Keycloak](/docs/guides/auth/social-login/auth-keycloak)   |
+| LinkedIn (OIDC)   | `LINKEDIN_OIDC_` | -                               | [Login with LinkedIn](/docs/guides/auth/social-login/auth-linkedin)   |
+| Notion            | `NOTION_`        | -                               | [Login with Notion](/docs/guides/auth/social-login/auth-notion)       |
+| Slack (OIDC)      | `SLACK_OIDC_`    | -                               | [Login with Slack](/docs/guides/auth/social-login/auth-slack)         |
+| Snapchat          | `SNAPCHAT_`      | -                               | -                                                                     |
+| Spotify           | `SPOTIFY_`       | -                               | [Login with Spotify](/docs/guides/auth/social-login/auth-spotify)     |
+| Twitch            | `TWITCH_`        | -                               | [Login with Twitch](/docs/guides/auth/social-login/auth-twitch)       |
+| Twitter           | `TWITTER_`       | -                               | [Login with Twitter](/docs/guides/auth/social-login/auth-twitter)     |
+| WorkOS            | `WORKOS_`        | -                               | [Login with WorkOS](/docs/guides/auth/social-login/auth-workos)       |
+| Zoom              | `ZOOM_`          | -                               | [Login with Zoom](/docs/guides/auth/social-login/auth-zoom)           |
+
+For each provider, you need at minimum `ENABLED`, `CLIENT_ID`, `SECRET`, and `REDIRECT_URI` in `.env` and `docker-compose.yml`.
+
+<Admonition type="caution">
+
+**LinkedIn (OIDC)** and **Slack (OIDC)** use multi-word env prefixes. The full Docker Compose variables are `GOTRUE_EXTERNAL_LINKEDIN_OIDC_CLIENT_ID` and `GOTRUE_EXTERNAL_SLACK_OIDC_CLIENT_ID` respectively - not `LINKEDIN_CLIENT_ID` or `SLACK_CLIENT_ID`.
+
+</Admonition>
+
+## Test the login flow
+
+You can test OAuth with the following minimal HTML page:
+
+- Save the code below to `index.html`
+- Start `python -m http.server 3000` in the same directory
+- Make sure `SITE_URL` is set to `http://localhost:3000` in your self-hosted Supabase `.env` configuration
+- Open your browser and go to `http://localhost:3000`
+
+```html
+<!doctype html>
+<html>
+  <body>
+    <h1>Supabase OAuth Test</h1>
+    <button id="loginBtn">Sign in with Google</button>
+    <pre id="result"></pre>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const SUPABASE_URL = 'https://<your-domain>'
+        const SUPABASE_ANON_KEY = 'your-anon-key'
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        const button = document.getElementById('loginBtn')
+
+        button.addEventListener('click', async () => {
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+          })
+
+          if (error) {
+            document.getElementById('result').textContent = JSON.stringify(error, null, 2)
+          }
+        })
+
+        supabase.auth.getSession().then(({ data }) => {
+          if (data.session) {
+            document.getElementById('result').textContent =
+              'Logged in as: ' + data.session.user.email
+          }
+        })
+      })
+    </script>
+  </body>
+</html>
+```
+
+For detailed client-side integration, see [Social Login](/docs/guides/auth/social-login).
+
+## Troubleshooting
+
+### "Provider not enabled" or provider shows `false` in `/auth/v1/settings`
+
+- Check that `GOTRUE_EXTERNAL_*_ENABLED` is set to `true` in `docker-compose.yml`
+- Verify the `.env` variable is not empty, e.g., check with `docker compose exec auth env | grep GOOGLE`
+
+### Variables added to `.env` but provider still not working
+
+Configuration variables from `.env` are **not** automatically available inside the container unless there's a matching passthrough definition in `docker-compose.yml`. Check, e.g., for:
+
+```
+GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
+```
+
+Run `docker compose exec auth env | grep GOTRUE_EXTERNAL` to verify the variables are reaching the container.
+
+### `SITE_URL` or redirect URL errors after login
+
+After a successful OAuth login, the Auth service redirects to `SITE_URL` or a URL from `ADDITIONAL_REDIRECT_URLS`. Ensure:
+
+- `SITE_URL` in `.env` is set to your application's URL
+- If your app uses a different redirect URL, add it to `ADDITIONAL_REDIRECT_URLS` (comma-separated)
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+### Nonce check failure on mobile (Google Sign In)
+
+When using Google Sign In on mobile with ID tokens, nonce verification may fail because mobile SDKs don't always support the nonce flow that the Auth service expects.
+
+<Admonition type="caution">
+
+`GOTRUE_EXTERNAL_SKIP_NONCE_CHECK` disables nonce validation on ID tokens, which weakens replay-attack protection. Treat it as a **short-lived troubleshooting workaround**, not a permanent fix:
+
+- Enable it only in the environment where you're debugging the issue.
+- Revert it as soon as the issue is resolved.
+- Prefer fixing the client-side nonce handling or switching to an OAuth flow (authorization code with PKCE) that avoids ID-token nonce issues entirely.
+
+</Admonition>
+
+To enable it, uncomment the following line in `docker-compose.yml`:
+
+```
+GOTRUE_EXTERNAL_SKIP_NONCE_CHECK: true
+```
+
+### Auth service fails to start
+
+Check the auth container logs:
+
+```sh
+docker compose logs auth
+```
+
+Common causes:
+
+- Missing required environment variable (e.g., `CLIENT_ID` or `SECRET` is empty)
+- Invalid `API_EXTERNAL_URL` (must be a valid URL with protocol)
+
+## Environment variable reference
+
+All OAuth-related environment variables for the `auth` service in `docker-compose.yml`:
+
+| Variable                         | Description                                                              | Required |
+| -------------------------------- | ------------------------------------------------------------------------ | -------- |
+| `GOTRUE_EXTERNAL_*_ENABLED`      | Enable the provider (`true`/`false`)                                     | Yes      |
+| `GOTRUE_EXTERNAL_*_CLIENT_ID`    | OAuth client ID from the provider                                        | Yes      |
+| `GOTRUE_EXTERNAL_*_SECRET`       | OAuth client secret from the provider                                    | Yes      |
+| `GOTRUE_EXTERNAL_*_REDIRECT_URI` | Callback URL: `${API_EXTERNAL_URL}/auth/v1/callback`                     | Yes      |
+| `GOTRUE_SITE_URL`                | Default redirect URL after authentication (set via `SITE_URL` in `.env`) | Yes      |
+
+## Additional resources
+
+- [Redirect URLs](/docs/guides/auth/redirect-urls)
+- [Auth server on GitHub](https://github.com/supabase/auth) (check README and `example.env`)

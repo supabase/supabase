@@ -45,19 +45,39 @@ API roles cannot access certain schemas, most notably `auth` and `vault`. This r
 
 If you created a custom schema, you will have to give the Database API permission to query it. Follow our [Using Custom Schemas guide](/docs/guides/api/using-custom-schemas) for more directions.
 
-### Revoked object level access:
+### Missing table-level privileges
 
-In rare cases, users may accidentally revoke object-level access in `public` from their API roles. To regrant full visibility, run the below code:
+If you see an error like `permission denied for table your_table`, the querying role may not have the required privilege for the operation.
+
+By default, tables in the `public` schema are granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` to the `anon` and `authenticated` roles. However, these privileges can be adjusted via the [Dashboard Table Editor](/dashboard/project/_/editor) or via SQL.
+
+To check the current privileges on a table:
 
 ```sql
-grant usage on schema public to anon, authenticated, service_role;
-grant all on all tables in schema public to anon, authenticated, service_role;
-grant all on all routines in schema public to anon, authenticated, service_role;
-grant all ON all sequences in schema public to anon, authenticated, service_role;
-alter default privileges for role postgres in schema public grant all on tables to anon, authenticated, service_role;
-alter default privileges for role postgres in schema public grant all on routines to anon, authenticated, service_role;
-alter default privileges for role postgres in schema public grant all on sequences to anon, authenticated, service_role;
+select grantee, privilege_type
+from information_schema.role_table_grants
+where table_name = 'your_table';
 ```
+
+To grant a specific privilege to a role:
+
+```sql
+grant select on table public.your_table to anon;
+```
+
+To grant all privileges:
+
+```sql
+grant select, insert, update, delete on table public.your_table to anon, authenticated;
+```
+
+<Admonition type="note">
+
+Granting privileges allows access to your table through the Data API, so you should ensure you [enable RLS](/docs/guides/database/postgres/row-level-security) and write appropriate policies to protect your data.
+
+For more information, see [Adjusting table-level privileges](/docs/guides/database/hardening-data-api#adjusting-table-level-privileges).
+
+</Admonition>
 
 ### Configured column-level restrictions
 

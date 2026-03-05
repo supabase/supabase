@@ -2,8 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Switch } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { z } from 'zod'
 
 const FormSchema = z.object({

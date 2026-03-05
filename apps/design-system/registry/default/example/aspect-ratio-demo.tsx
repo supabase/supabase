@@ -1,5 +1,4 @@
 import Image from 'next/image'
-
 import { AspectRatio } from 'ui'
 
 export default function AspectRatioDemo() {

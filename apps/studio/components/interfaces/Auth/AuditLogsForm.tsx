@@ -6,8 +6,7 @@ import { toast } from 'sonner'
 import { boolean, object } from 'yup'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -26,6 +25,13 @@ import {
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 const schema = object({
   AUDIT_LOG_DISABLE_POSTGRES: boolean().required(),
@@ -54,10 +60,10 @@ export const AuditLogsForm = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update audit logs: ${error?.message}`)
     },
@@ -87,28 +93,35 @@ export const AuditLogsForm = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError
-          error={authConfigError}
-          subject="Failed to retrieve auth configuration for hooks"
-        />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError
+            error={authConfigError}
+            subject="Failed to retrieve auth configuration for hooks"
+          />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <div className="space-y-4">
-        <ScaffoldSectionTitle className="mb-4">Settings</ScaffoldSectionTitle>
-
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Settings</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
         <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onSubmitAuditLogs)} className="space-y-4">
             <Card>
@@ -119,25 +132,25 @@ export const AuditLogsForm = () => {
                   render={({ field }) => (
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Disable writing auth audit logs to project database"
+                      label="Write audit logs to the database"
                       description={
                         <p className="text-sm prose text-foreground-lighter max-w-full">
-                          Audit logs will no longer be stored in the{' '}
+                          When enabled, audit logs are written to the{' '}
                           <InlineLink
                             target="_blank"
                             rel="noopener noreferrer"
                             href={`/project/${projectRef}/editor/${auditLogTable?.id}`}
                           >
-                            <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">
-                              {AUDIT_LOG_ENTRIES_TABLE}
-                            </code>
+                            <code className="text-code-inline">{AUDIT_LOG_ENTRIES_TABLE}</code>
                           </InlineLink>{' '}
-                          table in your project's database, which will reduce database storage
-                          usage. Audit logs will subsequently still be available in the{' '}
+                          table.
+                          <br />
+                          You can disable this to reduce disk usage while still accessing logs
+                          through the{' '}
                           <InlineLink
                             href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
                           >
-                            auth logs
+                            Auth logs
                           </InlineLink>
                           .
                         </p>
@@ -145,8 +158,8 @@ export const AuditLogsForm = () => {
                     >
                       <FormControl_Shadcn_>
                         <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
+                          checked={!field.value}
+                          onCheckedChange={(value) => field.onChange(!value)}
                           disabled={!canUpdateConfig}
                         />
                       </FormControl_Shadcn_>
@@ -158,20 +171,23 @@ export const AuditLogsForm = () => {
                     type="warning"
                     className="mt-4"
                     title="Disabling PostgreSQL storage will not automatically migrate or transfer existing audit log data"
-                  >
-                    <p className="!mb-0 !leading-normal prose text-foreground-light text-sm max-w-full">
-                      Future audit logs will only appear in the project's{' '}
-                      <InlineLink
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
-                      >
-                        auth logs
-                      </InlineLink>
-                      . You are responsible for backing up, copying, or migrating existing data from
-                      the <code>{AUDIT_LOG_ENTRIES_TABLE}</code> table if needed.
-                    </p>
-                  </Admonition>
+                    description={
+                      <p>
+                        Future audit logs will only appear in the project’s{' '}
+                        <InlineLink
+                          href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
+                        >
+                          auth logs
+                        </InlineLink>
+                        . You are responsible for backing up, copying, or migrating existing data
+                        from the{' '}
+                        <code className="text-code-inline !break-keep">
+                          {AUDIT_LOG_ENTRIES_TABLE}
+                        </code>{' '}
+                        table if needed.
+                      </p>
+                    }
+                  />
                 )}
               </CardContent>
 
@@ -193,7 +209,7 @@ export const AuditLogsForm = () => {
             </Card>
           </form>
         </Form_Shadcn_>
-      </div>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }

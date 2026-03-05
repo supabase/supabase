@@ -3,15 +3,12 @@ interface HeaderTitleProps {
   tableName?: string
 }
 
-const HeaderTitle = ({ isNewRecord, tableName }: HeaderTitleProps) => {
+export const HeaderTitle = ({ isNewRecord, tableName }: HeaderTitleProps) => {
   let header = `${isNewRecord ? 'Add new' : 'Update'} row ${isNewRecord ? 'to' : 'from'} `
-
   return (
-    <>
+    <span>
       {header}
       {tableName && <span className="text-code font-mono">{tableName}</span>}
-    </>
+    </span>
   )
 }
-
-export default HeaderTitle

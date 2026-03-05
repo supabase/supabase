@@ -52,18 +52,19 @@ export const Index: Record<string, any> = [`
     let { children } = iconNodes[iconName]
     children = children.map(({ name, attributes }) => [name, attributes])
 
-    const getSvg = () => readSvg(`${iconName}.svg`, iconsDir)
+    const svgContent = readSvg(`${iconName}.svg`, iconsDir)
+    const getSvg = () => svgContent
     // const { deprecated = false } = iconMetaData[iconName]
     const deprecated = false
 
     const elementTemplate = template({ componentName, iconName, children, getSvg, deprecated })
     const output = pretty
-      ? prettier.format(elementTemplate, {
-          singleQuote: true,
-          trailingComma: 'all',
-          printWidth: 100,
-          parser: 'babel',
-        })
+      ? await prettier.format(elementTemplate, {
+        singleQuote: true,
+        trailingComma: 'all',
+        printWidth: 100,
+        parser: 'babel',
+      })
       : elementTemplate
 
     const rawSvg = JSON.stringify(readSvg(`${iconName}.svg`, iconsDir))
@@ -111,7 +112,7 @@ export const Index: Record<string, any> = [`
   }
   // TO DO -- END
 
-  Promise.all([writeIconFiles])
+  Promise.all(writeIconFiles)
 
     // TO DO -- START
     //

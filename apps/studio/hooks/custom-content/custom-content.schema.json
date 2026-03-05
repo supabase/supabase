@@ -16,6 +16,11 @@
       "description": "Show a custom provider on the sign in page (Continue with X)"
     },
 
+    "docs:row_level_security_guide_path": {
+      "type": ["string"],
+      "description": "The path to the row level security guide in the docs"
+    },
+
     "organization:legal_documents": {
       "type": ["array", "null"],
       "description": "Renders a provided set of documents under the organization legal documents page",
@@ -91,6 +96,7 @@
   },
   "required": [
     "app:title",
+    "docs:row_level_security_guide_path",
     "organization:legal_documents",
     "project_homepage:client_libraries",
     "project_homepage:example_projects",

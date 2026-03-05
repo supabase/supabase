@@ -2,25 +2,20 @@
 title: Postgres Views
 description: Creating and using a view in PostgreSQL.
 author: paul_copplestone
-author_title: Supabase
-author_url: https://github.com/dragarcia
-author_image_url: https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4
-image: postgres-views.png
-categories:
-  - postgres
+imgSocial: postgres-views.png
 tags:
   - postgres
   - planetpg
-date: '11-18-2020'
+date: '2020-11-18'
 ---
 
 A quick summary of Postgres views, materialized views, and why you should use them.
 
-### What is a View?
+## What is a view?
 
 A [view](https://www.postgresql.org/docs/12/sql-createview.html) is a convenient shortcut to a query. Creating a view does not involve new tables or data. When run, an underlying query is executed, returning its results to the user.
 
-#### Basic Example
+### Basic example
 
 Say we have the following tables from a database of a university:
 
@@ -75,7 +70,7 @@ select * from transcripts;
 
 For additional parameters or options, refer [here](https://www.postgresql.org/docs/12/sql-createview.html#:~:text=parameters).
 
-### Why should we use Views?
+## Why should we use views?
 
 Views provide the several benefits:
 
@@ -84,7 +79,7 @@ Views provide the several benefits:
 - Logical Organization
 - Security
 
-#### Simplicity
+### Simplicity
 
 As a query becomes complex it becomes a hassle to call it. Especially when we run it at regularly. In the example above, instead of repeatedly running:
 
@@ -109,7 +104,7 @@ select * from transcripts;
 
 Additionally, a view behaves like a typical table. We can safely use it in table `JOIN`s or even create new views using existing views.
 
-#### Consistency
+### Consistency
 
 Views ensure that the likelihood of mistakes decreases when repeatedly executing a query. In our example above, we may decide that we want to exclude the course _Introduction to Postgres_. The query would become:
 
@@ -129,19 +124,19 @@ where courses.code != 'PG101';
 
 Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter just the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
 
-#### Logical Organization
+### Logical organization
 
 With views, we can give our query a name. This is extremely useful for teams working with the same database. Instead of guessing what a query is supposed to do, a well-named view can easily explain it. For example, by looking at the name of the view **transcripts**, we can infer that the underlying query might involve the **students**, **courses**, and **grades** tables.
 
-#### Security
+### Security
 
 Views can restrict the amount and type of data presented to a user. Instead of allowing a user direct access to a set of tables, we provide them a view instead. We can prevent them from reading sensitive columns by excluding them from the underlying query.
 
-### What is a Materialized View?
+## What is a materialized view?
 
 A [materialized view](https://www.postgresql.org/docs/12/rules-materializedviews.html) is a form of view but with the added feature of physically storing the results. In subsequent reads of a materialized view, the time taken to return its results would be much faster than a conventional view. This is because the data is readily available for a materialized view while the conventional view executes the underlying query each time it is called.
 
-#### Basic Example
+### Basic example
 
 Using our example above, a materialized view can be created like this:
 
@@ -167,7 +162,7 @@ select * from transcripts;
 
 For additional parameters or options, refer [here](https://www.postgresql.org/docs/12/sql-creatematerializedview.html#:~:text=parameters).
 
-#### Refreshing
+### Refreshing
 
 Unfortunately, there is a trade-off - data in materialized views are not always up to date. We need to refresh it regularly to prevent the data from becoming too stale. To do so:
 
@@ -177,13 +172,13 @@ refresh materialized view transcripts;
 
 It's up to you how regularly refresh your materialized views, and it's probably different for each view depending on its use-case.
 
-### Materialized views vs Conventional views
+## Materialized views vs conventional views
 
 Materialized views are useful when execution times for queries or views become unbearable or exceed the service level agreements of a business. These could likely occur in views or queries involving multiple tables and millions of rows. When using such a view, however, there should be tolerance towards data being outdated. Some use-cases for materialized views are internal dashboards and analytics.
 
 Creating a materialized view is not a solution to inefficient queries. You should always seek to optimize a slow running query even if you are implementing a materialized view.
 
-### Conclusion
+## Conclusion
 
 Postgres views and materialized views are a great way to organize and view results from commonly used queries. Although similar to one another, each has its purpose. Views simplify the process of running queries. Materialized views are usually faster at returning results, with the trade-off of having stale data.
 

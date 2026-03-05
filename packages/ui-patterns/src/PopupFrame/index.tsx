@@ -1,6 +1,6 @@
 import { useBreakpoint } from 'common'
 import React, { ReactNode } from 'react'
-import { Modal, cn } from 'ui'
+import { cn, Modal } from 'ui'
 
 interface PopupFrameProps {
   triggerContainerClassName?: string

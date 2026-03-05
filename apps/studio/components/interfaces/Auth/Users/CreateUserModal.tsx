@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Lock, Mail } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -43,7 +43,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     'create_user'
   )
 
-  const { mutate: createUser, isLoading: isCreatingUser } = useUserCreateMutation({
+  const { mutate: createUser, isPending: isCreatingUser } = useUserCreateMutation({
     onSuccess(res) {
       toast.success(`Successfully created user: ${res.email}`)
       form.reset({ email: '', password: '', autoConfirmUser: true })
@@ -51,9 +51,8 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     },
   })
 
-  const onCreateUser = async (values: any) => {
+  const onCreateUser: SubmitHandler<z.infer<typeof CreateUserFormSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
-
     createUser({ projectRef, user: values })
   }
 

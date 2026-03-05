@@ -14,7 +14,7 @@ export interface RevokeAppModalProps {
 
 export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
   const { slug } = useParams()
-  const { mutate: revokeAuthorizedApp, isLoading: isDeleting } = useAuthorizedAppRevokeMutation({
+  const { mutate: revokeAuthorizedApp, isPending: isDeleting } = useAuthorizedAppRevokeMutation({
     onSuccess: () => {
       toast.success(`Successfully revoked the app "${selectedApp?.name}"`)
       onClose()

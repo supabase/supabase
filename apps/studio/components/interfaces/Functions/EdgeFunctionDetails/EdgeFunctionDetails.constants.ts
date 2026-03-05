@@ -3,7 +3,12 @@ interface InvocationTab {
   label: string
   language: 'bash' | 'js' | 'ts' | 'dart' | 'python'
   hideLineNumbers?: boolean
-  code: (functionUrl: string, functionName: string, apiKey: string) => string
+  code: (props: {
+    showKey: boolean
+    functionUrl: string
+    functionName: string
+    apiKey: string
+  }) => string
 }
 
 export const INVOCATION_TABS: InvocationTab[] = [
@@ -11,17 +16,24 @@ export const INVOCATION_TABS: InvocationTab[] = [
     id: 'curl',
     label: 'cURL',
     language: 'bash',
-    code: (functionUrl, _, apiKey) => `curl -L -X POST '${functionUrl}' \\
-  -H 'Authorization: Bearer ${apiKey}' \\${apiKey.includes('publishable') ? `\n  -H 'apikey: ${apiKey}' \\` : ''}
+    code: ({ showKey, functionUrl, apiKey }) => {
+      const obfuscatedName = apiKey.includes('publishable')
+        ? 'SUPABASE_PUBLISHABLE_DEFAULT_KEY'
+        : 'SUPABASE_ANON_KEY'
+      const keyValue = showKey ? apiKey : obfuscatedName
+
+      return `curl -L -X POST '${functionUrl}' \\
+  -H 'Authorization: Bearer ${keyValue}' \\${apiKey.includes('publishable') ? `\n  -H 'apikey: ${keyValue}' \\` : ''}
   -H 'Content-Type: application/json' \\
-  --data '{"name":"Functions"}'`,
+  --data '{"name":"Functions"}'`
+    },
   },
   {
     id: 'supabase-js',
     label: 'JavaScript',
     language: 'js',
     hideLineNumbers: true,
-    code: (_, functionName) => `import { createClient } from '@supabase/supabase-js'
+    code: ({ functionName }) => `import { createClient } from '@supabase/supabase-js'
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
 const { data, error } = await supabase.functions.invoke('${functionName}', {
   body: { name: 'Functions' },
@@ -32,7 +44,7 @@ const { data, error } = await supabase.functions.invoke('${functionName}', {
     label: 'Swift',
     language: 'ts',
     hideLineNumbers: true,
-    code: (_, functionName) => `struct Response: Decodable {
+    code: ({ functionName }) => `struct Response: Decodable {
   // Expected response definition
 }
 
@@ -49,10 +61,9 @@ let response: Response = try await supabase.functions
     label: 'Flutter',
     language: 'dart',
     hideLineNumbers: true,
-    code: (
-      _,
-      functionName
-    ) => `final res = await supabase.functions.invoke('${functionName}', body: {'name': 'Functions'});
+    code: ({
+      functionName,
+    }) => `final res = await supabase.functions.invoke('${functionName}', body: {'name': 'Functions'});
 final data = res.data;`,
   },
   {
@@ -60,7 +71,7 @@ final data = res.data;`,
     label: 'Python',
     language: 'python',
     hideLineNumbers: true,
-    code: (_, functionName) => `response = supabase.functions.invoke(
+    code: ({ functionName }) => `response = supabase.functions.invoke(
     "${functionName}",
     invoke_options={"body": {"name": "Functions"}}
 )`,

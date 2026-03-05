@@ -1,9 +1,9 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-
+import { ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
@@ -20,12 +20,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface OrganizationProjectSelectorSelectorProps {
   slug?: string
   open?: boolean
-  selectedRef?: string
+  selectedRef?: string | null
   searchPlaceholder?: string
   sameWidthAsTrigger?: boolean
   checkPosition?: 'right' | 'left'
@@ -34,13 +34,20 @@ interface OrganizationProjectSelectorSelectorProps {
   renderTrigger?: ({
     isLoading,
     project,
+    listboxId,
+    open,
   }: {
     isLoading: boolean
     project?: OrgProject
+    listboxId: string
+    open: boolean
   }) => ReactNode
   renderActions?: (setOpen: (value: boolean) => void) => ReactNode
   onSelect?: (project: OrgProject) => void
   onInitialLoad?: (projects: OrgProject[]) => void
+  isOptionDisabled?: (project: OrgProject) => boolean
+  fetchOnMount?: boolean
+  modal?: boolean
 }
 
 export const OrganizationProjectSelector = ({
@@ -56,6 +63,9 @@ export const OrganizationProjectSelector = ({
   renderActions,
   onSelect,
   onInitialLoad,
+  isOptionDisabled,
+  fetchOnMount = false,
+  modal = false,
 }: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = _slug ?? organization?.slug
@@ -63,6 +73,7 @@ export const OrganizationProjectSelector = ({
   const [openInternal, setOpenInternal] = useState(false)
   const open = _open ?? openInternal
   const setOpen = _setOpen ?? setOpenInternal
+  const listboxId = useId()
 
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
@@ -86,7 +97,7 @@ export const OrganizationProjectSelector = ({
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true }
+    { enabled: fetchOnMount || open, placeholderData: keepPreviousData }
   )
 
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
@@ -98,8 +109,7 @@ export const OrganizationProjectSelector = ({
       !isFetching &&
       entry?.isIntersecting &&
       hasNextPage &&
-      !isFetchingNextPage &&
-      !isLoadingProjects
+      !isFetchingNextPage
     ) {
       fetchNextPage()
     }
@@ -122,16 +132,23 @@ export const OrganizationProjectSelector = ({
   }, [isLoadingProjects, isSuccessProjects])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={modal}>
       <PopoverTrigger_Shadcn_ asChild>
-        {!!renderTrigger ? (
-          renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })
+        {renderTrigger ? (
+          renderTrigger({
+            isLoading: isLoadingProjects || isFetching,
+            project: selectedProject,
+            listboxId,
+            open,
+          })
         ) : (
           <Button
             block
             type="default"
             role="combobox"
             size="small"
+            aria-expanded={open}
+            aria-controls={listboxId}
             className="justify-between"
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
@@ -144,6 +161,7 @@ export const OrganizationProjectSelector = ({
         )}
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
+        id={listboxId}
         sameWidthAsTrigger={sameWidthAsTrigger}
         className="p-0"
         side="bottom"
@@ -196,6 +214,7 @@ export const OrganizationProjectSelector = ({
                           setOpen(false)
                         }}
                         onClick={() => setOpen(false)}
+                        disabled={!!isOptionDisabled ? isOptionDisabled(project) : false}
                       >
                         {!!renderRow ? (
                           renderRow(project)

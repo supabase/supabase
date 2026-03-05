@@ -11,10 +11,15 @@ import {
   Gift,
   TrendingUp,
   Heart,
+  Smartphone,
   LifeBuoy,
   Wrench,
   Shield,
   Lock,
+  Video,
+  Users,
+  Mic,
+  Tag,
 } from 'lucide-react'
 
 const ICONS = {
@@ -27,9 +32,14 @@ const ICONS = {
   'trending-up': TrendingUp,
   heart: Heart,
   'life-buoy': LifeBuoy,
+  smartphone: Smartphone,
   wrench: Wrench,
   shield: Shield,
   lock: Lock,
+  video: Video,
+  users: Users,
+  mic: Mic,
+  tag: Tag,
 } as const
 
 type IconName = keyof typeof ICONS

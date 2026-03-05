@@ -1,0 +1,111 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Edit2, Trash, MoreVertical, MoreHorizontal } from 'lucide-react'
+import Link from 'next/link'
+
+import { ContentBase } from 'data/content/content-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useProfile } from 'lib/profile'
+import type { Dashboards } from 'types'
+import {
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from 'ui'
+
+interface ReportMenuItemProps {
+  item: {
+    id?: string
+    name: string
+    description: string
+    key: string
+    url: string
+    hasDropdownActions: boolean
+    report: ContentBase & {
+      type: 'report'
+      content: Dashboards.Content
+    }
+  }
+  pageKey: string
+  onSelectEdit: () => void
+  onSelectDelete: () => void
+}
+
+export const ObservabilityMenuItem = ({
+  item,
+  pageKey,
+  onSelectEdit,
+  onSelectDelete,
+}: ReportMenuItemProps) => {
+  const { profile } = useProfile()
+  const { can: canUpdateCustomReport } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'user_content',
+    {
+      resource: {
+        type: 'report',
+        visibility: item.report.visibility,
+        owner_id: item.report.owner_id,
+      },
+      subject: { id: profile?.id },
+    }
+  )
+
+  return (
+    <Link
+      className={cn(
+        'pr-2 h-7 pl-3 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
+        'flex items-center justify-between rounded-md group relative',
+        item.key === pageKey ? 'bg-surface-300 text-foreground' : 'hover:text-foreground'
+      )}
+      key={item.key + '-menukey'}
+      href={item.url}
+    >
+      <div>{item.name}</div>
+
+      {canUpdateCustomReport && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="text"
+              className="px-1 opacity-50 hover:opacity-100"
+              icon={<MoreVertical size={12} strokeWidth={2} />}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-32 *:gap-x-2">
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (!item.id) return
+                onSelectEdit()
+              }}
+            >
+              <Edit2 size={12} />
+              <div>Rename report</div>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (!item.id) return
+                onSelectDelete()
+              }}
+            >
+              <Trash size={12} />
+              <div>Delete report</div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </Link>
+  )
+}

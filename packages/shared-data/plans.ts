@@ -62,6 +62,7 @@ export const plans: PricingInformation[] = [
       'Email support',
       'Daily backups stored for 7 days',
       '7-day log retention',
+      ['Add Log Drains', 'additional $60 per drain, per project'],
     ],
     preface: 'Everything in the Free Plan, plus:',
     cta: 'Get Started',

@@ -1,8 +1,8 @@
 import { getCheckPrimaryKeysExistsSQL } from '@supabase/pg-meta/src/sql/studio/check-primary-keys-exists'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
 
 type CheckPrimaryKeysExistsVariables = {
@@ -44,14 +44,12 @@ export const useCheckPrimaryKeysExists = <TData = CheckPrimaryKeysExistsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<CheckPrimaryKeysExistsData, CheckPrimaryKeysExistsError, TData> = {}
+  }: UseCustomQueryOptions<CheckPrimaryKeysExistsData, CheckPrimaryKeysExistsError, TData> = {}
 ) =>
-  useQuery<CheckPrimaryKeysExistsData, CheckPrimaryKeysExistsError, TData>(
-    databaseKeys.checkPrimaryKeysExists(projectRef, tables),
-    () => checkPrimaryKeysExists({ projectRef, connectionString, tables }),
-    {
-      retry: false,
-      enabled: enabled && typeof projectRef !== 'undefined' && tables.length > 0,
-      ...options,
-    }
-  )
+  useQuery<CheckPrimaryKeysExistsData, CheckPrimaryKeysExistsError, TData>({
+    queryKey: databaseKeys.checkPrimaryKeysExists(projectRef, tables),
+    queryFn: () => checkPrimaryKeysExists({ projectRef, connectionString, tables }),
+    retry: false,
+    enabled: enabled && typeof projectRef !== 'undefined' && tables.length > 0,
+    ...options,
+  })

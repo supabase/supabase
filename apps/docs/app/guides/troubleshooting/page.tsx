@@ -15,9 +15,9 @@ import {
 import { TROUBLESHOOTING_CONTAINER_ID } from '~/features/docs/Troubleshooting.utils.shared'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { PROD_URL } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 
-// 60 seconds/minute * 60 minutes/hour * 24 hours/day
-// export const revalidate = 86_400
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 export default async function GlobalTroubleshootingPage() {
   const troubleshootingEntries = await getAllTroubleshootingEntries()
@@ -60,7 +60,7 @@ export default async function GlobalTroubleshootingPage() {
 }
 
 export const metadata: Metadata = {
-  title: 'Supabase Docs | Troubleshooting',
+  title: `${metadataTitle || 'Supabase'} | Troubleshooting`,
   alternates: {
     canonical: `${PROD_URL}/guides/troubleshooting`,
   },

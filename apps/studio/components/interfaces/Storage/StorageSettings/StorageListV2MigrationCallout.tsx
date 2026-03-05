@@ -1,10 +1,13 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useState } from 'react'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Dialog,
@@ -29,48 +32,53 @@ export const StorageListV2MigrationCallout = () => {
 
   return (
     <Admonition
-      type={remainingMonths <= 1 ? 'warning' : 'note'}
+      type="note"
       title="A new version of Storage is available for your project"
-    >
-      <p className="!leading-normal prose max-w-full text-sm !mb-0">
-        Get access to the List-V2 endpoint for improved performance and the ability to enable
-        Analytics buckets to your storage system
-      </p>
-      {remainingMonths <= 1 && (
-        <p className="!leading-normal prose max-w-full text-sm">
-          Your project's Storage will be automatically upgraded by{' '}
-          <TimestampInfo
-            displayAs="utc"
-            utcTimestamp={MIGRATION_DEADLINE}
-            className="text-sm text-foreground"
-            labelFormat="DD MMM YYYY HH:mm (UTC)"
-          />{' '}
-          if the upgrade is not completed by then.
-        </p>
-      )}
-      <div className="flex items-center gap-x-2 mt-3">
-        <StorageListV2MigrationDialog />
-      </div>
-    </Admonition>
+      description={
+        <>
+          <p>
+            Get access to the List-V2 endpoint for improved performance and the ability to enable
+            Analytics buckets to your storage system.
+          </p>
+          {remainingMonths <= 1 && (
+            <p>
+              Your project's Storage will be automatically upgraded by{' '}
+              <TimestampInfo
+                displayAs="utc"
+                utcTimestamp={MIGRATION_DEADLINE}
+                className="text-sm text-inherit font-medium"
+                labelFormat="DD MMM YYYY HH:mm (UTC)"
+              />{' '}
+              if the upgrade is not completed by then.
+            </p>
+          )}
+        </>
+      }
+      actions={<StorageListV2MigrationDialog />}
+    />
   )
 }
 
 export const StorageListV2MigratingCallout = () => {
   return (
-    <Admonition type="note" title="Project's storage is currently upgrading">
-      <p className="!leading-normal prose max-w-full text-sm !mb-0">
-        This notice will be closed once the upgrade has been completed - hang tight!
-      </p>
-    </Admonition>
+    <Admonition
+      type="note"
+      title="Project storage is currently upgrading"
+      description="This notice will be closed once the upgrade has been completed. Hang tight!"
+    />
   )
 }
 
 const StorageListV2MigrationDialog = () => {
   const { ref } = useParams()
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_WRITE,
+    '*'
+  )
 
   const [open, setOpen] = useState(false)
 
-  const { mutate: updateStorageConfig, isLoading: isUpdating } =
+  const { mutate: updateStorageConfig, isPending: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
       onSuccess: () => {
         toast.success(`Project's storage will be upgraded shortly!`)
@@ -86,7 +94,20 @@ const StorageListV2MigrationDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="primary">Upgrade Storage</Button>
+        <ButtonTooltip
+          type="primary"
+          disabled={!canUpdateStorageSettings}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canUpdateStorageSettings
+                ? 'You need additional permissions to upgrade storage'
+                : undefined,
+            },
+          }}
+        >
+          Upgrade Storage
+        </ButtonTooltip>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -100,7 +121,7 @@ const StorageListV2MigrationDialog = () => {
 
         <Admonition
           type="warning"
-          className="mb-0 rounded-none border-x-0 border-t-0"
+          className="rounded-none border-x-0 border-t-0"
           title="Migration required to optimise the database schema for upgrade"
           description="We recommend running the update during periods of lower activity, although minimal to no disruption is expected."
         />

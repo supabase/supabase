@@ -1,4 +1,4 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { getUnifiedLogsQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import {
@@ -6,7 +6,7 @@ import {
   QuerySearchParamsType,
 } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { logsKeys } from './keys'
 
 const LOGS_PAGE_LIMIT = 50
@@ -47,7 +47,7 @@ export const getUnifiedLogsISOStartEnd = (
 }
 
 export async function getUnifiedLogs(
-  { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam?: PageParam },
+  { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam: PageParam | null },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -159,27 +159,31 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<UnifiedLogsData, UnifiedLogsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    UnifiedLogsData,
+    UnifiedLogsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    PageParam | null
+  > = {}
 ) => {
-  return useInfiniteQuery<UnifiedLogsData, UnifiedLogsError, TData>(
-    logsKeys.unifiedLogsInfinite(projectRef, search),
-    ({ signal, pageParam }) => {
+  return useInfiniteQuery({
+    queryKey: logsKeys.unifiedLogsInfinite(projectRef, search),
+    queryFn: ({ signal, pageParam }) => {
       return getUnifiedLogs({ projectRef, search, pageParam }, signal)
     },
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      keepPreviousData: true,
-      getPreviousPageParam: (firstPage) => {
-        if (!firstPage.prevCursor) return null
-        const result = { cursor: firstPage.prevCursor, direction: 'prev' }
-        return result
-      },
-      getNextPageParam(lastPage) {
-        if (!lastPage.nextCursor || lastPage.data.length === 0) return null
-        return { cursor: lastPage.nextCursor, direction: 'next' }
-      },
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    placeholderData: keepPreviousData,
+    getPreviousPageParam: (firstPage) => {
+      if (!firstPage.prevCursor) return null
+      return { cursor: firstPage.prevCursor, direction: 'prev' } as const
+    },
+    initialPageParam: null,
+    getNextPageParam(lastPage) {
+      if (!lastPage.nextCursor || lastPage.data.length === 0) return null
+      return { cursor: lastPage.nextCursor, direction: 'next' } as const
+    },
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })
 }

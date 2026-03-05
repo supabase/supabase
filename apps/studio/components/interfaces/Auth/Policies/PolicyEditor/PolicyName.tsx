@@ -6,7 +6,7 @@ interface PolicyNameProps {
   onUpdatePolicyName: (name: string) => void
 }
 
-const PolicyName = ({ name = '', limit = 100, onUpdatePolicyName }: PolicyNameProps) => {
+export const PolicyName = ({ name = '', limit = 100, onUpdatePolicyName }: PolicyNameProps) => {
   return (
     <div className="flex flex-col md:flex-row gap-4 md:gap-12">
       <div className="flex md:w-1/3 flex-col space-y-2">
@@ -30,5 +30,3 @@ const PolicyName = ({ name = '', limit = 100, onUpdatePolicyName }: PolicyNamePr
     </div>
   )
 }
-
-export default PolicyName

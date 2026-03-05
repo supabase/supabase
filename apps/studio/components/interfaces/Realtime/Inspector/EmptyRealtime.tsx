@@ -1,24 +1,29 @@
-import { AiIconAnimation, Button, Card, cn } from 'ui'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
-import { AnimatedCursors } from './AnimatedCursors'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation, Button, Card, cn } from 'ui'
+
+import { AnimatedCursors } from './AnimatedCursors'
 
 /**
  * Acts as a container component for the entire log display
  */
 export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const handleCreateTriggerWithAssistant = () => {
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({
       name: `Realtime`,
-      open: true,
       initialInput: `Help me set up a realtime experience for my project`,
     })
   }
 
   return (
-    <div className="flex grow items-center justify-center p-12 border-t @container">
+    <div className="flex grow items-center justify-center p-12 @container">
       <div className="w-full max-w-4xl flex flex-col items-center gap-0">
         <div className="text-center mb-12">
           <AnimatedCursors />
@@ -89,7 +94,9 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
               Receive realtime messages in your application by listening to a channel
             </p>
             <Button type="default" asChild>
-              <Link href="https://supabase.com/docs/guides/realtime/subscribing-to-database-changes#listening-on-client-side">
+              <Link
+                href={`${DOCS_URL}/guides/realtime/subscribing-to-database-changes#listening-on-client-side`}
+              >
                 Read the guide
               </Link>
             </Button>

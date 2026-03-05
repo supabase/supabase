@@ -21,6 +21,10 @@ export interface BuildTableRowsQueryArgs {
   page?: number
   maxCharacters?: number
   maxArraySize?: number
+  /**
+   * Columns that should not be used for default sorting
+   */
+  sortExcludedColumns?: string[]
 }
 
 // Text and JSON types that should be truncated
@@ -71,13 +75,22 @@ const LARGE_COLUMNS_TYPES_SET = new Set(LARGE_COLUMNS_TYPES)
 export const THRESHOLD_COUNT = 100000
 
 // Return the primary key columns if exists, otherwise return the first column to use as a default sort
-export const getDefaultOrderByColumns = (table: Pick<PGTable, 'primary_keys' | 'columns'>) => {
+export const getDefaultOrderByColumns = (
+  table: Pick<PGTable, 'primary_keys' | 'columns'>,
+  { excludedColumns = [] }: { excludedColumns?: string[] } = {}
+) => {
   const primaryKeyColumns = table.primary_keys?.map((pk) => pk.name)
-  if (primaryKeyColumns && primaryKeyColumns.length > 0) {
+  if (
+    primaryKeyColumns &&
+    primaryKeyColumns.length > 0 &&
+    !primaryKeyColumns.every((col) => excludedColumns.includes(col))
+  ) {
     return primaryKeyColumns
   }
   if (table.columns && table.columns.length > 0) {
-    const eligibleColumnsForSorting = table.columns.filter((x) => !x.data_type.includes('json'))
+    const eligibleColumnsForSorting = table.columns.filter(
+      (x) => !x.data_type.includes('json') && !excludedColumns.includes(x.name)
+    )
     if (eligibleColumnsForSorting.length > 0) return [eligibleColumnsForSorting[0].name]
     else return []
   }
@@ -111,6 +124,7 @@ export const getTableRowsSql = ({
   limit,
   maxCharacters = MAX_CHARACTERS,
   maxArraySize = MAX_ARRAY_SIZE,
+  sortExcludedColumns = [],
 }: BuildTableRowsQueryArgs) => {
   if (!table || !table.columns) return ``
 
@@ -129,11 +143,13 @@ export const getTableRowsSql = ({
     )
   })
 
-  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort.
   // Only apply for selections over a Table, not View, MaterializedViews, ...
   const liveRowCount = (table as PGTable).live_rows_estimate || 0
   if (sorts.length === 0 && liveRowCount <= THRESHOLD_COUNT && table.columns.length > 0) {
-    const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable)
+    const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable, {
+      excludedColumns: sortExcludedColumns,
+    })
     if (defaultOrderByColumns.length > 0) {
       defaultOrderByColumns.forEach((col) => {
         queryChains = queryChains.order(table.name, col)

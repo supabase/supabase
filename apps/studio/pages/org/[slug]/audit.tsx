@@ -2,24 +2,43 @@ import { AuditLogs } from 'components/interfaces/Organization/AuditLogs/AuditLog
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { LogoLoader } from 'ui'
 
 const OrgAuditLogs: NextPageWithLayout = () => {
-  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
+  const { isPending: isLoadingPermissions } = usePermissionsQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   return (
-    <>{selectedOrganization === undefined && isLoadingPermissions ? <Loading /> : <AuditLogs />}</>
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Audit Logs</PageHeaderTitle>
+            <PageHeaderDescription>
+              Organization-level activity history and security event records
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      {selectedOrganization === undefined && isLoadingPermissions ? <LogoLoader /> : <AuditLogs />}
+    </>
   )
 }
 
 OrgAuditLogs.getLayout = (page) => (
   <DefaultLayout>
     <OrganizationLayout>
-      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
+      <OrganizationSettingsLayout pageTitle="Audit Logs">{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>
 )

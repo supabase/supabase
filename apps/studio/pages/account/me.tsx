@@ -2,23 +2,28 @@ import { AccountConnections } from 'components/interfaces/Account/Preferences/Ac
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
 import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
+import { HotkeySettings } from 'components/interfaces/Account/Preferences/HotkeySettings'
+import { InlineEditorSettings } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
+import { Card, CardContent } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const User: NextPageWithLayout = () => {
   return <ProfileCard />
@@ -26,7 +31,7 @@ const User: NextPageWithLayout = () => {
 
 User.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
         <AccountLayout title="Account Settings">{page}</AccountLayout>
       </OrganizationLayout>
@@ -47,55 +52,52 @@ const ProfileCard = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader className="pt-0">
-          <ScaffoldSectionTitle>Preferences</ScaffoldSectionTitle>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer bottomPadding>
-        <article>
-          {isLoading && (
-            <Panel>
-              <div className="p-4">
-                <GenericSkeletonLoader />
-              </div>
-            </Panel>
-          )}
-          {isError && (
-            <Panel>
-              <div className="p-4">
-                <AlertError error={error} subject="Failed to retrieve account information" />
-              </div>
-            </Panel>
-          )}
-          {isSuccess && (
-            <>
-              {profileShowInformation && isSuccess ? <ProfileInformation /> : null}
-              <AccountIdentities />
-            </>
-          )}
+      <PageHeader size="small">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Preferences</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage your account profile, connections, and dashboard experience.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="small">
+        {isLoading && (
+          <Card>
+            <CardContent className="p-4">
+              <GenericSkeletonLoader />
+            </CardContent>
+          </Card>
+        )}
 
-          <section>
-            <AccountConnections />
-          </section>
+        {isError && (
+          <Card>
+            <CardContent className="p-4">
+              <AlertError error={error} subject="Failed to retrieve account information" />
+            </CardContent>
+          </Card>
+        )}
 
-          <section>
-            <ThemeSettings />
-          </section>
+        {isSuccess && (
+          <>
+            {profileShowInformation ? <ProfileInformation /> : null}
+            <AccountIdentities />
+          </>
+        )}
 
-          {profileShowAnalyticsAndMarketing && (
-            <section>
-              <AnalyticsSettings />
-            </section>
-          )}
+        <AccountConnections />
 
-          {profileShowAccountDeletion && (
-            <section>
-              <AccountDeletion />
-            </section>
-          )}
-        </article>
-      </ScaffoldContainer>
+        <ThemeSettings />
+
+        <HotkeySettings />
+
+        <InlineEditorSettings />
+
+        {profileShowAnalyticsAndMarketing && <AnalyticsSettings />}
+
+        {profileShowAccountDeletion && <AccountDeletion />}
+      </PageContainer>
     </>
   )
 }

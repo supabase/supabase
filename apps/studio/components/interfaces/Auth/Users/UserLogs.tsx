@@ -1,16 +1,17 @@
-import { ExternalLink, RefreshCw } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
 import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { User } from 'data/auth/users-infinite-query'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { ExternalLink, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
+import { useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 import { Button, cn, CriticalIcon, Separator } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './Users.constants'
 
@@ -18,9 +19,13 @@ interface UserLogsProps {
   user: User
 }
 
+const API_LOGS_QUERY = (userId: string) =>
+  `select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nWHERE (\n  metadata[SAFE_OFFSET(0)].request[SAFE_OFFSET(0)].sb[SAFE_OFFSET(0)].auth_user\n    = '${userId}'\n)\nlimit 100`
+
 export const UserLogs = ({ user }: UserLogsProps) => {
   const { ref } = useParams()
   const { filters, setFilters } = useLogsUrlState()
+  const [, setFiltersValue] = useQueryState('f')
 
   const {
     logData: authLogs,
@@ -36,12 +41,35 @@ export const UserLogs = ({ user }: UserLogsProps) => {
 
   useEffect(() => {
     if (user.id) setFilters({ ...filters, search_query: user.id })
+
+    return () => {
+      setFiltersValue(null)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id])
 
   return (
     <div>
       <UserHeader user={user} />
+
+      <Separator />
+
+      <div className={cn('flex flex-col gap-y-3', PANEL_PADDING)}>
+        <div>
+          <p>API logs</p>
+          <p className="text-sm text-foreground-light">
+            View edge logs for requests made by this user
+          </p>
+        </div>
+
+        <Button asChild type="default" className="w-min">
+          <Link
+            href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(API_LOGS_QUERY(user.id ?? ''))}`}
+          >
+            Open in Log Explorer
+          </Link>
+        </Button>
+      </div>
 
       <Separator />
 

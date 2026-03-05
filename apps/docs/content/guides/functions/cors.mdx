@@ -10,19 +10,16 @@ See the [example on GitHub](https://github.com/supabase/supabase/blob/master/exa
 
 ### Recommended setup
 
-We recommend adding a `cors.ts` file within a [`_shared` folder](/docs/guides/functions/quickstart#organizing-your-edge-functions) which makes it easy to reuse the CORS headers across functions:
+<Admonition type="tip">
 
-```ts cors.ts
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-```
+**For `@supabase/supabase-js` v2.95.0 and later:** Import CORS headers directly from the SDK to ensure they stay synchronized with any new headers added to the client libraries.
 
-You can then import and use the CORS headers within your functions:
+</Admonition>
+
+Import `corsHeaders` from `@supabase/supabase-js/cors` to automatically get all required headers:
 
 ```ts index.ts
-import { corsHeaders } from '../_shared/cors.ts'
+import { corsHeaders } from '@supabase/supabase-js/cors'
 
 console.log(`Function "browser-with-cors" up and running!`)
 
@@ -49,4 +46,25 @@ Deno.serve(async (req) => {
     })
   }
 })
+```
+
+This approach ensures that when new headers are added to the Supabase SDK, your Edge Functions automatically include them, preventing CORS errors.
+
+#### For versions before 2.95.0
+
+If you're using `@supabase/supabase-js` before v2.95.0, you'll need to hardcode the CORS headers. Add a `cors.ts` file within a [`_shared` folder](/docs/guides/functions/quickstart#organizing-your-edge-functions):
+
+```ts _shared/cors.ts
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+```
+
+Then import it in your function:
+
+```ts index.ts
+import { corsHeaders } from '../_shared/cors.ts'
+
+// ... rest of your function code
 ```

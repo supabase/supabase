@@ -93,7 +93,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'nav-database-hooks',
         name: 'Webhooks',
         value: 'Database: Webhooks',
-        route: `/project/${ref}/integrations/hooks`,
+        route: `/project/${ref}/integrations/webhooks`,
         defaultHidden: true,
       },
       {

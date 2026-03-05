@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 type GetTableConstraintsVariables = {
   id?: number
@@ -75,13 +76,11 @@ export const useTableConstraintsQuery = <TData = TableConstraintsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<TableConstraintsData, TableConstraintsError, TData> = {}
+  }: UseCustomQueryOptions<TableConstraintsData, TableConstraintsError, TData> = {}
 ) =>
-  useQuery<TableConstraintsData, TableConstraintsError, TData>(
-    databaseKeys.tableConstraints(projectRef, id),
-    ({ signal }) => getTableConstraints({ projectRef, connectionString, id }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<TableConstraintsData, TableConstraintsError, TData>({
+    queryKey: databaseKeys.tableConstraints(projectRef, id),
+    queryFn: ({ signal }) => getTableConstraints({ projectRef, connectionString, id }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    ...options,
+  })

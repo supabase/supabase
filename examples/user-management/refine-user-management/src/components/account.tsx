@@ -1,20 +1,22 @@
 import { BaseKey, useGetIdentity, useLogout } from "@refinedev/core";
+
 import { useForm } from "@refinedev/react-hook-form";
 import { Controller } from "react-hook-form";
+
 import Avatar from "./avatar";
 
 interface IUserIdentity {
   id?: BaseKey;
   username: string;
   name: string;
-};
+}
 
 export interface IProfile {
   id?: string;
   username?: string;
   website?: string;
   avatar_url?: string;
-};
+}
 
 export default function Account() {
   const { data: userIdentity } = useGetIdentity<IUserIdentity>();
@@ -22,7 +24,7 @@ export default function Account() {
   const { mutate: logOut } = useLogout();
 
   const {
-    refineCore: { formLoading, queryResult, onFinish },
+    refineCore: { formLoading, query, onFinish },
     register,
     control,
     handleSubmit,
@@ -49,9 +51,10 @@ export default function Account() {
                 size={150}
                 onUpload={(filePath) => {
                   onFinish({
-                    ...queryResult?.data?.data,
+                    ...query?.data?.data,
                     avatar_url: filePath,
-                    onMutationError: (data: { message: string; }) => alert(data?.message),
+                    onMutationError: (data: { message: string }) =>
+                      alert(data?.message),
                   });
                   field.onChange({
                     target: {
@@ -104,4 +107,4 @@ export default function Account() {
       </form>
     </div>
   );
-};
+}

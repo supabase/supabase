@@ -34,9 +34,9 @@ export const BranchSelector = ({
   const [open, setOpen] = useState(false)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
 
-  // Filter out branches that are already ready for review and the main branch
+  // Filter out branches that are already ready for review or linked to a github branch
   const availableBranches = branches.filter(
-    (branch) => !branch.is_default && !branch.review_requested_at
+    (branch) => !branch.is_default && !branch.review_requested_at && !branch.git_branch
   )
 
   const handleBranchSelect = (branch: Branch) => {
@@ -67,7 +67,7 @@ export const BranchSelector = ({
           {isUpdating ? 'Creating...' : 'New merge request'}
         </ButtonTooltip>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal className="p-0 w-80" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="end">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Find branch to review..." />
           <CommandList_Shadcn_>

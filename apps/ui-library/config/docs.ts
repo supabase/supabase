@@ -1,4 +1,4 @@
-import { SidebarNavGroup } from 'types/nav'
+import { SidebarNavGroup } from '@/types/nav'
 
 export const gettingStarted: SidebarNavGroup = {
   title: 'Getting Started',
@@ -61,14 +61,14 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Password-Based Auth',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/password-based-auth',
       items: [],
       commandItemLabel: 'Password-Based Auth',
     },
     {
       title: 'Social Auth',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/social-auth',
       items: [],
       new: true,
@@ -76,14 +76,14 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Dropzone',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/dropzone',
       items: [],
       commandItemLabel: 'Dropzone (File Upload)',
     },
     {
       title: 'Realtime Cursor',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-cursor',
       items: [],
       commandItemLabel: 'Realtime Cursor',

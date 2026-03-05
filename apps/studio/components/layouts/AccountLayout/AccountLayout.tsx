@@ -4,6 +4,7 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
@@ -18,6 +19,8 @@ export interface AccountLayoutProps {
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
+
+  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
 
   const { appTitle } = useCustomContent(['app:title'])
   const titleSuffix = appTitle || 'Supabase'
@@ -68,14 +71,19 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
                   key: 'access-tokens',
                   label: 'Access Tokens',
                   href: '/account/tokens',
-                  isActive: currentPath === '/account/tokens',
+                  isActive:
+                    currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
                 },
-                {
-                  key: 'security',
-                  label: 'Security',
-                  href: '/account/security',
-                  isActive: currentPath === '/account/security',
-                },
+                ...(showSecuritySettings
+                  ? [
+                      {
+                        key: 'security',
+                        label: 'Security',
+                        href: '/account/security',
+                        isActive: currentPath === '/account/security',
+                      },
+                    ]
+                  : []),
               ],
             },
             {

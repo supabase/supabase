@@ -87,7 +87,7 @@ const LW15Heading = () => {
       span.innerHTML = originalContent
       span.style.display = 'inline-block'
       span.style.transform = 'translateY(100%)'
-      span.style.transition = 'transform ease-[.25,.25,0,1]'
+      span.style.transition = 'transform cubic-bezier(.25,.25,0,1)'
 
       element.innerHTML = ''
       element.appendChild(span)

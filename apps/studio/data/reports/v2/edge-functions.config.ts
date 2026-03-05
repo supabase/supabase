@@ -6,15 +6,16 @@ import {
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import { get } from 'data/fetchers'
-import {
-  analyticsIntervalToGranularity,
-  REPORT_STATUS_CODE_COLORS,
-} from 'data/reports/report.utils'
-import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
+import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
 import { ReportConfig } from './reports.types'
 import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { fetchLogs } from 'data/reports/report.utils'
+import {
+  extractStatusCodesFromData,
+  generateStatusCodeAttributes,
+  transformStatusCodeData,
+} from 'components/interfaces/Reports/Reports.utils'
 
 type EdgeFunctionReportFilters = {
   status_code: NumericFilter | null
@@ -152,49 +153,6 @@ order by
   },
 }
 
-export function extractStatusCodesFromData(data: any[]): string[] {
-  const statusCodes = new Set<string>()
-
-  data.forEach((item: any) => {
-    if (item.status_code) {
-      statusCodes.add(String(item.status_code))
-    }
-  })
-
-  return Array.from(statusCodes).sort()
-}
-
-export function generateStatusCodeAttributes(statusCodes: string[]) {
-  return statusCodes.map((code) => ({
-    attribute: code,
-    label: `${code} ${getHttpStatusCodeInfo(parseInt(code)).label}`,
-    color: REPORT_STATUS_CODE_COLORS[code] || REPORT_STATUS_CODE_COLORS.default,
-  }))
-}
-
-/**
- * Converts a list of { timestamp, status_code, count }
- * to a list of { timestamp, [status_code]: count }
- * That we can pass to the chart for rendering
- */
-export function transformStatusCodeData(data: any[], statusCodes: string[]) {
-  const pivotedData = data.reduce((acc: Record<string, any>, d: any) => {
-    const timestamp = isUnixMicro(d.timestamp)
-      ? unixMicroToIsoTimestamp(d.timestamp)
-      : dayjs.utc(d.timestamp).toISOString()
-    if (!acc[timestamp]) {
-      acc[timestamp] = { timestamp }
-      statusCodes.forEach((code) => {
-        acc[timestamp][code] = 0
-      })
-    }
-    acc[timestamp][d.status_code] = d.count
-    return acc
-  }, {})
-
-  return Object.values(pivotedData)
-}
-
 /**
  * Transforms raw invocation data by normalizing timestamps and adding function names
  * @param data - Raw data from the database
@@ -255,7 +213,7 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations over time.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = METRIC_SQL.TotalInvocations(interval, filters)
       const response = await fetchLogs(projectRef, sql, startDate, endDate)
@@ -287,7 +245,7 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function executions by status code.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
@@ -319,7 +277,7 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -381,7 +339,7 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations by region.',
-    availableIn: ['pro', 'team', 'enterprise'],
+    availableIn: ['pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = METRIC_SQL.InvocationsByRegion(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)

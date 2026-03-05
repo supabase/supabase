@@ -1,7 +1,7 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, put } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { apiKeysKeys } from './keys'
 
 export type ToggleLegacyAPIKeysVariables = {
@@ -30,31 +30,29 @@ export const useToggleLegacyAPIKeysMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>,
+  UseCustomMutationOptions<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>(
-    (vars) => toggleLegacyAPIKeys(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>({
+    mutationFn: (vars) => toggleLegacyAPIKeys(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(apiKeysKeys.status(projectRef))
+      await queryClient.invalidateQueries({ queryKey: apiKeysKeys.status(projectRef) })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(
-            `Failed to ${variables.enabled ? 're-enable' : 'disable'} JWT-based API keys: ${data.message}`
-          )
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(
+          `Failed to ${variables.enabled ? 're-enable' : 'disable'} JWT-based API keys: ${data.message}`
+        )
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

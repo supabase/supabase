@@ -1,21 +1,22 @@
-import { useCallback, useMemo, useState } from 'react'
-import dayjs from 'dayjs'
-import { createParser, useQueryState } from 'nuqs'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import {
+  REPORT_DATERANGE_HELPER_LABELS,
   REPORTS_DATEPICKER_HELPERS,
   ReportsDatetimeHelper,
-  REPORT_DATERANGE_HELPER_LABELS,
 } from 'components/interfaces/Reports/Reports.constants'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import dayjs from 'dayjs'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { createParser, useQueryState } from 'nuqs'
+import { useCallback, useMemo, useState } from 'react'
 
 export const DATERANGE_LIMITS: { [key: string]: number } = {
   free: 1,
   pro: 7,
   team: 28,
   enterprise: 90,
+  platform: 1,
 }
 
 export interface ReportDateRange {
@@ -174,31 +175,16 @@ export const useReportDateRange = (
     return getDefaultHelper().helper.text
   }, [timestampStartValue, timestampEndValue, helperTextValue, getDefaultHelper])
 
-  const handleIntervalGranularity = useCallback((from: string, to: string) => {
+  const handleIntervalGranularity = (from: string, to: string): AnalyticsInterval => {
     const diffInDays = dayjs(to).diff(from, 'day', true)
     const diffInHours = dayjs(to).diff(from, 'hour', true)
-    const conditions = {
-      '1m': diffInHours < 1.1, // less than 1.1 hours
-      '5m': diffInHours < 3.1, // less than 3.1 hours
-      '10m': diffInHours < 6.1, // less than 6.1 hours
-      '30m': diffInHours < 25, // less than 25 hours
-      '1h': diffInDays < 10, // less than 10 days
-      '1d': diffInDays >= 10, // more than 10 days
-    }
 
-    switch (true) {
-      case conditions['1m']:
-        return '1m'
-      case conditions['5m']:
-        return '5m'
-      case conditions['10m']:
-        return '10m'
-      case conditions['30m']:
-        return '30m'
-      default:
-        return '1h'
-    }
-  }, [])
+    if (diffInHours <= 1) return '1m'
+    if (diffInHours <= 12) return '2m'
+    if (diffInHours <= 24) return '10m'
+    if (diffInDays <= 7) return '1h'
+    return '1d'
+  }
 
   // Derive selectedDateRange from current values
   const selectedDateRange: ReportDateRange = useMemo(
@@ -207,7 +193,7 @@ export const useReportDateRange = (
       period_end: { date: timestampEnd, time_period: 'today' },
       interval: handleIntervalGranularity(timestampStart, timestampEnd),
     }),
-    [timestampStart, timestampEnd, handleIntervalGranularity]
+    [timestampStart, timestampEnd]
   )
 
   const updateDateRange = useCallback(
@@ -271,4 +257,27 @@ export const useReportDateRange = (
     setShowUpgradePrompt,
     handleDatePickerChange,
   }
+}
+
+export function useRefreshHandler(
+  datePickerValue: DatePickerValue,
+  datePickerHelpers: ReportsDatetimeHelper[],
+  handleDatePickerChange: (value: DatePickerValue) => boolean | void,
+  refresh: () => void | Promise<void>
+): () => void | Promise<void> {
+  return useCallback(async () => {
+    if (datePickerValue.isHelper && datePickerValue.text) {
+      const selectedHelper = datePickerHelpers.find((h) => h.text === datePickerValue.text)
+      if (selectedHelper) {
+        handleDatePickerChange({
+          from: selectedHelper.calcFrom(),
+          to: selectedHelper.calcTo(),
+          isHelper: true,
+          text: selectedHelper.text,
+        })
+      }
+    }
+
+    await refresh()
+  }, [datePickerValue, datePickerHelpers, handleDatePickerChange, refresh])
 }

@@ -22,6 +22,50 @@ In some cases you're able to use the OAuth flow within web-based native apps suc
 
 When developing with Expo, you can test Sign in with Apple via the Expo Go app, in all other cases you will need to obtain an [Apple Developer](https://developer.apple.com) account to enable the capability.
 
+<Admonition type="caution" label="Secret Key Rotation Required">
+
+If you're using the OAuth flow (web, Flutter web, Kotlin non-iOS platforms), Apple requires you to generate a new secret key every 6 months using the signing key (`.p8` file). This is a critical maintenance task that will cause authentication failures if missed.
+
+- Set a recurring calendar reminder for every 6 months to rotate your secret key
+- Store the `.p8` file securely - you'll need it for each rotation
+- If you lose the `.p8` file or it's compromised, immediately revoke it in the Apple Developer Console and create a new one
+- Consider automating this process if possible to prevent service disruptions
+
+This requirement only applies if you're configuring OAuth settings (Services ID, signing key, etc.). Native-only implementations don't require secret key rotation.
+
+</Admonition>
+
+<Admonition type="caution" label="Apple Does Not Provide Full Name in Identity Token">
+
+Apple's identity token does not include the user's full name in its claims. This means the Supabase Auth server cannot automatically populate the user's name metadata when users sign in with Apple.
+
+- Apple only provides the user's full name during the **first sign-in attempt** (when the user initially authorizes your app)
+- All subsequent sign-ins return `null` for the full name fields
+- The full name must be captured from Apple's native authentication response and manually saved using the `updateUser` method
+
+**Recommended Approach:**
+After a successful Sign in with Apple, check if the full name is available in the authentication response, and if so, use the `updateUser` method to save it to the user's metadata:
+
+```typescript
+// Example: Handling full name after successful sign in
+if (credential.fullName) {
+  // Full name is only provided on first sign-in
+  await supabase.auth.updateUser({
+    data: {
+      full_name: `${credential.fullName.givenName} ${credential.fullName.familyName}`,
+      given_name: credential.fullName.givenName,
+      family_name: credential.fullName.familyName,
+    },
+  })
+}
+```
+
+If a user revokes your app's access and then re-authorizes it, Apple will provide the full name again as if it were a first sign-in.
+
+The platform-specific examples below demonstrate how to implement this pattern for each SDK.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="large"
@@ -53,18 +97,29 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
 
     This call takes the user to Apple's consent screen. Once the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
+    <Admonition type="note" label="Full Name Not Available in OAuth Flow">
+
+    When using the OAuth flow, the user's full name is not accessible from Apple's response. Apple only provides the full name through native authentication methods (Sign in with Apple JS, or native iOS/macOS SDKs) during the first sign-in.
+
+    If you need to collect user names, consider:
+    - Using Sign in with Apple JS instead (see below)
+    - Collecting the name through a separate onboarding form
+    - Using a profiles table to store user information
+
+    </Admonition>
+
     <$Partial path="oauth_pkce_flow.mdx" />
 
-    ### Configuration [#configuration-web]
+    ### Configuration [#configuration-web-oauth]
 
     You will require the following information:
 
     1. Your Apple Developer account's **Team ID**, which is an alphanumeric string of 10 characters that uniquely identifies the developer of the app. It's often accessible in the upper right-side menu on the Apple Developer Console.
-    2. Register email sources for _Sign in with Apple for Email Communication_ which can be found in the [Services](https://developer.apple.com/account/resources/services/list) section of the Apple Developer Console.
+    2. Register email sources for _Sign in with Apple for Email Communication_ which can be found in the [Services](https://developer.apple.com/account/resources/services/list) section of the Apple Developer Console. This enables Apple to send relay emails through your domain when users choose to hide their email addresses.
     3. An **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple once you create an App ID in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
     4. A **Services ID** which uniquely identifies the web services provided by the app you registered in the previous step. You can create a new Services ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/serviceId) section in the Apple Developer Console (use the filter menu in the upper right side to see all Services IDs). These usually are a reverse domain name string, for example `com.example.app.web`.
     5. Configure Website URLs for the newly created **Services ID**. The web domain you should use is the domain your Supabase project is hosted on. This is usually `<project-id>.supabase.co` while the redirect URL is `https://<project-id>.supabase.co/auth/v1/callback`.
-    6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever lose access to it, or make it public accidentally, revoke it from the Apple Developer Console and create a new one immediately. You will have to generate a new secret key using this file every 6 months, so make sure you schedule a recurring meeting in your calendar!
+    6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever lose access to it, or make it public accidentally, revoke it from the Apple Developer Console and create a new one immediately.
     7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](/dashboard/project/_/auth/providers).
 
 You can also configure the Apple auth provider using the Management API:
@@ -100,33 +155,102 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     You can use the `signInWithIdToken()` method from the Supabase JavaScript library on the website to obtain an access and refresh token once the user has given consent using Sign in with Apple JS:
 
     ```ts
-    function signIn() {
-      const data = await AppleID.auth.signIn()
+    async function signIn() {
+      try {
+        // Generate a nonce for security
+        const nonce = crypto.randomUUID() // or use your preferred nonce generation method
 
-      await supabase.auth.signInWithIdToken({
-        provider: 'apple',
-        token: data.id_token,
-        nonce: '<nonce used in AppleID.auth.init>',
-      })
+        const data = await AppleID.auth.signIn()
+
+        const { data: authData, error } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: data.id_token,
+          nonce: nonce,
+        })
+
+        if (error) {
+          throw error
+        }
+
+        // Apple only provides the user's name on the first sign-in
+        // The user object contains name information from Apple's response
+        if (data.user && data.user.name) {
+          const fullName = [
+            data.user.name.firstName,
+            data.user.name.middleName,
+            data.user.name.lastName
+          ].filter(Boolean).join(' ')
+
+          // Save the name to user metadata for future use
+          await supabase.auth.updateUser({
+            data: {
+              full_name: fullName,
+              given_name: data.user.name.firstName,
+              family_name: data.user.name.lastName,
+            }
+          })
+        }
+      } catch (error) {
+        console.error('Apple sign in failed:', error)
+        // Handle sign-in errors appropriately
+      }
     }
     ```
 
     Alternatively, you can use the `AppleIDSignInOnSuccess` event with the `usePopup` option:
 
     ```ts
-    // Listen for authorization success.
+    // Generate and store nonce for verification
+    const nonce = crypto.randomUUID()
+
+    // Initialize Apple ID with nonce
+    AppleID.auth.init({
+      clientId: 'your-services-id',
+      scope: 'name email',
+      redirectURI: 'https://your-domain.com/auth/callback',
+      usePopup: true,
+      nonce: nonce,
+    })
+
+    // Listen for authorization success
     document.addEventListener('AppleIDSignInOnSuccess', async (event) => {
-      await supabase.auth.signInWithIdToken({
-        provider: 'apple',
-        token: event.data.id_token,
-        nonce: '<value used in appleid-signin-nonce meta tag>',
-      })
+      try {
+        const { data: authData, error } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: event.detail.authorization.id_token,
+          nonce: nonce,
+        })
+
+        if (error) {
+          throw error
+        }
+
+        // Apple only provides the user's name on the first sign-in
+        if (event.detail.user && event.detail.user.name) {
+          const fullName = [
+            event.detail.user.name.firstName,
+            event.detail.user.name.middleName,
+            event.detail.user.name.lastName
+          ].filter(Boolean).join(' ')
+
+          // Save the name to user metadata for future use
+          await supabase.auth.updateUser({
+            data: {
+              full_name: fullName,
+              given_name: event.detail.user.name.firstName,
+              family_name: event.detail.user.name.lastName,
+            }
+          })
+        }
+      } catch (error) {
+        console.error('Apple sign in failed:', error)
+      }
     })
     ```
 
-    Make sure you request for the scope `name email` when initializing the library.
+    Make sure you request the scope `name email` when initializing the library, as shown in the example above.
 
-    ### Configuration [#configuration-apple-js]
+    ### Configuration [#configuration-web-apple-js]
 
     To use Sign in with Apple JS you need to configure these options:
 
@@ -183,6 +307,24 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
                   })
                   console.log(JSON.stringify({ error, user }, null, 2))
                   if (!error) {
+                    // Apple only provides the user's full name on the first sign-in
+                    // Save it to user metadata if available
+                    if (credential.fullName) {
+                      const nameParts = []
+                      if (credential.fullName.givenName) nameParts.push(credential.fullName.givenName)
+                      if (credential.fullName.middleName) nameParts.push(credential.fullName.middleName)
+                      if (credential.fullName.familyName) nameParts.push(credential.fullName.familyName)
+
+                      const fullName = nameParts.join(' ')
+
+                      await supabase.auth.updateUser({
+                        data: {
+                          full_name: fullName,
+                          given_name: credential.fullName.givenName,
+                          family_name: credential.fullName.familyName,
+                        }
+                      })
+                    }
                     // User is signed in.
                   }
                 } else {
@@ -198,13 +340,49 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
             }}
           />
         )
-      return <>{/* Implement Android Auth options. */}</>
+      return (
+        <>
+          {/*
+            On Android, Sign in with Apple is not natively supported.
+            You have two options:
+            1. Use the OAuth flow via signInWithOAuth (see Flutter Android example below)
+            2. Use a web-based solution like react-native-app-auth
+
+            For most cases, we recommend using the OAuth flow:
+          */}
+          <Button
+            onPress={async () => {
+              const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'apple',
+                options: {
+                  redirectTo: 'your-app-scheme://auth/callback',
+                  skipBrowserRedirect: false,
+                },
+              })
+              if (error) {
+                console.error('Sign in error:', error)
+              }
+            }}
+          >
+            Sign in with Apple
+          </Button>
+        </>
+      )
     }
     ```
 
-    When working with bare React Native, you can use [invertase/react-native-apple-authentication](https://github.com/invertase/react-native-apple-authentication) to obtain the ID token.
+    <Admonition type="note" label="Android Implementation Notes">
 
-    ### Configuration [#expo-configuration-native-app]
+    - Sign in with Apple is not natively available on Android devices
+    - The OAuth flow opens a browser window for authentication
+    - You must configure [deep linking](/docs/guides/auth/native-mobile-deep-linking) for the callback to work properly
+    - The OAuth configuration (Services ID, etc.) must be set up as described in the [Web OAuth Configuration section](#configuration-web-oauth)
+
+    </Admonition>
+
+    When working with bare React Native, you can use [invertase/react-native-apple-authentication](https://github.com/invertase/react-native-apple-authentication) to obtain the ID token on iOS. For Android, use the OAuth flow as shown above.
+
+    ### Configuration [#configuration-expo-native]
 
     <Admonition type="note">
 
@@ -231,10 +409,10 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
   <TabPanel id="flutter" label="Flutter">
 
-    ## Apple sign in on iOS and macOS
+    ## Sign in with Apple on iOS and macOS
 
-    You can perform Apple sign in using the [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) package on Flutter apps running on iOS or macOS.
-    Follow the instructions in the package README to set up native Apple sign in on iOS and macOS.
+    You can perform Sign in with Apple using the [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) package on Flutter apps running on iOS or macOS.
+    Follow the instructions in the package README to set up native Sign in with Apple on iOS and macOS.
 
     Once the setup is complete on the Flutter app, add the bundle ID of your app to your Supabase dashboard in `Authentication -> Providers -> Apple` in order to register your app with Supabase.
 
@@ -262,22 +440,44 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
             'Could not find ID Token from generated credential.');
       }
 
-      return supabase.auth.signInWithIdToken(
+      final authResponse = await supabase.auth.signInWithIdToken(
         provider: OAuthProvider.apple,
         idToken: idToken,
         nonce: rawNonce,
       );
+
+      // Apple only provides the user's full name on the first sign-in
+      // Save it to user metadata if available
+      if (credential.givenName != null || credential.familyName != null) {
+        final nameParts = <String>[];
+        if (credential.givenName != null) nameParts.add(credential.givenName!);
+        if (credential.familyName != null) nameParts.add(credential.familyName!);
+
+        final fullName = nameParts.join(' ');
+
+        await supabase.auth.updateUser(
+          UserAttributes(
+            data: {
+              'full_name': fullName,
+              'given_name': credential.givenName,
+              'family_name': credential.familyName,
+            },
+          ),
+        );
+      }
+
+      return authResponse;
     }
     ```
 
-    ### Configuration [#flutter-configuration-native-app]
+    ### Configuration [#configuration-flutter-native]
 
     1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
     2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](/dashboard/project/_/auth/providers) under _Client IDs_.
 
-    ## Apple sign in on Android, Web, Windows and Linux
+    ## Sign in with Apple on Android, Web, Windows and Linux
 
-    For platforms that doesn't support native Apple sign in, you can use the `signInWithOAuth()` method to perform the Apple sign in.
+    For platforms that don't support native Sign in with Apple, you can use the `signInWithOAuth()` method to perform Sign in with Apple.
 
     <Admonition type="note">
 
@@ -298,7 +498,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
     This call takes the user to Apple's consent screen. Once the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your Flutter application with an access and refresh token representing the user's session.
 
-    ### Configuration [#flutter-configuration-web]
+    ### Configuration [#configuration-flutter-web]
 
     You will require the following information:
 
@@ -352,14 +552,47 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
                 else {
                   return
                 }
-                  try await client.auth.signInWithIdToken(
+
+                try await client.auth.signInWithIdToken(
                   credentials: .init(
                     provider: .apple,
                     idToken: idToken
                   )
                 )
+
+                // Apple only provides the user's full name on the first sign-in
+                // Save it to user metadata if available
+                if let fullName = credential.fullName {
+                  var nameParts: [String] = []
+                  if let givenName = fullName.givenName {
+                    nameParts.append(givenName)
+                  }
+                  if let middleName = fullName.middleName {
+                    nameParts.append(middleName)
+                  }
+                  if let familyName = fullName.familyName {
+                    nameParts.append(familyName)
+                  }
+
+                  let fullNameString = nameParts.joined(separator: " ")
+
+                  try await client.auth.update(
+                    user: UserAttributes(
+                      data: [
+                        "full_name": .string(fullNameString),
+                        "given_name": .string(fullName.givenName ?? ""),
+                        "family_name": .string(fullName.familyName ?? "")
+                      ]
+                    )
+                  )
+                }
+
+                // User successfully signed in
+                print("Sign in with Apple successful!")
               } catch {
-                dump(error)
+                // Handle sign-in errors
+                print("Sign in with Apple failed: \(error.localizedDescription)")
+                // Show error alert to user
               }
             }
           }
@@ -368,7 +601,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     }
     ```
 
-    ### Configuration [#swift-configuration-native-app]
+    ### Configuration [#configuration-swift-native]
 
     1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
     2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](/dashboard/project/_/auth/providers) under _Client IDs_.
@@ -408,12 +641,55 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
     ```kotlin
     val authState = supabaseClient.composeAuth.rememberLoginWithApple(
-    	onResult = {
-    		when(it) { //handle errors
-    			NativeSignInResult.ClosedByUser -> TODO()
-    			is NativeSignInResult.Error -> TODO()
-    			is NativeSignInResult.NetworkError -> TODO()
-    			NativeSignInResult.Success -> TODO()
+    	onResult = { result ->
+    		when(result) {
+    			NativeSignInResult.ClosedByUser -> {
+    				// User cancelled the sign-in flow
+    				println("User cancelled Apple sign in")
+    			}
+    			is NativeSignInResult.Error -> {
+    				// An error occurred during sign in
+    				println("Apple sign in error: ${result.message}")
+    				// Show error to user
+    			}
+    			is NativeSignInResult.NetworkError -> {
+    				// Network error occurred
+    				println("Network error during Apple sign in: ${result.error}")
+    				// Show network error to user
+    			}
+    			is NativeSignInResult.Success -> {
+    				// User successfully signed in
+    				println("Apple sign in successful!")
+
+    				// Apple only provides the user's full name on the first sign-in (iOS only)
+    				// Save it to user metadata if available
+    				result.data?.let { appleData ->
+    					appleData.fullName?.let { fullName ->
+    						val nameParts = mutableListOf<String>()
+    						fullName.givenName?.let { nameParts.add(it) }
+    						fullName.middleName?.let { nameParts.add(it) }
+    						fullName.familyName?.let { nameParts.add(it) }
+
+    						val fullNameString = nameParts.joinToString(" ")
+
+    						scope.launch {
+    							try {
+    								supabaseClient.auth.updateUser {
+    									data = buildJsonObject {
+    										put("full_name", fullNameString)
+    										fullName.givenName?.let { put("given_name", it) }
+    										fullName.familyName?.let { put("family_name", it) }
+    									}
+    								}
+    							} catch (e: Exception) {
+    								println("Failed to update user metadata: ${e.message}")
+    							}
+    						}
+    					}
+    				}
+
+    				// Navigate to home screen or update UI
+    			}
     		}
     	}
     )
@@ -422,6 +698,44 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     	Text("Sign in with Apple")
     }
     ```
+
+    ### Configuration [#configuration-kotlin]
+
+    **For iOS (native Sign in with Apple):**
+
+    1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank.
+    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](/dashboard/project/_/auth/providers) under _Client IDs_.
+
+    **For other platforms (Android, Desktop, Web):**
+
+    On non-iOS platforms, ComposeAuth automatically falls back to the OAuth flow. You need to configure the OAuth settings as described in the [Web OAuth Configuration section](#configuration-web-oauth) above, including:
+
+    - Team ID
+    - Email sources registration
+    - Services ID
+    - Signing Key and secret generation
+
+    **Dependencies:**
+
+    Add the following to your `build.gradle.kts`:
+
+    ```kotlin
+    dependencies {
+        implementation("io.github.jan-tennert.supabase:gotrue-kt:VERSION")
+        implementation("io.github.jan-tennert.supabase:compose-auth:VERSION")
+        implementation("io.github.jan-tennert.supabase:compose-auth-ui:VERSION") // Optional, for UI components
+    }
+    ```
+
+    <Admonition type="note">
+
+    **Platform-Specific Notes**
+
+    - **iOS**: Uses native Apple Authentication Services automatically
+    - **Android/Desktop/Web**: Falls back to OAuth flow (requires web OAuth configuration)
+    - **Minimum Versions**: Kotlin 1.9.0+, Compose Multiplatform 1.5.0+
+
+    </Admonition>
 
   </TabPanel>
   </$Show>

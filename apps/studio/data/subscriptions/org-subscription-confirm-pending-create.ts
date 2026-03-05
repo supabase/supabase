@@ -1,12 +1,12 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { organizationKeys } from 'data/organizations/keys'
-import { permissionKeys } from 'data/permissions/keys'
-import { castOrganizationResponseToOrganization } from 'data/organizations/organizations-query'
 import type { components } from 'api-types'
+import { handleError, post } from 'data/fetchers'
+import { organizationKeys } from 'data/organizations/keys'
+import { castOrganizationResponseToOrganization } from 'data/organizations/organizations-query'
+import { permissionKeys } from 'data/permissions/keys'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type PendingSubscriptionCreateVariables = {
   payment_intent_id: string
@@ -41,7 +41,7 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     PendingSubscriptionCreateData,
     ResponseError,
     PendingSubscriptionCreateVariables
@@ -54,8 +54,19 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
     PendingSubscriptionCreateData,
     ResponseError,
     PendingSubscriptionCreateVariables
-  >((vars) => confirmPendingSubscriptionCreate(vars), {
+  >({
+    mutationFn: (vars) => confirmPendingSubscriptionCreate(vars),
     async onSuccess(data, variables, context) {
+      // Handle 202 Accepted - show toast and skip query updates
+      if (data && 'message' in data && !('slug' in data)) {
+        const pendingResponse = data as components['schemas']['PendingConfirmationResponse']
+        toast.success(pendingResponse.message, {
+          dismissible: true,
+          duration: 10_000,
+        })
+        return
+      }
+
       // [Joshen] We're manually updating the query client here as the org's subscription is
       // created async, and the invalidation will happen too quick where the GET organizations
       // endpoint will error out with a 500 since the subscription isn't created yet.
@@ -75,7 +86,7 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
         }
       )
 
-      await queryClient.invalidateQueries(permissionKeys.list())
+      await queryClient.invalidateQueries({ queryKey: permissionKeys.list() })
 
       // todo replace plan in org
       await onSuccess?.(data, variables, context)

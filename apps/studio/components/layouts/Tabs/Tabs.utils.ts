@@ -1,6 +1,6 @@
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import useLatest from 'hooks/misc/useLatest'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { createTabId, editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 
 export function useTableEditorTabsCleanUp() {
@@ -104,4 +104,52 @@ export function useSqlEditorTabsCleanup() {
       if (!!snippet && snippet.name !== tab.label) tabs.updateTab(tab.id, { label: snippet.name })
     })
   }, [])
+}
+
+interface UseTabsScrollOptions {
+  activeTab: string | null | undefined
+  tabCount: number
+}
+
+export function useTabsScroll({ activeTab, tabCount }: UseTabsScrollOptions) {
+  const tabsListRef = useRef<HTMLDivElement>(null)
+  const prevTabCountRef = useRef<number>(tabCount)
+  const isInitialMount = useRef(true)
+
+  useEffect(() => {
+    if (tabsListRef.current) {
+      tabsListRef.current.scrollLeft = tabsListRef.current.scrollWidth
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+
+    if (!tabsListRef.current) return
+
+    const tabCountIncreased = tabCount > prevTabCountRef.current
+
+    if (tabCountIncreased) {
+      tabsListRef.current.scrollLeft = tabsListRef.current.scrollWidth
+    } else if (activeTab) {
+      const activeTabElement = tabsListRef.current.querySelector(
+        `[data-state="active"]`
+      ) as HTMLElement
+
+      if (activeTabElement) {
+        activeTabElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        })
+      }
+    }
+
+    prevTabCountRef.current = tabCount
+  }, [activeTab, tabCount])
+
+  return { tabsListRef }
 }

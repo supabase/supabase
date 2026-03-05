@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 import { registry } from '../registry/index'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const registryPath = path.join(__dirname, '..', 'registry.json')
+const registryPath = path.join(__dirname, '..', 'public', 'r', 'registry.json')
 
 const cleanedRegistry = {
   $schema: 'https://ui.shadcn.com/schema/registry.json',

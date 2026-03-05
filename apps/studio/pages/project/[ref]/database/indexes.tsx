@@ -3,50 +3,58 @@ import { ExternalLink } from 'lucide-react'
 import Indexes from 'components/interfaces/Database/Indexes/Indexes'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const IndexesPage: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <ScaffoldSectionContent className="gap-0">
-          <FormHeader
-            className="!mb-0"
-            title="Database Indexes"
-            description="Improve query performance against your database"
-          />
-        </ScaffoldSectionContent>
-        <ScaffoldSectionDetail className="flex items-center lg:justify-end gap-2 flex-wrap">
-          <DocsButton
-            className="no-underline"
-            href={`${DOCS_URL}/guides/database/query-optimization`}
-          />
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Indexes</PageHeaderTitle>
+            <PageHeaderDescription>
+              Improve query performance against your database
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton
               className="no-underline"
-              href={`${DOCS_URL}/guides/database/extensions/index_advisor`}
-            >
-              Index Advisor
-            </a>
-          </Button>
-        </ScaffoldSectionDetail>
-        <div className="col-span-12 mt-3">
-          <Indexes />
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+              href={`${DOCS_URL}/guides/database/query-optimization`}
+            />
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                className="no-underline"
+                href={`${DOCS_URL}/guides/database/extensions/index_advisor`}
+              >
+                Index Advisor
+              </a>
+            </Button>
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
+            <Indexes />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 

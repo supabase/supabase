@@ -13,7 +13,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import {
   Button,
   CodeBlock,
@@ -45,7 +45,7 @@ export const OngoingQueriesPanel = () => {
     data,
     error,
     isError,
-    isLoading: isLoadingOngoingQueries,
+    isPending: isLoadingOngoingQueries,
     isFetching: isFetchingOngoingQueries,
     refetch,
   } = useOngoingQueriesQuery(
@@ -67,7 +67,7 @@ export const OngoingQueriesPanel = () => {
     }
   }, [viewOngoingQueries])
 
-  const { mutate: abortQuery, isLoading } = useQueryAbortMutation({
+  const { mutate: abortQuery, isPending } = useQueryAbortMutation({
     onSuccess: () => {
       toast.success(`Successfully aborted query (ID: ${selectedId})`)
       setSelectedId(undefined)
@@ -171,7 +171,7 @@ export const OngoingQueriesPanel = () => {
       </Sheet>
 
       <ConfirmationModal
-        loading={isLoading}
+        loading={isPending}
         variant="warning"
         title={`Confirm to abort this query? (ID: ${selectedId})`}
         visible={selectedId !== undefined}

@@ -42,7 +42,7 @@ const CreateEnumeratedTypeSidePanel = ({
   const initialValues = { name: '', description: '', values: [{ value: '' }] }
   const submitRef = useRef<HTMLButtonElement>(null)
   const { data: project } = useSelectedProjectQuery()
-  const { mutate: createEnumeratedType, isLoading: isCreating } = useEnumeratedTypeCreateMutation({
+  const { mutate: createEnumeratedType, isPending: isCreating } = useEnumeratedTypeCreateMutation({
     onSuccess: (res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
       closePanel()

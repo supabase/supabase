@@ -8,13 +8,13 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { cn } from 'ui'
-import InvoicesSection from '../InvoicesSettings/InvoicesSection'
+import PaymentMethods from '../../Billing/Payment/PaymentMethods/PaymentMethods'
+import { InvoicesSection } from '../InvoicesSettings/InvoicesSection'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
 import { BillingCustomerData } from './BillingCustomerData/BillingCustomerData'
 import BillingEmail from './BillingEmail'
 import CostControl from './CostControl/CostControl'
 import CreditBalance from './CreditBalance'
-import PaymentMethods from '../../Billing/Payment/PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 
 export const BillingSettings = () => {

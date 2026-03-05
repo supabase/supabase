@@ -1,28 +1,15 @@
-import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
 
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { StorageItem } from '../Storage.types'
+import { STORAGE_ROW_TYPES } from '../Storage.constants'
 
-interface ConfirmDeleteModalProps {
-  visible: boolean
-  selectedItemsToDelete: StorageItem[]
-  onSelectCancel: () => void
-  onSelectDelete: () => void
-}
-
-export const ConfirmDeleteModal = ({
-  visible = false,
-  selectedItemsToDelete = [],
-  onSelectCancel = noop,
-  onSelectDelete = noop,
-}: ConfirmDeleteModalProps) => {
+export const ConfirmDeleteModal = () => {
   const [deleting, setDeleting] = useState(false)
+  const { selectedItemsToDelete, deleteFolder, deleteFiles, setSelectedItemsToDelete } =
+    useStorageExplorerStateSnapshot()
 
-  useEffect(() => {
-    setDeleting(false)
-  }, [visible])
-
+  const visible = selectedItemsToDelete.length > 0
   const multipleFiles = selectedItemsToDelete.length > 1
 
   const title = multipleFiles
@@ -37,18 +24,35 @@ export const ConfirmDeleteModal = ({
       ? `Are you sure you want to delete the selected ${selectedItemsToDelete[0].type.toLowerCase()}?`
       : ``
 
-  const onConfirmDelete = () => {
-    setDeleting(true)
-    onSelectDelete()
+  const onDeleteSelectedFiles = async () => {
+    try {
+      setDeleting(true)
+      if (
+        selectedItemsToDelete.length === 1 &&
+        selectedItemsToDelete[0].type === STORAGE_ROW_TYPES.FOLDER
+      ) {
+        await deleteFolder(selectedItemsToDelete[0])
+      } else {
+        await deleteFiles({ files: selectedItemsToDelete })
+      }
+    } catch (err) {
+    } finally {
+      setDeleting(false)
+    }
   }
+
+  useEffect(() => {
+    setDeleting(false)
+  }, [visible])
 
   return (
     <ConfirmationModal
+      size="medium"
       visible={visible}
       title={<span className="break-words">{title}</span>}
-      size="medium"
-      onCancel={onSelectCancel}
-      onConfirm={onConfirmDelete}
+      loading={deleting}
+      onCancel={() => setSelectedItemsToDelete([])}
+      onConfirm={onDeleteSelectedFiles}
       variant="destructive"
       alert={{
         base: { variant: 'destructive' },
@@ -58,5 +62,3 @@ export const ConfirmDeleteModal = ({
     />
   )
 }
-
-export default ConfirmDeleteModal

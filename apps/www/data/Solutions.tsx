@@ -3,10 +3,14 @@ import {
   Building2Icon,
   Code2Icon,
   HammerIcon,
+  Heart,
   LightbulbIcon,
   PointerIcon,
   PuzzleIcon,
+  ShieldCheck,
   TrendingUpIcon,
+  UsersIcon,
+  ZapIcon,
 } from 'lucide-react'
 
 export type SolutionTypes = Solutions[keyof Solutions]
@@ -20,9 +24,15 @@ export enum Solutions {
   firebase = 'firebase',
   neon = 'neon',
   startups = 'startups',
+  agencies = 'agencies',
   enterprise = 'enterprise',
   hackathon = 'hackathon',
   innovationTeams = 'innovation-teams',
+  vibeCoders = 'vibe-coders',
+  b2bSaaS = 'b2b-saas',
+  finserv = 'finserv',
+  healthcare = 'healthcare',
+  agents = 'agents',
 }
 
 export const skillBasedSolutions = {
@@ -90,6 +100,13 @@ export const skillBasedSolutions = {
         </svg>
       ),
     },
+    {
+      id: Solutions.vibeCoders,
+      text: 'Vibe Coders',
+      description: '',
+      url: '/solutions/vibe-coders',
+      icon: ZapIcon,
+    },
   ],
 }
 
@@ -111,6 +128,13 @@ export const useCaseSolutions = {
       icon: TrendingUpIcon,
     },
     {
+      id: Solutions.agencies,
+      text: 'Agencies',
+      description: '',
+      url: '/solutions/agencies',
+      icon: UsersIcon,
+    },
+    {
       id: Solutions.enterprise,
       text: 'Enterprise',
       description: '',
@@ -123,6 +147,40 @@ export const useCaseSolutions = {
       description: '',
       url: '/solutions/innovation-teams',
       icon: LightbulbIcon,
+    },
+  ],
+}
+
+export const appTypeSolutions = {
+  label: 'Solutions',
+  solutions: [
+    {
+      id: Solutions.b2bSaaS,
+      text: 'B2B SaaS',
+      description: '',
+      url: '/solutions/b2b-saas',
+      icon: Building2Icon,
+    },
+    {
+      id: Solutions.finserv,
+      text: 'FinServ',
+      description: '',
+      url: '/solutions/finserv',
+      icon: ShieldCheck,
+    },
+    {
+      id: Solutions.healthcare,
+      text: 'Healthcare',
+      description: '',
+      url: '/solutions/healthcare',
+      icon: Heart,
+    },
+    {
+      id: Solutions.agents,
+      text: 'Agents',
+      description: '',
+      url: '/solutions/agents',
+      icon: BotIcon,
     },
   ],
 }
@@ -158,7 +216,7 @@ export const migrationSolutions = {
     },
     {
       id: Solutions.neon,
-      text: 'Switch From Neon',
+      text: 'Switch from Neon',
       description: '',
       url: '/solutions/switch-from-neon',
       icon: (props: any) => (
@@ -217,6 +275,16 @@ export const navData = {
       label: "Who it's for",
       links: [
         ...useCaseSolutions.solutions.map((solution) => ({
+          text: solution.text,
+          url: solution.url,
+          icon: solution.icon,
+        })),
+      ],
+    },
+    {
+      label: 'App Type',
+      links: [
+        ...appTypeSolutions.solutions.map((solution) => ({
           text: solution.text,
           url: solution.url,
           icon: solution.icon,
