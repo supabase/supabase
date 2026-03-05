@@ -10,6 +10,7 @@ export const ObservabilityLink = () => {
           href={`${DOCS_URL}/guides/telemetry/metrics`}
           className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
           target="_blank"
+          rel="noreferrer"
         >
           Get started for free!
         </Link>

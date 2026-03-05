@@ -197,7 +197,7 @@ export const ChartHeader = ({
             },
           }}
         >
-          <Link href={docsUrl} target="_blank">
+          <Link href={docsUrl} target="_blank" rel="noreferrer">
             <InfoIcon className="w-4 h-4 text-foreground-lighter" />
           </Link>
         </ButtonTooltip>
