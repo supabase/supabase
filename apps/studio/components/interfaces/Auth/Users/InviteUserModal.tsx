@@ -1,11 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Mail } from 'lucide-react'
+import { AlertTriangle, ArrowRight, Mail } from 'lucide-react'
+import Link from 'next/link'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, Form, Input, Modal } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, Form, Input, Modal } from 'ui'
 
 export type InviteUserModalProps = {
   visible: boolean
@@ -26,6 +28,12 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
     PermissionAction.AUTH_EXECUTE,
     'invite_user'
   )
+
+  // Fetch auth config to check Site URL
+  const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
+  const siteUrl = authConfig?.SITE_URL || ''
+  const isSiteUrlLocalhost = siteUrl.includes('localhost') || siteUrl.includes('127.0.0.1')
+  const isSiteUrlMisconfigured = !isAuthConfigLoading && (!siteUrl || isSiteUrlLocalhost)
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -63,6 +71,25 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
       >
         {() => (
           <>
+            {isSiteUrlMisconfigured && (
+              <Modal.Content>
+                <Alert_Shadcn_ variant="warning">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>Site URL not configured</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    Your Site URL is not configured or set to localhost. Invite links will not work for external users.{' '}
+                    <Link
+                      href={`/project/${projectRef}/auth/url-configuration`}
+                      className="text-foreground underline inline-flex items-center gap-1"
+                      onClick={handleToggle}
+                    >
+                      Configure Site URL <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              </Modal.Content>
+            )}
+
             <Modal.Content>
               <Input
                 id="email"
