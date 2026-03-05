@@ -7,11 +7,12 @@ import * as z from 'zod'
 
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import FormBoxEmpty from 'components/ui/FormBoxEmpty'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -33,7 +34,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ChooseFunctionForm from './ChooseFunctionForm'
 import {
@@ -135,7 +135,11 @@ export const TriggerSheet = ({
   })
   const { function_name, function_schema } = form.watch()
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: closeConfirmationModalProps,
+  } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
   })
@@ -189,7 +193,7 @@ export const TriggerSheet = ({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={confirmOnClose}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
@@ -481,7 +485,7 @@ export const TriggerSheet = ({
             </Button>
           </SheetFooter>
 
-          <CloseConfirmationModal {...closeConfirmationModalProps} />
+          <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
         </SheetContent>
       </Sheet>
 
@@ -496,18 +500,3 @@ export const TriggerSheet = ({
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

@@ -5,7 +5,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { isGreaterThanOrEqual } from 'lib/semver'
@@ -15,7 +15,7 @@ import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { MouseEvent, UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { LoadingLine, Sheet, SheetContent } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 
 import { formatCronJobColumns } from './CronJobs.utils'
 import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
@@ -142,7 +142,11 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(false)
     cleanPointerEventsNoneOnBody(500)
   }
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: closeConfirmationModalProps,
+  } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       setIsDirty(false)
@@ -192,7 +196,10 @@ export const CronjobsTab = () => {
 
       <DeleteCronJob />
 
-      <Sheet open={!!createCronJobSheetShown || !!cronJobForEditing} onOpenChange={confirmOnClose}>
+      <Sheet
+        open={!!createCronJobSheetShown || !!cronJobForEditing}
+        onOpenChange={handleOpenChange}
+      >
         <SheetContent size="default" tabIndex={undefined}>
           <CreateCronJobSheet
             selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
@@ -203,7 +210,7 @@ export const CronjobsTab = () => {
           />
         </SheetContent>
       </Sheet>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
     </>
   )
 }
@@ -227,20 +234,4 @@ const CronJobsFooter = ({ count }: CronJobsFooterProps) => (
       `Total: ${count.value ?? 0} jobs${count.isEstimate ? ' (estimate)' : ''}`
     )}
   </div>
-)
-
-// Confirmation modal for unsaved changes
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
 )

@@ -1,11 +1,11 @@
 import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import useLatest from 'hooks/misc/useLatest'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { isEmpty, noop } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
@@ -198,7 +198,7 @@ const PolicyEditorModal = ({
       onCancel={confirmOnClose}
     >
       <div>
-        <CloseConfirmationModal {...closeConfirmationModalProps} />
+        <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
         {view === POLICY_MODAL_VIEWS.SELECTION ? (
           <PolicySelection
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
@@ -232,20 +232,5 @@ const PolicyEditorModal = ({
     </Modal>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the editor? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)
 
 export default PolicyEditorModal

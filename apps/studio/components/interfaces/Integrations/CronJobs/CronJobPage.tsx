@@ -3,7 +3,7 @@ import { toString as CronToString } from 'cronstrue'
 import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { type ConfirmOnCloseModalProps, useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Edit3, List } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -23,7 +23,7 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import {
   PageHeader,
   PageHeaderAside,
@@ -65,7 +65,11 @@ export const CronJobPage = () => {
   const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
 
   const [isDirty, setIsDirty] = useState(false)
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: closeConfirmationModalProps,
+  } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       setIsDirty(false)
@@ -192,7 +196,7 @@ export const CronJobPage = () => {
 
       <PreviousRunsTab />
 
-      <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
+      <Sheet open={isEditSheetOpen} onOpenChange={handleOpenChange}>
         <SheetContent size="lg">
           {job && (
             <CreateCronJobSheet
@@ -210,22 +214,7 @@ export const CronJobPage = () => {
           )}
         </SheetContent>
       </Sheet>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)
