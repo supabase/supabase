@@ -74,7 +74,7 @@ export async function handler(req: Request) {
       .eq('username', username)
       .maybeSingle()
 
-    if (error) console.log('fetch error', error.message)
+    if (error) console.error('fetch error', error.message)
     if (!data) throw new Error(error?.message ?? 'user not found')
 
     const { name, ticketNumber, metadata } = data

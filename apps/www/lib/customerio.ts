@@ -200,7 +200,7 @@ export class CustomerioAppClient {
       return null
     }
 
-    console.log('Found customer with ID:', customer.id)
+    console.debug('Found customer with ID:', customer.id)
 
     // Now get the specific attributes for this customer
     try {
