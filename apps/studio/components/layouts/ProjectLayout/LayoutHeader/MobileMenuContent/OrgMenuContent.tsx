@@ -7,7 +7,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { getPathnameWithoutQuery } from 'lib/pathname.utils'
 import { Blocks, Boxes, ChartArea, ChevronLeft, Receipt, Settings, Users } from 'lucide-react'
 import { useRouter } from 'next/router'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Button, cn, SidebarGroup, SidebarMenu } from 'ui'
 
 import { getOrgMenuComponent } from './mobileOrgMenuRegistry'
@@ -18,6 +18,7 @@ import {
   isOrgMenuActive,
 } from './OrgMenuContent.utils'
 import { OrgMenuItem } from './OrgMenuItem'
+import { orgItemHasSubmenu, useOrgMenuNavigation } from './useOrgMenuNavigation'
 
 export interface OrgMenuContentProps {
   onCloseSheet?: () => void
@@ -37,10 +38,8 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
   const activeRoute = getOrgActiveRoute(pathname)
   const initialSectionKey = getOrgSectionKeyFromPathname(activeRoute)
 
-  const [viewLevel, setViewLevel] = useState<'top' | 'section'>(
-    initialSectionKey ? 'section' : 'top'
-  )
-  const [selectedSectionKey, setSelectedSectionKey] = useState<string | null>(initialSectionKey)
+  const { viewLevel, selectedSectionKey, handleSubmenuClick, handleBackToTop } =
+    useOrgMenuNavigation({ initialSectionKey })
 
   const navMenuItems: OrgNavItem[] = useMemo(
     () => [
@@ -87,20 +86,6 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
     ],
     [organizationSlug, showBilling]
   )
-
-  const hasSubmenu = useCallback((item: OrgNavItem) => {
-    return getOrgMenuComponent(item.key) !== null
-  }, [])
-
-  const handleSubmenuClick = useCallback((item: OrgNavItem) => {
-    setSelectedSectionKey(item.key)
-    setViewLevel('section')
-  }, [])
-
-  const handleBackToTop = useCallback(() => {
-    setViewLevel('top')
-    setSelectedSectionKey(null)
-  }, [])
 
   const sectionKeyToShow = viewLevel === 'section' ? selectedSectionKey : null
   const sectionLabel =
@@ -153,7 +138,7 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
                   isActive={isOrgMenuActive(item, i, pathname, activeRoute)}
                   disabled={disableAccessMfa}
                   onCloseSheet={onCloseSheet}
-                  onSubmenuClick={hasSubmenu(item) ? handleSubmenuClick : undefined}
+                  onSubmenuClick={orgItemHasSubmenu(item) ? handleSubmenuClick : undefined}
                 />
               ))}
             </SidebarGroup>

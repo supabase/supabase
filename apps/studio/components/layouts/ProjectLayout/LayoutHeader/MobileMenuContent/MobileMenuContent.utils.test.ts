@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getSectionKeyFromPathname } from './MobileMenuContent.utils'
+import { getSectionKeyFromPathname, resolveSectionDisplay } from './MobileMenuContent.utils'
 
 describe('getSectionKeyFromPathname', () => {
   it('returns section key for project section paths', () => {
@@ -34,5 +34,79 @@ describe('getSectionKeyFromPathname', () => {
 
   it('returns first segment after project ref as section key', () => {
     expect(getSectionKeyFromPathname('/project/foo/bar/baz')).toBe('bar')
+  })
+})
+
+describe('resolveSectionDisplay', () => {
+  const routes = [
+    { key: 'database', label: 'Database' },
+    { key: 'auth', label: 'Authentication' },
+    { key: 'settings', label: 'Settings' },
+  ]
+
+  it('returns nulls when viewLevel is top', () => {
+    const result = resolveSectionDisplay({
+      viewLevel: 'top',
+      selectedSectionKey: 'database',
+      currentSectionKey: 'auth',
+      currentProduct: 'Authentication',
+      routes,
+    })
+    expect(result).toEqual({ sectionKey: null, sectionLabel: null })
+  })
+
+  it('uses selectedSectionKey when set', () => {
+    const result = resolveSectionDisplay({
+      viewLevel: 'section',
+      selectedSectionKey: 'database',
+      currentSectionKey: 'auth',
+      currentProduct: 'Authentication',
+      routes,
+    })
+    expect(result).toEqual({ sectionKey: 'database', sectionLabel: 'Database' })
+  })
+
+  it('falls back to currentSectionKey when selectedSectionKey is null', () => {
+    const result = resolveSectionDisplay({
+      viewLevel: 'section',
+      selectedSectionKey: null,
+      currentSectionKey: 'auth',
+      currentProduct: 'Authentication',
+      routes,
+    })
+    expect(result).toEqual({ sectionKey: 'auth', sectionLabel: 'Authentication' })
+  })
+
+  it('uses currentProduct as label when sectionKey matches currentSectionKey', () => {
+    const result = resolveSectionDisplay({
+      viewLevel: 'section',
+      selectedSectionKey: 'auth',
+      currentSectionKey: 'auth',
+      currentProduct: 'Auth Users',
+      routes,
+    })
+    expect(result).toEqual({ sectionKey: 'auth', sectionLabel: 'Auth Users' })
+  })
+
+  it('falls back to sectionKey itself when no matching route', () => {
+    const result = resolveSectionDisplay({
+      viewLevel: 'section',
+      selectedSectionKey: 'unknown',
+      currentSectionKey: null,
+      currentProduct: '',
+      routes,
+    })
+    expect(result).toEqual({ sectionKey: 'unknown', sectionLabel: 'unknown' })
+  })
+
+  it('returns nulls when in section view but both keys are null', () => {
+    const result = resolveSectionDisplay({
+      viewLevel: 'section',
+      selectedSectionKey: null,
+      currentSectionKey: null,
+      currentProduct: '',
+      routes,
+    })
+    expect(result).toEqual({ sectionKey: null, sectionLabel: null })
   })
 })

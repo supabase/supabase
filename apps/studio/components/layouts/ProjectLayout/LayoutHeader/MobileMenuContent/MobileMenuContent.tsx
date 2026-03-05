@@ -18,22 +18,15 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Button, cn, Separator, SidebarGroup, SidebarMenu } from 'ui'
 
 import { getPathSegment, getPathnameWithoutQuery } from 'lib/pathname.utils'
 
+import { resolveSectionDisplay } from './MobileMenuContent.utils'
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
 import { TopLevelRouteItem } from './TopLevelRouteItem'
-
-/** Tool routes navigate directly at top level; section/product menu is shown only when already in that section */
-const TOP_LEVEL_DIRECT_LINK_KEYS = ['editor', 'sql'] as const
-
-function isDirectLinkAtTopLevel(route: Route): boolean {
-  return TOP_LEVEL_DIRECT_LINK_KEYS.includes(
-    route.key as (typeof TOP_LEVEL_DIRECT_LINK_KEYS)[number]
-  )
-}
+import { routeHasSubmenu, useMobileMenuNavigation } from './useMobileMenuNavigation'
 
 export interface MobileMenuContentProps {
   currentProductMenu: React.ReactNode
@@ -54,10 +47,12 @@ export function MobileMenuContent({
   const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
   const activeRoute = getPathSegment(pathname, 3)
 
-  const [viewLevel, setViewLevel] = useState<'top' | 'section'>(
-    currentProductMenu && currentSectionKey ? 'section' : 'top'
-  )
-  const [selectedSectionKey, setSelectedSectionKey] = useState<string | null>(null)
+  const { viewLevel, selectedSectionKey, handleTopLevelClick, handleBackToTop } =
+    useMobileMenuNavigation({
+      currentSectionKey,
+      hasCurrentProductMenu: !!currentProductMenu,
+      onCloseSheet,
+    })
 
   const {
     projectAuthAll: authEnabled,
@@ -121,44 +116,13 @@ export function MobileMenuContent({
     [homeRoute, toolRoutes, productRoutes, otherRoutes, settingsRoutes]
   )
 
-  const hasSubmenu = useCallback((route: Route) => {
-    if (route.items && Array.isArray(route.items) && route.items.length > 0) return true
-    const component = getProductMenuComponent(route.key)
-    return component !== null
-  }, [])
-
-  const handleTopLevelClick = useCallback(
-    (route: Route) => {
-      if (route.disabled) return
-      if (isDirectLinkAtTopLevel(route) && route.link) {
-        router.push(route.link)
-        onCloseSheet?.()
-        return
-      }
-      if (hasSubmenu(route)) {
-        setSelectedSectionKey(route.key)
-        setViewLevel('section')
-        return
-      }
-      if (route.link) {
-        router.push(route.link)
-        onCloseSheet?.()
-      }
-    },
-    [hasSubmenu, router, onCloseSheet]
-  )
-
-  const handleBackToTop = useCallback(() => {
-    setViewLevel('top')
-    setSelectedSectionKey(null)
-  }, [])
-
-  const sectionKeyToShow = viewLevel === 'section' ? selectedSectionKey ?? currentSectionKey : null
-  const sectionLabel =
-    sectionKeyToShow &&
-    (sectionKeyToShow === currentSectionKey
-      ? currentProduct
-      : allTopLevelRoutes.find((r) => r.key === sectionKeyToShow)?.label ?? sectionKeyToShow)
+  const { sectionKey: sectionKeyToShow, sectionLabel } = resolveSectionDisplay({
+    viewLevel,
+    selectedSectionKey,
+    currentSectionKey,
+    currentProduct,
+    routes: allTopLevelRoutes,
+  })
 
   const SectionMenuContent = sectionKeyToShow ? getProductMenuComponent(sectionKeyToShow) : null
   const pageSegment = getPathSegment(pathname, 4)
@@ -168,7 +132,7 @@ export function MobileMenuContent({
       key={route.key}
       route={route}
       isActive={isActive}
-      hasSubmenu={hasSubmenu(route)}
+      hasSubmenu={routeHasSubmenu(route)}
       onTopLevelClick={handleTopLevelClick}
       onCloseSheet={onCloseSheet}
     />

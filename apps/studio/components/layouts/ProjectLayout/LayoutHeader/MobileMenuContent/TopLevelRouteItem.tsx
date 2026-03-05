@@ -2,24 +2,14 @@ import type { Route } from 'components/ui/ui.types'
 import Link from 'next/link'
 import { cn, sidebarMenuButtonVariants, SidebarMenuItem } from 'ui'
 
+import { isDirectLinkAtTopLevel } from './useMobileMenuNavigation'
+
 export interface TopLevelRouteItemProps {
   route: Route
   isActive: boolean
   hasSubmenu: boolean
   onTopLevelClick: (route: Route) => void
   onCloseSheet?: () => void
-}
-
-/**
- * Some routes navigate directly from top level links;
- * section/product submenu is shown only when already in the section
- */
-const TOP_LEVEL_DIRECT_LINK_KEYS = ['editor', 'sql'] as const
-
-function isDirectLinkAtTopLevel(route: Route): boolean {
-  return TOP_LEVEL_DIRECT_LINK_KEYS.includes(
-    route.key as (typeof TOP_LEVEL_DIRECT_LINK_KEYS)[number]
-  )
 }
 
 export function TopLevelRouteItem({
