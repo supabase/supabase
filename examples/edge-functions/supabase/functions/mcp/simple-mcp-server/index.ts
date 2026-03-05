@@ -9,6 +9,9 @@ import { z } from "zod";
 // Create Hono app
 const app = new Hono();
 
+// Your function name, change it based on your project.
+const functionName = "simplge-mcp-server";
+
 // Create your MCP server
 const server = new McpServer({
   name: "mcp",
@@ -25,7 +28,7 @@ server.registerTool("add", {
 }));
 
 // Handle MCP requests at the root path
-app.all("/", async (c) => {
+app.all("/" + functionName , async (c) => {
   const transport = new StreamableHTTPTransport();
   await server.connect(transport);
   return transport.handleRequest(c);
