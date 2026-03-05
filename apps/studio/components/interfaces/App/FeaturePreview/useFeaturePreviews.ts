@@ -14,8 +14,6 @@ type FeaturePreview = {
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
-  const gitlessBranchingEnabled = useFlag('gitlessBranching')
-  const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
   const tableEditorNewFilterBar = useFlag('tableEditorNewFilterBar')
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
@@ -35,7 +33,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
       name: 'Branching via dashboard',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/branching-2-0',
-      enabled: gitlessBranchingEnabled,
+      enabled: true,
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
@@ -44,7 +42,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
       name: 'Disable Advisor rules',
       discussionsUrl: undefined,
-      enabled: advisorRulesEnabled,
+      enabled: true,
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
