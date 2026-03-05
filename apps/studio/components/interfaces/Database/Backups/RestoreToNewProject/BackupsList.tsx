@@ -1,6 +1,5 @@
 import Panel from 'components/ui/Panel'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
@@ -9,17 +8,14 @@ import { BackupsEmpty } from '../BackupsEmpty'
 interface BackupsListProps {
   onSelectRestore: (id: number) => void
   disabled?: boolean
+  hasAccess?: boolean
 }
 
-export const BackupsList = ({ onSelectRestore, disabled }: BackupsListProps) => {
+export const BackupsList = ({ onSelectRestore, disabled, hasAccess }: BackupsListProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-
-  const isFreePlan = organization?.plan?.id === 'free'
-
   const { data: cloneBackups } = useCloneBackupsQuery(
     { projectRef: project?.ref },
-    { enabled: !isFreePlan }
+    { enabled: hasAccess }
   )
 
   return (

@@ -5,9 +5,10 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import { ProjectSecret } from 'data/secrets/secrets-query'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Eye, EyeOff, X } from 'lucide-react'
 import { useLatest } from 'react-use'
 import {
@@ -27,7 +28,6 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const FORM_ID = 'edit-secret-sidepanel'
@@ -59,6 +59,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
     }
   }, [form, secretName, visible])
   const isValid = form.formState.isValid
+  const isDirty = form.formState.isDirty
 
   const { ref: projectRef } = useParams()
   const { mutate: updateSecret, isPending: isUpdating } = useSecretsCreateMutation({
@@ -74,13 +75,17 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
     })
   }
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
-    checkIsDirty: () => form.formState.isDirty,
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: closeConfirmationModalProps,
+  } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
     onClose,
   })
 
   return (
-    <Sheet open={visible} onOpenChange={confirmOnClose}>
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent
         showClose={false}
         size={'default'}
@@ -98,7 +103,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
           </Button>
         </SheetFooter>
       </SheetContent>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
     </Sheet>
   )
 }
@@ -209,26 +214,5 @@ const SecretField = ({ form }: SecretFieldProps): ReactNode => {
         </FormItemLayout>
       )}
     />
-  )
-}
-
-const CloseConfirmationModal = ({
-  visible,
-  onClose,
-  onCancel,
-}: ConfirmOnCloseModalProps): ReactNode => {
-  return (
-    <ConfirmationModal
-      visible={visible}
-      title="Discard changes"
-      confirmLabel="Discard"
-      onCancel={onCancel}
-      onConfirm={onClose}
-    >
-      <p className="text-sm text-foreground-light">
-        There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-        lost.
-      </p>
-    </ConfirmationModal>
   )
 }

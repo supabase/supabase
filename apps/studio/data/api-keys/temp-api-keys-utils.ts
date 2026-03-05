@@ -23,7 +23,9 @@ export function isTemporaryApiKeyValid(
 
   const now = Date.now()
   const timeRemaining = key.expiryTimeMs - now
-  return timeRemaining > 20_000 // More than 20 seconds remaining
+  // Consider the key invalid if it has less than 30 seconds remaining to avoid edge cases where the key
+  // expires during use.
+  return timeRemaining > 30_000
 }
 
 const checkOrRefreshTemporaryApiKey = async (
