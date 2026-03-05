@@ -15,7 +15,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, Loading } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -61,6 +61,10 @@ export const ProjectUsageSection = () => {
   const DEFAULT_INTERVAL: ChartIntervalKey =
     retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
+
+  useEffect(() => {
+    setInterval(retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
+  }, [retentionDays])
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 

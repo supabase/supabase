@@ -17,7 +17,7 @@ import { Auth, Database, Realtime, Storage } from 'icons'
 import sumBy from 'lodash/sumBy'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Loading } from 'ui'
 
 type ChartIntervalKey = ProjectLogStatsVariables['interval']
@@ -39,6 +39,10 @@ const ProjectUsage = () => {
     retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day'
 
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
+
+  useEffect(() => {
+    setInterval(retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
+  }, [retentionDays])
 
   const { data, isPending: isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
