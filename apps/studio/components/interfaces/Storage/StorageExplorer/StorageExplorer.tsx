@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useDebounce } from '@uidotdev/usehooks'
-import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
 import { useLatest } from 'hooks/misc/useLatest'
@@ -20,9 +19,9 @@ import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
 
 export const StorageExplorer = () => {
-  const { ref, bucketId } = useParams()
   const storageExplorerRef = useRef(null)
   const {
+    bucketId,
     projectRef,
     view,
     columns,
@@ -44,7 +43,7 @@ export const StorageExplorer = () => {
     setSelectedItemsToMove,
   } = useStorageExplorerStateSnapshot()
 
-  useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
 
   // Detect when transitioning between buckets to avoid showing stale content from the previous bucket.
@@ -91,14 +90,15 @@ export const StorageExplorer = () => {
       }
     }
   })
+
   useEffect(() => {
     if (bucket && projectRef) fetchContents(bucket)
-  }, [bucket, projectRef, debouncedSearchString, fetchContents])
+  }, [bucketId, bucket, projectRef, debouncedSearchString, fetchContents])
 
   const openBucketRef = useLatest(openBucket)
   useEffect(() => {
     if (bucket && !!projectRef) openBucketRef.current(bucket)
-  }, [bucket, projectRef, openBucketRef])
+  }, [bucketId, bucket, projectRef, openBucketRef])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */

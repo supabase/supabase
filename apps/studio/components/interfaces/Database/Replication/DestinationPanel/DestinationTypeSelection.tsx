@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
@@ -7,13 +6,14 @@ import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const DestinationTypeSelection = () => {
-  const unifiedReplication = useFlag('unifiedReplication')
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
+  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
-  const numberOfTypes = [unifiedReplication, etlEnableBigQuery, etlEnableIceberg].filter(
+  const numberOfTypes = [infrastructureReadReplicas, etlEnableBigQuery, etlEnableIceberg].filter(
     Boolean
   ).length
 
@@ -57,7 +57,7 @@ export const DestinationTypeSelection = () => {
           '[&>button:first-of-type]:!rounded-l-lg [&>button:last-of-type]:!rounded-r-lg'
         )}
       >
-        {((!editMode && unifiedReplication) ||
+        {((!editMode && infrastructureReadReplicas) ||
           (editMode && destinationType === 'Read Replica')) && (
           <RadioGroupStackedItem
             label=""
@@ -85,7 +85,7 @@ export const DestinationTypeSelection = () => {
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
                 <div className="flex items-center gap-x-2">
                   <p>BigQuery</p>
-                  {unifiedReplication && <Badge>Alpha</Badge>}
+                  <Badge>Alpha</Badge>
                 </div>
                 <p className="text-foreground-lighter">
                   Send data to Google Cloud's data warehouse for analytics and business intelligence
@@ -108,7 +108,7 @@ export const DestinationTypeSelection = () => {
               <div className="flex flex-col gap-y-0.5 text-sm text-left">
                 <div className="flex items-center gap-x-2">
                   <p>Analytics Bucket</p>
-                  {unifiedReplication && <Badge>Alpha</Badge>}
+                  <Badge>Alpha</Badge>
                 </div>
                 <p className="text-foreground-lighter">
                   Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics

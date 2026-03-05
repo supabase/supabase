@@ -50,11 +50,13 @@ const DATE_OPERATORS: OperatorDefinition[] = [
   { value: '<=', label: 'Less or equal', group: 'comparison' },
   { value: '=', label: 'Equals', group: 'comparison' },
   { value: '<>', label: 'Not equal', group: 'comparison' },
+  { value: 'is', label: 'Is', group: 'setNull' },
 ]
 
 const BOOLEAN_OPERATORS: OperatorDefinition[] = [
   { value: '=', label: 'Equals', group: 'comparison' },
   { value: '<>', label: 'Not equal', group: 'comparison' },
+  { value: 'is', label: 'Is', group: 'setNull' },
 ]
 
 export function columnToFilterProperty(column: SupaColumn): FilterProperty {

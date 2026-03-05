@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import type { Hook } from 'components/interfaces/Auth/Hooks/hooks.constants'
 import { HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
 import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
@@ -88,9 +88,6 @@ export function useCreateCommandsConfig() {
   const setPage = useSetPage()
   const { openSidebar } = useSidebarManagerSnapshot()
   const snap = useAiAssistantStateSnapshot()
-
-  // Auth
-  const authenticationOauth21 = useFlag('EnableOAuth21')
 
   const {
     projectAuthAll: authEnabled,
@@ -182,7 +179,6 @@ export function useCreateCommandsConfig() {
     setPage,
     openSidebar,
     snap,
-    authenticationOauth21,
     authEnabled,
     edgeFunctionsEnabled,
     storageEnabled,

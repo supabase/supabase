@@ -1,7 +1,4 @@
 import { QueryClient, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useCallback } from 'react'
-
 import {
   formatFilterURLParams,
   formatSortURLParams,
@@ -13,8 +10,12 @@ import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { prefetchTableRows } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from 'lib/role-impersonation'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useCallback } from 'react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
+
+import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 
 interface PrefetchEditorTablePageArgs {
@@ -65,6 +66,7 @@ export function usePrefetchEditorTablePage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
+  const { connectionString } = useConnectionStringForReadOps()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   return useCallback(
@@ -79,7 +81,7 @@ export function usePrefetchEditorTablePage() {
       prefetchEditorTablePage({
         queryClient,
         projectRef: project.ref,
-        connectionString: project.connectionString,
+        connectionString,
         id,
         sorts,
         filters,
@@ -88,7 +90,7 @@ export function usePrefetchEditorTablePage() {
         // eat prefetching errors as they are not critical
       })
     },
-    [project, queryClient, roleImpersonationState, router]
+    [connectionString, project, queryClient, roleImpersonationState, router]
   )
 }
 

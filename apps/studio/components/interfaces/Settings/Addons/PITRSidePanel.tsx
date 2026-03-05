@@ -1,10 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
@@ -21,17 +15,22 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
   CriticalIcon,
   Radio,
   SidePanel,
-  cn,
 } from 'ui'
+
+import { DocsButton } from '@/components/ui/DocsButton'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -165,17 +164,9 @@ const PITRSidePanel = () => {
               : undefined
       }
       header={
-        <div className="flex items-center justify-between">
+        <div className="flex w-full items-center justify-between">
           <h4>Point in Time Recovery</h4>
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <Link
-              href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              About point in time recovery
-            </Link>
-          </Button>
+          <DocsButton href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`} />
         </div>
       }
     >

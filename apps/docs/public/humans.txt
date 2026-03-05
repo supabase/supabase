@@ -11,6 +11,7 @@ Akash Manimaran
 Alaister Young
 Alan De Los Santos
 Aleksi Immonen
+Alex Hall
 Alexander Korotkov
 Ali Waseem
 Allan S
@@ -110,8 +111,10 @@ Jess Shears
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joaquim Moreno
 Joel Low
 Joel Martin
+Johan Bergström
 John Pena
 John Schaeffer
 Jon M

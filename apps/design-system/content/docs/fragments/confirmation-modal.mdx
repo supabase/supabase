@@ -10,6 +10,8 @@ Use Confirmation Modal when the user needs extra context to make a decision, suc
 
 If the confirmation can be expressed as a single short paragraph, use [Alert Dialog](../components/alert-dialog). If the action is highly destructive and requires explicit typed intent, use [Text Confirm Dialog](../fragments/text-confirm-dialog). See [Modality](../ui-patterns/modality) for broader guidance on choosing the appropriate pattern.
 
+For dirty-form dismissal in dialogs/sheets, prefer the dedicated discard-confirmation pattern (`DiscardChangesConfirmationDialog` + `useConfirmOnClose`) rather than creating new local `CloseConfirmationModal` wrappers. The ad-hoc `CloseConfirmationModal` wrapper pattern is deprecated for new implementations.
+
 <ComponentPreview name="confirmation-modal-demo" peekCode wide />
 
 ## Usage
@@ -54,6 +56,7 @@ export default function ConfirmationModalDemo() {
 ## Guidelines
 
 - **Use for moderate complexity:** Suitable when the confirmation requires more than a single sentence but does not need typed intent.
+- **Do not use for standard dirty-form dismissal:** Prefer `DiscardChangesConfirmationDialog` for unsaved-changes prompts so copy, behavior, and wiring stay consistent across dialogs/sheets.
 - **Avoid critical destruction:** Do not use for irreversible or high-risk actions that could benefit from stronger safeguards.
 - **Keep content focused:** Include only the context needed to make the decision. If the dialog becomes a full flow, use a custom [Dialog](../components/dialog) instead.
 - **Provide clear actions:** Ensure confirm and cancel labels clearly describe the outcome of each choice.

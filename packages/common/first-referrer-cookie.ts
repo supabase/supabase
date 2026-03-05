@@ -233,7 +233,10 @@ export function shouldRefreshCookie(
  * (localhost, preview deploys) the domain is left unset so the browser
  * stores a host-only cookie instead of rejecting an invalid domain.
  */
-export function stampFirstReferrerCookie(request: MiddlewareRequest, response: MiddlewareResponse): void {
+export function stampFirstReferrerCookie(
+  request: MiddlewareRequest,
+  response: MiddlewareResponse
+): void {
   const referrer = request.headers.get('referer') ?? ''
 
   const { stamp } = shouldRefreshCookie(request.cookies.has(FIRST_REFERRER_COOKIE_NAME), {

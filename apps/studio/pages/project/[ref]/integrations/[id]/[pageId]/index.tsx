@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
@@ -41,7 +41,6 @@ const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
 
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()
@@ -137,10 +136,6 @@ const IntegrationPage: NextPageWithLayout = () => {
   }
 
   if (id === 'data_api' && !IS_PLATFORM) {
-    return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
-  }
-
-  if (id === 'stripe_sync_engine' && !stripeSyncEnabled) {
     return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
   }
 
