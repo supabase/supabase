@@ -31,6 +31,8 @@ If you are running Postgres 17 or higher, you can create a new user and grant th
 
 If you are replicating to an external system and using any of the tools below, check their documentation first. Additional information is provided where the setup with Supabase can vary.
 
+You can change the settings of your Supabase project to support high volume replication, read the [customising Postgres config guide](/docs/guides/platform/custom-postgres-config) for more information on the settings available.
+
 <Tabs
   scrollable
   size="small"
@@ -104,6 +106,12 @@ You can follow those steps with the following modifications:
 2. Set `pluginname` to `test-decoding`
 3. Depending on your databases the pre-assessment may fail. It is not required.
 4. Increase `wal_sender_timeout` and other settings (`max_wal_size`) using the [Supabase CLI](/docs/guides/platform/custom-postgres-config)
+
+</TabPanel>
+
+<TabPanel id="risingwave" label="Rising Wave">
+
+Rising Wave has the following [replicating to and from Supabase documentation](https://docs.risingwave.com/ingestion/sources/postgresql/supabase#set-up-supabase-postgresql).
 
 </TabPanel>
 
