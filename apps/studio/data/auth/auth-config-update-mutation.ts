@@ -12,13 +12,37 @@ export type AuthConfigUpdateVariables = {
   config: Partial<components['schemas']['UpdateGoTrueConfigBody']>
 }
 
+function isHookField(key: string): boolean {
+  return key.startsWith('HOOK_') && (
+    key.endsWith('_ENABLED') ||
+    key.endsWith('_URI') ||
+    key.endsWith('_SECRETS')
+  )
+}
+
+// Helper function to filter out hook-related fields from the config
+function filterHookFields(config: any): any {
+  const filteredConfig = { ...config }
+  
+  Object.keys(filteredConfig).forEach(key => {
+    if (isHookField(key)) {
+      delete filteredConfig[key]
+    }
+  })
+  
+  return filteredConfig
+}
+
 export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
+  // Filter out hook-related fields since they should be updated via the hooks endpoint
+  const filteredConfig = filterHookFields(config)
+  
   const { data, error } = await patch('/platform/auth/{ref}/config', {
     params: {
       path: { ref: projectRef },
     },
     body: {
-      ...config,
+      ...filteredConfig,
     },
   })
 
