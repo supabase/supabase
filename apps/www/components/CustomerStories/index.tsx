@@ -1,27 +1,25 @@
 'use client'
 
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
+import type { CustomerStoryType } from '~/data/CustomerStories'
+import customerStories from '~/data/CustomerStories'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import SectionHeader from 'components/UI/SectionHeader'
 import { ArrowRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-
-import SectionHeader from 'components/UI/SectionHeader'
 import { Button, cn } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
-
-import type { CustomerStoryType } from '~/data/CustomerStories'
-import customerStories from '~/data/CustomerStories'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 const CustomersSliderMobile = dynamic(() => import('./CustomersSliderMobile'))
 const CutomsersSliderDesktop = dynamic(() => import('./CutomsersSliderDesktop'))
 
 const CustomerStories = () => (
   <div id="customers" className="overflow-hidden pb-16 md:pb-24">
-    <SectionContainer className="!pb-8 w-full flex gap-4 justify-between flex-col xl:flex-row xl:items-end">
+    <SectionContainer className="!pb-16 w-full flex gap-4 justify-between flex-col xl:flex-row xl:items-end !max-w-[var(--container-max-w,75rem)] !px-6">
       <SectionHeader
         title="Trusted by the world’s"
         title_alt=" most innovative companies."
@@ -38,6 +36,7 @@ const CustomerStories = () => (
         </Button>
       </div>
     </SectionContainer>
+
     <CustomersSliderMobile columns={compositionCols} className="md:hidden w-full h-[230px]" />
     <CutomsersSliderDesktop columns={compositionCols} className="hidden md:flex" />
   </div>

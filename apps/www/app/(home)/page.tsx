@@ -1,6 +1,7 @@
+'use client'
+
 import dynamic from 'next/dynamic'
 import getContent from '~/data/home/content'
-import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
 import Logos from '~/components/logos'
 
@@ -13,11 +14,11 @@ const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSec
 const OpenSourceSection = dynamic(() => import('~/components/OpenSourceSection'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
 
-const Index = () => {
+export default function HomePage() {
   const content = getContent()
 
   return (
-    <Layout>
+    <>
       <Hero />
       <Logos />
       <Products {...content.productsSection} />
@@ -28,8 +29,6 @@ const Index = () => {
       <TwitterSocialSection {...content.twitterSocialSection} />
       <OpenSourceSection />
       <CTABanner className="border-none" />
-    </Layout>
+    </>
   )
 }
-
-export default Index
