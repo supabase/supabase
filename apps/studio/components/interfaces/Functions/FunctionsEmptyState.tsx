@@ -305,7 +305,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
               </div>
               <p className="text-sm text-foreground-light mt-1 mb-4 max-w-3xl">
                 Supabase Edge Runtime consists of a web server based on the Deno runtime, capable of
-                running Javascript, Typescript, and WASM services. You may self-host edge functions
+                running JavaScript, TypeScript, and WASM services. You may self-host edge functions
                 on providers like Fly.io, Digital Ocean, or AWS.
               </p>
               <div className="flex items-center gap-x-2">

@@ -52,7 +52,7 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
             iconRight={!simplifiedVersion && <ChevronDown size={14} strokeWidth={2} />}
           >
             {!simplifiedVersion
-              ? `Language: ${snap.docsLanguage === 'js' ? 'Javascript' : 'Bash'}`
+              ? `Language: ${snap.docsLanguage === 'js' ? 'JavaScript' : 'Bash'}`
               : undefined}
           </Button>
         </PopoverTrigger_Shadcn_>
@@ -65,7 +65,7 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
                   onSelect={() => updateLanguage('js')}
                   onClick={() => updateLanguage('js')}
                 >
-                  <p>Javascript</p>
+                  <p>JavaScript</p>
                 </CommandItem_Shadcn_>
                 <CommandItem_Shadcn_
                   className="cursor-pointer"
