@@ -3,15 +3,21 @@ import { useParams } from 'common'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
 
-import type { ProjectKeys } from './Connect.types'
+import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useConnectState } from './useConnectState'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+
+const CONNECT_MODES = ['framework', 'direct', 'orm', 'mcp'] as const
+
+function isConnectMode(value: string): value is ConnectMode {
+  return CONNECT_MODES.some((mode) => mode === value)
+}
 
 export const ConnectSheet = () => {
   const { ref: projectRef } = useParams()
@@ -30,7 +36,7 @@ export const ConnectSheet = () => {
     'showConnect',
     parseAsBoolean.withDefault(false)
   )
-  const [, setConnectTab] = useQueryState('connectTab', parseAsString)
+  const [connectTab, setConnectTab] = useQueryState('connectTab', parseAsString)
 
   const handleOpenChange = (sheetOpen: boolean) => {
     if (!sheetOpen) {
@@ -78,6 +84,17 @@ export const ConnectSheet = () => {
     [schema.modes, availableModeIds]
   )
 
+  useEffect(() => {
+    if (!showConnect || !connectTab || !isConnectMode(connectTab)) return
+    if (!availableModeIds.includes(connectTab) || state.mode === connectTab) return
+    setMode(connectTab)
+  }, [showConnect, connectTab, availableModeIds, state.mode, setMode])
+
+  const handleModeChange = (mode: ConnectMode) => {
+    setMode(mode)
+    setConnectTab(mode)
+  }
+
   return (
     <Sheet open={showConnect} onOpenChange={handleOpenChange}>
       <SheetContent size="lg" className="flex flex-col gap-0 p-0 space-y-0" tabIndex={undefined}>
@@ -88,7 +105,11 @@ export const ConnectSheet = () => {
 
         <div className="flex flex-1 flex-col overflow-y-auto divide-y">
           <div className="p-8">
-            <ModeSelector modes={availableModes} selected={state.mode} onChange={setMode} />
+            <ModeSelector
+              modes={availableModes}
+              selected={state.mode}
+              onChange={handleModeChange}
+            />
           </div>
 
           <div className="border-b p-8">

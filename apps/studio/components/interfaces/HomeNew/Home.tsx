@@ -17,9 +17,13 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 import { AdvisorSection } from './AdvisorSection'
 import { CustomReportSection } from './CustomReportSection'
+import { GetConnectedSection } from './GetConnectedSection'
 import { type GettingStartedState } from './GettingStarted/GettingStarted.types'
 import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
 import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+
+const DEFAULT_SECTION_ORDER = ['getting-started', 'get-connected', 'usage', 'advisor', 'custom-report']
 
 export const HomeV2 = () => {
   const { enableBranching } = useParams()
@@ -29,6 +33,9 @@ export const HomeV2 = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const showHomepageUsageV2 = useFlag('newHomepageUsageV2')
+  const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
+  const isConnectSheetFlagResolved = connectSheetFlag !== undefined
+  const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
@@ -38,7 +45,7 @@ export const HomeV2 = () => {
 
   const [sectionOrder, setSectionOrder] = useLocalStorage<string[]>(
     `home-section-order-${project?.ref || 'default'}`,
-    ['getting-started', 'usage', 'advisor', 'custom-report']
+    DEFAULT_SECTION_ORDER
   )
 
   const [gettingStartedState, setGettingStartedState] = useLocalStorage<GettingStartedState>(
@@ -47,6 +54,12 @@ export const HomeV2 = () => {
   )
 
   const UsageSection = showHomepageUsageV2 ? ProjectUsageSectionV2 : ProjectUsageSectionV1
+  const shouldShowGetConnectedRow = isConnectSheetFlagResolved && isConnectSheetEnabled
+  const shouldShowGettingStartedRow =
+    (!isConnectSheetFlagResolved || !isConnectSheetEnabled) &&
+    !isMatureProject &&
+    !!project &&
+    gettingStartedState !== 'hidden'
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -84,6 +97,43 @@ export const HomeV2 = () => {
     }
   }, [enableBranching, snap])
 
+  useEffect(() => {
+    setSectionOrder((items) => {
+      const knownItems = items.filter((id) => DEFAULT_SECTION_ORDER.includes(id))
+      const missingItems = DEFAULT_SECTION_ORDER.filter((id) => !knownItems.includes(id))
+
+      if (missingItems.length === 0 && knownItems.length === items.length) {
+        return items
+      }
+
+      const merged = [...knownItems]
+
+      // Insert missing sections using default order anchors instead of always appending.
+      missingItems.forEach((id) => {
+        const defaultIndex = DEFAULT_SECTION_ORDER.indexOf(id)
+        const nextKnownId = DEFAULT_SECTION_ORDER.slice(defaultIndex + 1).find((candidate) =>
+          merged.includes(candidate)
+        )
+
+        if (!nextKnownId) {
+          merged.push(id)
+          return
+        }
+
+        const insertIndex = merged.indexOf(nextKnownId)
+        merged.splice(insertIndex, 0, id)
+      })
+
+      return merged
+    })
+  }, [setSectionOrder])
+
+  const visibleSectionOrder = sectionOrder.filter((id) => {
+    if (id === 'getting-started') return shouldShowGettingStartedRow
+    if (id === 'get-connected') return shouldShowGetConnectedRow
+    return true
+  })
+
   return (
     <div className="w-full h-full">
       <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
@@ -99,12 +149,10 @@ export const HomeV2 = () => {
           <ScaffoldSection isFullWidth className="gap-16 pb-32">
             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
               <SortableContext
-                items={sectionOrder.filter(
-                  (id) => id !== 'getting-started' || gettingStartedState !== 'hidden'
-                )}
+                items={visibleSectionOrder}
                 strategy={verticalListSortingStrategy}
               >
-                {sectionOrder.map((id) => {
+                {visibleSectionOrder.map((id) => {
                   if (IS_PLATFORM && id === 'usage') {
                     return (
                       <div key={id} className={cn(isComingUp && 'opacity-60 pointer-events-none')}>
@@ -114,18 +162,20 @@ export const HomeV2 = () => {
                       </div>
                     )
                   }
-                  if (
-                    id === 'getting-started' &&
-                    !isMatureProject &&
-                    project &&
-                    gettingStartedState !== 'hidden'
-                  ) {
+                  if (id === 'getting-started') {
                     return (
                       <SortableSection key={id} id={id}>
                         <GettingStartedSection
                           value={gettingStartedState}
                           onChange={setGettingStartedState}
                         />
+                      </SortableSection>
+                    )
+                  }
+                  if (id === 'get-connected') {
+                    return (
+                      <SortableSection key={id} id={id}>
+                        <GetConnectedSection />
                       </SortableSection>
                     )
                   }
