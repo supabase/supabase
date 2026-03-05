@@ -249,6 +249,13 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
     comment.tags = original.modifierTags.map((tag) => ({ tag: tag.replace(/^@/, ''), text: '' }))
   }
 
+  if ('blockTags' in original && Array.isArray(original.blockTags)) {
+    const remarksTag = original.blockTags.find((t) => t.tag === '@remarks')
+    if (remarksTag) {
+      comment.text = remarksTag.content.map((p) => p.text).join('')
+    }
+  }
+
   // Extract @example tags from blockTags
   if ('blockTags' in original && Array.isArray(original.blockTags)) {
     const exampleTags = original.blockTags.filter((t) => t.tag === '@example')

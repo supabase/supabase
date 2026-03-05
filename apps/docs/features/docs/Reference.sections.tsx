@@ -467,6 +467,7 @@ async function FunctionSection({
 
   const fullDescription = [
     types?.comment?.shortText,
+    types?.comment?.text,
     'description' in fn && (fn.description as string),
     'notes' in fn && (fn.notes as string),
   ]
