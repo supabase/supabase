@@ -7,7 +7,7 @@ settings:
 catalogs:
   default:
     '@sentry/nextjs':
-      specifier: 10.27.0
+      specifier: ^10.26.0
       version: 10.27.0
     '@supabase/auth-js':
       specifier: 2.98.1-canary.0
