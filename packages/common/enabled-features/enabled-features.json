@@ -116,6 +116,7 @@
   "sdk:auth": true,
   "sdk:csharp": true,
   "sdk:dart": true,
+  "sdk:elixir": true,
   "sdk:kotlin": true,
   "sdk:python": true,
   "sdk:swift": true,

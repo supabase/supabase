@@ -500,6 +500,28 @@ export function IconMenuKotlin({ width = 16, height = 16, className }: HomeMenuI
   )
 }
 
+export function IconMenuElixir({ width = 16, height = 16, className }: HomeMenuIcon) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+    >
+      <path
+        d="M8 2c-.7 0-1.4.3-1.8.8-.5.5-.8 1.2-.8 2 0 .4.1.9.3 1.3l2.3 4.6c.1.2.3.4.4.4.2.1.4.2.5.2s.4-.1.5-.2c.2-.1.3-.2.4-.4l2.3-4.6c.2-.4.3-.9.3-1.3 0-.8-.3-1.5-.8-2C9.4 2.3 8.7 2 8 2zm0 .9c.5 0 .9.2 1.2.5.3.3.5.8.5 1.3 0 .3-.1.5-.2.8L8 8.4 6.5 5.5c-.1-.3-.2-.5-.2-.8 0-.5.2-1 .5-1.3.3-.3.7-.5 1.2-.5z"
+        fill="currentColor"
+      />
+      <path
+        d="M6.3 10.5c0 .5.2.9.5 1.2.3.3.7.5 1.2.5s.9-.2 1.2-.5c.3-.3.5-.7.5-1.2 0-.2 0-.3-.1-.5l-1.6 1.6-1.6-1.6c-.1.2-.1.3-.1.5z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
 export function IconMenuStatus({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
