@@ -5,7 +5,7 @@ import {
   subscriptionHasHipaaAddon,
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
-import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
+import { ProjectUpdateDisabledTooltip } from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import {
   ScaffoldContainer,
@@ -186,7 +186,7 @@ export const Addons = () => {
             </ScaffoldContainer>
           )}
           <ScaffoldContainer>
-            <ScaffoldSection>
+            <ScaffoldSection className="!pb-12">
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
                   <p className="m-0">Compute Size</p>
@@ -360,7 +360,7 @@ export const Addons = () => {
             <>
               <ScaffoldDivider />
               <ScaffoldContainer>
-                <ScaffoldSection>
+                <ScaffoldSection className="!pb-12">
                   <ScaffoldSectionDetail>
                     <div className="space-y-6">
                       <p className="m-0">Dedicated IPv4 address</p>
@@ -411,7 +411,11 @@ export const Addons = () => {
                         <ProjectUpdateDisabledTooltip
                           projectUpdateDisabled={projectUpdateDisabled}
                           projectNotActive={!isProjectActive}
-                          projectNotAwsProvider={!isAws}
+                          tooltip={
+                            !isAws
+                              ? 'Dedicated IPv4 address is only available for AWS projects'
+                              : undefined
+                          }
                         >
                           <Button
                             type="default"
@@ -440,7 +444,7 @@ export const Addons = () => {
           <ScaffoldDivider />
 
           <ScaffoldContainer>
-            <ScaffoldSection>
+            <ScaffoldSection className="!pb-12">
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
                   <p className="m-0">Point in time recovery</p>
@@ -568,7 +572,7 @@ export const Addons = () => {
             <>
               <ScaffoldDivider />
               <ScaffoldContainer>
-                <ScaffoldSection>
+                <ScaffoldSection className="!pb-12">
                   <ScaffoldSectionDetail>
                     <div className="space-y-6">
                       <p className="m-0">Custom domain</p>
