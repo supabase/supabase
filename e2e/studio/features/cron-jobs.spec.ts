@@ -22,66 +22,22 @@ const navigateToCronJobsPage = async (page: Page, ref: string) => {
   await expect(page.getByRole('grid')).toBeVisible({ timeout: 30000 })
 }
 
-/**
- * Helper to delete a cron job by name.
- * The delete modal requires typing the job name for confirmation.
- * Uses right-click context menu to access the delete option.
- * Waits for the row to be removed from the grid after deletion.
- */
-const deleteCronJobViaUI = async (page: Page, jobName: string) => {
-  // Find the row and right-click to open context menu
-  const jobRow = page.getByRole('row', { name: new RegExp(jobName) })
-  await jobRow.click({ button: 'right' })
-
-  // Click "Delete job" in the context menu
-  await page.getByRole('menuitem', { name: 'Delete job' }).click()
-
-  // The modal requires typing the job name - fill it in
-  await expect(page.getByRole('heading', { name: 'Delete this cron job' })).toBeVisible()
-  await page.getByPlaceholder('Type in name of cron job').fill(jobName)
-
-  // Click the delete button
-  await page.getByRole('button', { name: `Delete cron job ${jobName}` }).click()
-
-  // Wait for success toast and for the row to be removed from the grid
-  await expect(page.getByText(/Successfully removed cron job/)).toBeVisible({ timeout: 10000 })
-  await expect(jobRow).not.toBeVisible({ timeout: 10000 })
+const createJobViaAPI = async (page: Page, ref: string, jobName: string) => {
+  await page.request.post(toUrl(`/api/platform/pg-meta/${ref}/query`), {
+    failOnStatusCode: true,
+    data: {
+      query: `select cron.schedule('${jobName}', '*/30 * * * *', $$select 'test';$$);`,
+    },
+  })
 }
 
-const createJobViaUI = async (page: Page, jobName: string) => {
-  // Click create job button
-  await page.getByRole('button', { name: 'Create job' }).click()
-
-  // Wait for the dialog to open
-  await expect(page.getByRole('heading', { name: 'Create a new cron job' })).toBeVisible()
-
-  // Fill in job name using the input name attribute
-  await page.locator('input[name="name"]').fill(jobName)
-
-  // Click the "Every minute" preset button to set schedule
-  await page.getByRole('button', { name: 'Every minute' }).click()
-
-  // Fill in the SQL command using the Monaco editor
-  await page.getByRole('code').click()
-  await page.getByRole('textbox', { name: /Editor content/ }).fill("SELECT 'test';")
-
-  // Save the job
-  await page.getByRole('button', { name: 'Create cron job' }).click()
-
-  // Wait for success toast
-  await expect(page.getByText(/Successfully created cron job/)).toBeVisible({ timeout: 10000 })
-
-  // Verify the job appears in the list
-  await expect(page.getByRole('row', { name: new RegExp(jobName) })).toBeVisible()
-}
-
-const createJob = async (jobName: string) => {
-  await query(`select cron.schedule('${jobName}', '*/30 * * * *', $$select 'test';$$);`)
-}
-
-const deleteJob = async (jobName: string) => {
-  await query(`select cron.unschedule('${jobName}');`)
-
+const deleteJobViaAPI = async (page: Page, ref: string, jobName: string) => {
+  await page.request.post(toUrl(`/api/platform/pg-meta/${ref}/query`), {
+    failOnStatusCode: true,
+    data: {
+      query: `select cron.unschedule('${jobName}');`,
+    },
+  })
 }
 
 test.describe('Cron Jobs Integration', () => {
@@ -108,21 +64,49 @@ test.describe('Cron Jobs Integration', () => {
     test('can create a new cron job', async ({ page, ref }) => {
       const cronJobName = 'pw_cron_create_job'
       await navigateToCronJobsPage(page, ref)
-      await using _ = await withSetupCleanup(async () => {
-          await createJobViaUI(page, cronJobName)
-      }, async () => {
-          // We can't use deleteJob here because the job belongs to supabase_admin but deleteJob role is postgres
-          await deleteCronJobViaUI(page, cronJobName)
+      await using _ = await withSetupCleanup(
+        async () => {
+          // Nothing
+        },
+        async () => {
+          await deleteJobViaAPI(page, ref, cronJobName)
         }
       )
+
+      // Click create job button
+      await page.getByRole('button', { name: 'Create job' }).click()
+
+      // Wait for the dialog to open
+      await expect(page.getByRole('heading', { name: 'Create a new cron job' })).toBeVisible()
+
+      // Fill in job name using the input name attribute
+      await page.locator('input[name="name"]').fill(cronJobName)
+
+      // Click the "Every minute" preset button to set schedule
+      await page.getByRole('button', { name: 'Every minute' }).click()
+
+      // Fill in the SQL command using the Monaco editor
+      await page.getByRole('code').click()
+      await page.getByRole('textbox', { name: /Editor content/ }).fill("SELECT 'test';")
+
+      // Save the job
+      await page.getByRole('button', { name: 'Create cron job' }).click()
+
+      // Wait for success toast
+      await expect(page.getByText(/Successfully created cron job/)).toBeVisible({ timeout: 10000 })
+
+      // Verify the job appears in the list
+      await expect(page.getByRole('row', { name: new RegExp(cronJobName) })).toBeVisible()
     })
 
     test('can search for cron jobs', async ({ page, ref }) => {
       const cronJobName = 'pw_cron_search_job'
-      await using _ = await withSetupCleanup(async () => {
-          await createJob(cronJobName)
-        }, async () => {
-          await deleteJob(cronJobName)
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createJobViaAPI(page, ref, cronJobName)
+        },
+        async () => {
+          await deleteJobViaAPI(page, ref, cronJobName)
         }
       )
       await navigateToCronJobsPage(page, ref)
@@ -149,15 +133,15 @@ test.describe('Cron Jobs Integration', () => {
 
     test('can edit a cron job', async ({ page, ref }) => {
       const cronJobName = 'pw_cron_edit_job'
-      await navigateToCronJobsPage(page, ref)
-      await using _ = await withSetupCleanup(async () => {
-        // We can't use createJob here because the job to postgres user and the test would create a new job that belongs to supabase_admin
-          await createJobViaUI(page, cronJobName)
-        }, async () => {
-          // We can't use deleteJob here because the job belongs to supabase_admin but deleteJob role is postgres
-          await deleteCronJobViaUI(page, cronJobName)
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createJobViaAPI(page, ref, cronJobName)
+        },
+        async () => {
+          await deleteJobViaAPI(page, ref, cronJobName)
         }
       )
+      await navigateToCronJobsPage(page, ref)
 
       // Find the test job row and right-click to open context menu
       const jobRow = page.getByRole('row', { name: new RegExp(cronJobName) })
@@ -180,12 +164,48 @@ test.describe('Cron Jobs Integration', () => {
       await expect(page.getByText(/Successfully updated cron job/)).toBeVisible({ timeout: 10000 })
     })
 
+    test('can delete a cron job', async ({ page, ref }) => {
+      const cronJobName = 'pw_cron_delete_job'
+      let shouldCleanup = true
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createJobViaAPI(page, ref, cronJobName)
+        },
+        async () => {
+          if (!shouldCleanup) return
+          await deleteJobViaAPI(page, ref, cronJobName)
+        }
+      )
+      await navigateToCronJobsPage(page, ref)
+
+      // Find the row and right-click to open context menu
+      const jobRow = page.getByRole('row', { name: new RegExp(cronJobName) })
+      await jobRow.click({ button: 'right' })
+
+      // Click "Delete job" in the context menu
+      await page.getByRole('menuitem', { name: 'Delete job' }).click()
+
+      // The modal requires typing the job name - fill it in
+      await expect(page.getByRole('heading', { name: 'Delete this cron job' })).toBeVisible()
+      await page.getByPlaceholder('Type in name of cron job').fill(cronJobName)
+
+      // Click the delete button
+      await page.getByRole('button', { name: `Delete cron job ${cronJobName}` }).click()
+
+      // Wait for success toast and for the row to be removed from the grid
+      await expect(page.getByText(/Successfully removed cron job/)).toBeVisible({ timeout: 10000 })
+      await expect(jobRow).not.toBeVisible({ timeout: 10000 })
+      shouldCleanup = false
+    })
+
     test('can view cron job run history', async ({ page, ref }) => {
       const cronJobName = 'pw_cron_history_job'
-      await using _ = await withSetupCleanup(async () => {
-          await createJob(cronJobName)
-        }, async () => {
-          await deleteJob(cronJobName)
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createJobViaAPI(page, ref, cronJobName)
+        },
+        async () => {
+          await deleteJobViaAPI(page, ref, cronJobName)
         }
       )
       await navigateToCronJobsPage(page, ref)
@@ -255,10 +275,12 @@ test.describe('High Query Cost Banner', () => {
   }) => {
     const testJobName = 'pw_high_cost_test_job'
     await navigateToCronJobsPage(page, ref)
-    await using _ = await withSetupCleanup(async () => {
-        await createJob(testJobName)
-      }, async () => {
-        await deleteJob(testJobName)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createJobViaAPI(page, ref, testJobName)
+      },
+      async () => {
+        await deleteJobViaAPI(page, ref, testJobName)
       }
     )
 
