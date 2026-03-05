@@ -77,7 +77,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         })
       }
     } else {
-      console.log(`Unknown error: ${error}`)
+      console.error(`Unknown error: ${error}`)
     }
 
     return res.status(500).json({

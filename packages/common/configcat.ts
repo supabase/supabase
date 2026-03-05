@@ -30,7 +30,7 @@ async function getClient() {
   if (client) return client
 
   if (!process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY && !process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL) {
-    console.log('Skipping ConfigCat set up as env vars are not present')
+    console.debug('Skipping ConfigCat set up as env vars are not present')
     return undefined
   }
 
