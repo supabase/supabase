@@ -63,7 +63,7 @@ jobs:
         if: steps.changed.outputs.skip != 'true'
         id: push
         run: |
-          cd apps/studio && pnpm evals:push
+          cd apps/studio && pnpm scorers:deploy
           slugs=$(jq -r '[.[].slug] | join(",")' evals/scorer-online-manifest.json)
           echo "slugs=$slugs" >> $GITHUB_OUTPUT
         env:

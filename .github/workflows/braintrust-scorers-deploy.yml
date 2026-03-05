@@ -41,4 +41,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Push scorers
-        run: cd apps/studio && pnpm evals:push
+        run: cd apps/studio && pnpm scorers:deploy
