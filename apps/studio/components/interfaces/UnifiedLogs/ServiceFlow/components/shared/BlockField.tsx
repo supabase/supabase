@@ -75,7 +75,7 @@ export const BlockField = ({
         filterFields={filterFields}
         value={stringValue}
         table={table}
-        className="flex justify-between items-center py-1 px-2  rounded hover:bg-accent/50 cursor-pointer w-full hover:bg-surface-400"
+        className="flex justify-between items-center py-1 px-2 rounded hover:bg-surface-400 cursor-pointer w-full"
       >
         {fieldContent}
       </DataTableSheetRowAction>
