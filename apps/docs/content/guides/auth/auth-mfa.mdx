@@ -236,28 +236,37 @@ create policy "Policy name."
 Users that have enrolled MFA on their account are expecting that your
 application only works for them if they've gone through MFA.
 
+Since the `authenticated` role does not have direct access to `auth.mfa_factors`, you need to wrap the check in a `security definer` function. This function runs with the permissions of the owner (`postgres`), which can query the `auth` schema.
+
+```sql
+create or replace function public.mfa_is_required()
+returns boolean as $$
+  select exists (
+    select 1
+    from auth.mfa_factors
+    where user_id = auth.uid()
+      and status = 'verified'
+  );
+$$ language sql security definer set search_path = '';
+```
+
+Then use this function in your RLS policy:
+
 ```sql
 create policy "Policy name."
   on table_name
   as restrictive -- very important!
   to authenticated
   using (
-    array[(select auth.jwt()->>'aal')] <@ (
-      select
-          case
-            when count(id) > 0 then array['aal2']
-            else array['aal1', 'aal2']
-          end as aal
-        from auth.mfa_factors
-        where ((select auth.uid()) = user_id) and status = 'verified'
-    ));
+    (select auth.jwt()->>'aal') = 'aal2'
+    or not (select public.mfa_is_required())
+  );
 ```
 
-- The policy will only accept only `aal2` when the user has at least one MFA
-  factor verified.
-- Otherwise, it will accept both `aal1` and `aal2`.
-- The `<@` operator is PostgreSQL's ["contained in"
-  operator.](https://www.postgresql.org/docs/current/functions-array.html)
+- The policy requires `aal2` only when the user has at least one verified MFA factor.
+- If the user has no verified factors, both `aal1` and `aal2` are accepted.
+- The `security definer` function is needed because the `authenticated` role
+  cannot directly query `auth.mfa_factors`.
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
 
