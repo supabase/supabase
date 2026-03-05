@@ -174,7 +174,7 @@ export const LogTable = ({
     name: '',
     width: 32,
     maxWidth: 32,
-    minWidth:32,
+    minWidth: 32,
     renderCell: ({ row }) => {
       const key = getRowKey(row)
       const toggle = () => {
