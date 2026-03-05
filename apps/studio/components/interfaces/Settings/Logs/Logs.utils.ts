@@ -770,9 +770,11 @@ export function formatLogsAsMarkdown(rows: LogData[]): string {
         let tsString: string
         if (isFinite(numTs)) {
           tsString = new Date(numTs / 1000).toISOString()
+        } else if (typeof row.timestamp === 'string') {
+          const d = new Date(row.timestamp)
+          tsString = isNaN(d.getTime()) ? row.timestamp : d.toISOString()
         } else {
-          const d = new Date(row.timestamp as unknown as string)
-          tsString = isNaN(d.getTime()) ? String(row.timestamp) : d.toISOString()
+          tsString = String(row.timestamp)
         }
         lines.push(`**Timestamp:** ${tsString}`)
       }
