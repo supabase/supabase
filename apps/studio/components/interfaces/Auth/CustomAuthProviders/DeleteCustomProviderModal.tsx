@@ -28,7 +28,7 @@ export const DeleteCustomProviderModal = ({
 
   const onConfirmDelete = () => {
     mutate({
-      identifier: selectedProvider?.id,
+      identifier: selectedProvider?.identifier,
       projectRef,
       clientEndpoint,
     })

@@ -17,19 +17,6 @@ export const CUSTOM_PROVIDER_ENABLED_OPTIONS = [
   { name: 'Disabled', value: 'false', icon: null },
 ]
 
-/** Common OAuth/OIDC scope options for custom providers (select or add custom) */
-export const CUSTOM_PROVIDER_SCOPE_OPTIONS = [
-  'openid',
-  'email',
-  'profile',
-  'read:user',
-  'user:email',
-  'read:users',
-  'offline_access',
-  'address',
-  'phone',
-]
-
 export function filterCustomProviders({
   providers,
   searchString,
