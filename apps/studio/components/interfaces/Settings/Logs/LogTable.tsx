@@ -58,6 +58,7 @@ interface Props {
   isSelectedLogLoading?: boolean
   selectedLogError?: LogQueryError | ResponseError
   onSelectedLogChange?: (log: LogData | null) => void
+  sqlQuery?: string
 }
 type LogMap = { [id: string]: LogData }
 
@@ -86,6 +87,7 @@ export const LogTable = ({
   isSelectedLogLoading,
   selectedLogError,
   onSelectedLogChange,
+  sqlQuery,
 }: Props) => {
   const { ref } = useParams()
   const { profile } = useProfile()
@@ -504,6 +506,8 @@ export const LogTable = ({
                 selectedRowsData={selectedRowsData}
                 copiedFormat={copiedFormat}
                 onCopy={handleCopySelectedRows}
+                queryType={queryType}
+                sqlQuery={sqlQuery}
                 onClear={() => {
                   setSelectedRows(new Set())
                   setAnchorRowId(null)

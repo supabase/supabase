@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import type { LogData } from './Logs.types'
+import type { LogData, QueryType } from './Logs.types'
 import { buildLogsPrompt } from './Logs.utils'
 
 interface MultiSelectActionBarProps {
@@ -21,6 +21,8 @@ interface MultiSelectActionBarProps {
   copiedFormat: 'json' | 'markdown' | null
   onCopy: (format: 'json' | 'markdown') => void
   onClear: () => void
+  queryType?: QueryType
+  sqlQuery?: string
 }
 
 export function MultiSelectActionBar({
@@ -29,12 +31,14 @@ export function MultiSelectActionBar({
   copiedFormat,
   onCopy,
   onClear,
+  queryType,
+  sqlQuery,
 }: MultiSelectActionBarProps) {
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
 
   function handleOpenAiAssistant() {
-    const prompt = buildLogsPrompt(selectedRowsData)
+    const prompt = buildLogsPrompt(selectedRowsData, queryType, sqlQuery)
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({ initialMessage: prompt })
   }
@@ -76,7 +80,7 @@ export function MultiSelectActionBar({
 
         <AiAssistantDropdown
           label="Explain with AI"
-          buildPrompt={() => buildLogsPrompt(selectedRowsData)}
+          buildPrompt={() => buildLogsPrompt(selectedRowsData, queryType, sqlQuery)}
           onOpenAssistant={handleOpenAiAssistant}
         />
 
