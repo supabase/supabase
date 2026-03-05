@@ -6,9 +6,8 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { expect, test, vi } from 'vitest'
-
 import { customRender as render } from 'tests/lib/custom-render'
+import { expect, test, vi } from 'vitest'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
