@@ -1086,7 +1086,7 @@ export const insertRowsViaSpreadsheet = async (
       },
       complete: () => {
         const t2: any = new Date()
-        console.log(`Total time taken for importing spreadsheet: ${(t2 - t1) / 1000} seconds`)
+        console.debug(`Total time taken for importing spreadsheet: ${(t2 - t1) / 1000} seconds`)
         resolve({ error: insertError })
       },
     })
