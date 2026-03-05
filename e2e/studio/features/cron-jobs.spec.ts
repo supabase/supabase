@@ -28,7 +28,7 @@ const navigateToCronJobsPage = async (page: Page, ref: string) => {
  * Uses right-click context menu to access the delete option.
  * Waits for the row to be removed from the grid after deletion.
  */
-const deleteCronJob = async (page: Page, jobName: string) => {
+const deleteCronJobViaUI = async (page: Page, jobName: string) => {
   // Find the row and right-click to open context menu
   const jobRow = page.getByRole('row', { name: new RegExp(jobName) })
   await jobRow.click({ button: 'right' })
@@ -48,7 +48,7 @@ const deleteCronJob = async (page: Page, jobName: string) => {
   await expect(jobRow).not.toBeVisible({ timeout: 10000 })
 }
 
-const createJob = async (page: Page, jobName: string) => {
+const createJobViaUI = async (page: Page, jobName: string) => {
   // Click create job button
   await page.getByRole('button', { name: 'Create job' }).click()
 
@@ -73,6 +73,15 @@ const createJob = async (page: Page, jobName: string) => {
 
   // Verify the job appears in the list
   await expect(page.getByRole('row', { name: new RegExp(jobName) })).toBeVisible()
+}
+
+const createJob = async (jobName: string) => {
+  await query(`select cron.schedule('${jobName}', '*/30 * * * *', $$select 'test';$$);`)
+}
+
+const deleteJob = async (jobName: string) => {
+  await query(`select cron.unschedule('${jobName}');`)
+
 }
 
 test.describe('Cron Jobs Integration', () => {
@@ -100,22 +109,23 @@ test.describe('Cron Jobs Integration', () => {
       const cronJobName = 'pw_cron_create_job'
       await navigateToCronJobsPage(page, ref)
       await using _ = await withSetupCleanup(async () => {
-          await createJob(page, cronJobName)
-        }, async () => {
-          await deleteCronJob(page, cronJobName)
+          await createJobViaUI(page, cronJobName)
+      }, async () => {
+          // We can't use deleteJob here because the job belongs to supabase_admin but deleteJob role is postgres
+          await deleteCronJobViaUI(page, cronJobName)
         }
       )
     })
 
     test('can search for cron jobs', async ({ page, ref }) => {
       const cronJobName = 'pw_cron_search_job'
-      await navigateToCronJobsPage(page, ref)
       await using _ = await withSetupCleanup(async () => {
-          await createJob(page, cronJobName)
+          await createJob(cronJobName)
         }, async () => {
-          await deleteCronJob(page, cronJobName)
+          await deleteJob(cronJobName)
         }
       )
+      await navigateToCronJobsPage(page, ref)
 
       // Search for the test job
       const searchInput = page.getByPlaceholder('Search for a job')
@@ -141,9 +151,11 @@ test.describe('Cron Jobs Integration', () => {
       const cronJobName = 'pw_cron_edit_job'
       await navigateToCronJobsPage(page, ref)
       await using _ = await withSetupCleanup(async () => {
-          await createJob(page, cronJobName)
+        // We can't use createJob here because the job to postgres user and the test would create a new job that belongs to supabase_admin
+          await createJobViaUI(page, cronJobName)
         }, async () => {
-          await deleteCronJob(page, cronJobName)
+          // We can't use deleteJob here because the job belongs to supabase_admin but deleteJob role is postgres
+          await deleteCronJobViaUI(page, cronJobName)
         }
       )
 
@@ -170,13 +182,13 @@ test.describe('Cron Jobs Integration', () => {
 
     test('can view cron job run history', async ({ page, ref }) => {
       const cronJobName = 'pw_cron_history_job'
-      await navigateToCronJobsPage(page, ref)
       await using _ = await withSetupCleanup(async () => {
-          await createJob(page, cronJobName)
+          await createJob(cronJobName)
         }, async () => {
-          await deleteCronJob(page, cronJobName)
+          await deleteJob(cronJobName)
         }
       )
+      await navigateToCronJobsPage(page, ref)
 
       // Click on the job row to view history (click on the name cell, not the action button)
       const jobRow = page.getByRole('row', { name: new RegExp(cronJobName) })
@@ -206,7 +218,6 @@ test.describe('Cron Jobs Integration', () => {
     })
 
     test('navigation tabs work correctly', async ({ page, ref }) => {
-      console.log('test')
       await navigateToCronOverview(page, ref)
       await navigateToCronJobsPage(page, ref)
 
@@ -234,6 +245,10 @@ test.describe('High Query Cost Banner', () => {
     })
   })
 
+  test.afterAll(async () => {
+    await releaseFileOnceCleanup(import.meta.url)
+  })
+
   test('shows banner and still displays cron jobs when query cost exceeds threshold', async ({
     page,
     ref,
@@ -241,9 +256,9 @@ test.describe('High Query Cost Banner', () => {
     const testJobName = 'pw_high_cost_test_job'
     await navigateToCronJobsPage(page, ref)
     await using _ = await withSetupCleanup(async () => {
-        await createJob(page, testJobName)
+        await createJob(testJobName)
       }, async () => {
-        await deleteCronJob(page, testJobName)
+        await deleteJob(testJobName)
       }
     )
 
