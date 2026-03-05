@@ -1,6 +1,4 @@
 import { expect, Page } from '@playwright/test'
-
-import { env } from '../env.config.js'
 import { query } from '../utils/db/client.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
 import { test, withSetupCleanup } from '../utils/test.js'
@@ -23,6 +21,8 @@ const navigateToCronJobsPage = async (page: Page, ref: string) => {
 }
 
 const createJobViaAPI = async (page: Page, ref: string, jobName: string) => {
+  // Make the request in the page context so that the job belongs to supabase_admin
+  // Otherwise, tests that edit or delete jobs would fail
   await page.request.post(toUrl(`/api/platform/pg-meta/${ref}/query`), {
     failOnStatusCode: true,
     data: {
@@ -32,6 +32,7 @@ const createJobViaAPI = async (page: Page, ref: string, jobName: string) => {
 }
 
 const deleteJobViaAPI = async (page: Page, ref: string, jobName: string) => {
+  // Make the request in the page context so that the it can delete jobs that belongs to supabase_admin
   await page.request.post(toUrl(`/api/platform/pg-meta/${ref}/query`), {
     failOnStatusCode: true,
     data: {
