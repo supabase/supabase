@@ -3,7 +3,10 @@
   "compilerOptions": {
     "module": "ESNext",
     "target": "ES2021",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "paths": {
+      "@studio-data/*": ["../../apps/studio/data/*"]
+    }
   },
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"]
