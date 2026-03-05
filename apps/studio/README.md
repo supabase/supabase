@@ -84,3 +84,17 @@ If you would like to configure different defaults for "Default Organization" and
 DEFAULT_ORGANIZATION_NAME=
 DEFAULT_PROJECT_NAME=
 ```
+
+## Self-hosted PostgreSQL Connection Settings
+
+For self-hosted deployments, you can configure the PostgreSQL connection settings using the following environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `POSTGRES_HOST` | `db` | PostgreSQL host |
+| `POSTGRES_PORT` | `5432` | PostgreSQL port |
+| `POSTGRES_DB` | `postgres` | Database name |
+| `POSTGRES_PASSWORD` | `postgres` | Database password |
+| `POSTGRES_USER_READ_WRITE` | `supabase_admin` | User for read-write connections |
+| `POSTGRES_USER_READ_ONLY` | `supabase_read_only_user` | User for read-only connections |
+| `POSTGRES_SSL` | (empty) | PostgreSQL sslmode (`disable`, `allow`, `prefer`, `require`, `verify-ca`, `verify-full`) |
