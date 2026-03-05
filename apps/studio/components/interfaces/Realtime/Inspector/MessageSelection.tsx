@@ -84,13 +84,13 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
             </div>
             <Button
               type="text"
-              className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
+              className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <X size={14} strokeWidth={2} className="text-scale-900" />
+              <X size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
           </div>
-          <div className="h-px w-full bg-scale-600 rounded" />
+          <div className="h-px w-full bg-border-muted rounded" />
         </div>
         <div className="flex flex-col space-y-6 py-4">
           {log && <SelectedRealtimeMessagePanel log={log} />}

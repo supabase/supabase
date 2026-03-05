@@ -56,7 +56,7 @@ export const SendMessageModal = ({
           onChange={(v) => setValues({ ...values, message: v.target.value })}
         />
         <div className="flex flex-col gap-y-2">
-          <p className="text-sm text-scale-1100">Message payload</p>
+          <p className="text-sm text-foreground-light">Message payload</p>
           <CodeEditor
             id="message-payload"
             language="json"
