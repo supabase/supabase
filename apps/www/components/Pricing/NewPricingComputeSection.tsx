@@ -5,13 +5,12 @@ import { useWindowSize } from 'react-use'
 import { plans as allPlans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
 
 import Panel from '../Panel'
-import ComputePricingCalculator from './ComputePricingCalculator'
 import ComputePricingTable from './ComputePricingTable'
-import PricingComputeAnimation from './PricingComputeAnimation'
-import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
 import NewComputePricingCalculator from './NewComputePricingCalculator'
+import PricingComputeAnimation from './PricingComputeAnimation'
 
 const plans = allPlans
   .filter((plan) => plan.planId === 'pro' || plan.planId === 'team')

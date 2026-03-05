@@ -1,18 +1,17 @@
 'use client'
 
 import { ArrowDownIcon } from '@heroicons/react/outline'
+import DefaultLayout from '~/components/Layouts/Default'
+import NewPricingComputeSection from '~/components/Pricing/NewPricingComputeSection'
+import PricingPlans from '~/components/Pricing/PricingPlans'
+import { useOrganizations } from '~/data/organizations'
+import { hasConsented, posthogClient } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-
-import { hasConsented, posthogClient } from 'common'
-import DefaultLayout from '~/components/Layouts/Default'
-import NewPricingComputeSection from '~/components/Pricing/NewPricingComputeSection'
-import PricingPlans from '~/components/Pricing/PricingPlans'
-import { useOrganizations } from '~/data/organizations'
 
 const EXPERIMENT_ID = 'pricingCalculatorExperiment' as const
 type PricingCalculatorVariant = 'control' | 'test'
@@ -55,7 +54,8 @@ export default function PricingContent() {
   // Uses client-side PostHog directly — server-side evaluation lacks full person context for www pages.
   // DevToolbar overrides (x-ph-flag-overrides cookie) are respected in local dev via posthogClient.getFeatureFlag.
   const [flagValue, setFlagValue] = useState<PricingCalculatorVariant | false | undefined>(
-    () => posthogClient.getFeatureFlag(EXPERIMENT_ID) as PricingCalculatorVariant | false | undefined
+    () =>
+      posthogClient.getFeatureFlag(EXPERIMENT_ID) as PricingCalculatorVariant | false | undefined
   )
 
   useEffect(() => {
@@ -71,12 +71,8 @@ export default function PricingContent() {
   useEffect(() => {
     if (!isInExperiment) return
 
-    posthogClient.captureExperimentExposure(
-      EXPERIMENT_ID,
-      { variant: flagValue },
-      hasConsented()
-    )
-  }, [isInExperiment, flagValue])
+    posthogClient.captureExperimentExposure(EXPERIMENT_ID, { variant: flagValue }, hasConsented())
+  }, [isInExperiment])
 
   return (
     <DefaultLayout>
@@ -121,7 +117,7 @@ export default function PricingContent() {
         id="addon-compute"
         className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
       >
-        {!isTestVariant && (
+        {isInExperiment && !isTestVariant && (
           <div className="text-center mb-8 lg:mb-16">
             <h2 className="text-foreground text-3xl" id="how-compute-pricing-works">
               How compute pricing works

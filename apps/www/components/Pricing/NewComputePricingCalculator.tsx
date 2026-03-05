@@ -1,11 +1,10 @@
 import { InformationCircleIcon } from '@heroicons/react/outline'
+import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Button, Slider_Shadcn_, cn } from 'ui'
+import { Button, cn, Slider_Shadcn_ } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-
-import pricingAddOn from '~/data/PricingAddOnTable.json'
 
 const findIntanceValueByColumn = (instance: any, column: string) =>
   instance.columns?.find((col: any) => col.key === column)?.value
@@ -39,10 +38,6 @@ const NewComputePricingCalculator = ({
   const [activePrice, setActivePrice] = useState(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
   const [hasInteractedWithSlider, setHasInteractedWithSlider] = useState(false)
 
-  useEffect(() => {
-    setActivePrice(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
-  }, [])
-
   const handleUpdateInstance = (position: number, value: number[]) => {
     setHasInteractedWithSlider(true)
     const newArray = activeInstances.map((activeInstance) => {
@@ -58,12 +53,11 @@ const NewComputePricingCalculator = ({
   }
 
   const calculateComputeAggregate = (price: number) => {
-    activeInstances.map(
-      (activeInstance: any) =>
-        (price += parsePrice(findIntanceValueByColumn(activeInstance, 'pricing')))
+    return activeInstances.reduce(
+      (acc, activeInstance: any) =>
+        acc + parsePrice(findIntanceValueByColumn(activeInstance, 'pricing')),
+      price
     )
-
-    return price
   }
 
   const calculatePrice = () => {
@@ -80,10 +74,7 @@ const NewComputePricingCalculator = ({
   const removeInstance = (position: number) => {
     const newArray = activeInstances
       .filter((activeInstance) => activeInstance.position !== position)
-      .map((instance, index) => {
-        instance.position = index
-        return instance
-      })
+      .map((instance, index) => ({ ...instance, position: index }))
 
     setActiveInstances(newArray)
   }
