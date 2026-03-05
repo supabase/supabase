@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
-import { generateRegexpWhere } from '../Reports/Reports.constants'
+
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
+import { generateRegexpWhere } from '../Reports/Reports.constants'
 
 type PostgrestMetricsVariables = {
   projectRef: string

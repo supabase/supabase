@@ -285,12 +285,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
-  const shouldRedirectToHomeForBuilding =
-    isProjectBuilding && requiresDbConnection && !isHomePage
+  const shouldRedirectToHomeForBuilding = isProjectBuilding && requiresDbConnection && !isHomePage
 
   // Don't show building state on the home page — it handles building state inline
-  const shouldShowBuildingState =
-    isProjectBuilding && requiresDbConnection && !isHomePage
+  const shouldShowBuildingState = isProjectBuilding && requiresDbConnection && !isHomePage
 
   useEffect(() => {
     if (shouldRedirectToHomeForBuilding && ref) {

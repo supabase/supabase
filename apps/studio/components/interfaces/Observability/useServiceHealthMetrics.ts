@@ -8,11 +8,11 @@ import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import { LogsTableName } from '../Settings/Logs/Logs.constants'
 import { genChartQuery } from '../Settings/Logs/Logs.utils'
 import {
-  type RawChartData,
   calculateAggregatedMetrics,
   calculateDateRange,
   calculateHealthMetrics,
   transformToBarChartData,
+  type RawChartData,
 } from './useServiceHealthMetrics.utils'
 
 export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'

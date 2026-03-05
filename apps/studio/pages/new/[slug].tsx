@@ -11,8 +11,8 @@ import { DisabledWarningDueToIncident } from 'components/interfaces/ProjectCreat
 import { FreeProjectLimitWarning } from 'components/interfaces/ProjectCreation/FreeProjectLimitWarning'
 import { OrganizationSelector } from 'components/interfaces/ProjectCreation/OrganizationSelector'
 import {
-  PostgresVersionSelector,
   extractPostgresVersionDetails,
+  PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { sizes } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { FormSchema } from 'components/interfaces/ProjectCreation/ProjectCreation.schema'
@@ -57,9 +57,9 @@ import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
-import { Button, FormField_Shadcn_, Form_Shadcn_, useWatch_Shadcn_ } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
