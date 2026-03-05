@@ -17,6 +17,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
   const tableEditorNewFilterBar = useFlag('tableEditorNewFilterBar')
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
+  const showFloatingMobileNavbar = useFlag('enableFloatingMobileNavbar')
 
   return [
     {
@@ -91,6 +92,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: true,
       isPlatformOnly: false,
       isDefaultOptIn: tableEditorNewFilterBar,
+    },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_NAVBAR,
+      name: 'Floating Mobile Navbar',
+      discussionsUrl: undefined,
+      enabled: showFloatingMobileNavbar,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: false,
     },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }
