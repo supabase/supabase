@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { isEqual } from 'lodash'
 import { Copy, Eye, EyeOff, Play, X as XIcon } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -8,8 +7,6 @@ import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { ResponseError } from 'types'
 import {
   Button,
@@ -29,7 +26,6 @@ import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnR
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import {
-  buildLogsPrompt,
   formatLogsAsJson,
   formatLogsAsMarkdown,
   isDefaultLogPreviewFormat,
@@ -99,8 +95,6 @@ export const LogTable = ({
   const { profile } = useProfile()
   const [selectedLogId] = useSelectedLog()
   const { show: showContextMenu } = useContextMenu()
-  const { openSidebar } = useSidebarManagerSnapshot()
-  const aiSnap = useAiAssistantStateSnapshot()
 
   const [cellPosition, setCellPosition] = useState<any>()
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
@@ -403,14 +397,6 @@ export const LogTable = ({
     })
   }
 
-  function handleOpenAiAssistant() {
-    const prompt = buildLogsPrompt(selectedRowsData)
-    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-    aiSnap.newChat({
-      initialMessage: prompt,
-    })
-  }
-
   const LogsExplorerTableHeader = () => (
     <div
       className={cn(
@@ -526,7 +512,6 @@ export const LogTable = ({
                   setSelectedRows(new Set())
                   setAnchorRowId(null)
                 }}
-                onOpenAiAssistant={handleOpenAiAssistant}
               />
             </div>
             <DataGrid

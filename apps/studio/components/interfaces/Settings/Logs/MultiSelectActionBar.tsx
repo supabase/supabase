@@ -1,6 +1,9 @@
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Check, ChevronDown, Copy, X as XIcon } from 'lucide-react'
 import { useMemo } from 'react'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   DropdownMenu,
@@ -18,7 +21,6 @@ interface MultiSelectActionBarProps {
   copiedFormat: 'json' | 'markdown' | null
   onCopy: (format: 'json' | 'markdown') => void
   onClear: () => void
-  onOpenAiAssistant: () => void
 }
 
 export function MultiSelectActionBar({
@@ -27,8 +29,15 @@ export function MultiSelectActionBar({
   copiedFormat,
   onCopy,
   onClear,
-  onOpenAiAssistant,
 }: MultiSelectActionBarProps) {
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
+
+  function handleOpenAiAssistant() {
+    const prompt = buildLogsPrompt(selectedRowsData)
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({ initialMessage: prompt })
+  }
   const count = selectedRows.size
   if (count === 0) return null
 
@@ -68,7 +77,7 @@ export function MultiSelectActionBar({
         <AiAssistantDropdown
           label="Explain with AI"
           buildPrompt={() => buildLogsPrompt(selectedRowsData)}
-          onOpenAssistant={onOpenAiAssistant}
+          onOpenAssistant={handleOpenAiAssistant}
         />
 
         <Button
