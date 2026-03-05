@@ -35,7 +35,7 @@ fi
 
 jwt_secret="$(gen_base64 30)"
 
-# Used in get_token()
+# Used in gen_token()
 header='{"alg":"HS256","typ":"JWT"}'
 iat=$(date +%s)
 exp=$((iat + 5 * 3600 * 24 * 365)) # 5 years
@@ -43,9 +43,6 @@ exp=$((iat + 5 * 3600 * 24 * 365)) # 5 years
 # Normalizes JSON formatting so that the token matches https://www.jwt.io/ results
 anon_payload="{\"role\":\"anon\",\"iss\":\"supabase\",\"iat\":$iat,\"exp\":$exp}"
 service_role_payload="{\"role\":\"service_role\",\"iss\":\"supabase\",\"iat\":$iat,\"exp\":$exp}"
-
-#echo "anon_payload=$anon_payload"
-#echo "service_role_payload=$service_role_payload"
 
 anon_key=$(gen_token "$anon_payload")
 service_role_key=$(gen_token "$service_role_payload")
@@ -65,8 +62,6 @@ minio_root_password=$(gen_hex 16)
 echo ""
 echo "JWT_SECRET=${jwt_secret}"
 echo ""
-#echo "Issued at: $iat"
-#echo "Expire: $exp"
 echo "ANON_KEY=${anon_key}"
 echo "SERVICE_ROLE_KEY=${service_role_key}"
 echo ""
