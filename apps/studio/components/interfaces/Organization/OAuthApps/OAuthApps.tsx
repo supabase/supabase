@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -11,6 +8,8 @@ import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-app
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Check, X } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import {
   Button,
   Card,
@@ -34,6 +33,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { AuthorizedAppRow } from './AuthorizedAppRow'
 import { DeleteAppModal } from './DeleteAppModal'
 import { OAuthAppRow } from './OAuthAppRow'
@@ -45,14 +45,30 @@ import { RevokeAppModal } from './RevokeAppModal'
 // to prevent any confusion (case study: GitHub). Authorized apps could be in the "integrations" tab, but let's
 // check in again after we wrap up Vercel integration
 
-export const OAuthApps = () => {
-  type PublishedAppsSort = 'created:asc' | 'created:desc'
-  type PublishedAppsSortColumn = 'created'
-  type PublishedAppsSortOrder = 'asc' | 'desc'
-  type AuthorizedAppsSort = 'authorized:asc' | 'authorized:desc'
-  type AuthorizedAppsSortColumn = 'authorized'
-  type AuthorizedAppsSortOrder = 'asc' | 'desc'
+type SortOrder = 'asc' | 'desc'
+type PublishedAppsSort = 'created:asc' | 'created:desc'
+type PublishedAppsSortColumn = 'created'
+type AuthorizedAppsSort = 'authorized:asc' | 'authorized:desc'
+type AuthorizedAppsSortColumn = 'authorized'
 
+const parseSort = <C extends string>(sort: string): [C, SortOrder] => {
+  return sort.split(':') as [C, SortOrder]
+}
+
+const toggleSort = <S extends string>(
+  currentSort: S,
+  column: string,
+  setSort: (sort: S) => void
+) => {
+  const [currentColumn, currentOrder] = parseSort(currentSort)
+  if (currentColumn === column) {
+    setSort(`${column}:${currentOrder === 'asc' ? 'desc' : 'asc'}` as S)
+  } else {
+    setSort(`${column}:asc` as S)
+  }
+}
+
+export const OAuthApps = () => {
   const { slug } = useParams()
   const [showPublishModal, setShowPublishModal] = useState(false)
   const [createdApp, setCreatedApp] = useState<OAuthAppCreateResponse>()
@@ -80,10 +96,7 @@ export const OAuthApps = () => {
   } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps })
 
   const sortedPublishedApps = useMemo(() => {
-    const [sortColumn, sortOrder] = publishedAppsSort.split(':') as [
-      PublishedAppsSortColumn,
-      PublishedAppsSortOrder,
-    ]
+    const [sortColumn, sortOrder] = parseSort<PublishedAppsSortColumn>(publishedAppsSort)
     const orderMultiplier = sortOrder === 'asc' ? 1 : -1
 
     return [...(publishedApps ?? [])].sort((a, b) => {
@@ -106,10 +119,7 @@ export const OAuthApps = () => {
   } = useAuthorizedAppsQuery({ slug })
 
   const sortedAuthorizedApps = useMemo(() => {
-    const [sortColumn, sortOrder] = authorizedAppsSort.split(':') as [
-      AuthorizedAppsSortColumn,
-      AuthorizedAppsSortOrder,
-    ]
+    const [sortColumn, sortOrder] = parseSort<AuthorizedAppsSortColumn>(authorizedAppsSort)
     const orderMultiplier = sortOrder === 'asc' ? 1 : -1
 
     return [...(authorizedApps ?? [])].sort((a, b) => {
@@ -123,39 +133,18 @@ export const OAuthApps = () => {
       return 0
     })
   }, [authorizedApps, authorizedAppsSort])
+
   const hasPublishedApps = (publishedApps?.length ?? 0) > 0
   const hasAuthorizedApps = (authorizedApps?.length ?? 0) > 0
   const avatarHeadClass = 'w-[62px] min-w-[62px] max-w-[62px]'
   const avatarHeadCollapsedClass = 'w-0 min-w-0 max-w-0 p-0'
 
   const handlePublishedSortChange = (column: PublishedAppsSortColumn) => {
-    const [currentColumn, currentOrder] = publishedAppsSort.split(':') as [
-      PublishedAppsSortColumn,
-      PublishedAppsSortOrder,
-    ]
-
-    if (currentColumn === column) {
-      setPublishedAppsSort(
-        (currentOrder === 'asc' ? `${column}:desc` : `${column}:asc`) as PublishedAppsSort
-      )
-    } else {
-      setPublishedAppsSort(`${column}:asc` as PublishedAppsSort)
-    }
+    toggleSort(publishedAppsSort, column, setPublishedAppsSort)
   }
 
   const handleAuthorizedSortChange = (column: AuthorizedAppsSortColumn) => {
-    const [currentColumn, currentOrder] = authorizedAppsSort.split(':') as [
-      AuthorizedAppsSortColumn,
-      AuthorizedAppsSortOrder,
-    ]
-
-    if (currentColumn === column) {
-      setAuthorizedAppsSort(
-        (currentOrder === 'asc' ? `${column}:desc` : `${column}:asc`) as AuthorizedAppsSort
-      )
-    } else {
-      setAuthorizedAppsSort(`${column}:asc` as AuthorizedAppsSort)
-    }
+    toggleSort(authorizedAppsSort, column, setAuthorizedAppsSort)
   }
 
   return (
