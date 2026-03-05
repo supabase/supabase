@@ -117,7 +117,11 @@ Sentry.init({
       )
     }
 
-    integrations.push(Sentry.replayIntegration())
+    integrations.push(
+        Sentry.replayIntegration({
+          maskAllInputs: true,
+        })
+      )
 
     return integrations
   })(),

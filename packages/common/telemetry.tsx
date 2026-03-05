@@ -367,7 +367,7 @@ export const PageTelemetry = ({
             ref,
             telemetryDataOverride: telemetryData,
             firstReferrerData,
-          })
+          }).catch((e) => captureTelemetryError(e, 'telemetry-page-view'))
         } catch (error) {
           if (!IS_PROD) {
             console.warn('Invalid telemetry cookie data:', error)
@@ -379,7 +379,7 @@ export const PageTelemetry = ({
             slug,
             ref,
             firstReferrerData,
-          })
+          }).catch((e) => captureTelemetryError(e, 'telemetry-page-view'))
         } finally {
           clearTelemetryDataCookie()
         }
@@ -391,7 +391,7 @@ export const PageTelemetry = ({
           slug,
           ref,
           firstReferrerData,
-        })
+        }).catch((e) => captureTelemetryError(e, 'telemetry-page-view'))
       }
 
       hasSentInitialPageTelemetryRef.current = true
