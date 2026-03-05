@@ -11,7 +11,7 @@ import {
 } from '@/registry/default/components/ui/card'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { supabase } = createClient(request)
+  const { supabase, headers } = createClient(request);
   const origin = new URL(request.url).origin
 
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -22,7 +22,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   })
 
   if (data.url) {
-    return redirect(data.url)
+    return redirect(data.url, { headers });
   }
 
   if (error) {
