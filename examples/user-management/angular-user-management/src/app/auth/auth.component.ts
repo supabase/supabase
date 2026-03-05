@@ -9,14 +9,13 @@ import { SupabaseService } from '../supabase.service'
   standalone: false,
 })
 export class AuthComponent {
-  signInForm!: FormGroup
+  loading = false
+  signInForm: FormGroup
+
   constructor(
     private readonly supabase: SupabaseService,
     private readonly formBuilder: FormBuilder
-  ) {}
-
-  loading = false
-  ngOnInit() {
+  ) {
     this.signInForm = this.formBuilder.group({
       email: '',
     })
