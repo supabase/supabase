@@ -4,11 +4,8 @@ import { useParams } from 'common'
 import { X } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
   Button,
   cn,
   Form_Shadcn_,
@@ -28,6 +25,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
+  useWatch_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -35,7 +33,10 @@ import * as z from 'zod'
 import { FormSectionLabel } from '@/components/ui/Forms/FormSection'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthCustomProviderCreateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-create-mutation'
-import { useOAuthCustomProviderUpdateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
+import {
+  useOAuthCustomProviderUpdateMutation,
+  type OAuthCustomProviderUpdateVariables,
+} from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
 
 interface CreateOrUpdateCustomProviderSheetProps {
   visible: boolean
@@ -43,45 +44,44 @@ interface CreateOrUpdateCustomProviderSheetProps {
   onClose: () => void
 }
 
-const FormSchema = z
-  .object({
-    identifier: z
-      .string()
-      .min(1, 'Please provide an identifier')
-      .regex(
-        /^[a-zA-Z0-9_-]+$/,
-        'Identifier can only contain letters, numbers, hyphens, and underscores'
-      ),
-    name: z
-      .string()
-      .min(1, 'Please provide a name for your custom provider')
-      .max(100, 'Name must be less than 100 characters'),
-    provider_type: z.enum(['oidc', 'oauth2']).default('oidc'),
-    client_id: z.string(),
-    client_secret: z.string(),
-    email_optional: z.boolean().default(false),
-    issuer: z.string().url('Please provide a valid URL'),
-    authorization_url: z.union([z.string().url(), z.literal('')]).default(''),
-    token_url: z.union([z.string().url(), z.literal('')]).default(''),
-    userinfo_url: z.union([z.string().url(), z.literal('')]).default(''),
-    jwks_uri: z.union([z.string().url(), z.literal('')]).default(''),
-    discovery_url: z.union([z.string().url(), z.literal('')]).default(''),
-    // comma-separated scopes in the form, will be transformed to array when sending
-    scopes: z.string().default(''),
-    callback_url: z.string().optional(), // Readonly display from project endpoint, not part of payload
-  })
-  .superRefine((data, ctx) => {
-    if (data.provider_type === 'oauth2') {
-      if (!data.authorization_url?.trim())
-        ctx.addIssue({ code: 'custom', path: ['authorization_url'], message: 'Required' })
-      if (!data.token_url?.trim())
-        ctx.addIssue({ code: 'custom', path: ['token_url'], message: 'Required' })
-      if (!data.userinfo_url?.trim())
-        ctx.addIssue({ code: 'custom', path: ['userinfo_url'], message: 'Required' })
-      if (!data.jwks_uri?.trim())
-        ctx.addIssue({ code: 'custom', path: ['jwks_uri'], message: 'Required' })
-    }
-  })
+const SharedFormSchema = z.object({
+  identifier: z
+    .string()
+    .min(1, 'Please provide an identifier')
+    .regex(
+      /^[a-zA-Z0-9_-]+$/,
+      'Identifier can only contain letters, numbers, hyphens, and underscores'
+    ),
+  name: z
+    .string()
+    .min(1, 'Please provide a name for your custom provider')
+    .max(100, 'Name must be less than 100 characters'),
+  provider_type: z.enum(['oidc', 'oauth2']).default('oidc'),
+  client_id: z.string(),
+  client_secret: z.string(),
+  email_optional: z.boolean().default(false),
+  issuer: z.string().url('Please provide a valid URL'),
+  // comma-separated scopes in the form, will be transformed to array when sending
+  scopes: z.string().default(''),
+  callback_url: z.string().optional(), // Readonly display from project endpoint, not part of payload
+})
+
+const OidcSchema = SharedFormSchema.extend({
+  provider_type: z.literal('oidc'),
+  discovery_url: z.union([z.string().url('Please provide a valid URL'), z.literal('')]).default(''),
+})
+
+const OAuth2Schema = SharedFormSchema.extend({
+  provider_type: z.literal('oauth2'),
+  authorization_url: z
+    .union([z.string().url('Please provide a valid URL'), z.literal('')])
+    .default(''),
+  token_url: z.union([z.string().url('Please provide a valid URL'), z.literal('')]).default(''),
+  userinfo_url: z.union([z.string().url('Please provide a valid URL'), z.literal('')]).default(''),
+  jwks_uri: z.union([z.string().url('Please provide a valid URL'), z.literal('')]).default(''),
+})
+
+const FormSchema = z.discriminatedUnion('provider_type', [OidcSchema, OAuth2Schema])
 
 const FORM_ID = 'create-or-update-custom-provider-form'
 
@@ -106,7 +106,6 @@ const initialValues = {
 export const CreateOrUpdateCustomProviderSheet = ({
   visible,
   providerToEdit,
-
   onClose,
 }: CreateOrUpdateCustomProviderSheetProps) => {
   const isEditMode = !!providerToEdit
@@ -120,125 +119,115 @@ export const CreateOrUpdateCustomProviderSheet = ({
   useEffect(() => {
     if (visible) {
       if (providerToEdit) {
-        form.reset({
-          name: providerToEdit.name,
-          identifier: providerToEdit.identifier.replace('custom:', ''),
-          provider_type: providerToEdit.provider_type,
-          client_id: providerToEdit.client_id,
-          client_secret: '********',
-          email_optional: providerToEdit.email_optional,
-          issuer: providerToEdit.issuer,
-          authorization_url: providerToEdit.authorization_url,
-          token_url: providerToEdit.token_url,
-          userinfo_url: providerToEdit.userinfo_url,
-          jwks_uri: providerToEdit.jwks_uri,
-          discovery_url: providerToEdit.discovery_url,
-          scopes: (providerToEdit.scopes || []).join(', '),
-        })
+        if (providerToEdit.provider_type === 'oidc') {
+          form.reset({
+            name: providerToEdit.name,
+            identifier: providerToEdit.identifier.replace('custom:', ''),
+            provider_type: providerToEdit.provider_type,
+            client_id: providerToEdit.client_id,
+            client_secret: '********',
+            email_optional: providerToEdit.email_optional,
+            issuer: providerToEdit.issuer,
+            discovery_url: providerToEdit.discovery_url,
+            scopes: (providerToEdit.scopes || []).join(', '),
+          })
+        } else {
+          form.reset({
+            name: providerToEdit.name,
+            identifier: providerToEdit.identifier.replace('custom:', ''),
+            provider_type: providerToEdit.provider_type,
+            client_id: providerToEdit.client_id,
+            client_secret: '********',
+            email_optional: providerToEdit.email_optional,
+            issuer: providerToEdit.issuer,
+            authorization_url: providerToEdit.authorization_url,
+            token_url: providerToEdit.token_url,
+            userinfo_url: providerToEdit.userinfo_url,
+            jwks_uri: providerToEdit.jwks_uri,
+            scopes: (providerToEdit.scopes || []).join(', '),
+          })
+        }
       } else {
         form.reset(initialValues)
       }
     }
   }, [visible, providerToEdit, form])
 
-  const { mutate: createCustomProvider } = useOAuthCustomProviderCreateMutation({
-    onSuccess: () => {
-      onClose()
-    },
-  })
-  const { mutate: updateCustomProvider } = useOAuthCustomProviderUpdateMutation({
-    onSuccess: () => {
-      onClose()
-    },
-  })
+  const { mutate: createCustomProvider, isPending: isCreating } =
+    useOAuthCustomProviderCreateMutation({
+      onSuccess: () => {
+        toast.success('Custom provider created successfully')
+        onClose()
+      },
+    })
+  const { mutate: updateCustomProvider, isPending: isUpdating } =
+    useOAuthCustomProviderUpdateMutation({
+      onSuccess: () => {
+        toast.success('Custom provider updated successfully')
+        onClose()
+      },
+    })
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    const identifierValue = (data.identifier || '').replace(/^custom:/i, '').trim()
+  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
+    const identifierValue = (values.identifier || '').replace(/^custom:/i, '').trim()
     const identifier = identifierValue ? `custom:${identifierValue}` : ''
 
-    let discoveryData = {
-      authorization_url: data.authorization_url,
-      token_url: data.token_url,
-      userinfo_url: data.userinfo_url,
-      jwks_uri: data.jwks_uri,
-    }
-
-    const issuer = data.issuer?.trim()
-    const discoveryUrl =
-      data.discovery_url?.trim() ||
-      (issuer ? `${issuer.replace(/\/$/, '')}/.well-known/openid-configuration` : '')
-    if (data.provider_type === 'oidc') {
-      if (!discoveryUrl) {
-        form.setError('issuer', { message: 'Please provide an Issuer URL or Discovery URL' })
-        return
+    let payload: Partial<OAuthCustomProviderUpdateVariables> = {}
+    if (values.provider_type === 'oidc') {
+      payload = {
+        skip_nonce_check: false,
+        discovery_url:
+          values.discovery_url ||
+          `${values.issuer.replace(/\/$/, '')}/.well-known/openid-configuration`,
       }
-
-      const baseUrl = discoveryUrl.replace(/\/\.well-known\/openid-configuration\/?$/i, '')
-
-      discoveryData = {
-        authorization_url: `${baseUrl.replace(/\/$/, '')}/oauth/authorize`,
-        token_url: `${baseUrl.replace(/\/$/, '')}/oauth/token`,
-        userinfo_url: `${baseUrl.replace(/\/$/, '')}/oauth/userinfo`,
-        jwks_uri: `${baseUrl.replace(/\/$/, '')}/.well-known/jwks.json`,
+    } else {
+      const issuer = values.issuer?.trim()
+      payload = {
+        authorization_url: `${issuer.replace(/\/$/, '')}/oauth/authorize`,
+        token_url: `${issuer.replace(/\/$/, '')}/oauth/token`,
+        userinfo_url: `${issuer.replace(/\/$/, '')}/oauth/userinfo`,
+        jwks_uri: `${issuer.replace(/\/$/, '')}/.well-known/jwks.json`,
       }
     }
 
     if (isEditMode) {
-      if (!data.client_id?.trim()) {
+      if (!values.client_id?.trim()) {
         form.setError('client_id', { message: 'Client ID is required' })
         return
       }
-      if (!data.client_secret?.trim()) {
+      if (!values.client_secret?.trim()) {
         form.setError('client_secret', { message: 'Client secret is required' })
         return
       }
 
       updateCustomProvider({
         identifier,
-        projectRef: undefined,
-        clientEndpoint: undefined,
-        name: data.name,
-        client_id: data.client_id,
-        scopes: data.scopes.split(',').map((s) => s.trim()),
-        issuer: data.issuer,
+        projectRef,
+        clientEndpoint: endpointData,
+        name: values.name,
+        client_id: values.client_id,
+        scopes: values.scopes.split(',').map((s) => s.trim()),
+        issuer: values.issuer,
         pkce_enabled: true,
         enabled: true,
-        email_optional: data.email_optional,
-        ...(data.provider_type === 'oidc' &&
-          discoveryData && {
-            issuer: data.issuer,
-            skip_nonce_check: false,
-            discovery_url: discoveryUrl,
-          }),
-        authorization_url: data.authorization_url,
-        token_url: data.token_url,
-        userinfo_url: data.userinfo_url,
-        jwks_uri: data.jwks_uri,
+        email_optional: values.email_optional,
+        ...payload,
       })
     } else {
       createCustomProvider({
         identifier,
-        projectRef: projectRef!,
-        clientEndpoint: endpointData!,
-        provider_type: data.provider_type,
-        name: data.name,
-        client_id: data.client_id,
-        client_secret: data.client_secret,
-        scopes: data.scopes.split(',').map((s) => s.trim()),
-        issuer: data.issuer,
+        projectRef,
+        clientEndpoint: endpointData,
+        provider_type: values.provider_type,
+        name: values.name,
+        client_id: values.client_id,
+        client_secret: values.client_secret,
+        scopes: values.scopes.split(',').map((s) => s.trim()),
+        issuer: values.issuer,
         pkce_enabled: true,
         enabled: true,
-        email_optional: data.email_optional,
-        ...(data.provider_type === 'oidc' &&
-          discoveryData && {
-            issuer: data.issuer,
-            skip_nonce_check: false,
-            discovery_url: discoveryUrl,
-          }),
-        authorization_url: data.authorization_url,
-        token_url: data.token_url,
-        userinfo_url: data.userinfo_url,
-        jwks_uri: data.jwks_uri,
+        email_optional: values.email_optional,
+        ...payload,
       })
     }
   }
@@ -248,7 +237,8 @@ export const CreateOrUpdateCustomProviderSheet = ({
     onClose()
   }
 
-  const isManualConfiguration = form.watch('provider_type') === 'oauth2'
+  const isManualConfiguration =
+    useWatch_Shadcn_({ control: form.control, name: 'provider_type' }) === 'oauth2'
 
   return (
     <Sheet open={visible} onOpenChange={() => onCloseSheet()}>
@@ -365,7 +355,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
               />
             </SheetSection>
             {isManualConfiguration ? (
-              <SheetSection className="flex-grow px-5 pt-0 space-y-4">
+              <SheetSection className="flex-grow px-5 pt-0 space-y-4" key="manual-config">
                 <FormField_Shadcn_
                   control={form.control}
                   name="authorization_url"
@@ -428,38 +418,26 @@ export const CreateOrUpdateCustomProviderSheet = ({
                 />
               </SheetSection>
             ) : (
-              <>
-                <Separator />
-                <SheetSection className="flex-grow space-y-4 p-0">
-                  <Accordion_Shadcn_ type="single" collapsible>
-                    <AccordionItem_Shadcn_ value="advanced-configuration" className="border-none">
-                      <AccordionTrigger_Shadcn_ className="py-3 px-5 font-normal text-sm text-foreground-light hover:no-underline hover:text-foreground">
-                        <FormSectionLabel>Advanced: Custom discovery URL</FormSectionLabel>
-                      </AccordionTrigger_Shadcn_>
-                      <AccordionContent_Shadcn_ className="px-5 flex flex-col gap-y-4">
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="discovery_url"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              layout="horizontal"
-                              label="Discovery URL"
-                              description="Leave empty to use standard path: {issuer}/.well-known/openid-configuration. Only needed if your provider uses a non-standard discovery path. Discovery runs when you save."
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  placeholder="https://github.company.com/.well-known/openid-configuration"
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
+              <SheetSection className="flex-grow px-5 pt-0 space-y-4" key="discovery-config">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="discovery_url"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="horizontal"
+                      label="Discovery URL"
+                      description="Leave empty to use standard path: {issuer}/.well-known/openid-configuration. Only needed if your provider uses a non-standard discovery path. Discovery runs when you save."
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_
+                          {...field}
+                          placeholder="https://github.company.com/.well-known/openid-configuration"
                         />
-                      </AccordionContent_Shadcn_>
-                    </AccordionItem_Shadcn_>
-                  </Accordion_Shadcn_>
-                </SheetSection>
-              </>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </SheetSection>
             )}
             <Separator />
             <SheetSection className="flex-grow px-5 space-y-4">
@@ -550,7 +528,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
           <Button type="default" onClick={onCloseSheet}>
             Cancel
           </Button>
-          <Button htmlType="submit" form={FORM_ID}>
+          <Button htmlType="submit" form={FORM_ID} loading={isCreating || isUpdating}>
             {isEditMode ? 'Update provider' : 'Create and enable provider'}
           </Button>
         </SheetFooter>
