@@ -6,7 +6,8 @@ const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'accenture-reinvention-2026/contest',
   metadata: {
-    title: 'Win an iPhone 17 Pro Max | Supabase at Accenture AI & Data Conference (ReinventionX) 2026',
+    title:
+      'Win an iPhone 17 Pro Max | Supabase at Accenture AI & Data Conference (ReinventionX) 2026',
     description:
       'Create a Supabase account and load data for a chance to win an iPhone 17 Pro Max. Accenture AI & Data Conference (ReinventionX) 2026.',
   },
