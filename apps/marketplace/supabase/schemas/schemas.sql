@@ -108,6 +108,25 @@ as $$
   );
 $$;
 
+create function public.item_latest_review_is_approved(target_item_id bigint)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (
+      select ir.status = 'approved'
+      from public.item_reviews ir
+      where ir.item_id = target_item_id
+      order by coalesce(ir.reviewed_at, ir.updated_at, ir.created_at) desc
+      limit 1
+    ),
+    false
+  );
+$$;
+
 create function public.storage_object_partner_id(object_name text)
 returns bigint
 language sql
@@ -186,6 +205,7 @@ create table public.items (
   title text not null,
   summary text,
   content text, -- markdown body
+  published boolean not null default false,
   type public.marketplace_item_type not null,
   url text,
   registry_item_url text,
@@ -384,6 +404,14 @@ create policy "items_delete"
     or public.is_partner_member(partner_id)
   );
 
+create policy "items_select_published_with_latest_approved_review"
+  on public.items
+  for select
+  using (
+    published = true
+    and public.item_latest_review_is_approved(id)
+  );
+
 -- Categories: readable by anyone, writable by admin members.
 create policy "categories_select_all"
   on public.categories
@@ -517,6 +545,19 @@ create policy "item_files_delete"
       from public.items i
       where i.id = item_files.item_id
         and public.is_partner_member(i.partner_id)
+    )
+  );
+
+create policy "item_files_select_published_item_with_latest_approved_review"
+  on public.item_files
+  for select
+  using (
+    exists (
+      select 1
+      from public.items i
+      where i.id = item_files.item_id
+        and i.published = true
+        and public.item_latest_review_is_approved(i.id)
     )
   );
 

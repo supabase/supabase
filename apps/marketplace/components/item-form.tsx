@@ -13,6 +13,7 @@ import {
   Input_Shadcn_ as Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  Switch,
   TextArea_Shadcn_ as TextArea,
   TreeView,
   TreeViewItem,
@@ -45,6 +46,7 @@ export type ItemInfo = {
   title: string
   summary: string | null
   content: string | null
+  published: boolean
   type: string
   url: string | null
   registry_item_url: string | null
@@ -136,6 +138,7 @@ const itemFormSchema = z.object({
   slug: z.string().optional(),
   summary: z.string().optional(),
   content: z.string().optional(),
+  published: z.boolean(),
   type: itemTypeEnum,
   url: z
     .string()
@@ -191,6 +194,7 @@ export function ItemForm(props: ItemFormProps) {
       slug: item?.slug ?? '',
       summary: item?.summary ?? '',
       content: item?.content ?? '',
+      published: item?.published ?? false,
       type: item?.type === 'oauth' ? 'oauth' : 'template',
       url: item?.url ?? '',
       documentation_url: item?.documentation_url ?? '',
@@ -347,6 +351,7 @@ export function ItemForm(props: ItemFormProps) {
         slug: value.slug ?? '',
         summary: value.summary ?? '',
         content: value.content ?? '',
+        published: value.published ?? false,
         type: value.type === 'oauth' ? 'oauth' : 'template',
         url: value.url ?? '',
         documentation_url: value.documentation_url ?? '',
@@ -403,6 +408,7 @@ export function ItemForm(props: ItemFormProps) {
     formData.set('slug', trimmedSlug ?? '')
     formData.set('summary', parsed.data.summary ?? '')
     formData.set('type', parsed.data.type)
+    formData.set('published', parsed.data.published ? 'true' : 'false')
     formData.set('url', parsed.data.type === 'oauth' ? parsed.data.url ?? '' : '')
     formData.set('documentationUrl', parsed.data.documentation_url ?? '')
     formData.set('content', parsed.data.content ?? '')
@@ -595,6 +601,29 @@ export function ItemForm(props: ItemFormProps) {
                         placeholder="## Overview"
                         disabled={fieldsDisabled}
                         {...field}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </div>
+
+            <div className="p-6 pt-0">
+              <FormField
+                control={form.control}
+                name="published"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Published"
+                    description="Published items are visible to readers once the latest review is approved."
+                  >
+                    <FormControl className="col-span-8">
+                      <Switch
+                        id="item-published"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={fieldsDisabled}
                       />
                     </FormControl>
                   </FormItemLayout>

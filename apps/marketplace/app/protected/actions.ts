@@ -253,6 +253,8 @@ export async function createItemDraftAction(formData: FormData) {
   const content = formData.get('content')
   const rawType = parseRequiredString(formData, 'type')
   const type = parseItemType(rawType)
+  const publishedRaw = formData.get('published')
+  const published = publishedRaw === 'true' || publishedRaw === 'on' || publishedRaw === '1'
   const url = parseOptionalString(formData, 'url')
   const templateZip = parseTemplateZip(formData)
   const documentationUrl = formData.get('documentationUrl')
@@ -275,6 +277,7 @@ export async function createItemDraftAction(formData: FormData) {
       slug,
       summary: typeof summary === 'string' ? summary : null,
       content: typeof content === 'string' ? content : null,
+      published,
       type,
       url: type === 'oauth' ? url : null,
       registry_item_url: null,
@@ -364,6 +367,8 @@ export async function updateItemDraftAction(formData: FormData) {
       : null
   const rawType = parseRequiredString(formData, 'type')
   const type = parseItemType(rawType)
+  const publishedRaw = formData.get('published')
+  const published = publishedRaw === 'true' || publishedRaw === 'on' || publishedRaw === '1'
   const removedFileIds = parseNumberList(formData, 'removedFileIds[]')
 
   const slugSource = typeof slugInput === 'string' && slugInput.trim() ? slugInput : name
@@ -394,6 +399,7 @@ export async function updateItemDraftAction(formData: FormData) {
       slug,
       summary: typeof summary === 'string' ? summary : null,
       content: typeof content === 'string' ? content : null,
+      published,
       url: type === 'oauth' ? url : null,
       documentation_url: normalizedDocumentationUrl,
       type,

@@ -46,7 +46,7 @@ export default async function EditItemPage({ params }: EditItemPageProps) {
   const { data: item, error: itemError } = await supabase
     .from('items')
     .select(
-      'id, slug, title, summary, content, type, url, registry_item_url, documentation_url, updated_at'
+      'id, slug, title, summary, content, published, type, url, registry_item_url, documentation_url, updated_at'
     )
     .eq('partner_id', partner.id)
     .eq('slug', slug)

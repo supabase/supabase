@@ -55,6 +55,12 @@ const reviewerClient = hasRequiredEnv
     })
   : null
 
+const publicClient = hasRequiredEnv
+  ? createClient(SUPABASE_URL!, SUPABASE_PUBLISHABLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
+  : null
+
 async function signIn(
   client: NonNullable<typeof partnerClient>,
   email: string,
@@ -176,6 +182,20 @@ describeIfConfigured('Marketplace RLS policies', () => {
       featured: false,
     })
     expect(reviewInsertError).toBeNull()
+
+    const { error: fileInsertError } = await adminClient.from('item_files').insert([
+      {
+        item_id: partnerItemId,
+        file_path: `${partnerId}/items/${partnerItemId}/preview.png`,
+        sort_order: 0,
+      },
+      {
+        item_id: otherPartnerItemId,
+        file_path: `${otherPartnerId}/items/${otherPartnerItemId}/preview.png`,
+        sort_order: 0,
+      },
+    ])
+    expect(fileInsertError).toBeNull()
 
     await Promise.all([
       signIn(partnerClient!, PARTNER_EMAIL, PASSWORD),
@@ -327,5 +347,79 @@ describeIfConfigured('Marketplace RLS policies', () => {
     expect(finalReview?.status).toBe('approved')
     expect(finalReview?.reviewed_by).toBe(REVIEWER_USER_ID)
     expect(finalReview?.featured).toBe(true)
+  })
+
+  it('allows anonymous reads only for published items with latest approved review', async () => {
+    const { error: pendingSetupError } = await admin!
+      .from('items')
+      .update({ published: true })
+      .eq('id', partnerItemId)
+    expect(pendingSetupError).toBeNull()
+
+    const { error: pendingReviewError } = await admin!
+      .from('item_reviews')
+      .update({
+        status: 'pending_review',
+        reviewed_by: REVIEWER_USER_ID,
+      })
+      .eq('item_id', partnerItemId)
+    expect(pendingReviewError).toBeNull()
+
+    const { data: pendingItems, error: pendingItemsError } = await publicClient!
+      .from('items')
+      .select('id')
+      .eq('id', partnerItemId)
+    expect(pendingItemsError).toBeNull()
+    expect(pendingItems).toHaveLength(0)
+
+    const { data: pendingFiles, error: pendingFilesError } = await publicClient!
+      .from('item_files')
+      .select('id')
+      .eq('item_id', partnerItemId)
+    expect(pendingFilesError).toBeNull()
+    expect(pendingFiles).toHaveLength(0)
+
+    const { error: approvedReviewError } = await admin!
+      .from('item_reviews')
+      .update({
+        status: 'approved',
+        reviewed_by: REVIEWER_USER_ID,
+      })
+      .eq('item_id', partnerItemId)
+    expect(approvedReviewError).toBeNull()
+
+    const { data: approvedItems, error: approvedItemsError } = await publicClient!
+      .from('items')
+      .select('id')
+      .eq('id', partnerItemId)
+    expect(approvedItemsError).toBeNull()
+    expect(approvedItems).toHaveLength(1)
+
+    const { data: approvedFiles, error: approvedFilesError } = await publicClient!
+      .from('item_files')
+      .select('id')
+      .eq('item_id', partnerItemId)
+    expect(approvedFilesError).toBeNull()
+    expect(approvedFiles).toHaveLength(1)
+
+    const { error: unpublishedSetupError } = await admin!
+      .from('items')
+      .update({ published: false })
+      .eq('id', partnerItemId)
+    expect(unpublishedSetupError).toBeNull()
+
+    const { data: unpublishedItems, error: unpublishedItemsError } = await publicClient!
+      .from('items')
+      .select('id')
+      .eq('id', partnerItemId)
+    expect(unpublishedItemsError).toBeNull()
+    expect(unpublishedItems).toHaveLength(0)
+
+    const { data: unpublishedFiles, error: unpublishedFilesError } = await publicClient!
+      .from('item_files')
+      .select('id')
+      .eq('item_id', partnerItemId)
+    expect(unpublishedFilesError).toBeNull()
+    expect(unpublishedFiles).toHaveLength(0)
   })
 })
