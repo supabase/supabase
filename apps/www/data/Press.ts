@@ -46,7 +46,7 @@ const data: PressItem[] = [
     type: 'podcast',
     href: 'https://stackoverflow.blog/2022/05/17/open-source-is-winning-over-developers-and-investors-ep-442/',
     title: 'Open-source is winning over developers and investors',
-    publisher: 'Stackoverflow',
+    publisher: 'Stack Overflow',
   },
   {
     type: 'podcast',

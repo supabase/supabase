@@ -29,7 +29,7 @@ const ShareArticleActions = ({
       </Link>
 
       <Link
-        aria-label="Share on Linkedin"
+        aria-label="Share on LinkedIn"
         href={`https://www.linkedin.com/shareArticle?url=${permalink}&text=${encodedTitle}`}
         target="_blank"
         className="text-foreground-lighter hover:text-foreground"

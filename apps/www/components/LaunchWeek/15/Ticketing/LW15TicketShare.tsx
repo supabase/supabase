@@ -94,7 +94,7 @@ export default function LW15TicketShare() {
         asChild
       >
         <Link href={linkedInUrl} target="_blank">
-          {userData.shared_on_linkedin ? 'Shared on Linkedin' : 'Share on Linkedin'}
+          {userData.shared_on_linkedin ? 'Shared on LinkedIn' : 'Share on LinkedIn'}
         </Link>
       </Button>
     </div>
