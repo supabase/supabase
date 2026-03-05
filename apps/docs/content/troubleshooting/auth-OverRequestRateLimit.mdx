@@ -1,0 +1,107 @@
+---
+title = "Auth: over_request_rate_limit"
+topics = ["auth"]
+date_created = "2025-07-07T22:39:54+00:00"
+keywords = ["auth" ]
+
+database_id = "031ba6d7-4928-4d95-a2da-bff8dbb740ac"
+
+[[errors]]
+http_status_code = 429
+---
+
+
+The error `over_request_rate_limit` means you violated the rate limits set for a specific path. You can reconfigure your rate limits in the [Auth Dashboard](https://supabase.com/dashboard/project/_/auth/rate-limits) or with the [Management API](https://supabase.com/docs/reference/api/v1-update-auth-service-config).
+
+## Rate Limits
+
+### Email Sending Limit
+Controls how many authentication-related emails can be sent per hour from your project.
+
+- **Default limit**: 2 emails per hour
+> Note: You must set up SMTP to configure this limit.
+
+#### Affected paths:
+- /auth/v1/signup
+- /auth/v1/otp
+- /auth/v1/resend
+- /auth/v1/recover
+
+### SMS Sending Limit
+Controls how many authentication-related SMS messages can be sent per hour from your project.
+- **Default limit**: 30 SMS messages per hour
+> Note: You must set up SMS to configure this limit.
+
+#### Affected paths:
+- /auth/v1/signup
+- /auth/v1/otp
+- /auth/v1/resend
+- /auth/v1/recover
+
+### Auth Token Refresh Limit
+Controls the number of sessions that can be refreshed in a _5 minute interval_ per IP address.
+
+- **Default limit**: 150 sessions per 5 minute interval
+
+#### Affected paths:
+- /auth/v1/resend
+- /auth/v1/otp
+- /auth/v1/recover
+- /auth/v1/token?grant_type=id_token
+- /auth/v1/token?grant_type=refresh_token
+- /auth/v1/signup
+- /auth/v1/token?grant_type=password
+- /auth/v1/user
+- /auth/v1/otp
+- /auth/v1/verify
+- /auth/v1/token?grant_type=pkce
+
+### Auth OTP/Magic Link request limit
+Controls the number of OTP/Magic Links an IP can request in a _5 minute interval_.
+
+- **Default limit**: 30 OTP/Magic Links per 5 minute interval
+
+#### Affected paths:
+- /auth/v1/otp
+- /auth/v1/recover
+
+### Auth OTP/Magic Link request limit
+Controls the number of OTP/Magic Links an IP can request in a _5 minute interval_.
+
+- **Default limit**: 30 OTP/Magic Links per 5 minute interval
+
+#### Affected paths:
+- /auth/v1/otp
+- /auth/v1/recover
+
+### Auth anonymous signin request limit
+Controls the number of anonymous signins an IP can request in a _5 minute interval_.
+
+- **Default limit**: 30 anonymous signins per 5 minute interval
+> Note: only applies if anonymous signins are enabled in the [Auth Dashboard](https://supabase.com/dashboard/project/_/auth/providers).
+
+#### Affected paths:
+- /auth/v1/signup (when used for anonymous signins)
+
+
+### Rate limit for sign ups and sign ins
+Controls the number of signups and signins an IP can request in a _5 minute interval_ (except for those from anonymous signins)
+
+- **Default limit**: 30 signups/signins per 5 minute interval
+
+#### Affected paths:
+- /auth/v1/signup
+- /auth/v1/otp
+- /auth/v1/resend
+- /auth/v1/recover
+
+
+
+### Example:
+A user calls `/auth/v1/signup` 31 times in a 5 minute interval. The 31st call will receive a 429 status code.
+
+### How to fix it
+- Configure your rate limits in the [Auth Dashboard](https://supabase.com/dashboard/project/_/auth/rate-limits) or with the [Management API](https://supabase.com/docs/reference/api/v1-update-auth-service-config)
+- Check your app to make sure it is not redundantly making requests. This often happens due to 
+  - accidentally calling the paths during page refreshes
+  - accidentally calling the values in a loop, such as one implemented in React's useEffect
