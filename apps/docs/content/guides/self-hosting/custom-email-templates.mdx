@@ -28,8 +28,8 @@ If Supabase Auth cannot fetch the template or if the fetched template is invalid
 
 Authentication email templates can be configured using the following environment variables:
 
-- `GOTRUE_MAILER_TEMPLATES_<AUTH_FLOW>`: Provide template URL
-- `GOTRUE_MAILER_SUBJECTS_<AUTH_FLOW>`: Customize email subject
+- `GOTRUE_MAILER_TEMPLATES_<AUTH_FLOW>`: Provide a custom template URL. Falls back to the default template if not set.
+- `GOTRUE_MAILER_SUBJECTS_<AUTH_FLOW>`: Customize the email subject. Falls back to the default subject if not set.
 
 | Auth flow          | Sent                                                                 |
 | ------------------ | -------------------------------------------------------------------- |
@@ -46,12 +46,6 @@ For example:
 GOTRUE_MAILER_TEMPLATES_MAGIC_LINK='<template_url>'
 GOTRUE_MAILER_SUBJECTS_MAGIC_LINK='<custom_subject>'
 ```
-
-<Admonition type="tip">
-
-Both the template and subject environment variables are optional. If they are not provided, auth service falls back to the default.
-
-</Admonition>
 
 ### Example
 
@@ -113,8 +107,8 @@ docker compose up -d --force-recreate --no-deps auth templates-server
 Notification email templates can be configured using the following environment variables:
 
 - `GOTRUE_MAILER_NOTIFICATIONS_<NOTIFICATION_TYPE>_ENABLED`: Enable the notification email
-- `GOTRUE_MAILER_TEMPLATES_<NOTIFICATION_TYPE>_NOTIFICATION`: Provide template URL
-- `GOTRUE_MAILER_SUBJECTS_<NOTIFICATION_TYPE>_NOTIFICATION`: Customize email subject
+- `GOTRUE_MAILER_TEMPLATES_<NOTIFICATION_TYPE>_NOTIFICATION`: Provide a custom template URL. Falls back to the default template if not set.
+- `GOTRUE_MAILER_SUBJECTS_<NOTIFICATION_TYPE>_NOTIFICATION`: Customize the email subject. Falls back to the default subject if not set.
 
 | Notification Type       | Sent                                                  |
 | ----------------------- | ----------------------------------------------------- |
@@ -133,12 +127,6 @@ GOTRUE_MAILER_NOTIFICATIONS_EMAIL_CHANGED_ENABLED='true'
 GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION='<template_url>'
 GOTRUE_MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION='<custom_subject>'
 ```
-
-<Admonition type="tip">
-
-Both the template and subject environment variables are optional. If they are not provided, auth service falls back to the default.
-
-</Admonition>
 
 ### Example
 
