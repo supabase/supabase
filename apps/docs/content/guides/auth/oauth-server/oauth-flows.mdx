@@ -230,7 +230,11 @@ The error parameters allow clients to display relevant error messages to users:
 
 ### Step 5: Token exchange
 
-The client exchanges the authorization code for tokens by making a POST request to the token endpoint:
+The client exchanges the authorization code for tokens by making a POST request to the token endpoint. How the client authenticates depends on its `token_endpoint_auth_method` (set during [client registration](/docs/guides/auth/oauth-server/getting-started#token-endpoint-authentication-method)).
+
+#### Public clients (`token_endpoint_auth_method: none`)
+
+Public clients send only the `client_id` in the request body with no secret:
 
 ```bash
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
@@ -242,7 +246,29 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
   -d 'code_verifier=<code-verifier>'
 ```
 
-For confidential clients (with client secret):
+#### Confidential clients (`token_endpoint_auth_method: client_secret_basic`)
+
+This is the **default** for confidential clients. Credentials are sent via the `Authorization` header using HTTP Basic authentication (base64-encoded `client_id:client_secret`):
+
+```bash
+curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -u '<client-id>:<client-secret>' \
+  -d 'grant_type=authorization_code' \
+  -d 'code=<authorization-code>' \
+  -d 'redirect_uri=<redirect-uri>' \
+  -d 'code_verifier=<code-verifier>'
+```
+
+<Admonition type="note">
+
+The `-u` flag in cURL automatically encodes the credentials and sets the `Authorization: Basic <base64(client_id:client_secret)>` header. If you're not using cURL, you must base64-encode the `client_id:client_secret` string yourself.
+
+</Admonition>
+
+#### Confidential clients (`token_endpoint_auth_method: client_secret_post`)
+
+Credentials are sent as form parameters in the request body:
 
 ```bash
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
@@ -261,7 +287,7 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
 // Retrieve the code verifier from storage
 const codeVerifier = sessionStorage.getItem('code_verifier')
 
-// Exchange code for tokens
+// --- Public clients (token_endpoint_auth_method: none) ---
 const response = await fetch(`https://<project-ref>.supabase.co/auth/v1/oauth/token`, {
   method: 'POST',
   headers: {
@@ -271,6 +297,37 @@ const response = await fetch(`https://<project-ref>.supabase.co/auth/v1/oauth/to
     grant_type: 'authorization_code',
     code: authorizationCode,
     client_id: '<client-id>',
+    redirect_uri: '<redirect-uri>',
+    code_verifier: codeVerifier,
+  }),
+})
+
+// --- Confidential clients (token_endpoint_auth_method: client_secret_basic) ---
+const response = await fetch(`https://<project-ref>.supabase.co/auth/v1/oauth/token`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    Authorization: 'Basic ' + btoa('<client-id>:<client-secret>'),
+  },
+  body: new URLSearchParams({
+    grant_type: 'authorization_code',
+    code: authorizationCode,
+    redirect_uri: '<redirect-uri>',
+    code_verifier: codeVerifier,
+  }),
+})
+
+// --- Confidential clients (token_endpoint_auth_method: client_secret_post) ---
+const response = await fetch(`https://<project-ref>.supabase.co/auth/v1/oauth/token`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
+  body: new URLSearchParams({
+    grant_type: 'authorization_code',
+    code: authorizationCode,
+    client_id: '<client-id>',
+    client_secret: '<client-secret>',
     redirect_uri: '<redirect-uri>',
     code_verifier: codeVerifier,
   }),
@@ -377,7 +434,9 @@ Clients should refresh access tokens when:
 
 ### Refresh request
 
-Make a POST request to the token endpoint with the refresh token:
+Make a POST request to the token endpoint with the refresh token. The client authenticates the same way as during the [token exchange](#step-5-token-exchange), based on its `token_endpoint_auth_method`.
+
+#### Public clients (`token_endpoint_auth_method: none`)
 
 ```bash
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
@@ -387,7 +446,17 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
   -d 'client_id=<client-id>'
 ```
 
-For confidential clients:
+#### Confidential clients (`token_endpoint_auth_method: client_secret_basic`)
+
+```bash
+curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -u '<client-id>:<client-secret>' \
+  -d 'grant_type=refresh_token' \
+  -d 'refresh_token=<refresh-token>'
+```
+
+#### Confidential clients (`token_endpoint_auth_method: client_secret_post`)
 
 ```bash
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
@@ -401,6 +470,7 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
 #### Example in JavaScript
 
 ```javascript
+// Public clients (token_endpoint_auth_method: none)
 async function refreshAccessToken(refreshToken) {
   const response = await fetch(`https://<project-ref>.supabase.co/auth/v1/oauth/token`, {
     method: 'POST',
@@ -411,6 +481,27 @@ async function refreshAccessToken(refreshToken) {
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
       client_id: '<client-id>',
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to refresh token')
+  }
+
+  return await response.json()
+}
+
+// Confidential clients (token_endpoint_auth_method: client_secret_basic)
+async function refreshAccessTokenConfidential(refreshToken) {
+  const response = await fetch(`https://<project-ref>.supabase.co/auth/v1/oauth/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: 'Basic ' + btoa('<client-id>:<client-secret>'),
+    },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
     }),
   })
 

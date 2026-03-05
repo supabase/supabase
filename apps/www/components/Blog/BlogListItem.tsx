@@ -1,31 +1,17 @@
-import blogAuthors from 'lib/authors.json'
+import dayjs from 'dayjs'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import type PostTypes from '~/types/post'
-import dayjs from 'dayjs'
 import { Badge } from 'ui'
-import type { CMSPostTypes } from '~/types/post'
+
+import blogAuthors from '@/lib/authors.json'
+import type PostTypes from '@/types/post'
 
 interface Props {
-  post: PostTypes | CMSPostTypes
+  post: PostTypes
 }
 
-const getAuthors = (post: PostTypes | CMSPostTypes) => {
-  if ('isCMS' in post && post.isCMS) {
-    // For CMS posts, display author directly from the blog data
-    const cmsBlog = post as CMSPostTypes
-    const authors =
-      cmsBlog.authors?.map((author) => ({
-        author: author.author || 'Unknown Author',
-        author_image_url: author.author_image_url || null,
-        author_url: author.author_url || '#',
-        position: author.position || '',
-      })) || []
-
-    return authors
-  }
-
+const getAuthors = (post: PostTypes) => {
   const authorArray = post.author?.split(',').map((a) => a.trim()) || []
   const authors = []
 

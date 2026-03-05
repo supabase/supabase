@@ -53,42 +53,12 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
   queryGroup="auth-store"
 >
   <TabPanel id="async-storage" label="AsyncStorage">
-{/* TODO: Future task to extract to repo and transclude */}
-    <$CodeTabs>
 
-    ```ts name=lib/supabase.web.ts
-    import AsyncStorage from '@react-native-async-storage/async-storage';
-    import { createClient } from '@supabase/supabase-js';
-    import 'react-native-url-polyfill/auto';
-
-    const ExpoWebSecureStoreAdapter = {
-      getItem: (key: string) => {
-        console.debug("getItem", { key })
-        return AsyncStorage.getItem(key)
-      },
-      setItem: (key: string, value: string) => {
-        return AsyncStorage.setItem(key, value)
-      },
-      removeItem: (key: string) => {
-        return AsyncStorage.removeItem(key)
-      },
-    };
-
-    export const supabase = createClient(
-      process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
-      process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
-      {
-        auth: {
-          storage: ExpoWebSecureStoreAdapter,
-          autoRefreshToken: true,
-          persistSession: true,
-          detectSessionInUrl: false,
-        },
-      },
-    );
-    ```
-
-    </$CodeTabs>
+    <$CodeSample
+      path="/auth/expo-social-auth/lib/supabase.web.ts"
+      lines={[[1, -1]]}
+      meta="name=lib/supabase.web.ts"
+    />
 
   </TabPanel>
   <TabPanel id="secure-store" label="SecureStore">
@@ -96,49 +66,18 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
     If you want to encrypt the user's session information, use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
 
     Make sure that:
+
     - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
     - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
     - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
 
     Implement a `ExpoSecureStoreAdapter` to pass in as Auth storage adapter for the `supabase-js` client:
 
-    <$CodeTabs>
-
-    ```ts name=lib/supabase.ts
-    import { createClient } from '@supabase/supabase-js';
-    import { deleteItemAsync, getItemAsync, setItemAsync } from 'expo-secure-store';
-
-    const ExpoSecureStoreAdapter = {
-      getItem: (key: string) => {
-        console.debug("getItem", { key, getItemAsync })
-        return getItemAsync(key)
-      },
-      setItem: (key: string, value: string) => {
-        if (value.length > 2048) {
-          console.warn('Value being stored in SecureStore is larger than 2048 bytes and it may not be stored successfully. In a future SDK version, this call may throw an error.')
-        }
-        return setItemAsync(key, value)
-      },
-      removeItem: (key: string) => {
-        return deleteItemAsync(key)
-      },
-    };
-
-    export const supabase = createClient(
-      process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
-      process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
-      {
-        auth: {
-          storage: ExpoSecureStoreAdapter as any,
-          autoRefreshToken: true,
-          persistSession: true,
-          detectSessionInUrl: false,
-        },
-      },
-    );
-    ```
-
-    </$CodeTabs>
+    <$CodeSample
+      path="/auth/expo-social-auth/lib/supabase.ts"
+      lines={[[1, -1]]}
+      meta="name=lib/supabase.ts"
+    />
 
   </TabPanel>
 </Tabs>
@@ -150,14 +89,11 @@ These variables are safe to expose in your Expo app since Supabase has [Row Leve
 
 Create a `.env` file containing these variables:
 
-<$CodeTabs>
-
-```bash name=.env
-EXPO_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
-EXPO_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/auth/expo-social-auth/.env.template"
+lines={[[1, -1]]}
+meta="name=.env"
+/>
 
 ### Set up protected navigation
 
@@ -167,279 +103,59 @@ Next, you need to protect app navigation to prevent unauthenticated users from a
 
 Create [a React context](https://react.dev/learn/passing-data-deeply-with-context) to manage the authentication session, making it accessible from any component:
 
-<$CodeTabs>
-
-```tsx name=hooks/use-auth-context.tsx
-import { Session } from '@supabase/supabase-js'
-import { createContext, useContext } from 'react'
-
-export type AuthData = {
-  session?: Session | null
-  profile?: any | null
-  isLoading: boolean
-  isLoggedIn: boolean
-}
-
-export const AuthContext = createContext<AuthData>({
-  session: undefined,
-  profile: undefined,
-  isLoading: true,
-  isLoggedIn: false,
-})
-
-export const useAuthContext = () => useContext(AuthContext)
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/auth/expo-social-auth/hooks/use-auth-context.tsx"
+lines={[[1, -1]]}
+meta="name=hooks/use-auth-context.tsx"
+/>
 
 #### Create the `AuthProvider`
 
 Next, create a provider component to manage the authentication session throughout the app:
 
-<$CodeTabs>
-
-```tsx name=providers/auth-provider.tsx
-import { AuthContext } from '@/hooks/use-auth-context'
-import { supabase } from '@/lib/supabase'
-import type { Session } from '@supabase/supabase-js'
-import { PropsWithChildren, useEffect, useState } from 'react'
-
-export default function AuthProvider({ children }: PropsWithChildren) {
-  const [session, setSession] = useState<Session | undefined | null>()
-  const [profile, setProfile] = useState<any>()
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-
-  // Fetch the session once, and subscribe to auth state changes
-  useEffect(() => {
-    const fetchSession = async () => {
-      setIsLoading(true)
-
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession()
-
-      if (error) {
-        console.error('Error fetching session:', error)
-      }
-
-      setSession(session)
-      setIsLoading(false)
-    }
-
-    fetchSession()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed:', { event: _event, session })
-      setSession(session)
-    })
-
-    // Cleanup subscription on unmount
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
-
-  // Fetch the profile when the session changes
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setIsLoading(true)
-
-      if (session) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-
-        setProfile(data)
-      } else {
-        setProfile(null)
-      }
-
-      setIsLoading(false)
-    }
-
-    fetchProfile()
-  }, [session])
-
-  return (
-    <AuthContext.Provider
-      value={{
-        session,
-        isLoading,
-        profile,
-        isLoggedIn: session != undefined,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  )
-}
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/auth/expo-social-auth/providers/auth-provider.tsx"
+lines={[[1, -1]]}
+meta="name=providers/auth-provider.tsx"
+/>
 
 #### Create the `SplashScreenController`
 
 Create a `SplashScreenController` component to display the [Expo `SplashScreen`](https://docs.expo.dev/versions/latest/sdk/splash-screen/) while the authentication session is loading:
 
-<$CodeTabs>
-
-```tsx name=components/splash-screen-controller.tsx
-import { useAuthContext } from '@/hooks/use-auth-context'
-import { SplashScreen } from 'expo-router'
-
-SplashScreen.preventAutoHideAsync()
-
-export function SplashScreenController() {
-  const { isLoading } = useAuthContext()
-
-  if (!isLoading) {
-    SplashScreen.hideAsync()
-  }
-
-  return null
-}
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/auth/expo-social-auth/components/splash-screen-controller.tsx"
+lines={[[1, -1]]}
+meta="name=components/splash-screen-controller.tsx"
+/>
 
 ### Create a logout component
 
 Create a logout button component to handle user sign-out:
 
-<$CodeTabs>
-
-```tsx name=components/social-auth-buttons/sign-out-button.tsx
-import { supabase } from '@/lib/supabase'
-import React from 'react'
-import { Button } from 'react-native'
-
-async function onSignOutButtonPress() {
-  const { error } = await supabase.auth.signOut()
-
-  if (error) {
-    console.error('Error signing out:', error)
-  }
-}
-
-export default function SignOutButton() {
-  return <Button title="Sign out" onPress={onSignOutButtonPress} />
-}
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/auth/expo-social-auth/components/social-auth-buttons/sign-out-button.tsx"
+lines={[[1, -1]]}
+meta="name=components/social-auth-buttons/sign-out-button.tsx"
+/>
 
 And add it to the `app/(tabs)/index.tsx` file used to display the user profile data and the logout button:
 
-<$CodeTabs>
-
-```tsx name=app/(tabs)/index.tsx
-import { Image } from 'expo-image'
-import { StyleSheet } from 'react-native'
-
-import { HelloWave } from '@/components/hello-wave'
-import ParallaxScrollView from '@/components/parallax-scroll-view'
-import { ThemedText } from '@/components/themed-text'
-import { ThemedView } from '@/components/themed-view'
-import SignOutButton from '@/components/social-auth-buttons/sign-out-button'
-import { useAuthContext } from '@/hooks/use-auth-context'
-
-export default function HomeScreen() {
-  const { profile } = useAuthContext()
-
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Username</ThemedText>
-        <ThemedText>{profile?.username}</ThemedText>
-        <ThemedText type="subtitle">Full name</ThemedText>
-        <ThemedText>{profile?.full_name}</ThemedText>
-      </ThemedView>
-      <SignOutButton />
-    </ParallaxScrollView>
-  )
-}
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-})
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/auth/expo-social-auth/app/(tabs)/index.tsx"
+lines={[[1, -1]]}
+meta="name=app/(tabs)/index.tsx"
+/>
 
 ### Create a login screen
 
 Next, create a basic login screen component:
 
-<$CodeTabs>
-
-```tsx name=app/login.tsx
-import { Link, Stack } from 'expo-router'
-import { StyleSheet } from 'react-native'
-
-import { ThemedText } from '@/components/themed-text'
-import { ThemedView } from '@/components/themed-view'
-
-export default function LoginScreen() {
-  return (
-    <>
-      <Stack.Screen options={{ title: 'Login' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">Login</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Try to navigate to home screen!</ThemedText>
-        </Link>
-      </ThemedView>
-    </>
-  )
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-})
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/auth/expo-social-auth/app/login.tsx"
+lines={[[1, -1]]}
+meta="name=app/login.tsx"
+/>
 
 #### Implement protected routes
 
@@ -447,63 +163,12 @@ Wrap the navigation with the `AuthProvider` and `SplashScreenController`.
 
 Using [Expo Router's protected routes](https://docs.expo.dev/router/advanced/authentication/#using-protected-routes), you can secure navigation:
 
-<$CodeTabs>
-
-```tsx name=app/_layout.tsx
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
-import { useFonts } from 'expo-font'
-import { Stack } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
-import 'react-native-reanimated'
-
-import { SplashScreenController } from '@/components/splash-screen-controller'
-
-import { useAuthContext } from '@/hooks/use-auth-context'
-import { useColorScheme } from '@/hooks/use-color-scheme'
-import AuthProvider from '@/providers/auth-provider'
-
-// Separate RootNavigator so we can access the AuthContext
-function RootNavigator() {
-  const { isLoggedIn } = useAuthContext()
-
-  return (
-    <Stack>
-      <Stack.Protected guard={isLoggedIn}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack.Protected>
-      <Stack.Protected guard={!isLoggedIn}>
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-      </Stack.Protected>
-      <Stack.Screen name="+not-found" />
-    </Stack>
-  )
-}
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme()
-
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  })
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null
-  }
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AuthProvider>
-        <SplashScreenController />
-        <RootNavigator />
-        <StatusBar style="auto" />
-      </AuthProvider>
-    </ThemeProvider>
-  )
-}
-```
-
-</$CodeTabs>
+{/* prettier-ignore */}
+<$CodeSample
+path="/auth/expo-social-auth/app/_layout.tsx"
+lines={[[1, -1]]}
+meta="name=app/\_layout.tsx"
+/>
 
 You can now test the app by running:
 
@@ -534,22 +199,22 @@ Start by adding the button inside the login screen:
 <$CodeTabs>
 
 ```tsx name=app/login.tsx
-...
+…
 import AppleSignInButton from '@/components/social-auth-buttons/apple/apple-sign-in-button';
-...
+…
 export default function LoginScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Login' }} />
       <ThemedView style={styles.container}>
-        ...
+        …
         <AppleSignInButton />
-        ...
+        …
       </ThemedView>
     </>
   );
 }
-...
+…
 ```
 
 </$CodeTabs>
@@ -606,64 +271,11 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Then create the iOS specific button component `AppleSignInButton`:
 
-    <$CodeTabs>
-
-    ```tsx name=components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx
-    import { supabase } from '@/lib/supabase';
-    import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
-    import type { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
-    import { router } from 'expo-router';
-    import { Platform } from 'react-native';
-
-    async function onAppleButtonPress() {
-      // Performs login request
-      const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: appleAuth.Operation.LOGIN,
-        // Note: it appears putting FULL_NAME first is important, see issue #293
-        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
-      });
-
-      // Get the current authentication state for user
-      // Note: This method must be tested on a real device. On the iOS simulator it always throws an error.
-      const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
-
-      console.log('Apple sign in successful:', { credentialState, appleAuthRequestResponse });
-
-      if (credentialState === appleAuth.State.AUTHORIZED && appleAuthRequestResponse.identityToken && appleAuthRequestResponse.authorizationCode) {
-        const signInWithIdTokenCredentials: SignInWithIdTokenCredentials = {
-          provider: 'apple',
-          token: appleAuthRequestResponse.identityToken,
-          nonce: appleAuthRequestResponse.nonce,
-          access_token: appleAuthRequestResponse.authorizationCode,
-        };
-
-        const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials);
-
-        if (error) {
-          console.error('Error signing in with Apple:', error);
-        }
-
-        if (data) {
-          console.log('Apple sign in successful:', data);
-          router.navigate('/(tabs)/explore');
-        }
-      }
-    }
-
-    export default function AppleSignInButton() {
-      if (Platform.OS !== 'ios') { return <></>; }
-
-      return <AppleButton
-        buttonStyle={AppleButton.Style.BLACK}
-        buttonType={AppleButton.Type.SIGN_IN}
-        style={{ width: 160, height: 45 }}
-        onPress={() => onAppleButtonPress()}
-      />;
-    }
-    ```
-
-    </$CodeTabs>
-
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx"
+    />
 
     <Admonition type="note">
 
@@ -672,9 +284,9 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
     <$CodeTabs>
 
     ```tsx name=components/social-auth-buttons/apple/apple-sign-in-button.ios.tsx
-    ...
+    …
     const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
-    ...
+    …
     ```
 
     </$CodeTabs>
@@ -689,13 +301,13 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
     ```json name=app.json
     {
       "expo": {
-        ...
+        …
         "ios": {
-          ...
+          …
           "usesAppleSignIn": true
-          ...
+          …
         },
-        ...
+        …
       }
     }
     ```
@@ -749,79 +361,11 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Next, create the Android-specific `AppleSignInButton` component:
 
-    <$CodeTabs>
-
-    ```tsx name=components/social-auth-buttons/apple/apple-sign-in-button.android.tsx
-    import { supabase } from '@/lib/supabase';
-    import { appleAuthAndroid, AppleButton } from '@invertase/react-native-apple-authentication';
-    import { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
-    import { Platform } from 'react-native';
-    import 'react-native-get-random-values';
-    import { v4 as uuid } from 'uuid';
-
-    async function onAppleButtonPress() {
-      // Generate secure, random values for state and nonce
-      const rawNonce = uuid();
-      const state = uuid();
-
-      // Configure the request
-      appleAuthAndroid.configure({
-        // The Service ID you registered with Apple
-        clientId: process.env.EXPO_PUBLIC_APPLE_AUTH_SERVICE_ID ?? '',
-
-        // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
-        // the URL you provided to Apple. It can be an empty route on your backend as it's never called.
-        redirectUri: process.env.EXPO_PUBLIC_APPLE_AUTH_REDIRECT_URI ?? '',
-
-        // The type of response requested - code, id_token, or both.
-        responseType: appleAuthAndroid.ResponseType.ALL,
-
-        // The amount of user information requested from Apple.
-        scope: appleAuthAndroid.Scope.ALL,
-
-        // Random nonce value that will be SHA256 hashed before sending to Apple.
-        nonce: rawNonce,
-
-        // Unique state value used to prevent CSRF attacks. A UUID will be generated if nothing is provided.
-        state,
-      });
-
-      // Open the browser window for user sign in
-      const credentialState = await appleAuthAndroid.signIn();
-      console.log('Apple sign in successful:', credentialState);
-
-      if (credentialState.id_token && credentialState.code && credentialState.nonce) {
-        const signInWithIdTokenCredentials: SignInWithIdTokenCredentials = {
-          provider: 'apple',
-          token: credentialState.id_token,
-          nonce: credentialState.nonce,
-          access_token: credentialState.code,
-        };
-
-        const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials);
-
-        if (error) {
-          console.error('Error signing in with Apple:', error);
-        }
-
-        if (data) {
-          console.log('Apple sign in successful:', data);
-        }
-      }
-    }
-
-    export default function AppleSignInButton() {
-      if (Platform.OS !== 'android' || appleAuthAndroid.isSupported !== true) { return <></> }
-
-      return <AppleButton
-        buttonStyle={AppleButton.Style.BLACK}
-        buttonType={AppleButton.Type.SIGN_IN}
-        onPress={() => onAppleButtonPress()}
-      />;
-    }
-    ```
-
-    </$CodeTabs>
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.android.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/apple/apple-sign-in-button.android.tsx"
+    />
 
     You should now be able to test the authentication by running it on a physical device or simulator:
 
@@ -854,78 +398,11 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Next, create the Web-specific `AppleSignInButton` component:
 
-    <$CodeTabs>
-
-    ```tsx name=components/social-auth-buttons/apple/apple-sign-in-button.web.tsx
-    import { supabase } from '@/lib/supabase';
-    import type { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
-    import { useEffect, useState } from 'react';
-    import AppleSignin, { type AppleAuthResponse } from 'react-apple-signin-auth';
-    import { Platform } from 'react-native';
-
-    export default function AppleSignInButton() {
-      const [nonce, setNonce] = useState('');
-      const [sha256Nonce, setSha256Nonce] = useState('');
-
-      async function onAppleButtonSuccess(appleAuthRequestResponse: AppleAuthResponse) {
-        console.debug('Apple sign in successful:', { appleAuthRequestResponse });
-        if (appleAuthRequestResponse.authorization && appleAuthRequestResponse.authorization.id_token && appleAuthRequestResponse.authorization.code) {
-          const signInWithIdTokenCredentials: SignInWithIdTokenCredentials = {
-            provider: 'apple',
-            token: appleAuthRequestResponse.authorization.id_token,
-            nonce,
-            access_token: appleAuthRequestResponse.authorization.code,
-          };
-
-          const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials)
-
-          if (error) {
-            console.error('Error signing in with Apple:', error);
-          }
-
-          if (data) {
-            console.log('Apple sign in successful:', data);
-          }
-        };
-      }
-
-      useEffect(() => {
-        function generateNonce(): string {
-          const array = new Uint32Array(1);
-          window.crypto.getRandomValues(array);
-          return array[0].toString();
-        };
-
-        async function generateSha256Nonce(nonce: string): Promise<string> {
-          const buffer = await window.crypto.subtle.digest('sha-256', new TextEncoder().encode(nonce));
-          const array = Array.from(new Uint8Array(buffer));
-          return array.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        let nonce = generateNonce();
-        setNonce(nonce);
-
-        generateSha256Nonce(nonce)
-          .then((sha256Nonce) => { setSha256Nonce(sha256Nonce) });
-      }, []);
-
-      if (Platform.OS !== 'web') { return <></>; }
-
-      return <AppleSignin
-        authOptions={{
-          clientId: process.env.EXPO_PUBLIC_APPLE_AUTH_SERVICE_ID ?? '',
-          redirectURI: process.env.EXPO_PUBLIC_APPLE_AUTH_REDIRECT_URI ?? '',
-          scope: 'email name',
-          state: 'state',
-          nonce: sha256Nonce,
-          usePopup: true,
-        }}
-        onSuccess={onAppleButtonSuccess}
-      />;
-    }
-    ```
-
-    </$CodeTabs>
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.web.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/apple/apple-sign-in-button.web.tsx"
+    />
 
     Test the authentication in your browser using the tunneled HTTPS URL:
 
@@ -956,14 +433,14 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
     ```json name=app.json
     {
       "expo": {
-        ...
+        …
         "ios": {
-          ...
+          …
           "usesAppleSignIn": true
-          ...
+          …
         },
         "plugins": ["expo-apple-authentication"]
-        ...
+        …
       }
     }
     ```
@@ -972,64 +449,11 @@ For more information, follow the [Supabase Login with Apple](/docs/guides/auth/s
 
     Then create the iOS specific button component `AppleSignInButton`:
 
-    <$CodeTabs>
-
-    ```tsx name=components/social-auth-buttons/apple/apple-sign-in-button.tsx
-    import { supabase } from '@/lib/supabase';
-    import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
-    import type { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
-    import { router } from 'expo-router';
-    import { Platform } from 'react-native';
-
-    async function onAppleButtonPress() {
-      // Performs login request
-      const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: appleAuth.Operation.LOGIN,
-        // Note: it appears putting FULL_NAME first is important, see issue #293
-        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
-      });
-
-      // Get the current authentication state for user
-      // Note: This method must be tested on a real device. On the iOS simulator it always throws an error.
-      const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
-
-      console.log('Apple sign in successful:', { credentialState, appleAuthRequestResponse });
-
-      if (credentialState === appleAuth.State.AUTHORIZED && appleAuthRequestResponse.identityToken && appleAuthRequestResponse.authorizationCode) {
-        const signInWithIdTokenCredentials: SignInWithIdTokenCredentials = {
-          provider: 'apple',
-          token: appleAuthRequestResponse.identityToken,
-          nonce: appleAuthRequestResponse.nonce,
-          access_token: appleAuthRequestResponse.authorizationCode,
-        };
-
-        const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials);
-
-        if (error) {
-          console.error('Error signing in with Apple:', error);
-        }
-
-        if (data) {
-          console.log('Apple sign in successful:', data);
-          router.navigate('/(tabs)/explore');
-        }
-      }
-    }
-
-    export default function AppleSignInButton() {
-      if (Platform.OS !== 'ios') { return <></>; }
-
-      return <AppleButton
-        buttonStyle={AppleButton.Style.BLACK}
-        buttonType={AppleButton.Type.SIGN_IN}
-        style={{ width: 160, height: 45 }}
-        onPress={() => onAppleButtonPress()}
-      />;
-    }
-    ```
-
-    </$CodeTabs>
-
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/apple/apple-sign-in-button.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/apple/apple-sign-in-button.tsx"
+    />
 
     <Admonition type="note">
 
@@ -1047,22 +471,22 @@ Start by adding the button to the login screen:
 <$CodeTabs>
 
 ```tsx name=app/login.tsx
-...
+…
 import GoogleSignInButton from '@/components/social-auth-buttons/google/google-sign-in-button';
-...
+…
 export default function LoginScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Login' }} />
       <ThemedView style={styles.container}>
-        ...
+        …
         <GoogleSignInButton />
-        ...
+        …
       </ThemedView>
     </>
   );
 }
-...
+…
 ```
 
 </$CodeTabs>
@@ -1071,7 +495,7 @@ For Google authentication, you can choose between the following options:
 
 - [GN Google Sign In Premium](https://react-native-google-signin.github.io/docs/install#sponsor-only-version) - that supports iOS, Android, and Web by using the latest Google's One Tap sign-in (but [it requires a subscription](https://universal-sign-in.com/))
 - [@react-oauth/google](https://github.com/MomenSherif/react-oauth#googlelogin) - that supports Web (so it's not a good option for mobile, but it works)
-- Relying on the [``signInWithOAuth](/docs/reference/javascript/auth-signinwithoauth) function of the Supabase Auth - that also supports iOS, Android and Web (useful also to manage any other OAuth provider)
+- Relying on the [`signInWithOAuth`](/docs/reference/javascript/auth-signinwithoauth) function of the Supabase Auth - that also supports iOS, Android and Web (useful also to manage any other OAuth provider)
 
 <Admonition type="note">
 
@@ -1096,144 +520,16 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
   defaultActiveId="web"
   queryGroup="google-authentication"
 >
- <TabPanel id="mobile" label="Mobile">
+
+  <TabPanel id="mobile" label="Mobile">
 
     Create the mobile generic button component `GoogleSignInButton`:
 
-    <$CodeTabs>
-
-    ```tsx name=components/social-auth-buttons/google/google-sign-in-button.tsx
-    import { supabase } from '@/lib/supabase';
-    import { useEffect } from 'react';
-    import { TouchableOpacity } from 'react-native';
-
-    import { expo } from '@/app.json';
-    import { Text } from '@react-navigation/elements';
-    import { Image } from 'expo-image';
-    import * as WebBrowser from "expo-web-browser";
-
-    WebBrowser.maybeCompleteAuthSession();
-
-    export default function GoogleSignInButton() {
-
-      function extractParamsFromUrl(url: string) {
-        const parsedUrl = new URL(url);
-        const hash = parsedUrl.hash.substring(1); // Remove the leading '#'
-        const params = new URLSearchParams(hash);
-
-        return {
-          access_token: params.get("access_token"),
-          expires_in: parseInt(params.get("expires_in") || "0"),
-          refresh_token: params.get("refresh_token"),
-          token_type: params.get("token_type"),
-          provider_token: params.get("provider_token"),
-          code: params.get("code"),
-        };
-      };
-
-      async function onSignInButtonPress() {
-        console.debug('onSignInButtonPress - start');
-        const res = await supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            redirectTo: `${expo.scheme}://google-auth`,
-            queryParams: { prompt: "consent" },
-            skipBrowserRedirect: true,
-          },
-        });
-
-        const googleOAuthUrl = res.data.url;
-
-        if (!googleOAuthUrl) {
-          console.error("no oauth url found!");
-          return;
-        }
-
-        const result = await WebBrowser.openAuthSessionAsync(
-          googleOAuthUrl,
-          `${expo.scheme}://google-auth`,
-          { showInRecents: true },
-        ).catch((err) => {
-          console.error('onSignInButtonPress - openAuthSessionAsync - error', { err });
-          console.log(err);
-        });
-
-        console.debug('onSignInButtonPress - openAuthSessionAsync - result', { result });
-
-        if (result && result.type === "success") {
-          console.debug('onSignInButtonPress - openAuthSessionAsync - success');
-          const params = extractParamsFromUrl(result.url);
-          console.debug('onSignInButtonPress - openAuthSessionAsync - success', { params });
-
-          if (params.access_token && params.refresh_token) {
-            console.debug('onSignInButtonPress - setSession');
-            const { data, error } = await supabase.auth.setSession({
-              access_token: params.access_token,
-              refresh_token: params.refresh_token,
-            });
-            console.debug('onSignInButtonPress - setSession - success', { data, error });
-            return;
-          } else {
-            console.error('onSignInButtonPress - setSession - failed');
-            // sign in/up failed
-          }
-        } else {
-          console.error('onSignInButtonPress - openAuthSessionAsync - failed');
-        }
-      }
-
-      // to warm up the browser
-      useEffect(() => {
-        WebBrowser.warmUpAsync();
-
-        return () => {
-          WebBrowser.coolDownAsync();
-        };
-      }, []);
-
-      return (
-        <TouchableOpacity
-          onPress={onSignInButtonPress}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: '#ffffff',
-            borderWidth: 1,
-            borderColor: '#dbdbdb',
-            borderRadius: 4,
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-            justifyContent: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-            elevation: 2, // For Android shadow
-          }}
-          activeOpacity={0.8}
-        >
-          <Image
-            source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
-            style={{ width: 24, height: 24, marginRight: 10 }}
-          />
-          <Text
-            style={{
-              fontSize: 16,
-              color: '#757575',
-              fontFamily: 'Roboto-Regular', // Assuming Roboto is available; install via expo-google-fonts or similar if needed
-              fontWeight: '500',
-            }}
-          >
-            Sign in with Google
-          </Text>
-        </TouchableOpacity>
-      );
-    }
-
-    ```
-
-    </$CodeTabs>
-
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/google/google-sign-in-button.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/google/google-sign-in-button.tsx"
+    />
 
     Finally, update the iOS and Android projects by running the Expo prebuild command:
 
@@ -1267,18 +563,18 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
     ```json name=app.json
     {
       "expo": {
-        ...
-        "plugins": {
-          ...
+        …
+        "plugins": [
+          …
           [
             "expo-web-browser",
             {
               "experimentalLauncherActivity": false
             }
           ]
-          ...
-        },
-        ...
+          …
+        ],
+        …
       }
     }
     ```
@@ -1287,86 +583,11 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
 
     Then create the iOS specific button component `GoogleSignInButton`:
 
-    <$CodeTabs>
-    ```tsx name=components/social-auth-buttons/google/google-sign-in-button.web.tsx
-
-    import { supabase } from '@/lib/supabase';
-    import { CredentialResponse, GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-    import { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
-    import { useEffect, useState } from 'react';
-
-    import 'react-native-get-random-values';
-
-    export default function GoogleSignInButton() {
-
-      // Generate secure, random values for state and nonce
-      const [nonce, setNonce] = useState('');
-      const [sha256Nonce, setSha256Nonce] = useState('');
-
-      async function onGoogleButtonSuccess(authRequestResponse: CredentialResponse) {
-        console.debug('Google sign in successful:', { authRequestResponse });
-        if (authRequestResponse.clientId && authRequestResponse.credential) {
-          const signInWithIdTokenCredentials: SignInWithIdTokenCredentials = {
-            provider: 'google',
-            token: authRequestResponse.credential,
-            nonce: nonce,
-          };
-
-          const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials);
-
-          if (error) {
-            console.error('Error signing in with Google:', error);
-          }
-
-          if (data) {
-            console.log('Google sign in successful:', data);
-          }
-        }
-      }
-
-      function onGoogleButtonFailure() {
-        console.error('Error signing in with Google');
-      }
-
-      useEffect(() => {
-        function generateNonce(): string {
-          const array = new Uint32Array(1);
-          window.crypto.getRandomValues(array);
-          return array[0].toString();
-        }
-
-        async function generateSha256Nonce(nonce: string): Promise<string> {
-          const buffer = await window.crypto.subtle.digest('sha-256', new TextEncoder().encode(nonce));
-          const array = Array.from(new Uint8Array(buffer));
-          return array.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        let nonce = generateNonce();
-        setNonce(nonce);
-
-        generateSha256Nonce(nonce)
-          .then((sha256Nonce) => { setSha256Nonce(sha256Nonce) });
-      }, []);
-
-      return (
-        <GoogleOAuthProvider
-          clientId={process.env.EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID ?? ''}
-          nonce={sha256Nonce}
-        >
-          <GoogleLogin
-            nonce={sha256Nonce}
-            onSuccess={onGoogleButtonSuccess}
-            onError={onGoogleButtonFailure}
-            useOneTap={true}
-            auto_select={true}
-          />
-        </GoogleOAuthProvider>
-      );
-    }
-
-    ```
-    </$CodeTabs>
-
+    <$CodeSample
+      path="/auth/expo-social-auth/components/social-auth-buttons/google/google-sign-in-button.web.tsx"
+      lines={[[1, -1]]}
+      meta="name=components/social-auth-buttons/google/google-sign-in-button.web.tsx"
+    />
 
     Test the authentication in your browser using the tunnelled HTTPS URL:
 

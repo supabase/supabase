@@ -1,33 +1,47 @@
-import { MutableRefObject } from 'react'
+import { useParams } from 'common'
+import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
 
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import type { FDW } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { getWrapperMetaForWrapper } from './Wrappers.utils'
+import { INTEGRATIONS } from '../Landing/Integrations.constants'
+import { getWrapperMetaForWrapper, wrapperMetaComparator } from './Wrappers.utils'
 
-interface DeleteWrapperModalProps {
-  selectedWrapper?: FDW
-  onClose: () => void
-  deletingWrapperIdRef?: MutableRefObject<string | null>
-}
-
-const DeleteWrapperModal = ({
-  selectedWrapper,
-  onClose,
-  deletingWrapperIdRef,
-}: DeleteWrapperModalProps) => {
+export const DeleteWrapperModal = () => {
+  const { id, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { mutate: deleteFDW, isPending: isDeleting } = useFDWDeleteMutation({
+  const integration = INTEGRATIONS.find((i) => i.id === id)
+
+  const { data, isSuccess } = useFDWsQuery({
+    projectRef: ref,
+    connectionString: project?.connectionString,
+  })
+
+  const wrappers = useMemo(
+    () =>
+      integration && integration.type === 'wrapper' && data
+        ? data.filter((wrapper) => wrapperMetaComparator(integration.meta, wrapper))
+        : [],
+    [data, integration]
+  )
+
+  const [selectedWrapperIdToDelete, setSelectedWrapperToDelete] = useQueryState(
+    'delete',
+    parseAsString
+  )
+  const selectedWrapper = wrappers.find((x) => x.id.toString() === selectedWrapperIdToDelete)
+
+  const {
+    mutate: deleteFDW,
+    isPending: isDeleting,
+    isSuccess: isSuccessDelete,
+  } = useFDWDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled ${selectedWrapper?.name} foreign data wrapper`)
-      onClose()
-    },
-    onError: () => {
-      if (deletingWrapperIdRef) {
-        deletingWrapperIdRef.current = null
-      }
+      setSelectedWrapperToDelete(null)
     },
   })
   const wrapperMeta = getWrapperMetaForWrapper(selectedWrapper)
@@ -37,10 +51,6 @@ const DeleteWrapperModal = ({
     if (!selectedWrapper) return console.error('Wrapper is required')
     if (!wrapperMeta) return console.error('Wrapper meta is required')
 
-    if (deletingWrapperIdRef) {
-      deletingWrapperIdRef.current = selectedWrapper.id.toString()
-    }
-
     deleteFDW({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -49,13 +59,27 @@ const DeleteWrapperModal = ({
     })
   }
 
+  useEffect(() => {
+    if (isSuccess && !!selectedWrapperIdToDelete && !selectedWrapper && !isSuccessDelete) {
+      toast('Wrapper not found')
+      setSelectedWrapperToDelete(null)
+    }
+  }, [
+    isSuccess,
+    isSuccessDelete,
+    selectedWrapper,
+    selectedWrapperIdToDelete,
+    setSelectedWrapperToDelete,
+  ])
+
   return (
     <Modal
       size="medium"
+      variant="danger"
       alignFooter="right"
       loading={isDeleting}
       visible={selectedWrapper !== undefined}
-      onCancel={() => onClose()}
+      onCancel={() => setSelectedWrapperToDelete(null)}
       onConfirm={() => onConfirmDelete()}
       header={`Confirm to disable ${selectedWrapper?.name}`}
     >
@@ -68,5 +92,3 @@ const DeleteWrapperModal = ({
     </Modal>
   )
 }
-
-export default DeleteWrapperModal

@@ -1,20 +1,19 @@
+import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import dayjs from 'dayjs'
 import { Code, Play } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
-
-import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-
 import { Badge, Button, ChartContainer, ChartTooltipContent, cn, CodeBlock } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
-import { getCumulativeResults } from './QueryBlock.utils'
+import { checkHasNonPositiveValues, formatLogTick, getCumulativeResults } from './QueryBlock.utils'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -23,6 +22,7 @@ export const DEFAULT_CHART_CONFIG: ChartConfig = {
   yKey: '',
   showLabels: false,
   showGrid: false,
+  logScale: false,
   view: 'table',
 }
 
@@ -68,7 +68,7 @@ export const QueryBlock = ({
   onDragStart,
 }: QueryBlockProps) => {
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
-  const { xKey, yKey, view = 'table' } = chartSettings
+  const { xKey, yKey, view = 'table', logScale = false } = chartSettings
 
   const [showSql, setShowSql] = useState(!results && !initialHideSql)
   const [focusDataIndex, setFocusDataIndex] = useState<number>()
@@ -105,6 +105,13 @@ export const QueryBlock = ({
     ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
     : formattedQueryResult
 
+  const hasNonPositiveValues = useMemo(() => {
+    if (!logScale || !yKey || !chartData?.length) return false
+    return checkHasNonPositiveValues(chartData, yKey)
+  }, [logScale, yKey, chartData])
+
+  const effectiveLogScale = logScale && !hasNonPositiveValues
+
   const getDateFormat = (key: any) => {
     const value = chartData?.[0]?.[key] || ''
     if (typeof value === 'number') return 'number'
@@ -139,59 +146,62 @@ export const QueryBlock = ({
       label={label}
       badge={isWriteQuery && <Badge variant="warning">Write</Badge>}
       actions={
-        disabled ? null : (
-          <>
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              className="w-7 h-7"
-              icon={<Code size={14} strokeWidth={1.5} />}
-              onClick={() => setShowSql(!showSql)}
-              tooltip={{
-                content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
-              }}
-            />
-            {hasResults && (
-              <BlockViewConfiguration
-                view={view}
-                isChart={view === 'chart'}
-                lockColumns={false}
-                chartConfig={chartSettings}
-                columns={Object.keys(results?.[0] ?? {})}
-                changeView={(nextView) => {
-                  if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view: nextView } })
-                  setChartSettings({ ...chartSettings, view: nextView })
-                }}
-                updateChartConfig={(config) => {
-                  if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
-                  setChartSettings(config)
+        <>
+          {!disabled && (
+            <>
+              <ButtonTooltip
+                type="text"
+                size="tiny"
+                className="w-7 h-7"
+                icon={<Code size={14} strokeWidth={1.5} />}
+                onClick={() => setShowSql(!showSql)}
+                tooltip={{
+                  content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
                 }}
               />
-            )}
+              {hasResults && (
+                <BlockViewConfiguration
+                  view={view}
+                  isChart={view === 'chart'}
+                  lockColumns={false}
+                  chartConfig={chartSettings}
+                  columns={Object.keys(results?.[0] ?? {})}
+                  changeView={(nextView) => {
+                    if (onUpdateChartConfig)
+                      onUpdateChartConfig({ chartConfig: { view: nextView } })
+                    setChartSettings({ ...chartSettings, view: nextView })
+                  }}
+                  updateChartConfig={(config) => {
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
+                    setChartSettings(config)
+                  }}
+                />
+              )}
 
-            <EditQueryButton id={id} title={label} sql={sql} />
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              className="w-7 h-7"
-              icon={<Play size={14} strokeWidth={1.5} />}
-              loading={isExecuting}
-              disabled={isExecuting || disabled || !sql}
-              onClick={runSelect}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  className: 'max-w-56 text-center',
-                  text: isExecuting
-                    ? 'Query is running. Check the SQL Editor to manage running queries.'
-                    : 'Run query',
-                },
-              }}
-            />
+              <EditQueryButton id={id} title={label} sql={sql} />
+              <ButtonTooltip
+                type="text"
+                size="tiny"
+                className="w-7 h-7"
+                icon={<Play size={14} strokeWidth={1.5} />}
+                loading={isExecuting}
+                disabled={isExecuting || disabled || !sql}
+                onClick={runSelect}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    className: 'max-w-56 text-center',
+                    text: isExecuting
+                      ? 'Query is running. Check the SQL Editor to manage running queries.'
+                      : 'Run query',
+                  },
+                }}
+              />
+            </>
+          )}
 
-            {actions}
-          </>
-        )
+          {actions}
+        </>
       }
     >
       {!!showWarning && !blockWriteQueries && (
@@ -250,6 +260,11 @@ export const QueryBlock = ({
             </div>
           ) : (
             <div className="flex-1 w-full">
+              {hasNonPositiveValues && (
+                <p className="px-3 pt-1 text-xs text-foreground-light">
+                  Log scale is unavailable because the data contains zero or negative values.
+                </p>
+              )}
               <ChartContainer
                 className="aspect-auto px-3 py-2"
                 style={{ height: '230px', minHeight: '230px' }}
@@ -277,7 +292,16 @@ export const QueryBlock = ({
                       xKeyDateFormat === 'date' ? dayjs(value).format('MMM D YYYY HH:mm') : value
                     }
                   />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={4} />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={4}
+                    scale={effectiveLogScale ? 'log' : 'auto'}
+                    domain={effectiveLogScale ? [1, 'auto'] : undefined}
+                    allowDataOverflow={effectiveLogScale}
+                    width={effectiveLogScale ? 52 : undefined}
+                    tickFormatter={effectiveLogScale ? formatLogTick : undefined}
+                  />
                   <Tooltip content={<ChartTooltipContent className="w-[150px]" />} />
                   <Bar radius={1} dataKey={yKey}>
                     {chartData?.map((_: any, index: number) => (

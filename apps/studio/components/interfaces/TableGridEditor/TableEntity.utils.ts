@@ -1,5 +1,6 @@
 import { SupaTable } from 'components/grid/types'
-import { Lint } from '../../../data/lint/lint-query'
+
+import { Lint } from '@/data/lint/lint-query'
 
 export const getEntityLintDetails = (
   entityName: string,

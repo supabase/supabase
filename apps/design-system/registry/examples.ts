@@ -14,6 +14,12 @@ export const examples: Registry = [
     files: ['example/admonition-demo.tsx'],
   },
   {
+    name: 'admonition-responsive',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-responsive.tsx'],
+  },
+  {
     name: 'admonition-button',
     type: 'components:example',
     registryDependencies: ['admonition'],
@@ -32,10 +38,22 @@ export const examples: Registry = [
     files: ['example/admonition-destructive.tsx'],
   },
   {
+    name: 'admonition-sandwiched',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-sandwiched.tsx'],
+  },
+  {
     name: 'alert-demo',
     type: 'components:example',
     registryDependencies: ['alert'],
     files: ['example/alert-demo.tsx'],
+  },
+  {
+    name: 'alert-collapsible-demo',
+    type: 'components:example',
+    registryDependencies: ['alert', 'collapsible', 'button'],
+    files: ['example/alert-collapsible-demo.tsx'],
   },
   {
     name: 'alert-dialog-demo',

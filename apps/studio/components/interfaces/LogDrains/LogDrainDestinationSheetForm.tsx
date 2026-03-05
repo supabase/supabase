@@ -10,22 +10,23 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   RadioGroupCard,
   RadioGroupCardItem,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectLabel_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -33,14 +34,23 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { z } from 'zod'
 
 import { urlRegex } from '../Auth/Auth.constants'
-import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import {
+  DATADOG_REGIONS,
+  LAST9_REGIONS,
+  LOG_DRAIN_TYPES,
+  LogDrainType,
+  OTLP_PROTOCOLS,
+} from './LogDrains.constants'
+import {
+  getHeadersSectionDescription as getHeadersDescription,
+  validateNewHeader,
+} from './LogDrains.utils'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -112,6 +122,25 @@ const formUnion = z.discriminatedUnion('type', [
     api_token: z.string().min(1, { message: 'API token is required' }),
     dataset_name: z.string().min(1, { message: 'Dataset name is required' }),
   }),
+  z.object({
+    type: z.literal('last9'),
+    region: z.string().min(1, { message: 'Region is required' }),
+    username: z.string().min(1, { message: 'Username is required' }),
+    password: z.string().min(1, { message: 'Password is required' }),
+  }),
+  z.object({
+    type: z.literal('otlp'),
+    endpoint: z
+      .string()
+      .min(1, { message: 'OTLP endpoint is required' })
+      .refine(
+        (url) => url.startsWith('http://') || url.startsWith('https://'),
+        'OTLP endpoint must start with http:// or https://'
+      ),
+    protocol: z.string().optional().default('http/protobuf'),
+    gzip: z.boolean().optional().default(true),
+    headers: z.record(z.string(), z.string()).optional(),
+  }),
 ])
 
 const formSchema = z
@@ -175,21 +204,27 @@ export function LogDrainDestinationSheetForm({
   // and it does not include `type` inside the config itself, so it's not trivial to create `discriminatedUnion`
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
   const defaultConfig = (defaultValues?.config || {}) as any
-  const CREATE_DEFAULT_HEADERS = {
-    'Content-Type': 'application/json',
+  const defaultType = defaultValues?.type || 'webhook'
+  const CREATE_DEFAULT_HEADERS_BY_TYPE: Partial<Record<LogDrainType, Record<string, string>>> = {
+    webhook: { 'Content-Type': 'application/json' },
+    otlp: { 'Content-Type': 'application/x-protobuf' },
   }
-  const DEFAULT_HEADERS = mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultConfig?.headers || {}
+  const DEFAULT_HEADERS =
+    mode === 'create'
+      ? CREATE_DEFAULT_HEADERS_BY_TYPE[defaultType] ?? {}
+      : defaultConfig?.headers || {}
 
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
   const axiomEnabled = useFlag('axiomLogDrain')
+  const otlpEnabled = useFlag('otlpLogDrain')
+  const last9Enabled = useFlag('Last9LogDrain')
 
   const { ref } = useParams()
   const { data: logDrains } = useLogDrainsQuery({
     ref,
   })
 
-  const defaultType = defaultValues?.type || 'webhook'
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
   const track = useTrack()
 
@@ -215,6 +250,8 @@ export function LogDrainDestinationSheetForm({
       batch_timeout: defaultConfig?.batch_timeout ?? 3000,
       dataset_name: defaultConfig?.dataset_name || '',
       api_token: defaultConfig?.api_token || '',
+      endpoint: defaultConfig?.endpoint || '',
+      protocol: defaultConfig?.protocol || 'http/protobuf',
     },
   })
 
@@ -232,19 +269,13 @@ export function LogDrainDestinationSheetForm({
   function addHeader() {
     const formHeaders = form.getValues('headers')
     if (!formHeaders) return
-    const headerKeys = Object.keys(formHeaders)
-    if (headerKeys?.length === 20) {
-      toast.error('You can only have 20 custom headers')
+
+    const validation = validateNewHeader(formHeaders, newCustomHeader)
+    if (!validation.valid) {
+      toast.error(validation.error)
       return
     }
-    if (headerKeys?.includes(newCustomHeader.name)) {
-      toast.error('Header name already exists')
-      return
-    }
-    if (!newCustomHeader.name || !newCustomHeader.value) {
-      toast.error('Header name and value are required')
-      return
-    }
+
     form.setValue('headers', { ...formHeaders, [newCustomHeader.name]: newCustomHeader.value })
     setNewCustomHeader({ name: '', value: '' })
   }
@@ -256,16 +287,6 @@ export function LogDrainDestinationSheetForm({
       form.reset()
     }
   }, [mode, open, form])
-
-  function getHeadersSectionDescription() {
-    if (type === 'webhook') {
-      return 'Set custom headers when draining logs to the Endpoint URL'
-    }
-    if (type === 'loki') {
-      return 'Set custom headers when draining logs to the Loki HTTP(S) endpoint'
-    }
-    return ''
-  }
 
   return (
     <Sheet
@@ -328,9 +349,7 @@ export function LogDrainDestinationSheetForm({
                     <Select_Shadcn_
                       defaultValue={defaultType}
                       value={form.getValues('type')}
-                      onValueChange={(v: Exclude<LogDrainType, 'axiom'>) =>
-                        form.setValue('type', v)
-                      }
+                      onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                     >
                       <SelectTrigger_Shadcn_>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
@@ -340,6 +359,8 @@ export function LogDrainDestinationSheetForm({
                           if (t.value === 'sentry') return sentryEnabled
                           if (t.value === 's3') return s3Enabled
                           if (t.value === 'axiom') return axiomEnabled
+                          if (t.value === 'otlp') return otlpEnabled
+                          if (t.value === 'last9') return last9Enabled
                           return true
                         }).map((type) => (
                           <SelectItem_Shadcn_
@@ -592,20 +613,135 @@ export function LogDrainDestinationSheetForm({
                     />
                   </div>
                 )}
+                {type === 'otlp' && (
+                  <>
+                    <div className="grid gap-4 px-content">
+                      <LogDrainFormItem
+                        type="url"
+                        value="endpoint"
+                        label="OTLP Endpoint"
+                        placeholder="https://otlp.example.com:4318/v1/logs"
+                        formControl={form.control}
+                        description="The HTTP endpoint for OTLP log ingestion (typically ends with /v1/logs)"
+                      />
+                      <FormField_Shadcn_
+                        name="protocol"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="horizontal"
+                            label="Protocol"
+                            description="Only HTTP with Protocol Buffers is currently supported"
+                          >
+                            <FormControl_Shadcn_>
+                              <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger_Shadcn_ className="col-span-3">
+                                  <SelectValue_Shadcn_ placeholder="Select protocol" />
+                                </SelectTrigger_Shadcn_>
+                                <SelectContent_Shadcn_>
+                                  <SelectGroup_Shadcn_>
+                                    <SelectLabel_Shadcn_>Protocol</SelectLabel_Shadcn_>
+                                    {OTLP_PROTOCOLS.map((proto) => (
+                                      <SelectItem_Shadcn_ key={proto.value} value={proto.value}>
+                                        {proto.label}
+                                      </SelectItem_Shadcn_>
+                                    ))}
+                                  </SelectGroup_Shadcn_>
+                                </SelectContent_Shadcn_>
+                              </Select_Shadcn_>
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </div>
+
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="gzip"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="space-y-2 px-4">
+                          <div className="flex gap-2 items-center">
+                            <FormControl_Shadcn_>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl_Shadcn_>
+                            <FormLabel_Shadcn_ className="text-base">
+                              Gzip Compression
+                            </FormLabel_Shadcn_>
+                            <InfoTooltip align="start">
+                              Enable gzip compression for log data sent to the OTLP endpoint.
+                            </InfoTooltip>
+                          </div>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                  </>
+                )}
+                {type === 'last9' && (
+                  <div className="grid gap-4 px-content">
+                    <FormField_Shadcn_
+                      name="region"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="horizontal"
+                          label={'Region'}
+                          description={
+                            <p>
+                              The Last9 region to send logs to. Credentials can be obtained from the
+                              Last9 OTEL integration panel.
+                            </p>
+                          }
+                        >
+                          <FormControl_Shadcn_>
+                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger_Shadcn_ className="col-span-3">
+                                <SelectValue_Shadcn_ placeholder="Select a region" />
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                <SelectGroup_Shadcn_>
+                                  <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
+                                  {LAST9_REGIONS.map((reg) => (
+                                    <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
+                                      {reg.label}
+                                    </SelectItem_Shadcn_>
+                                  ))}
+                                </SelectGroup_Shadcn_>
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                    <LogDrainFormItem
+                      type="text"
+                      value="username"
+                      label="Username"
+                      placeholder="username"
+                      formControl={form.control}
+                      description="Username for authentication from Last9 OTEL integration."
+                    />
+                    <LogDrainFormItem
+                      type="password"
+                      value="password"
+                      label="Password"
+                      placeholder="••••••••••••••••"
+                      formControl={form.control}
+                      description="Password for authentication from Last9 OTEL integration."
+                    />
+                  </div>
+                )}
                 <FormMessage_Shadcn_ />
               </div>
             </form>
           </Form_Shadcn_>
 
           {/* This form needs to be outside the <Form_Shadcn_> */}
-          {(type === 'webhook' || type === 'loki') && (
+          {(type === 'webhook' || type === 'loki' || type === 'otlp') && (
             <>
               <div className="border-t mt-4">
                 <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
                   <h2 className="text-sm">Custom Headers</h2>
-                  <p className="text-xs text-foreground-lighter">
-                    {getHeadersSectionDescription()}
-                  </p>
+                  <p className="text-xs text-foreground-lighter">{getHeadersDescription(type)}</p>
                 </div>
                 <div className="divide-y">
                   {hasHeaders &&

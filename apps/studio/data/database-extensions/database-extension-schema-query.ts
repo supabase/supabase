@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { UseCustomQueryOptions } from 'types'
 
-import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
-import { getDatabaseExtensionDefaultSchemaSQL } from '../sql/queries/get-extension-default-schema'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { getDatabaseExtensionDefaultSchemaSQL } from './database-extensions.sql'
 import { databaseExtensionsKeys } from './keys'
 
 type DatabaseExtensionDefaultSchemaVariables = {

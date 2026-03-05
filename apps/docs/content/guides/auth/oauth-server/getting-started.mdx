@@ -491,6 +491,22 @@ Store the client secret securely. It will only be shown once. If you lose it, yo
 
 </Admonition>
 
+#### Token endpoint authentication method
+
+When a client exchanges an authorization code or refreshes a token, it must authenticate with the token endpoint. The `token_endpoint_auth_method` controls how this authentication happens:
+
+| Method | Description | Used by |
+| --- | --- | --- |
+| `none` | No client authentication. Only `client_id` is sent in the request body. | Public clients (required) |
+| `client_secret_basic` | Client credentials sent via HTTP Basic auth (`Authorization: Basic <base64(client_id:client_secret)>`). **This is the default for confidential clients.** | Confidential clients |
+| `client_secret_post` | Client credentials sent in the request body (`client_id` and `client_secret` as form parameters). | Confidential clients |
+
+**Defaults:** Public clients default to `none`. Confidential clients default to `client_secret_basic` (per [RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591#section-2)).
+
+**Constraints:** Public clients must use `none`. Confidential clients cannot use `none`.
+
+You can set this when registering a client via the dashboard or programmatically. See [OAuth Flows](/docs/guides/auth/oauth-server/oauth-flows#step-5-token-exchange) for examples of each method in action.
+
 </TabPanel>
 <TabPanel id="programmatically" label="Programmatically">
 
@@ -518,6 +534,8 @@ const { data, error } = await supabase.auth.admin.oauth.createClient({
   name: 'My Third-Party App',
   redirect_uris: ['https://my-app.com/auth/callback', 'https://my-app.com/auth/silent-callback'],
   client_type: 'confidential',
+  // Optional: defaults to 'client_secret_basic' for confidential, 'none' for public
+  token_endpoint_auth_method: 'client_secret_basic',
 })
 
 if (error) {
@@ -548,7 +566,9 @@ response = supabase.auth.admin.oauth.create_client({
         'https://my-app.com/auth/callback',
         'https://my-app.com/auth/silent-callback'
     ],
-    'client_type': 'confidential'
+    'client_type': 'confidential',
+    # Optional: defaults to 'client_secret_basic' for confidential, 'none' for public
+    'token_endpoint_auth_method': 'client_secret_basic'
 })
 
 print('Client created:', response)
@@ -572,7 +592,8 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/admin/oauth/clients' \
       "https://my-app.com/auth/callback",
       "https://my-app.com/auth/silent-callback"
     ],
-    "client_type": "confidential"
+    "client_type": "confidential",
+    "token_endpoint_auth_method": "client_secret_basic"
   }'
 ```
 
@@ -585,7 +606,8 @@ curl -X POST 'http://localhost:54321/auth/v1/admin/oauth/clients' \
   -d '{
     "name": "Local Dev App",
     "redirect_uris": ["http://localhost:3000/auth/callback"],
-    "client_type": "confidential"
+    "client_type": "confidential",
+    "token_endpoint_auth_method": "client_secret_post"
   }'
 ```
 
@@ -598,6 +620,7 @@ Response:
   "name": "My Third-Party App",
   "redirect_uris": ["https://my-app.com/auth/callback", "https://my-app.com/auth/silent-callback"],
   "client_type": "confidential",
+  "token_endpoint_auth_method": "client_secret_basic",
   "created_at": "2025-01-15T10:30:00.000Z"
 }
 ```

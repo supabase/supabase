@@ -1,43 +1,50 @@
-import { parseAsString, useQueryState } from 'nuqs'
-import { toast } from 'sonner'
-
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody } from 'lib/helpers'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
-interface DeleteCronJobProps {
-  cronJob: CronJob
-  visible: boolean
-  onClose: () => void
-  onDeleteStart?: (jobId: string) => void
-}
+import { useCronJobsData } from './CronJobsTab.useCronJobsData'
 
-export const DeleteCronJob = ({ cronJob, visible, onClose, onDeleteStart }: DeleteCronJobProps) => {
+export const DeleteCronJob = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
+  const [cronJobIdForDeletion, setCronJobForDeletion] = useQueryState('delete', parseAsString)
+
+  const { grid } = useCronJobsData({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    searchQuery,
+  })
+  const cronJob = grid.rows.find((j) => j.jobid.toString() === cronJobIdForDeletion)
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: deleteDatabaseCronJob, isPending } = useDatabaseCronJobDeleteMutation({
+  const {
+    mutate: deleteDatabaseCronJob,
+    isPending,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
       sendEvent({
         action: 'cron_job_removed',
         groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
-      toast.success(`Successfully removed cron job ${cronJob.jobname}`)
-      onClose()
+      toast.success(`Successfully removed cron job`)
+      setCronJobForDeletion(null)
     },
   })
 
   async function handleDelete() {
     if (!project) return console.error('Project is required')
+    if (!cronJob) return console.error('Cron job is missing')
 
-    onDeleteStart?.(cronJob.jobid.toString())
     deleteDatabaseCronJob({
       jobId: cronJob.jobid,
       projectRef: project.ref,
@@ -45,6 +52,13 @@ export const DeleteCronJob = ({ cronJob, visible, onClose, onDeleteStart }: Dele
       searchTerm: searchQuery,
     })
   }
+
+  useEffect(() => {
+    if (grid.isSuccess && !!cronJobIdForDeletion && !cronJob && !isSuccessDelete) {
+      toast('Cron job not found')
+      setCronJobForDeletion(null)
+    }
+  }, [cronJob, cronJobIdForDeletion, grid.isSuccess, isSuccessDelete, setCronJobForDeletion])
 
   if (!cronJob) {
     return null
@@ -55,9 +69,9 @@ export const DeleteCronJob = ({ cronJob, visible, onClose, onDeleteStart }: Dele
     return (
       <ConfirmationModal
         variant="destructive"
-        visible={visible}
+        visible={!!cronJob}
         onCancel={() => {
-          onClose()
+          setCronJobForDeletion(null)
           cleanPointerEventsNoneOnBody()
         }}
         onConfirm={handleDelete}
@@ -72,10 +86,10 @@ export const DeleteCronJob = ({ cronJob, visible, onClose, onDeleteStart }: Dele
   return (
     <TextConfirmModal
       variant="destructive"
-      visible={visible}
+      visible={!!cronJob}
       onConfirm={handleDelete}
       onCancel={() => {
-        onClose()
+        setCronJobForDeletion(null)
         cleanPointerEventsNoneOnBody()
       }}
       title="Delete this cron job"

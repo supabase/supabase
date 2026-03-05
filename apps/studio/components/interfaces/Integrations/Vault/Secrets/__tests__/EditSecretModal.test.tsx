@@ -2,13 +2,14 @@ import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { useState } from 'react'
-import { render } from 'tests/helpers'
+import { HttpResponse } from 'msw'
+import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock } from 'tests/lib/msw'
 import { routerMock } from 'tests/lib/route-mock'
 import type { VaultSecret } from 'types'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import EditSecretModal from '../EditSecretModal'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { EditSecretModal } from '../EditSecretModal'
 
 const secret: VaultSecret = {
   id: '47ca58b4-01c5-4a71-8814-c73856b02e0e',
@@ -19,32 +20,13 @@ const secret: VaultSecret = {
   updated_at: '2025-07-13 14:51:37.818223+00',
 }
 
-const Page = ({ onClose }: { onClose: () => void }) => {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <ProjectContextProvider projectRef="default">
-      <button onClick={() => setOpen(true)}>Open</button>
-
-      <EditSecretModal
-        visible={open}
-        secret={secret}
-        onClose={() => {
-          setOpen(false)
-          onClose()
-        }}
-      />
-    </ProjectContextProvider>
-  )
-}
-
 mockAnimationsApi()
 
 describe(`EditSecretModal`, () => {
   beforeEach(() => {
     // useSelectedProjectQuery -> useParams
     routerMock.setCurrentUrl(`/project/default/integrations/vault/secrets`)
-    // 'http://localhost:3000/api/platform/projects/default'
+    // useSelectedProjectQuery
     addAPIMock({
       method: `get`,
       path: `/platform/projects/:ref`,
@@ -60,24 +42,40 @@ describe(`EditSecretModal`, () => {
         status: 'ACTIVE_HEALTHY',
       },
     })
-    // 'http://localhost:3000/api/platform/pg-meta/default/query?key=projects-default-secrets-47ca58b4-01c5-4a71-8814-c73856b02e0e'
-    // 'http://localhost:3000/api/platform/pg-meta/default/query?key='
-    // useVaultSecretDecryptedValueQuery + useVaultSecretUpdateMutation
-    // both call the same endpoint but execute different SQL queries
+    // useVaultSecretsQuery + useVaultSecretDecryptedValueQuery + useVaultSecretUpdateMutation
+    // all call the same endpoint but execute different SQL queries
     addAPIMock({
       method: `post`,
       path: `/platform/pg-meta/:ref/query`,
       // @ts-expect-error this path erroneously has a `never` return type when it should be `unknown` since it executes a SQL query
-      response: [{ decrypted_secret: 'bar', update_secret: '' }],
+      response: async ({ request }) => {
+        const body = (await request.json()) as { query: string }
+        const query = body.query
+
+        if (query.includes('decrypted_secrets')) {
+          return HttpResponse.json([{ decrypted_secret: 'bar' }])
+        } else if (query.includes('update_secret')) {
+          return HttpResponse.json([{ update_secret: '' }])
+        }
+        // vault.secrets list query
+        return HttpResponse.json([secret])
+      },
     })
   })
 
   it(`renders a modal pre-filled with the secret's values`, async () => {
-    const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
-
-    const openButton = screen.getByRole(`button`, { name: `Open` })
-    await userEvent.click(openButton)
+    customRender(
+      <ProjectContextProvider projectRef="default">
+        <EditSecretModal />
+      </ProjectContextProvider>,
+      {
+        nuqs: {
+          searchParams: {
+            edit: secret.id,
+          },
+        },
+      }
+    )
 
     await screen.findByRole(`dialog`)
 
@@ -99,6 +97,8 @@ describe(`EditSecretModal`, () => {
 
     fireEvent.click(submitButton)
 
-    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(screen.queryByRole(`dialog`)).not.toBeInTheDocument()
+    })
   })
 })

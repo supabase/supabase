@@ -62,7 +62,7 @@ interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
 }
 
-const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:!px-6 [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-6 [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
+const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:!px-card [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-card [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
 
 const Chart = React.forwardRef<HTMLDivElement, ChartProps>(
   ({ children, isLoading = false, isDisabled = false, className, ...props }, ref) => {
@@ -108,7 +108,7 @@ const ChartHeader = React.forwardRef<HTMLDivElement, ChartHeaderProps>(
       <div
         ref={ref}
         className={cn(
-          'py-4 px-6 flex flex-row justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
+          'p-card flex flex-row justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
           align === 'center' ? 'items-center' : 'items-start',
           className
         )}
@@ -338,7 +338,7 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
     }
 
     return (
-      <div ref={ref} className={cn('px-6 pt-4 pb-6', chartTableClasses, className)} {...props}>
+      <div ref={ref} className={cn('p-card', chartTableClasses, className)} {...props}>
         {content}
       </div>
     )

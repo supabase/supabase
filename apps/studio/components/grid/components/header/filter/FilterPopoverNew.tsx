@@ -5,15 +5,15 @@ import { format } from 'date-fns'
 import { Loader2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Button, Calendar } from 'ui'
+import { AiIconAnimation, Button, Calendar } from 'ui'
 import {
   CustomOptionProps,
   FilterBar,
   FilterGroup,
   FilterOption,
   FilterProperty,
-  SerializableFilterProperty,
   isGroup,
+  SerializableFilterProperty,
   updateGroupAtPath,
 } from 'ui-patterns'
 
@@ -190,7 +190,9 @@ export const FilterPopoverNew = ({ isRefetching = false }: FilterPopoverProps) =
     [generateFilters, serializableFilterProperties, handleFilterChange, setFreeformText]
   )
 
-  const icon = isRefetching ? (
+  const icon = isGenerating ? (
+    <AiIconAnimation size={16} loading />
+  ) : isRefetching ? (
     <Loader2 className="animate-spin text-brand h-4 w-4 shrink-0" aria-label="Loading table data" />
   ) : null
 

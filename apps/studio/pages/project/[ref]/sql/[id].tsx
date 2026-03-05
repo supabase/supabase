@@ -69,7 +69,7 @@ const SqlEditor: NextPageWithLayout = () => {
         snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
       } else {
         setLastVisitedSnippet(undefined)
-        router.push(`/project/${ref}/sql/new`)
+        router.replace(`/project/${ref}/sql/new`)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,7 +84,7 @@ const SqlEditor: NextPageWithLayout = () => {
       content === undefined
     ) {
       const snippet = allSnippets.find((snippet) => snippet.id === history.sql)
-      if (snippet !== undefined) router.push(`/project/${ref}/sql/${history.sql}`)
+      if (snippet !== undefined) router.replace(`/project/${ref}/sql/${history.sql}`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, allSnippets, content])

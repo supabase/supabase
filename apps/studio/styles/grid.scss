@@ -36,17 +36,13 @@
   box-shadow: inset 0 0 0 1px #24b47e;
 }
 
-// Cell with unsaved changes - yellow/amber border
+// Cell with unsaved changes - warning (amber) background/text color
 .rdg-cell.rdg-cell--dirty {
-  box-shadow: inset 0 0 0 2px hsl(var(--warning-default));
+  background-color: hsl(var(--warning-300) / 0.75);
+  color: hsl(var(--warning-default));
 }
 
-// When a dirty cell is also selected, keep the amber border
-.rdg-cell.rdg-cell--dirty[aria-selected='true'] {
-  box-shadow: inset 0 0 0 2px hsl(var(--warning-default));
-}
-
-// Row pending addition - green background
+// Row pending addition - green background, green text
 .rdg-row.rdg-row--added {
   background-color: hsl(var(--brand-200) / 0.3);
 
@@ -56,32 +52,33 @@
 
   .rdg-cell {
     border-left-color: hsl(var(--brand-default));
+    color: hsl(var(--brand-link));
   }
 
   // First cell gets a stronger left border to indicate new row
   .rdg-cell:first-child {
-    box-shadow: inset 3px 0 0 0 hsl(var(--brand-default));
+    box-shadow: inset 2px 0 0 0 hsl(var(--brand-default));
   }
 }
 
-// Row pending deletion - red background with strikethrough effect
+// Row pending deletion - red background with strikethrough effect, red text
 .rdg-row.rdg-row--deleted {
-  background-color: hsl(var(--destructive-200) / 0.3);
-  opacity: 0.6;
+  background-color: hsl(var(--destructive-300) / 0.3);
 
   &:hover {
-    background-color: hsl(var(--destructive-200) / 0.5);
+    background-color: hsl(var(--destructive-300) / 0.5);
   }
 
   .rdg-cell {
     text-decoration: line-through;
     text-decoration-color: hsl(var(--destructive-default));
     border-left-color: hsl(var(--destructive-default));
+    color: hsl(var(--destructive-default));
   }
 
   // First cell gets a stronger left border to indicate deleted row
   .rdg-cell:first-child {
-    box-shadow: inset 3px 0 0 0 hsl(var(--destructive-default));
+    box-shadow: inset 2px 0 0 0 hsl(var(--destructive-default));
   }
 }
 
@@ -89,7 +86,6 @@
   @apply box-border select-none overflow-x-auto overflow-y-scroll bg-dash-canvas;
   @apply border-t border-r-0 border-l-0;
   contain: strict;
-  -webkit-user-select: none;
   font-size: 14px;
 }
 

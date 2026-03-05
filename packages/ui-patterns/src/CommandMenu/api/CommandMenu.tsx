@@ -199,7 +199,7 @@ function CommandMenuTriggerInput({
             strokeWidth={1.5}
             className="group-hover:text-foreground-light transition-colors"
           />
-          <p className="flex text-sm pr-2 text-foreground-muted">{placeholder}</p>
+          <p className="flex text-xs pr-2 text-foreground-muted">{placeholder}</p>
         </div>
         {showShortcut && (
           <div className="command-shortcut hidden md:flex items-center space-x-1">

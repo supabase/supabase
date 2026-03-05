@@ -99,7 +99,7 @@ notify pgrst, 'reload config';
 
 <$Partial path="db_pre_request_warning.mdx" />
 
-Inside the function you can perform any additional checks on the request headers or JWT and raise an exception to prevent the request from completing. For example, this exception raises a HTTP 402 Payment Required response with a `hint` and additional `X-Powered-By` header:
+Inside the function you can perform any additional checks on the request headers or JWT and raise an exception to prevent the request from completing. For example, this exception raises an HTTP 402 Payment Required response with a `hint` and additional `X-Powered-By` header:
 
 ```sql
 raise sqlstate 'PGRST' using
@@ -186,7 +186,7 @@ You can only rate-limit `POST`, `PUT`, `PATCH` and `DELETE` requests. This is be
 Outline:
 
 - A new row is added to a `private.rate_limits` table each time a modifying action is done to the database containing the IP address and the timestamp of the action.
-- If there are over 100 requests from the same IP address in the last 5 minutes, the request is rejected with a HTTP 420 code.
+- If there are over 100 requests from the same IP address in the last 5 minutes, the request is rejected with an HTTP 420 code.
 
 Create the table:
 

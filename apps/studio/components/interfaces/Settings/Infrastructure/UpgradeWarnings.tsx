@@ -1,15 +1,14 @@
-import Link from 'next/link'
-
-import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
+
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   const { ref } = useParams()
-  const unifiedReplication = useFlag('unifiedReplication')
 
   return (
     <Admonition
@@ -18,11 +17,9 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
       title="A newer version of Postgres is available"
       description={`You will need to remove all read replicas prior to upgrading your Postgres version to the latest available (${latestPgVersion}).`}
       actions={
-        unifiedReplication ? (
-          <Button asChild type="default">
-            <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
-          </Button>
-        ) : undefined
+        <Button asChild type="default">
+          <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
+        </Button>
       }
     />
   )

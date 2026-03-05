@@ -1,6 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Info } from 'lucide-react'
-
 import { useParams } from 'common'
 import { BackupsList } from 'components/interfaces/Database/Backups/BackupsList'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
@@ -14,6 +12,7 @@ import { useBackupsQuery } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { Info } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -94,9 +93,9 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                         title="Point-In-Time-Recovery (PITR) enabled"
                         description={
                           <div>
-                            Your project uses PITR and full daily backups are no longer taken.
-                            They're not needed, as PITR supports a superset of functionality, in
-                            terms of the granular recovery that can be performed.{' '}
+                            Your project uses PITR and full daily backups are no longer taken. PITR
+                            lets you restore to a specific time (down to the second) within your
+                            selected PITR retention period.{' '}
                             <a
                               className="text-brand transition-colors hover:text-brand-600"
                               href={`${DOCS_URL}/guides/platform/backups`}

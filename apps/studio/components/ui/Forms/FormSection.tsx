@@ -16,7 +16,7 @@ export const FormSection = ({
   className?: string
 }) => {
   const classes = [
-    'grid grid-cols-12 gap-6 px-[var(--card-padding-x)] py-4 md:py-8',
+    'grid grid-cols-12 gap-6 px-card py-4 md:py-8',
     `${disabled ? ' opacity-30' : ' opacity-100'}`,
     `${className}`,
   ]

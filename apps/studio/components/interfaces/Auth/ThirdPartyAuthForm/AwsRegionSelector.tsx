@@ -1,19 +1,19 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import {
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
   FormControl_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
-  cn,
 } from 'ui'
 
 // copied from https://docs.aws.amazon.com/general/latest/gr/cognito_identity.html
@@ -56,6 +56,7 @@ export const AwsRegionSelector = ({
   onChange: (value: string) => void
 }) => {
   const [open, setOpen] = useState(false)
+  const listboxId = useId()
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
@@ -64,6 +65,8 @@ export const AwsRegionSelector = ({
           <Button
             type="default"
             role="combobox"
+            aria-expanded={open}
+            aria-controls={listboxId}
             className={cn('w-full justify-between', !value && 'text-muted-foreground')}
             size="small"
             iconRight={
@@ -74,7 +77,7 @@ export const AwsRegionSelector = ({
           </Button>
         </FormControl_Shadcn_>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
+      <PopoverContent_Shadcn_ id={listboxId} className="p-0" sameWidthAsTrigger>
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search AWS regions..." />
           <CommandList_Shadcn_>

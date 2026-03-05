@@ -1,0 +1,36 @@
+{$PROXY_DOMAIN} {
+    @supabase_api path /auth/v1/* /rest/v1/* /graphql/v1/* /realtime/v1/* /functions/v1/* /mcp
+
+    handle @supabase_api {
+        reverse_proxy kong:8000
+    }
+
+    handle_path /storage/v1/* {
+        # CORS headers for Storage (bypasses Kong, which normally handles CORS)
+        @cors_preflight method OPTIONS
+        handle @cors_preflight {
+            header Access-Control-Allow-Origin *
+            header Access-Control-Allow-Methods "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS"
+            header Access-Control-Allow-Headers *
+            respond 204
+        }
+
+        header Access-Control-Allow-Origin *
+
+        reverse_proxy storage:5000 {
+            # Required for TUS resumable upload Location headers and S3 signature verification.
+            header_up X-Forwarded-Prefix /{http.request.orig_uri.path.0}/{http.request.orig_uri.path.1}
+        }
+    }
+
+    handle {
+        basic_auth {
+            # PROXY_AUTH_PASSWORD is overwritten with the bcrypt on startup
+            {$PROXY_AUTH_USERNAME} {$PROXY_AUTH_PASSWORD}
+        }
+
+        reverse_proxy studio:3000
+    }
+
+    header -server
+}

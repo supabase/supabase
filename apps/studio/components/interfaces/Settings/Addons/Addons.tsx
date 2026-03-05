@@ -1,10 +1,3 @@
-import dayjs from 'dayjs'
-import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useMemo } from 'react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import {
@@ -12,9 +5,8 @@ import {
   subscriptionHasHipaaAddon,
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
-import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
+import { ProjectUpdateDisabledTooltip } from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -31,16 +23,28 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import dayjs from 'dayjs'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import {
+  useIsAwsCloudProvider,
+  useIsOrioleDbInAws,
+  useIsProjectActive,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
+import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useMemo } from 'react'
 import { useAddonsPagePanel } from 'state/addons-page'
-import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert, Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
@@ -49,6 +53,7 @@ export const Addons = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
+  const isAws = useIsAwsCloudProvider()
   const isProjectActive = useIsProjectActive()
   const isOrioleDbInAws = useIsOrioleDbInAws()
 
@@ -181,7 +186,7 @@ export const Addons = () => {
             </ScaffoldContainer>
           )}
           <ScaffoldContainer>
-            <ScaffoldSection>
+            <ScaffoldSection className="!pb-12">
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
                   <p className="m-0">Compute Size</p>
@@ -355,7 +360,7 @@ export const Addons = () => {
             <>
               <ScaffoldDivider />
               <ScaffoldContainer>
-                <ScaffoldSection>
+                <ScaffoldSection className="!pb-12">
                   <ScaffoldSectionDetail>
                     <div className="space-y-6">
                       <p className="m-0">Dedicated IPv4 address</p>
@@ -406,16 +411,26 @@ export const Addons = () => {
                         <ProjectUpdateDisabledTooltip
                           projectUpdateDisabled={projectUpdateDisabled}
                           projectNotActive={!isProjectActive}
+                          tooltip={
+                            !isAws
+                              ? 'Dedicated IPv4 address is only available for AWS projects'
+                              : undefined
+                          }
                         >
                           <Button
                             type="default"
                             className="mt-2 pointer-events-auto"
                             onClick={() => setPanel('ipv4')}
                             disabled={
-                              !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
+                              !isAws ||
+                              !isProjectActive ||
+                              projectUpdateDisabled ||
+                              !(canUpdateIPv4 || ipv4)
                             }
                           >
-                            Change dedicated IPv4 address
+                            {!!ipv4
+                              ? 'Toggle dedicated IPv4 address'
+                              : 'Enable dedicated IPv4 address'}
                           </Button>
                         </ProjectUpdateDisabledTooltip>
                       </div>
@@ -429,7 +444,7 @@ export const Addons = () => {
           <ScaffoldDivider />
 
           <ScaffoldContainer>
-            <ScaffoldSection>
+            <ScaffoldSection className="!pb-12">
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
                   <p className="m-0">Point in time recovery</p>
@@ -525,7 +540,7 @@ export const Addons = () => {
                           },
                         }}
                       >
-                        Change point in time recovery
+                        Enable point in time recovery
                       </ButtonTooltip>
                     ) : (
                       <ProjectUpdateDisabledTooltip
@@ -543,7 +558,7 @@ export const Addons = () => {
                             hasHipaaAddon
                           }
                         >
-                          Change point in time recovery
+                          {!!pitr ? 'Change recovery duration' : 'Enable point in time recovery'}
                         </Button>
                       </ProjectUpdateDisabledTooltip>
                     )}
@@ -557,7 +572,7 @@ export const Addons = () => {
             <>
               <ScaffoldDivider />
               <ScaffoldContainer>
-                <ScaffoldSection>
+                <ScaffoldSection className="!pb-12">
                   <ScaffoldSectionDetail>
                     <div className="space-y-6">
                       <p className="m-0">Custom domain</p>
@@ -605,19 +620,28 @@ export const Addons = () => {
                             ? 'Custom domain is enabled'
                             : 'Custom domain is not enabled'}
                         </p>
-                        <ProjectUpdateDisabledTooltip
-                          projectUpdateDisabled={projectUpdateDisabled}
-                          projectNotActive={!isProjectActive}
-                        >
-                          <Button
-                            type="default"
-                            className="mt-2 pointer-events-auto"
-                            onClick={() => setPanel('customDomain')}
-                            disabled={!isProjectActive || projectUpdateDisabled}
+                        <div className="mt-2  flex items-center gap-x-2">
+                          <ProjectUpdateDisabledTooltip
+                            projectUpdateDisabled={projectUpdateDisabled}
+                            projectNotActive={!isProjectActive}
                           >
-                            Change custom domain
-                          </Button>
-                        </ProjectUpdateDisabledTooltip>
+                            <Button
+                              type="default"
+                              className="pointer-events-auto"
+                              onClick={() => setPanel('customDomain')}
+                              disabled={!isProjectActive || projectUpdateDisabled}
+                            >
+                              {!!customDomain ? 'Toggle custom domain' : 'Enable custom domain'}
+                            </Button>
+                          </ProjectUpdateDisabledTooltip>
+                          {!!customDomain && (
+                            <Button asChild type="outline">
+                              <Link href={`/project/${projectRef}/settings/general#custom-domains`}>
+                                Edit custom domain
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </ScaffoldSectionContent>

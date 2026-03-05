@@ -15,7 +15,7 @@ import { FilterCondition } from './FilterCondition'
 import { useDeferredBlur, useHighlightNavigation } from './hooks'
 import { buildPropertyItems } from './menuItems'
 import { FilterGroup as FilterGroupType } from './types'
-import { pathsEqual } from './utils'
+import { buildFilterPlaceholder, pathsEqual } from './utils'
 
 export type FilterGroupProps = {
   group: FilterGroupType
@@ -31,6 +31,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     supportsOperators,
     actions,
     variant,
+    highlightedConditionPath,
     handleInputBlur,
     handleGroupFreeformFocus,
     handleGroupFreeformChange,
@@ -46,7 +47,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
 
   const isActive = activeInput?.type === 'group' && pathsEqual(path, activeInput.path)
 
-  // Reset local value when group freeform value is cleared
   useEffect(() => {
     if (freeformText === '') {
       setLocalFreeformValue('')
@@ -83,6 +83,16 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     return activeInput.type === 'operator' && pathsEqual(conditionPath, activeInput.path)
   }
 
+  const isPropertyActiveForCondition = (conditionPath: number[]) => {
+    if (!activeInput) return false
+    return activeInput.type === 'property' && pathsEqual(conditionPath, activeInput.path)
+  }
+
+  const isConditionHighlighted = (conditionPath: number[]) => {
+    if (!highlightedConditionPath) return false
+    return pathsEqual(conditionPath, highlightedConditionPath)
+  }
+
   const items = useMemo(
     () =>
       buildPropertyItems({
@@ -92,6 +102,14 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         supportsOperators,
       }),
     [filterProperties, isActive, freeformText, localFreeformValue, actions, supportsOperators]
+  )
+
+  const emptyPlaceholder = useMemo(
+    () =>
+      buildFilterPlaceholder(filterProperties, {
+        hasActions: actions && actions.length > 0,
+      }),
+    [filterProperties, actions]
   )
 
   // Only the root group should expand to fill available space
@@ -106,7 +124,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     (index) => {
       if (items[index]) handleSelectMenuItem(items[index])
     },
-    handleKeyDown
+    handleKeyDown,
+    { skipEnterWhenFilterHighlighted: highlightedConditionPath !== null }
   )
 
   useEffect(() => {
@@ -156,12 +175,16 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   path={currentPath}
                   isActive={isConditionActive(currentPath)}
                   isOperatorActive={isOperatorActive(currentPath)}
+                  isPropertyActive={isPropertyActiveForCondition(currentPath)}
+                  isHighlighted={isConditionHighlighted(currentPath)}
                 />
               )}
             </React.Fragment>
           )
         })}
-        <Popover_Shadcn_ open={isActive && !isLoading && items.length > 0}>
+        <Popover_Shadcn_
+          open={isActive && !isLoading && items.length > 0 && !highlightedConditionPath}
+        >
           <PopoverAnchor_Shadcn_ asChild>
             {isRootGroup ? (
               <Input_Shadcn_
@@ -174,11 +197,14 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onKeyDown={handleFreeformKeyDown}
                 className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-0"
                 placeholder={
-                  group.conditions.length === 0
-                    ? 'Ask AI for help (e.g. Find all users with name John) or filter...'
-                    : 'Add more filters...'
+                  group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
                 disabled={isLoading}
+                data-testid="filter-bar-freeform-input"
+                autoComplete="off"
+                data-1p-ignore
+                data-lpignore="true"
+                data-form-type="other"
               />
             ) : (
               <div className="relative inline-block">
@@ -193,6 +219,10 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   className="h-full border-none bg-transparent py-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
                   placeholder="+ Add filter"
                   disabled={isLoading}
+                  autoComplete="off"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-form-type="other"
                 />
                 <span className="invisible whitespace-pre text-xs block">
                   {(isActive ? freeformText : localFreeformValue) || '+'}

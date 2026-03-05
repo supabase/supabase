@@ -24,10 +24,10 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
+  getStatusName,
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
   PIPELINE_ERROR_MESSAGES,
-  getStatusName,
 } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 
@@ -57,7 +57,7 @@ export const RowMenu = ({
   const { ref: projectRef } = useParams()
   const statusName = getStatusName(pipelineStatus)
 
-  const [_, setEdit] = useQueryState(
+  const [, setEdit] = useQueryState(
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )

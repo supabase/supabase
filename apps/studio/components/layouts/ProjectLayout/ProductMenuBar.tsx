@@ -18,10 +18,7 @@ const ProductMenuBar = ({ title, children, className }: PropsWithChildren<Produc
         'hide-scrollbar bg-dash-sidebar border-default'
       )}
     >
-      <div
-        className="border-default flex max-h-12 items-center border-b px-6"
-        style={{ minHeight: '3rem' }}
-      >
+      <div className="border-default flex min-h-[var(--header-height)] items-center border-b px-6">
         <h4 className="text-lg">{title}</h4>
       </div>
       <div className={cn('flex-grow overflow-y-auto', className)}>{children}</div>

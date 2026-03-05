@@ -4,7 +4,7 @@ description: 'Deploy read-only databases across multiple regions, for lower late
 subtitle: 'Deploy read-only databases across multiple regions, for lower latency and better resource management.'
 ---
 
-Read Replicas are additional databases that are kept in sync with your Primary database. You can read your data from a Read Replica, which helps with:
+Read Replicas are additional databases kept in sync with your Primary database. You can read your data from a Read Replica, which helps with:
 
 - **Load balancing:** Read Replicas reduce load on the Primary database. For example, you can use a Read Replica for complex analytical queries and reserve the Primary for user-facing create, update, and delete operations.
 - **Improved latency:** For projects with a global user base, additional databases can be deployed closer to users to reduce latency.
@@ -14,12 +14,14 @@ Read Replicas are additional databases that are kept in sync with your Primary d
   alt="Map view of all project databases."
   src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
   containerClassName="max-w-[700px] !mx-auto"
-  zoomable
+
+width={2000}
+height={830}
 />
 
 ## About Read Replicas
 
-The database you start with when launching a Supabase project is your Primary database. Read Replicas are kept in sync with the Primary through a process called "replication." Replication is asynchronous to ensure that transactions on the Primary aren't blocked. There is a delay between an update on the Primary and the time that a Read Replica receives the change. This delay is called "replication lag."
+The database you start with when launching a Supabase project is your Primary database. A process called "replication" keeps Read Replicas in sync with the Primary. Replication is asynchronous to ensure that transactions on the Primary aren't blocked. There is a delay between an update on the Primary and the time that a Read Replica receives the change. This delay is called "replication lag."
 
 You can only read data from a Read Replica. This is in contrast to a Primary database, where you can both read and write:
 
@@ -28,73 +30,32 @@ You can only read data from a Read Replica. This is in contrast to a Primary dat
 | Primary      | ✅     | ✅     | ✅     | ✅     |
 | Read Replica | ✅     | -      | -      | -      |
 
-## Prerequisites
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="large"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Do you need Read Replicas?"
+      id="rr-flow"
+    >
 
-<Admonition type="note">
+    When your database starts slowing down, you face a choice: make your existing database bigger (scale vertically), or spread the load across multiple databases (scale horizontally). Both approaches work. Neither is universally correct. The right answer depends on your workload, your budget, and where the bottleneck actually is.
 
-Read Replicas are available for all projects on the Pro, Team and Enterprise plans. Spin one up now over at the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure).
+    <Image
+      src="/docs/img/guides/platform/read-replicas/read-replicas-flow.svg"
+      alt="Read Replicas decision flowchart"
+    />
 
-</Admonition>
+    </AccordionItem>
 
-Projects must meet these requirements to use Read Replicas:
+  </div>
 
-1. Running on AWS.
-1. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
-   - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
-1. Running on Postgres 15+.
-   - For projects running on older versions of Postgres, you will need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
-1. Using [physical backups](/docs/guides/platform/backups#point-in-time-recovery)
-   - Physical backups are automatically enabled if using [PITR](/docs/guides/platform/backups#point-in-time-recovery)
-   - If you're not using PITR, you'll be able to switch to physical backups as part of the Read Replica setup process. Note that physical backups can't be downloaded from the dashboard in the way logical backups can.
-
-## Getting started
-
-To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard.
-
-You can also manage Read Replicas using the Management API (beta functionality):
-
-```bash
-# Get your access token from https://supabase.com/dashboard/account/tokens
-export SUPABASE_ACCESS_TOKEN="your-access-token"
-export PROJECT_REF="your-project-ref"
-
-# Create a new Read Replica
-curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/setup" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "region": "us-east-1"
-  }'
-
-# Delete a Read Replica
-curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/remove" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "database_identifier": "abcdefghijklmnopqrst"
-  }'
-```
-
-Projects on an XL compute add-on or larger can create up to five Read Replicas. Projects on compute add-ons smaller than XL can create up to two Read Replicas. All Read Replicas inherit the compute size of their Primary database.
-
-### Deploying a Read Replica
-
-A Read Replica is deployed by using a physical backup as a starting point, and a combination of WAL file archives and direct replication from the Primary database to catch up. Both components may take significant time to complete. The duration of restoring from a physical backup is roughly dependent and directly related to the database size of your project. The time taken to catch up to the primary using WAL archives and direct replication is dependent on the level of activity on the Primary database; a more active database will produce a larger number of WAL files that will need to be processed.
-
-Along with the progress of the deployment, the dashboard displays rough estimates for each component.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
-### What does it mean when "Init failed" is observed?
-
-The status `Init failed` indicates that the Read Replica has failed to deploy. Some possible scenarios as to why a Read Replica may have failed to be deployed:
-
-- Underlying instance failed to come up.
-- Network issue leading to inability to connect to the Primary database.
-- Possible incompatible database settings between the Primary and Read Replica databases.
-- Platform issues.
-
-It is safe to drop this failed Read Replica, and in the event of a transient issue, attempt to spin up another one. If however spinning up Read Replicas for your project consistently fails, do check out our [status page](https://status.supabase.com) for any ongoing incidents, or open a support ticket [here](/dashboard/support/new). To aid the investigation, do not bring down the recently failed Read Replica.
+</Accordion>
 
 ## Features
 
@@ -104,14 +65,18 @@ Read Replicas offer the following features:
 
 Each Read Replica has its own dedicated database and API endpoints.
 
-- Find the database endpoint on the projects [**Connect** panel](/dashboard/project/_?showConnect=true)
-- Find the API endpoint on the [API Settings page](/dashboard/project/_/settings/api) under **Project URL**
+- Find the database endpoint on the project's [**Connect** panel](/dashboard/project/_?showConnect=true). Toggle between Primary and Read Replicas using the **Source** dropdown.
+- Find the API endpoint on the [API Settings page](/dashboard/project/_/settings/api) under **Project URL**. Toggle between Primary and Read Replicas using the **Source** dropdown.
+
+If you use an [IPv4 add-on](/docs/guides/platform/ipv4-address#read-replicas), the database endpoints for your Read Replicas also use an IPv4 add-on.
 
 Read Replicas only support `GET` requests from the [REST API](/docs/guides/api). If you are calling a read-only Postgres function through the REST API, make sure to set the `get: true` [option](/docs/reference/javascript/rpc?queryGroups=example&example=call-a-read-only-postgres-function).
 
+<Admonition type="caution">
+
 Requests to other Supabase products, such as Auth, Storage, and Realtime, aren't able to use a Read Replica or its API endpoint. Support for more products will be added in the future.
 
-If you're using an [IPv4 add-on](/docs/guides/platform/ipv4-address#read-replicas), the database endpoints for your Read Replicas will also use an IPv4 add-on.
+</Admonition>
 
 ### Dedicated connection pool
 
@@ -119,11 +84,15 @@ A connection pool through Supavisor is also available for each Read Replica. Fin
 
 ### API load balancer
 
-A load balancer is deployed to automatically balance requests between your Primary database and Read Replicas. Find its endpoint on the [API Settings page](/dashboard/project/_/settings/api).
+A load balancer automatically balances requests between your Primary database and Read Replicas. Find its endpoint on the [**API Settings page**](/dashboard/project/_/settings/api).
 
-The load balancer enables geo-routing for Data API requests so that `GET` requests will automatically be routed to the database that is closest to your user ensuring the lowest latency. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database.
+The load balancer enables geo-routing for Data API requests to automatically route `GET` requests to the database closest to your user ensuring the lowest latency. You can also send Non-`GET` requests through this endpoint, and they are routed to the Primary database automatically.
 
-You can also interact with Supabase services (Auth, Edge Functions, Realtime, and Storage) through this load balancer so there's no need to worry about which endpoint to use and in which situations. However, geo-routing for these services are not yet available but is coming soon.
+<Admonition type="note">
+
+You can also interact with other Supabase services (Auth, Edge Functions, Realtime, and Storage) through this load balancer so there's no need to worry about which endpoint to use and in which situations. Geo-routing for Auth, Realtime, and Storage aren't yet available but are coming soon.
+
+</Admonition>
 
 <Admonition type="note">
 
@@ -137,10 +106,10 @@ If you remove all Read Replicas from your project, the load balancer and its end
 
 <Admonition type="note">
 
-Starting on April 4th, 2025, we will be changing the routing behavior for eligible Data API requests:
+From April 4th, 2025, the routing behavior for eligible Data API requests changed:
 
-- Old behavior: Round-Robin distribution among all databases (all read replicas + primary) of your project, regardless of location
-- New behavior: Geo-routing, that directs requests to the closest available database (all read replicas + primary)
+- **Old behavior**: Round-Robin distribution among all databases (all read replicas + primary) of your project, regardless of location
+- **New behavior**: Geo-routing, that directs requests to the closest available database (all read replicas + primary)
 
 The new behavior delivers a better experience for your users by minimizing the latency to your project. You can take full advantage of this by placing Read Replicas close to your major customer bases.
 
@@ -160,7 +129,9 @@ In the SQL editor, you can choose if you want to run the query on a particular R
   alt="SQL editor view."
   src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
   containerClassName="max-w-[700px]"
-  zoomable
+
+width={2024}
+height={1048}
 />
 
 ### Logging
@@ -186,74 +157,6 @@ We recommend ingesting your [project's metrics](/docs/guides/platform/metrics#ac
 
 All settings configured through the dashboard will be propagated across all databases of a project. This ensures that no Read Replica get out of sync with the Primary database or with other Read Replicas.
 
-## Operations blocked by Read Replicas
-
-### Project upgrades and data restorations
-
-The following procedures require all Read Replicas for a project to be brought down before they can be performed:
-
-1. [Project upgrades](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade)
-1. [Data restorations](/docs/guides/platform/backups#pitr-restoration-process)
-
-These operations need to be completed before Read Replicas can be re-deployed.
-
-## About replication
-
-We use a hybrid approach to replicate data from a Primary to its Read Replicas, combining the native methods of streaming replication and file-based log shipping.
-
-### Streaming replication
-
-Postgres generates a Write Ahead Log (WAL) as database changes occur. With streaming replication, these changes stream from the Primary to the Read Replica server. The WAL alone is sufficient to reconstruct the database to its current state.
-
-This replication method is fast, since changes are streamed directly from the Primary to the Read Replica. On the other hand, it faces challenges when the Read Replica can't keep up with the WAL changes from its Primary. This can happen when the Read Replica is too small, running on degraded hardware, or has a heavier workload running.
-
-To address this, Postgres does provide tunable configuration, like `wal_keep_size`, to adjust the WAL retained by the Primary. If the Read Replica fails to “catch up” before the WAL surpasses the `wal_keep_size` setting, the replication is terminated. Tuning is a bit of an art - the amount of WAL required is variable for every situation.
-
-### File-based log shipping
-
-In this replication method, the Primary continuously buffers WAL changes to a local file and then sends the file to the Read Replica. If multiple Read Replicas are present, files could also be sent to an intermediary location accessible by all. The Read Replica then reads the WAL files and applies those changes. There is higher replication lag than streaming replication since the Primary buffers the changes locally first. It also means there is a small chance that WAL changes do not reach Read Replicas if the Primary goes down before the file is transferred. In these cases, if the Primary fails a Replica using streaming replication would (in most cases) be more up-to-date than a Replica using file-based log shipping.
-
-### File-based log shipping 🤝 streaming replication
-
-<Image
-  alt="Map view of Primary and Read Replica databases"
-  caption="Map view of Primary and Read Replica databases"
-  src="/docs/img/guides/platform/read-replicas/streaming-replication-dark.png?v=1"
-  containerClassName="max-w-[700px] mx-auto"
-  zoomable
-/>
-
-We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the Primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3.
-
-We combine it with streaming replication to reduce replication lag. Once WAL-G files have been synced from S3, Read Replicas connect to the Primary and stream the WAL directly.
-
-### Monitoring replication lag
-
-Replication lag for a specific Read Replica can be monitored through the dashboard. On the [Database Reports page](/dashboard/project/_/observability/database) Read Replicas will have an additional chart under `Replica Information` displaying historical replication lag in seconds. Realtime replication lag in seconds can be observed on the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure). This is the value on top of the Read Replica. Do note that there is no single threshold to indicate when replication lag should be addressed. It would be fully dependent on the requirements of your project.
-
-If you are already ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can also keep track of replication lag and set alarms accordingly with the metric: `physical_replication_lag_physical_replica_lag_seconds`.
-
-Some common sources of high replication lag include:
-
-1. Exclusive locks on tables on the Primary.
-   Operations such as `drop table`, `reindex` (amongst others) take an Access Exclusive lock on the table. This can result in increasing replication lag for the duration of the lock.
-1. Resource Constraints on the database
-   Heavy utilization on the primary or the replica, if run on an under-resourced project, can result in high replication lag. This includes the characteristics of the disk being utilized (IOPS, Throughput).
-1. Long-running transactions on the Primary.
-   Transactions that run for a long-time on the primary can also result in high replication lag. You can use the `pg_stat_activity` view to identify and terminate such transactions if needed. `pg_stat_activity` is a live view, and does not offer historical data on transactions that might have been active for a long time in the past.
-
-High replication lag can result in stale data being returned for queries being executed against the affected read replicas.
-
-You can [consult](https://cloud.google.com/sql/docs/postgres/replication/replication-lag) [additional](https://repost.aws/knowledge-center/rds-postgresql-replication-lag) [resources](https://severalnines.com/blog/what-look-if-your-postgresql-replication-lagging/) on the subject as well.
-
-## Misc
-
-### Restart or compute add-on change behaviour
-
-When a project that utilizes Read Replicas is restarted, or the compute add-on size is changed, the Primary database gets restarted first. During this period, the Read Replicas remain available.
-
-Once the Primary database has completed restarting (or resizing, in case of a compute add-on change) and become available for usage, all the Read Replicas are restarted (and resized, if needed) concurrently.
-
 ## Pricing
 
-For a detailed breakdown of how charges are calculated, refer to [Manage Read Replica usage](/docs/guides/platform/manage-your-usage/read-replicas).
+For a detailed breakdown of how we calculate charges, read the [Manage Read Replica usage guide](/docs/guides/platform/manage-your-usage/read-replicas).

@@ -1,8 +1,3 @@
-import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React, { useState } from 'react'
-
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   useFeaturePreviewModal,
@@ -15,8 +10,12 @@ import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/S
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useContentQuery } from 'data/content/content-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
 import {
   Badge,
   Button,
@@ -33,6 +32,7 @@ import {
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
 
 const SupaIcon = ({ className }: { className?: string }) => {
@@ -116,8 +116,7 @@ export function LogsSidebarMenuV2() {
   // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
   const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
-  const { plan: orgPlan } = useCurrentOrgPlan()
-  const isFreePlan = orgPlan?.id === 'free'
+  const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
 
   const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -153,13 +152,13 @@ export function LogsSidebarMenuV2() {
     },
     IS_PLATFORM
       ? {
-          name: isFreePlan ? 'Pooler' : 'Shared Pooler',
+          name: hasDedicatedPooler ? 'Shared Pooler' : 'Pooler',
           key: 'pooler-logs',
           url: `/project/${ref}/logs/pooler-logs`,
           items: [],
         }
       : null,
-    !isFreePlan && IS_PLATFORM
+    hasDedicatedPooler && IS_PLATFORM
       ? {
           name: 'Dedicated Pooler',
           key: 'dedicated-pooler-logs',
@@ -368,7 +367,7 @@ export function LogsSidebarMenuV2() {
           />
         )}
         {savedQueries.map((query) => (
-          <SavedQueriesItem item={query as any} key={query.id} /> // kemal: i know, i know, temp any fix.
+          <SavedQueriesItem item={query} key={query.id} />
         ))}
       </SidebarCollapsible>
 
@@ -380,8 +379,10 @@ export function LogsSidebarMenuV2() {
         description="Send logs to your preferred observability or storage platform."
         illustration={
           <div className="flex items-center gap-4">
-            {LOG_DRAIN_TYPES.map((type) =>
-              React.cloneElement(type.icon, { height: 20, width: 20 })
+            {LOG_DRAIN_TYPES.filter((t) =>
+              ['datadog', 'sentry', 'webhook', 'loki'].includes(t.value)
+            ).map((type) =>
+              React.cloneElement(type.icon, { key: type.name, height: 20, width: 20 })
             )}
           </div>
         }
