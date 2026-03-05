@@ -1,9 +1,8 @@
 import dayjs from 'dayjs'
-import { Clock, HistoryIcon } from 'lucide-react'
+import { Clock, HistoryIcon, Lock } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Badge } from '@ui/components/shadcn/ui/badge'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -22,8 +21,6 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
-import type { PlanId } from 'data/subscriptions/types'
-
 type Unit = 'minute' | 'hour' | 'day'
 
 export type ParsedCustomInput =
@@ -57,30 +54,11 @@ export const parseCustomInput = (input: string): ParsedCustomInput => {
   return { type: 'unit', value, unit: matchedUnit }
 }
 
-export const getAvailableInForDays = (days: number): PlanId[] => {
-  if (days <= 1) return ['free', 'pro', 'team', 'enterprise', 'platform']
-  if (days <= 7) return ['pro', 'team', 'enterprise', 'platform']
-  return ['team', 'enterprise', 'platform']
-}
-
-export const convertToDays = (value: number, unit: Unit): number => {
-  switch (unit) {
-    case 'minute':
-      return value / (60 * 24)
-    case 'hour':
-      return value / 24
-    case 'day':
-      return value
-  }
-}
-
 export const generateDynamicHelper = (value: number, unit: Unit): DatetimeHelper => {
-  const days = convertToDays(value, unit)
   return {
     text: `Last ${value} ${unit}${value === 1 ? '' : 's'}`,
     calcFrom: () => dayjs().subtract(value, unit).toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: getAvailableInForDays(days),
   }
 }
 
@@ -330,7 +308,6 @@ export const LogsDatePicker = ({
 
   const showHelperBadge = (helper?: DatetimeHelper) => {
     if (!helper) return false
-    if (!helper.availableIn?.length) return false
     if (!entitledToAuditLogDays) return false
 
     const day = Math.abs(dayjs().diff(dayjs(helper.calcFrom()), 'day'))
@@ -384,7 +361,9 @@ export const LogsDatePicker = ({
                   aria-disabled={helper.disabled}
                 ></RadioGroupItem>
                 {helper.text}
-                {showHelperBadge(helper) ? <Badge>{helper.availableIn?.[0] || ''}</Badge> : null}
+                {showHelperBadge(helper) ? (
+                  <Lock size={12} className="text-foreground-muted" />
+                ) : null}
               </Label>
             ))}
           </RadioGroup>

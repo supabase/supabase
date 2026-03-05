@@ -116,7 +116,7 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"Supabase is great because it has everything. I don\'t need a different solution for authentication, a different solution for database, or a different solution for storage."',
+        text: "Supabase is great because it has everything. I don't need a different solution for authentication, a different solution for database, or a different solution for storage.",
         author: 'Yasser Elsaid',
         role: 'Founder, Chatbase',
         link: '/customers/chatbase',
@@ -320,6 +320,15 @@ const data: () => {
         </>
       ),
       customers: [
+        {
+          name: 'Hyper',
+          logo: '/images/customers/logos/hyper.svg',
+          highlights: [
+            '100x cost reduction by having agents query SQL instead of live platform APIs',
+            'Per-customer isolated databases for agencies managing hundreds of clients',
+          ],
+          cta: { label: 'Read the case study', href: '/customers/hyper' },
+        },
         {
           name: 'Humata',
           logo: '/images/customers/logos/humata.png',
