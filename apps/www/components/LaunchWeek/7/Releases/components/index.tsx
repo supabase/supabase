@@ -261,7 +261,7 @@ export const SectionButtons = ({
       )}
       {!!github && (
         <ChipLink href={github} target="_blank">
-          Github
+          GitHub
           <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <GithubSvg />
           </div>
