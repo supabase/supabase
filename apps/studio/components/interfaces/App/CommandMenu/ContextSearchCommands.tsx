@@ -1,25 +1,26 @@
 'use client'
 
-import { useMemo } from 'react'
-import { Database } from 'lucide-react'
+import { IS_PLATFORM } from 'common'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Auth, EdgeFunctions, Storage } from 'icons'
+import { Database } from 'lucide-react'
+import { useMemo } from 'react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   CommandHeader,
   CommandInput,
   CommandWrapper,
   PageType,
+  useQuery,
   useRegisterCommands,
   useRegisterPage,
   useSetPage,
-  useQuery,
 } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { orderCommandSectionsByPriority } from './ordering'
 import { ContextSearchResults } from './ContextSearchResults'
-import { useFlag, IS_PLATFORM } from 'common'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { orderCommandSectionsByPriority } from './ordering'
 import type { SearchContextValue } from './SearchContext.types'
 
 interface SearchContextOption {
@@ -81,7 +82,6 @@ function ContextSearchPage({
 }
 
 export function useContextSearchCommands() {
-  const enableSearchEntitiesCommandMenu = useFlag('enableSearchEntitiesCommandMenu')
   const { data: project } = useSelectedProjectQuery()
   const setPage = useSetPage()
 
@@ -147,6 +147,6 @@ export function useContextSearchCommands() {
   useRegisterCommands(COMMAND_MENU_SECTIONS.QUERY, contextCommands, {
     orderSection: orderCommandSectionsByPriority,
     sectionMeta: { priority: 3 },
-    enabled: !IS_PLATFORM || (enableSearchEntitiesCommandMenu && !!project),
+    enabled: !IS_PLATFORM || !!project,
   })
 }
