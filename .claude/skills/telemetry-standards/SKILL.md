@@ -15,7 +15,8 @@ reviewing PRs that touch tracking or when implementing new tracking.
 **Format:** `[object]_[verb]` in snake_case
 
 **Approved verbs only:**
-opened, clicked, submitted, created, removed, updated, retrieved, intended, evaluated, added
+opened, clicked, submitted, created, removed, updated, retrieved, intended, evaluated, added,
+enabled, disabled, copied, exposed, failed, converted
 
 **Flag these:**
 - Unapproved verbs (saved, viewed, seen, pressed, etc.)
@@ -35,16 +36,17 @@ opened, clicked, submitted, created, removed, updated, retrieved, intended, eval
 
 ## Property Standards
 
-**Casing:** camelCase always
+**Casing:** camelCase preferred for new events. The codebase has existing snake_case properties (e.g., `schema_name`, `table_name`) — when adding properties to an existing event, match its established convention.
 
 **Names must be self-explanatory:**
 - `{ productType: 'database', planTier: 'pro' }`
 - `{ assistantType: 'sql', suggestionType: 'optimization' }`
 
 **Flag these:**
-- Generic names: `label`, `value`, `type`, `name`, `data`
-- snake_case or PascalCase properties
+- Generic names: `label`, `value`, `name`, `data`
+- PascalCase properties
 - Inconsistent names across similar events (e.g., `assistantType` in one event, `aiType` in a related event)
+- Mixing camelCase and snake_case within the same event
 
 ## What NOT to Track
 
@@ -54,14 +56,16 @@ opened, clicked, submitted, created, removed, updated, retrieved, intended, eval
 
 **DO track:** user clicks, form submissions, explicit opens/closes, user-initiated actions.
 
+**Exception:** `_exposed` events for A/B experiment exposure tracking are valid even though they fire on render.
+
 **Never track PII** (emails, names, IPs, etc.) in event properties.
 
 ## Required Pattern
 
-Use `useTrack` from `lib/telemetry/track`. Never use `useSendEventMutation` (deprecated).
+Import `useTrack` from `lib/telemetry/track` (within `apps/studio/`). Never use `useSendEventMutation` (deprecated).
 
 ```typescript
-import { useTrack } from 'common/lib/telemetry'
+import { useTrack } from 'lib/telemetry/track'
 
 const MyComponent = () => {
   const track = useTrack()
@@ -80,18 +84,27 @@ const MyComponent = () => {
 
 ## Event Definitions
 
-All events must be defined in `packages/common/telemetry-constants.ts` with JSDoc:
+All events must be defined as TypeScript interfaces in `packages/common/telemetry-constants.ts`:
 
 ```typescript
 /**
  * [Event description]
- * @page [page/location where this fires]
+ *
+ * @group Events
  * @source [what triggers this event]
  */
-export const EVENT_NAME = '[object]_[verb]' as const
+export interface MyFeatureClickedEvent {
+  action: 'my_feature_clicked'
+  properties: {
+    /** Description of property */
+    featureType: string
+  }
+  groups: TelemetryGroups
+}
 ```
 
-`@page` and `@source` must accurately describe where and how the event fires.
+Add the new interface to the `TelemetryEvent` union type so `useTrack` picks it up.
+`@group Events` and `@source` must be accurate.
 
 ## Review Rules
 
@@ -112,26 +125,27 @@ When checking property consistency, search `packages/common/telemetry-constants.
 
 ## Well-Formed Event Examples
 
+From the actual codebase:
+
 ```typescript
-track('sql_query_submitted', {
-  queryType: 'select',
-  executionTime: 1234,
-  rowCount: 50,
+// User copies a connection string
+track('connection_string_copied', {
+  connectionType: 'psql',
+  connectionMethod: 'transaction_pooler',
+  connectionTab: 'Connection String',
 })
 
-track('assistant_suggestion_clicked', {
-  assistantType: 'sql',
-  suggestionType: 'optimization',
+// User enables a feature preview
+track('feature_preview_enabled', {
+  feature: 'realtime_inspector',
 })
 
-track('database_connection_clicked', {
-  connectionType: 'direct',
-  source: 'settings_page',
-})
+// User clicks a banner CTA
+track('index_advisor_banner_dismiss_button_clicked')
 
-track('backup_button_clicked', {
-  backupType: 'manual',
-  databaseSize: 'large',
+// Experiment exposure (fires on render — valid exception)
+track('home_new_experiment_exposed', {
+  variant: 'treatment',
 })
 ```
 
@@ -140,9 +154,9 @@ track('backup_button_clicked', {
 To add tracking for a user action:
 
 1. **Name the event** — `[object]_[verb]` using approved verbs only
-2. **Choose properties** — camelCase, self-explanatory; check `packages/common/telemetry-constants.ts` for similar events and match their property names
-3. **Add to telemetry-constants.ts** — with `@page` and `@source` JSDoc
-4. **Add to component** — import `useTrack`, call `track('event_name', { properties })`
+2. **Choose properties** — camelCase preferred for new events; check `packages/common/telemetry-constants.ts` for similar events and match their property names and casing
+3. **Add interface to telemetry-constants.ts** — with `@group Events` and `@source` JSDoc, add to the `TelemetryEvent` union type
+4. **Add to component** — `import { useTrack } from 'lib/telemetry/track'`, call `track('event_name', { properties })`
 
 ### Verification checklist
 
