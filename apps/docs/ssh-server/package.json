@@ -1,0 +1,20 @@
+{
+  "name": "docs-over-ssh",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts"
+  },
+  "dependencies": {
+    "globby": "^14.0.0",
+    "just-bash": "latest",
+    "ssh2": "^1.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ssh2": "^1.15.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

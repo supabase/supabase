@@ -1,0 +1,10 @@
+services:
+  docs-ssh:
+    build: .
+    ports:
+      - "22:22"
+    volumes:
+      - ../public/docs/guides:/docs:ro
+      - ./keys:/app/keys
+    environment:
+      HOST_KEY_PATH: /app/keys/host_key
