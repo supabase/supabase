@@ -30,7 +30,6 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
-  FormMessage_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -319,7 +318,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
                       </Select_Shadcn_>
                     </FormControl_Shadcn_>
                   </FormLayout>
-                  <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>
               )}
             />
