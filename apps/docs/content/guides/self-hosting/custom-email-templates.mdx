@@ -100,7 +100,7 @@ services:
 - Adds a `templates-server`service that runs alongside the Supabase services in the same docker network.
 - Serves your custom email template files from the `./volumes/templates` directory.
 - Keeps the templates-server private to the Docker network (no published ports), so it is not accessible from outside.
-- Enables the `auth` container to fetch templates using Docker's internal DNS (for example, `http://templates-server/invite.html`).
+- Allows the `auth` service to fetch templates via `http://templates-server/<template>.html`.
 
 ### Step 3: Restart containers
 
