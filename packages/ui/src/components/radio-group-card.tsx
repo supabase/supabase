@@ -40,7 +40,7 @@ const RadioGroupCardItem = React.forwardRef<
         'hover:z-[1] focus-visible:z-[1]',
         'data-[state=checked]:z-[1]',
         'data-[state=checked]:ring-2 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-surface-200 dark:data-[state=checked]:bg-surface-300',
+        'data-[state=checked]:bg-surface-300 dark:data-[state=checked]:bg-surface-300',
         'data-[state=checked]:border-foreground/50',
         'transition-colors',
         'group',
