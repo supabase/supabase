@@ -20,12 +20,12 @@ function parseToolCall(
 ): ParsedToolCall {
   switch (toolCall.toolName) {
     case 'execute_sql': {
-      const sqlQuery = toolCall.input.sql
+      const sqlQuery = toolCall.input?.sql
       if (typeof sqlQuery !== 'string') return {}
       return { sqlQuery }
     }
     case 'search_docs': {
-      const content = toolResult.output.content
+      const content = toolResult.output?.content
       if (!content || !Array.isArray(content)) return {}
       const docs = content.map((item) => item?.text).filter((text) => typeof text === 'string')
       if (docs.length === 0) return {}

@@ -6,6 +6,7 @@ on:
     paths:
       - "apps/studio/evals/scorer.ts"
       - "apps/studio/evals/scorer-online.ts"
+      - "apps/studio/evals/scorer-online-manifest.json"
 
 permissions:
   contents: read
