@@ -6,7 +6,7 @@ tocVideo: 'AE7dKIKMJy4'
 
 <$Partial path="quickstart_intro.mdx" />
 
-![Supabase User Management example](/docs/img/supabase-flutter-demo.png)
+![Supabase User Management example](/docs/img/supabase-expo-react-native-demo.png)
 
 <Admonition type="note">
 
@@ -34,7 +34,7 @@ cd expo-user-management
 Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npx expo install @supabase/supabase-js @rneui/themed expo-sqlite
+npx expo install @supabase/supabase-js expo-sqlite
 ```
 
 Now let's create a helper file to initialize the Supabase client.
@@ -86,7 +86,7 @@ These variables are safe to expose in your Expo app since Supabase has
 
     ```bash
     npm install @supabase/supabase-js
-    npm install @rneui/themed @react-native-async-storage/async-storage
+    npm install @react-native-async-storage/async-storage
     npm install aes-js react-native-get-random-values
     npm install --save-dev @types/aes-js
     npx expo install expo-secure-store
@@ -167,6 +167,88 @@ These variables are safe to expose in your Expo app since Supabase has
   </TabPanel>
 </Tabs>
 
+### App styling
+
+We've set up the following `StyleSheet` component `styles/styles.ts` that can be used to make the app look nice:
+
+<$CodeTabs>
+```ts name=styles/styles.ts
+
+import { StyleSheet } from "react-native";
+
+export const appStyles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+    padding: 12,
+  },
+  verticallySpaced: {
+    paddingTop: 4,
+    paddingBottom: 4,
+    alignSelf: "stretch",
+  },
+  mt20: {
+    marginTop: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#86939e",
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#86939e",
+    borderRadius: 4,
+    padding: 12,
+    fontSize: 16,
+  },
+  inputDisabled: {
+    backgroundColor: "#f2f2f2",
+    borderColor: "#d1d1d1",
+    color: "#9e9e9e",
+  },
+  button: {
+    backgroundColor: "#2089dc",
+    borderRadius: 4,
+    padding: 12,
+    alignItems: "center",
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  avatarContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  avatar: {
+    borderRadius: 5,
+    overflow: "hidden",
+    maxWidth: "100%",
+    marginBottom: 20,
+  },
+  image: {
+    objectFit: "cover",
+    paddingTop: 0,
+  },
+  noImage: {
+    backgroundColor: "#333",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "rgb(200, 200, 200)",
+    borderRadius: 5,
+  },
+});
+
+
+```
+</$CodeTabs>
+
 ### Set up a login component
 
 Let's set up a React Native component to manage logins and sign ups.
@@ -175,101 +257,107 @@ Users would be able to sign in with their email and password.
 <$CodeTabs>
 
 ```tsx name=components/Auth.tsx
-import React, { useState } from 'react'
-import { Alert, StyleSheet, View, AppState } from 'react-native'
-import { supabase } from '../lib/supabase'
-import { Button, Input } from '@rneui/themed'
+import React, { useState } from "react";
+import {
+  Alert,
+  View,
+  AppState,
+  TextInput,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import { supabase } from "../lib/supabase";
+import { appStyles } from "../styles/styles";
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
 // `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
 // if the user's session is terminated. This should only be registered once.
-AppState.addEventListener('change', (state) => {
-  if (state === 'active') {
-    supabase.auth.startAutoRefresh()
+AppState.addEventListener("change", (state) => {
+  if (state === "active") {
+    supabase.auth.startAutoRefresh();
   } else {
-    supabase.auth.stopAutoRefresh()
+    supabase.auth.stopAutoRefresh();
   }
-})
+});
 
 export default function Auth() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const styles = appStyles;
 
   async function signInWithEmail() {
-    setLoading(true)
+    setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
-    })
+    });
 
-    if (error) Alert.alert(error.message)
-    setLoading(false)
+    if (error) Alert.alert(error.message);
+    setLoading(false);
   }
 
   async function signUpWithEmail() {
-    setLoading(true)
+    setLoading(true);
     const {
       data: { session },
       error,
     } = await supabase.auth.signUp({
       email: email,
       password: password,
-    })
+    });
 
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert('Please check your inbox for email verification!')
-    setLoading(false)
+    if (error) Alert.alert(error.message);
+    if (!session)
+      Alert.alert("Please check your inbox for email verification!");
+    setLoading(false);
   }
 
   return (
     <View style={styles.container}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input
-          label="Email"
-          leftIcon={{ type: 'font-awesome', name: 'envelope' }}
+        <Text style={styles.label}>Email</Text>
+        <TextInput
           onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
-          autoCapitalize={'none'}
+          autoCapitalize="none"
+          style={styles.input}
         />
       </View>
       <View style={styles.verticallySpaced}>
-        <Input
-          label="Password"
-          leftIcon={{ type: 'font-awesome', name: 'lock' }}
+        <Text style={styles.label}>Password</Text>
+        <TextInput
           onChangeText={(text) => setPassword(text)}
           value={password}
           secureTextEntry={true}
           placeholder="Password"
-          autoCapitalize={'none'}
+          autoCapitalize="none"
+          style={styles.input}
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={() => signInWithEmail()}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>Sign in</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.verticallySpaced}>
-        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={() => signUpWithEmail()}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>Sign up</Text>
+        </TouchableOpacity>
       </View>
     </View>
-  )
+  );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
-    marginTop: 20,
-  },
-})
 ```
 
 </$CodeTabs>
@@ -291,47 +379,55 @@ Let's create a new component for that called `Account.tsx`.
 <$CodeTabs>
 
 ```tsx name=components/Account.tsx
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert } from 'react-native'
-import { Button, Input } from '@rneui/themed'
-import { Session } from '@supabase/supabase-js'
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import {
+  StyleSheet,
+  View,
+  Alert,
+  TextInput,
+  Text,
+  TouchableOpacity,
+} from "react-native";
+import { Session } from "@supabase/supabase-js";
+import { appStyles } from "../styles/styles";
 
 export default function Account({ session }: { session: Session }) {
-  const [loading, setLoading] = useState(true)
-  const [username, setUsername] = useState('')
-  const [website, setWebsite] = useState('')
-  const [avatarUrl, setAvatarUrl] = useState('')
+  const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState("");
+  const [website, setWebsite] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const styles = appStyles;
 
   useEffect(() => {
-    if (session) getProfile()
-  }, [session])
+    if (session) getProfile();
+  }, [session]);
 
   async function getProfile() {
     try {
-      setLoading(true)
-      if (!session?.user) throw new Error('No user on the session!')
+      setLoading(true);
+      if (!session?.user) throw new Error("No user on the session!");
 
       const { data, error, status } = await supabase
-        .from('profiles')
+        .from("profiles")
         .select(`username, website, avatar_url`)
-        .eq('id', session?.user.id)
-        .single()
+        .eq("id", session?.user.id)
+        .single();
       if (error && status !== 406) {
-        throw error
+        throw error;
       }
 
       if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
+        setUsername(data.username);
+        setWebsite(data.website);
+        setAvatarUrl(data.avatar_url);
       }
     } catch (error) {
       if (error instanceof Error) {
-        Alert.alert(error.message)
+        Alert.alert(error.message);
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -340,13 +436,13 @@ export default function Account({ session }: { session: Session }) {
     website,
     avatar_url,
   }: {
-    username: string
-    website: string
-    avatar_url: string
+    username: string;
+    website: string;
+    avatar_url: string;
   }) {
     try {
-      setLoading(true)
-      if (!session?.user) throw new Error('No user on the session!')
+      setLoading(true);
+      if (!session?.user) throw new Error("No user on the session!");
 
       const updates = {
         id: session?.user.id,
@@ -354,63 +450,74 @@ export default function Account({ session }: { session: Session }) {
         website,
         avatar_url,
         updated_at: new Date(),
-      }
+      };
 
-      const { error } = await supabase.from('profiles').upsert(updates)
+      const { error } = await supabase.from("profiles").upsert(updates);
 
       if (error) {
-        throw error
+        throw error;
       }
     } catch (error) {
       if (error instanceof Error) {
-        Alert.alert(error.message)
+        Alert.alert(error.message);
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
     <View style={styles.container}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={session?.user?.email} disabled />
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          value={session?.user?.email}
+          readOnly
+          style={[styles.input, styles.inputDisabled]}
+        />
       </View>
       <View style={styles.verticallySpaced}>
-        <Input label="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />
+        <Text style={styles.label}>Username</Text>
+        <TextInput
+          value={username || ""}
+          onChangeText={(text) => setUsername(text)}
+          style={styles.input}
+        />
       </View>
       <View style={styles.verticallySpaced}>
-        <Input label="Website" value={website || ''} onChangeText={(text) => setWebsite(text)} />
-      </View>
-
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title={loading ? 'Loading ...' : 'Update'}
-          onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
-          disabled={loading}
+        <Text style={styles.label}>Website</Text>
+        <TextInput
+          value={website || ""}
+          onChangeText={(text) => setWebsite(text)}
+          style={styles.input}
         />
       </View>
 
+      <View style={[styles.verticallySpaced, styles.mt20]}>
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={() =>
+            updateProfile({ username, website, avatar_url: avatarUrl })
+          }
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Loading ..." : "Update"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+        <TouchableOpacity
+          style={[styles.button, styles.buttonDisabled]}
+          onPress={() => supabase.auth.signOut()}
+        >
+          <Text style={styles.buttonText}>Sign Out</Text>
+        </TouchableOpacity>
       </View>
     </View>
-  )
+  );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
-    marginTop: 20,
-  },
-})
 ```
 
 </$CodeTabs>
@@ -422,32 +529,37 @@ Now that we have all the components in place, let's update `App.tsx`:
 <$CodeTabs>
 
 ```tsx name=App.tsx
-import { useState, useEffect } from 'react'
-import { supabase } from './lib/supabase'
-import Auth from './components/Auth'
-import Account from './components/Account'
-import { View } from 'react-native'
-import { Session } from '@supabase/supabase-js'
+import { useState, useEffect } from "react";
+import { supabase } from "./lib/supabase";
+import Auth from "./components/Auth";
+import Account from "./components/Account";
+import { View } from "react-native";
+import { Session } from "@supabase/supabase-js";
 
 export default function App() {
-  const [session, setSession] = useState<Session | null>(null)
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
+      setSession(session);
+    });
 
     supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  }, [])
+      setSession(session);
+    });
+  }, []);
 
   return (
     <View>
-      {session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />}
+      {session && session.user ? (
+        <Account key={session.user.id} session={session} />
+      ) : (
+        <Auth />
+      )}
     </View>
-  )
+  );
 }
+
 ```
 
 </$CodeTabs>
@@ -481,49 +593,53 @@ We can start by creating a new component:
 <$CodeTabs>
 
 ```tsx name=components/Avatar.tsx
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert, Image, Button } from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import { View, Alert, Image, Text, TouchableOpacity } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { appStyles } from "../styles/styles";
 
 interface Props {
-  size: number
-  url: string | null
-  onUpload: (filePath: string) => void
+  size: number;
+  url: string | null;
+  onUpload: (filePath: string) => void;
 }
 
 export default function Avatar({ url, size = 150, onUpload }: Props) {
-  const [uploading, setUploading] = useState(false)
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-  const avatarSize = { height: size, width: size }
+  const [uploading, setUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const avatarSize = { height: size, width: size };
+  const styles = appStyles;
 
   useEffect(() => {
-    if (url) downloadImage(url)
-  }, [url])
+    if (url) downloadImage(url);
+  }, [url]);
 
   async function downloadImage(path: string) {
     try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .download(path);
 
       if (error) {
-        throw error
+        throw error;
       }
 
-      const fr = new FileReader()
-      fr.readAsDataURL(data)
+      const fr = new FileReader();
+      fr.readAsDataURL(data);
       fr.onload = () => {
-        setAvatarUrl(fr.result as string)
-      }
+        setAvatarUrl(fr.result as string);
+      };
     } catch (error) {
       if (error instanceof Error) {
-        console.log('Error downloading image: ', error.message)
+        console.log("Error downloading image: ", error.message);
       }
     }
   }
 
   async function uploadAvatar() {
     try {
-      setUploading(true)
+      setUploading(true);
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
@@ -531,48 +647,50 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
         allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
         quality: 1,
         exif: false, // We don't want nor need that data.
-      })
+      });
 
       if (result.canceled || !result.assets || result.assets.length === 0) {
-        console.log('User cancelled image picker.')
-        return
+        console.log("User cancelled image picker.");
+        return;
       }
 
-      const image = result.assets[0]
-      console.log('Got image', image)
+      const image = result.assets[0];
+      console.log("Got image", image);
 
       if (!image.uri) {
-        throw new Error('No image uri!') // Realistically, this should never happen, but just in case...
+        throw new Error("No image uri!"); // Realistically, this should never happen, but just in case...
       }
 
-      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
+      const arraybuffer = await fetch(image.uri).then((res) =>
+        res.arrayBuffer(),
+      );
 
-      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg'
-      const path = `${Date.now()}.${fileExt}`
+      const fileExt = image.uri?.split(".").pop()?.toLowerCase() ?? "jpeg";
+      const path = `${Date.now()}.${fileExt}`;
       const { data, error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from("avatars")
         .upload(path, arraybuffer, {
-          contentType: image.mimeType ?? 'image/jpeg',
-        })
+          contentType: image.mimeType ?? "image/jpeg",
+        });
 
       if (uploadError) {
-        throw uploadError
+        throw uploadError;
       }
 
-      onUpload(data.path)
+      onUpload(data.path);
     } catch (error) {
       if (error instanceof Error) {
-        Alert.alert(error.message)
+        Alert.alert(error.message);
       } else {
-        throw error
+        throw error;
       }
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
   }
 
   return (
-    <View>
+    <View style={styles.avatarContainer}>
       {avatarUrl ? (
         <Image
           source={{ uri: avatarUrl }}
@@ -583,34 +701,19 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
         <View style={[avatarSize, styles.avatar, styles.noImage]} />
       )}
       <View>
-        <Button
-          title={uploading ? 'Uploading ...' : 'Upload'}
+        <TouchableOpacity
+          style={styles.button}
           onPress={uploadAvatar}
           disabled={uploading}
-        />
+        >
+          <Text style={styles.buttonText}>
+            {uploading ? "Uploading ..." : "Upload"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
-  )
+  );
 }
-
-const styles = StyleSheet.create({
-  avatar: {
-    borderRadius: 5,
-    overflow: 'hidden',
-    maxWidth: '100%',
-  },
-  image: {
-    objectFit: 'cover',
-    paddingTop: 0,
-  },
-  noImage: {
-    backgroundColor: '#333',
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: 'rgb(200, 200, 200)',
-    borderRadius: 5,
-  },
-})
 ```
 
 </$CodeTabs>
@@ -634,8 +737,8 @@ return (
         size={200}
         url={avatarUrl}
         onUpload={(url: string) => {
-          setAvatarUrl(url)
-          updateProfile({ username, website, avatar_url: url })
+          setAvatarUrl(url);
+          updateProfile({ username, website, avatar_url: url });
         }}
       />
     </View>
