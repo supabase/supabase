@@ -141,7 +141,7 @@ export const DeleteProjectModal = ({
         <>
           <div className="space-y-1">
             <h4 className="text-base">
-              Help us improve by sharing why you're deleting your project.
+              What made you decide to delete your project?
             </h4>
           </div>
           <div className="space-y-4 pt-4">
