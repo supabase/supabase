@@ -29,7 +29,7 @@ const page: GoPageInput = {
         <div className="flex flex-col items-center gap-2 text-foreground-light">
           <p className="text-lg font-medium text-foreground">Spruce Restaurant</p>
           <p>3640 Sacramento St, San Francisco, CA</p>
-          <p className="mt-4 text-lg font-medium text-foreground">Tuesday, April 29, 2026</p>
+          <p className="mt-4 text-lg font-medium text-foreground">Wednesday, April 29, 2026</p>
           <p>6:30 PM -- Cocktails and introductions</p>
           <p>7:00 PM -- Dinner and discussion</p>
         </div>
