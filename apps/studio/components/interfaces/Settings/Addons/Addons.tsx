@@ -424,7 +424,9 @@ export const Addons = () => {
                               !(canUpdateIPv4 || ipv4)
                             }
                           >
-                            Change dedicated IPv4 address
+                            {!!ipv4
+                              ? 'Toggle dedicated IPv4 address'
+                              : 'Enable dedicated IPv4 address'}
                           </Button>
                         </ProjectUpdateDisabledTooltip>
                       </div>
@@ -534,7 +536,7 @@ export const Addons = () => {
                           },
                         }}
                       >
-                        Change point in time recovery
+                        Enable point in time recovery
                       </ButtonTooltip>
                     ) : (
                       <ProjectUpdateDisabledTooltip
@@ -552,7 +554,7 @@ export const Addons = () => {
                             hasHipaaAddon
                           }
                         >
-                          Change point in time recovery
+                          {!!pitr ? 'Change recovery duration' : 'Enable point in time recovery'}
                         </Button>
                       </ProjectUpdateDisabledTooltip>
                     )}
@@ -614,19 +616,28 @@ export const Addons = () => {
                             ? 'Custom domain is enabled'
                             : 'Custom domain is not enabled'}
                         </p>
-                        <ProjectUpdateDisabledTooltip
-                          projectUpdateDisabled={projectUpdateDisabled}
-                          projectNotActive={!isProjectActive}
-                        >
-                          <Button
-                            type="default"
-                            className="mt-2 pointer-events-auto"
-                            onClick={() => setPanel('customDomain')}
-                            disabled={!isProjectActive || projectUpdateDisabled}
+                        <div className="mt-2  flex items-center gap-x-2">
+                          <ProjectUpdateDisabledTooltip
+                            projectUpdateDisabled={projectUpdateDisabled}
+                            projectNotActive={!isProjectActive}
                           >
-                            Change custom domain
-                          </Button>
-                        </ProjectUpdateDisabledTooltip>
+                            <Button
+                              type="default"
+                              className="pointer-events-auto"
+                              onClick={() => setPanel('customDomain')}
+                              disabled={!isProjectActive || projectUpdateDisabled}
+                            >
+                              {!!customDomain ? 'Toggle custom domain' : 'Enable custom domain'}
+                            </Button>
+                          </ProjectUpdateDisabledTooltip>
+                          {!!customDomain && (
+                            <Button asChild type="outline">
+                              <Link href={`/project/${projectRef}/settings/general#custom-domains`}>
+                                Edit custom domain
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </ScaffoldSectionContent>

@@ -1,10 +1,9 @@
+import { IS_PLATFORM } from 'common'
+import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { IS_PLATFORM, useFlag } from 'common'
-import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { Button, StatusIcon } from 'ui'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {
@@ -34,8 +33,6 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
 // there's a new version of Studio is available, and the user has been on the old dashboard (based on commit) for more than 24 hours.
 // [Joshen] K-Dog has a suggestion here to bring down the time period here by checking commits
 export function useCheckLatestDeploy() {
-  const showRefreshToast = useFlag('showRefreshToast')
-
   const [currentCommitTime, setCurrentCommitTime] = useState('')
   const [isToastShown, setIsToastShown] = useState(false)
 
@@ -59,7 +56,7 @@ export function useCheckLatestDeploy() {
   }, [commit])
 
   useEffect(() => {
-    if (!showRefreshToast || !commit || commit.commitTime === 'unknown') {
+    if (!commit || commit.commitTime === 'unknown') {
       return
     }
 
@@ -91,5 +88,5 @@ export function useCheckLatestDeploy() {
       position: 'bottom-right',
     })
     setIsToastShown(true)
-  }, [commit, showRefreshToast, isToastShown, currentCommitTime])
+  }, [commit, isToastShown, currentCommitTime])
 }
