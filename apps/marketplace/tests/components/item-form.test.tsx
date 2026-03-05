@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { ItemForm } from '@/components/item-form'
+
 const pushMock = vi.fn()
 const createItemDraftActionMock = vi.fn()
 const updateItemDraftActionMock = vi.fn()
@@ -25,8 +27,6 @@ vi.mock('@/app/protected/actions', () => ({
   updateItemDraftAction: (...args: unknown[]) => updateItemDraftActionMock(...args),
 }))
 
-import { ItemForm } from '@/components/item-form'
-
 describe('ItemForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -40,7 +40,7 @@ describe('ItemForm', () => {
     await user.click(screen.getByRole('button', { name: 'Create item' }))
 
     expect(
-      await screen.findByText('Upload a template ZIP package that includes registry-item.json.')
+      await screen.findByText('Upload a template ZIP package that includes template.json.')
     ).toBeInTheDocument()
     expect(createItemDraftActionMock).not.toHaveBeenCalled()
   })

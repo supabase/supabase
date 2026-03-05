@@ -23,10 +23,7 @@ import { z } from 'zod'
 
 import { createItemDraftAction, updateItemDraftAction } from '@/app/protected/actions'
 import { ItemFilesUploader, type ItemPreviewFile } from '@/components/item-files-uploader'
-import {
-  normalizeTemplatePath,
-  shouldIgnoreTemplatePath,
-} from '@/lib/marketplace/template-package'
+import { normalizeTemplatePath, shouldIgnoreTemplatePath } from '@/lib/marketplace/template-package'
 import { createClient } from '@/lib/supabase/client'
 
 export type ItemFile = {
@@ -386,11 +383,11 @@ export function ItemForm(props: ItemFormProps) {
     if (parsed.data.type === 'template') {
       const hasExistingRegistryFile = Boolean(item?.registry_item_url)
       if (isCreateMode && !templateZipFile) {
-        setError('Upload a template ZIP package that includes registry-item.json.')
+        setError('Upload a template ZIP package that includes template.json.')
         return
       }
       if (!isCreateMode && !templateZipFile && !hasExistingRegistryFile) {
-        setError('Upload a template ZIP package that includes registry-item.json.')
+        setError('Upload a template ZIP package that includes template.json.')
         return
       }
     }
@@ -717,7 +714,7 @@ export function ItemForm(props: ItemFormProps) {
                       'Template package (.zip)'
                     )
                   }
-                  description="Upload a zip containing registry-item.json, functions/, and schemas/."
+                  description="Upload a zip containing template.json, functions/, and schemas/."
                 >
                   <Input
                     id="item-template-zip"

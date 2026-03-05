@@ -35,7 +35,7 @@ export function normalizeTemplatePaths(paths: string[]) {
 
 export function hasRequiredTemplateEntries(paths: string[]) {
   const normalized = normalizeTemplatePaths(paths)
-  const hasRegistry = normalized.some((path) => path === 'registry-item.json')
+  const hasRegistry = normalized.some((path) => path === 'template.json')
   const hasFunctions = normalized.some((path) => path.startsWith('functions/'))
   const hasSchemas = normalized.some((path) => path.startsWith('schemas/'))
   return hasRegistry && hasFunctions && hasSchemas

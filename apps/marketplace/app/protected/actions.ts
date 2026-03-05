@@ -1,8 +1,8 @@
 'use server'
 
+import JSZip from 'jszip'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import JSZip from 'jszip'
 
 import {
   ensureItemDraftConstraints,
@@ -55,7 +55,7 @@ async function uploadTemplatePackage({
 
   if (!hasRequiredTemplateEntries(entryPaths)) {
     throw new Error(
-      'Template package must include registry-item.json plus files in functions/ and schemas/'
+      'Template package must include template.json plus files in functions/ and schemas/'
     )
   }
 
@@ -86,7 +86,9 @@ async function uploadTemplatePackage({
 
   const existingTemplatePaths = await listStorageFilesRecursively()
   if (existingTemplatePaths.length > 0) {
-    const { error: removeError } = await supabase.storage.from('item_files').remove(existingTemplatePaths)
+    const { error: removeError } = await supabase.storage
+      .from('item_files')
+      .remove(existingTemplatePaths)
     if (removeError) {
       throw new Error(removeError.message)
     }
@@ -105,7 +107,7 @@ async function uploadTemplatePackage({
     }
   }
 
-  const registryFilePath = `${basePath}/registry-item.json`
+  const registryFilePath = `${basePath}/template.json`
   const {
     data: { publicUrl },
   } = supabase.storage.from('item_files').getPublicUrl(registryFilePath)
@@ -351,9 +353,7 @@ export async function createItemDraftAction(formData: FormData) {
   const templateZip = parseTemplateZip(formData)
   const documentationUrl = formData.get('documentationUrl')
   const normalizedDocumentationUrl =
-    typeof documentationUrl === 'string' && documentationUrl.trim()
-      ? documentationUrl.trim()
-      : null
+    typeof documentationUrl === 'string' && documentationUrl.trim() ? documentationUrl.trim() : null
   const intentRaw = formData.get('intent')
   const intent = intentRaw === 'request_review' ? 'request_review' : 'save'
   const slugSource = typeof slugInput === 'string' && slugInput.trim() ? slugInput : title
@@ -454,9 +454,7 @@ export async function updateItemDraftAction(formData: FormData) {
   const existingRegistryItemUrl = parseOptionalString(formData, 'existingRegistryItemUrl')
   const documentationUrl = formData.get('documentationUrl')
   const normalizedDocumentationUrl =
-    typeof documentationUrl === 'string' && documentationUrl.trim()
-      ? documentationUrl.trim()
-      : null
+    typeof documentationUrl === 'string' && documentationUrl.trim() ? documentationUrl.trim() : null
   const rawType = parseRequiredString(formData, 'type')
   const type = parseItemType(rawType)
   const publishedRaw = formData.get('published')
@@ -646,9 +644,13 @@ export async function saveItemReviewAction(formData: FormData) {
     throw new Error(existingCategoryItemsError.message)
   }
 
-  const existingCategoryIds = new Set((existingCategoryItems ?? []).map((entry) => entry.category_id))
+  const existingCategoryIds = new Set(
+    (existingCategoryItems ?? []).map((entry) => entry.category_id)
+  )
   const nextCategoryIds = new Set(categoryIds)
-  const categoryIdsToInsert = categoryIds.filter((categoryId) => !existingCategoryIds.has(categoryId))
+  const categoryIdsToInsert = categoryIds.filter(
+    (categoryId) => !existingCategoryIds.has(categoryId)
+  )
   const categoryIdsToDelete = Array.from(existingCategoryIds).filter(
     (categoryId) => !nextCategoryIds.has(categoryId)
   )

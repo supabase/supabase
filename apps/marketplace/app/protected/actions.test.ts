@@ -1,5 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  addPartnerMemberAction,
+  createItemAction,
+  createItemDraftAction,
+  createPartnerAction,
+  requestItemReviewAction,
+  saveItemReviewAction,
+  updateItemAction,
+  updateItemDraftAction,
+  updateItemReviewAction,
+  updatePartnerAction,
+} from './actions'
+
 const redirectMock = vi.fn()
 const revalidatePathMock = vi.fn()
 const createClientMock = vi.fn()
@@ -22,19 +35,6 @@ vi.mock('jszip', () => ({
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => createClientMock(),
 }))
-
-import {
-  addPartnerMemberAction,
-  createItemAction,
-  createItemDraftAction,
-  createPartnerAction,
-  requestItemReviewAction,
-  saveItemReviewAction,
-  updateItemAction,
-  updateItemReviewAction,
-  updatePartnerAction,
-  updateItemDraftAction,
-} from './actions'
 
 type Result<T = unknown> = { data: T; error: null | { message: string; code?: string } }
 
@@ -60,25 +60,40 @@ function createSupabaseMock({
     upload?: (path: string) => Promise<{ error: null | { message: string } }>
     getPublicUrl?: (path: string) => { data: { publicUrl: string } }
   }
-  rpc?: (name: string, args: Record<string, unknown>) => Promise<{ error: null | { message: string } }>
+  rpc?: (
+    name: string,
+    args: Record<string, unknown>
+  ) => Promise<{ error: null | { message: string } }>
 }) {
   return {
     auth: {
       getUser: vi.fn().mockResolvedValue({ data: { user } }),
     },
-    rpc: vi.fn().mockImplementation((name, args) => rpc?.(name, args) ?? Promise.resolve({ error: null })),
+    rpc: vi
+      .fn()
+      .mockImplementation((name, args) => rpc?.(name, args) ?? Promise.resolve({ error: null })),
     storage: {
       from: vi.fn().mockReturnValue({
-        list: vi.fn().mockImplementation((path: string) => storage?.list?.(path) ?? Promise.resolve(success([]))),
+        list: vi
+          .fn()
+          .mockImplementation(
+            (path: string) => storage?.list?.(path) ?? Promise.resolve(success([]))
+          ),
         remove: vi
           .fn()
-          .mockImplementation((paths: string[]) => storage?.remove?.(paths) ?? Promise.resolve({ error: null })),
+          .mockImplementation(
+            (paths: string[]) => storage?.remove?.(paths) ?? Promise.resolve({ error: null })
+          ),
         upload: vi
           .fn()
-          .mockImplementation((path: string) => storage?.upload?.(path) ?? Promise.resolve({ error: null })),
+          .mockImplementation(
+            (path: string) => storage?.upload?.(path) ?? Promise.resolve({ error: null })
+          ),
         getPublicUrl: vi
           .fn()
-          .mockImplementation((path: string) => storage?.getPublicUrl?.(path) ?? { data: { publicUrl: path } }),
+          .mockImplementation(
+            (path: string) => storage?.getPublicUrl?.(path) ?? { data: { publicUrl: path } }
+          ),
       }),
     },
     from: vi.fn().mockImplementation((table: string) => {
@@ -275,9 +290,9 @@ describe('protected actions', () => {
   it('creates template item and updates registry URL from uploaded package', async () => {
     jsZipLoadAsyncMock.mockResolvedValue({
       files: {
-        'pkg/registry-item.json': {
+        'pkg/template.json': {
           dir: false,
-          name: 'pkg/registry-item.json',
+          name: 'pkg/template.json',
           async: vi.fn().mockResolvedValue(new Blob(['{}'], { type: 'application/json' })),
         },
         'pkg/functions/main.ts': {
@@ -299,7 +314,7 @@ describe('protected actions', () => {
         storage: {
           list: vi.fn().mockResolvedValue(success([])),
           upload: vi.fn().mockResolvedValue({ error: null }),
-          getPublicUrl: () => ({ data: { publicUrl: 'https://cdn.example/registry-item.json' } }),
+          getPublicUrl: () => ({ data: { publicUrl: 'https://cdn.example/template.json' } }),
         },
         fromHandler: (table, state) => {
           if (table === 'items' && state.op === 'insert') {

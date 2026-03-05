@@ -20,9 +20,7 @@ describe('template-package utils', () => {
     expect(normalizeTemplatePath('my-template/functions/index.ts', 'my-template')).toBe(
       'functions/index.ts'
     )
-    expect(normalizeTemplatePath('/my-template/registry-item.json', 'my-template')).toBe(
-      'registry-item.json'
-    )
+    expect(normalizeTemplatePath('/my-template/template.json', 'my-template')).toBe('template.json')
   })
 
   it('infers top-level root prefix only when all entries share one', () => {
@@ -35,15 +33,15 @@ describe('template-package utils', () => {
       normalizeTemplatePaths([
         'pkg/functions/index.ts',
         'pkg/schemas/001.sql',
-        'pkg/registry-item.json',
+        'pkg/template.json',
         '__MACOSX/skip',
       ])
-    ).toEqual(['functions/index.ts', 'schemas/001.sql', 'registry-item.json'])
+    ).toEqual(['functions/index.ts', 'schemas/001.sql', 'template.json'])
   })
 
   it('validates required template package entries', () => {
     expect(
-      hasRequiredTemplateEntries(['pkg/functions/a.ts', 'pkg/schemas/a.sql', 'pkg/registry-item.json'])
+      hasRequiredTemplateEntries(['pkg/functions/a.ts', 'pkg/schemas/a.sql', 'pkg/template.json'])
     ).toBe(true)
     expect(hasRequiredTemplateEntries(['pkg/functions/a.ts', 'pkg/schemas/a.sql'])).toBe(false)
   })
