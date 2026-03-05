@@ -57,10 +57,10 @@ const SharedFormSchema = z.object({
     .min(1, 'Please provide a name for your custom provider')
     .max(100, 'Name must be less than 100 characters'),
   provider_type: z.enum(['oidc', 'oauth2']).default('oidc'),
-  client_id: z.string(),
-  client_secret: z.string(),
+  client_id: z.string().trim(),
+  client_secret: z.string().trim(),
   email_optional: z.boolean().default(false),
-  issuer: z.string().url('Please provide a valid URL'),
+  issuer: z.string().url('Please provide a valid URL').trim(),
   // comma-separated scopes in the form, will be transformed to array when sending
   scopes: z.string().default(''),
   callback_url: z.string().optional(), // Readonly display from project endpoint, not part of payload
@@ -181,25 +181,17 @@ export const CreateOrUpdateCustomProviderSheet = ({
           `${values.issuer.replace(/\/$/, '')}/.well-known/openid-configuration`,
       }
     } else {
-      const issuer = values.issuer?.trim()
+      const issuer = values.issuer
       payload = {
-        authorization_url: `${issuer.replace(/\/$/, '')}/oauth/authorize`,
-        token_url: `${issuer.replace(/\/$/, '')}/oauth/token`,
-        userinfo_url: `${issuer.replace(/\/$/, '')}/oauth/userinfo`,
-        jwks_uri: `${issuer.replace(/\/$/, '')}/.well-known/jwks.json`,
+        authorization_url:
+          values.authorization_url || `${issuer.replace(/\/$/, '')}/oauth/authorize`,
+        token_url: values.token_url || `${issuer.replace(/\/$/, '')}/oauth/token`,
+        userinfo_url: values.userinfo_url || `${issuer.replace(/\/$/, '')}/oauth/userinfo`,
+        jwks_uri: values.jwks_uri || `${issuer.replace(/\/$/, '')}/.well-known/jwks.json`,
       }
     }
 
     if (isEditMode) {
-      if (!values.client_id?.trim()) {
-        form.setError('client_id', { message: 'Client ID is required' })
-        return
-      }
-      if (!values.client_secret?.trim()) {
-        form.setError('client_secret', { message: 'Client secret is required' })
-        return
-      }
-
       updateCustomProvider({
         identifier,
         projectRef,
