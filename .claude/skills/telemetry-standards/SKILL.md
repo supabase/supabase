@@ -2,13 +2,13 @@
 name: telemetry-standards
 description: PostHog event tracking standards for Supabase Studio. Use when reviewing
   PRs for telemetry compliance or implementing new event tracking. Covers event naming,
-  property conventions, approved patterns, and implementation workflow.
+  property conventions, approved patterns, and implementation guide.
 ---
 
 # Telemetry Standards for Supabase Studio
 
-Standards and workflows for PostHog event tracking in `apps/studio/`. Use this
-when reviewing PRs for tracking compliance or implementing new tracking.
+Standards for PostHog event tracking in `apps/studio/`. Apply these when
+reviewing PRs that touch tracking or when implementing new tracking.
 
 ## Event Naming
 
@@ -17,16 +17,15 @@ when reviewing PRs for tracking compliance or implementing new tracking.
 **Approved verbs only:**
 opened, clicked, submitted, created, removed, updated, retrieved, intended, evaluated, added
 
-**Flag these mistakes:**
-- New unapproved verbs (saved, viewed, seen, pressed, etc.)
-- Wrong order: `click_product_card` should be `product_card_clicked`
-- Wrong casing: `productCardClicked` or `Product_Card_Clicked` should be `product_card_clicked`
+**Flag these:**
+- Unapproved verbs (saved, viewed, seen, pressed, etc.)
+- Wrong order: `click_product_card` → should be `product_card_clicked`
+- Wrong casing: `productCardClicked` → should be `product_card_clicked`
 
 **Good examples:**
 - `product_card_clicked`
-- `sql_query_executed` — note: `executed` is not in the approved list, prefer `submitted`
-- `assistant_suggestion_accepted` — note: `accepted` is not in the approved list, prefer `clicked`
 - `backup_button_clicked`
+- `sql_query_submitted`
 
 ## Property Standards
 
@@ -45,17 +44,13 @@ opened, clicked, submitted, created, removed, updated, retrieved, intended, eval
 
 - Passive views/renders on page load (`dashboard_viewed`, `sidebar_appeared`, `page_loaded`)
 - Component appearances without user interaction
-- Generic "viewed" or "seen" events — these are already captured by pageview events
+- Generic "viewed" or "seen" events — already captured by pageview events
 
-**DO track:**
-- User clicks
-- Form submissions
-- Explicit opens/closes by user
-- User-initiated actions
+**DO track:** user clicks, form submissions, explicit opens/closes, user-initiated actions.
 
-## Implementation Pattern
+## Required Pattern
 
-**Required hook:** `useTrack` from `lib/telemetry/track`
+Use `useTrack` from `lib/telemetry/track`. Never use `useSendEventMutation` (deprecated).
 
 ```typescript
 import { useTrack } from 'common/lib/telemetry'
@@ -75,123 +70,53 @@ const MyComponent = () => {
 }
 ```
 
-**Deprecated — flag any usage:**
-```typescript
-// NEVER use useSendEventMutation
-const { mutate: sendEvent } = useSendEventMutation()
-```
-
 ## Event Definitions
 
-All events must be defined in `packages/common/telemetry-constants.ts` with accurate JSDoc:
+All events must be defined in `packages/common/telemetry-constants.ts` with JSDoc:
 
 ```typescript
 /**
  * [Event description]
- * @page [accurate page/location where this fires]
+ * @page [page/location where this fires]
  * @source [what triggers this event]
  */
 export const EVENT_NAME = '[object]_[verb]' as const
 ```
 
-## Review Workflow
+`@page` and `@source` must accurately describe where and how the event fires.
 
-Use when reviewing a PR for telemetry compliance.
+## Review Rules
 
-### Step 1: Fetch PR Details
+When reviewing a PR, flag these as **required changes:**
 
-```bash
-gh pr view [PR_NUMBER] --json files,diff,title,body
-gh pr diff [PR_NUMBER]
-```
+1. **Naming violations** — event not following `[object]_[verb]` snake_case, or using an unapproved verb
+2. **Property violations** — not camelCase, generic names, or inconsistent with similar events
+3. **Deprecated hook** — any usage of `useSendEventMutation` instead of `useTrack`
+4. **Unnecessary view tracking** — events that fire on page load without user interaction
+5. **Inaccurate docs** — `@page`/`@source` descriptions that don't match the actual implementation
 
-Focus on:
-- `packages/common/telemetry-constants.ts`
-- Any files using `useTrack`, `track()`, or `useSendEventMutation`
-
-### Step 2: Check telemetry-constants.ts
-
-If modified, check every new or changed event for:
-- Event name follows `[object]_[verb]` snake_case format
-- Verb is from the approved list
-- Properties use camelCase and are self-explanatory
-- `@page` and `@source` descriptions are accurate
-- Property names are consistent with similar existing events
-
-### Step 3: Check Implementation Files
-
-For files using tracking functions:
-- No `useSendEventMutation` usage (must use `useTrack`)
-- No unnecessary view tracking (passive renders on page load)
-- Properties consistent with similar events in telemetry-constants.ts
-
-### Step 4: Check for Missing Tracking
-
-If the PR adds user-facing interactions (buttons, forms, toggles, modals, dialogs) without tracking:
-- Flag it as a suggestion: "This adds a user interaction that may benefit from tracking. Consider adding a `useTrack()` call."
+When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
+- "This adds a user interaction that may benefit from tracking."
 - Propose the event name following `[object]_[verb]` convention
 - Propose the `useTrack()` call with suggested properties
 
-### Step 5: Present Issues
+When checking property consistency, search `packages/common/telemetry-constants.ts` for similar events and verify property names match.
 
-Format each issue as:
+## Implementing New Tracking
 
-```
-**File:** [filename]
-**Line:** [approximate line number from diff]
-**Issue:** [specific problem]
-**Suggestion:** [exact fix needed]
-**Severity:** Request Changes (for violations) or Suggestion (for missing tracking)
-```
+To add tracking for a user action:
 
-Present all issues and wait for user approval before posting.
+1. **Name the event** — `[object]_[verb]` using approved verbs only
+2. **Choose properties** — camelCase, self-explanatory; check `packages/common/telemetry-constants.ts` for similar events and match their property names
+3. **Add to telemetry-constants.ts** — with `@page` and `@source` JSDoc
+4. **Add to component** — import `useTrack`, call `track('event_name', { properties })`
 
-### Step 6: Post Comments (After Approval)
+### Verification checklist
 
-```bash
-gh pr comment [PR_NUMBER] --body "[formatted comment]"
-```
-
-## Implementation Workflow
-
-Use when adding new event tracking.
-
-### Step 1: Design the Event
-
-Given the user action to track:
-1. Name: `[object]_[verb]` using approved verbs only
-2. Properties: camelCase, self-explanatory names
-3. Search `packages/common/telemetry-constants.ts` for similar events and match their property names
-
-Present the design:
-
-```
-Event Name: [object]_[verb]
-Properties:
-  - propertyName: type (description)
-@page: [where this fires]
-@source: [what triggers it]
-Similar Events: [list any related events found]
-```
-
-Wait for approval.
-
-### Step 2: Add to telemetry-constants.ts
-
-Add the event definition with JSDoc to `packages/common/telemetry-constants.ts`.
-
-### Step 3: Implement in Component
-
-1. Import: `import { useTrack } from 'common/lib/telemetry'`
-2. Initialize: `const track = useTrack()`
-3. Call: `track('object_verb', { propertyName: value })`
-
-### Step 4: Verify
-
-- [ ] Event added to telemetry-constants.ts with accurate @page/@source
-- [ ] Event name follows [object]_[verb] pattern with approved verb
+- [ ] Event name follows `[object]_[verb]` with approved verb
 - [ ] Event name is snake_case
 - [ ] Properties are camelCase and self-explanatory
-- [ ] Using useTrack hook (not useSendEventMutation)
+- [ ] Event defined in telemetry-constants.ts with accurate `@page`/`@source`
+- [ ] Using `useTrack` hook (not `useSendEventMutation`)
 - [ ] Not tracking passive views/appearances
-- [ ] Consistent with similar events
+- [ ] Property names consistent with similar events
