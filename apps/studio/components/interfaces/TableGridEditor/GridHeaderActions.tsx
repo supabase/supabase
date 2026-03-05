@@ -469,7 +469,14 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   <p>
                     Foreign tables do not enforce RLS, which may allow unrestricted access. To
                     secure them, either move foreign tables to a private schema not exposed by
-                    PostgREST, or <a href="">disable PostgREST access</a> entirely.
+                    PostgREST, or{' '}
+                    <Link
+                      href={`/project/${ref}/integrations/data_api/overview`}
+                      className="underline hover:text-foreground transition"
+                    >
+                      disable PostgREST access
+                    </Link>{' '}
+                    entirely.
                   </p>
 
                   <div className="mt-2">
