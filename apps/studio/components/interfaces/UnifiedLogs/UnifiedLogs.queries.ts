@@ -206,8 +206,6 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, any>)
   const hourDiff = endTime.diff(startTime, 'hour')
   const dayDiff = endTime.diff(startTime, 'day')
 
-  console.log(`Time difference: ${minuteDiff} minutes, ${hourDiff} hours, ${dayDiff} days`)
-
   // Adjust bucketing based on time range
   if (dayDiff >= 2) {
     truncationLevel = 'DAY'
