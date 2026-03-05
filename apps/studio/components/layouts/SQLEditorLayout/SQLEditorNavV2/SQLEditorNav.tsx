@@ -15,6 +15,7 @@ import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorM
 import { useSqlEditorTabsCleanup } from 'components/layouts/Tabs/Tabs.utils'
 import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
@@ -40,6 +41,15 @@ import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQ
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { ShareSnippetModal } from './ShareSnippetModal'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 
 interface SQLEditorNavProps {
   sort?: 'inserted_at' | 'name'
@@ -63,6 +73,79 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     favorite: showFavoriteSnippets,
     private: showPrivateSnippets,
   } = sectionVisibility
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before drag starts
+      },
+    })
+  )
+
+  // Mutation for updating snippet folder
+  const { mutate: updateSnippet } = useContentUpsertMutation({
+    onSuccess: () => {
+      toast.success('Query moved successfully')
+    },
+    onError: (error) => {
+      toast.error(`Failed to move query: ${error.message}`)
+    },
+  })
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || !projectRef) return
+
+    const draggedItem = active.data.current
+    const dropTarget = over.data.current
+
+    // Only handle snippet dragging (not folders)
+    if (draggedItem?.type !== 'snippet') return
+
+    const snippet = draggedItem.element?.metadata as Snippet
+    if (!snippet) return
+
+    // Determine the new folder_id based on drop target
+    let newFolderId: string | null = null
+
+    if (dropTarget?.type === 'folder') {
+      // Dropped on a folder
+      newFolderId = dropTarget.element.id
+    } else if (dropTarget?.type === 'snippet') {
+      // Dropped on another snippet - use that snippet's folder
+      newFolderId = dropTarget.element?.metadata?.folder_id ?? null
+    } else {
+      // Dropped on root/section - remove from folder
+      newFolderId = null
+    }
+
+    // Only update if folder changed
+    if (newFolderId === snippet.folder_id) return
+
+    // Update snippet with new folder_id
+    updateSnippet({
+      projectRef,
+      payload: {
+        id: snippet.id,
+        name: snippet.name,
+        description: snippet.description,
+        type: 'sql',
+        visibility: snippet.visibility,
+        folder_id: newFolderId,
+        content: {}, // Content doesn't need to be changed
+      },
+    })
+
+    // Update local state immediately for responsiveness
+    snapV2.addSnippet({
+      projectRef,
+      snippet: {
+        ...snippet,
+        folder_id: newFolderId,
+      },
+    })
+  }
 
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -447,7 +530,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   }, [allSnippetsInView, isSuccess, sqlEditorTabsCleanup])
 
   return (
-    <>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <InnerSideMenuSeparator />
       {IS_PLATFORM && (
         <>
@@ -807,6 +890,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
           Are you sure you want to delete the folder '{selectedFolderToDelete?.name}'?
         </p>
       </ConfirmationModal>
-    </>
+    </DndContext>
   )
 }

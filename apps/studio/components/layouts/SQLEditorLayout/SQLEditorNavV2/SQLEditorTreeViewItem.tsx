@@ -1,4 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import {
   Copy,
   Download,
@@ -98,6 +100,20 @@ export const SQLEditorTreeViewItem = ({
   const { data: project } = useSelectedProjectQuery()
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: element.id,
+    data: {
+      type: isBranch ? 'folder' : 'snippet',
+      element,
+    },
+    disabled: isBranch, // Folders can't be dragged (for now)
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
@@ -215,11 +231,12 @@ export const SQLEditorTreeViewItem = ({
   }
 
   return (
-    <>
+    <div ref={setNodeRef} style={style} {...attributes}>
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <TreeViewItem
-            className={className}
+            {...listeners}
+            className={cn(className, isDragging && 'opacity-50 cursor-grabbing')}
             level={level}
             isExpanded={isExpanded}
             isBranch={isBranch}
@@ -446,6 +463,6 @@ export const SQLEditorTreeViewItem = ({
           </Button>
         </div>
       )}
-    </>
+    </div>
   )
 }
