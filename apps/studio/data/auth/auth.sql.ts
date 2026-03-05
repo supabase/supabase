@@ -2,7 +2,7 @@ import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 
 import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from '../table-rows/table-rows.sql'
 
-function prefixToUUID(prefix: string, max: boolean) {
+export function prefixToUUID(prefix: string, max: boolean) {
   const mapped = '00000000-0000-0000-0000-000000000000'
     .split('')
     .map((c, i) => (c === '-' ? c : prefix[i] ?? c))
@@ -30,7 +30,7 @@ function prefixToUUID(prefix: string, max: boolean) {
   return mapped.join('')
 }
 
-function stringRange(prefix: string): [string, string | undefined] {
+export function stringRange(prefix: string): [string, string | undefined] {
   if (!prefix) {
     return [prefix, undefined]
   }
