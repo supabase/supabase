@@ -7,6 +7,8 @@ import {
   computeInstanceAddonVariantIdSchema,
 } from './compute-disk-limits'
 import config from './config'
+import { ERROR_CODE_DOCS_URLS, ERROR_CODES, HTTP_ERROR_CODES } from './errorCodes'
+import type { ErrorCodeDefinition, ErrorCodeService } from './errorCodes'
 import extensions from './extensions.json'
 import logConstants from './logConstants'
 import { plans, PricingInformation } from './plans'
@@ -26,6 +28,9 @@ export {
   COMPUTE_MAX_THROUGHPUT,
   computeInstanceAddonVariantIdSchema,
   config,
+  ERROR_CODE_DOCS_URLS,
+  ERROR_CODES,
+  HTTP_ERROR_CODES,
   extensions,
   FLY_REGIONS,
   logConstants,
@@ -37,4 +42,11 @@ export {
   topTweets,
   tweets,
 }
-export type { AWS_REGIONS_KEYS, CloudProvider, PricingInformation, Region }
+export type {
+  AWS_REGIONS_KEYS,
+  CloudProvider,
+  ErrorCodeDefinition,
+  ErrorCodeService,
+  PricingInformation,
+  Region,
+}
