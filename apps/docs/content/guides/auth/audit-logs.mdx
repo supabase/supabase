@@ -47,13 +47,16 @@ Audit logs contain detailed information about each authentication event:
   "timestamp": "2025-08-01T10:30:00Z",
   "user_id": "uuid",
   "action": "user_signedup",
-  "ip_address": "192.168.1.1",
   "user_agent": "Mozilla/5.0...",
   "metadata": {
     "provider": "email"
   }
 }
 ```
+> **Note**
+>
+> The `ip_address` field is not currently included in Auth audit logs.
+> Client IP addresses are available in `auth.sessions`, but are not logged for each authentication event in the audit logs.
 
 ### Log actions reference
 
