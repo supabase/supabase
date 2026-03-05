@@ -1,4 +1,5 @@
 import posthog, { PostHogConfig } from 'posthog-js'
+import * as Sentry from '@sentry/nextjs'
 
 // Limit the max number of queued events
 // (e.g. if a user navigates around a lot before accepting consent)
@@ -15,13 +16,21 @@ export interface ClientTelemetryEvent {
 
 type ClientTelemetryListener = (event: ClientTelemetryEvent) => void
 
+function captureToSentry(error: unknown) {
+  Sentry.withScope((scope) => {
+    scope.setTag('team', 'growth-eng')
+    scope.setTag('context', 'posthog-client')
+    Sentry.captureException(error instanceof Error ? error : new Error(String(error)))
+  })
+}
+
 interface PostHogClientConfig {
   apiKey?: string
   apiHost?: string
   uiHost?: string
 }
 
-class PostHogClient {
+export class PostHogClient {
   /** True after posthog.init() is called (prevents double-init) */
   private initStarted = false
   /** True after the `loaded` callback fires, meaning PostHog has fully bootstrapped */
@@ -80,7 +89,7 @@ class PostHogClient {
               this.pendingIdentification.properties
             )
           } catch (error) {
-            console.error('PostHog identify failed:', error)
+            captureToSentry(error)
           }
           this.pendingIdentification = null
         }
@@ -90,7 +99,7 @@ class PostHogClient {
           try {
             posthog.capture(event, properties, { transport: 'sendBeacon' })
           } catch (error) {
-            console.error('PostHog capture failed:', error)
+            captureToSentry(error)
           }
         })
         this.pendingEvents = []
@@ -134,7 +143,7 @@ class PostHogClient {
 
       this.emitToDevListeners('pageview', '$pageview', properties)
     } catch (error) {
-      console.error('PostHog pageview capture failed:', error)
+      captureToSentry(error)
     }
   }
 
@@ -157,7 +166,7 @@ class PostHogClient {
 
       this.emitToDevListeners('pageleave', '$pageleave', properties)
     } catch (error) {
-      console.error('PostHog pageleave capture failed:', error)
+      captureToSentry(error)
     }
   }
 
@@ -175,7 +184,7 @@ class PostHogClient {
 
       this.emitToDevListeners('identify', '$identify', { userId, ...properties })
     } catch (error) {
-      console.error('PostHog identify failed:', error)
+      captureToSentry(error)
     }
   }
 
@@ -190,7 +199,7 @@ class PostHogClient {
     try {
       posthog.reset()
     } catch (error) {
-      console.error('PostHog reset failed:', error)
+      captureToSentry(error)
     }
   }
 
@@ -204,7 +213,7 @@ class PostHogClient {
       try {
         return posthog.get_distinct_id()
       } catch (error) {
-        console.error('PostHog getDistinctId failed:', error)
+        captureToSentry(error)
       }
     }
 
@@ -257,7 +266,7 @@ class PostHogClient {
     try {
       return posthog.get_session_id()
     } catch (error) {
-      console.error('PostHog getSessionId failed:', error)
+      captureToSentry(error)
       return undefined
     }
   }
@@ -300,7 +309,7 @@ class PostHogClient {
       posthog.capture(eventName, { experiment_id: experimentId, ...properties })
       sessionStorage.setItem(storageKey, sessionId)
     } catch (error) {
-      console.error('PostHog experiment exposure capture failed:', error)
+      captureToSentry(error)
     }
   }
 
@@ -337,7 +346,7 @@ class PostHogClient {
       try {
         listener(event)
       } catch (e) {
-        console.error('Dev telemetry listener error:', e)
+        captureToSentry(e)
       }
     })
   }
