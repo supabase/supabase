@@ -189,7 +189,6 @@ export const PlanUpdateSidePanel = () => {
                 : router.query.source
               // TODO this panel should allow direct configuration of the highlighting rather than indirectly via the source param
               const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_pro'
-              console.log({ source, shouldHighlight, planId: plan.id })
 
               if (plan.id === 'tier_enterprise') {
                 return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
