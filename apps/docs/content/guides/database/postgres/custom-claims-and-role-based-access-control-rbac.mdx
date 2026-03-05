@@ -100,13 +100,13 @@ as $$
 
     if user_role is not null then
       -- Set the claim
-      claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
+      claims := jsonb_set(claims, '{user_role}'::text[], to_jsonb(user_role));
     else
-      claims := jsonb_set(claims, '{user_role}', 'null');
+      claims := jsonb_set(claims, '{user_role}'::text[], 'null');
     end if;
 
     -- Update the 'claims' object in the original event
-    event := jsonb_set(event, '{claims}', claims);
+    event := jsonb_set(event, '{claims}'::text[], claims);
 
     -- Return the modified or original event
     return event;
