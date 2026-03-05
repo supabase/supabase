@@ -1,12 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { base64SVG } from '@supabase/build-icons'
 
-export default ({ componentName, iconName, children, getSvg, deprecated, svgAttributes = {} }) => {
+export default ({ componentName, iconName, children, getSvg, deprecated }) => {
   const svgContents = getSvg()
   const svgBase64 = base64SVG(svgContents)
-
-  const hasAttrs = Object.keys(svgAttributes).length > 0
-  const attrsArg = hasAttrs ? `, ${JSON.stringify(svgAttributes)}` : ''
 
   return `
 import createSupabaseIcon from '../createSupabaseIcon';
@@ -21,7 +18,7 @@ import createSupabaseIcon from '../createSupabaseIcon';
  * @returns {JSX.Element} JSX Element
  * ${deprecated ? '@deprecated' : ''}
  */
-const ${componentName} = createSupabaseIcon('${componentName}', ${JSON.stringify(children)}${attrsArg});
+const ${componentName} = createSupabaseIcon('${componentName}', ${JSON.stringify(children)});
 
 export default ${componentName};
 `

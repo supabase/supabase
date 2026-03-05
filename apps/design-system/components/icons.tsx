@@ -19,6 +19,7 @@ function Icons() {
             <DropdownMenuTrigger asChild>
               <GridItem>
                 <icon.component
+                  strokeWidth={1.5}
                   size={21}
                   className="group-data-[state=open]:scale-125 transition-all"
                 />
