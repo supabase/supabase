@@ -246,7 +246,6 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const { data } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: snap.table.id,
       sorts,
       filters,
@@ -261,7 +260,6 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const { data: countData } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,

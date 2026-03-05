@@ -1,6 +1,6 @@
 'use client'
 
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
   Clock5,
@@ -25,13 +25,13 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useMemo } from 'react'
+import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
   useRegisterCommands,
   useRegisterPage,
   useSetCommandMenuOpen,
 } from 'ui-patterns/CommandMenu'
-import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import {
@@ -51,14 +51,12 @@ const Graphql = dynamic(() => import('icons').then((mod) => mod.Graphql))
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
 export function useCreateCommands(options?: CommandOptions) {
-  const enableCreateCommands = useFlag('enablecreatecommands')
   const setIsOpen = useSetCommandMenuOpen()
   const {
     ref,
     setPage,
     openSidebar,
     snap,
-    authenticationOauth21,
     authEnabled,
     edgeFunctionsEnabled,
     storageEnabled,
@@ -184,7 +182,7 @@ export function useCreateCommands(options?: CommandOptions) {
                   },
                 ]
               : []),
-            ...(IS_PLATFORM && authenticationOauth21
+            ...(IS_PLATFORM
               ? [
                   {
                     id: 'create-oauth-app',
@@ -207,7 +205,6 @@ export function useCreateCommands(options?: CommandOptions) {
       passwordVerificationHook,
       passwordVerificationHookEnabled,
       beforeUserCreatedHook,
-      authenticationOauth21,
     ]
   )
 
@@ -453,7 +450,7 @@ export function useCreateCommands(options?: CommandOptions) {
     },
     {
       deps: [sections],
-      enabled: enableCreateCommands,
+      enabled: true,
     }
   )
 
@@ -471,7 +468,7 @@ export function useCreateCommands(options?: CommandOptions) {
       ...options,
       orderSection: (sections) => sections,
       sectionMeta: { priority: 3 },
-      enabled: enableCreateCommands,
+      enabled: true,
     }
   )
 }

@@ -282,3 +282,15 @@ div[data-radix-portal]:not(.portal--toast) {
   height: 6px !important;
   @apply border-strong dark:border-r-2 dark:border-b-2 dark:border-overlay #{!important};
 }
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+}
+
+@keyframes blink-caret {
+  50% {
+    border-color: transparent;
+  }
+}
