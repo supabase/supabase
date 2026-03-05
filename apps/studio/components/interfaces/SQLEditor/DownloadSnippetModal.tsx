@@ -73,7 +73,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
                     <div className="flex flex-col gap-y-1">
                       <p className="text-base">{snippet.title}</p>
                       <Markdown
-                        className="text-sm text-scale-1000 [&>p>code]:!break-normal"
+                        className="text-sm text-foreground-light [&>p>code]:!break-normal"
                         content={snippet.description}
                       />
                     </div>

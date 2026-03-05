@@ -89,7 +89,7 @@ export const TableNode = ({
                 'bg-surface-100',
                 'border-t',
                 'border-t-[0.5px]',
-                'hover:bg-scale-500 transition cursor-default',
+                'hover:bg-surface-200 transition cursor-default',
                 itemHeight
               )}
               key={column.id}

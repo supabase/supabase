@@ -172,7 +172,7 @@ const FormField = ({
                 onClick={() => setHidden(!hidden)}
               />
             ) : (
-              <span className="mr-3 text-scale-900">
+              <span className="mr-3 text-foreground-lighter">
                 {properties.units ? (
                   <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                     {properties.units}
