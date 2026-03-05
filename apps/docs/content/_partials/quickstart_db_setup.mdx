@@ -2,31 +2,43 @@
 
 Go to [database.new](https://database.new) and create a new Supabase project.
 
-Alternatively, you can create a project using the Management API:
-
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
 
-```bash
-# First, get your access token from https://supabase.com/dashboard/account/tokens
-export SUPABASE_ACCESS_TOKEN="your-access-token"
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+    <AccordionItem
+      header="Alternatively, create a project using the Management API"
+      id="item-1"
+    >
+    ```bash
+    # First, get your access token from https://supabase.com/dashboard/account/tokens
+    export SUPABASE_ACCESS_TOKEN="your-access-token"
 
-# List your organizations to get the organization ID
-curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  https://api.supabase.com/v1/organizations
+    # List your organizations to get the organization ID
+    curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+      https://api.supabase.com/v1/organizations
 
-# Create a new project (replace <org-id> with your organization ID)
-curl -X POST https://api.supabase.com/v1/projects \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "organization_id": "<org-id>",
-    "name": "My Project",
-    "region": "us-east-1",
-    "db_pass": "<your-secure-password>"
-  }'
-```
+    # Create a new project (replace <org-id> with your organization ID)
+    curl -X POST https://api.supabase.com/v1/projects \
+      -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "organization_id": "<org-id>",
+        "name": "My Project",
+        "region": "us-east-1",
+        "db_pass": "<your-secure-password>"
+      }'
+    ```
+    </AccordionItem>
+</Accordion>
 
 </StepHikeCompact.Code>
 
@@ -34,11 +46,23 @@ curl -X POST https://api.supabase.com/v1/projects \
 
 When your project is up and running, go to the [Table Editor](/dashboard/project/_/editor), create a new table and insert some data.
 
-Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create an `instruments` table with some sample data.
-
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+    <AccordionItem
+      header="Alternatively, use the SQL Editor"
+      id="item-1"
+    >
+    Run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create an `instruments` table with some sample data.
 
     ```sql SQL_EDITOR
     -- Create the table
@@ -55,16 +79,12 @@ Alternatively, you can run the following snippet in your project's [SQL Editor](
 
     alter table instruments enable row level security;
     ```
-
-</StepHikeCompact.Code>
-
-<StepHikeCompact.Details>
-
-Make the data in your table publicly readable by adding an RLS policy:
-
-</StepHikeCompact.Details>
-
-<StepHikeCompact.Code>
+    </AccordionItem>
+    <AccordionItem
+      header="Add a Row Level Security (RLS) policy"
+      id="item-2"
+    >
+    Make the data in your table publicly readable by adding an RLS policy:
 
     ```sql SQL_EDITOR
     create policy "public can read instruments"
@@ -72,5 +92,8 @@ Make the data in your table publicly readable by adding an RLS policy:
     for select to anon
     using (true);
     ```
+    </AccordionItem>
+
+</Accordion>
 
 </StepHikeCompact.Code>
