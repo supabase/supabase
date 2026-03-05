@@ -31,7 +31,7 @@ jobs:
         # On labeled events, always push. On synchronize, only push if scorer files changed.
         run: |
           if [[ "${{ github.event.action }}" == "synchronize" ]]; then
-            changed=$(git diff --name-only origin/master...HEAD | grep -E 'evals/scorer' || true)
+            changed=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E 'evals/scorer' || true)
             if [ -z "$changed" ]; then
               echo "No scorer files changed, skipping push"
               echo "skip=true" >> $GITHUB_OUTPUT
