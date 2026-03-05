@@ -1,12 +1,12 @@
 ---
 id: 'ai-rag-with-permissions'
 title: 'RAG with Permissions'
-subtitle: 'Fine-grain access control with Retrieval Augmented Generation.'
-description: 'Implement fine-grain access control with retrieval augmented generation'
+subtitle: 'Fine-grained access control with Retrieval Augmented Generation.'
+description: 'Implement fine-grained access control with retrieval augmented generation'
 sidebar_label: 'RAG with Permissions'
 ---
 
-Since pgvector is built on top of Postgres, you can implement fine-grain access control on your vector database using [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security). This means you can restrict which documents are returned during a vector similarity search to users that have access to them. Supabase also supports [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) which means you can use an external database or data source to determine these permissions if your user data doesn't exist in Supabase.
+Since pgvector is built on top of Postgres, you can implement fine-grained access control on your vector database using [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security). This means you can restrict which documents are returned during a vector similarity search to users that have access to them. Supabase also supports [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) which means you can use an external database or data source to determine these permissions if your user data doesn't exist in Supabase.
 
 Use this guide to learn how to restrict access to documents when performing retrieval augmented generation (RAG).
 

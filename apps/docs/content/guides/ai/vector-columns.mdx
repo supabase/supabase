@@ -5,7 +5,7 @@ description: 'Learn how to use vectors within your own Postgres tables'
 sidebar_label: 'Vector columns'
 ---
 
-Supabase offers a number of different ways to store and query vectors within Postgres. The SQL included in this guide is applicable for clients in all programming languages. If you are a Python user see your [Python client options](/docs/guides/ai/python-clients) after reading the `Learn` section.
+Supabase offers a number of different ways to store and query vectors within Postgres. The SQL included in this guide is applicable for clients in all programming languages. If you are a Python user, see your [Python client options](/docs/guides/ai/python-clients) after reading the `Learn` section.
 
 Vectors in Supabase are enabled via [pgvector](https://github.com/pgvector/pgvector/), a Postgres extension for storing and querying vectors in Postgres. It can be used to store [embeddings](/docs/guides/ai/concepts#what-are-embeddings).
 
@@ -48,7 +48,7 @@ To disable an extension, call `drop extension`.
 
 ### Create a table to store vectors
 
-After enabling the `vector` extension, you will get access to a new data type called `vector`. The size of the vector (indicated in parenthesis) represents the number of dimensions stored in that vector.
+After enabling the `vector` extension, you will get access to a new data type called `vector`. The size of the vector (indicated in parentheses) represents the number of dimensions stored in that vector.
 
 ```sql
 create table documents (
@@ -99,7 +99,7 @@ This example uses the JavaScript Supabase client, but you can modify it to work 
 
 ### Querying a vector / embedding
 
-Similarity search is the most common use case for vectors. `pgvector` support 3 new operators for computing distance:
+Similarity search is the most common use case for vectors. `pgvector` supports 3 new operators for computing distance:
 
 | Operator | Description            |
 | -------- | ---------------------- |
