@@ -81,7 +81,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 
-        <Button className="w-full" disabled={isLoading}>
+        <Button htmlType="submit" className="w-full" disabled={isLoading}>
           {isLoading ? 'Creating account...' : 'Create account'}
         </Button>
       </form>
