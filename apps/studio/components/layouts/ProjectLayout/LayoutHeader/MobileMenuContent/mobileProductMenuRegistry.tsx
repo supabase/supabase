@@ -59,7 +59,7 @@ export const MOBILE_PRODUCT_MENU_REGISTRY: Record<string, ComponentType | null> 
   ),
   api: null,
   integrations: React.lazy(() =>
-    import('components/layouts/Integrations/layout').then((m) => ({
+    import('components/layouts/Integrations/IntegrationsProductMenu').then((m) => ({
       default: m.IntegrationsProductMenu,
     }))
   ),

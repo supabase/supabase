@@ -17,20 +17,14 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { ChevronLeft } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useCallback, useMemo, useState } from 'react'
-import {
-  Button,
-  cn,
-  Separator,
-  SidebarGroup,
-  SidebarMenu,
-  sidebarMenuButtonVariants,
-  SidebarMenuItem,
-} from 'ui'
+import { Button, cn, Separator, SidebarGroup, SidebarMenu } from 'ui'
+
+import { getPathSegment, getPathnameWithoutQuery } from 'lib/pathname.utils'
 
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
+import { TopLevelRouteItem } from './TopLevelRouteItem'
 
 /** Tool routes navigate directly at top level; section/product menu is shown only when already in that section */
 const TOP_LEVEL_DIRECT_LINK_KEYS = ['editor', 'sql'] as const
@@ -57,8 +51,8 @@ export function MobileMenuContent({
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const pathname = router.asPath?.split('?')[0] ?? router.pathname
-  const activeRoute = pathname.split('/')[3]
+  const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
+  const activeRoute = getPathSegment(pathname, 3)
 
   const [viewLevel, setViewLevel] = useState<'top' | 'section'>(
     currentProductMenu && currentSectionKey ? 'section' : 'top'
@@ -167,55 +161,17 @@ export function MobileMenuContent({
       : allTopLevelRoutes.find((r) => r.key === sectionKeyToShow)?.label ?? sectionKeyToShow)
 
   const SectionMenuContent = sectionKeyToShow ? getProductMenuComponent(sectionKeyToShow) : null
-  const pageSegment = pathname.split('/')[4]
+  const pageSegment = getPathSegment(pathname, 4)
 
-  const renderTopLevelRoute = useCallback(
-    (route: Route, isActive: boolean) => {
-      const hasItems = hasSubmenu(route) && !isDirectLinkAtTopLevel(route)
-      const content = (
-        <>
-          {route.icon && (
-            <span className="flex size-5 shrink-0 items-center justify-center [&>svg]:size-5 [&>svg]:shrink-0">
-              {route.icon}
-            </span>
-          )}
-          <span className="truncate">{route.label}</span>
-        </>
-      )
-      const menuButtonClass = cn(
-        sidebarMenuButtonVariants({ size: 'default', hasIcon: !!route.icon }),
-        route.disabled && 'opacity-50 pointer-events-none'
-      )
-      return (
-        <SidebarMenuItem key={route.key}>
-          {hasItems ? (
-            <button
-              type="button"
-              data-active={isActive}
-              onClick={() => handleTopLevelClick(route)}
-              disabled={route.disabled}
-              className={menuButtonClass}
-            >
-              {content}
-            </button>
-          ) : route.link ? (
-            <Link
-              href={route.link}
-              onClick={onCloseSheet}
-              data-active={isActive}
-              className={menuButtonClass}
-            >
-              {content}
-            </Link>
-          ) : (
-            <span data-active={false} className={cn(menuButtonClass, 'cursor-default')}>
-              {content}
-            </span>
-          )}
-        </SidebarMenuItem>
-      )
-    },
-    [hasSubmenu, handleTopLevelClick, onCloseSheet]
+  const renderRoute = (route: Route, isActive: boolean) => (
+    <TopLevelRouteItem
+      key={route.key}
+      route={route}
+      isActive={isActive}
+      hasSubmenu={hasSubmenu(route)}
+      onTopLevelClick={handleTopLevelClick}
+      onCloseSheet={onCloseSheet}
+    />
   )
 
   return (
@@ -244,26 +200,26 @@ export function MobileMenuContent({
             <SidebarMenu>
               <SidebarGroup className="gap-0.5">
                 {[homeRoute, ...toolRoutes].map((route) =>
-                  renderTopLevelRoute(
+                  renderRoute(
                     route,
-                    activeRoute === route.key || (route.key === 'HOME' && !activeRoute)
+                    activeRoute === route.key || (route.key === 'HOME' && activeRoute === undefined)
                   )
                 )}
               </SidebarGroup>
               <Separator className="mx-2 w-auto bg-sidebar-border" />
               <SidebarGroup className="gap-0.5">
                 {productRoutes.map((route) =>
-                  renderTopLevelRoute(route, activeRoute === route.key)
+                  renderRoute(route, activeRoute === route.key)
                 )}
               </SidebarGroup>
               <Separator className="mx-2 w-auto bg-sidebar-border" />
               <SidebarGroup className="gap-0.5">
-                {otherRoutes.map((route) => renderTopLevelRoute(route, activeRoute === route.key))}
+                {otherRoutes.map((route) => renderRoute(route, activeRoute === route.key))}
               </SidebarGroup>
               <Separator className="mx-2 w-auto bg-sidebar-border" />
               <SidebarGroup className="gap-0.5">
                 {settingsRoutes.map((route) =>
-                  renderTopLevelRoute(route, activeRoute === route.key)
+                  renderRoute(route, activeRoute === route.key)
                 )}
               </SidebarGroup>
             </SidebarMenu>

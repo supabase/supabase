@@ -5,10 +5,18 @@ import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Blocks, Boxes, ChartArea, Receipt, Settings, Users } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
-import { cn, SidebarGroup, SidebarMenu, sidebarMenuButtonVariants, SidebarMenuItem } from 'ui'
+import { SidebarGroup, SidebarMenu } from 'ui'
+
+import { getPathnameWithoutQuery } from 'lib/pathname.utils'
+
+import type { OrgNavItem } from './OrgMenuContent.utils'
+import {
+  getOrgActiveRoute,
+  isOrgMenuActive,
+} from './OrgMenuContent.utils'
+import { OrgMenuItem } from './OrgMenuItem'
 
 export interface OrgMenuContentProps {
   onCloseSheet?: () => void
@@ -23,10 +31,10 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
   const showBilling = useIsFeatureEnabled('billing:all')
 
-  const pathname = router.asPath?.split('?')[0] ?? router.pathname
-  const activeRoute = pathname.split('/')[3]
+  const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
+  const activeRoute = getOrgActiveRoute(pathname)
 
-  const navMenuItems = useMemo(
+  const navMenuItems: OrgNavItem[] = useMemo(
     () => [
       {
         label: 'Projects',
@@ -80,42 +88,15 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
         <nav className="flex flex-col gap-2 p-2" aria-label="Organization menu">
           <SidebarMenu>
             <SidebarGroup className="gap-0.5">
-              {navMenuItems.map((item, i) => {
-                const isActive =
-                  i === 0
-                    ? activeRoute === undefined
-                    : item.key === 'settings'
-                      ? pathname.includes('/general') ||
-                        pathname.includes('/apps') ||
-                        pathname.includes('/audit') ||
-                        pathname.includes('/documents') ||
-                        pathname.includes('/security')
-                      : activeRoute === item.key
-                const content = (
-                  <>
-                    <span className="flex size-5 shrink-0 items-center justify-center [&>svg]:size-5 [&>svg]:shrink-0">
-                      {item.icon}
-                    </span>
-                    <span className="truncate">{item.label}</span>
-                  </>
-                )
-                const menuButtonClass = cn(
-                  sidebarMenuButtonVariants({ size: 'default', hasIcon: true }),
-                  disableAccessMfa && 'opacity-50 pointer-events-none'
-                )
-                return (
-                  <SidebarMenuItem key={item.key}>
-                    <Link
-                      href={item.href}
-                      onClick={onCloseSheet}
-                      data-active={isActive}
-                      className={menuButtonClass}
-                    >
-                      {content}
-                    </Link>
-                  </SidebarMenuItem>
-                )
-              })}
+              {navMenuItems.map((item, i) => (
+                <OrgMenuItem
+                  key={item.key}
+                  item={item}
+                  isActive={isOrgMenuActive(item, i, pathname, activeRoute)}
+                  disabled={disableAccessMfa}
+                  onCloseSheet={onCloseSheet}
+                />
+              ))}
             </SidebarGroup>
           </SidebarMenu>
         </nav>

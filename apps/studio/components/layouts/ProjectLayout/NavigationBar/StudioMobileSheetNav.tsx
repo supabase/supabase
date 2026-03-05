@@ -14,7 +14,6 @@ function isSidebarId(content: unknown): content is TYPEOF_SIDEBAR_KEYS {
   )
 }
 
-/** Resolve sheet content: sidebar panel (by id) or custom ReactNode (menu, etc.). */
 function getSheetChildren(
   content: MobileSheetContentType,
   activeSidebar: { id: string; component?: () => ReactNode } | null
