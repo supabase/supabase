@@ -422,7 +422,7 @@ export const DatabaseConnectionString = () => {
                       !sharedPoolerPreferred && !ipv4Addon
                         ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
                         : sharedPoolerPreferred
-                          ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
+                          ? 'Use Session Pooler if on an IPv4 network or purchase IPv4 add-on'
                           : IPV4_ADDON_TEXT,
                     links: buttonLinks,
                   }}

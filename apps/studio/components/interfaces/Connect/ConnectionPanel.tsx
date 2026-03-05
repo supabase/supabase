@@ -225,7 +225,7 @@ export const ConnectionPanel = ({
                 <WarningIcon />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-foreground">Only use on a IPv4 network</span>
+                <span className="text-xs text-foreground">Only use on an IPv4 network</span>
                 <div className="flex flex-col text-xs text-foreground-lighter">
                   <p>Session pooler connections are IPv4 proxied for free.</p>
                   <p>Use Direct Connection if connecting via an IPv6 network.</p>
@@ -280,7 +280,7 @@ export const ConnectionPanel = ({
                     You may also use the{' '}
                     <span className="text-foreground-light">Session Pooler</span> or{' '}
                     <span className="text-foreground-light">Transaction Pooler</span> if you are on
-                    a IPv4 network.
+                    an IPv4 network.
                   </p>
                 </div>
               </CollapsibleContent_Shadcn_>

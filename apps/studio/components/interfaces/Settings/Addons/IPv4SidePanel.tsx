@@ -131,7 +131,7 @@ const IPv4SidePanel = () => {
           <p className="text-sm">
             Direct connections to the database only work if your client is able to resolve IPv6
             addresses. Enabling the dedicated IPv4 add-on allows you to directly connect to your
-            database via a IPv4 address.
+            database via an IPv4 address.
           </p>
 
           {!isAws && (
@@ -252,7 +252,7 @@ const IPv4SidePanel = () => {
 
           {!hasAccessToIPv4 && (
             <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
-              <p>Upgrade your plan to enable a IPv4 address for your project</p>
+              <p>Upgrade your plan to enable an IPv4 address for your project</p>
               <Button asChild type="default">
                 <Link
                   href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=ipv4SidePanel`}
