@@ -2,7 +2,6 @@
 
 import { ArrowDownIcon } from '@heroicons/react/outline'
 import DefaultLayout from '~/components/Layouts/Default'
-import NewPricingComputeSection from '~/components/Pricing/NewPricingComputeSection'
 import PricingPlans from '~/components/Pricing/PricingPlans'
 import { useOrganizations } from '~/data/organizations'
 import { hasConsented, posthogClient } from 'common'
@@ -16,6 +15,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 const EXPERIMENT_ID = 'pricingCalculatorExperiment' as const
 type PricingCalculatorVariant = 'control' | 'test'
 
+const NewPricingComputeSection = dynamic(() => import('~/components/Pricing/NewPricingComputeSection'))
 const PricingComputeSection = dynamic(() => import('~/components/Pricing/PricingComputeSection'))
 const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons'))
 const PricingComparisonTable = dynamic(() => import('~/components/Pricing/PricingComparisonTable'))
@@ -72,7 +72,7 @@ export default function PricingContent() {
     if (!isInExperiment) return
 
     posthogClient.captureExperimentExposure(EXPERIMENT_ID, { variant: flagValue }, hasConsented())
-  }, [isInExperiment])
+  }, [isInExperiment, flagValue])
 
   return (
     <DefaultLayout>
@@ -117,7 +117,7 @@ export default function PricingContent() {
         id="addon-compute"
         className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
       >
-        {isInExperiment && !isTestVariant && (
+        {isTestVariant && (
           <div className="text-center mb-8 lg:mb-16">
             <h2 className="text-foreground text-3xl" id="how-compute-pricing-works">
               How compute pricing works

@@ -1,4 +1,3 @@
-import { InformationCircleIcon } from '@heroicons/react/outline'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -6,13 +5,15 @@ import { Button, cn, Slider_Shadcn_ } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-const findIntanceValueByColumn = (instance: any, column: string) =>
+const findInstanceValueByColumn = (instance: any, column: string) =>
   instance.columns?.find((col: any) => col.key === column)?.value
 
-const parsePrice = (price: string) => parseInt(price?.toString().replace('$', '').replace(',', ''))
+const parsePrice = (price: string) => {
+  const n = parseInt(price?.toString().replace('$', '').replace(',', ''), 10)
+  return Number.isNaN(n) ? 0 : n
+}
 
 interface ComputePricingCalculatorProps {
-  disableInteractivity?: boolean
   activePlan?: {
     name: string
     price: number
@@ -20,7 +21,6 @@ interface ComputePricingCalculatorProps {
 }
 
 const NewComputePricingCalculator = ({
-  disableInteractivity,
   activePlan = { name: 'Pro', price: 25 },
 }: ComputePricingCalculatorProps) => {
   // Filter out rows with no specific pricing
@@ -28,7 +28,7 @@ const NewComputePricingCalculator = ({
     row.columns.some((it) => it.key === 'pricing' && it.value !== 'Contact Us')
   )
   const priceSteps = computeInstances.map((instance) =>
-    parsePrice(findIntanceValueByColumn(instance, 'pricing'))
+    parsePrice(findInstanceValueByColumn(instance, 'pricing'))
   )
   // Base discount credits that come with every paid plan
   const COMPUTE_CREDITS = 10
@@ -55,20 +55,14 @@ const NewComputePricingCalculator = ({
   const calculateComputeAggregate = (price: number) => {
     return activeInstances.reduce(
       (acc, activeInstance: any) =>
-        acc + parsePrice(findIntanceValueByColumn(activeInstance, 'pricing')),
+        acc + parsePrice(findInstanceValueByColumn(activeInstance, 'pricing')),
       price
     )
   }
 
-  const calculatePrice = () => {
-    let aggregatePrice = 0
-    const computeAggregate = calculateComputeAggregate(aggregatePrice)
-
-    return setActivePrice(computeAggregate + activePlan.price - COMPUTE_CREDITS)
-  }
-
   useEffect(() => {
-    calculatePrice()
+    const computeAggregate = calculateComputeAggregate(0)
+    setActivePrice(Math.max(0, computeAggregate + activePlan.price - COMPUTE_CREDITS))
   }, [activeInstances, activePlan])
 
   const removeInstance = (position: number) => {
@@ -82,39 +76,35 @@ const NewComputePricingCalculator = ({
   const findSliderComputeValue = (activeInstance: any) => {
     // find index of compute based on active compute name
     const selectedCompute = computeInstances
-      .map((compute) => findIntanceValueByColumn(compute, 'plan'))
-      .indexOf(findIntanceValueByColumn(activeInstance, 'plan'))
+      .map((compute) => findInstanceValueByColumn(compute, 'plan'))
+      .indexOf(findInstanceValueByColumn(activeInstance, 'plan'))
 
     return [selectedCompute + 1]
   }
-
-  const PriceSummary = () => (
-    <div className="flex flex-col gap-1 text-lighter text-right leading-4 w-full border-b pb-1 mb-1">
-      <div className="flex items-center justify-between">
-        <span className="text-foreground-muted">Plan subscription</span>
-        <span className="text-light font-mono" translate="no">
-          ${activePlan.price}
-        </span>
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-foreground-muted">Total Compute</span>
-        <span className="text-light font-mono">${calculateComputeAggregate(0)}</span>
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-foreground-muted">Compute Credits</span>
-        <span className="text-light font-mono" translate="no">
-          - ${COMPUTE_CREDITS}
-        </span>
-      </div>
-    </div>
-  )
 
   return (
     <div className="flex flex-col lg:grid grid-cols-4 gap-4 border border-strong rounded-xl p-4">
       <div className="flex flex-col text-lighter leading-4 text-xs w-full gap-4">
         <div>
           <p className="text-foreground-light text-xs mb-2">Monthly estimate:</p>
-          <PriceSummary />
+          <div className="flex flex-col gap-1 text-lighter text-right leading-4 w-full border-b pb-1 mb-1">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground-muted">Plan subscription</span>
+              <span className="text-light font-mono" translate="no">
+                ${activePlan.price}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-foreground-muted">Total Compute</span>
+              <span className="text-light font-mono">${calculateComputeAggregate(0)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-foreground-muted">Compute Credits</span>
+              <span className="text-light font-mono" translate="no">
+                - ${COMPUTE_CREDITS}
+              </span>
+            </div>
+          </div>
           <div className="flex items-center gap-1 w-full justify-between">
             <span>Total</span>
             <span className="text-foreground font-mono flex items-center gap-1">
@@ -142,14 +132,14 @@ const NewComputePricingCalculator = ({
               <div className="w-full flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <ComputeBadge
-                    infraComputeSize={findIntanceValueByColumn(activeInstance, 'plan')}
+                    infraComputeSize={findInstanceValueByColumn(activeInstance, 'plan')}
                   />
                   <p className="text-xs text-foreground-lighter">
                     Project {activeInstance.position + 1}
                   </p>
                 </div>
                 <span className="leading-3 text-sm" translate="no">
-                  {findIntanceValueByColumn(activeInstance, 'pricing')}
+                  {findInstanceValueByColumn(activeInstance, 'pricing')}
                 </span>
               </div>
               <div className="w-full relative">
@@ -174,10 +164,10 @@ const NewComputePricingCalculator = ({
               <div className="flex items-center justify-between text-sm">
                 <div className="w-full flex items-center gap-2">
                   <span className="text-lighter text-xs md:text-[13px]">
-                    {findIntanceValueByColumn(activeInstance, 'memory')} RAM /{' '}
-                    {findIntanceValueByColumn(activeInstance, 'cpu')} CPU / Connections: Direct{' '}
-                    {findIntanceValueByColumn(activeInstance, 'directConnections')}, Pooler{' '}
-                    {findIntanceValueByColumn(activeInstance, 'poolerConnections')}
+                    {findInstanceValueByColumn(activeInstance, 'memory')} RAM /{' '}
+                    {findInstanceValueByColumn(activeInstance, 'cpu')} CPU / Connections: Direct{' '}
+                    {findInstanceValueByColumn(activeInstance, 'directConnections')}, Pooler{' '}
+                    {findInstanceValueByColumn(activeInstance, 'poolerConnections')}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -202,13 +192,11 @@ const NewComputePricingCalculator = ({
             type="primary"
             icon={<Plus />}
             onClick={() => {
-              if (disableInteractivity) return
               setActiveInstances([
                 ...activeInstances,
                 { ...computeInstances[0], position: activeInstances.length },
               ])
             }}
-            className=" "
           >
             <span className="text-left">Add Project</span>
           </Button>
