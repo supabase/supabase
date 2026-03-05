@@ -73,6 +73,40 @@ const NavigationMenuGuideList = ({
     }
   }
 
+  // Inject skills into the 'AI Tools > Skills' section
+  if (id === MenuId.GettingStarted && additionalNavItems?.skills) {
+    const aiToolsSectionIndex = menu.items.findIndex((item) => item.name === 'AI Tools')
+    if (aiToolsSectionIndex !== -1) {
+      const beforeAITools = menu.items.slice(0, aiToolsSectionIndex)
+      const afterAITools = menu.items.slice(aiToolsSectionIndex + 1)
+
+      const aiToolsSection = menu.items[aiToolsSectionIndex]
+      const skillsSectionIndex = aiToolsSection.items.findIndex((item) => item.name === 'Skills')
+
+      if (skillsSectionIndex !== -1) {
+        const beforeSkills = aiToolsSection.items.slice(0, skillsSectionIndex)
+        const afterSkills = aiToolsSection.items.slice(skillsSectionIndex + 1)
+
+        const skillsSection = aiToolsSection.items[skillsSectionIndex]
+
+        const modifiedSkillsSection = {
+          ...skillsSection,
+          items: additionalNavItems.skills,
+        }
+
+        const modifiedAIToolsSection = {
+          ...aiToolsSection,
+          items: [...beforeSkills, modifiedSkillsSection, ...afterSkills],
+        }
+
+        menu = {
+          ...menu,
+          items: [...beforeAITools, modifiedAIToolsSection, ...afterAITools],
+        }
+      }
+    }
+  }
+
   return (
     <NavigationMenuGuideListWrapper id={id} firstLevelRoute={firstLevelRoute}>
       <NavigationMenuGuideListItems menu={menu} id={id} />
