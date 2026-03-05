@@ -1,5 +1,3 @@
-import http from 'node:http'
-import https from 'node:https'
 import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
 import { EvalCase, EvalScorer } from 'braintrust'
@@ -285,34 +283,18 @@ export const urlValidityScorer: EvalScorer<
   }
 
   const results = await Promise.all(
-    urls.map(
-      (url) =>
-        new Promise<{ valid: boolean; error?: string }>((resolve) => {
-          const parsed = new URL(url)
-          const lib = parsed.protocol === 'https:' ? https : http
-          const req = lib.request(
-            {
-              hostname: parsed.hostname,
-              path: parsed.pathname + parsed.search,
-              method: 'HEAD',
-              rejectUnauthorized: false, // required: Braintrust lambda has incomplete CA cert store
-              signal: AbortSignal.timeout(5000),
-            },
-            (res) => {
-              res.resume()
-              if (res.statusCode && res.statusCode < 400) {
-                resolve({ valid: true })
-              } else {
-                resolve({ valid: false, error: `${url} returned ${res.statusCode}` })
-              }
-            }
-          )
-          req.on('error', (error) => {
-            resolve({ valid: false, error: `${url} failed: ${error.message}` })
-          })
-          req.end()
-        })
-    )
+    urls.map(async (url) => {
+      try {
+        const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+        if (response.ok) {
+          return { valid: true }
+        }
+        return { valid: false, error: `${url} returned ${response.status}` }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        return { valid: false, error: `${url} failed: ${errorMessage}` }
+      }
+    })
   )
 
   const errors = results.flatMap((r) => (r.error ? [r.error] : []))
