@@ -10,11 +10,11 @@ import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { BannerStackProvider } from '../ui/BannerStack/BannerStackProvider'
-import { LayoutHeader } from './ProjectLayout/LayoutHeader/LayoutHeader'
+import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
+import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
+import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
-import { MobileSheetProvider } from './ProjectLayout/NavigationBar/MobileSheetContext'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {

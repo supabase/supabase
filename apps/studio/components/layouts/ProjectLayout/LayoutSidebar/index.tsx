@@ -1,10 +1,9 @@
 import { useBreakpoint } from 'common'
+import { useMobileSheet } from 'components/layouts/Navigation/NavigationBar/MobileSheetContext'
 import { useEffect } from 'react'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn, ResizableHandle, ResizablePanel } from 'ui'
 import { MobileSheetNav } from 'ui-patterns'
-
-import { useMobileSheet } from '../NavigationBar/MobileSheetContext'
 
 // Having these params as props as otherwise it's quite hard to visually check the sizes in DefaultLayout
 // as react resizeable panels requires all these values to be valid to render correctly
