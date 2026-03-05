@@ -20,7 +20,6 @@ jobs:
     env:
       BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
       BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_PROJECT_ID }}
-      IS_PUSH: "true"
 
     steps:
       - name: Checkout
