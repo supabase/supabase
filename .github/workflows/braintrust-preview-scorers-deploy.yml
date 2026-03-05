@@ -69,6 +69,7 @@ jobs:
         env:
           BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
           BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_STAGING_PROJECT_ID }}
+          GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
 
       - name: Post PR comment
         if: steps.changed.outputs.skip != 'true'

@@ -26,8 +26,9 @@ if (!projectId && process.env.IS_PUSH) throw new Error('BRAINTRUST_PROJECT_ID is
 // in the staging project. GITHUB_HEAD_REF is set on PR events, GITHUB_REF_NAME on push/dispatch.
 const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
 const prefix = branch ? `${branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()}-` : ''
-const metadata = branch ? { gitBranch: branch } : undefined
-const description = branch
+const prNumber = process.env.GITHUB_PR_NUMBER ? Number(process.env.GITHUB_PR_NUMBER) : undefined
+const metadata = branch ? { gitBranch: branch, ...(prNumber && { prNumber }) } : undefined
+const description = prNumber && branch ? `#${prNumber} · ${branch}` : branch
 
 const handlers = {
   'goal-completion': goalCompletionScorer,
