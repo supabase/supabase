@@ -275,19 +275,13 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
     }
 
     const descByName = Object.fromEntries(
-      original.blockTags
-        .filter((t) => t.tag === '@exampleDescription')
-        .map(tagNameAndBody)
+      original.blockTags.filter((t) => t.tag === '@exampleDescription').map(tagNameAndBody)
     )
     const sqlByName = Object.fromEntries(
-      original.blockTags
-        .filter((t) => t.tag === '@exampleSql')
-        .map(tagNameAndBody)
+      original.blockTags.filter((t) => t.tag === '@exampleSql').map(tagNameAndBody)
     )
     const respByName = Object.fromEntries(
-      original.blockTags
-        .filter((t) => t.tag === '@exampleResponse')
-        .map(tagNameAndBody)
+      original.blockTags.filter((t) => t.tag === '@exampleResponse').map(tagNameAndBody)
     )
 
     if (exampleTags.length > 0) {
