@@ -27,7 +27,7 @@ Supabase Storage also supports an S3-compatible API. This allows you to use tool
 
 Install the AWS CLI by following the [AWS CLI installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
 
-Create S3 credentials in Supabase using the [Supabase S3 authentication guide](https://supabase.com/docs/guides/storage/s3/authentication?queryGroups=language&language=credentials).
+Create S3 credentials in Supabase using the [Supabase S3 authentication guide](/docs/guides/storage/s3/authentication?queryGroups=language&language=credentials).
 
 Configure an AWS CLI profile using the credentials you generated in Supabase. The profile name can be anything, but it must match the value used in the following commands.
 
@@ -41,7 +41,6 @@ Download files from a bucket or prefix:
 aws s3 cp s3://bucket-name/folder-name ./download-target
 --profile supabase-s3
 --endpoint-url https://<project-ref>.supabase.co/storage/v1/s3
-
 --recursive
 --region <region>
 ```
@@ -58,7 +57,6 @@ Move or rename files using the `mv` command. Because folders in Supabase Storage
 aws s3 mv s3://bucket-name-one/folder-name-one s3://bucket-name-two/folder-name-two
 --profile supabase-s3
 --endpoint-url https://<project-ref>.supabase.co/storage/v1/s3
-
 --recursive
 --region <region>
 ```
