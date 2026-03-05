@@ -18063,9 +18063,9 @@
           "sources": [
             {
               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-              "line": 1283,
+              "line": 1374,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1283"
+              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1374"
             }
           ],
           "signatures": [
@@ -18094,9 +18094,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                  "line": 1283,
+                  "line": 1374,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1283"
+                  "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1374"
                 }
               ],
               "parameters": [
@@ -18174,9 +18174,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                              "line": 1286,
+                              "line": 1377,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1286"
+                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1377"
                             }
                           ],
                           "type": {
@@ -18207,9 +18207,9 @@
                       "sources": [
                         {
                           "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                          "line": 1285,
+                          "line": 1376,
                           "character": 5,
-                          "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1285"
+                          "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1376"
                         }
                       ]
                     }
@@ -18382,7 +18382,157 @@
                   },
                   {
                     "kind": "text",
-                    "text": ".\nOtherwise, use the default value for the column. Only applies for bulk\ninserts."
+                    "text": ".\nOtherwise, use the default value for the column. Only applies for bulk\ninserts.\n *"
+                  }
+                ]
+              },
+              {
+                "tag": "@category",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "Database"
+                  }
+                ]
+              },
+              {
+                "tag": "@example",
+                "name": "Create a record",
+                "content": [
+                  {
+                    "kind": "code",
+                    "text": "```ts\nconst { error } = await supabase\n  .from('countries')\n  .insert({ id: 1, name: 'Mordor' })\n```"
+                  }
+                ]
+              },
+              {
+                "tag": "@exampleSql",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "Create a record\n"
+                  },
+                  {
+                    "kind": "code",
+                    "text": "```sql\n```"
+                  },
+                  {
+                    "kind": "text",
+                    "text": "sql\ncreate table\n  countries (id int8 primary key, name text);\n"
+                  },
+                  {
+                    "kind": "code",
+                    "text": "```\n```"
+                  }
+                ]
+              },
+              {
+                "tag": "@exampleResponse",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "Create a record\n"
+                  },
+                  {
+                    "kind": "code",
+                    "text": "```json\n{\n  \"status\": 201,\n  \"statusText\": \"Created\"\n}\n```"
+                  }
+                ]
+              },
+              {
+                "tag": "@example",
+                "name": "Create a record and return it",
+                "content": [
+                  {
+                    "kind": "code",
+                    "text": "```ts\nconst { data, error } = await supabase\n  .from('countries')\n  .insert({ id: 1, name: 'Mordor' })\n  .select()\n```"
+                  }
+                ]
+              },
+              {
+                "tag": "@exampleSql",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "Create a record and return it\n"
+                  },
+                  {
+                    "kind": "code",
+                    "text": "```sql\n```"
+                  },
+                  {
+                    "kind": "text",
+                    "text": "sql\ncreate table\n  countries (id int8 primary key, name text);\n"
+                  },
+                  {
+                    "kind": "code",
+                    "text": "```\n```"
+                  }
+                ]
+              },
+              {
+                "tag": "@exampleResponse",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "Create a record and return it\n"
+                  },
+                  {
+                    "kind": "code",
+                    "text": "```json\n{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Mordor\"\n    }\n  ],\n  \"status\": 201,\n  \"statusText\": \"Created\"\n}\n```"
+                  }
+                ]
+              },
+              {
+                "tag": "@exampleDescription",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "Bulk create\nA bulk create operation is handled in a single transaction.\nIf any of the inserts fail, none of the rows are inserted."
+                  }
+                ]
+              },
+              {
+                "tag": "@example",
+                "name": "Bulk create",
+                "content": [
+                  {
+                    "kind": "code",
+                    "text": "```ts\nconst { error } = await supabase\n  .from('countries')\n  .insert([\n    { id: 1, name: 'Mordor' },\n    { id: 1, name: 'The Shire' },\n  ])\n```"
+                  }
+                ]
+              },
+              {
+                "tag": "@exampleSql",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "Bulk create\n"
+                  },
+                  {
+                    "kind": "code",
+                    "text": "```sql\n```"
+                  },
+                  {
+                    "kind": "text",
+                    "text": "sql\ncreate table\n  countries (id int8 primary key, name text);\n"
+                  },
+                  {
+                    "kind": "code",
+                    "text": "```\n```"
+                  }
+                ]
+              },
+              {
+                "tag": "@exampleResponse",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "Bulk create\n"
+                  },
+                  {
+                    "kind": "code",
+                    "text": "```json\n{\n  \"error\": {\n    \"code\": \"23505\",\n    \"details\": \"Key (id)=(1) already exists.\",\n    \"hint\": null,\n    \"message\": \"duplicate key value violates unique constraint \\\"countries_pkey\\\"\"\n  },\n  \"status\": 409,\n  \"statusText\": \"Conflict\"\n}\n```"
                   }
                 ]
               }
@@ -18403,9 +18553,9 @@
             },
             {
               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-              "line": 988,
+              "line": 1079,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L988"
+              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1079"
             }
           ],
           "signatures": [
@@ -20019,9 +20169,9 @@
           "sources": [
             {
               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-              "line": 1230,
+              "line": 1321,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1230"
+              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1321"
             }
           ],
           "signatures": [
@@ -20050,9 +20200,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                  "line": 1230,
+                  "line": 1321,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1230"
+                  "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1321"
                 }
               ],
               "typeParameters": [
@@ -20180,9 +20330,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                              "line": 1235,
+                              "line": 1326,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1235"
+                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1326"
                             }
                           ],
                           "type": {
@@ -20213,9 +20363,9 @@
                       "sources": [
                         {
                           "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                          "line": 1234,
+                          "line": 1325,
                           "character": 7,
-                          "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1234"
+                          "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1325"
                         }
                       ]
                     }
@@ -20509,21 +20659,21 @@
           "sources": [
             {
               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-              "line": 1036,
+              "line": 1127,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1036"
+              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1127"
             },
             {
               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-              "line": 1052,
+              "line": 1143,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1052"
+              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1143"
             },
             {
               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-              "line": 1155,
+              "line": 1246,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1155"
+              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1246"
             }
           ],
           "signatures": [
@@ -20536,9 +20686,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                  "line": 1036,
+                  "line": 1127,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1036"
+                  "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1127"
                 }
               ],
               "typeParameters": [
@@ -20612,9 +20762,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                              "line": 1041,
+                              "line": 1132,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1041"
+                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1132"
                             }
                           ],
                           "type": {
@@ -20646,9 +20796,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                              "line": 1040,
+                              "line": 1131,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1040"
+                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1131"
                             }
                           ],
                           "type": {
@@ -20667,9 +20817,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                              "line": 1039,
+                              "line": 1130,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1039"
+                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1130"
                             }
                           ],
                           "type": {
@@ -20687,9 +20837,9 @@
                       "sources": [
                         {
                           "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                          "line": 1038,
+                          "line": 1129,
                           "character": 14,
-                          "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1038"
+                          "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1129"
                         }
                       ]
                     }
@@ -20770,9 +20920,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                  "line": 1052,
+                  "line": 1143,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1052"
+                  "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1143"
                 }
               ],
               "typeParameters": [
@@ -20849,9 +20999,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                              "line": 1057,
+                              "line": 1148,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1057"
+                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1148"
                             }
                           ],
                           "type": {
@@ -20883,9 +21033,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                              "line": 1058,
+                              "line": 1149,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1058"
+                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1149"
                             }
                           ],
                           "type": {
@@ -20904,9 +21054,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                              "line": 1056,
+                              "line": 1147,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1056"
+                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1147"
                             }
                           ],
                           "type": {
@@ -20925,9 +21075,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                              "line": 1055,
+                              "line": 1146,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1055"
+                              "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1146"
                             }
                           ],
                           "type": {
@@ -20945,9 +21095,9 @@
                       "sources": [
                         {
                           "fileName": "packages/core/postgrest-js/src/PostgrestQueryBuilder.ts",
-                          "line": 1054,
+                          "line": 1145,
                           "character": 14,
-                          "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1054"
+                          "url": "https://github.com/supabase/supabase-js/blob/6e4bbf490e56b44e28ca2bf3a5030b294a606a98/packages/core/postgrest-js/src/PostgrestQueryBuilder.ts#L1145"
                         }
                       ]
                     }
@@ -21039,11 +21189,11 @@
       "categories": [
         {
           "title": "Database",
-          "children": [120]
+          "children": [129, 120]
         },
         {
           "title": "Other",
-          "children": [79, 106, 103, 104, 105, 102, 114, 168, 129, 161, 143]
+          "children": [79, 106, 103, 104, 105, 102, 114, 168, 161, 143]
         }
       ],
       "sources": [
