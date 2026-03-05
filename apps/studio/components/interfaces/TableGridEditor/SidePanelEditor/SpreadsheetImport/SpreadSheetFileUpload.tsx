@@ -51,7 +51,7 @@ const SpreadSheetFileUpload = ({
       {!uploadedFile ? (
         <div
           className={`flex h-48 cursor-pointer items-center justify-center rounded-md border border-dashed border-strong ${
-            isDraggedOver ? 'bg-gray-500' : ''
+            isDraggedOver ? 'bg-surface-200' : ''
           }`}
           onDragOver={onDragOver}
           onDragLeave={onDragOver}
