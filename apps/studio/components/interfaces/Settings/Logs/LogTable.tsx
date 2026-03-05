@@ -202,6 +202,7 @@ export const LogTable = ({
           <Checkbox_Shadcn_
             className="group-hover:border-foreground-muted"
             checked={selectedRows.has(key)}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
             onCheckedChange={toggle}
           />
         </div>

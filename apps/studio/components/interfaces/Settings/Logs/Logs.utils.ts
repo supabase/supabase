@@ -766,7 +766,15 @@ export function formatLogsAsMarkdown(rows: LogData[]): string {
     .map((row, i) => {
       const lines: string[] = [`## Log ${i + 1}`]
       if (row.timestamp) {
-        lines.push(`**Timestamp:** ${new Date(Number(row.timestamp) / 1000).toISOString()}`)
+        const numTs = Number(row.timestamp)
+        let tsString: string
+        if (isFinite(numTs)) {
+          tsString = new Date(numTs / 1000).toISOString()
+        } else {
+          const d = new Date(row.timestamp as string)
+          tsString = isNaN(d.getTime()) ? String(row.timestamp) : d.toISOString()
+        }
+        lines.push(`**Timestamp:** ${tsString}`)
       }
       if (row.event_message) {
         lines.push(`**Message:** ${row.event_message}`)
