@@ -7173,6 +7173,7 @@ export interface components {
             | 'instances.read_replicas'
             | 'instances.disk_modifications'
             | 'instances.high_availability'
+            | 'instances.orioledb'
             | 'replication.etl'
             | 'storage.max_file_size'
             | 'storage.max_file_size.configurable'
@@ -7218,8 +7219,10 @@ export interface components {
             | 'security.member_roles'
             | 'project_pausing'
             | 'project_cloning'
+            | 'project_restore_after_expiry'
             | 'assistant.advance_model'
             | 'integrations.github_connections'
+            | 'dedicated_pooler'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -17207,6 +17210,7 @@ export interface operations {
           | 'instances.read_replicas'
           | 'instances.disk_modifications'
           | 'instances.high_availability'
+          | 'instances.orioledb'
           | 'replication.etl'
           | 'storage.max_file_size'
           | 'storage.max_file_size.configurable'
@@ -17252,8 +17256,10 @@ export interface operations {
           | 'security.member_roles'
           | 'project_pausing'
           | 'project_cloning'
+          | 'project_restore_after_expiry'
           | 'assistant.advance_model'
           | 'integrations.github_connections'
+          | 'dedicated_pooler'
       }
       header?: never
       path?: never
