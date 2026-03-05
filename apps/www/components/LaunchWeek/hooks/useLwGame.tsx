@@ -58,7 +58,7 @@ const useLwGame = (inputRef?: RefObject<HTMLInputElement>, disabled?: boolean) =
           .eq('launch_week', 'lw13')
           .eq('username', user.username)
           .then((res) => {
-            if (res.error) return console.log('error', res.error)
+            if (res.error) return console.error('error', res.error)
             setIsGameMode(false)
           })
 

@@ -12,7 +12,7 @@ serve(async (req) => {
       password: Deno.env.get('SMTP_PASSWORD')!,
     })
   } catch (error) {
-    console.log('error connecting to smtp: ', error)
+    console.error('error connecting to smtp: ', error)
     return new Response(error.message, { status: 500 })
   }
 
@@ -52,7 +52,7 @@ serve(async (req) => {
       content,
     })
   } catch (error: any) {
-    console.log('email sending failed with error: ', error)
+    console.error('email sending failed with error: ', error)
     return new Response(error.message, { status: 500 })
   }
 
