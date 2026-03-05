@@ -115,17 +115,14 @@ export const SearchList = ({ search }: SearchListProps) => {
                     ...element,
                     name: (
                       <span className="flex flex-col py-0.5">
-                        <span title={element.name} className="truncate">
-                          {element.name}
-                        </span>
+                        <span className="truncate">{element.name}</span>
                         {!!visibility && (
-                          <span title={visibility} className="text-foreground-lighter text-xs">
-                            {visibility}
-                          </span>
+                          <span className="text-foreground-lighter text-xs">{visibility}</span>
                         )}
                       </span>
                     ),
                   }}
+                  nameForTitle={element.name}
                   isBranch={false}
                   isOpened={isOpened && !isPreview}
                   isSelected={isActive}

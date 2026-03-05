@@ -1,9 +1,4 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AlertCircle, XIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import {
   useFeaturePreviewModal,
   useIsColumnLevelPrivilegesEnabled,
@@ -31,8 +26,12 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { AlertCircle, XIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
@@ -40,7 +39,7 @@ const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 const PrivilegesPage: NextPageWithLayout = () => {
   const { ref, table: paramTable } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { openFeaturePreviewModal } = useFeaturePreviewModal()
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const isEnabled = useIsColumnLevelPrivilegesEnabled()
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -351,7 +350,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 You may access this feature by enabling it under dashboard feature previews.
               </AlertDescription_Shadcn_>
               <div className="mt-4">
-                <Button type="default" onClick={openFeaturePreviewModal}>
+                <Button type="default" onClick={() => toggleFeaturePreviewModal(true)}>
                   View feature previews
                 </Button>
               </div>

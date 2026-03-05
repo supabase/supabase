@@ -7,7 +7,7 @@ export type Example = {
   }[]
 }
 
-const examples = {
+export const examples = {
   nodejs: {
     installCommands: ['npm install postgres'],
     files: [
@@ -149,5 +149,3 @@ except Exception as e:
     ],
   },
 }
-
-export default examples

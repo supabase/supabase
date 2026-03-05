@@ -1,15 +1,3 @@
-import { Fragment } from 'react'
-import ReactMarkdown from 'react-markdown'
-import {
-  Badge,
-  cn,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
-
-import { isFeatureEnabled } from 'common'
 import ApiSchema from '~/components/ApiSchema'
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import {
@@ -21,7 +9,7 @@ import {
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   ApiOperationRequestBodyDetails,
@@ -35,6 +23,18 @@ import {
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
+import { isFeatureEnabled } from 'common'
+import { Fragment } from 'react'
+import ReactMarkdown from 'react-markdown'
+import {
+  Badge,
+  cn,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
+
 import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
 import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
@@ -286,6 +286,10 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
+  const endpointFgaPermissionGroups =
+    endpointDetails.security
+      ?.filter((sec) => 'fga_permissions' in sec)
+      .map((sec) => sec.fga_permissions) ?? []
   const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
   const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
   const bodyParameters =
@@ -355,6 +359,27 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
                   {endpointDetails['x-oauth-scope']}
                 </span>
               </li>
+            </ul>
+          </section>
+        )}
+        {endpointFgaPermissionGroups.length > 0 && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              The fine-grained token must include the following permissions to access this endpoint:
+            </h3>
+            <ul>
+              {endpointFgaPermissionGroups.map((group, groupIndex) => (
+                <Fragment key={groupIndex}>
+                  {groupIndex > 0 && (
+                    <li className="my-2 text-foreground-lighter text-sm italic">or</li>
+                  )}
+                  {group.map((perm, permIndex) => (
+                    <li key={permIndex} className="list-['-'] ml-2 pl-2">
+                      <span className="font-mono text-sm font-medium text-foreground">{perm}</span>
+                    </li>
+                  ))}
+                </Fragment>
+              ))}
             </ul>
           </section>
         )}
@@ -435,7 +460,7 @@ async function FunctionSection({
   const fn = fns?.find((fn) => fn.id === section.id)
   if (!fn) return null
 
-  let types: MethodTypes | undefined
+  let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
     types = await getTypeSpec(fn['$ref'] as string)
   }
@@ -454,7 +479,7 @@ async function FunctionSection({
       <StickyHeader {...section} className="col-[1_/_-1]" />
 
       {/* Display method signature below title */}
-      {types && formatMethodSignature(types) && (
+      {types && 'params' in types && formatMethodSignature(types) && (
         <div className="col-[1_/_-1] -mt-2 mb-4">
           <code className="text-sm text-foreground-muted font-mono">
             {formatMethodSignature(types)}
@@ -475,12 +500,18 @@ async function FunctionSection({
                 }))
               : 'params' in fn
                 ? (fn.params as Array<object>).map((param) => ({ ...param, __overwritten: true }))
-                : types?.params
+                : types && 'params' in types
+                  ? types.params
+                  : undefined
           }
-          altParameters={types?.altSignatures?.map(({ params }) => params)}
+          altParameters={
+            types && 'altSignatures' in types
+              ? types.altSignatures?.map(({ params }) => params)
+              : undefined
+          }
           className="max-w-[80ch]"
         />
-        {!!types?.ret && <ReturnTypeDetails returnType={types.ret} />}
+        {types && 'ret' in types && !!types.ret && <ReturnTypeDetails returnType={types.ret} />}
       </div>
       <div className="overflow-auto">
         {(() => {

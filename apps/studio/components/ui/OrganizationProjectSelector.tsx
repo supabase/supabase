@@ -3,8 +3,7 @@ import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-
+import { ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
@@ -35,15 +34,20 @@ interface OrganizationProjectSelectorSelectorProps {
   renderTrigger?: ({
     isLoading,
     project,
+    listboxId,
+    open,
   }: {
     isLoading: boolean
     project?: OrgProject
+    listboxId: string
+    open: boolean
   }) => ReactNode
   renderActions?: (setOpen: (value: boolean) => void) => ReactNode
   onSelect?: (project: OrgProject) => void
   onInitialLoad?: (projects: OrgProject[]) => void
   isOptionDisabled?: (project: OrgProject) => boolean
   fetchOnMount?: boolean
+  modal?: boolean
 }
 
 export const OrganizationProjectSelector = ({
@@ -61,6 +65,7 @@ export const OrganizationProjectSelector = ({
   onInitialLoad,
   isOptionDisabled,
   fetchOnMount = false,
+  modal = false,
 }: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = _slug ?? organization?.slug
@@ -68,6 +73,7 @@ export const OrganizationProjectSelector = ({
   const [openInternal, setOpenInternal] = useState(false)
   const open = _open ?? openInternal
   const setOpen = _setOpen ?? setOpenInternal
+  const listboxId = useId()
 
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
@@ -126,16 +132,23 @@ export const OrganizationProjectSelector = ({
   }, [isLoadingProjects, isSuccessProjects])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={modal}>
       <PopoverTrigger_Shadcn_ asChild>
         {renderTrigger ? (
-          renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })
+          renderTrigger({
+            isLoading: isLoadingProjects || isFetching,
+            project: selectedProject,
+            listboxId,
+            open,
+          })
         ) : (
           <Button
             block
             type="default"
             role="combobox"
             size="small"
+            aria-expanded={open}
+            aria-controls={listboxId}
             className="justify-between"
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
@@ -148,7 +161,7 @@ export const OrganizationProjectSelector = ({
         )}
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
-        portal
+        id={listboxId}
         sameWidthAsTrigger={sameWidthAsTrigger}
         className="p-0"
         side="bottom"

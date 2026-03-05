@@ -1,10 +1,8 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-import { install, uninstall } from 'stripe-experiment-sync/supabase'
-import { VERSION } from 'stripe-experiment-sync'
 import { waitUntil } from '@vercel/functions'
-
-const ENABLE_FLAG_KEY = 'enableStripeSyncEngineIntegration'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { VERSION } from 'stripe-experiment-sync'
+import { install, uninstall } from 'stripe-experiment-sync/supabase'
+import { z } from 'zod'
 
 const InstallBodySchema = z.object({
   projectRef: z.string().min(1),
@@ -112,7 +110,7 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
         errorData.error?.message || `Invalid Stripe API key (HTTP ${stripeResponse.status})`
       return res.status(400).json({
         data: null,
-        error: { message: `Invalid Stripe API key: ${errorMessage}` },
+        error: { message: errorMessage },
       })
     }
   } catch (error: any) {

@@ -18,7 +18,13 @@ You might use database replication for:
 
 ## Replication methods
 
-Supabase supports two methods for replicating your database to external destinations:
+Supabase supports three methods for replicating your database to external destinations:
+
+### Read Replicas
+
+Additional databases that are kept in sync with your Primary database. These read-only databases can be deployed across multiple regions, for lower latency and better resource management.
+
+- [Set up Read Replicas](/docs/guides/platform/read-replicas)
 
 ### Replication
 

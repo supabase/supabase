@@ -93,6 +93,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-responsive": {
+      name: "admonition-responsive",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-responsive")),
+      source: "",
+      files: ["registry/default/example/admonition-responsive.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "admonition-button": {
       name: "admonition-button",
       type: "components:example",
@@ -126,6 +137,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-sandwiched": {
+      name: "admonition-sandwiched",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-sandwiched")),
+      source: "",
+      files: ["registry/default/example/admonition-sandwiched.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "alert-demo": {
       name: "alert-demo",
       type: "components:example",
@@ -133,6 +155,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/alert-demo")),
       source: "",
       files: ["registry/default/example/alert-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-collapsible-demo": {
+      name: "alert-collapsible-demo",
+      type: "components:example",
+      registryDependencies: ["alert","collapsible","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-collapsible-demo")),
+      source: "",
+      files: ["registry/default/example/alert-collapsible-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -159,17 +192,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "aspect-ratio-demo": {
-      name: "aspect-ratio-demo",
-      type: "components:example",
-      registryDependencies: ["aspect-ratio"],
-      component: React.lazy(() => import("@/registry/default/example/aspect-ratio-demo")),
-      source: "",
-      files: ["registry/default/example/aspect-ratio-demo.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "alert-dialog-destructive": {
       name: "alert-dialog-destructive",
       type: "components:example",
@@ -188,6 +210,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/alert-dialog-warning")),
       source: "",
       files: ["registry/default/example/alert-dialog-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "aspect-ratio-demo": {
+      name: "aspect-ratio-demo",
+      type: "components:example",
+      registryDependencies: ["aspect-ratio"],
+      component: React.lazy(() => import("@/registry/default/example/aspect-ratio-demo")),
+      source: "",
+      files: ["registry/default/example/aspect-ratio-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2234,6 +2267,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/page-section-horizontal")),
       source: "",
       files: ["registry/default/example/page-section-horizontal.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-section-title-only": {
+      name: "page-section-title-only",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-section-title-only")),
+      source: "",
+      files: ["registry/default/example/page-section-title-only.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

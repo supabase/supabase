@@ -5,6 +5,7 @@ import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
+import { Admonition } from 'ui-patterns'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
@@ -256,7 +257,9 @@ export const QueryIndexes = ({
       </QueryPanelSection>
       <QueryPanelSection className="flex flex-col gap-y-6 py-6 border-t">
         <div className="flex flex-col gap-y-1">
-          <h4 className="mb-2">New index recommendations</h4>
+          {(!isSuccessIndexAdvisorResult || indexAdvisorResult !== null) && (
+            <h4 className="mb-2">New index recommendations</h4>
+          )}
           {isLoadingExtensions ? (
             <GenericSkeletonLoader />
           ) : !isIndexAdvisorEnabled ? (
@@ -273,7 +276,14 @@ export const QueryIndexes = ({
               )}
               {isSuccessIndexAdvisorResult && (
                 <>
-                  {(index_statements ?? []).length === 0 ? (
+                  {indexAdvisorResult === null ? (
+                    <Admonition
+                      type="default"
+                      showIcon={true}
+                      title="Index recommendations not available"
+                      description="Index advisor could not analyze this query. This can happen if the query references tables, functions, or extensions that no longer exist or were deleted."
+                    />
+                  ) : (index_statements ?? []).length === 0 ? (
                     <Alert_Shadcn_ className="[&>svg]:rounded-full">
                       <Check />
                       <AlertTitle_Shadcn_>This query is optimized</AlertTitle_Shadcn_>

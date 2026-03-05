@@ -1,20 +1,20 @@
 'use client'
+
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import { useBreakpoint } from 'common'
+import useDragToClose from 'common/hooks/useDragToClose'
 import { AlertTriangle, ArrowLeft, Command, Search } from 'lucide-react'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-
-import { useBreakpoint } from 'common'
-import useDragToClose from 'common/hooks/useDragToClose'
 import {
   Button,
+  cn,
   Command_Shadcn_,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-  cn,
 } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
@@ -199,7 +199,7 @@ function CommandMenuTriggerInput({
             strokeWidth={1.5}
             className="group-hover:text-foreground-light transition-colors"
           />
-          <p className="flex text-sm pr-2 text-foreground-muted">{placeholder}</p>
+          <p className="flex text-xs pr-2 text-foreground-muted">{placeholder}</p>
         </div>
         {showShortcut && (
           <div className="command-shortcut hidden md:flex items-center space-x-1">

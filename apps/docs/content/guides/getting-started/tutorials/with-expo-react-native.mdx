@@ -34,7 +34,7 @@ cd expo-user-management
 Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npx expo install @supabase/supabase-js @react-native-async-storage/async-storage @rneui/themed
+npx expo install @supabase/supabase-js @rneui/themed expo-sqlite
 ```
 
 Now let's create a helper file to initialize the Supabase client.
@@ -46,15 +46,15 @@ These variables are safe to expose in your Expo app since Supabase has
   scrollable
   size="large"
   type="underlined"
-  defaultActiveId="async-storage"
+  defaultActiveId="local-storage"
   queryGroup="auth-store"
 >
-  <TabPanel id="async-storage" label="AsyncStorage">
+  <TabPanel id="local-storage" label="LocalStorage">
 
     <$CodeTabs>
 
     ```ts name=lib/supabase.ts
-    import AsyncStorage from '@react-native-async-storage/async-storage'
+    import 'expo-sqlite/localStorage/install';
     import { createClient } from '@supabase/supabase-js'
 
     const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
@@ -62,7 +62,7 @@ These variables are safe to expose in your Expo app since Supabase has
 
     export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
       auth: {
-        storage: AsyncStorage,
+        storage: localStorage,
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: false,

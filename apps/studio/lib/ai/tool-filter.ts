@@ -70,6 +70,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   deploy_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
+  get_active_incidents: TOOL_CATEGORIES.UI,
 
   // Schema tools - MCP
   list_tables: TOOL_CATEGORIES.SCHEMA,

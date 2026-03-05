@@ -1,10 +1,10 @@
-import Link from 'next/link'
 import { Doc } from 'contentlayer/generated'
-import { NavItem, NavItemWithChildren } from '@/types/nav'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 
 import { docsConfig } from '@/config/docs'
 import { cn } from '@/lib/utils'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { NavItem, NavItemWithChildren } from '@/types/nav'
 
 interface DocsPagerProps {
   doc: Doc
@@ -70,4 +70,28 @@ export function flatten(links: NavItemWithChildren[]): NavItem[] {
       return flat.concat(link.items?.length ? flatten(link.items) : link)
     }, [])
     .filter((link) => !link?.disabled)
+}
+
+export interface BreadcrumbSegment {
+  title: string
+  href?: string
+}
+
+export function getBreadcrumbSegments(doc: Doc): BreadcrumbSegment[] {
+  const segments: BreadcrumbSegment[] = [{ title: 'Docs', href: '/docs' }]
+
+  for (const section of docsConfig.sidebarNav) {
+    const flatItems = flatten(section.items ?? [])
+    const inSection = flatItems.some((item) => item.href === doc.slug)
+    if (!inSection || !section.title) continue
+
+    const sectionLanding = flatItems.find((item) => item.priority) ?? flatItems[0]
+    const isOnLanding = sectionLanding?.href === doc.slug
+    if (sectionLanding?.href && !isOnLanding) {
+      segments.push({ title: section.title, href: sectionLanding.href })
+    }
+    break
+  }
+
+  return segments
 }

@@ -60,7 +60,7 @@ export type FDW = {
   name: string
   handler: string
   server_name: string
-  server_options: string[]
+  server_options: string[] | null
   tables: FDWTable[]
 }
 

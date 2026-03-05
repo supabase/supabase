@@ -12,7 +12,7 @@ type AnalyticsBucketDeleteVariables = {
 
 async function deleteAnalyticsBucket({ projectRef, id }: AnalyticsBucketDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const { data, error } = await del('/platform/storage/{ref}/analytics-buckets/{id}', {
     params: { path: { ref: projectRef, id } },

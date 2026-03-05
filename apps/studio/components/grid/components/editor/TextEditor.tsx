@@ -4,6 +4,7 @@ import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
@@ -44,6 +45,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(initialValue)
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
 
@@ -169,7 +171,14 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                         size="tiny"
                         type="default"
                         htmlType="button"
-                        onClick={() => setIsConfirmNextModalOpen(true)}
+                        onClick={() => {
+                          if (isQueueOperationsEnabled) {
+                            // Skip confirmation when queue mode is enabled - changes can be reviewed/cancelled
+                            saveChanges(null)
+                          } else {
+                            setIsConfirmNextModalOpen(true)
+                          }
+                        }}
                       >
                         Set to NULL
                       </Button>

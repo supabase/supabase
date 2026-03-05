@@ -111,12 +111,16 @@ export const PageHeader = ({
             <div className="flex items-center gap-4">
               {icon && <div className="text-foreground-light">{icon}</div>}
               <div className="space-y-1">
-                {title && <ScaffoldTitle>{title}</ScaffoldTitle>}
-                {subtitle && (
-                  <ScaffoldDescription className="text-sm text-foreground-light">
-                    {subtitle}
-                  </ScaffoldDescription>
-                )}
+                {title &&
+                  (typeof title === 'string' ? <ScaffoldTitle>{title}</ScaffoldTitle> : title)}
+                {subtitle &&
+                  (typeof subtitle === 'string' ? (
+                    <ScaffoldDescription className="text-sm text-foreground-light">
+                      {subtitle}
+                    </ScaffoldDescription>
+                  ) : (
+                    subtitle
+                  ))}
               </div>
             </div>
           </div>

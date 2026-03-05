@@ -74,7 +74,11 @@ await supabase.storage.from('avatars').move('public/avatar1.png', 'private/avata
 
 ## Permissions
 
-For a user to move and copy objects, they need `select` permission on the source object and `insert` permission on the destination object. For example:
+To **copy** objects, users need `select` permission on the source object and `insert` permission on the destination object. If the user also has `update` permission, the copy can be performed as an upsert, which will overwrite the destination object if it already exists.
+
+To **move** objects, users need `select` and `update` permissions on the object.
+
+For example:
 
 ```sql
 create policy "User can select their own objects (in any buckets)"
@@ -85,11 +89,19 @@ using (
     owner_id = (select auth.uid())
 );
 
-create policy "User can upload in their own folders (in any buckets)"
+create policy "User can insert in their own folders (in any buckets)"
 on storage.objects
 for insert
 to authenticated
 with check (
     (storage.folder(name))[1] = (select auth.uid())
+);
+
+create policy "User can update their own objects (in any buckets)"
+on storage.objects
+for update
+to authenticated
+using (
+    owner_id = (select auth.uid())
 );
 ```

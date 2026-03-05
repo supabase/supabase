@@ -1,21 +1,21 @@
-import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { InlineLink } from 'components/ui/InlineLink'
+import type { UseFormReturn } from 'react-hook-form'
 import {
-  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import {
   CATEGORY_OPTIONS,
   type ExtendedSupportCategories,
@@ -91,7 +91,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
                 </SelectTrigger_Shadcn_>
                 <SelectContent_Shadcn_>
                   <SelectGroup_Shadcn_>
-                    {CATEGORY_OPTIONS.filter((option) => !option.hidden).map((option) => (
+                    {CATEGORY_OPTIONS.map((option) => (
                       <SelectItem_Shadcn_ key={option.value} value={option.value}>
                         {option.label}
                         <span className="block text-xs text-foreground-lighter">

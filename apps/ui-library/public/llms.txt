@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-11-20T11:14:14.146Z
+Last updated: 2026-01-22T19:37:07.586Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -33,8 +33,12 @@ Library of components for your project. The components integrate with Supabase a
     - Social authentication block for Next.js
 - [Supabase Client Libraries](https://supabase.com/ui/docs/nuxtjs/client)
     - Supabase client for Nuxt.js
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/nuxtjs/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
 - [Password-based Authentication](https://supabase.com/ui/docs/nuxtjs/password-based-auth)
     - Password-based authentication block for Nuxt.js
+- [Realtime Cursor](https://supabase.com/ui/docs/nuxtjs/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/nuxtjs/social-auth)
     - Social authentication block for Nuxt.js
 - [Platform Kit](https://supabase.com/ui/docs/platform/platform-kit)
@@ -89,7 +93,11 @@ Library of components for your project. The components integrate with Supabase a
     - Social authentication block for Tanstack Start
 - [Supabase Client Libraries](https://supabase.com/ui/docs/vue/client)
     - Supabase client for Vue Single Page Applications
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/vue/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
 - [Password-based Authentication](https://supabase.com/ui/docs/vue/password-based-auth)
     - Password-based authentication block for Vue Single Page Applications
+- [Realtime Cursor](https://supabase.com/ui/docs/vue/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/vue/social-auth)
     - Social authentication block for Vue Single Page Applications

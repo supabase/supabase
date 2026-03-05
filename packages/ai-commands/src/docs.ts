@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { codeBlock, oneLine } from 'common-tags'
 import type OpenAI from 'openai'
+
 import { ApplicationError, UserError } from './errors'
 import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from './tokenizer'
 import type { Message } from './types'

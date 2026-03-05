@@ -18,7 +18,7 @@ provider will be deprecated in future releases.
 Setting up X / Twitter logins for your application consists of 3 parts:
 
 - Create and configure an X Project and App on the [X Developer Dashboard](https://developer.x.com/en/portal/dashboard).
-- Add your X `API Key` and `API Secret Key` to your [Supabase Project](/dashboard).
+- Add your X OAuth 2.0 `Client ID` and `Client Secret` to your [Supabase Project](/dashboard).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your X developer account
@@ -37,8 +37,7 @@ Setting up X / Twitter logins for your application consists of 3 parts:
   - Select your use case, click `Next`.
   - Enter a description for your project, click `Next`.
   - Enter a name for your app, click `Next`.
-  - Copy and save your `API Key` (this is your `client_id`).
-  - Copy and save your `API Secret Key` (this is your `client_secret`).
+  - Copy and save your **API Key** and **API Secret Key** (these are used for OAuth 1.0a, which is being deprecated).
   - Click on `App settings` to proceed to next steps.
 - At the bottom, you will find `User authentication settings`. Click on `Set up`.
 - Under `User authentication settings`, you can configure `App permissions`.
@@ -50,6 +49,11 @@ Setting up X / Twitter logins for your application consists of 3 parts:
   - Enter your `Terms of service URL`.
   - Enter your `Privacy policy URL`.
 - Click `Save`.
+- After saving, navigate to `Keys and tokens` on your App page.
+  - Scroll to the bottom of the page and copy your **Client ID**.
+  - Click the `Regenerate` button next to **Client Secret**.
+  - In the confirmation modal, click `Yes, regenerate`.
+  - Copy and save your **Client Secret**.
 
 ## Enter your X credentials into your Supabase project
 
@@ -68,8 +72,8 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   -H "Content-Type: application/json" \
   -d '{
     "external_x_enabled": true,
-    "external_x_client_id": "your-x-api-key",
-    "external_x_secret": "your-x-api-secret-key"
+    "external_x_client_id": "your-x-client-id",
+    "external_x_secret": "your-x-client-secret"
   }'
 ```
 
@@ -120,6 +124,19 @@ Future<void> signInWithX() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+When your user signs in, call [`signInWithOAuth(provider:)`](/docs/reference/swift/auth-signinwithoauth) with `.x` as the `provider`:
+
+```swift
+func signInWithX() async throws {
+  try await supabase.auth.signInWithOAuth(provider: .x)
+}
+```
+
+</TabPanel>
+</$Show>
 <$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
@@ -173,6 +190,19 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+When your user signs out, call [signOut()](/docs/reference/swift/auth-signout) to remove them from the browser session:
+
+```swift
+func signOut() async throws {
+  try await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+</$Show>
 <$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 

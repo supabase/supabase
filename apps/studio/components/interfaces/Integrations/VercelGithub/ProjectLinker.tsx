@@ -328,7 +328,6 @@ const ProjectLinker = ({
                   side="bottom"
                   align="center"
                   sameWidthAsTrigger
-                  portal
                 >
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search for a project" />

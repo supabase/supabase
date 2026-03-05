@@ -1,13 +1,25 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { PropsWithChildren, createContext, useContext } from 'react'
-import { proxy, useSnapshot } from 'valtio'
-
 import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
+import {
+  resolveDeleteRowConflicts,
+  resolveEditCellConflicts,
+  upsertOperation,
+} from 'components/grid/utils/queueConflictResolution'
+import { generateTableChangeKey } from 'components/grid/utils/queueOperationUtils'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import { createContext, PropsWithChildren, useContext } from 'react'
 import type { Dictionary } from 'types'
+import { proxy, useSnapshot } from 'valtio'
+
+import {
+  NewQueuedOperation,
+  QueuedOperationType,
+  type OperationQueueState,
+  type QueueStatus,
+} from './table-editor-operation-queue.types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 
@@ -29,6 +41,7 @@ export type SidePanel =
       foreignKey: ForeignKeyState
     }
   | { type: 'csv-import'; file?: File }
+  | { type: 'operation-queue' }
 
 export type ConfirmationDialog =
   | { type: 'table'; isDeleteWithCascade: boolean }
@@ -189,6 +202,16 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'csv-import', file },
       }
     },
+    toggleViewOperationQueue: () => {
+      if (state.ui.open === 'side-panel' && state.ui.sidePanel.type === 'operation-queue') {
+        state.closeSidePanel()
+      } else {
+        state.ui = {
+          open: 'side-panel',
+          sidePanel: { type: 'operation-queue' },
+        }
+      }
+    },
 
     /* Utils */
     toggleConfirmationIsWithCascade: (overrideIsDeleteWithCascade?: boolean) => {
@@ -200,6 +223,123 @@ export const createTableEditorState = () => {
         state.ui.confirmationDialog.isDeleteWithCascade =
           overrideIsDeleteWithCascade ?? !state.ui.confirmationDialog.isDeleteWithCascade
       }
+    },
+
+    // ========================================================================
+    // Operation Queue
+    // ========================================================================
+
+    operationQueue: {
+      operations: [],
+      status: 'idle',
+    } as OperationQueueState,
+
+    /**
+     * Queue a new operation for later processing.
+     * If an operation with the same key already exists, it will be overwritten.
+     * Handles conflict resolution:
+     * - DELETE_ROW on a row: remove any pending EDIT_CELL ops for that row
+     * - EDIT_CELL on a row pending deletion: reject (console.warn)
+     * - EDIT_CELL on a newly added row: merge edit into ADD_ROW's rowData
+     * - DELETE_ROW on a newly added row: cancel both operations
+     */
+    queueOperation: (operation: NewQueuedOperation) => {
+      const updateQueueStatus = () => {
+        if (state.operationQueue.operations.length === 0) {
+          state.operationQueue.status = 'idle'
+        } else if (state.operationQueue.status === 'idle') {
+          state.operationQueue.status = 'pending'
+        }
+      }
+
+      // Handle DELETE_ROW conflicts
+      if (operation.type === QueuedOperationType.DELETE_ROW) {
+        const result = resolveDeleteRowConflicts(state.operationQueue.operations, operation)
+        state.operationQueue.operations = result.filteredOperations
+        if (result.action === 'skip') {
+          updateQueueStatus()
+          return
+        }
+      }
+
+      // Handle EDIT_CELL_CONTENT conflicts
+      if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+        const result = resolveEditCellConflicts(state.operationQueue.operations, operation)
+        if (result.action === 'reject') {
+          console.warn(result.reason)
+          return
+        }
+        if (result.action === 'merge') {
+          state.operationQueue.operations = result.updatedOperations
+          updateQueueStatus()
+          return
+        }
+      }
+
+      // Normal upsert
+      const { operations } = upsertOperation(state.operationQueue.operations, operation)
+      state.operationQueue.operations = operations
+      updateQueueStatus()
+    },
+
+    /**
+     * Clear all operations from the queue
+     */
+    clearQueue: () => {
+      state.operationQueue.operations = []
+      state.operationQueue.status = 'idle'
+    },
+
+    /**
+     * Remove a specific operation from the queue
+     */
+    removeOperation: (operationId: string) => {
+      state.operationQueue.operations = state.operationQueue.operations.filter(
+        (op) => op.id !== operationId
+      )
+      if (state.operationQueue.operations.length === 0) {
+        state.operationQueue.status = 'idle'
+      }
+    },
+
+    /**
+     * Update the queue status
+     */
+    setQueueStatus: (status: QueueStatus) => {
+      state.operationQueue.status = status
+    },
+
+    /**
+     * Check if there are any pending operations in the queue
+     */
+    get hasPendingOperations(): boolean {
+      return state.operationQueue.operations.length > 0
+    },
+
+    hasPendingCellChange: (
+      tableId: number,
+      rowIdentifiers: Dictionary<unknown>,
+      columnName: string
+    ): boolean => {
+      const key = generateTableChangeKey({
+        type: QueuedOperationType.EDIT_CELL_CONTENT,
+        tableId,
+        payload: {
+          columnName,
+          rowIdentifiers,
+        },
+      })
+      return state.operationQueue.operations.some((op) => op.id === key)
+    },
+
+    /**
+     * Toggle the preflight check behaviour for each table
+     */
+    tablesToIgnorePreflightCheck: [] as number[],
+    setTableToIgnorePreflightCheck: (id: number) => {
+      const set = new Set<number>(state.tablesToIgnorePreflightCheck)
+      set.add(id)
+      state.tablesToIgnorePreflightCheck = [...set]
     },
   })
 

@@ -1184,4 +1184,240 @@ where
     and ext.default_version is not null
     and ext.installed_version != ext.default_version
 order by
-    ext.name)`.trim()
+    ext.name)
+union all
+(
+-- Detects tables exposed via API that contain columns with sensitive names
+-- Inspired by patterns from security scanners that detect PII/credential exposure
+with sensitive_patterns as (
+    select unnest(array[
+        -- Authentication & Credentials
+        'password', 'passwd', 'pwd', 'passphrase',
+        'secret', 'secret_key', 'private_key', 'api_key', 'apikey',
+        'auth_key', 'token', 'jwt', 'access_token', 'refresh_token',
+        'oauth_token', 'session_token', 'bearer_token', 'auth_code',
+        'session_id', 'session_key', 'session_secret',
+        'recovery_code', 'backup_code', 'verification_code',
+        'otp', 'two_factor', '2fa_secret', '2fa_code',
+        -- Personal Identifiers
+        'ssn', 'social_security', 'social_security_number',
+        'driver_license', 'drivers_license', 'license_number',
+        'passport_number', 'passport_id', 'national_id', 'tax_id',
+        -- Financial Information
+        'credit_card', 'card_number', 'cvv', 'cvc', 'cvn',
+        'bank_account', 'account_number', 'routing_number',
+        'iban', 'swift_code', 'bic',
+        -- Health & Medical
+        'health_record', 'medical_record', 'patient_id',
+        'insurance_number', 'health_insurance', 'medical_insurance',
+        'treatment',
+        -- Device Identifiers
+        'mac_address', 'macaddr', 'imei', 'device_uuid',
+        -- Digital Keys & Certificates
+        'pgp_key', 'gpg_key', 'ssh_key', 'certificate',
+        'license_key', 'activation_key',
+        -- Biometric Data
+        'facial_recognition'
+    ]) as pattern
+),
+exposed_tables as (
+    select
+        n.nspname as schema_name,
+        c.relname as table_name,
+        c.oid as table_oid
+    from
+        pg_catalog.pg_class c
+        join pg_catalog.pg_namespace n
+            on c.relnamespace = n.oid
+    where
+        c.relkind = 'r' -- regular tables
+        and (
+            pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
+            or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
+        )
+        and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
+        and n.nspname not in (
+            '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        )
+        -- Only flag tables without RLS enabled
+        and not c.relrowsecurity
+),
+sensitive_columns as (
+    select
+        et.schema_name,
+        et.table_name,
+        a.attname as column_name,
+        sp.pattern as matched_pattern
+    from
+        exposed_tables et
+        join pg_catalog.pg_attribute a
+            on a.attrelid = et.table_oid
+            and a.attnum > 0
+            and not a.attisdropped
+        cross join sensitive_patterns sp
+    where
+        -- Match column name against sensitive patterns (case insensitive), allowing '-'/'_' variants
+        replace(lower(a.attname), '-', '_') = sp.pattern
+)
+select
+    'sensitive_columns_exposed' as name,
+    'Sensitive Columns Exposed' as title,
+    'ERROR' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects tables exposed via API that contain columns with potentially sensitive data (PII, credentials, financial info) without RLS protection.' as description,
+    format(
+        'Table \`%s.%s\` is exposed via API without RLS and contains potentially sensitive column(s): %s. This may lead to data exposure.',
+        schema_name,
+        table_name,
+        string_agg(distinct column_name, ', ' order by column_name)
+    ) as detail,
+    '${DOCS_URL}/guides/database/database-linter?lint=0023_sensitive_columns_exposed' as remediation,
+    jsonb_build_object(
+        'schema', schema_name,
+        'name', table_name,
+        'type', 'table',
+        'sensitive_columns', array_agg(distinct column_name order by column_name),
+        'matched_patterns', array_agg(distinct matched_pattern order by matched_pattern)
+    ) as metadata,
+    format(
+        'sensitive_columns_exposed_%s_%s',
+        schema_name,
+        table_name
+    ) as cache_key
+from
+    sensitive_columns
+group by
+    schema_name,
+    table_name
+order by
+    schema_name,
+    table_name)
+union all
+(
+-- Detects RLS policies that are overly permissive (e.g., USING (true), USING (1=1))
+-- These policies effectively disable row-level security while giving a false sense of security
+with policies as (
+    select
+        nsp.nspname as schema_name,
+        pb.tablename as table_name,
+        pc.relrowsecurity as is_rls_active,
+        pa.polname as policy_name,
+        pa.polpermissive as is_permissive,
+        pa.polroles as role_oids,
+        (select array_agg(r::regrole::text) from unnest(pa.polroles) as x(r)) as roles,
+        case pa.polcmd
+            when 'r' then 'SELECT'
+            when 'a' then 'INSERT'
+            when 'w' then 'UPDATE'
+            when 'd' then 'DELETE'
+            when '*' then 'ALL'
+        end as command,
+        pb.qual,
+        pb.with_check,
+        -- Normalize expressions by removing whitespace and lowercasing
+        replace(replace(replace(lower(coalesce(pb.qual, '')), ' ', ''), E'\n', ''), E'\t', '') as normalized_qual,
+        replace(replace(replace(lower(coalesce(pb.with_check, '')), ' ', ''), E'\n', ''), E'\t', '') as normalized_with_check
+    from
+        pg_catalog.pg_policy pa
+        join pg_catalog.pg_class pc
+            on pa.polrelid = pc.oid
+        join pg_catalog.pg_namespace nsp
+            on pc.relnamespace = nsp.oid
+        join pg_catalog.pg_policies pb
+            on pc.relname = pb.tablename
+            and nsp.nspname = pb.schemaname
+            and pa.polname = pb.policyname
+    where
+        pc.relkind = 'r' -- regular tables
+        and nsp.nspname not in (
+            '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        )
+),
+permissive_patterns as (
+    select
+        p.*,
+        -- Check for always-true USING clause patterns
+        -- Note: SELECT with (true) is often intentional and documented, so we only flag UPDATE/DELETE
+        case when (
+            command in ('UPDATE', 'DELETE', 'ALL')
+            and (
+                normalized_qual in ('true', '(true)', '1=1', '(1=1)')
+                -- Empty or null qual on permissive policy means allow all
+                or (qual is null and is_permissive)
+            )
+        ) then true else false end as has_permissive_using,
+        -- Check for always-true WITH CHECK clause patterns
+        case when (
+            normalized_with_check in ('true', '(true)', '1=1', '(1=1)')
+            -- Empty with_check on INSERT means allow all (INSERT has no USING to fall back on)
+            or (with_check is null and is_permissive and command = 'INSERT')
+            -- Empty with_check on UPDATE/ALL with permissive USING means allow all writes
+            or (with_check is null and is_permissive and command in ('UPDATE', 'ALL')
+                and normalized_qual in ('true', '(true)', '1=1', '(1=1)'))
+        ) then true else false end as has_permissive_with_check
+    from
+        policies p
+    where
+        -- Only check tables with RLS enabled (otherwise it's a different lint)
+        is_rls_active
+        -- Only check permissive policies (restrictive policies with true are less dangerous)
+        and is_permissive
+        -- Only flag policies that apply to anon or authenticated roles (or public/all roles)
+        and (
+            role_oids = array[0::oid] -- public (all roles)
+            or exists (
+                select 1
+                from unnest(role_oids) as r
+                where r::regrole::text in ('anon', 'authenticated')
+            )
+        )
+)
+select
+    'rls_policy_always_true' as name,
+    'RLS Policy Always True' as title,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects RLS policies that use overly permissive expressions like \`USING (true)\` or \`WITH CHECK (true)\` for UPDATE, DELETE, or INSERT operations. SELECT policies with \`USING (true)\` are intentionally excluded as this pattern is often used deliberately for public read access.' as description,
+    format(
+        'Table \`%s.%s\` has an RLS policy \`%s\` for \`%s\` that allows unrestricted access%s. This effectively bypasses row-level security for %s.',
+        schema_name,
+        table_name,
+        policy_name,
+        command,
+        case
+            when has_permissive_using and has_permissive_with_check then ' (both USING and WITH CHECK are always true)'
+            when has_permissive_using then ' (USING clause is always true)'
+            when has_permissive_with_check then ' (WITH CHECK clause is always true)'
+            else ''
+        end,
+        array_to_string(roles, ', ')
+    ) as detail,
+    '${DOCS_URL}/guides/database/database-linter?lint=0024_permissive_rls_policy' as remediation,
+    jsonb_build_object(
+        'schema', schema_name,
+        'name', table_name,
+        'type', 'table',
+        'policy_name', policy_name,
+        'command', command,
+        'roles', roles,
+        'qual', qual,
+        'with_check', with_check,
+        'permissive_using', has_permissive_using,
+        'permissive_with_check', has_permissive_with_check
+    ) as metadata,
+    format(
+        'rls_policy_always_true_%s_%s_%s',
+        schema_name,
+        table_name,
+        policy_name
+    ) as cache_key
+from
+    permissive_patterns
+where
+    has_permissive_using or has_permissive_with_check
+order by
+    schema_name,
+    table_name,
+    policy_name)`.trim()

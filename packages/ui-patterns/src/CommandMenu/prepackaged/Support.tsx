@@ -1,7 +1,7 @@
-import { LifeBuoy, Activity } from 'lucide-react'
+import { useRegisterCommands, useSetCommandMenuOpen, type ICommand } from '..'
+import { Activity, LifeBuoy } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { useRegisterCommands, useSetCommandMenuOpen, type ICommand } from '..'
 import { BASE_PATH } from './shared/constants'
 
 const useSupportCommands = ({ enabled = true }: { enabled?: boolean } = {}) => {

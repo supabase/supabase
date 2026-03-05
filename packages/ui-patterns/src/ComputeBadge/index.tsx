@@ -1,7 +1,5 @@
-import type { HTMLAttributes } from 'react'
-
 import { components } from 'api-types'
-
+import type { HTMLAttributes } from 'react'
 import { cn } from 'ui'
 
 interface ComputeBadgeProps extends HTMLAttributes<HTMLDivElement> {

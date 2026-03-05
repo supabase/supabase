@@ -1,13 +1,13 @@
-import { AuthSession } from '@supabase/supabase-js'
 import { Component, createEffect, createSignal } from 'solid-js'
 import Avatar from './Avatar'
 import { supabase } from './supabaseClient'
 
 interface Props {
-	session: AuthSession
+	userId: string
+	userEmail: string | null
 }
 
-const Account: Component<Props> = ({ session }) => {
+const Account: Component<Props> = ({ userId, userEmail }) => {
 	const [loading, setLoading] = createSignal(true)
 	const [username, setUsername] = createSignal<string | null>(null)
 	const [website, setWebsite] = createSignal<string | null>(null)
@@ -20,12 +20,11 @@ const Account: Component<Props> = ({ session }) => {
 	const getProfile = async () => {
 		try {
 			setLoading(true)
-			const { user } = session
 
 			let { data, error, status } = await supabase
 				.from('profiles')
 				.select(`username, website, avatar_url`)
-				.eq('id', user.id)
+				.eq('id', userId)
 				.single()
 
 			if (error && status !== 406) {
@@ -51,10 +50,9 @@ const Account: Component<Props> = ({ session }) => {
 
 		try {
 			setLoading(true)
-			const { user } = session
 
 			const updates = {
-				id: user.id,
+				id: userId,
 				username: username(),
 				website: website(),
 				avatar_url: avatarUrl(),
@@ -86,7 +84,7 @@ const Account: Component<Props> = ({ session }) => {
 						updateProfile(e)
 					}}
 				/>
-				<div>Email: {session.user.email}</div>
+				<div>Email: {userEmail}</div>
 				<div>
 					<label for="username">Name</label>
 					<input

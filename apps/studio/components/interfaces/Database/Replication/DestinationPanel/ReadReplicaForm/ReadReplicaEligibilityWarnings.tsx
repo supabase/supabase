@@ -133,7 +133,7 @@ export const ReadReplicaEligibilityWarnings = () => {
         </p>
         <div className="flex items-center gap-x-2 mt-2">
           <UpgradePlanButton
-            type="default"
+            variant="default"
             plan="Pro"
             addon="computeSize"
             source="read-replicas"
@@ -206,7 +206,7 @@ export const ReadReplicaEligibilityWarnings = () => {
           the spend cap first to allow overages before launching a replica.
         </p>
         <UpgradePlanButton
-          type="default"
+          variant="default"
           source="read-replicas"
           addon="spendCap"
           className="mt-2"
@@ -230,7 +230,7 @@ export const ReadReplicaEligibilityWarnings = () => {
               project is on an XL compute or higher.
             </p>
             <UpgradePlanButton
-              type="default"
+              variant="default"
               plan="Pro"
               addon="computeSize"
               source="read-replicas"

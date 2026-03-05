@@ -1,16 +1,16 @@
 import type { XYCoord } from 'dnd-core'
-import { ArrowRight, Key, Link, Lock, Lightbulb } from 'lucide-react'
+import { ArrowRight, Key, Lightbulb, Link, Lock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import {
   useColumnHasIndexSuggestion,
   useTableIndexAdvisor,
 } from '../../context/TableIndexAdvisorContext'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu/ColumnMenu'
 
@@ -21,6 +21,7 @@ export function ColumnHeader<R>({
   isEncrypted,
   format,
   foreignKey,
+  comment,
 }: ColumnHeaderProps<R>) {
   const ref = useRef<HTMLDivElement>(null)
   const columnIdx = column.idx
@@ -133,9 +134,18 @@ export function ColumnHeader<R>({
               </TooltipContent>
             </Tooltip>
           )}
-          <span className="sb-grid-column-header__inner__name" title={hoverValue}>
-            {column.name}
-          </span>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <span className="sb-grid-column-header__inner__name">{column.name}</span>
+            </TooltipTrigger>
+            {!!comment && (
+              <TooltipContent side="bottom" className="max-w-xs text-center">
+                {comment}
+              </TooltipContent>
+            )}
+          </Tooltip>
+
           <span className="sb-grid-column-header__inner__format">
             {columnFormat}
             {columnFormat === 'bytea' ? ` (hex)` : ''}

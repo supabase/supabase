@@ -1,17 +1,17 @@
 'use client'
 
+import { User2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   MetricCard,
+  MetricCardContent,
+  MetricCardDifferential,
   MetricCardHeader,
   MetricCardIcon,
   MetricCardLabel,
-  MetricCardContent,
-  MetricCardValue,
-  MetricCardDifferential,
   MetricCardSparkline,
+  MetricCardValue,
 } from 'ui-patterns/MetricCard'
-import { User2 } from 'lucide-react'
 
 export default function MetricsCardDemo() {
   const [data, setData] = useState<Array<{ value: number; timestamp: string }>>([])

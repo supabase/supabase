@@ -1,0 +1,66 @@
+---
+title: Realtime Cursor
+description: Real-time cursor sharing for collaborative applications
+---
+
+<div className="flex flex-row -space-x-px w-full">
+  <BlockPreview name="realtime-cursor-demo" isPair />
+  <BlockPreview name="realtime-cursor-demo" isPair />
+</div>
+
+## Installation
+
+<BlockItem
+  name="realtime-cursor-nuxtjs"
+  description="Renders realtime cursors from other users in a room."
+/>
+
+## Folder structure
+
+This block assumes that you have already installed a Supabase client for Nuxt from the previous step.
+
+<RegistryBlock itemName="realtime-cursor-nuxtjs" />
+
+## Introduction
+
+The Realtime Cursors component lets users share their cursor position with others in the same room—perfect for real-time collaboration. It handles all the setup and boilerplate for you, so you can add it to your app with minimal effort.
+
+**Features**
+
+- Broadcast cursor position to other users in the same room
+- Customizable cursor appearance
+- Presence detection (automatically joins/leaves users)
+- Low-latency updates using Supabase Realtime
+- Room-based isolation for scoped collaboration
+
+## Usage
+
+The Realtime Cursor component is designed to be used in a room. It can be used to build real-time collaborative applications. Add the `<RealtimeCursors />` component to your page and it will render realtime cursors from other users in the room.
+
+```html
+<script setup lang="ts">
+  import RealtimeCursors from '@/components/RealtimeCursors.vue'
+</script>
+
+<template>
+  <div class="w-full min-h-screen">
+    <RealtimeCursors roomName="macrodata_refinement_office" username="Mark Scout" />
+  </div>
+</template>
+```
+
+## Props
+
+| Prop       | Type     | Description                                                |
+| ---------- | -------- | ---------------------------------------------------------- |
+| `roomName` | `string` | Unique identifier for the shared room or session.          |
+| `username` | `string` | Name of the current user; used to track and label cursors. |
+
+## Further reading
+
+- [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
+- [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)
+
+### Smoother cursors
+
+While our Realtime Cursor component aims to keep things simple and lightweight, you may want to add smoother cursor animations for a more polished experience. Libraries like [perfect-cursors](https://github.com/steveruizok/perfect-cursors) can be integrated to add sophisticated interpolation between cursor positions. This is especially useful when dealing with network latency, as it creates fluid cursor movements even when position updates are received at longer intervals (e.g., every 50-80ms). The library handles the complex math of creating natural-looking cursor paths while maintaining performance.

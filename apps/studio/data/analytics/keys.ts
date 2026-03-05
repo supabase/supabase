@@ -150,8 +150,6 @@ export const analyticsKeys = {
         databaseIdentifier,
       },
     ] as const,
-  projectMetrics: (projectRef: string | undefined, { interval }: { interval?: string }) =>
-    ['projects', projectRef, 'project.metrics', { interval }] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
 

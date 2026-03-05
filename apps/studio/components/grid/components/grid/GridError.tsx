@@ -1,18 +1,44 @@
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useCallback } from 'react'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-export const GridError = ({ error }: { error?: any }) => {
-  const { filters } = useTableFilter()
+import { isFilterRelatedError } from './GridError.utils'
+import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { HighCostError } from '@/components/ui/HighQueryCost'
+import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { ResponseError } from '@/types'
+
+export const GridError = ({ error }: { error?: ResponseError | null }) => {
+  const { id: _id } = useParams()
+  const tableId = _id ? Number(_id) : undefined
+
+  const newFilterBarEnabled = useIsTableFilterBarEnabled()
+  const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
+  const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
   const { sorts } = useTableSort()
+
   const snap = useTableEditorTableStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+
+  const removeAllFilters = useCallback(() => {
+    if (newFilterBarEnabled) {
+      clearNewFilters()
+    } else {
+      clearOldFilters()
+    }
+  }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
+
+  if (!error) return null
 
   const tableEntityType = snap.originalTable?.entity_type
   const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
@@ -20,16 +46,32 @@ export const GridError = ({ error }: { error?: any }) => {
   const isForeignTableMissingVaultKeyError =
     isForeignTable && error?.message?.includes('query vault failed')
 
-  const isInvalidSyntaxError =
-    filters.length > 0 && error?.message?.includes('invalid input syntax')
+  const hasActiveFilters = oldFilters.length > 0 || newFilters.length > 0
+
+  const hasFilterRelatedError = hasActiveFilters && isFilterRelatedError(error?.message)
 
   const isInvalidOrderingOperatorError =
     sorts.length > 0 && error?.message?.includes('identify an ordering operator')
 
-  if (isForeignTableMissingVaultKeyError) {
+  const isHighCostError = error?.message.includes(COST_THRESHOLD_ERROR)
+
+  if (isHighCostError) {
+    return (
+      <HighCostError
+        error={error}
+        suggestions={[
+          'Remove any sorts or filters on unindexed columns, or',
+          'Create indexes for columns that you want to filter or sort on',
+        ]}
+        onSelectLoadData={() => {
+          if (!!tableId) tableEditorSnap.setTableToIgnorePreflightCheck(tableId)
+        }}
+      />
+    )
+  } else if (isForeignTableMissingVaultKeyError) {
     return <ForeignTableMissingVaultKeyError />
-  } else if (isInvalidSyntaxError) {
-    return <InvalidSyntaxError error={error} />
+  } else if (hasFilterRelatedError) {
+    return <FilterError removeAllFilters={removeAllFilters} />
   } else if (isInvalidOrderingOperatorError) {
     return <InvalidOrderingOperatorError error={error} />
   }
@@ -67,36 +109,27 @@ const ForeignTableMissingVaultKeyError = () => {
   )
 }
 
-const InvalidSyntaxError = ({ error }: { error?: any }) => {
-  const { onApplyFilters } = useTableFilter()
-
+const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => {
   return (
     <Admonition
-      type="warning"
+      type="note"
       className="pointer-events-auto"
-      title="Invalid input syntax provided in filter value(s)"
+      title="No results found — check your filter values"
     >
-      <p className="!mb-0">
-        Unable to retrieve results as the provided value in your filter(s) doesn't match it's column
-        data type.
+      <p className="!mb-4">
+        One or more of your filters may have a value or operator that doesn't match the column's
+        data type. Try updating or removing the filter.
       </p>
-      <p className="!mb-2">
-        Verify that your filter values are correct before applying the filters again.
-      </p>
-      <p className="text-sm text-foreground-lighter prose max-w-full !mb-4">
-        Error: <code className="text-code-inline">{error.message}</code>
-      </p>
-
-      <Button type="default" onClick={() => onApplyFilters([])}>
+      <Button type="default" onClick={removeAllFilters}>
         Remove filters
       </Button>
     </Admonition>
   )
 }
 
-const InvalidOrderingOperatorError = ({ error }: { error: any }) => {
+const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
   const { sorts, onApplySorts } = useTableSort()
-  const invalidDataType = (error?.message ?? '').split('type ').pop()
+  const invalidDataType = (error.message ?? '').split('type ').pop() ?? ''
   const formattedInvalidDataType = invalidDataType.includes('json')
     ? invalidDataType.toUpperCase()
     : invalidDataType
@@ -127,13 +160,13 @@ const InvalidOrderingOperatorError = ({ error }: { error: any }) => {
   )
 }
 
-const GeneralError = ({ error }: { error: any }) => {
+const GeneralError = ({ error }: { error: ResponseError }) => {
   const { filters } = useTableFilter()
 
   return (
     <AlertError
-      className="pointer-events-auto"
       error={error}
+      className="pointer-events-auto"
       subject="Failed to retrieve rows from table"
     >
       {filters.length > 0 && (

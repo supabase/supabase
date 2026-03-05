@@ -19,7 +19,7 @@
     "configcat-js": "^9.5.1",
     "dat.gui": "^0.7.9",
     "flags": "^4.0.0",
-    "lodash": "^4.17.21",
+    "lodash": "catalog:",
     "next-themes": "^0.3.0",
     "posthog-js": "^1.257.2",
     "react-use": "^17.4.0",

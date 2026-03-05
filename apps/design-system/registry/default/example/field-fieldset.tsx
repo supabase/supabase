@@ -1,11 +1,11 @@
 import { Input } from 'ui'
 import {
-  FieldSet,
-  FieldLegend,
-  FieldDescription,
   Field,
-  FieldLabel,
+  FieldDescription,
   FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
 } from 'ui/src/components/shadcn/ui/field'
 
 export default function FieldFieldset() {

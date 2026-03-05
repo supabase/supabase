@@ -111,7 +111,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId: bucketName })
-  const schema = wrapperInstance?.server_options
+  const schema = (wrapperInstance?.server_options ?? [])
     .find((x) => x.startsWith('supabase_target_schema'))
     ?.split('supabase_target_schema=')[1]
 

@@ -1,28 +1,37 @@
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
+import type { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import type { Organization } from 'types'
 import { Input } from 'ui'
 
 export const DeleteProjectModal = ({
   visible,
   onClose,
+  project: projectProp,
+  organization: organizationProp,
 }: {
   visible: boolean
   onClose: () => void
+  project?: OrgProject
+  organization?: Organization
 }) => {
   const router = useRouter()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: projectFromQuery } = useSelectedProjectQuery()
+  const { data: organizationFromQuery } = useSelectedOrganizationQuery()
+
+  // Use props if provided, otherwise fall back to hooks
+  const project = projectProp || projectFromQuery
+  const organization = organizationProp || organizationFromQuery
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -130,9 +139,7 @@ export const DeleteProjectModal = ({
       {!isFree && (
         <>
           <div className="space-y-1">
-            <h4 className="text-base">
-              Help us improve by sharing why you're deleting your project.
-            </h4>
+            <h4 className="text-base">What made you decide to delete your project?</h4>
           </div>
           <div className="space-y-4 pt-4">
             <div className="flex flex-wrap gap-2" data-toggle="buttons">

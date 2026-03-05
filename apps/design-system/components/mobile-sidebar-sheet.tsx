@@ -1,8 +1,9 @@
 'use client'
 
+import { ScrollArea, Sheet, SheetContent, SheetTitle } from 'ui'
+
 import { SideNavigation } from '@/components/side-navigation'
 import { useMobileSidebar } from '@/hooks/use-mobile-sidebar'
-import { Sheet, SheetContent, SheetTitle, ScrollArea } from 'ui'
 
 export function MobileSidebarSheet() {
   const { open, setOpen } = useMobileSidebar()

@@ -89,6 +89,38 @@ export const startCase = (string: string): string => {
  * @param options The options object
  * @returns Returns the new debounced function
  */
+/**
+ * Formats numbers into thousands (K) notation with intelligent decimal handling.
+ * Returns raw number string for values < 1000 to avoid "0K"/"0.xK" outputs.
+ * @param value The value to format (number, string, null, or undefined)
+ * @returns Formatted string (e.g., "999", "1K", "12.5K")
+ */
+export const kFormatter = (value: number | string | null | undefined): string => {
+  // Coerce to safe number, guarding against NaN
+  const num = Number(value ?? 0)
+  const safeNum = isNaN(num) ? 0 : num
+
+  // Early return for values less than 1000
+  if (safeNum < 1000) {
+    return String(Math.floor(safeNum))
+  }
+
+  const kFormat = Math.floor(safeNum / 1000)
+  const lastTwoDigits = safeNum % 1000
+
+  const decimalPart = Math.floor((lastTwoDigits % 100) / 10)
+  const hundreds = Math.floor(lastTwoDigits / 100)
+
+  const isAlmostNextThousand = decimalPart >= 8 && hundreds >= 9
+
+  const showDecimals =
+    (!isAlmostNextThousand && hundreds >= 1) || (hundreds === 0 && decimalPart >= 8)
+
+  return showDecimals
+    ? `${kFormat}.${decimalPart >= 8 ? hundreds + 1 : hundreds}K`
+    : `${isAlmostNextThousand ? kFormat + 1 : kFormat}K`
+}
+
 export const debounce = <T extends (...args: any[]) => any>(
   func: T,
   wait: number,

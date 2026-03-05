@@ -1,8 +1,8 @@
-import { cn } from 'ui'
-import SectionContainer from '../Layouts/SectionContainer'
-import { getSortedPosts } from '~/lib/posts'
 import Image from 'next/image'
 import Link from 'next/link'
+import { cn } from 'ui'
+import { getSortedPosts } from '~/lib/posts'
+import SectionContainer from '../Layouts/SectionContainer'
 
 interface PostGridProps {
   id?: string
@@ -31,10 +31,14 @@ function PostGrid({ id, className, header, subheader, posts }: PostGridProps) {
               className="border rounded-md flex flex-col relative overflow-hidden"
               key={post.slug}
             >
-              {post.thumb && (
+              {post.imgThumb && (
                 <div className="w-full aspect-video relative rounded-t-md dark:[mask-image:linear-gradient(to_bottom,_#000_0%,_#000_60%,_transparent_100%)]">
                   <Image
-                    src={`/images/blog/${post.thumb}`}
+                    src={
+                      post.imgThumb.startsWith('/') || post.imgThumb.startsWith('http')
+                        ? post.imgThumb
+                        : `/images/blog/${post.imgThumb}`
+                    }
                     alt={post.title || ''}
                     className="object-cover"
                     fill

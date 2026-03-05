@@ -13,9 +13,12 @@ const toBoolean = (value?: string) => {
   return normalized === 'true'
 }
 
+// Default service role key for local development
+const DEFAULT_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
+
 export const env = {
   STUDIO_URL: process.env.STUDIO_URL || 'http://localhost:8082',
-  API_URL: process.env.API_URL || 'https://localhost:8080',
+  API_URL: process.env.API_URL || 'http://127.0.0.1:54321',
 
   IS_PLATFORM: toBoolean(process.env.IS_PLATFORM || 'false'),
   EMAIL: process.env.EMAIL,
@@ -40,6 +43,9 @@ export const env = {
 
   IS_APP_RUNNING_ON_LOCALHOST:
     process.env.STUDIO_URL?.includes('localhost') || process.env.STUDIO_URL?.includes('127.0.0.1'),
+
+  
+  SERVICE_ROLE_KEY: process.env.SERVICE_ROLE_KEY || DEFAULT_SERVICE_ROLE_KEY,
 }
 
 export const STORAGE_STATE_PATH = path.join(import.meta.dirname, './playwright/.auth/user.json')

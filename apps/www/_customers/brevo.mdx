@@ -1,0 +1,219 @@
+---
+name: Brevo
+title: How Brevo built AI-powered sales workflows on Supabase, without waiting for engineering
+# Use meta_title to add a custom meta title. Otherwise it defaults to '{name} | Supabase Customer Stories':
+# meta_title:
+description: Brevo's Revenue Operations team built three production AI workflows connecting their CRM to Dust's AI agents via Supabase MCP—without a single engineering ticket.
+# Use meta_description to add a custom meta description. Otherwise it defaults to {description}:
+meta_description: How Brevo's RevOps team built AI-powered sales workflows with Supabase and Dust, connecting their CRM to AI agents in days—without engineering.
+author: prashant
+author_title: Prashant Sridharan
+author_url: https://github.com/CoolAssPuppy
+author_image_url: https://avatars.githubusercontent.com/u/914007?v=4
+logo: /images/customers/logos/brevo.svg
+logo_inverse: /images/customers/logos/light/brevo.svg
+tags:
+  - supabase
+date: '2025-12-18'
+company_url: https://www.brevo.com
+misc: [{ label: 'Founded', text: 'France' }]
+about: Paris-based Omnichannel Customer Engagement platform used by over 600,000 businesses worldwide. Email marketing, SMS, WhatsApp, CRM, marketing automation. Brevo surpassed $218M in ARR in 2025 and hit unicorn status with a $1B valuation.
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['saas', 'ai']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'enterprise'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'Europe'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database']
+---
+
+<Quote
+  img="alexandre-le-goupil-brevo.jpeg"
+  caption="Alexandre Le Goupil, Revenue Systems and AI, Brevo"
+>
+  Our AI agents are only as good as the data they can reach. Supabase gave them access to our entire
+  CRM, stored what they produced, and never got in the way. It is the quiet part of our stack that
+  makes everything else work.
+</Quote>
+
+[Brevo](https://www.brevo.com) is a Paris-based Omnichannel Customer Engagement platform used by over 600,000 businesses worldwide. Email marketing, SMS, WhatsApp, CRM, marketing automation. Brevo surpassed $218M in ARR in 2025 and hit unicorn status with a $1B valuation to take on HubSpot and Salesforce.
+
+## A CRM full of intelligence, locked away from AI
+
+Brevo's sales organization prospects across dozens of industries. E-commerce, retail, SaaS, financial services. For every prospect call, a rep needs context: which existing Brevo customers are in the same industry? What use cases worked? Has this prospect talked to Brevo before? How far did they get?
+
+All of that intelligence sits in the CRM. Contacts, Deals, Companies. Years of account history.
+
+Alexandre Le Goupil runs Revenue Systems and AI for Brevo's sales team. His group had adopted **[Dust](https://dust.tt), an AI agent platform**, and the agents were already good at research, reasoning, and writing. But the CRM was completely out of reach, and that data was what would make the agents' output truly actionable.
+
+<Quote
+  img="alexandre-le-goupil-brevo.jpeg"
+  caption="Alexandre Le Goupil, Head of Revenue Systems and AI, Brevo"
+>
+  Salespeople would come to me and ask for a list of our best e-commerce customers before a call. Or
+  they would need to know if we had history with a prospect's company. That context was all in the
+  CRM, but our AI agents were completely blind to it. I needed to connect those two worlds.
+</Quote>
+
+Other teams at Brevo ran their analytics on BigQuery, Snowflake, and Databricks. None of those were built for what Alexandre needed: a database that AI agents could read from and write to in real time, through a standard protocol, without a custom integration for every workflow.
+
+## Why Supabase
+
+Alexandre found his answer in the [Supabase MCP server](/docs/guides/getting-started/mcp). MCP (Model Context Protocol) gives AI agents a structured way to interact with databases. Supabase ships one out of the box. That meant a direct connection between Dust's AI agents and a Postgres database, with read and write permissions controlled at the tool level.
+
+<Quote
+  img="https://github.com/LeandreLeBizec.png"
+  caption="Léandre Le Bizec, Dust engineering team"
+>
+  Supabase shipping a remote MCP server means any Dust agent can connect to it instantly, with read
+  and write access, no custom integration needed. That is exactly the model we want to see from data
+  platforms: natively agent-ready, so teams can focus on building workflows instead of plumbing.
+</Quote>
+
+According to Dust's engineering team, Supabase was the first data platform where they enabled both read and write capabilities through natural language. Snowflake has since followed with its own MCP, and Databricks is next. But Supabase got there first, and for teams like Alexandre's that need to iterate fast with AI, that head start mattered.
+
+<Quote
+  img="alexandre-le-goupil-brevo.jpeg"
+  caption="Alexandre Le Goupil, Head of Revenue Systems and AI, Brevo"
+>
+  BigQuery and Snowflake are great for analytics. But I needed something an AI agent could query
+  live, in the middle of a conversation. Supabase gave me Postgres with an MCP server ready to go.
+  That was what decided it.
+</Quote>
+
+Brevo actually started with a custom MCP connection before Dust launched its official Supabase integration in June 2025. When the official version shipped, they migrated. The fact that they went from a scrappy custom setup to the supported integration says something about commitment: this was not an experiment.
+
+The team is Revenue Operations, not database engineering. Speed mattered. Alexandre connected Supabase to Dust in days. He defined his tables, wrote descriptions of every field so the LLM would know what each one meant, and started testing.
+
+<Quote
+  img="alexandre-le-goupil-brevo.jpeg"
+  caption="Alexandre Le Goupil, Head of Revenue Systems and AI, Brevo"
+>
+  Connecting Supabase was the easy part. The real work was writing good documentation for the AI,
+  telling it what each field means, which tables to query for which questions. Once we got that
+  right, everything clicked.
+</Quote>
+
+The Supabase MCP was well-documented and stable, and the integration was live on the platform level within minutes. Alexandre's investment in that documentation is what separates a good Dust agent from a great one.
+
+## Three workflows in production
+
+### Finding reference customers in seconds
+
+Brevo's sales reps now ask a Dust agent: "Find me the top three e-commerce customers we can reference for this prospect." The agent queries the CRM mirror in Supabase, pulls matching customers by industry, deal size, and product usage, and suggests a specific approach angle.
+
+Before, that request went to RevOps. Someone would pull a report, filter it, and send it back. Fifteen minutes per request, minimum.
+
+<Quote
+  img="alexandre-le-goupil-brevo.jpeg"
+  caption="Alexandre Le Goupil, Head of Revenue Systems and AI, Brevo"
+>
+  That workflow alone changed how reps prepare for calls. They get reference customers, account
+  context, and a suggested angle in seconds. It freed up hours of my team's time every week.
+</Quote>
+
+### Personalized emails for every prospect
+
+This is the most ambitious workflow. BDRs select contacts to prospect for the week. That selection kicks off a Dust conversation, which pulls the prospect's full history from Supabase: prior contact, pipeline stage, products discussed, engagement with Brevo's content.
+
+The agent also grabs context from the web. LinkedIn profiles, firmographic data, company news. Then it routes to a specialized sub-agent based on the prospect type. Someone who downloaded a white paper goes to a "Gated Asset" agent. A cold e-commerce lead goes to an industry-specific agent. Each sub-agent writes three emails tailored to that person's role, seniority, and history.
+
+The emails come back as structured JSON and HTML. Dust writes them directly to Supabase. Brevo's CRM then pulls those emails into multi-channel sales sequences: email, phone, LinkedIn.
+
+<Quote
+  img="alexandre-le-goupil-brevo.jpeg"
+  caption="Alexandre Le Goupil, Head of Revenue Systems and AI, Brevo"
+>
+  We used to send the same generic email to every e-commerce prospect. Now every email reflects who
+  this person is and what we know about them. Supabase holds the context going in and stores the
+  output coming out. It is the connective tissue between our CRM and our AI.
+</Quote>
+
+The result is an 80% reduction in time spent on email personalization, from thirty minutes of research and writing per prospect down to minutes.
+
+The team also built anti-hallucination guardrails into their prompts. A sales email with a fabricated customer name or made-up statistic destroys trust. By grounding every agent in structured data from Supabase, they reduced that risk. The prompts enforce strict rules: only reference data that exists in the database.
+
+### Personalized landing pages on demand
+
+Brevo's marketing team uses the same architecture for lead generation. A visitor enters their email and company name on a [landing page](https://www.brevo.com/tools/relationship-plan?utm_medium=web-external&utm_source=CTA_dust_blog&utm_campaign=en_supabase_blog_202602). The data goes into Supabase and triggers a Dust agent that generates a complete marketing plan for that company: channel recommendations, campaign ideas, timelines. The output lands back in Supabase and renders as a unique page for that visitor.
+
+<Quote
+  img="alexandre-le-goupil-brevo.jpeg"
+  caption="Alexandre Le Goupil, Head of Revenue Systems and AI, Brevo"
+>
+  Someone fills out a form and gets a [custom marketing
+  plan](https://www.brevo.com/tools/relationship-plan?utm_medium=web-external&utm_source=CTA_dust_blog&utm_campaign=en_supabase_blog_202602)
+  in seconds. Data goes into Supabase, the AI builds the plan, the result comes back through
+  Supabase as a page. We kept the whole thing as simple as we could.
+</Quote>
+
+## Set it up, never touch it again
+
+The part of this story that stands out most is what happened after launch. Nothing.
+
+Alexandre's team connected Supabase, documented their schema, tested the workflows, and moved on. They have not had to troubleshoot, reconfigure, or debug the connection since.
+
+<Quote
+  img="alexandre-le-goupil-brevo.jpeg"
+  caption="Alexandre Le Goupil, Head of Revenue Systems and AI, Brevo"
+>
+  We set it up, it worked, and we have not gone back. It just runs. That is exactly what you want
+  from infrastructure when you are a small ops team trying to ship fast.
+</Quote>
+
+Dust's data backs this up. Since the official integration launched in June 2025, Brevo has executed over 2,500 actions through the Supabase MCP. That includes parallel batch runs where dozens of AI conversations query and write to the database at the same time.
+
+<Quote
+  img="https://github.com/LeandreLeBizec.png"
+  caption="Léandre Le Bizec, Dust engineering team"
+>
+  Brevo runs parallel batch conversations making Supabase queries, and it works smoothly. The MCP
+  has been rock-solid since deployment with no incidents.
+</Quote>
+
+Because Supabase is Postgres under the hood, extending it is simple. A new use case means a new table and an updated agent prompt. No re-architecture, no new integrations.
+
+## An ops team that ships like engineers
+
+Brevo's Revenue Operations team is not an engineering team. They do not write backend services or manage infrastructure. But with Supabase and [Dust](https://dust.tt), they built three production AI workflows that run daily across Sales and Marketing, without filing a single ticket with engineering.
+
+This is the pattern Supabase sees across enterprise innovation teams: when you give non-engineering builders a production-grade backend with AI-native tooling, they stop waiting and start shipping.
+
+<Quote
+  img="https://github.com/LeandreLeBizec.png"
+  caption="Léandre Le Bizec, Dust engineering team"
+>
+  What makes Supabase particularly exciting is its agility. It is lighter and faster to iterate with
+  than traditional data platforms. For AI use cases, this speed matters: storing agent outputs,
+  syncing workflows, generating content that feeds directly into production systems. It is perfectly
+  suited for teams that need to experiment rapidly with AI.
+</Quote>
+
+## Supabase is the platform for building agentic systems
+
+Dust's engineering team points to three things that make Supabase work for agents. The remote MCP server is production-grade and easy to onboard. Read and write access closes the agentic loop, so agents produce durable outputs, not just answers. And non-technical teams own the entire data layer themselves, no engineering bottleneck. For agentic use cases where iteration speed is the advantage, that is a structural edge.
+
+<Quote
+  img="https://github.com/LeandreLeBizec.png"
+  caption="Léandre Le Bizec, Dust engineering team"
+>
+  What teams like Brevo's gain is not just speed, it is focus. When agents handle the data pulling,
+  the personalization, the logging, the people can spend their time where it actually matters:
+  strategy, relationships, decisions. That is the version of AI we are building toward.
+</Quote>
+
+## What comes next
+
+Alexandre estimates that 30% or more of the internal support requests his team fields via Slack could be answered automatically. The data already exists across Notion, Slack history, and their Supabase-backed CRM mirror. The team is building a Slack assistant that handles first-level responses to internal sales support tickets.
+
+They are also scaling the email generation workflow to handle thousands of prospects in a single batch run.
+
+<Quote
+  img="alexandre-le-goupil-brevo.jpeg"
+  caption="Alexandre Le Goupil, Head of Revenue Systems and AI, Brevo"
+>
+  We started with one use case. Now we have three in production and more on the way. Every time we
+  have a new idea, the first question is: what table do we need in Supabase? That is how fast we can
+  move now.
+</Quote>

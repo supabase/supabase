@@ -4,7 +4,6 @@ import type { NextPageWithLayout } from 'types'
 import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
 import { AwsMarketplaceLinkExistingOrg } from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceLinkExistingOrg'
 import AwsMarketplaceOnboardingPlaceholder from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboardingPlaceholder'
-import { useCloudMarketplaceOnboardingInfoQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
 import LinkAwsMarketplaceLayout from '../components/layouts/LinkAwsMarketplaceLayout'
 import {
   ScaffoldContainer,
@@ -13,17 +12,51 @@ import {
   ScaffoldTitle,
 } from '../components/layouts/Scaffold'
 import { useOrganizationsQuery } from '../data/organizations/organizations-query'
+import { useCloudMarketplaceContractLinkingEligibilityQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
+import AwsMarketplaceContractNotLinkable from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceContractNotLinkable'
 
 const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
   const {
     query: { buyer_id: buyerId },
   } = useRouter()
 
-  const { data: organizations, isFetched: isOrganizationsFetched } = useOrganizationsQuery()
-  const { data: onboardingInfo, isPending: isLoadingOnboardingInfo } =
-    useCloudMarketplaceOnboardingInfoQuery({
-      buyerId: buyerId as string,
-    })
+  const {
+    data: organizations,
+    isFetched: isOrganizationsFetched,
+    isSuccess: wasOrganizationsRequestSuccessful,
+  } = useOrganizationsQuery()
+
+  const {
+    data: contractLinkingEligibility,
+    isFetched: isContractLinkingEligibilityFetched,
+    isSuccess: wasEligibilityRequestSuccessful,
+  } = useCloudMarketplaceContractLinkingEligibilityQuery({
+    buyerId: buyerId as string,
+  })
+
+  const renderContent = () => {
+    if (!isOrganizationsFetched || !isContractLinkingEligibilityFetched) {
+      return <AwsMarketplaceOnboardingPlaceholder />
+    }
+
+    if (!wasOrganizationsRequestSuccessful || !wasEligibilityRequestSuccessful) {
+      return <p className="mt-4">Error loading AWS Marketplace setup page. Try again later.</p>
+    }
+
+    if (!contractLinkingEligibility.eligibility.is_eligible) {
+      return (
+        <AwsMarketplaceContractNotLinkable
+          reason={contractLinkingEligibility.eligibility.reasons[0]}
+        />
+      )
+    }
+
+    if (organizations?.length) {
+      return <AwsMarketplaceLinkExistingOrg organizations={organizations} />
+    }
+
+    return <AwsMarketplaceCreateNewOrg />
+  }
 
   return (
     <ScaffoldContainer>
@@ -31,17 +64,7 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
         <ScaffoldTitle>AWS Marketplace Setup</ScaffoldTitle>
       </ScaffoldHeader>
       <ScaffoldDivider />
-      {!isOrganizationsFetched ? (
-        <AwsMarketplaceOnboardingPlaceholder />
-      ) : organizations?.length ? (
-        <AwsMarketplaceLinkExistingOrg
-          organizations={organizations}
-          onboardingInfo={onboardingInfo}
-          isLoadingOnboardingInfo={isLoadingOnboardingInfo}
-        />
-      ) : (
-        <AwsMarketplaceCreateNewOrg onboardingInfo={onboardingInfo} />
-      )}
+      {renderContent()}
     </ScaffoldContainer>
   )
 }

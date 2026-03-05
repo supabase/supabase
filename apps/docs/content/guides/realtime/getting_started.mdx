@@ -197,7 +197,7 @@ let channel = supabase.channel("room:lobby:messages") {
 
 ```python
 # Create a channel with a descriptive topic name
-channel = supabase.channel('room:lobby:messages', params={config={private= True }})
+channel = supabase.channel('room:lobby:messages', params={'config': {'private': True }})
 ```
 
 </TabPanel>
@@ -501,14 +501,14 @@ BEGIN
   -- Send custom notification when new message is created
   IF TG_OP = 'INSERT' THEN
     PERFORM realtime.send(
-      'room:' || NEW.room_id::text || ':notifications',
-      'message_created',
       jsonb_build_object(
         'message_id', NEW.id,
         'user_id', NEW.user_id,
         'room_id', NEW.room_id,
         'created_at', NEW.created_at
       ),
+      'message_created',
+      'room:' || NEW.room_id::text || ':notifications',
       true  -- private channel
     );
   END IF;
@@ -688,7 +688,7 @@ Now that you understand the basics, dive deeper into each feature:
 
 - **[Architecture](/docs/guides/realtime/architecture)** - Understand how Realtime works under the hood
 - **[Benchmarks](/docs/guides/realtime/benchmarks)** - Performance characteristics and scaling considerations
-- **[Quotas](/docs/guides/realtime/quotas)** - Usage limits and best practices
+- **[Limits](/docs/guides/realtime/limits)** - Usage limits and best practices
 
 ### Integration guides
 

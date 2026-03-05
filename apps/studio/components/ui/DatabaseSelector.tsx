@@ -1,35 +1,32 @@
+import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
+import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
 import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
-
-import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { useShowNewReplicaPanel } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/use-show-new-replica'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
-import { timeout } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   ButtonProps,
+  cn,
+  Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 
 interface DatabaseSelectorProps {
@@ -38,8 +35,8 @@ interface DatabaseSelectorProps {
   additionalOptions?: { id: string; name: string }[]
   buttonProps?: ButtonProps
   onSelectId?: (id: string) => void // Optional callback
-  portal?: boolean
   className?: string
+  align?: 'start' | 'end'
 }
 
 export const DatabaseSelector = ({
@@ -48,14 +45,13 @@ export const DatabaseSelector = ({
   additionalOptions = [],
   onSelectId = noop,
   buttonProps,
-  portal = true,
+  align = 'end',
   className,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
-  const { setShowNewReplicaPanel } = useShowNewReplicaPanel()
 
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
@@ -73,6 +69,8 @@ export const DatabaseSelector = ({
   const formattedDatabaseId = formatDatabaseID(selectedDatabaseId ?? '')
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
+
+  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
 
   useEffect(() => {
     if (_selectedDatabaseId) state.setSelectedDatabaseId(_selectedDatabaseId)
@@ -118,7 +116,7 @@ export const DatabaseSelector = ({
           </Button>
         </div>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end" portal={portal}>
+      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align={align}>
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             {additionalOptions.length > 0 && (
@@ -215,22 +213,16 @@ export const DatabaseSelector = ({
                   className="cursor-pointer w-full"
                   onSelect={() => {
                     setOpen(false)
-                    router.push(`/project/${projectRef}/settings/infrastructure`)
+                    router.push(newReplicaURL)
                   }}
                   onClick={() => setOpen(false)}
                 >
                   <Link
-                    href={`/project/${projectRef}/settings/infrastructure`}
+                    href={newReplicaURL}
                     onClick={async () => {
                       setOpen(false)
                       // [Joshen] This is used in the Connect UI which is available across all pages
                       setShowConnect(false)
-
-                      // [Joshen] Adding a short timeout to compensate for the shift in focus
-                      // the replica panel from a "portal" based component (e.g dialog, sheet, dropdown, etc)
-                      // Although I'd prefer if there's a better way to resolve this
-                      await timeout(50)
-                      setShowNewReplicaPanel(true)
                     }}
                     className="w-full flex items-center gap-2"
                   >

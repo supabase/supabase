@@ -1,18 +1,17 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
+import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import 'react-native-reanimated'
 
-import { SplashScreenController } from '@/components/splash-screen-controller';
+import { SplashScreenController } from '@/components/splash-screen-controller'
 
-import { useAuthContext } from '@/hooks/use-auth-context';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import AuthProvider from '@/providers/auth-provider';
+import { useAuthContext } from '@/hooks/use-auth-context'
+import { useColorScheme } from '@/hooks/use-color-scheme'
+import AuthProvider from '@/providers/auth-provider'
 
 // Separate RootNavigator so we can access the AuthContext
 function RootNavigator() {
-  const { isLoggedIn } = useAuthContext();
+  const { isLoggedIn } = useAuthContext()
 
   return (
     <Stack>
@@ -24,20 +23,11 @@ function RootNavigator() {
       </Stack.Protected>
       <Stack.Screen name="+not-found" />
     </Stack>
-  );
+  )
 }
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+  const colorScheme = useColorScheme()
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -47,6 +37,5 @@ export default function RootLayout() {
         <StatusBar style="auto" />
       </AuthProvider>
     </ThemeProvider>
-  );
+  )
 }
-  

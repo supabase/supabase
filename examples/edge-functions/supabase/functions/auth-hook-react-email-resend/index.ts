@@ -6,7 +6,7 @@ import { MagicLinkEmail } from './_templates/magic-link.tsx'
 import { SignUpEmail } from './_templates/sign-up.tsx'
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string)
-const hookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string
+const hookSecret = (Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string).replace('v1,whsec_', '')
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') {

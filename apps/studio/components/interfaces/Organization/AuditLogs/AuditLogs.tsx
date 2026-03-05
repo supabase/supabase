@@ -76,6 +76,7 @@ export const AuditLogs = () => {
     isSuccess,
     isError,
     isRefetching,
+    fetchStatus,
     refetch,
   } = useOrganizationAuditLogsQuery(
     {
@@ -140,6 +141,9 @@ export const AuditLogs = () => {
       }
     })
 
+  const shouldShowLoadingState =
+    (isLoading && fetchStatus !== 'idle') || isLoadingPermissions || isLoadingEntitlements
+
   // This feature depends on the subscription tier of the user.
   // The API limits the logs to maximum of 62 days and 5 minutes so when the page is
   // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
@@ -159,7 +163,7 @@ export const AuditLogs = () => {
 
   if (isLogsNotAvailableBasedOnPlan) {
     return (
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection isFullWidth>
           <UpgradeToPro
             plan="Team"
@@ -175,7 +179,7 @@ export const AuditLogs = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection isFullWidth>
           <div className="space-y-4 flex flex-col">
             {showFilters && (
@@ -256,7 +260,7 @@ export const AuditLogs = () => {
               </div>
             )}
 
-            {isLoading || isLoadingPermissions || isLoadingEntitlements ? (
+            {shouldShowLoadingState ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />

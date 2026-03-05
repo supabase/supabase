@@ -234,7 +234,7 @@ test.describe.serial('RLS Policies', () => {
       // Hover the badge to verify the tooltip explains the risk
       await unrestrictedBadge.hover()
       await expect(
-        page.getByText(/Data is publicly accessible via API/i),
+        page.getByText(/This table can be accessed by anyone via the Data API as RLS is disabled/i),
         'Tooltip should describe unrestricted public access when RLS is disabled'
       ).toBeVisible({ timeout: 10000 })
     })

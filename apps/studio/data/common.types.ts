@@ -1,4 +1,4 @@
 export type ConnectionVars = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }

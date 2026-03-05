@@ -1,0 +1,84 @@
+---
+title = "'Why Supabase Edge Functions cannot provide static egress IPs for allow listing'"
+topics = [ "auth", "functions", "platform", "self-hosting" ]
+keywords = []
+database_id = "99b56e92-62f2-4602-8e13-d38caf7aff4c"
+---
+
+When trying to establish secure connections from Supabase Edge Functions to external services, you might encounter difficulties with traditional IP allow listing. This guide explains why this problem occurs and provides various solutions to address it.
+
+## What are egress IP addresses?
+
+An **Egress IP address** is the public IP address from which network traffic originates when leaving a network or service. When an application or a serverless function connects to an external third-party service, the third-party service sees the connection coming from this Egress IP.
+
+## What is CIDR?
+
+**CIDR (Classless Inter-Domain Routing)** is a method for efficiently allocating IP addresses and routing IP packets. It allows IP addresses to be grouped into blocks using a notation like `[IP]/prefix_length` (e.g., `192.168.1.0/24`). Allow listing based on CIDR ranges typically grants access to all IP addresses within a specified block.
+
+## Understanding Supabase Edge Functions and the problem
+
+**Supabase Edge Functions** are serverless functions that run globally, close to your users, powered by Deno Deploy. They are designed for low-latency execution and adhere to "serverless" and "edge-first" principles:
+
+- **Serverless:** The underlying infrastructure is dynamically managed by the cloud provider. Developers don't directly manage servers; they deploy their code, and the platform handles execution. This means Edge Functions do not run on a single, dedicated server.
+- **Edge-first:** They are deployed on a globally distributed network. This ensures they execute geographically close to your users, minimizing latency and improving performance.
+
+Due to their serverless and globally distributed nature, Supabase Edge Functions do not originate from a single static IP address or a small, stable range of IPs. This prevents the assignment of fixed egress IP addresses necessary for traditional network-level allow listing.
+
+## Problem summary
+
+Because Supabase Edge Functions lack static or stable egress IP addresses, standard outbound calls from an Edge Function to a service that requires IP allow listing (e.g., specifying an IPv4 CIDR range like `[IP]/24`) will likely be blocked.
+
+## Solutions for allow listing external services
+
+This section details the approaches to enable secure connections from your Edge Functions.
+
+### Solution 1: Use an outbound proxy (recommended)
+
+This is the standard and recommended solution for connecting to third-party services that you do not control but which require a static IP address for allow listing.
+
+- **How it Works:** Instead of your Edge Function directly connecting to the third-party service, you route all its requests through an intermediary "outbound proxy" server. This proxy server is configured with a static public IP address.
+- **Implementation:**
+  1.  Deploy a small, dedicated instance (for example, an AWS EC2 instance or similar cloud VM) with a fixed egress IP. This instance will act as your gateway or proxy.
+  2.  Configure your Supabase Edge Function to route its outbound requests through this proxy server.
+  3.  Allow list the static IP address of your proxy server on the external third-party service.
+- **Benefit:** All traffic from your Edge Function will appear to originate from the proxy's static IP, satisfying the allow listing requirement of the external service.
+
+### Solution 2: Header-based authentication (best for servers you control)
+
+If you own or control the destination server, you can shift your security strategy from the network layer to the application layer. Instead of relying on IP addresses for authentication, you use a shared secret.
+
+- **What are Application Layer and Network Layer Security?**
+  - **Network Layer Security:** Filters traffic based on originating IP addresses, operating at a lower level of the network stack. IP allow listing is an example.
+  - **Application Layer Security:** Authenticates requests based on credentials or secrets embedded within the application's communication (like HTTP headers), operating at a higher level of the network stack.
+- **How it Works:**
+  1.  **Generate a Secret:** Create a unique, random secret token.
+  2.  **Store the Secret:** Store this token securely within your Supabase project (e.g., using Supabase Secrets, like `supabase secrets set CUSTOM_AUTH_TOKEN=your_random_string`).
+  3.  **Edge Function Configuration:** In your Edge Function, retrieve this secret token (e.g., `const token = Deno.env.get("CUSTOM_AUTH_TOKEN");`).
+  4.  **Send Request:** Include the secret token in a custom HTTP header with every request to your destination server.
+      ```javascript
+      await fetch('https://api.example.com/data', {
+        method: 'POST',
+        headers: {
+          'X-Custom-Auth': token, // Example custom header carrying the secret
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: 'example',
+        }),
+      })
+      ```
+  5.  **Destination Server Configuration:** On your destination server, configure your middleware or application logic to:
+      - Inspect incoming requests for the presence and correctness of this custom header and its secret token.
+      - Reject any request that does not carry the correct secret token.
+- **Benefit:** This creates a "virtual allow list" at the application level, effectively controlling access without relying on static IP addresses.
+
+### Solution 3: Self-hosting the edge runtime
+
+This solution is for scenarios with extremely strict security policies (e.g., government or health data regulations) that might forbid the use of proxies or secret-based allow listing for compliance reasons.
+
+- **How it Works:** Supabase Edge Functions are built on the open-source Edge Runtime. You have the option to deploy this runtime environment yourself.
+- **Implementation:**
+  1.  Deploy the open-source Edge Runtime on your own Virtual Private Server (VPS) or similar infrastructure.
+  2.  Ensure your VPS has a static IP address that you can control and allow list.
+- **Benefit:** This approach gives you full control over the network environment, including the ability to assign and manage static IP addresses, while still leveraging the Deno developer experience for your functions.
+- **Further Reading:** More details can typically be found in documentation or blog posts on self-hosted Deno functions.

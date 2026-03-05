@@ -1,8 +1,9 @@
 'use client'
 
-import { type ComponentProps, Fragment, type HTMLAttributes, type ReactNode, useRef } from 'react'
+import { Fragment, useRef, type ComponentProps, type HTMLAttributes, type ReactNode } from 'react'
 import { cn, ScrollArea, ScrollViewport } from 'ui'
 import { removeAnchor } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
+
 import type { TOCItemType } from './server/get-toc'
 import * as Primitive from './toc-primitive'
 import { TocThumb } from './toc-thumb'

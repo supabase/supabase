@@ -1,5 +1,6 @@
 // @ts-ignore
 import { ChevronRight } from 'lucide-react'
+
 import BreadcrumbStyle from './Breadcrumb.module.css'
 
 interface Props {

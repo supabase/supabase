@@ -20,6 +20,8 @@ const buckets = [
   },
 ]
 
+// Studio: See also createNavigationHandler in apps/studio/lib/navigation.ts
+// It handles all of the below, plus modifier clicks and middle mouse button clicks.
 const handleBucketNavigation = (
   bucketId: string,
   event: React.MouseEvent | React.KeyboardEvent

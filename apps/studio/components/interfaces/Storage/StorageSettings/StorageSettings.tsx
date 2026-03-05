@@ -5,7 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
@@ -36,6 +36,7 @@ import {
   Select_Shadcn_,
   Switch,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
@@ -83,7 +84,7 @@ export const StorageSettings = () => {
   const {
     data: config,
     error,
-    isPending: isLoading,
+    isPending: isLoadingProjectStorageConfig,
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
@@ -103,17 +104,28 @@ export const StorageSettings = () => {
   const shouldAutoValidateBucketLimits = sizeLimitCheckCondition === 'auto'
 
   const { data: organization } = useSelectedOrganizationQuery()
-  const { getEntitlementNumericValue, isEntitlementUnlimited } =
-    useCheckEntitlements('storage.max_file_size')
-  const isFreeTier = organization?.plan.id === 'free'
+  const {
+    getEntitlementNumericValue,
+    isEntitlementUnlimited,
+    isLoading: isLoadingMaxFileSizeEntitlement,
+  } = useCheckEntitlements('storage.max_file_size')
+  const { hasAccess: hasAccessToFileSizeConfiguration, isLoading: isLoadingFileSizeConfigurable } =
+    useCheckEntitlements('storage.max_file_size.configurable')
+  const {
+    hasAccess: hasAccessToImageTransformations,
+    isLoading: isLoadingImageTransformationEntitlement,
+  } = useCheckEntitlements('storage.image_transformations')
+
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
+  const hasLimitedStorageAccess =
+    !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
   const [isUpdating, setIsUpdating] = useState(false)
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
     unit: StorageSizeUnits.MB,
-    imageTransformationEnabled: !isFreeTier,
+    imageTransformationEnabled: false,
   })
 
   const maxBytes = useMemo(() => {
@@ -124,6 +136,12 @@ export const StorageSettings = () => {
     }
   }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
 
+  const isLoading =
+    isLoadingProjectStorageConfig ||
+    isLoadingPermissions ||
+    isLoadingMaxFileSizeEntitlement ||
+    isLoadingFileSizeConfigurable ||
+    isLoadingImageTransformationEntitlement
   const FormSchema = z
     .object({
       fileSizeLimit: z.coerce.number(),
@@ -217,10 +235,11 @@ export const StorageSettings = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && config) {
+    if (isSuccess && config && !isLoading) {
       const { fileSizeLimit, features } = config
       const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-      const imageTransformationEnabled = features?.imageTransformation?.enabled ?? !isFreeTier
+      const imageTransformationEnabled =
+        features?.imageTransformation?.enabled ?? hasAccessToImageTransformations
 
       setInitialValues({
         fileSizeLimit: value,
@@ -236,14 +255,20 @@ export const StorageSettings = () => {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, config])
+  }, [isSuccess, config, isLoading, hasAccessToImageTransformations])
 
   return (
     <PageContainer>
       <PageSection>
         <PageSectionContent className="flex flex-col gap-y-8">
           <Form_Shadcn_ {...form}>
-            {isLoading || isLoadingPermissions ? (
+            {!IS_PLATFORM ? (
+              <Admonition
+                type="default"
+                title="Storage settings are not available for self-hosted projects"
+                description="Storage settings are only available for Supabase Platform projects."
+              />
+            ) : isLoading ? (
               <GenericSkeletonLoader />
             ) : (
               <>
@@ -289,7 +314,9 @@ export const StorageSettings = () => {
                                 <FormControl_Shadcn_>
                                   <Switch
                                     size="large"
-                                    disabled={isFreeTier}
+                                    disabled={
+                                      !hasAccessToImageTransformations || !canUpdateStorageSettings
+                                    }
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                   />
@@ -337,7 +364,10 @@ export const StorageSettings = () => {
                                         form.clearErrors('fileSizeLimit')
                                       }}
                                       className="w-32 rounded-r-none border-r-0"
-                                      disabled={isFreeTier || !canUpdateStorageSettings}
+                                      disabled={
+                                        !hasAccessToFileSizeConfiguration ||
+                                        !canUpdateStorageSettings
+                                      }
                                     />
                                     <FormField_Shadcn_
                                       control={form.control}
@@ -349,7 +379,10 @@ export const StorageSettings = () => {
                                             unitField.onChange(val)
                                             form.clearErrors('fileSizeLimit')
                                           }}
-                                          disabled={isFreeTier || !canUpdateStorageSettings}
+                                          disabled={
+                                            !hasAccessToFileSizeConfiguration ||
+                                            !canUpdateStorageSettings
+                                          }
                                         >
                                           <SelectTrigger_Shadcn_ className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
                                             <SelectValue_Shadcn_ placeholder="Choose a prefix">
@@ -360,7 +393,7 @@ export const StorageSettings = () => {
                                             {Object.values(StorageSizeUnits).map((unit: string) => (
                                               <SelectItem_Shadcn_
                                                 key={unit}
-                                                disabled={isFreeTier}
+                                                disabled={!hasAccessToFileSizeConfiguration}
                                                 value={unit}
                                               >
                                                 {unit}
@@ -391,12 +424,13 @@ export const StorageSettings = () => {
                             </FormMessage_Shadcn_>
                           )}
                         </CardContent>
-                        {isFreeTier && (
+                        {hasLimitedStorageAccess && (
                           <UpgradeToPro
                             fullWidth
+                            variant="primary"
                             source="storageSizeLimit"
                             featureProposition="configure upload file size limits in Storage"
-                            primaryText="Free Plan has a fixed upload file size limit of 50 MB."
+                            primaryText="Free Plan has a fixed upload file size limit of 50 MB"
                             secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
                               STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                             )} and unlock image transformations.`}
@@ -406,11 +440,12 @@ export const StorageSettings = () => {
                           <UpgradeToPro
                             fullWidth
                             addon="spendCap"
+                            variant="default"
                             source="storageSizeLimit"
                             featureProposition="increase the file upload size limits in Storage"
-                            buttonText="Disable Spend Cap"
-                            primaryText="Reduced max upload file size limit due to Spend Cap"
-                            secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
+                            buttonText="Disable spend cap"
+                            primaryText="Reduced max upload file size limit due to spend cap"
+                            secondaryText={`Disable your spend cap to allow file uploads of up to ${formatBytes(
                               STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                             )}.`}
                           />
@@ -438,7 +473,7 @@ export const StorageSettings = () => {
                             </Button>
                           )}
                           <Button
-                            type="primary"
+                            type={hasLimitedStorageAccess ? 'default' : 'primary'}
                             htmlType="submit"
                             loading={isUpdating}
                             disabled={

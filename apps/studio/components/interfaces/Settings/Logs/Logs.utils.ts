@@ -77,6 +77,7 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
 const genWhereStatement = (table: LogsTableName, filters: Filters) => {
   const keys = Object.keys(filters)
   const filterTemplates = SQL_FILTER_TEMPLATES[table]
+
   const _resolveTemplateToStatement = (dotKey: string): string | null => {
     const template = filterTemplates[dotKey]
     const value = get(filters, dotKey)

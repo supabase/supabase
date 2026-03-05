@@ -1,3 +1,4 @@
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { noop } from 'lodash'
 import {
   Calendar,
@@ -10,35 +11,35 @@ import {
   Type,
 } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode, useState } from 'react'
-
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { ReactNode, useId, useState } from 'react'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  CommandSeparator_Shadcn_,
   CriticalIcon,
   Input,
   Label_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
+
 import {
-  POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
+  POSTGRES_DATA_TYPES,
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
@@ -69,6 +70,7 @@ const ColumnType = ({
   error,
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
+  const listboxId = useId()
   const availableTypes = POSTGRES_DATA_TYPES.concat(
     enumTypes.map((type) => type.format.replaceAll('"', ''))
   )
@@ -165,13 +167,14 @@ const ColumnType = ({
   return (
     <div className={cn('flex flex-col gap-y-2', className)}>
       {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+      <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
             type={error ? 'danger' : 'default'}
             role="combobox"
             size={'small'}
             aria-expanded={open}
+            aria-controls={listboxId}
             className={cn('w-full justify-between', !value && 'text-foreground-lighter')}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
@@ -185,19 +188,24 @@ const ColumnType = ({
             )}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-[460px] p-0" side="bottom" align="center">
-          <ScrollArea className="h-[335px]">
-            <Command_Shadcn_>
-              <CommandInput_Shadcn_
-                placeholder="Search types..."
-                // [Joshen] Addresses style issues when this component is being used in the old Form component
-                // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
-                className="!bg-transparent focus:!shadow-none focus:!ring-0"
-              />
-              <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
+        <PopoverContent_Shadcn_
+          id={listboxId}
+          className="w-[460px] p-0"
+          side="bottom"
+          align="center"
+        >
+          <Command_Shadcn_>
+            <CommandInput_Shadcn_
+              placeholder="Search types..."
+              // [Joshen] Addresses style issues when this component is being used in the old Form component
+              // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
+              className="!bg-transparent focus:!shadow-none focus:!ring-0 text-xs"
+            />
+            <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
 
-              <CommandList_Shadcn_>
-                <CommandGroup_Shadcn_>
+            <CommandList_Shadcn_>
+              <ScrollArea className="h-[240px]">
+                <CommandGroup_Shadcn_ heading="Postgres data types">
                   {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => (
                     <CommandItem_Shadcn_
                       key={option.name}
@@ -219,10 +227,11 @@ const ColumnType = ({
                     </CommandItem_Shadcn_>
                   ))}
                 </CommandGroup_Shadcn_>
+
                 {enumTypes.length > 0 && (
                   <>
-                    <CommandItem_Shadcn_>Other types</CommandItem_Shadcn_>
-                    <CommandGroup_Shadcn_>
+                    <CommandSeparator_Shadcn_ />
+                    <CommandGroup_Shadcn_ heading="Other types">
                       {enumTypes.map((option) => (
                         <CommandItem_Shadcn_
                           key={option.id}
@@ -266,9 +275,9 @@ const ColumnType = ({
                     </CommandGroup_Shadcn_>
                   </>
                 )}
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
-          </ScrollArea>
+              </ScrollArea>
+            </CommandList_Shadcn_>
+          </Command_Shadcn_>
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
 

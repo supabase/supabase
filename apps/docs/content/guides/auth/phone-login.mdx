@@ -77,6 +77,15 @@ supabase.auth.signInWith(OTP) {
 }
 ```
 
+To send the OTP via WhatsApp instead of SMS (requires Twilio or Twilio Verify provider):
+
+```kotlin
+supabase.auth.signInWith(OTP) {
+    phone = "+13334445555"
+    channel = Phone.Channel.WHATSAPP
+}
+```
+
 </TabPanel>
 </$Show>
 <$Show if="sdk:python">

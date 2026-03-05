@@ -28,15 +28,6 @@
     }
   ],
   "paths": {
-    "/metrics": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Default Response"
-          }
-        }
-      }
-    },
     "/upload/resumable/": {
       "post": {
         "summary": "Handle POST request for TUS Resumable uploads",
