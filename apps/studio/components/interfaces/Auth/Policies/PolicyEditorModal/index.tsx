@@ -134,7 +134,6 @@ export const PolicyEditorModal = ({
 
   const onUpdatePolicyFormFields = (field: Partial<PolicyFormField>) => {
     setIsDirty(true)
-    console.log('UPDATE')
     if (field.name && field.name.length > 63) return
     setPolicyFormFields({ ...policyFormFields, ...field })
   }
@@ -142,9 +141,6 @@ export const PolicyEditorModal = ({
   const validatePolicyFormFields = () => {
     const { name, definition, check, command } = policyFormFields
 
-    if (!selectedPolicyToEdit) {
-      return toast.error('Unable to find policy')
-    }
     if (name.length === 0) {
       return toast.error('Please provide a name for your policy')
     }
