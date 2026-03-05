@@ -23,7 +23,8 @@ import {
 import manifest from './scorer-online-manifest.json'
 
 const projectId = process.env.BRAINTRUST_PROJECT_ID
-if (!projectId && process.env.IS_BRAINTRUST_PUSH) throw new Error('BRAINTRUST_PROJECT_ID is not set')
+if (!projectId && process.env.IS_BRAINTRUST_PUSH)
+  throw new Error('BRAINTRUST_PROJECT_ID is not set')
 
 // When running in CI, prefix scorers with the branch name to avoid collisions between PRs
 // in the staging project. GITHUB_HEAD_REF is set on PR events, GITHUB_REF_NAME on push/dispatch.
