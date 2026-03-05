@@ -33,7 +33,7 @@ export default () => {
       image: '/images/index/gradient-bg.png',
       cta: {
         label: 'Start your project',
-        link: 'https://app.supabase.com',
+        link: 'https://supabase.com/dashboard',
       },
       secondaryCta: {
         label: 'Documentation',
