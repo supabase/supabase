@@ -118,10 +118,13 @@ Sentry.init({
     }
 
     integrations.push(
-        Sentry.replayIntegration({
-          maskAllInputs: true,
-        })
-      )
+      Sentry.replayIntegration({
+        // Both maskAllInputs and maskAllText default to true — explicitly set here
+        // to document that input and text masking are both intentionally active.
+        maskAllInputs: true,
+        maskAllText: true,
+      })
+    )
 
     return integrations
   })(),
