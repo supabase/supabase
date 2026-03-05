@@ -12,7 +12,7 @@ export interface Provider {
   properties: {
     [x: string]: {
       title: string
-      type: 'boolean' | 'string' | 'select' | 'number'
+      type: 'boolean' | 'string' | 'multiline-string' | 'select' | 'number' | 'datetime'
       enum: Enum[]
       show: {
         key: string
