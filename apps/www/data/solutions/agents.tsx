@@ -116,7 +116,7 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: 'Supabase is great because it has everything. I don\'t need a different solution for authentication, a different solution for database, or a different solution for storage.',
+        text: "Supabase is great because it has everything. I don't need a different solution for authentication, a different solution for database, or a different solution for storage.",
         author: 'Yasser Elsaid',
         role: 'Founder, Chatbase',
         link: '/customers/chatbase',
