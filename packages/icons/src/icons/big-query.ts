@@ -4,7 +4,7 @@ import createSupabaseIcon from '../createSupabaseIcon';
  * @component @name BigQuery
  * @description Supabase SVG icon component, renders SVG Element with children.
  *
- * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNy40ODk4MSAxNy44OThMNy40ODk4MSA5LjY1MzA4TTEwLjgzNjggMTguNzU1MkwxMC44MzY4IDcuNTMwNjNNMTQuMTgzNyAxOC4wMjA1VjEyLjAyMDRNMjEgMjEuMDgxN0wxNi40Mjg2IDE2LjUxMDNNMTguNzU1MiAxMC44Nzc2QzE4Ljc1NTIgMTUuMjI4MiAxNS4yMjgyIDE4Ljc1NTIgMTAuODc3NiAxOC43NTUyQzYuNTI2OTEgMTguNzU1MiAzIDE1LjIyODIgMyAxMC44Nzc2QzMgNi41MjY5MSA2LjUyNjkxIDMgMTAuODc3NiAzQzE1LjIyODIgMyAxOC43NTUyIDYuNTI2OTEgMTguNzU1MiAxMC44Nzc2WiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIwLjk3NTI5OSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo=)
+ * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNy40ODk4MSAxNy44OThMNy40ODk4MSA5LjY1MzA4TTEwLjgzNjggMTguNzU1MkwxMC44MzY4IDcuNTMwNjNNMTQuMTgzNyAxOC4wMjA1VjEyLjAyMDRNMjEgMjEuMDgxN0wxNi40Mjg2IDE2LjUxMDNNMTguNzU1MiAxMC44Nzc2QzE4Ljc1NTIgMTUuMjI4MiAxNS4yMjgyIDE4Ljc1NTIgMTAuODc3NiAxOC43NTUyQzYuNTI2OTEgMTguNzU1MiAzIDE1LjIyODIgMyAxMC44Nzc2QzMgNi41MjY5MSA2LjUyNjkxIDMgMTAuODc3NiAzQzE1LjIyODIgMyAxOC43NTUyIDYuNTI2OTEgMTguNzU1MiAxMC44Nzc2WiIgc3Ryb2tlPSIjMDAwIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjogI2ZmZjsgYm9yZGVyLXJhZGl1czogMnB4IiBzdHJva2Utd2lkdGg9IjAuOTc1Mjk5IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==)
  *
  * @param {Object} props - Supabase icons props and any valid SVG attribute
  * @returns {JSX.Element} JSX Element
@@ -18,7 +18,7 @@ const BigQuery = createSupabaseIcon('BigQuery', [
       stroke: 'currentColor',
       'stroke-width': '0.975299',
       'stroke-linecap': 'round',
-      key: 't3k65m',
+      key: '1oqls8',
     },
   ],
 ]);
