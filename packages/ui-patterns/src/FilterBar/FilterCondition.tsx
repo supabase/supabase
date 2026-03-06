@@ -14,7 +14,7 @@ import {
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
 import { useDeferredBlur, useHighlightNavigation } from './hooks'
-import { buildOperatorItems, buildValueItems } from './menuItems'
+import { buildOperatorItems, buildPropertyChangeItems, buildValueItems } from './menuItems'
 import { FilterCondition as FilterConditionType } from './types'
 
 export type FilterConditionProps = {
@@ -22,6 +22,7 @@ export type FilterConditionProps = {
   path: number[]
   isActive: boolean
   isOperatorActive: boolean
+  isPropertyActive: boolean
   isHighlighted: boolean
 }
 
@@ -30,6 +31,7 @@ export function FilterCondition({
   path,
   isActive,
   isOperatorActive,
+  isPropertyActive,
   isHighlighted,
 }: FilterConditionProps) {
   const {
@@ -44,6 +46,7 @@ export function FilterCondition({
     handleInputFocus,
     handleInputBlur,
     handleLabelClick,
+    handlePropertyChange,
     handleKeyDown,
     handleRemoveCondition,
     handleSelectMenuItem,
@@ -55,10 +58,12 @@ export function FilterCondition({
   const valueRef = useRef<HTMLInputElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const property = filterProperties.find((p) => p.name === condition.propertyName)
+  const propertyLabelRef = useRef<HTMLDivElement>(null)
   const [showValueCustom, setShowValueCustom] = useState(false)
   const [hasTypedOperator, setHasTypedOperator] = useState(false)
   const [hasTypedValue, setHasTypedValue] = useState(false)
   const [localValue, setLocalValue] = useState((condition.value ?? '').toString())
+  const [propertySearchText, setPropertySearchText] = useState('')
 
   const conditionValue = (condition.value ?? '').toString()
 
@@ -91,6 +96,43 @@ export function FilterCondition({
     handleInputBlur
   )
   const handleValueBlur = useDeferredBlur(
+    wrapperRef as React.RefObject<HTMLElement>,
+    handleInputBlur
+  )
+
+  useEffect(() => {
+    if (!isPropertyActive) setPropertySearchText('')
+  }, [isPropertyActive])
+
+  const propertyItems = useMemo(
+    () =>
+      buildPropertyChangeItems({
+        filterProperties,
+        currentPropertyName: condition.propertyName,
+        inputValue: propertySearchText,
+      }),
+    [filterProperties, condition.propertyName, propertySearchText]
+  )
+
+  const {
+    highlightedIndex: propHighlightedIndex,
+    handleKeyDown: handlePropertyKeyDown,
+    reset: resetPropHighlight,
+  } = useHighlightNavigation(
+    propertyItems.length,
+    (index) => {
+      if (propertyItems[index]) {
+        handlePropertyChange(path, propertyItems[index].value)
+      }
+    },
+    handleKeyDown
+  )
+
+  useEffect(() => {
+    if (!isPropertyActive) resetPropHighlight()
+  }, [isPropertyActive, resetPropHighlight])
+
+  const handlePropertyBlur = useDeferredBlur(
     wrapperRef as React.RefObject<HTMLElement>,
     handleInputBlur
   )
@@ -218,19 +260,67 @@ export function FilterCondition({
     <div
       ref={wrapperRef}
       className={cn(
-        'flex items-stretch px-0 bg-muted group shrink-0',
+        'flex items-stretch px-0 py-1 bg-muted group shrink-0',
         variant === 'pill' ? 'rounded border' : 'border-r',
         isHighlighted && 'ring-2 ring-primary'
       )}
       data-testid={`filter-condition-${property.name}`}
       data-highlighted={isHighlighted}
     >
-      <span
-        className="text-xs pl-2 pr-1 cursor-pointer shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center"
-        onClick={() => handleLabelClick(path)}
-      >
-        {property.label}
-      </span>
+      <Popover_Shadcn_ open={isPropertyActive && !isLoading && propertyItems.length > 0}>
+        <PopoverAnchor_Shadcn_ asChild>
+          <div ref={propertyLabelRef} className="relative inline-flex items-center shrink-0">
+            {isPropertyActive ? (
+              <Input_Shadcn_
+                type="text"
+                value={propertySearchText}
+                onChange={(e) => setPropertySearchText(e.target.value)}
+                onBlur={handlePropertyBlur}
+                onKeyDown={handlePropertyKeyDown}
+                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
+                placeholder={property.label}
+                autoFocus
+                aria-label={`Change property from ${property.label}`}
+                data-testid={`filter-property-search-${property.name}`}
+                tabIndex={-1}
+                autoComplete="off"
+                data-1p-ignore
+                data-lpignore="true"
+                data-form-type="other"
+              />
+            ) : null}
+            <span
+              className={cn(
+                'text-xs pl-2 pr-1 shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center cursor-pointer hover:text-foreground transition-colors',
+                isPropertyActive && 'invisible'
+              )}
+              onClick={() => handleLabelClick(path)}
+            >
+              {property.label}
+            </span>
+          </div>
+        </PopoverAnchor_Shadcn_>
+        <PopoverContent_Shadcn_
+          className="min-w-[220px] p-0"
+          align="start"
+          side="bottom"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          onInteractOutside={(e) => {
+            const target = e.target as Node
+            if (wrapperRef.current && !wrapperRef.current.contains(target)) {
+              handleInputBlur()
+            }
+          }}
+        >
+          <DefaultCommandList
+            items={propertyItems}
+            highlightedIndex={propHighlightedIndex}
+            onSelect={(item) => handlePropertyChange(path, item.value)}
+            includeIcon={false}
+          />
+        </PopoverContent_Shadcn_>
+      </Popover_Shadcn_>
       <Popover_Shadcn_ open={isOperatorActive && !isLoading && operatorItems.length > 0}>
         <PopoverAnchor_Shadcn_ asChild>
           <div className="relative inline-block">
@@ -281,7 +371,7 @@ export function FilterCondition({
       </Popover_Shadcn_>
       <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
         <PopoverAnchor_Shadcn_ asChild>
-          <div className="relative inline-block max-w-[150px]">
+          <div className="relative inline-block max-w-[180px]">
             <Input_Shadcn_
               ref={valueRef}
               type="text"
@@ -349,7 +439,7 @@ export function FilterCondition({
         icon={
           <X
             strokeWidth={1}
-            size={10}
+            size={12}
             className="group-hover:text-foreground text-foreground-lighter"
           />
         }
