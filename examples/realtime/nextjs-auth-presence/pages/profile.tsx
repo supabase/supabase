@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { serialize } from 'cookie'
 import { User } from '@supabase/supabase-js'
 import { GetServerSidePropsContext } from 'next'
 import Link from 'next/link'
@@ -28,10 +29,13 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
           }))
         },
         setAll(cookiesToSet) {
-          ctx.res.setHeader(
-            'Set-Cookie',
-            cookiesToSet.map(({ name, value }) => `${name}=${value}`)
-          )
+          const existing = ctx.res.getHeader('Set-Cookie') ?? []
+          ctx.res.setHeader('Set-Cookie', [
+            ...(Array.isArray(existing) ? existing : [String(existing)]),
+            ...cookiesToSet.map(({ name, value, options }) =>
+              serialize(name, value, options)
+            ),
+          ])
         },
       },
     }
