@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
@@ -13,13 +12,12 @@ import { INTEGRATIONS } from './Integrations.constants'
 import {
   isInstalled as checkIsInstalled,
   findStripeSchema,
-  parseStripeSchemaStatus,
+  parseStripeSchema,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
 
   const allIntegrations = useMemo(() => {
     return INTEGRATIONS.filter((integration) => {
@@ -29,15 +27,12 @@ export const useInstalledIntegrations = () => {
       ) {
         return false
       }
-      if (!stripeSyncEnabled && integration.id === 'stripe_sync_engine') {
-        return false
-      }
       if (!IS_PLATFORM && integration.id === 'data_api') {
         return false
       }
       return true
     })
-  }, [integrationsWrappers, stripeSyncEnabled])
+  }, [integrationsWrappers])
 
   const {
     data,
@@ -86,8 +81,8 @@ export const useInstalledIntegrations = () => {
         }
         if (integration.id === 'stripe_sync_engine') {
           const stripeSchema = findStripeSchema(schemas)
-          const status = parseStripeSchemaStatus(stripeSchema)
-          return checkIsInstalled(status)
+          const parsedSchema = parseStripeSchema(stripeSchema)
+          return checkIsInstalled(parsedSchema.status)
         }
         if (integration.type === 'wrapper') {
           return wrappers.find((w) => wrapperMetaComparator(integration.meta, w))

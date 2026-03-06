@@ -2,14 +2,17 @@ TEAM
 
 Supabase is 100% remote.
 
+Aaron Brooks
 Aaron Byrne
 Ada Wong
+Adam Mohammed
 Adam Mokan
 AJ Matias
 Akash Manimaran
 Alaister Young
 Alan De Los Santos
 Aleksi Immonen
+Alex Hall
 Alexander Korotkov
 Ali Waseem
 Allan S
@@ -82,6 +85,7 @@ Francesco Sansalvadore
 Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
+Giuseppe Mandato
 Greg Kress
 Greg P
 Greg Richardson
@@ -108,7 +112,10 @@ Jess Shears
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joaquim Moreno
 Joel Low
+Joel Martin
+Johan Bergström
 John Pena
 John Schaeffer
 Jon M
