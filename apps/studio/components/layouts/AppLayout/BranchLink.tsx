@@ -22,12 +22,8 @@ export function BranchLink({ branch, isSelected, onClose }: BranchLinkProps) {
     <Link passHref href={href}>
       <CommandItem_Shadcn_
         value={branch.name.replaceAll('"', '')}
-        className="cursor-pointer w-full flex items-center justify-between text-sm md:text-xs"
-        onSelect={() => {
-          onClose()
-          router.push(href)
-        }}
-        onClick={() => onClose()}
+        className="cursor-pointer w-full flex items-center justify-between text-sm md:text-xs p-2 md:py-1.5 md:px-2"
+        onSelect={() => onClose()}
       >
         <p className="truncate w-60 flex items-center gap-1" title={branch.name}>
           {branch.is_default && <Shield size={14} className="text-amber-900" />}

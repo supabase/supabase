@@ -1,6 +1,6 @@
 import { AlertCircle, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
-import type { ReactNode } from 'react'
+import { forwardRef, type ReactNode } from 'react'
 import { Button, cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 
 interface AppLayoutDropdownErrorProps {
@@ -16,23 +16,25 @@ export function AppLayoutDropdownError({ message }: AppLayoutDropdownErrorProps)
   )
 }
 
-interface AppLayoutDropdownTriggerButtonProps {
+interface AppLayoutDropdownTriggerButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string
 }
 
-export function AppLayoutDropdownTriggerButton({
-  className,
-}: AppLayoutDropdownTriggerButtonProps = {}) {
-  return (
-    <Button
-      type="text"
-      block
-      size="tiny"
-      className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1', className)}
-      iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-    />
-  )
-}
+export const AppLayoutDropdownTriggerButton = forwardRef<
+  HTMLButtonElement,
+  AppLayoutDropdownTriggerButtonProps
+>(({ className, ...props }, ref) => (
+  <Button
+    ref={ref}
+    size="tiny"
+    className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1', className)}
+    iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+    {...props}
+    type="text"
+  />
+))
+AppLayoutDropdownTriggerButton.displayName = 'AppLayoutDropdownTriggerButton'
 
 export interface AppLayoutDropdownWithPopoverProps {
   linkHref: string
@@ -54,18 +56,18 @@ export function AppLayoutDropdownWithPopover({
   triggerButtonClassName,
 }: AppLayoutDropdownWithPopoverProps) {
   return (
-    <>
-      <Link href={linkHref} className={linkClassName}>
-        {linkContent}
-      </Link>
-      <Popover_Shadcn_ open={open} onOpenChange={onOpenChange} modal={false}>
+    <Popover_Shadcn_ open={open} onOpenChange={onOpenChange} modal={false}>
+      <div className="flex items-center flex-shrink-0">
+        <Link href={linkHref} className={linkClassName}>
+          {linkContent}
+        </Link>
         <PopoverTrigger_Shadcn_ asChild>
           <AppLayoutDropdownTriggerButton className={triggerButtonClassName} />
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-          {commandContent}
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-    </>
+      </div>
+      <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+        {commandContent}
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }

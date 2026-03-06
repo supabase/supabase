@@ -6,7 +6,7 @@ import { Boxes } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Badge, cn } from 'ui'
-import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
 import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
 import { OrganizationDropdownCommandContent } from './OrganizationDropdownCommandContent'
@@ -40,13 +40,9 @@ export const OrganizationDropdown = ({
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
 
-  if (isLoadingOrganizations && !embedded) {
-    return <GenericSkeletonLoader className="p-2 w-[90px]" />
-  }
+  if (isLoadingOrganizations && !embedded) return <GenericSkeletonLoader className="p-2 w-[90px]" />
 
-  if (isError) {
-    return <AppLayoutDropdownError message="Failed to load organizations" />
-  }
+  if (isError) return <AppLayoutDropdownError message="Failed to load organizations" />
 
   const commandContent = (
     <OrganizationDropdownCommandContent
@@ -61,16 +57,8 @@ export const OrganizationDropdown = ({
     />
   )
 
-  if (embedded) {
-    return isLoadingOrganizations ? (
-      <div className="space-y-1 p-2">
-        <ShimmeringLoader className="py-2" />
-        <ShimmeringLoader className="py-2 w-4/5" />
-      </div>
-    ) : (
-      commandContent
-    )
-  }
+  if (embedded)
+    return isLoadingOrganizations ? <GenericSkeletonLoader className="p-2" /> : commandContent
 
   return (
     <AppLayoutDropdownWithPopover

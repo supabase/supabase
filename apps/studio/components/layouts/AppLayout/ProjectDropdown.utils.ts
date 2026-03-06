@@ -2,21 +2,23 @@ import type { ParsedUrlQuery } from 'querystring'
 
 /**
  * Sanitizes a route for project navigation (e.g. when building href for project switch).
- * Truncates to avoid carrying extra query params as path segments.
+ * Truncates to avoid carrying project-specific dynamic path segments.
+ * Uses route segments (not query params) to determine truncation, so non-path query keys
+ * (e.g. sort, filter) do not incorrectly trigger or affect truncation.
  */
-export function sanitizeRoute(route: string, routerQueries: ParsedUrlQuery): string {
-  const queryArray = Object.entries(routerQueries)
+export function sanitizeRoute(_route: string, _routerQueries: ParsedUrlQuery): string {
+  const routeSegments = _route.split('/')
 
-  if (queryArray.length > 1) {
-    // [Joshen] Ideally we shouldn't use hard coded numbers, but temp workaround
-    // for storage bucket route since its longer
-    const isStorageBucketRoute = 'bucketId' in routerQueries
-    const isSecurityAdvisorRoute = 'preset' in routerQueries
+  const hasStorageBucketSegment = routeSegments.includes('[bucketId]')
+  const hasSecurityAdvisorSegment = routeSegments.includes('[preset]')
+  const hasOtherDynamicSegment = routeSegments.some(
+    (s) => s.startsWith('[') && s.endsWith(']') && s !== '[ref]'
+  )
 
-    return route
-      .split('/')
-      .slice(0, isStorageBucketRoute || isSecurityAdvisorRoute ? 5 : 4)
-      .join('/')
-  }
-  return route
+  const needsTruncation =
+    hasStorageBucketSegment || hasSecurityAdvisorSegment || hasOtherDynamicSegment
+  if (!needsTruncation) return _route
+
+  const sliceLength = hasStorageBucketSegment || hasSecurityAdvisorSegment ? 5 : 4
+  return routeSegments.slice(0, sliceLength).join('/')
 }

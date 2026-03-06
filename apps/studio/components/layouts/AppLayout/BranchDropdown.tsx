@@ -75,19 +75,13 @@ export const BranchDropdown = ({
     />
   )
 
-  if (isLoading) {
-    return <GenericSkeletonLoader className="p-2 w-[90px]" />
-  }
+  if (isLoading) return <GenericSkeletonLoader className="p-2" />
 
-  if (isError) {
-    return <AppLayoutDropdownError message="Failed to load branches" />
-  }
+  if (isError) return <AppLayoutDropdownError message="Failed to load branches" />
 
   if (!isSuccess) return null
 
-  if (embedded) {
-    return commandContent
-  }
+  if (embedded) return commandContent
 
   return (
     <AppLayoutDropdownWithPopover

@@ -1,7 +1,6 @@
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import {
   Button,
   Command_Shadcn_,
@@ -40,7 +39,6 @@ export function OrganizationDropdownCommandContent({
   organizationCreationEnabled,
   onClose,
 }: OrganizationDropdownCommandContentProps) {
-  const router = useRouter()
 
   const orgList = (
     <>
@@ -116,11 +114,7 @@ export function OrganizationDropdownCommandContent({
         <CommandGroup_Shadcn_>
           <CommandItem_Shadcn_
             className="cursor-pointer w-full"
-            onSelect={() => {
-              onClose()
-              router.push('/organizations')
-            }}
-            onClick={onClose}
+            onSelect={() => onClose()}
           >
             <Link href="/organizations" className="flex items-center gap-2 w-full">
               All Organizations
@@ -133,11 +127,7 @@ export function OrganizationDropdownCommandContent({
             <CommandGroup_Shadcn_>
               <CommandItem_Shadcn_
                 className="cursor-pointer w-full"
-                onSelect={() => {
-                  onClose()
-                  router.push('/new')
-                }}
-                onClick={onClose}
+                onSelect={() => onClose()}
               >
                 <Link href="/new" className="flex items-center gap-2 w-full">
                   <Plus size={14} strokeWidth={1.5} />

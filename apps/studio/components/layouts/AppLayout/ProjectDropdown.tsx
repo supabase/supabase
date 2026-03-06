@@ -37,13 +37,7 @@ function ProjectDropdownNewProjectActions({
 
   if (embedded) {
     return (
-      <Button
-        type="default"
-        block
-        size="small"
-        asChild
-        icon={<Plus size={14} strokeWidth={1.5} />}
-      >
+      <Button type="default" block size="small" asChild icon={<Plus size={14} strokeWidth={1.5} />}>
         <Link
           href={href}
           onClick={onClose}
@@ -97,25 +91,24 @@ function ProjectDropdownPlatformView({
   selectorProps,
 }: ProjectDropdownPlatformViewProps) {
   return (
-    <>
+    <div className="flex items-center flex-shrink-0">
       <Link
         href={`/project/${projectRef}`}
         className="flex items-center gap-2 flex-shrink-0 text-sm"
       >
         <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span
-          title={projectName}
-          className="text-foreground max-w-32 lg:max-w-64 truncate"
-        >
+        <span title={projectName} className="text-foreground max-w-32 lg:max-w-64 truncate">
           {projectName}
         </span>
       </Link>
 
       <OrganizationProjectSelector
         {...selectorProps}
-        renderTrigger={() => <AppLayoutDropdownTriggerButton />}
+        renderTrigger={() => (
+          <AppLayoutDropdownTriggerButton className="flex-shrink-0" />
+        )}
       />
-    </>
+    </div>
   )
 }
 
@@ -150,7 +143,7 @@ export const ProjectDropdown = ({
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
-    if (!embedded) return <GenericSkeletonLoader className="p-2 w-[90px]" />
+    if (!embedded) return <GenericSkeletonLoader className="p-2" />
   }
 
   const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen
@@ -184,11 +177,10 @@ export const ProjectDropdown = ({
       ) : null,
   }
 
-  if (embedded) {
+  if (embedded)
     return (
       <OrganizationProjectSelector {...selectorProps} embedded className={className} fetchOnMount />
     )
-  }
 
   return IS_PLATFORM ? (
     <ProjectDropdownPlatformView

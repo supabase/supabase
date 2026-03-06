@@ -1,8 +1,7 @@
 import PartnerIcon from 'components/ui/PartnerIcon'
-import type { Organization } from 'types'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import type { Organization } from 'types'
 import { cn, CommandItem_Shadcn_ } from 'ui'
 
 export interface OrgCommandItemProps {
@@ -22,7 +21,6 @@ export function OrgCommandItem({
   onClose,
   compactPadding = false,
 }: OrgCommandItemProps) {
-  const router = useRouter()
   const href = hasRouteSlug ? routePathname.replace('[slug]', org.slug) : `/org/${org.slug}`
 
   return (
@@ -30,17 +28,13 @@ export function OrgCommandItem({
       key={org.slug}
       value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
       className="cursor-pointer w-full"
-      onSelect={() => {
-        onClose()
-        router.push(href)
-      }}
-      onClick={onClose}
+      onSelect={() => onClose()}
     >
       <Link
         href={href}
         className={cn(
           'w-full flex items-center justify-between text-sm md:text-xs',
-          compactPadding && 'p-0.5 md:p-0'
+          !compactPadding && 'p-0.5'
         )}
       >
         <div className="flex items-center gap-2">
