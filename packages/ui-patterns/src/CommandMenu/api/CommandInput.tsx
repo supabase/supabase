@@ -1,10 +1,9 @@
 'use client'
 
+import { useBreakpoint, useDebounce } from 'common'
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
-
-import { useBreakpoint, useDebounce } from 'common'
-import { CommandInput_Shadcn_, cn } from 'ui'
+import { cn, CommandInput_Shadcn_ } from 'ui'
 
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'

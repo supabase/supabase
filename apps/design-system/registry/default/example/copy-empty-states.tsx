@@ -1,8 +1,8 @@
 'use client'
 
+import { Key } from 'lucide-react'
 import { Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
-import { Key } from 'lucide-react'
 
 export default function CopyEmptyStates() {
   return (

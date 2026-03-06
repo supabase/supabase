@@ -154,3 +154,9 @@ gcloud.json
 **/.sentryclirc
 
 keys.json
+
+# Playwright MCP
+.playwright-mcp/*
+
+# Application
+**/.superset/**

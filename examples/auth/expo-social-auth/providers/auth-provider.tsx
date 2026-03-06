@@ -1,33 +1,35 @@
 import { AuthContext } from '@/hooks/use-auth-context'
 import { supabase } from '@/lib/supabase'
-import type { Session } from '@supabase/supabase-js'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
 export default function AuthProvider({ children }: PropsWithChildren) {
-  const [session, setSession] = useState<Session | undefined | null>()
+  const [claims, setClaims] = useState<Record<string, any> | undefined | null>()
   const [profile, setProfile] = useState<any>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
-  // Fetch the session once, and subscribe to auth state changes
+  // Fetch the claims once, and subscribe to auth state changes
   useEffect(() => {
-    const fetchSession = async () => {
+    const fetchClaims = async () => {
       setIsLoading(true)
-  
-      const { data: { session }, error } = await supabase.auth.getSession()
+
+      const { data, error } = await supabase.auth.getClaims()
 
       if (error) {
-        console.error('Error fetching session:', error)
+        console.error('Error fetching claims:', error)
       }
 
-      setSession(session)
+      setClaims(data?.claims ?? null)
       setIsLoading(false)
     }
 
-    fetchSession()
+    fetchClaims()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed:', { event: _event, session })
-      setSession(session)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, _session) => {
+      console.log('Auth state changed:', { event: _event })
+      const { data } = await supabase.auth.getClaims()
+      setClaims(data?.claims ?? null)
     })
 
     // Cleanup subscription on unmount
@@ -36,16 +38,16 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     }
   }, [])
 
-  // Fetch the profile when the session changes
+  // Fetch the profile when the claims change
   useEffect(() => {
     const fetchProfile = async () => {
       setIsLoading(true)
 
-      if (session) {
+      if (claims) {
         const { data } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', session.user.id)
+          .eq('id', claims.sub)
           .single()
 
         setProfile(data)
@@ -57,15 +59,15 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     }
 
     fetchProfile()
-  }, [session])
+  }, [claims])
 
   return (
     <AuthContext.Provider
       value={{
-        session,
+        claims,
         isLoading,
         profile,
-        isLoggedIn: session != undefined
+        isLoggedIn: claims != undefined,
       }}
     >
       {children}

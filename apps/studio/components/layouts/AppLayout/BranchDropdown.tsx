@@ -1,3 +1,6 @@
+import { useParams } from 'common'
+import { Branch, useBranchesQuery } from 'data/branches/branches-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertCircle,
   Check,
@@ -10,30 +13,26 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Badge,
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
-  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { sanitizeRoute } from './ProjectDropdown'
-import { partition } from 'lodash'
 
 const BranchLink = ({
   branch,
@@ -128,7 +127,10 @@ export const BranchDropdown = () => {
       {isSuccess && (
         <>
           <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 ">
-            <span className="text-sm text-foreground max-w-32 lg:max-w-none truncate">
+            <span
+              title={isBranchingEnabled ? selectedBranch?.name : 'main'}
+              className="text-sm text-foreground max-w-32 lg:max-w-64 truncate"
+            >
               {isBranchingEnabled ? selectedBranch?.name : 'main'}
             </span>
             {isBranchingEnabled ? (

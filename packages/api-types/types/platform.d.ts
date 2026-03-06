@@ -951,6 +951,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/redeem': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Redeems a credit code */
+    post: operations['OrgCreditsController_redeemCode']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/top-up': {
     parameters: {
       query?: never
@@ -1912,6 +1929,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/plans/features': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get feature configurations for all plans
+     * @description Returns feature configurations for customer-facing plans (Free, Pro, Team, Enterprise). Use the featureKey query parameter to get a specific feature, or omit it to get all features.
+     */
+    get: operations['PlanFeaturesController_getPlanFeatures']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/profile': {
     parameters: {
       query?: never
@@ -2623,6 +2660,23 @@ export interface paths {
     head?: never
     /** Updates realtime configuration */
     patch: operations['RealtimeConfigController_updateConfig']
+    trace?: never
+  }
+  '/platform/projects/{ref}/config/realtime/shutdown': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Shutdowns realtime connections for a project */
+    post: operations['RealtimeConfigController_shutdown']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/platform/projects/{ref}/config/secrets': {
@@ -4266,6 +4320,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/stripe/fabric/provisioning/account_requests/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get account request details */
+    get: operations['AccountRequestsController_getAccountRequest']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/fabric/provisioning/account_requests/{id}/confirm': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Confirm account request (from Studio) */
+    post: operations['AccountRequestsController_confirmAccountRequest']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/stripe/invoices/overdue': {
     parameters: {
       query?: never
@@ -4419,6 +4507,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/telemetry/stream': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Stream telemetry events (local dev only) */
+    get: operations['TelemetryStreamController_streamEvents']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/tos/fly': {
     parameters: {
       query?: never
@@ -4537,6 +4642,22 @@ export interface components {
       /** @enum {string} */
       scope?: 'V0'
       token_alias: string
+    }
+    AccountRequestDetailsDto: {
+      email: string
+      expires_at: string
+      id: string
+      name?: string
+      orchestrator: {
+        stripe?: {
+          account: string
+          organization?: string
+        }
+        type: string
+      }
+      scopes?: string[]
+      /** @enum {string} */
+      status: 'pending' | 'complete' | 'expired'
     }
     AddAwsAccountToPrivateLinkBody: {
       account_name?: string
@@ -4719,6 +4840,10 @@ export interface components {
       payment_intent_id: string
       size?: string
     }
+    ConfirmResponseDto: {
+      organization_slug: string
+      success: boolean
+    }
     ConfirmSubscriptionChangeBody: {
       payment_intent_id: string
     }
@@ -4815,6 +4940,8 @@ export interface components {
         | 'sentry'
         | 's3'
         | 'axiom'
+        | 'last9'
+        | 'otlp'
     }
     CreateBucketIndexBody: {
       /** @enum {string} */
@@ -5075,7 +5202,12 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
+          billing_partner:
+            | 'fly'
+            | 'aws_marketplace'
+            | 'vercel_marketplace'
+            | 'stripe_product'
+            | null
           id: number
           is_owner: boolean
           name: string
@@ -5127,8 +5259,6 @@ export interface components {
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
-        | 'pico'
-        | 'nano'
         | 'micro'
         | 'small'
         | 'medium'
@@ -5153,7 +5283,7 @@ export interface components {
        * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
        */
-      postgres_engine?: '13' | '14' | '15' | '17' | '17-oriole'
+      postgres_engine?: '15' | '17' | '17-oriole'
       /** @description Provider region selection. Only one of db_region or region_selection can be specified. */
       region_selection?:
         | {
@@ -5224,15 +5354,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -5300,15 +5430,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -5378,12 +5508,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -5408,12 +5541,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -5484,8 +5620,12 @@ export interface components {
         | 'auth_signing_keys_write'
         | 'backups_read'
         | 'backups_write'
+        | 'branching_development_create'
+        | 'branching_development_delete'
         | 'branching_development_read'
         | 'branching_development_write'
+        | 'branching_production_create'
+        | 'branching_production_delete'
         | 'branching_production_read'
         | 'branching_production_write'
         | 'custom_domain_read'
@@ -5518,6 +5658,8 @@ export interface components {
         | 'edge_functions_secrets_write'
         | 'infra_add_ons_read'
         | 'infra_add_ons_write'
+        | 'infra_disk_config_read'
+        | 'infra_disk_config_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -5723,6 +5865,14 @@ export interface components {
       organization_slug: string
       source: string
       teamId?: string
+    }
+    CreditRedemptionRequest: {
+      code: string
+    }
+    CreditRedemptionResponse: {
+      amount_cents: number
+      /** Format: date-time */
+      credits_expire_at: string | null
     }
     CreditsTopUpRequest: {
       address?: {
@@ -6406,7 +6556,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -6610,6 +6760,8 @@ export interface components {
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
       AUDIT_LOG_DISABLE_POSTGRES: boolean | null
+      CUSTOM_OAUTH_ENABLED: boolean
+      CUSTOM_OAUTH_MAX_PROVIDERS: number
       DB_MAX_POOL_SIZE: number | null
       /** @enum {string|null} */
       DB_MAX_POOL_SIZE_UNIT: 'connections' | 'percent' | null
@@ -6800,6 +6952,7 @@ export interface components {
       SECURITY_CAPTCHA_SECRET: string
       SECURITY_MANUAL_LINKING_ENABLED: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
+      SECURITY_SB_FORWARDED_FOR_ENABLED: boolean
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
       SESSIONS_INACTIVITY_TIMEOUT: number
       SESSIONS_SINGLE_PER_USER: boolean
@@ -6950,6 +7103,8 @@ export interface components {
         | 'sentry'
         | 's3'
         | 'axiom'
+        | 'last9'
+        | 'otlp'
       user_id: number
     }
     LFEndpoint: {
@@ -7017,8 +7172,11 @@ export interface components {
             | 'instances.compute_update_available_sizes'
             | 'instances.read_replicas'
             | 'instances.disk_modifications'
+            | 'instances.high_availability'
+            | 'instances.orioledb'
             | 'replication.etl'
             | 'storage.max_file_size'
+            | 'storage.max_file_size.configurable'
             | 'storage.image_transformations'
             | 'storage.vector_buckets'
             | 'storage.iceberg_catalog'
@@ -7045,7 +7203,9 @@ export interface components {
             | 'auth.user_sessions'
             | 'auth.leaked_password_protection'
             | 'auth.advanced_auth_settings'
+            | 'auth.performance_settings'
             | 'backup.retention_days'
+            | 'backup.restore_to_new_project'
             | 'function.max_count'
             | 'function.size_limit_mb'
             | 'realtime.max_concurrent_users'
@@ -7059,6 +7219,10 @@ export interface components {
             | 'security.member_roles'
             | 'project_pausing'
             | 'project_cloning'
+            | 'project_restore_after_expiry'
+            | 'assistant.advance_model'
+            | 'integrations.github_connections'
+            | 'dedicated_pooler'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -7406,7 +7570,7 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
       id: number
       is_owner: boolean
       name: string
@@ -7469,7 +7633,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -7684,6 +7848,28 @@ export interface components {
     }
     PgbouncerStatusResponse: {
       active: boolean
+    }
+    PlanFeaturesResponse: {
+      [key: string]: {
+        [key: string]: {
+          config:
+            | {
+                enabled: boolean
+              }
+            | {
+                enabled: boolean
+                unit: string
+                unlimited: boolean
+                value: number
+              }
+            | {
+                enabled: boolean
+                set: string[]
+              }
+          /** @enum {string} */
+          type: 'boolean' | 'numeric' | 'set'
+        }
+      }
     }
     PlansResponse: {
       plans: {
@@ -8271,7 +8457,26 @@ export interface components {
           type: 'smartGroup'
         }[]
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -8290,7 +8495,26 @@ export interface components {
           type: 'smartGroup'
         }
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -8315,15 +8539,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -8403,15 +8627,15 @@ export interface components {
           | {
               big_query: {
                 /**
+                 * @description Number of concurrent BigQuery Storage Write API connections.
+                 * @example 8
+                 */
+                connection_pool_size?: number
+                /**
                  * @description BigQuery dataset id
                  * @example analytics
                  */
                 dataset_id: string
-                /**
-                 * @description Maximum number of concurrent write streams
-                 * @example 8
-                 */
-                max_concurrent_streams?: number
                 /**
                  * @description Maximum data staleness in minutes
                  * @example 5
@@ -8613,12 +8837,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -8675,12 +8902,15 @@ export interface components {
              * @example 200
              */
             max_fill_ms?: number
-            /**
-             * @description Maximum size of the batch
-             * @example 200
-             */
-            max_size?: number
           }
+          /**
+           * @description Behavior when the replication slot is invalidated
+           * @example error
+           * @enum {string}
+           */
+          invalidated_slot_behavior?: 'error' | 'recreate'
+          /** @description Maximum number of copy connections per table */
+          max_copy_connections_per_table?: number
           /** @description Maximum number of table sync workers */
           max_table_sync_workers?: number
           /**
@@ -9602,6 +9832,8 @@ export interface components {
         | 'sentry'
         | 's3'
         | 'axiom'
+        | 'last9'
+        | 'otlp'
     }
     UpdateCollectionBody: {
       name: string
@@ -9651,6 +9883,7 @@ export interface components {
     UpdateGoTrueConfigBody: {
       API_MAX_REQUEST_DURATION?: number | null
       AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
+      CUSTOM_OAUTH_ENABLED?: boolean
       DB_MAX_POOL_SIZE?: number | null
       /** @enum {string|null} */
       DB_MAX_POOL_SIZE_UNIT?: 'connections' | 'percent' | null
@@ -9853,6 +10086,7 @@ export interface components {
       SECURITY_CAPTCHA_SECRET?: string | null
       SECURITY_MANUAL_LINKING_ENABLED?: boolean | null
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number | null
+      SECURITY_SB_FORWARDED_FOR_ENABLED?: boolean | null
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean | null
       SESSIONS_INACTIVITY_TIMEOUT?: number | null
       SESSIONS_SINGLE_PER_USER?: boolean | null
@@ -10055,15 +10289,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -10131,15 +10365,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -10209,12 +10443,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -10239,12 +10476,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -10575,15 +10815,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -10650,12 +10890,15 @@ export interface components {
            * @example 200
            */
           max_fill_ms?: number
-          /**
-           * @description Maximum size of the batch
-           * @example 200
-           */
-          max_size?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
         max_table_sync_workers?: number
         /**
@@ -13315,6 +13558,61 @@ export interface operations {
         content?: never
       }
       /** @description Failed to determine available Postgres versions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgCreditsController_redeemCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreditRedemptionRequest']
+      }
+    }
+    responses: {
+      /** @description Credit code redeemed successfully. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreditRedemptionResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to redeem credit code */
       500: {
         headers: {
           [name: string]: unknown
@@ -16904,6 +17202,81 @@ export interface operations {
       }
     }
   }
+  PlanFeaturesController_getPlanFeatures: {
+    parameters: {
+      query?: {
+        featureKey?:
+          | 'instances.compute_update_available_sizes'
+          | 'instances.read_replicas'
+          | 'instances.disk_modifications'
+          | 'instances.high_availability'
+          | 'instances.orioledb'
+          | 'replication.etl'
+          | 'storage.max_file_size'
+          | 'storage.max_file_size.configurable'
+          | 'storage.image_transformations'
+          | 'storage.vector_buckets'
+          | 'storage.iceberg_catalog'
+          | 'security.audit_logs_days'
+          | 'security.questionnaire'
+          | 'security.soc2_report'
+          | 'security.private_link'
+          | 'security.enforce_mfa'
+          | 'log.retention_days'
+          | 'custom_domain'
+          | 'vanity_subdomain'
+          | 'ipv4'
+          | 'pitr.available_variants'
+          | 'log_drains'
+          | 'branching_limit'
+          | 'branching_persistent'
+          | 'auth.mfa_phone'
+          | 'auth.mfa_web_authn'
+          | 'auth.mfa_enhanced_security'
+          | 'auth.hooks'
+          | 'auth.platform.sso'
+          | 'auth.custom_jwt_template'
+          | 'auth.saml_2'
+          | 'auth.user_sessions'
+          | 'auth.leaked_password_protection'
+          | 'auth.advanced_auth_settings'
+          | 'auth.performance_settings'
+          | 'backup.retention_days'
+          | 'backup.restore_to_new_project'
+          | 'function.max_count'
+          | 'function.size_limit_mb'
+          | 'realtime.max_concurrent_users'
+          | 'realtime.max_events_per_second'
+          | 'realtime.max_joins_per_second'
+          | 'realtime.max_channels_per_client'
+          | 'realtime.max_bytes_per_second'
+          | 'realtime.max_presence_events_per_second'
+          | 'realtime.max_payload_size_in_kb'
+          | 'project_scoped_roles'
+          | 'security.member_roles'
+          | 'project_pausing'
+          | 'project_cloning'
+          | 'project_restore_after_expiry'
+          | 'assistant.advance_model'
+          | 'integrations.github_connections'
+          | 'dedicated_pooler'
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanFeaturesResponse']
+        }
+      }
+    }
+  }
   ProfileController_getProfile: {
     parameters: {
       query?: never
@@ -18082,7 +18455,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        /** @description Log drains token */
+        /** @description Log drains identifier */
         token: string
       }
       cookie?: never
@@ -18138,7 +18511,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        /** @description Log drains token */
+        /** @description Log drains identifier */
         token: string
       }
       cookie?: never
@@ -19630,6 +20003,55 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  RealtimeConfigController_shutdown: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Realtime connections shutdown successfully */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Tenant not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -22385,8 +22807,6 @@ export interface operations {
       query: {
         cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
         desired_instance_size?:
-          | 'pico'
-          | 'nano'
           | 'micro'
           | 'small'
           | 'medium'
@@ -25992,6 +26412,48 @@ export interface operations {
       }
     }
   }
+  AccountRequestsController_getAccountRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AccountRequestDetailsDto']
+        }
+      }
+    }
+  }
+  AccountRequestsController_confirmAccountRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ConfirmResponseDto']
+        }
+      }
+    }
+  }
   InvoicesController_getOverdueInvoices: {
     parameters: {
       query?: never
@@ -26071,7 +26533,10 @@ export interface operations {
   }
   TelemetryFeatureFlagsController_callFeatureFlag: {
     parameters: {
-      query?: never
+      query?: {
+        organization_slug?: string
+        project_ref?: string
+      }
       header?: never
       path?: never
       cookie?: never
@@ -26225,6 +26690,33 @@ export interface operations {
       }
       /** @description Failed to reset analytics */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  TelemetryStreamController_streamEvents: {
+    parameters: {
+      query?: {
+        session_id?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description SSE stream of telemetry events */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Only available in local development */
+      404: {
         headers: {
           [name: string]: unknown
         }

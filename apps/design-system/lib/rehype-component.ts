@@ -1,14 +1,15 @@
 import fs from 'fs'
 import path from 'path'
-import { UnistNode, UnistTree } from '@/types/unist'
+// import { Column, IColumnProps } from './sample-component'
+import React from 'react'
 import { u } from 'unist-builder'
 import { visit } from 'unist-util-visit'
 
 import { Index } from '../__registry__'
 import { styles } from '../registry/styles'
+import { UnistNode, UnistTree } from '@/types/unist'
 
-// import { Column, IColumnProps } from './sample-component'
-import React from 'react' // ComponentType
+// ComponentType
 
 function inspectComponentProps<T>(component: React.ComponentType<T>): void {
   // Assert the component's props type

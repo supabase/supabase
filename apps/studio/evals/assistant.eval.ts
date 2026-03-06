@@ -22,6 +22,7 @@ assert(process.env.OPENAI_API_KEY, 'OPENAI_API_KEY is not set')
 
 Eval('Assistant', {
   projectId: process.env.BRAINTRUST_PROJECT_ID,
+  trialCount: process.env.CI ? 3 : 1,
   data: () => dataset,
   task: async (input) => {
     const result = await generateAssistantResponse({

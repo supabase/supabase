@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { FilterBar } from './FilterBar'
-import { FilterProperty, FilterGroup } from './types'
+import { FilterGroup, FilterProperty } from './types'
 
 const mockFilterProperties: FilterProperty[] = [
   {
@@ -50,7 +51,7 @@ describe('FilterBar', () => {
       />
     )
 
-    expect(screen.getByPlaceholderText('Search or filter...')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Filter by Name, Status, Count')).toBeInTheDocument()
   })
 
   it('renders with search input', () => {
@@ -64,7 +65,7 @@ describe('FilterBar', () => {
       />
     )
 
-    const input = screen.getByPlaceholderText('Search or filter...')
+    const input = screen.getByPlaceholderText('Filter by Name, Status, Count')
     expect(input).toBeInTheDocument()
   })
 
@@ -85,23 +86,19 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText('Search or filter...')
+    const freeform = screen.getByPlaceholderText('Filter by Name, Status, Count')
     freeform.focus()
     await user.click(freeform)
 
-    // Should show property items in popover
     expect(await screen.findByText('Name')).toBeInTheDocument()
     expect(screen.getByText('Status')).toBeInTheDocument()
 
-    // Select a property
     await user.click(screen.getByText('Status'))
 
-    // Wait for filter change callback and re-render with new state
     await waitFor(() => {
       expect(handleFilterChange).toHaveBeenCalled()
     })
 
-    // Re-render with updated filters
     rerender(
       <FilterBar
         filterProperties={mockFilterProperties}
@@ -112,7 +109,6 @@ describe('FilterBar', () => {
       />
     )
 
-    // Value input should appear for selected property
     await waitFor(() => {
       expect(screen.getByLabelText('Value for Status')).toBeInTheDocument()
     })
@@ -135,7 +131,7 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText('Search or filter...')
+    const freeform = screen.getByPlaceholderText('Filter by Name, Status, Count')
     await user.click(freeform)
     await user.click(screen.getByText('Status'))
 
@@ -158,13 +154,10 @@ describe('FilterBar', () => {
     })
     valueInput.focus()
 
-    // Popover should show value options
     expect(await screen.findByText('active')).toBeInTheDocument()
 
-    // Select 'active' (first item)
     await user.keyboard('{Enter}')
 
-    // Wait for value to be updated
     await waitFor(() => {
       expect(handleFilterChange).toHaveBeenCalledTimes(2) // Once for property, once for value
     })
@@ -225,7 +218,7 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText('Search or filter...')
+    const freeform = screen.getByPlaceholderText('Filter by Name, Status, Count...')
     await user.click(freeform)
     await user.click(screen.getByText('Tag'))
 
@@ -243,19 +236,16 @@ describe('FilterBar', () => {
       />
     )
 
-    // Wait for FilterCondition to be created
     const valueInput = await waitFor(() => screen.getByLabelText('Value for Tag'), {
       timeout: 3000,
     })
 
-    // Focus the value input to show the popover
     await user.click(valueInput)
 
-    // Custom UI should render inside the popover automatically (no menu for single custom option)
+    // When value options contain only a custom component, the popover renders it directly (no menu)
     const pickFoo = await screen.findByText('Pick Foo')
     await user.click(pickFoo)
 
-    // Wait for value change callback
     await waitFor(() => {
       expect(handleFilterChange).toHaveBeenCalledTimes(2) // Once for property, once for value
     })
@@ -270,7 +260,6 @@ describe('FilterBar', () => {
       />
     )
 
-    // Value should be applied
     const updatedValueInput = await screen.findByLabelText('Value for Tag')
     expect((updatedValueInput as HTMLInputElement).value).toBe('foo')
   })
@@ -287,7 +276,7 @@ describe('FilterBar', () => {
       />
     )
 
-    const freeform = screen.getByPlaceholderText('Search or filter...')
+    const freeform = screen.getByPlaceholderText('Filter by Name, Status, Count')
     await user.click(freeform)
     expect(await screen.findByText('Name')).toBeInTheDocument()
 
@@ -360,6 +349,99 @@ describe('FilterBar', () => {
     expect(screen.queryByText('AND')).not.toBeInTheDocument()
   })
 
+  it('allows switching filter property by clicking the label', async () => {
+    const user = userEvent.setup()
+    let currentFilters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [
+        {
+          propertyName: 'name',
+          value: 'test',
+          operator: '=',
+        },
+      ],
+    }
+    const handleFilterChange = vi.fn((filters) => {
+      currentFilters = filters
+    })
+
+    const { rerender } = render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    expect(screen.getByText('Name')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('test')).toBeInTheDocument()
+
+    await user.click(screen.getByText('Name'))
+
+    // Dropdown excludes current property ("Name" is visible as label but not in the picker list)
+    expect(await screen.findByText('Status')).toBeInTheDocument()
+    expect(screen.getByText('Count')).toBeInTheDocument()
+
+    await user.click(screen.getByText('Status'))
+
+    await waitFor(() => {
+      expect(handleFilterChange).toHaveBeenCalled()
+    })
+
+    const updatedCondition = currentFilters.conditions[0] as {
+      propertyName: string
+      value: string
+      operator: string
+    }
+    expect(updatedCondition.propertyName).toBe('status')
+    expect(updatedCondition.operator).toBe('=')
+  })
+
+  it('resets operator when switching to property with incompatible operators', async () => {
+    const user = userEvent.setup()
+    // CONTAINS exists on Name but not Status, so switching should reset operator
+    let currentFilters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [
+        {
+          propertyName: 'name',
+          value: 'test',
+          operator: 'CONTAINS',
+        },
+      ],
+    }
+    const handleFilterChange = vi.fn((filters) => {
+      currentFilters = filters
+    })
+
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    await user.click(screen.getByText('Name'))
+    await user.click(await screen.findByText('Status'))
+
+    await waitFor(() => {
+      expect(handleFilterChange).toHaveBeenCalled()
+    })
+
+    const updatedCondition = currentFilters.conditions[0] as {
+      propertyName: string
+      value: string
+      operator: string
+    }
+    expect(updatedCondition.propertyName).toBe('status')
+    expect(updatedCondition.operator).toBe('')
+  })
+
   it('hides logical operators by default', () => {
     const multipleFilters: FilterGroup = {
       logicalOperator: 'AND',
@@ -384,7 +466,6 @@ describe('FilterBar', () => {
         onFilterChange={mockOnFilterChange}
         freeformText=""
         onFreeformTextChange={mockOnFreeformTextChange}
-        // supportsOperators defaults to false
       />
     )
 

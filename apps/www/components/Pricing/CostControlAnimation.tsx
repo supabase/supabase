@@ -1,3 +1,5 @@
+'use client'
+
 import React, { FC, useRef, useState } from 'react'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { Switch, cn } from 'ui'

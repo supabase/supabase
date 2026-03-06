@@ -1,4 +1,3 @@
-import config from './config'
 import {
   COMPUTE_BASELINE_IOPS,
   COMPUTE_BASELINE_THROUGHPUT,
@@ -7,6 +6,7 @@ import {
   COMPUTE_MAX_THROUGHPUT,
   computeInstanceAddonVariantIdSchema,
 } from './compute-disk-limits'
+import config from './config'
 import extensions from './extensions.json'
 import logConstants from './logConstants'
 import { plans, PricingInformation } from './plans'

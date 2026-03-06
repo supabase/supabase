@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, Card, cn } from 'ui'
+
 import { AnimatedCursors } from './AnimatedCursors'
 
 /**
@@ -22,7 +23,7 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
   }
 
   return (
-    <div className="flex grow items-center justify-center p-12 border-t @container">
+    <div className="flex grow items-center justify-center p-12 @container">
       <div className="w-full max-w-4xl flex flex-col items-center gap-0">
         <div className="text-center mb-12">
           <AnimatedCursors />

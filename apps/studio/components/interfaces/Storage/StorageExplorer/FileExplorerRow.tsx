@@ -315,8 +315,9 @@ export const FileExplorerRow = ({
         className={cn(
           'storage-row group flex h-full items-center px-2.5',
           'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
-          `${isOpened ? 'bg-surface-200' : ''}`,
-          `${isPreviewed ? 'bg-green-500 hover:bg-green-500' : ''}`,
+          `${isOpened ? 'bg-selection' : ''}`,
+          `${isSelected ? 'bg-selection' : ''}`,
+          `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
           `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
         )}
         onClick={(event) => {

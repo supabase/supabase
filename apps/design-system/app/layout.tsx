@@ -3,9 +3,9 @@ import '../../studio/styles/typography.scss'
 
 import type { Metadata, Viewport } from 'next'
 
+import { customFont, sourceCodePro } from './fonts'
 import { ThemeProvider } from './Providers'
 import { SonnerToaster } from './SonnerToast'
-import { customFont, sourceCodePro } from './fonts'
 
 const className = `${customFont.variable} ${sourceCodePro.variable}`
 

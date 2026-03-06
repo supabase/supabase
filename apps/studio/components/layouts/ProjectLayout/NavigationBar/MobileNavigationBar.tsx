@@ -1,14 +1,12 @@
+import { useParams } from 'common'
+import { SidebarContent } from 'components/interfaces/Sidebar'
+import { IS_PLATFORM } from 'lib/constants'
 import { Menu, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { SidebarContent } from 'components/interfaces/Sidebar'
-import { IS_PLATFORM } from 'lib/constants'
 import { Button, cn } from 'ui'
-import { CommandMenuTrigger } from 'ui-patterns'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+import { CommandMenuTrigger, MobileSheetNav } from 'ui-patterns'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5

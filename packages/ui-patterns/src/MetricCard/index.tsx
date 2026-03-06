@@ -17,11 +17,11 @@ import {
   Card,
   CardContent,
   CardTitle,
+  cn,
   Skeleton,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 
 interface MetricCardContextValue {
@@ -72,7 +72,7 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
       <div
         ref={ref}
         className={cn(
-          'py-4 px-6 flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
+          'p-card flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
           className
         )}
         {...props}
@@ -111,7 +111,7 @@ const MetricCardContent = React.forwardRef<HTMLDivElement, MetricCardContentProp
     <CardContent
       ref={ref}
       className={cn(
-        'pb-4 px-6 pt-0 flex-1 flex h-full items-start gap-1 overflow-hidden border-b-0',
+        'p-card pt-0 flex-1 flex h-full items-start gap-1 overflow-hidden border-b-0',
         orientation === 'horizontal' ? 'flex-row' : 'flex-col ',
         className
       )}

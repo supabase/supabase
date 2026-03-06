@@ -1,8 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { keepPreviousData } from '@tanstack/react-query'
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
+import { queueRowDeletesWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { GridHeaderActions } from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import {
@@ -29,19 +30,19 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
+  cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
-  cn,
-  copyToClipboard,
 } from 'ui'
 
 import { useInitializeFiltersFromUrl, useSyncFiltersToUrl } from '../../hooks/useFilterLifeCycle'
 import { ExportDialog } from './ExportDialog'
-import { formatRowsForCSV } from './Header.utils'
 import { FilterPopoverNew } from './filter/FilterPopoverNew'
+import { formatRowsForCSV } from './Header.utils'
 import { SortPopover } from './sort/SortPopover'
 
 export type HeaderProps = {
@@ -70,7 +71,7 @@ export const HeaderNew = ({
         ) : snap.selectedRows.size > 0 ? (
           <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
         ) : (
-          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} />
+          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} isRefetching={isRefetching} />
         )}
         <div className="flex items-center gap-2">
           <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
@@ -83,11 +84,12 @@ export const HeaderNew = ({
 
 const DefaultHeader = ({
   tableQueriesEnabled = true,
-}: Pick<HeaderProps, 'tableQueriesEnabled'>) => {
+  isRefetching,
+}: Pick<HeaderProps, 'tableQueriesEnabled' | 'isRefetching'>) => {
   return (
     <>
-      <div className="flex-1 min-w-0">
-        <FilterPopoverNew />
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        <FilterPopoverNew isRefetching={isRefetching} />
       </div>
       <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
     </>
@@ -221,9 +223,14 @@ type RowHeaderProps = {
 }
 
 const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
+  const { id: _id } = useParams()
+  const tableId = _id ? Number(_id) : undefined
+
+  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
@@ -234,14 +241,16 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const [isExporting, setIsExporting] = useState(false)
   const [showExportModal, setShowExportModal] = useState(false)
 
+  const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
+
   const { data } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: snap.table.id,
       sorts,
       filters,
       page: snap.page,
+      preflightCheck,
       limit: tableEditorSnap.rowsPerPage,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
@@ -251,7 +260,6 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const { data: countData } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
@@ -268,15 +276,28 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   }
 
   const onRowsDelete = () => {
-    const numRows = snap.allRowsSelected ? totalRows : snap.selectedRows.size
     const rowIdxs = Array.from(snap.selectedRows) as number[]
     const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
 
+    // Queue delete operations directly if queue mode is enabled (and not all rows selected)
+    if (isQueueOperationsEnabled && !snap.allRowsSelected) {
+      queueRowDeletesWithOptimisticUpdate({
+        rows,
+        table: snap.originalTable,
+        queryClient,
+        queueOperation: tableEditorSnap.queueOperation,
+        projectRef: project?.ref,
+      })
+      snap.resetSelectedRows()
+      return
+    }
+
+    const numRows = snap.allRowsSelected ? totalRows : snap.selectedRows.size
     tableEditorSnap.onDeleteRows(rows, {
       allRowsSelected: snap.allRowsSelected,
       numRows,
       callback: () => {
-        snap.setSelectedRows(new Set())
+        snap.resetSelectedRows()
       },
     })
   }
@@ -380,13 +401,9 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
     setIsExporting(false)
   }
 
-  function deselectRows() {
-    snap.setSelectedRows(new Set())
-  }
-
   useSubscribeToImpersonatedRole(() => {
     if (snap.allRowsSelected || snap.selectedRows.size > 0) {
-      deselectRows()
+      snap.resetSelectedRows()
     }
   })
 

@@ -2,7 +2,9 @@
 
 import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
+import React from 'react'
 import { cn } from 'ui'
+
 import { FilterBarRoot, useFilterBar, type FilterBarVariant } from './FilterBarContext'
 import { FilterGroup } from './FilterGroup'
 import { FilterBarAction, FilterGroup as FilterGroupType, FilterProperty } from './types'
@@ -18,10 +20,11 @@ export type FilterBarProps = {
   className?: string
   supportsOperators?: boolean
   variant?: FilterBarVariant
+  icon?: React.ReactNode
 }
 
 function FilterBarContent({ className }: { className?: string }) {
-  const { filters, error, optionsError, isLoading, variant } = useFilterBar()
+  const { filters, error, optionsError, isLoading, variant, icon: loadingIcon } = useFilterBar()
 
   return (
     <div className="w-full space-y-2 relative">
@@ -33,11 +36,21 @@ function FilterBarContent({ className }: { className?: string }) {
       >
         <div
           className={cn(
-            'flex items-center shrink-0 px-2 bg-surface-200',
+            'relative flex items-center justify-center shrink-0 px-2 bg-surface-200',
             variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r'
           )}
         >
-          <Search className="text-foreground-muted w-4 h-4 sticky" />
+          <div
+            className={cn(
+              'transition-opacity duration-300 ease-in-out',
+              loadingIcon ? 'opacity-0' : 'opacity-100'
+            )}
+          >
+            <Search className="text-foreground-muted w-4 h-4 sticky" />
+          </div>
+          {loadingIcon && (
+            <div className="absolute inset-0 flex items-center justify-center">{loadingIcon}</div>
+          )}
         </div>
         <motion.div
           className="flex-1 flex flex-wrap items-stretch gap-0"
@@ -97,6 +110,7 @@ export function FilterBar({
   className,
   supportsOperators = false,
   variant = 'default',
+  icon,
 }: FilterBarProps) {
   return (
     <FilterBarRoot
@@ -109,6 +123,7 @@ export function FilterBar({
       isLoading={isLoading}
       supportsOperators={supportsOperators}
       variant={variant}
+      icon={icon}
     >
       <FilterBarContent className={className} />
     </FilterBarRoot>

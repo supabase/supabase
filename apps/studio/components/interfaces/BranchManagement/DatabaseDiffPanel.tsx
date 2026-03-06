@@ -1,4 +1,4 @@
-import { CircleAlert, Database, Download, Wind } from 'lucide-react'
+import { CircleAlert, Database, Download, Loader2, Wind } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
@@ -19,7 +19,26 @@ export const DatabaseDiffPanel = ({
   error,
   currentBranchRef,
 }: DatabaseDiffPanelProps) => {
-  if (isLoading) return <Skeleton className="h-64" />
+  if (isLoading) {
+    return (
+      <div className="flex flex-1 min-h-0 flex-col">
+        <div className="flex flex-1 min-h-[400px] flex-col rounded-md border border-border bg-surface-100">
+          <div className="flex shrink-0 items-center gap-2 border-b border-border px-4 py-3">
+            <Loader2
+              size={16}
+              strokeWidth={1.5}
+              className="animate-spin text-foreground-muted"
+              aria-hidden
+            />
+            <span className="text-sm text-foreground-light">Loading database diff…</span>
+          </div>
+          <div className="min-h-0 flex-1 p-4">
+            <Skeleton className="h-full w-full rounded" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (error)
     return (
@@ -45,8 +64,8 @@ export const DatabaseDiffPanel = ({
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
+    <Card className="flex flex-1 min-h-0 flex-col">
+      <CardHeader className="flex shrink-0 flex-row items-center justify-between space-y-0 py-3">
         <CardTitle>
           <Link
             href={`/project/${currentBranchRef}/database/schema`}
@@ -88,13 +107,15 @@ export const DatabaseDiffPanel = ({
           Download as migration
         </Button>
       </CardHeader>
-      <CardContent className="p-0 h-96">
-        <DiffEditor
-          language="sql"
-          original=""
-          modified={diffContent}
-          options={{ readOnly: true }}
-        />
+      <CardContent className="flex min-h-0 flex-1 flex-col p-0">
+        <div className="min-h-0 flex-1">
+          <DiffEditor
+            language="sql"
+            original=""
+            modified={diffContent}
+            options={{ readOnly: true }}
+          />
+        </div>
       </CardContent>
     </Card>
   )

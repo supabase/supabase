@@ -1,8 +1,4 @@
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { RowsChangeData } from 'react-data-grid'
-import { toast } from 'sonner'
-
 import { SupaRow } from 'components/grid/types'
 import { queueCellEditWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -14,9 +10,13 @@ import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-muta
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { useCallback } from 'react'
+import { RowsChangeData } from 'react-data-grid'
+import { toast } from 'sonner'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Dictionary } from 'types'
+
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 export function useOnRowsChange(rows: SupaRow[]) {
@@ -100,6 +100,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
         .map((column) => column.name)
 
       const identifiers = {} as Dictionary<any>
+
       isTableLike(snap.originalTable) &&
         snap.originalTable.primary_keys.forEach((column) => {
           const col = snap.originalTable.columns.find((c) => c.name === column.name)
@@ -134,6 +135,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
           projectRef: project.ref,
           tableId: snap.table.id,
           table: snap.originalTable,
+          row: previousRow,
           rowIdentifiers: identifiers,
           columnName: changedColumn,
           oldValue: previousRow[changedColumn],

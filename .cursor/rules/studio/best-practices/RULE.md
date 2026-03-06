@@ -100,7 +100,7 @@ const UserDashboard = () => {
 
 ### Co-locate related components
 
-Place sub-components in the same directory as the parent component. Use an index file for cleaner imports.
+Place sub-components in the same directory as the parent component. Avoid using barrel files (files that do nothing but re-export things from other files) for imports.
 
 ```
 components/interfaces/Auth/Users/

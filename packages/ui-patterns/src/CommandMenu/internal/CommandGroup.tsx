@@ -1,8 +1,7 @@
 'use client'
 
 import { forwardRef } from 'react'
-
-import { CommandGroup_Shadcn_, cn } from 'ui'
+import { cn, CommandGroup_Shadcn_ } from 'ui'
 
 const CommandGroup = forwardRef<
   React.ElementRef<typeof CommandGroup_Shadcn_>,

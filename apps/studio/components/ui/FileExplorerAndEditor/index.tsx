@@ -1,25 +1,25 @@
+import { AIEditor } from 'components/ui/AIEditor'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Edit, File, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { AIEditor } from 'components/ui/AIEditor'
 import {
   Button,
-  cn,
-  ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
-  flattenTree,
+  ContextMenu_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   TreeView,
   TreeViewItem,
+  cn,
+  flattenTree,
 } from 'ui'
-import { FileAction, TreeChildData, type FileData } from './FileExplorerAndEditor.types'
+
+import { FileAction, type FileData, TreeChildData } from './FileExplorerAndEditor.types'
 import {
   extractZipFile,
   getFileAction,
@@ -27,6 +27,7 @@ import {
   isBinaryFile,
   isZipFile,
 } from './FileExplorerAndEditor.utils'
+import { IS_PLATFORM } from 'common'
 
 interface FileExplorerAndEditorProps {
   files: FileData[]
@@ -373,9 +374,11 @@ export const FileExplorerAndEditor = ({
           <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
             Files
           </h3>
-          <Button size="tiny" type="default" icon={<Plus size={14} />} onClick={addNewFile}>
-            Add File
-          </Button>
+          {IS_PLATFORM && (
+            <Button size="tiny" type="default" icon={<Plus size={14} />} onClick={addNewFile}>
+              Add File
+            </Button>
+          )}
         </div>
         <div className="flex-1 overflow-y-auto">
           <TreeView
@@ -414,7 +417,7 @@ export const FileExplorerAndEditor = ({
                         icon={<File size={14} className="text-foreground-light shrink-0" />}
                         isEditing={isEditing}
                         onEditSubmit={(value) => {
-                          if (originalId !== null) {
+                          if (IS_PLATFORM && originalId !== null) {
                             handleFileNameChange(originalId, value)
                           }
                         }}
@@ -424,7 +427,7 @@ export const FileExplorerAndEditor = ({
                           }
                         }}
                         onDoubleClick={() => {
-                          if (originalId !== null) {
+                          if (IS_PLATFORM && originalId !== null) {
                             handleStartRename(originalId)
                           }
                         }}
@@ -445,36 +448,38 @@ export const FileExplorerAndEditor = ({
                       />
                     </div>
                   </ContextMenuTrigger_Shadcn_>
-                  <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
-                    <ContextMenuItem_Shadcn_
-                      className="gap-x-2"
-                      onSelect={() => {
-                        if (originalId !== null) handleStartRename(originalId)
-                      }}
-                      onFocusCapture={(e) => e.stopPropagation()}
-                    >
-                      <Edit size={14} />
-                      Rename file
-                    </ContextMenuItem_Shadcn_>
+                  {IS_PLATFORM && (
+                    <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
+                      <ContextMenuItem_Shadcn_
+                        className="gap-x-2"
+                        onSelect={() => {
+                          if (originalId !== null) handleStartRename(originalId)
+                        }}
+                        onFocusCapture={(e) => e.stopPropagation()}
+                      >
+                        <Edit size={14} />
+                        Rename file
+                      </ContextMenuItem_Shadcn_>
 
-                    {files.length > 1 && (
-                      <>
-                        <ContextMenuSeparator_Shadcn_ />
-                        <ContextMenuItem_Shadcn_
-                          className="gap-x-2"
-                          onSelect={() => {
-                            if (originalId !== null) {
-                              handleFileDelete(originalId)
-                            }
-                          }}
-                          onFocusCapture={(e) => e.stopPropagation()}
-                        >
-                          <Trash size={14} />
-                          Delete file
-                        </ContextMenuItem_Shadcn_>
-                      </>
-                    )}
-                  </ContextMenuContent_Shadcn_>
+                      {files.length > 1 && (
+                        <>
+                          <ContextMenuSeparator_Shadcn_ />
+                          <ContextMenuItem_Shadcn_
+                            className="gap-x-2"
+                            onSelect={() => {
+                              if (originalId !== null) {
+                                handleFileDelete(originalId)
+                              }
+                            }}
+                            onFocusCapture={(e) => e.stopPropagation()}
+                          >
+                            <Trash size={14} />
+                            Delete file
+                          </ContextMenuItem_Shadcn_>
+                        </>
+                      )}
+                    </ContextMenuContent_Shadcn_>
+                  )}
                 </ContextMenu_Shadcn_>
               )
             }}
@@ -509,6 +514,7 @@ export const FileExplorerAndEditor = ({
               padding: { top: 20, bottom: 20 },
               lineNumbersMinChars: 3,
               fixedOverflowWidgets: true,
+              readOnly: !IS_PLATFORM,
             }}
           />
         )}

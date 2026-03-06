@@ -2,9 +2,10 @@ import Slugger from 'github-slugger'
 import type { Heading, Root } from 'mdast'
 import type { Data, Transformer } from 'unified'
 import { visit } from 'unist-util-visit'
+import type { VFile } from 'vfile'
+
 import type { TOCItemType } from '../types'
 import { flattenNode } from './remark-utils'
-import type { VFile } from 'vfile'
 
 const slugger = new Slugger()
 

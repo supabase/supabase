@@ -24,6 +24,7 @@ type InfrastructureMetrics = {
   cpu: MetricData
   ram: MetricData
   disk: MetricData
+  diskIo: MetricData
 }
 
 export function parseInfrastructureMetrics(
@@ -37,7 +38,13 @@ export function parseInfrastructureMetrics(
 
   const cpuValue = parseNumericValue(series.avg_cpu_usage?.totalAverage)
   const ramValue = parseNumericValue(series.ram_usage?.totalAverage)
-  const diskValue = parseNumericValue(series.disk_io_consumption?.totalAverage)
+  const diskSystemValue = parseNumericValue(series.disk_fs_used_system?.totalAverage)
+  const diskWalValue = parseNumericValue(series.disk_fs_used_wal?.totalAverage)
+  const diskDatabaseValue = parseNumericValue(series.pg_database_size?.totalAverage)
+  const diskSizeValue = parseNumericValue(series.disk_fs_size?.totalAverage)
+  const diskUsedValue = diskSystemValue + diskWalValue + diskDatabaseValue
+  const diskUsageValue = diskSizeValue > 0 ? (diskUsedValue / diskSizeValue) * 100 : 0
+  const diskIoValue = parseNumericValue(series.disk_io_consumption?.totalAverage)
 
   return {
     cpu: {
@@ -49,7 +56,11 @@ export function parseInfrastructureMetrics(
       max: 100,
     },
     disk: {
-      current: diskValue,
+      current: diskUsageValue,
+      max: 100,
+    },
+    diskIo: {
+      current: diskIoValue,
       max: 100,
     },
   }

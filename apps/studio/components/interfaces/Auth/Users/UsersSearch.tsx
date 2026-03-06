@@ -4,17 +4,17 @@ import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
+  cn,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectSeparator_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -55,7 +55,7 @@ export const UsersSearch = ({
   telemetryGroups,
   onSelectFilterColumn,
 }: UsersSearchProps) => {
-  const [_, setSelectedId] = useQueryState(
+  const [, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )

@@ -2,9 +2,10 @@ import { ChevronRight, ChevronsDown, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { ElementRef, forwardRef } from 'react'
 import {
+  cn,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -16,8 +17,8 @@ import {
   TooltipContent,
   TooltipTrigger,
   TreeViewItemVariant,
-  cn,
 } from 'ui'
+
 import { ShimmeringLoader } from '../ShimmeringLoader'
 
 const InnerSideBarTitle = forwardRef<HTMLSpanElement, React.ComponentPropsWithoutRef<'span'>>(

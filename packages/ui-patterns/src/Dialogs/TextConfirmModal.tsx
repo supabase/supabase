@@ -2,29 +2,30 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Copy } from 'lucide-react'
-import { ReactNode, forwardRef, useEffect, useState } from 'react'
+import { forwardRef, ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Alert_Shadcn_,
   Button,
+  cn,
+  copyToClipboard,
   Dialog,
   DialogContent,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
-  cn,
-  copyToClipboard,
 } from 'ui'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
+
 import { Admonition } from './../admonition'
 
 export interface TextConfirmModalProps {

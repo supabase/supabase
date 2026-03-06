@@ -2,12 +2,13 @@
 
 import 'react-medium-image-zoom/dist/styles.css'
 
-import { useEffect, useState } from 'react'
-import NextImage, { type ImageProps as NextImageProps } from 'next/image'
-import { useTheme } from 'next-themes'
 import { useBreakpoint } from 'common'
-import { cn } from '../../lib/utils'
+import { useTheme } from 'next-themes'
+import NextImage, { type ImageProps as NextImageProps } from 'next/image'
+import { useEffect, useState } from 'react'
 import Zoom from 'react-medium-image-zoom'
+
+import { cn } from '../../lib/utils'
 import ZoomContent from './ZoomContent'
 
 export type CaptionAlign = 'left' | 'center' | 'right'

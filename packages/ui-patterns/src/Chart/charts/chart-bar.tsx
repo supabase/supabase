@@ -1,19 +1,19 @@
 'use client'
 
-import { useState, ReactNode } from 'react'
+import dayjs from 'dayjs'
+import { useTheme } from 'next-themes'
+import { ReactNode, useState } from 'react'
 import {
   Bar,
+  CartesianGrid,
   Cell,
   BarChart as RechartBarChart,
+  ReferenceArea,
   XAxis,
   YAxis,
-  ReferenceArea,
-  CartesianGrid,
 } from 'recharts'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
-import dayjs from 'dayjs'
-import { useTheme } from 'next-themes'
 
 const CHART_COLORS = {
   TICK: 'hsl(var(--background-overlay-hover))',

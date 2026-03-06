@@ -1,7 +1,8 @@
 'use client'
 
-import { frameworkTitles } from '@/config/docs'
 import { createContext, useContext, useEffect, useState } from 'react'
+
+import { frameworkTitles } from '@/config/docs'
 
 type Framework = keyof typeof frameworkTitles
 type FrameworkContextType = {

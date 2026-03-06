@@ -1,15 +1,14 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
+import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
 import dayjs from 'dayjs'
+import { BASE_PATH } from 'lib/constants'
 import { Edit, Unlink } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
-import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
-import { BASE_PATH } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -34,6 +33,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
@@ -68,7 +68,7 @@ export const AccountIdentities = () => {
     },
   })
 
-  const [_, message] = router.asPath.split('#message=')
+  const [, message] = router.asPath.split('#message=')
 
   const onConfirmUnlinkIdentity = async () => {
     const identity = identities.find((i) => i.provider === selectedProviderUnlink)
@@ -140,7 +140,7 @@ export const AccountIdentities = () => {
                     <div className="flex items-center gap-x-1">
                       {provider === 'email' && (
                         <Button asChild type="default">
-                          <Link href="/reset-password">Reset password</Link>
+                          <Link href="/reset-password?type=change">Change password</Link>
                         </Button>
                       )}
                       <ButtonTooltip

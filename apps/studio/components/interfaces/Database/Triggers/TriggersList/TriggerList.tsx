@@ -1,15 +1,15 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, sortBy } from 'lodash'
-import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { includes, sortBy } from 'lodash'
+import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
@@ -23,25 +23,19 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+
 import { generateTriggerCreateSQL } from './TriggerList.utils'
+import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 interface TriggerListProps {
-  schema: string
-  filterString: string
-  isLocked: boolean
   editTrigger: (trigger: PostgresTrigger) => void
   duplicateTrigger: (trigger: PostgresTrigger) => void
   deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
-export const TriggerList = ({
-  schema,
-  filterString,
-  isLocked,
-  editTrigger,
-  duplicateTrigger,
-  deleteTrigger,
-}: TriggerListProps) => {
+export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: TriggerListProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -52,15 +46,27 @@ export const TriggerList = ({
     'triggers'
   )
 
+  const { selectedSchema: schema } = useQuerySchemaState()
+  const { isSchemaLocked: isLocked } = useIsProtectedSchema({ schema })
+  const [filterString] = useQueryState('search', parseAsString.withDefault(''))
+  const [tablesFilter] = useQueryState(
+    'tables',
+    parseAsJson(selectFilterSchema.parse).withDefault([])
+  )
+
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter(
-    (x) =>
-      includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
-      (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase()))
-  )
+  const filteredTriggers = (triggers ?? []).filter((x) => {
+    const search = filterString?.toLowerCase()
+    const matchesSearch =
+      !search ||
+      x.name.toLowerCase().includes(search) ||
+      (!!x.function_name && includes(x.function_name.toLowerCase(), search))
+    const matchesTables = !tablesFilter?.length || tablesFilter.includes(x.table)
+    return matchesSearch && matchesTables
+  })
   const _triggers = sortBy(
     filteredTriggers.filter((x) => x.schema == schema),
     (trigger) => trigger.name.toLocaleLowerCase()

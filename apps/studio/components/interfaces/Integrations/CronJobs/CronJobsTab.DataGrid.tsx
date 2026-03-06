@@ -1,4 +1,4 @@
-import { type MouseEvent, type ReactNode, type UIEvent } from 'react'
+import { type MouseEvent, type UIEvent } from 'react'
 import DataGrid, { type Column, Row } from 'react-data-grid'
 
 import AlertError from 'components/ui/AlertError'
@@ -15,7 +15,6 @@ interface CronJobsTabDataGridProps {
   searchQuery?: string | null
   onScroll: (event: UIEvent<HTMLDivElement>) => void
   onRowClick: (row: CronJob, event: MouseEvent<HTMLDivElement>) => void
-  overlay?: ReactNode
 }
 
 export const CronJobsTabDataGrid = ({
@@ -26,16 +25,13 @@ export const CronJobsTabDataGrid = ({
   searchQuery,
   onScroll,
   onRowClick,
-  overlay,
 }: CronJobsTabDataGridProps) => {
-  const fallbackContent = overlay ? (
-    <div className="absolute top-20 px-6 w-full flex justify-center">{overlay}</div>
-  ) : isLoading ? (
+  const fallbackContent = isLoading ? (
     <div className="absolute top-12 px-6 w-full">
       <GenericSkeletonLoader />
     </div>
   ) : error ? (
-    <div className="absolute top-28 px-10 flex flex-col items-center justify-center w-full">
+    <div className="absolute top-14 px-10 flex flex-col items-center justify-center w-full">
       <AlertError subject="Failed to retrieve cron jobs" error={error} />
     </div>
   ) : (

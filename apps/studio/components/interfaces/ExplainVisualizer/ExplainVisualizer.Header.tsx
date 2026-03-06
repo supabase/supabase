@@ -1,14 +1,13 @@
-import { ArrowUp, Eye, Code, HelpCircle } from 'lucide-react'
-
-import { useFlag } from 'common'
-import { AiIconAnimation, Button } from 'ui'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
+import { Code, Eye, HelpCircle } from 'lucide-react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { buildExplainPrompt } from './ExplainVisualizer.ai'
 import type { QueryPlanRow } from './ExplainVisualizer.types'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export interface ExplainSummary {
   totalTime: number
@@ -31,26 +30,39 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
 
-  const handleExplainWithAI = () => {
-    if (!id) return
+  const getPromptData = () => {
+    if (!id) return null
     const snippet = snapV2.snippets[id]?.snippet
-    if (!snippet?.content?.sql) return
+    if (!snippet?.content?.sql) return null
 
-    const { query, prompt } = buildExplainPrompt({
+    return buildExplainPrompt({
       sql: snippet.content.sql,
       explainPlanRows: (rows as QueryPlanRow[]) ?? [],
     })
+  }
+
+  const handleExplainWithAI = () => {
+    const promptData = getPromptData()
+    if (!promptData) return
 
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({
       sqlSnippets: [
         {
           label: 'Query',
-          content: query,
+          content: promptData.query,
         },
       ],
-      initialMessage: prompt,
+      initialMessage: promptData.prompt,
     })
+  }
+
+  const buildPromptForCopy = () => {
+    const promptData = getPromptData()
+    if (!promptData) return ''
+
+    // Combine SQL and prompt into a single copyable text
+    return `${promptData.prompt}\n\nSQL Query:\n\`\`\`sql\n${promptData.query}\n\`\`\``
   }
 
   const hasSummaryStats =
@@ -111,14 +123,14 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
         </div>
         <div className="flex items-center gap-2">
           {id && rows && (
-            <Button
-              type="default"
+            <AiAssistantDropdown
+              label="Explain with AI"
+              buildPrompt={buildPromptForCopy}
+              onOpenAssistant={handleExplainWithAI}
+              telemetrySource="explain_visualizer"
               size="tiny"
-              icon={<AiIconAnimation size={14} />}
-              onClick={handleExplainWithAI}
-            >
-              Explain with AI
-            </Button>
+              type="default"
+            />
           )}
           <Button
             type="default"

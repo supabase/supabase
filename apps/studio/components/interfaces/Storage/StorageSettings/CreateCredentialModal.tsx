@@ -1,16 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-
 import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsProjectActive } from 'hooks/misc/useSelectedProject'
+import { Plus } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Dialog,
@@ -29,6 +27,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
 
 interface CreateCredentialModalProps {
   visible: boolean

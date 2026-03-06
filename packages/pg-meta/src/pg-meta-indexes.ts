@@ -1,8 +1,9 @@
-import { literal } from './pg-format'
+import { z } from 'zod'
+
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
+import { literal } from './pg-format'
 import { INDEXES_SQL } from './sql/indexes'
-import { z } from 'zod'
 
 const pgIndexZod = z.object({
   id: z.number(),

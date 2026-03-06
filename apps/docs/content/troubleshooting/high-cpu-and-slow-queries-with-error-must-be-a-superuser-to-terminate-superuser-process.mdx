@@ -51,7 +51,7 @@ Since the wraparound prevention autovacuum cannot be stopped, the best approach 
 2.  **Increase Disk Throughput/IOPS:**
     - **Action:** If disk I/O utilization is also consistently high (e.g., near 100%), consider temporarily increasing your disk's provisioned IOPS and throughput.
     - **Why it helps:** Autovacuum is an I/O-intensive operation, involving a lot of reading and writing. Higher disk performance can significantly speed up the process.
-    - **Considerations:** Cloud providers often have limitations, such as a cooldown period (e.g., 6 hours) between disk modification operations.
+    - **Considerations:** Cloud providers often have limitations, such as a cooldown period (e.g., 4 hours) between disk modification operations.
 
 ### **Monitoring progress and future prevention**
 

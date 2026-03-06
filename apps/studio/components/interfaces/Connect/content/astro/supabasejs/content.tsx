@@ -1,10 +1,9 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
-
 import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
   ConnectTabContent,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+  ConnectTabs,
 } from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
 

@@ -23,7 +23,7 @@ After installing the block, you'll have the following environment variables in y
 
 ```env
 VITE_SUPABASE_URL=
-VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY=
+VITE_SUPABASE_PUBLISHABLE_KEY=
 ```
 
 - If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&tab=frameworks&framework=vuejs&using=supabasejs) under App Frameworks or in your project's [API keys](https://supabase.com/dashboard/project/_/settings/api-keys).
@@ -35,6 +35,7 @@ You can use the client in your Vue component like following:
 ```vue
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+
 import { createClient } from './lib/supabase/client'
 
 const profile = ref(null)
