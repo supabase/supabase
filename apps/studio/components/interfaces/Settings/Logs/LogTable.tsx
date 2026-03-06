@@ -35,6 +35,203 @@ import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
 
+// ---------------------------------------------------------------------------
+// Pure helpers (outside component so they are tree-shakeable and easy to test)
+// ---------------------------------------------------------------------------
+
+/** Moves the timestamp key to the front of the row object for consistent column ordering. */
+export function getOrderedFirstRow(firstRow: LogData | undefined): Record<string, unknown> {
+  if (!firstRow) return {}
+  const { timestamp, ...rest } = firstRow
+  if (!timestamp) return firstRow
+  return { timestamp, ...rest }
+}
+
+/** Formats any cell value for display in the data grid. */
+export function formatCellValue(value: unknown): string {
+  if (value && typeof value === 'object') return JSON.stringify(value)
+  if (value === null) return 'NULL'
+  return String(value)
+}
+
+/**
+ * Returns the column definitions to use for a given query type.
+ * Falls back to custom defaultColumns when no queryType is set or no match.
+ * Exported for testability.
+ */
+export function resolveColumns(
+  queryType: QueryType | undefined,
+  firstRow: LogData | undefined,
+  defaultColumns: Column<LogData>[]
+): Column<LogData>[] {
+  if (!queryType) return defaultColumns
+
+  switch (queryType) {
+    case 'api':
+      return DatabaseApiColumnRender
+    case 'database':
+    case 'pg_cron':
+      return DatabasePostgresColumnRender
+    case 'fn_edge':
+      return FunctionsEdgeColumnRender
+    case 'functions':
+      return FunctionsLogsColumnRender
+    case 'auth':
+      return AuthColumnRenderer
+    default:
+      return firstRow && isDefaultLogPreviewFormat(firstRow)
+        ? DefaultPreviewColumnRenderer
+        : defaultColumns
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Hooks
+// ---------------------------------------------------------------------------
+
+/** Handles ArrowUp / ArrowDown keyboard navigation through log rows. */
+function useLogKeyboardNavigation(
+  logDataRows: LogData[],
+  selectedRow: LogData | null,
+  onRowClick: (row: LogData) => void
+) {
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!logDataRows.length || !selectedRow) return
+      const currentIndex = logDataRows.findIndex((row) => isEqual(row, selectedRow))
+      if (currentIndex === -1) return
+
+      if (event.key === 'ArrowUp' && currentIndex > 0) {
+        onRowClick(logDataRows[currentIndex - 1])
+      } else if (event.key === 'ArrowDown' && currentIndex < logDataRows.length - 1) {
+        onRowClick(logDataRows[currentIndex + 1])
+      }
+    },
+    [logDataRows, selectedRow, onRowClick]
+  )
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components (defined outside LogTable to avoid remount on every render)
+// ---------------------------------------------------------------------------
+
+interface TableHeaderProps {
+  data: LogData[]
+  fileRef: string | undefined
+  className?: string
+  showHeader: boolean
+  showHistogramToggle: boolean
+  isHistogramShowing?: boolean
+  onHistogramToggle?: () => void
+  canCreateLogQuery: boolean | null
+  onSave?: () => void
+  isSaving?: boolean
+  hasEditorValue?: boolean
+  onRun?: () => void
+  isLoading?: boolean
+}
+
+const LogsExplorerTableHeader = ({
+  data,
+  fileRef,
+  className,
+  showHeader,
+  showHistogramToggle,
+  isHistogramShowing,
+  onHistogramToggle,
+  canCreateLogQuery,
+  onSave,
+  isSaving,
+  hasEditorValue,
+  onRun,
+  isLoading,
+}: TableHeaderProps) => (
+  <div
+    className={cn(
+      'flex w-full items-center justify-between border-t bg-surface-100 px-5 py-2',
+      className,
+      { hidden: !showHeader }
+    )}
+  >
+    <div className="flex items-center gap-2">
+      <DownloadResultsButton
+        type="text"
+        text={`Results ${data && data.length ? `(${data.length})` : ''}`}
+        results={data}
+        fileName={`supabase-logs-${fileRef}.csv`}
+      />
+    </div>
+
+    {showHistogramToggle && (
+      <div className="flex items-center gap-2">
+        <Button
+          type="default"
+          icon={isHistogramShowing ? <Eye /> : <EyeOff />}
+          onClick={onHistogramToggle}
+        >
+          Histogram
+        </Button>
+      </div>
+    )}
+
+    <div className="space-x-2">
+      {IS_PLATFORM && (
+        <ButtonTooltip
+          type="default"
+          onClick={onSave}
+          loading={isSaving}
+          disabled={!canCreateLogQuery || !hasEditorValue}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canCreateLogQuery
+                ? 'You need additional permissions to save your query'
+                : undefined,
+            },
+          }}
+        >
+          Save query
+        </ButtonTooltip>
+      )}
+      <Button
+        title="run-logs-query"
+        type={hasEditorValue ? 'primary' : 'alternative'}
+        disabled={!hasEditorValue}
+        onClick={onRun}
+        iconRight={<Play size={12} />}
+        loading={isLoading}
+      >
+        Run
+      </Button>
+    </div>
+  </div>
+)
+
+interface LogTableErrorProps {
+  error: LogQueryError
+  isCustomQuery: boolean
+}
+
+const LogTableError = ({ error, isCustomQuery }: LogTableErrorProps) => {
+  if (
+    typeof error === 'object' &&
+    error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
+  ) {
+    return <ResourcesExceededErrorRenderer error={error} isCustomQuery={isCustomQuery} />
+  }
+
+  return (
+    <div className="text-foreground flex gap-2 font-mono p-4">
+      <DefaultErrorRenderer error={error} isCustomQuery={isCustomQuery} />
+    </div>
+  )
+}
+
 interface Props {
   data?: LogData[]
   onHistogramToggle?: () => void
@@ -104,19 +301,7 @@ export const LogTable = ({
   )
 
   const firstRow = data[0]
-
-  // move timestamp to the first column, if it exists
-  function getFirstRow() {
-    if (!firstRow) return {}
-
-    const { timestamp, ...rest } = firstRow
-
-    if (!timestamp) return firstRow
-
-    return { timestamp, ...rest }
-  }
-
-  const columnNames = Object.keys(getFirstRow() || {})
+  const columnNames = Object.keys(getOrderedFirstRow(firstRow))
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
@@ -124,14 +309,14 @@ export const LogTable = ({
   const panelContentMaxSize = 60
 
   const LOGS_EXPLORER_CONTEXT_MENU_ID = 'logs-explorer-context-menu'
-  const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
-    const column = `logs-column-${idx}`
-    const result: Column<LogData> = {
-      key: column,
-      name: v as string,
-      resizable: true,
-      renderCell: ({ row }) => {
-        return (
+
+  const defaultColumns = useMemo<Column<LogData>[]>(
+    () =>
+      columnNames.map((v: keyof LogData, idx) => ({
+        key: `logs-column-${idx}`,
+        name: v as string,
+        resizable: true,
+        renderCell: ({ row }) => (
           <span
             onContextMenu={(e) => {
               e.preventDefault()
@@ -141,54 +326,18 @@ export const LogTable = ({
           >
             {formatCellValue(row?.[v])}
           </span>
-        )
-      },
-      renderHeaderCell: () => {
-        return <div className="flex items-center">{v}</div>
-      },
-      minWidth: 128,
-    }
+        ),
+        renderHeaderCell: () => <div className="flex items-center">{v}</div>,
+        minWidth: 128,
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columnNames.join(','), setCellPosition, showContextMenu]
+  )
 
-    return result
-  })
-
-  let columns = DEFAULT_COLUMNS
-
-  if (!queryType) {
-    columns
-  } else {
-    switch (queryType) {
-      case 'api':
-        columns = DatabaseApiColumnRender
-        break
-
-      case 'database':
-        columns = DatabasePostgresColumnRender
-        break
-
-      case 'fn_edge':
-        columns = FunctionsEdgeColumnRender
-        break
-      case 'functions':
-        columns = FunctionsLogsColumnRender
-        break
-
-      case 'auth':
-        columns = AuthColumnRenderer
-        break
-      case 'pg_cron':
-        columns = DatabasePostgresColumnRender
-        break
-
-      default:
-        if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
-          columns = DefaultPreviewColumnRenderer
-        } else {
-          columns = DEFAULT_COLUMNS
-        }
-        break
-    }
-  }
+  const columns = useMemo(
+    () => resolveColumns(queryType, firstRow, defaultColumns),
+    [queryType, firstRow, defaultColumns]
+  )
 
   const [dedupedData, logMap] = useMemo<[LogData[], LogMap]>(() => {
     const deduped = [...new Set(data)] as LogData[]
@@ -214,154 +363,40 @@ export const LogTable = ({
   }, [dedupedData, hasId, hasTimestamp, logMap])
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
-    (key, props) => {
-      const handleContextMenu = (e: React.MouseEvent) => {
-        if (columns.length > 0) {
-          setCellPosition({ row: props.row, column: columns[0] })
-        }
-        showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })
-      }
-      return (
-        <Row
-          key={key}
-          {...props}
-          isRowSelected={false}
-          selectedCellIdx={undefined}
-          onContextMenu={handleContextMenu}
-        />
-      )
-    },
+    (key, props) => (
+      <Row
+        key={key}
+        {...props}
+        isRowSelected={false}
+        selectedCellIdx={undefined}
+        onContextMenu={(e: React.MouseEvent) => {
+          if (columns.length > 0) {
+            setCellPosition({ row: props.row, column: columns[0] })
+          }
+          showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })
+        }}
+      />
+    ),
     [columns, showContextMenu]
   )
 
-  const formatCellValue = (value: any) => {
-    return value && typeof value === 'object'
-      ? JSON.stringify(value)
-      : value === null
-        ? 'NULL'
-        : String(value)
-  }
-
   const onCopyCell = () => {
     if (!cellPosition) return
-    const eventMessage = cellPosition.row.event_message
-    copyToClipboard(eventMessage, () => {
+    copyToClipboard(cellPosition.row.event_message, () => {
       toast.success('Copied to clipboard')
     })
   }
 
-  const LogsExplorerTableHeader = () => (
-    <div
-      className={cn(
-        'flex w-full items-center justify-between border-t bg-surface-100 px-5 py-2',
-        className,
-        { hidden: !showHeader }
-      )}
-    >
-      <div className="flex items-center gap-2">
-        <DownloadResultsButton
-          type="text"
-          text={`Results ${data && data.length ? `(${data.length})` : ''}`}
-          results={data}
-          fileName={`supabase-logs-${ref}.csv`}
-        />
-      </div>
-
-      {showHistogramToggle && (
-        <div className="flex items-center gap-2">
-          <Button
-            type="default"
-            icon={isHistogramShowing ? <Eye /> : <EyeOff />}
-            onClick={onHistogramToggle}
-          >
-            Histogram
-          </Button>
-        </div>
-      )}
-
-      <div className="space-x-2">
-        {IS_PLATFORM && (
-          <ButtonTooltip
-            type="default"
-            onClick={onSave}
-            loading={isSaving}
-            disabled={!canCreateLogQuery || !hasEditorValue}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canCreateLogQuery
-                  ? 'You need additional permissions to save your query'
-                  : undefined,
-              },
-            }}
-          >
-            Save query
-          </ButtonTooltip>
-        )}
-        <Button
-          title="run-logs-query"
-          type={hasEditorValue ? 'primary' : 'alternative'}
-          disabled={!hasEditorValue}
-          onClick={onRun}
-          iconRight={<Play size={12} />}
-          loading={isLoading}
-        >
-          Run
-        </Button>
-      </div>
-    </div>
+  const onRowClick = useCallback(
+    (row: LogData) => {
+      setSelectedRow(row)
+      onSelectedLogChange?.(row)
+    },
+    [onSelectedLogChange]
   )
-
-  const RenderErrorAlert = () => {
-    if (!error) return null
-
-    const childProps = {
-      isCustomQuery: queryType ? false : true,
-      error: error!,
-    }
-
-    if (
-      typeof error === 'object' &&
-      error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
-    ) {
-      return <ResourcesExceededErrorRenderer {...childProps} />
-    }
-
-    return (
-      <div className="text-foreground flex gap-2 font-mono p-4">
-        <DefaultErrorRenderer {...childProps} />
-      </div>
-    )
-  }
-
-  const RenderNoResultAlert = () => {
-    if (EmptyState) return EmptyState
-    else return <LogsTableEmptyState />
-  }
-
-  function onRowClick(row: LogData) {
-    setSelectedRow(row)
-    onSelectedLogChange?.(row)
-  }
 
   // Keyboard navigation
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (!logDataRows.length || !selectedRow) return
-
-      const currentIndex = logDataRows.findIndex((row) => isEqual(row, selectedRow))
-      if (currentIndex === -1) return
-
-      if (event.key === 'ArrowUp' && currentIndex > 0) {
-        const prevRow = logDataRows[currentIndex - 1]
-        onRowClick(prevRow)
-      } else if (event.key === 'ArrowDown' && currentIndex < logDataRows.length - 1) {
-        const nextRow = logDataRows[currentIndex + 1]
-        onRowClick(nextRow)
-      }
-    },
-    [logDataRows, selectedRow, onRowClick]
-  )
+  useLogKeyboardNavigation(logDataRows, selectedRow, onRowClick)
 
   useEffect(() => {
     if (selectedLog || isSelectedLogLoading) {
@@ -371,13 +406,6 @@ export const LogTable = ({
       setSelectedRow(null)
     }
   }, [selectedLog, isSelectedLogLoading])
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [handleKeyDown])
 
   useEffect(() => {
     if (!isLoading && !selectedRow) {
@@ -392,7 +420,23 @@ export const LogTable = ({
 
   return (
     <section className={'h-full flex w-full flex-col flex-1'}>
-      {!queryType && <LogsExplorerTableHeader />}
+      {!queryType && (
+        <LogsExplorerTableHeader
+          data={data}
+          fileRef={ref}
+          className={className}
+          showHeader={showHeader}
+          showHistogramToggle={showHistogramToggle}
+          isHistogramShowing={isHistogramShowing}
+          onHistogramToggle={onHistogramToggle}
+          canCreateLogQuery={canCreateLogQuery}
+          onSave={onSave}
+          isSaving={isSaving}
+          hasEditorValue={hasEditorValue}
+          onRun={onRun}
+          isLoading={isLoading}
+        />
+      )}
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel
           id="log-table-content"
@@ -434,8 +478,10 @@ export const LogTable = ({
               renderRow: RowRenderer,
               noRowsFallback: !isLoading ? (
                 <>
-                  {logDataRows.length === 0 && !error && <RenderNoResultAlert />}
-                  {error && <RenderErrorAlert />}
+                  {logDataRows.length === 0 && !error && (EmptyState ?? <LogsTableEmptyState />)}
+                  {error && (
+                    <LogTableError error={error} isCustomQuery={queryType ? false : true} />
+                  )}
                 </>
               ) : null,
             }}

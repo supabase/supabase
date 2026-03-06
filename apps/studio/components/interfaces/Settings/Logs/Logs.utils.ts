@@ -683,31 +683,35 @@ function getWarningCondition(table: LogsTableName): string {
   }
 }
 
-export function jwtAPIKey(metadata: any) {
-  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.apikey?.[0]
-  if (!apikeyHeader) {
-    return undefined
-  }
+type JwtPayload = {
+  algorithm?: string
+  issuer?: string
+  role?: string
+  subject?: string
+}
 
-  if (apikeyHeader.invalid) {
-    return '<invalid>'
-  }
-
-  const payload = apikeyHeader?.payload?.[0]
-  if (!payload) {
-    return '<unrecognized>'
-  }
-
-  if (
+/**
+ * Returns true if the JWT payload belongs to a known Supabase built-in role (anon / service_role).
+ * Extracted from jwtAPIKey for testability.
+ */
+export function isKnownSupabaseApiKeyPayload(payload: JwtPayload): boolean {
+  return (
     payload.algorithm === 'HS256' &&
     payload.issuer === 'supabase' &&
-    ['anon', 'service_role'].includes(payload.role) &&
+    ['anon', 'service_role'].includes(payload.role ?? '') &&
     !payload.subject
-  ) {
-    return payload.role
-  }
+  )
+}
 
-  return '<unrecognized>'
+export function jwtAPIKey(metadata: any): string | undefined {
+  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.apikey?.[0]
+  if (!apikeyHeader) return undefined
+  if (apikeyHeader.invalid) return '<invalid>'
+
+  const payload = apikeyHeader?.payload?.[0]
+  if (!payload) return '<unrecognized>'
+
+  return isKnownSupabaseApiKeyPayload(payload) ? payload.role : '<unrecognized>'
 }
 
 export function apiKey(metadata: any) {
