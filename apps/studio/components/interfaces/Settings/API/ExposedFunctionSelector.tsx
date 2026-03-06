@@ -212,6 +212,24 @@ export const ExposedFunctionSelector = ({
                           <div className="w-full flex items-center gap-x-2">
                             <div className="w-4 shrink-0 flex items-center justify-center">
                               {isExposed && <Check size={16} className="text-brand shrink-0" />}
+                              {!isSchemaExposed && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      type="button"
+                                      tabIndex={-1}
+                                      aria-label="Schema not exposed"
+                                      className="inline-flex items-center text-foreground-muted hover:text-foreground-light"
+                                    >
+                                      <Info size={14} />
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="left" className="max-w-[320px] text-xs">
+                                    The schema "{fn.schema}" must be exposed before enabling this
+                                    function.
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
                             </div>
                             <span
                               className={cn(
@@ -243,24 +261,6 @@ export const ExposedFunctionSelector = ({
                                     className="max-w-[320px] text-xs pointer-events-none"
                                   >
                                     {customGrantsTooltip}
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
-                              {!isSchemaExposed && (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <button
-                                      type="button"
-                                      tabIndex={-1}
-                                      aria-label="Schema not exposed"
-                                      className="inline-flex items-center text-foreground-muted hover:text-foreground-light"
-                                    >
-                                      <Info size={14} />
-                                    </button>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="right" className="max-w-[320px] text-xs">
-                                    The schema "{fn.schema}" must be exposed before enabling this
-                                    function.
                                   </TooltipContent>
                                 </Tooltip>
                               )}
