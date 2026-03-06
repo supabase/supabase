@@ -58,8 +58,14 @@ describe('getMarketplaceSidebarData', () => {
               in: () => ({
                 order: async () => ({
                   data: [
-                    { id: 11, partner_id: 1, slug: 'a-item', title: 'A Item' },
-                    { id: 10, partner_id: 1, slug: 'b-item', title: 'B Item' },
+                    {
+                      id: 11,
+                      partner_id: 1,
+                      slug: 'a-item',
+                      title: 'A Item',
+                      item_reviews: { status: 'approved' },
+                    },
+                    { id: 10, partner_id: 1, slug: 'b-item', title: 'B Item', item_reviews: null },
                   ],
                   error: null,
                 }),
@@ -75,6 +81,10 @@ describe('getMarketplaceSidebarData', () => {
     const result = await getMarketplaceSidebarData()
     expect(result.partners.map((partner) => partner.slug)).toEqual(['acme', 'reviewers'])
     expect(result.partners[0]?.items.map((item) => item.slug)).toEqual(['a-item', 'b-item'])
+    expect(result.partners[0]?.items.map((item) => item.latestReviewStatus)).toEqual([
+      'approved',
+      null,
+    ])
     expect(result.isReviewerMember).toBe(true)
   })
 })

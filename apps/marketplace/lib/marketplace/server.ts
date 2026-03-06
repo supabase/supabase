@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import type { ReviewStatus } from '@/lib/marketplace/review-state'
 
 export type PartnerSidebarData = {
   id: number
@@ -10,6 +11,7 @@ export type PartnerSidebarData = {
     id: number
     slug: string
     title: string
+    latestReviewStatus: ReviewStatus | null
   }>
 }
 
@@ -58,7 +60,7 @@ export async function getMarketplaceSidebarData() {
   if (partnerIds.length > 0) {
     const { data: items, error: itemsError } = await supabase
       .from('items')
-      .select('id, partner_id, slug, title')
+      .select('id, partner_id, slug, title, item_reviews(status)')
       .in('partner_id', partnerIds)
       .order('title', { ascending: true })
 
@@ -66,13 +68,29 @@ export async function getMarketplaceSidebarData() {
       throw new Error(itemsError.message)
     }
 
-    for (const item of items ?? []) {
+    for (const item of (items ?? []) as Array<{
+      id: number
+      partner_id: number
+      slug: string
+      title: string
+      item_reviews?:
+        | {
+            status: ReviewStatus | null
+          }
+        | Array<{
+            status: ReviewStatus | null
+          }>
+        | null
+    }>) {
       const partner = partnerMap.get(item.partner_id)
       if (!partner) continue
+      const latestReview = Array.isArray(item.item_reviews) ? item.item_reviews[0] : item.item_reviews
+
       partner.items.push({
         id: item.id,
         slug: item.slug,
         title: item.title,
+        latestReviewStatus: latestReview?.status ?? null,
       })
     }
   }

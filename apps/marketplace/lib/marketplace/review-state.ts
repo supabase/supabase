@@ -19,6 +19,24 @@ export function deriveOpenReviewState(latestStatus: string | null | undefined) {
   return { hasOpenReview, isApproved, openReviewStatusLabel }
 }
 
+export function deriveLatestReviewStatusDisplay(latestStatus: string | null | undefined) {
+  const { isApproved, openReviewStatusLabel } = deriveOpenReviewState(latestStatus)
+
+  if (isApproved) {
+    return { label: 'Approved', variant: 'success' as const }
+  }
+
+  if (latestStatus === 'rejected') {
+    return { label: 'Rejected', variant: 'destructive' as const }
+  }
+
+  if (openReviewStatusLabel) {
+    return { label: openReviewStatusLabel, variant: 'warning' as const }
+  }
+
+  return null
+}
+
 export function deriveReviewDecisionDefaults(
   latestReview:
     | {

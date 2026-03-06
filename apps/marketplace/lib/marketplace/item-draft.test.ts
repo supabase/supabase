@@ -60,8 +60,9 @@ describe('item-draft utils', () => {
         slug: 'template-item',
         url: null,
         templateZip: null,
+        published: true,
       })
-    ).toThrow('Template items require a template ZIP package')
+    ).toThrow('Template items require a template ZIP package before publishing or requesting review')
 
     expect(() =>
       ensureItemDraftConstraints({
@@ -69,8 +70,32 @@ describe('item-draft utils', () => {
         slug: 'template-item',
         url: null,
         templateZip: templateFile,
+        published: true,
       })
     ).not.toThrow()
+  })
+
+  it('allows template drafts without a template package', () => {
+    expect(() =>
+      ensureItemDraftConstraints({
+        type: 'template',
+        slug: 'template-item',
+        url: null,
+        templateZip: null,
+      })
+    ).not.toThrow()
+  })
+
+  it('requires a template package when requesting review', () => {
+    expect(() =>
+      ensureItemDraftConstraints({
+        type: 'template',
+        slug: 'template-item',
+        url: null,
+        templateZip: null,
+        intent: 'request_review',
+      })
+    ).toThrow('Template items require a template ZIP package before publishing or requesting review')
   })
 
   it('parses template zip file only when provided', () => {

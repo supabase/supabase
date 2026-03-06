@@ -359,7 +359,7 @@ export async function createItemDraftAction(formData: FormData) {
   const slugSource = typeof slugInput === 'string' && slugInput.trim() ? slugInput : title
   const slug = slugify(slugSource)
 
-  ensureItemDraftConstraints({ type, slug, url, templateZip })
+  ensureItemDraftConstraints({ type, slug, url, templateZip, published, intent })
 
   const { data: item, error } = await supabase
     .from('items')
@@ -470,6 +470,7 @@ export async function updateItemDraftAction(formData: FormData) {
     url,
     templateZip,
     existingRegistryItemUrl,
+    published,
   })
 
   const templateRegistryUrl =
@@ -559,6 +560,24 @@ export async function requestItemReviewAction(formData: FormData) {
   const itemId = Number(parseRequiredString(formData, 'itemId'))
   const itemSlug = parseRequiredString(formData, 'itemSlug')
   const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const { data: item, error: itemError } = await supabase
+    .from('items')
+    .select('type, registry_item_url, url')
+    .eq('id', itemId)
+    .single()
+
+  if (itemError || !item) {
+    throw new Error(itemError?.message ?? 'Unable to load item')
+  }
+
+  ensureItemDraftConstraints({
+    type: parseItemType(item.type),
+    slug: itemSlug,
+    url: item.url,
+    templateZip: null,
+    existingRegistryItemUrl: item.registry_item_url,
+    intent: 'request_review',
+  })
 
   const { data: existingReview, error: existingReviewError } = await supabase
     .from('item_reviews')

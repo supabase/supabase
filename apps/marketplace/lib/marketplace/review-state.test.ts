@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  deriveLatestReviewStatusDisplay,
   deriveOpenReviewState,
   deriveReviewDecisionDefaults,
   isReviewStatus,
@@ -32,6 +33,22 @@ describe('review-state utils', () => {
       isApproved: true,
       openReviewStatusLabel: null,
     })
+  })
+
+  it('derives review status labels and badge variants', () => {
+    expect(deriveLatestReviewStatusDisplay('approved')).toEqual({
+      label: 'Approved',
+      variant: 'success',
+    })
+    expect(deriveLatestReviewStatusDisplay('rejected')).toEqual({
+      label: 'Rejected',
+      variant: 'destructive',
+    })
+    expect(deriveLatestReviewStatusDisplay('draft')).toEqual({
+      label: 'Draft',
+      variant: 'warning',
+    })
+    expect(deriveLatestReviewStatusDisplay(null)).toBeNull()
   })
 
   it('derives review decision defaults with safe fallback', () => {

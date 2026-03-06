@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -32,16 +32,22 @@ describe('ItemForm', () => {
     vi.clearAllMocks()
   })
 
-  it('shows template zip validation error in create mode', async () => {
+  it('allows creating a template draft without a zip package', async () => {
     const user = userEvent.setup()
+    createItemDraftActionMock.mockResolvedValue({
+      itemId: 1,
+      itemSlug: 'auth-template',
+      partnerSlug: 'acme',
+    })
+
     render(<ItemForm mode="create" partner={{ id: 1, slug: 'acme' }} />)
 
     await user.type(screen.getByPlaceholderText('Authentication starter'), 'Auth Template')
     await user.click(screen.getByRole('button', { name: 'Create item' }))
 
+    await waitFor(() => expect(createItemDraftActionMock).toHaveBeenCalledTimes(1))
     expect(
-      await screen.findByText('Upload a template ZIP package that includes template.json.')
-    ).toBeInTheDocument()
-    expect(createItemDraftActionMock).not.toHaveBeenCalled()
+      screen.queryByText('Upload a template ZIP package that includes template.json.')
+    ).not.toBeInTheDocument()
   })
 })

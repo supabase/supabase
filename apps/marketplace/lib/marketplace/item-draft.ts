@@ -56,12 +56,16 @@ export function ensureItemDraftConstraints({
   url,
   templateZip,
   existingRegistryItemUrl,
+  published = false,
+  intent = 'save',
 }: {
   type: 'oauth' | 'template' | null
   slug: string
   url: string | null
   templateZip: File | null
   existingRegistryItemUrl?: string | null
+  published?: boolean
+  intent?: 'save' | 'request_review'
 }): asserts type is 'oauth' | 'template' {
   if (!slug) {
     throw new Error('Item slug cannot be empty')
@@ -72,7 +76,8 @@ export function ensureItemDraftConstraints({
   if (type === 'oauth' && !url) {
     throw new Error('OAuth items require a listing URL')
   }
-  if (type === 'template' && !templateZip && !existingRegistryItemUrl) {
-    throw new Error('Template items require a template ZIP package')
+  const requiresTemplatePackage = type === 'template' && (published || intent === 'request_review')
+  if (requiresTemplatePackage && !templateZip && !existingRegistryItemUrl) {
+    throw new Error('Template items require a template ZIP package before publishing or requesting review')
   }
 }

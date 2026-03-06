@@ -343,6 +343,29 @@ describe('protected actions', () => {
     expect(result).toEqual({ itemId: 20, itemSlug: 'template-item', partnerSlug: 'acme' })
   })
 
+  it('creates template drafts without a template package', async () => {
+    createClientMock.mockResolvedValue(
+      createSupabaseMock({
+        user: { id: 'user-1' },
+        fromHandler: (table, state) => {
+          if (table === 'items' && state.op === 'insert') {
+            return success({ id: 21, slug: 'draft-template' })
+          }
+          return success(null)
+        },
+      })
+    )
+
+    const formData = new FormData()
+    formData.set('partnerId', '1')
+    formData.set('partnerSlug', 'acme')
+    formData.set('title', 'Draft Template')
+    formData.set('type', 'template')
+
+    const result = await createItemDraftAction(formData)
+    expect(result).toEqual({ itemId: 21, itemSlug: 'draft-template', partnerSlug: 'acme' })
+  })
+
   it('throws when template item review upsert fails', async () => {
     createClientMock.mockResolvedValue(
       createSupabaseMock({
@@ -400,6 +423,9 @@ describe('protected actions', () => {
       createSupabaseMock({
         user: { id: 'reviewer' },
         fromHandler: (table, state) => {
+          if (table === 'items' && state.op === 'select') {
+            return success({ type: 'oauth', registry_item_url: null, url: 'https://example.com' })
+          }
           if (table === 'item_reviews' && state.op === 'select') {
             return success({ status: 'draft' })
           }
@@ -570,6 +596,9 @@ describe('protected actions', () => {
       createSupabaseMock({
         user: { id: 'reviewer' },
         fromHandler: (table, state) => {
+          if (table === 'items' && state.op === 'select') {
+            return success({ type: 'oauth', registry_item_url: null, url: 'https://example.com' })
+          }
           if (table === 'item_reviews' && state.op === 'select') {
             return failure('existing review query failed')
           }
@@ -586,11 +615,37 @@ describe('protected actions', () => {
     await expect(requestItemReviewAction(formData)).rejects.toThrow('existing review query failed')
   })
 
+  it('rejects template review requests when no template package has been uploaded', async () => {
+    createClientMock.mockResolvedValue(
+      createSupabaseMock({
+        user: { id: 'reviewer' },
+        fromHandler: (table, state) => {
+          if (table === 'items' && state.op === 'select') {
+            return success({ type: 'template', registry_item_url: null, url: null })
+          }
+          return success(null)
+        },
+      })
+    )
+
+    const formData = new FormData()
+    formData.set('itemId', '7')
+    formData.set('itemSlug', 'my-item')
+    formData.set('partnerSlug', 'acme')
+
+    await expect(requestItemReviewAction(formData)).rejects.toThrow(
+      'Template items require a template ZIP package before publishing or requesting review'
+    )
+  })
+
   it('throws when request-review upsert fails', async () => {
     createClientMock.mockResolvedValue(
       createSupabaseMock({
         user: { id: 'reviewer' },
         fromHandler: (table, state) => {
+          if (table === 'items' && state.op === 'select') {
+            return success({ type: 'oauth', registry_item_url: null, url: 'https://example.com' })
+          }
           if (table === 'item_reviews' && state.op === 'select') {
             return success({ status: 'rejected' })
           }

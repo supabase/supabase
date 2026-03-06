@@ -231,8 +231,16 @@ create table public.items (
   updated_at timestamptz not null default now(),
   constraint items_slug_format check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
   constraint items_type_destination_check check (
-    (type = 'oauth' and url is not null and registry_item_url is null)
-    or (type = 'template' and url is null)
+    (
+      type = 'oauth'
+      and registry_item_url is null
+      and (published = false or url is not null)
+    )
+    or (
+      type = 'template'
+      and url is null
+      and (published = false or registry_item_url is not null)
+    )
   )
 );
 

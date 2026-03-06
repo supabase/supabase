@@ -380,14 +380,14 @@ export function ItemForm(props: ItemFormProps) {
     setError(null)
     setSuccess(null)
 
+    const intent = submitIntentRef.current
     if (parsed.data.type === 'template') {
       const hasExistingRegistryFile = Boolean(item?.registry_item_url)
-      if (isCreateMode && !templateZipFile) {
-        setError('Upload a template ZIP package that includes template.json.')
-        return
-      }
-      if (!isCreateMode && !templateZipFile && !hasExistingRegistryFile) {
-        setError('Upload a template ZIP package that includes template.json.')
+      const requiresTemplatePackage = parsed.data.published || intent === 'request_review'
+      if (requiresTemplatePackage && !templateZipFile && !hasExistingRegistryFile) {
+        setError(
+          'Upload a template ZIP package that includes template.json before publishing or requesting review.'
+        )
         return
       }
     }
@@ -397,7 +397,6 @@ export function ItemForm(props: ItemFormProps) {
     }
 
     const formData = new FormData()
-    const intent = submitIntentRef.current
     const trimmedSlug = parsed.data.slug?.trim()
 
     formData.set('partnerId', String(props.partner.id))
@@ -762,6 +761,11 @@ export function ItemForm(props: ItemFormProps) {
                   {templateZipFile ? (
                     <p className="mt-2 text-xs text-muted-foreground">
                       Selected package: {templateZipFile.name}
+                    </p>
+                  ) : null}
+                  {!hasTemplateFilesForTree ? (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Optional while drafting. Required before publishing or requesting review.
                     </p>
                   ) : null}
                 </FormItemLayout>

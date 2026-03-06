@@ -2,6 +2,7 @@ import { Plus, Search } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
+  Badge,
   Button,
   Card,
   Input,
@@ -22,6 +23,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
+import { deriveLatestReviewStatusDisplay } from '@/lib/marketplace/review-state'
 import { getMarketplaceSidebarData } from '@/lib/marketplace/server'
 
 type PartnerItemsPageProps = {
@@ -108,29 +110,41 @@ export default async function PartnerItemsPage({ params, searchParams }: Partner
                       <TableRow>
                         <TableHead>Item</TableHead>
                         <TableHead>Slug</TableHead>
+                        <TableHead>Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredItems.map((item) => (
-                        <TableRow key={item.id} className="group">
-                          <TableCell className="p-0 font-medium">
-                            <Link
-                              href={`/protected/${partner.slug}/items/${item.slug}`}
-                              className="block px-4 py-4 group-hover:underline"
-                            >
-                              {item.title}
-                            </Link>
-                          </TableCell>
-                          <TableCell className="p-0 text-muted-foreground">
-                            <Link
-                              href={`/protected/${partner.slug}/items/${item.slug}`}
-                              className="block px-4 py-4 group-hover:underline"
-                            >
-                              /{item.slug}
-                            </Link>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {filteredItems.map((item) => {
+                        const statusDisplay = deriveLatestReviewStatusDisplay(item.latestReviewStatus)
+
+                        return (
+                          <TableRow key={item.id} className="group">
+                            <TableCell className="p-0 font-medium">
+                              <Link
+                                href={`/protected/${partner.slug}/items/${item.slug}`}
+                                className="block px-4 py-4 group-hover:underline"
+                              >
+                                {item.title}
+                              </Link>
+                            </TableCell>
+                            <TableCell className="p-0 text-muted-foreground">
+                              <Link
+                                href={`/protected/${partner.slug}/items/${item.slug}`}
+                                className="block px-4 py-4 group-hover:underline"
+                              >
+                                /{item.slug}
+                              </Link>
+                            </TableCell>
+                            <TableCell className="px-4 py-4">
+                              {statusDisplay ? (
+                                <Badge variant={statusDisplay.variant}>{statusDisplay.label}</Badge>
+                              ) : (
+                                <span className="text-sm text-muted-foreground">No review</span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
                     </TableBody>
                   </Table>
                 </Card>
