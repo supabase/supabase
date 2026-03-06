@@ -4,11 +4,10 @@ import dayjs from 'dayjs'
 import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { TableCell, TableRow, copyToClipboard } from 'ui'
+import { copyToClipboard, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { EdgeFunctionsResponse } from '@/data/edge-functions/edge-functions-query'
 import { createNavigationHandler } from '@/lib/navigation'
 
@@ -21,15 +20,8 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
-
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint ?? ''
-  const functionUrl =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain.hostname}/functions/v1/${item.slug}`
-      : `${protocol}://${endpoint}/functions/v1/${item.slug}`
+  const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
+  const functionUrl = `${endpoint}/functions/v1/${item.slug}`
 
   const handleNavigation = createNavigationHandler(
     `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/details`}`,

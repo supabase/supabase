@@ -1,4 +1,4 @@
-import { Github, MoreVertical, Trash, Copy, Check } from 'lucide-react'
+import { Github, MoreVertical, Settings, Copy, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
 import { useState } from 'react'
@@ -22,7 +22,6 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
-import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
@@ -46,7 +45,6 @@ export const ProjectTableRow = ({
   const router = useRouter()
   const { name, ref: projectRef } = project
   const projectStatus = inferProjectStatus(project.status)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
 
   const url = rewriteHref ?? `/project/${project.ref}`
@@ -177,23 +175,17 @@ export const ProjectTableRow = ({
                   className="gap-x-2"
                   onClick={(e) => {
                     e.stopPropagation()
-                    setIsDeleteModalOpen(true)
+                    router.push(`/project/${projectRef}/settings/general`)
                   }}
                 >
-                  <Trash size={14} />
-                  <span>Delete project</span>
+                  <Settings size={14} />
+                  <span>Settings</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </TableCell>
       </TableRow>
-      <DeleteProjectModal
-        visible={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        project={project}
-        organization={organization}
-      />
     </>
   )
 }
