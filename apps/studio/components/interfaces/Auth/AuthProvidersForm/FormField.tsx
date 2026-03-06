@@ -29,6 +29,9 @@ const FormField = ({
   disabled = false,
   setFieldValue,
 }: FormFieldProps) => {
+  const isSmsTemplate = name === 'SMS_TEMPLATE'
+
+  
   const [hidden, setHidden] = useState(!!properties.isSecret)
   const [dateAsText, setDateAsText] = useState(
     formValues[name] ? formatDate(new Date(formValues[name])) : ''
@@ -100,6 +103,35 @@ const FormField = ({
       )
 
     case 'string':
+      if (isSmsTemplate) {
+        return (
+          <Input.TextArea
+            size="small"
+            layout="vertical"
+            id={name}
+            name={name}
+            disabled={disabled}
+            label={properties.title}
+            labelOptional={
+              properties.descriptionOptional ? (
+                <Markdown
+                  content={properties.descriptionOptional}
+                  className="text-foreground-lighter"
+                />
+              ) : null
+            }
+            descriptionText={
+              properties.description ? (
+                <Markdown
+                  content={properties.description}
+                  className="text-foreground-lighter"
+                />
+              ) : null
+            }
+          />
+        )
+      }
+
       return (
         <Input
           size="small"
@@ -119,7 +151,10 @@ const FormField = ({
           }
           descriptionText={
             properties.description ? (
-              <Markdown content={properties.description} className="text-foreground-lighter" />
+              <Markdown
+                content={properties.description}
+                className="text-foreground-lighter"
+              />
             ) : null
           }
           actions={
@@ -141,7 +176,7 @@ const FormField = ({
           }
         />
       )
-
+  
     case 'multiline-string':
       return (
         <Input.TextArea
