@@ -44,7 +44,7 @@ const deleteJobViaAPI = async (page: Page, ref: string, jobName: string) => {
 test.describe('Cron Jobs Integration', () => {
   test.beforeAll(async () => {
     await withFileOnceSetup(import.meta.url, async () => {
-      await query('create extension if not exists pg_cron;')
+      await query('create extension if not exists pg_cron schema pg_catalog;')
     })
   })
 

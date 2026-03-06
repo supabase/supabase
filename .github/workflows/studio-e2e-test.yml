@@ -78,6 +78,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
 
+      - name: Reset supabase
+        if: steps.filter.outputs.studio == 'true'
+        run: rm -rf supabase && pnpm exec supabase init && mkdir supabase/functions
+
       - name: 🚀 Run Playwright tests against Vercel Preview
         if: steps.filter.outputs.studio == 'true'
         id: playwright
