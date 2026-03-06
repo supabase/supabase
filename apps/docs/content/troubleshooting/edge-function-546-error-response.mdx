@@ -77,7 +77,7 @@ LIMIT 20;
 
 ## Step 2: Check error frequency
 
-Before optimizing, run the below query in the [Log Explorer](https://supabase.com/dashboard/project/_/logs/explorer?q=SELECT%0A++COUNT%28id%29+AS+total_responses%2C%0A++COUNTIF%28response.status_code+%3D+546%29+AS+total_546%2C%0A++SAFE_DIVIDE%28COUNTIF%28response.status_code+%3D+546%29%2C+COUNT%28*%29%29+*+100+AS+pct_546%0AFROM+function_edge_logs%0ACROSS+JOIN+UNNEST%28function_edge_logs.metadata%29+AS+metadata%0ACROSS+JOIN+UNNEST%28metadata.response%29+AS+response%0ACROSS+JOIN+UNNEST%28metadata.request%29+AS+request%0AWHERE+pathname+%3D+%27%2Ffunctions%2Fv1%2FYOUR_FUNCTION_NAME%27+) to understand how often 546s are occurring relative to total requests:
+Before optimizing, run the below query in the [Log Explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++COUNT%28id%29+AS+total_responses%2C%0A++COUNTIF%28response.status_code+%3D+546%29+AS+total_546%2C%0A++SAFE_DIVIDE%28COUNTIF%28response.status_code+%3D+546%29%2C+COUNT%28*%29%29+*+100+AS+pct_546%0AFROM+function_edge_logs%0ACROSS+JOIN+UNNEST%28function_edge_logs.metadata%29+AS+metadata%0ACROSS+JOIN+UNNEST%28metadata.response%29+AS+response%0ACROSS+JOIN+UNNEST%28metadata.request%29+AS+request%0AWHERE+pathname+%3D+%27%2Ffunctions%2Fv1%2FYOUR_FUNCTION_NAME%27+) to understand how often 546s are occurring relative to total requests:
 
 ```sql
 SELECT
