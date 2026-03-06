@@ -4,8 +4,6 @@ import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import type { Branch } from 'data/branches/branches-query'
 import type { ProjectDetail } from 'data/projects/project-detail-query'
 import { Box, Boxes, GitBranch } from 'lucide-react'
-
-import { ProjectBranchSelectorSheetTabTrigger } from './ProjectBranchSelectorSheetTabTrigger'
 import type { Organization } from 'types'
 import {
   cn,
@@ -14,9 +12,10 @@ import {
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
 } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+
+import { ProjectBranchSelectorSheetTabTrigger } from './ProjectBranchSelectorSheetTabTrigger'
 
 const EMBEDDED_CLASSNAME =
   'bg-transparent border-0 shadow-none min-h-0 flex-1 flex flex-col overflow-hidden rounded-none'

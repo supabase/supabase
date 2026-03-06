@@ -22,8 +22,7 @@ export function getProjectBranchSelectorState(params: {
 
   const isMainBranch = !isBranchingEnabled || selectedBranch?.is_default === true
   const branchDisplayName = isBranchingEnabled ? selectedBranch?.name ?? 'main' : 'main'
-  const selectedOrgInitial =
-    selectedOrganization?.name?.trim().charAt(0).toUpperCase() ?? 'O'
+  const selectedOrgInitial = selectedOrganization?.name?.trim().charAt(0).toUpperCase() ?? 'O'
   const organizationHref = selectedOrganization?.slug
     ? `/org/${selectedOrganization.slug}`
     : '/organizations'

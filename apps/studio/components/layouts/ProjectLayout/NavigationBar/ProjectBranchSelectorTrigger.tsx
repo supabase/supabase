@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronsUpDown, GitBranch } from 'lucide-react'
+import { ChevronsUpDown, GitBranch } from 'lucide-react'
 import { cn, SidebarMenuButton } from 'ui'
 
 export interface ProjectBranchSelectorTriggerProps {
@@ -15,9 +15,7 @@ export function ProjectBranchSelectorTrigger({
   displayProjectName,
   selectedOrgInitial,
   isBranch,
-  isProductionBranch,
   branchDisplayName,
-  onGoToOrganization,
   onClick,
 }: ProjectBranchSelectorTriggerProps) {
   return (

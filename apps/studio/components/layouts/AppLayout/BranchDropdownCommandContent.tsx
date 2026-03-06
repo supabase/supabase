@@ -8,10 +8,10 @@ import {
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  CommandInput_Shadcn_,
   ScrollArea,
 } from 'ui'
 
@@ -159,7 +159,10 @@ export function BranchDropdownCommandContent({
             }}
             onClick={onClose}
           >
-            <Link href={`/project/${projectRef}/branches`} className="w-full flex items-center gap-2">
+            <Link
+              href={`/project/${projectRef}/branches`}
+              className="w-full flex items-center gap-2"
+            >
               <ListTree size={14} strokeWidth={1.5} />
               <p>Manage branches</p>
             </Link>

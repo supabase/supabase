@@ -1,8 +1,10 @@
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
+import type { Organization } from 'types'
 import {
   Button,
+  cn,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -11,10 +13,7 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   ScrollArea,
-  cn,
 } from 'ui'
-
-import type { Organization } from 'types'
 
 import { OrgCommandItem } from './OrgCommandItem'
 
@@ -39,7 +38,6 @@ export function OrganizationDropdownCommandContent({
   organizationCreationEnabled,
   onClose,
 }: OrganizationDropdownCommandContentProps) {
-
   const orgList = (
     <>
       {organizations?.map((org) => (
@@ -112,10 +110,7 @@ export function OrganizationDropdownCommandContent({
         </CommandGroup_Shadcn_>
         <CommandSeparator_Shadcn_ />
         <CommandGroup_Shadcn_>
-          <CommandItem_Shadcn_
-            className="cursor-pointer w-full"
-            onSelect={() => onClose()}
-          >
+          <CommandItem_Shadcn_ className="cursor-pointer w-full" onSelect={() => onClose()}>
             <Link href="/organizations" className="flex items-center gap-2 w-full">
               All Organizations
             </Link>
@@ -125,10 +120,7 @@ export function OrganizationDropdownCommandContent({
           <>
             <CommandSeparator_Shadcn_ />
             <CommandGroup_Shadcn_>
-              <CommandItem_Shadcn_
-                className="cursor-pointer w-full"
-                onSelect={() => onClose()}
-              >
+              <CommandItem_Shadcn_ className="cursor-pointer w-full" onSelect={() => onClose()}>
                 <Link href="/new" className="flex items-center gap-2 w-full">
                   <Plus size={14} strokeWidth={1.5} />
                   <p>New organization</p>

@@ -104,9 +104,7 @@ function ProjectDropdownPlatformView({
 
       <OrganizationProjectSelector
         {...selectorProps}
-        renderTrigger={() => (
-          <AppLayoutDropdownTriggerButton className="flex-shrink-0" />
-        )}
+        renderTrigger={() => <AppLayoutDropdownTriggerButton className="flex-shrink-0" />}
       />
     </div>
   )

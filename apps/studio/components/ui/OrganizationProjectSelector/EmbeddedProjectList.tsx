@@ -1,5 +1,5 @@
 import type { OrgProject } from 'data/projects/org-projects-infinite-query'
-import type { RefObject, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectCommandItem } from './ProjectCommandItem'
@@ -12,7 +12,7 @@ export interface EmbeddedProjectListProps {
   renderRow?: (project: OrgProject) => ReactNode
   checkPosition?: 'right' | 'left'
   isOptionDisabled?: (project: OrgProject) => boolean
-  sentinelRef: RefObject<HTMLDivElement | null>
+  sentinelRef: (node: Element | null) => void
   hasNextPage: boolean
 }
 

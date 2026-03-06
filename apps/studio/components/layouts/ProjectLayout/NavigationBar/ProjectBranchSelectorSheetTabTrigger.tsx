@@ -47,10 +47,7 @@ export function ProjectBranchSelectorSheetTabTrigger({
             d="M5.49365 31L0.493652 0V62L5.49365 31Z"
             className="fill-[hsl(var(--background-dash-sidebar))] group-data-[state=active]:fill-[hsl(var(--background-surface-200))]"
           />
-          <path
-            d="M0.493652 0L5.49365 31L0.493652 62"
-            stroke="hsl(var(--border-default))"
-          />
+          <path d="M0.493652 0L5.49365 31L0.493652 62" stroke="hsl(var(--border-default))" />
         </svg>
       )}
     </TabsTrigger_Shadcn_>
