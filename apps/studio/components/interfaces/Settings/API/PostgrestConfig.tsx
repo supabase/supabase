@@ -18,7 +18,7 @@ import {
   FormItem_Shadcn_,
   Input_Shadcn_,
   PrePostTab,
-  Skeleton
+  Skeleton,
 } from 'ui'
 import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
@@ -32,6 +32,8 @@ import {
 } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
+import { ExposedSchemaSelector } from './ExposedSchemaSelector'
+import { HardenAPIModal } from './HardenAPIModal'
 import { ExposedTableSelector } from '@/components/interfaces/Settings/API/ExposedTableSelector'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
@@ -47,8 +49,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { noop } from '@/lib/void'
 import type { ResponseError } from '@/types'
-import { ExposedSchemaSelector } from './ExposedSchemaSelector'
-import { HardenAPIModal } from './HardenAPIModal'
 
 const formSchema = z.object({
   // Fields for updatePostgrestConfig

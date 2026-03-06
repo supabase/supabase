@@ -57,10 +57,7 @@ export const ExposedTableSelector = ({
     rootMargin: '0px',
   })
 
-  const {
-    data: countsData,
-    isPending: isCountsPending,
-  } = useQuery({
+  const { data: countsData, isPending: isCountsPending } = useQuery({
     ...exposedTableCountsQueryOptions({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -185,7 +182,10 @@ export const ExposedTableSelector = ({
                           <CommandItem_Shadcn_
                             key={table.id}
                             value={`${table.schema}.${table.name}-${table.id}`}
-                            className={cn('w-full', isSchemaExposed ? 'cursor-pointer' : 'opacity-50 !cursor-not-allowed')}
+                            className={cn(
+                              'w-full',
+                              isSchemaExposed ? 'cursor-pointer' : 'opacity-50 !cursor-not-allowed'
+                            )}
                             onSelect={() => {
                               if (!isSchemaExposed) return
 
@@ -222,7 +222,7 @@ export const ExposedTableSelector = ({
                               >
                                 {`${table.schema}.${table.name}`}
                               </span>
-                              
+
                               <div className="ml-auto flex items-center gap-x-2">
                                 {isCustomTable && (
                                   <Tooltip>
@@ -238,7 +238,10 @@ export const ExposedTableSelector = ({
                                         <CircleAlert size={14} />
                                       </div>
                                     </TooltipTrigger>
-                                    <TooltipContent side="right" className="max-w-[320px] text-xs pointer-events-none">
+                                    <TooltipContent
+                                      side="right"
+                                      className="max-w-[320px] text-xs pointer-events-none"
+                                    >
                                       {customGrantsTooltip}
                                     </TooltipContent>
                                   </Tooltip>
