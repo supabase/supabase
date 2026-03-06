@@ -2525,7 +2525,7 @@ export interface RequestUpgradeModalOpenedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
     /** Feature context driving the upgrade request */
@@ -2546,7 +2546,7 @@ export interface RequestUpgradeSubmittedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
   }

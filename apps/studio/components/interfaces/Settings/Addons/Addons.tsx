@@ -4,6 +4,7 @@ import {
   getAddons,
   subscriptionHasHipaaAddon,
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { ProjectUpdateDisabledTooltip } from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import AlertError from 'components/ui/AlertError'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
@@ -16,6 +17,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
+  useIsAwsCloudProvider,
   useIsOrioleDbInAws,
   useIsProjectActive,
   useSelectedProjectQuery,
@@ -48,6 +50,7 @@ export const Addons = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
+  const isAws = useIsAwsCloudProvider()
   const isProjectActive = useIsProjectActive()
   const isOrioleDbInAws = useIsOrioleDbInAws()
 
@@ -93,7 +96,8 @@ export const Addons = () => {
   const pitrEnabled = pitr !== undefined
   const customDomainEnabled = customDomain !== undefined
 
-  const canOpenIPv4 = isProjectActive && !projectUpdateDisabled && (canUpdateIPv4 || ipv4Enabled)
+  const canOpenIPv4 =
+    isAws && isProjectActive && !projectUpdateDisabled && (canUpdateIPv4 || ipv4Enabled)
   const canOpenPITR =
     isProjectActive &&
     !projectUpdateDisabled &&
@@ -102,13 +106,15 @@ export const Addons = () => {
     !isOrioleDbInAws
   const canOpenCustomDomain = isProjectActive && !projectUpdateDisabled
 
-  const ipv4DisabledReason = !isProjectActive
-    ? 'Project must be active to update IPv4'
-    : projectUpdateDisabled
-      ? 'Project updates are currently disabled'
-      : !canUpdateIPv4 && !ipv4Enabled
-        ? 'You can only add IPv4 when your project network configuration is set to IPv6'
-        : undefined
+  const ipv4DisabledReason = !isAws
+    ? 'Dedicated IPv4 address is only available for AWS projects'
+    : !isProjectActive
+      ? 'Project must be active to update IPv4'
+      : projectUpdateDisabled
+        ? 'Project updates are currently disabled'
+        : !canUpdateIPv4 && !ipv4Enabled
+          ? 'You can only add IPv4 when your project network configuration is set to IPv6'
+          : undefined
 
   const pitrDisabledReason = !isProjectActive
     ? 'Project must be active to update PITR'
@@ -129,6 +135,8 @@ export const Addons = () => {
       : undefined
 
   const listTopSpacing = isBranch ? 'mt-6' : undefined
+  const resourceItemClassName =
+    'min-h-[128px] !border-b last:!border-b-0 [&>div:first-child]:hidden @lg:[&>div:first-child]:flex'
 
   return (
     <PageContainer size="default">
@@ -140,8 +148,8 @@ export const Addons = () => {
               You are currently on a preview branch of your project
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
-              Updating addons here will only apply to this preview branch. To manage your addons,
-              for your main branch, please visit the{' '}
+              Updating add-ons here will only apply to this preview branch. To manage add-ons for
+              your main branch, please visit the{' '}
               <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
                 main branch
               </Link>
@@ -152,25 +160,29 @@ export const Addons = () => {
 
         {isLoading && (
           <ResourceList className={listTopSpacing}>
-            <div className="py-4 px-6 border-b last:border-b-none">
-              <HorizontalShimmerWithIcon />
-            </div>
-            <div className="py-4 px-6 border-b last:border-b-none">
-              <HorizontalShimmerWithIcon />
-            </div>
-            <div className="py-4 px-6 border-b last:border-b-none">
-              <HorizontalShimmerWithIcon />
-            </div>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex min-h-[128px] items-center gap-4 border-b px-6 py-4 last:border-b-none"
+              >
+                <div className="hidden @lg:flex h-24 w-40 shrink-0 items-center justify-center rounded-lg border">
+                  <div className="shimmering-loader h-full w-full rounded-lg" />
+                </div>
+                <div className="flex-1">
+                  <HorizontalShimmerWithIcon />
+                </div>
+              </div>
+            ))}
           </ResourceList>
         )}
 
-        {isError && <AlertError error={error} subject="Failed to retrieve project addons" />}
+        {isError && <AlertError error={error} subject="Failed to retrieve project add-ons" />}
 
         {isSuccess && (
           <ResourceList className={listTopSpacing}>
             {projectAddonsDedicatedIpv4Address && (
               <ResourceItem
-                className="!border-b last:!border-b-0 [&>div:first-child]:hidden @lg:[&>div:first-child]:flex"
+                className={resourceItemClassName}
                 onClick={canOpenIPv4 ? () => setPanel('ipv4') : undefined}
                 media={
                   <Image
@@ -187,19 +199,17 @@ export const Addons = () => {
                 }
                 meta={
                   <div className="flex items-center gap-4">
-                    {ipv4Enabled ? (
-                      <Badge variant="success">Enabled</Badge>
-                    ) : (
-                      <Badge variant="default">Disabled</Badge>
-                    )}
-                    {!canOpenIPv4 && ipv4DisabledReason && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
-                        </TooltipTrigger>
-                        <TooltipContent>{ipv4DisabledReason}</TooltipContent>
-                      </Tooltip>
-                    )}
+                    <ProjectUpdateDisabledTooltip
+                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectNotActive={!isProjectActive}
+                      tooltip={ipv4DisabledReason}
+                    >
+                      {ipv4Enabled ? (
+                        <Badge variant="success">Enabled</Badge>
+                      ) : (
+                        <Badge variant="default">Disabled</Badge>
+                      )}
+                    </ProjectUpdateDisabledTooltip>
                   </div>
                 }
               >
@@ -208,28 +218,25 @@ export const Addons = () => {
                   <p className="m-0 text-foreground-light text-sm">
                     Reserve a dedicated IPv4 address for your project.
                   </p>
-                  <div>
-                    <Link
-                      href={`${DOCS_URL}/guides/platform/ipv4-address`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-link"
-                    >
-                      <div className="inline-flex items-center gap-2 opacity-50 hover:opacity-100 transition">
-                        <span className="text-sm">About IPv4 deprecation</span>
-                      </div>
-                    </Link>
-                  </div>
+                  <Link
+                    href={`${DOCS_URL}/guides/platform/ipv4-address`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-link text-sm"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    About IPv4 deprecation
+                  </Link>
                 </div>
               </ResourceItem>
             )}
 
             <ResourceItem
-              className="!border-b last:!border-b-0 [&>div:first-child]:hidden @lg:[&>div:first-child]:flex"
+              className={resourceItemClassName}
               onClick={canOpenPITR ? () => setPanel('pitr') : undefined}
               media={
                 <Image
-                  className="bg"
+                  className="bg rounded-lg border"
                   alt="PITR"
                   width={160}
                   height={96}
@@ -263,18 +270,15 @@ export const Addons = () => {
                 <p className="m-0 text-foreground-light text-sm">
                   Restore your database to a specific moment in the past.
                 </p>
-                <div>
-                  <Link
-                    href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-link"
-                  >
-                    <div className="inline-flex items-center gap-2 opacity-50 hover:opacity-100 transition">
-                      <span className="text-sm">About PITR backups</span>
-                    </div>
-                  </Link>
-                </div>
+                <Link
+                  href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-link text-sm"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  About PITR backups
+                </Link>
               </div>
             </ResourceItem>
 
@@ -322,7 +326,7 @@ export const Addons = () => {
 
             {projectSettingsCustomDomains && (
               <ResourceItem
-                className="!border-b last:!border-b-0 [&>div:first-child]:hidden @lg:[&>div:first-child]:flex"
+                className={resourceItemClassName}
                 onClick={canOpenCustomDomain ? () => setPanel('customDomain') : undefined}
                 media={
                   <Image
@@ -364,18 +368,15 @@ export const Addons = () => {
                   <p className="m-0 text-foreground-light text-sm">
                     Serve your project on your own domain name.
                   </p>
-                  <div>
-                    <Link
-                      href={`${DOCS_URL}/guides/platform/custom-domains`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-link"
-                    >
-                      <div className="inline-flex items-center gap-2 opacity-50 hover:opacity-100 transition">
-                        <span className="text-sm">About custom domains</span>
-                      </div>
-                    </Link>
-                  </div>
+                  <Link
+                    href={`${DOCS_URL}/guides/platform/custom-domains`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-link text-sm"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    About custom domains
+                  </Link>
                 </div>
               </ResourceItem>
             )}

@@ -16,7 +16,7 @@ const ProjectAddons: NextPageWithLayout = () => {
       <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Add ons</PageHeaderTitle>
+            <PageHeaderTitle>Add-ons</PageHeaderTitle>
             <PageHeaderDescription>Level up your project with add-ons</PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
@@ -28,7 +28,7 @@ const ProjectAddons: NextPageWithLayout = () => {
 
 ProjectAddons.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout title="Add ons">{page}</SettingsLayout>
+    <SettingsLayout title="Add-ons">{page}</SettingsLayout>
   </DefaultLayout>
 )
 export default ProjectAddons
