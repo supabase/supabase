@@ -101,6 +101,13 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       if (payload[x] === '') payload[x] = null
     })
 
+    // Convert \n escape sequences in SMS_TEMPLATE to real newline characters.
+    // This allows users to type \n in the template textarea to create actual line
+    // breaks in the sent SMS — required for WebOTP API compatibility (issue #6435).
+    if (typeof payload.SMS_TEMPLATE === 'string') {
+      payload.SMS_TEMPLATE = payload.SMS_TEMPLATE.replace(/\\n/g, '\n')
+    }
+
     // The backend uses empty string to represent no required characters in the password
     if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
       payload.PASSWORD_REQUIRED_CHARACTERS = ''
