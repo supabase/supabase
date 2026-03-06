@@ -107,6 +107,11 @@ const HomePageCover = (props) => {
       href: '/guides/getting-started/quickstarts/flask',
       hasLightIcon: false,
     },
+    {
+      tooltip: 'Angular',
+      icon: '/docs/img/icons/angular-icon',
+      href: '/guides/getting-started/quickstarts/angular',
+    }
   ]
 
   const GettingStarted = () => (
