@@ -1,4 +1,3 @@
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
@@ -20,6 +19,7 @@ import { Button, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import {
@@ -302,6 +302,7 @@ export const ApiAccessToggle = ({
           )}
         </div>
       </div>
+
       <SchemaExposureOptions
         projectRef={projectRef}
         schemaName={schemaName}
@@ -331,14 +332,13 @@ const SchemaExposureOptions = ({
 }): ReactNode => {
   const { selectedDatabaseId } = useDatabaseSelectorStateSnapshot()
 
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const { data: endpoint } = useProjectApiUrl({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
   const { data: databases } = useReadReplicasQuery({ projectRef })
 
   const apiEndpoint = useMemo(() => {
-    const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
-    if (isCustomDomainActive && selectedDatabaseId === projectRef) {
-      return `https://${customDomainData.customDomain.hostname}`
+    if (selectedDatabaseId === projectRef) {
+      return endpoint
     }
 
     const loadBalancerSelected = selectedDatabaseId === 'load-balancer'
@@ -348,14 +348,8 @@ const SchemaExposureOptions = ({
 
     const selectedDatabase = databases?.find((db) => db.identifier === selectedDatabaseId)
     return selectedDatabase?.restUrl
-  }, [
-    projectRef,
-    databases,
-    selectedDatabaseId,
-    customDomainData?.customDomain?.status,
-    customDomainData?.customDomain?.hostname,
-    loadBalancers,
-  ])
+  }, [selectedDatabaseId, projectRef, databases, endpoint, loadBalancers])
+
   const apiBaseUrl = useMemo(() => {
     if (!apiEndpoint) return undefined
     return apiEndpoint.endsWith('/') ? apiEndpoint.slice(0, -1) : apiEndpoint

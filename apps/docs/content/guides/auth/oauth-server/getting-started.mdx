@@ -495,11 +495,11 @@ Store the client secret securely. It will only be shown once. If you lose it, yo
 
 When a client exchanges an authorization code or refreshes a token, it must authenticate with the token endpoint. The `token_endpoint_auth_method` controls how this authentication happens:
 
-| Method | Description | Used by |
-| --- | --- | --- |
-| `none` | No client authentication. Only `client_id` is sent in the request body. | Public clients (required) |
-| `client_secret_basic` | Client credentials sent via HTTP Basic auth (`Authorization: Basic <base64(client_id:client_secret)>`). **This is the default for confidential clients.** | Confidential clients |
-| `client_secret_post` | Client credentials sent in the request body (`client_id` and `client_secret` as form parameters). | Confidential clients |
+| Method                | Description                                                                                                                                               | Used by                   |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `none`                | No client authentication. Only `client_id` is sent in the request body.                                                                                   | Public clients (required) |
+| `client_secret_basic` | Client credentials sent via HTTP Basic auth (`Authorization: Basic <base64(client_id:client_secret)>`). **This is the default for confidential clients.** | Confidential clients      |
+| `client_secret_post`  | Client credentials sent in the request body (`client_id` and `client_secret` as form parameters).                                                         | Confidential clients      |
 
 **Defaults:** Public clients default to `none`. Confidential clients default to `client_secret_basic` (per [RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591#section-2)).
 

@@ -762,6 +762,12 @@ export const examples: Registry = [
     files: ['example/separator-demo.tsx'],
   },
   {
+    name: 'sheet-confirm-on-close-demo',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button', 'input', 'label', 'separator', 'sheet'],
+    files: ['example/sheet-confirm-on-close-demo.tsx'],
+  },
+  {
     name: 'sheet-demo',
     type: 'components:example',
     registryDependencies: ['sheet'],
