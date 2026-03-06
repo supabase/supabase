@@ -15,7 +15,9 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 const EXPERIMENT_ID = 'pricingCalculatorExperiment' as const
 type PricingCalculatorVariant = 'control' | 'test'
 
-const NewPricingComputeSection = dynamic(() => import('~/components/Pricing/NewPricingComputeSection'))
+const NewPricingComputeSection = dynamic(
+  () => import('~/components/Pricing/NewPricingComputeSection')
+)
 const PricingComputeSection = dynamic(() => import('~/components/Pricing/PricingComputeSection'))
 const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons'))
 const PricingComparisonTable = dynamic(() => import('~/components/Pricing/PricingComparisonTable'))

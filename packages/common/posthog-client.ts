@@ -267,7 +267,9 @@ class PostHogClient {
           .map((c) => c.trim())
           .find((c) => c.startsWith('x-ph-flag-overrides='))
         if (cookieEntry) {
-          const overrides = JSON.parse(decodeURIComponent(cookieEntry.substring('x-ph-flag-overrides='.length)))
+          const overrides = JSON.parse(
+            decodeURIComponent(cookieEntry.substring('x-ph-flag-overrides='.length))
+          )
           if (key in overrides) return overrides[key]
         }
       } catch {}
