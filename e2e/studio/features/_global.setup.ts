@@ -1,6 +1,9 @@
 import { test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
-import path from 'path'
+import path from 'node:path'
+import os from 'node:os'
+import fs from 'node:fs/promises'
+
 import { env } from '../env.config.js'
 import { setupProjectForTests } from '../scripts/setup-platform-tests.js'
 import { loginWithEmail } from '../scripts/login/email.js'
@@ -36,7 +39,7 @@ setup('Global Setup', async ({ page }) => {
 
   await page.goto(studioUrl).catch((err) => {
     console.error(
-      `\n 🚨 Setup Error 
+      `\n 🚨 Setup Error
 Studio is not available at: ${studioUrl}
 
 Please ensure:
@@ -117,5 +120,14 @@ To start API locally, run:
       console.error(`\n 🚨 Authentication failed with GitHub`)
       throw err
     }
+  }
+
+  // Cleanup locks as they may persist between runs especially locally
+  const locksDirPath = path.join(os.tmpdir(), 'playwright-locks')
+  try {
+    await fs.access(locksDirPath);
+    await fs.rm(locksDirPath, { recursive: true, force: true })
+  } catch {
+    // Silently catch, no directory
   }
 })
