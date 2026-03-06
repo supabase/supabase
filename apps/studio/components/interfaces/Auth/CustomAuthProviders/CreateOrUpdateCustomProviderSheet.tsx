@@ -30,6 +30,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { FormSectionLabel } from '@/components/ui/Forms/FormSection'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthCustomProviderCreateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-create-mutation'
@@ -37,6 +38,7 @@ import {
   useOAuthCustomProviderUpdateMutation,
   type OAuthCustomProviderUpdateVariables,
 } from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface CreateOrUpdateCustomProviderSheetProps {
   visible: boolean
@@ -57,13 +59,12 @@ const SharedFormSchema = z.object({
     .min(1, 'Please provide a name for your custom provider')
     .max(100, 'Name must be less than 100 characters'),
   provider_type: z.enum(['oidc', 'oauth2']).default('oidc'),
-  client_id: z.string().trim(),
-  client_secret: z.string().trim(),
+  client_id: z.string().min(1, 'Please provide a client ID').trim(),
+  client_secret: z.string().min(1, 'Please provide a client secret').trim(),
   email_optional: z.boolean().default(false),
   issuer: z.string().url('Please provide a valid URL').trim(),
   // comma-separated scopes in the form, will be transformed to array when sending
   scopes: z.string().default(''),
-  callback_url: z.string().optional(), // Readonly display from project endpoint, not part of payload
 })
 
 const OidcSchema = SharedFormSchema.extend({
@@ -224,16 +225,23 @@ export const CreateOrUpdateCustomProviderSheet = ({
     }
   }
 
-  const onCloseSheet = () => {
-    form.reset(initialValues)
-    onClose()
-  }
-
   const isManualConfiguration =
     useWatch_Shadcn_({ control: form.control, name: 'provider_type' }) === 'oauth2'
 
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: closeConfirmationModalProps,
+  } = useConfirmOnClose({
+    checkIsDirty: () => form.formState.isDirty,
+    onClose: () => {
+      form.reset(initialValues)
+      onClose()
+    },
+  })
+
   return (
-    <Sheet open={visible} onOpenChange={() => onCloseSheet()}>
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent
         size="lg"
         showClose={false}
@@ -491,33 +499,24 @@ export const CreateOrUpdateCustomProviderSheet = ({
             </SheetSection>
             <Separator />
             <SheetSection className="flex-grow px-5 space-y-4">
-              <FormField_Shadcn_
-                control={form.control}
-                name="callback_url"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="horizontal"
-                    label="Callback URL"
-                    description="Configure this in your OAuth provider's settings: (readonly field, existing)"
-                  >
-                    <FormControl_Shadcn_>
-                      <Input
-                        {...field}
-                        copy
-                        readOnly
-                        disabled
-                        value={`${endpointData}/auth/v1/callback`}
-                        placeholder={`${endpointData}/auth/v1/callback`}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
+              <FormItemLayout
+                layout="horizontal"
+                label="Callback URL"
+                description="Configure this in your OAuth provider's settings."
+              >
+                <Input
+                  copy
+                  readOnly
+                  disabled
+                  value={`${endpointData}/auth/v1/callback`}
+                  placeholder={`${endpointData}/auth/v1/callback`}
+                />
+              </FormItemLayout>
             </SheetSection>
           </form>
         </Form_Shadcn_>
         <SheetFooter>
-          <Button type="default" onClick={onCloseSheet}>
+          <Button type="default" onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button htmlType="submit" form={FORM_ID} loading={isCreating || isUpdating}>
@@ -525,6 +524,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
           </Button>
         </SheetFooter>
       </SheetContent>
+      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
     </Sheet>
   )
 }
