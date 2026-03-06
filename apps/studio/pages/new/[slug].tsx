@@ -44,7 +44,6 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useTrackExperimentExposure } from 'hooks/misc/useTrackExperimentExposure'
 import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
@@ -72,10 +71,6 @@ const Wizard: NextPageWithLayout = () => {
   const { profile } = useProfile()
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
-  const rlsExperimentVariant = usePHFlag<'control' | 'test' | false | undefined>(
-    'projectCreationEnableRlsEventTrigger'
-  )
-  const shouldShowEnableRlsEventTrigger = rlsExperimentVariant === 'test'
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
@@ -250,9 +245,6 @@ const Wizard: NextPageWithLayout = () => {
         {
           instanceSize: form.getValues('instanceSize'),
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
-          ...((rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test') && {
-            rlsOptionVariant: rlsExperimentVariant,
-          }),
           dataApiEnabled: form.getValues('dataApi'),
           useOrioleDb: form.getValues('useOrioleDb'),
         },
@@ -388,15 +380,6 @@ const Wizard: NextPageWithLayout = () => {
       })
     }
   }, [instanceSize, watchedInstanceSize, form])
-
-  // Track exposure to RLS option experiment (only when explicitly assigned to a variant)
-  const shouldTrackRlsExposure =
-    !!currentOrg?.slug && (rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test')
-
-  useTrackExperimentExposure(
-    'project_creation_rls_option',
-    shouldTrackRlsExposure ? rlsExperimentVariant : undefined
-  )
 
   return (
     <Form_Shadcn_ {...form}>
