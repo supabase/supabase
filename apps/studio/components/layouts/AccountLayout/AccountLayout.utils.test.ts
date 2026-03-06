@@ -10,7 +10,12 @@ describe('toSubMenuSections', () => {
         heading: 'Account Settings',
         links: [
           { key: 'preferences', label: 'Preferences', href: '/account/me', isActive: true },
-          { key: 'access-tokens', label: 'Access Tokens', href: '/account/tokens', isActive: false },
+          {
+            key: 'access-tokens',
+            label: 'Access Tokens',
+            href: '/account/tokens',
+            isActive: false,
+          },
         ],
       },
     ]
@@ -79,9 +84,7 @@ describe('getActiveKey', () => {
   })
 
   it('returns undefined when no active link', () => {
-    const sections = [
-      { key: 's1', links: [{ key: 'a', label: 'A', isActive: false }] },
-    ]
+    const sections = [{ key: 's1', links: [{ key: 'a', label: 'A', isActive: false }] }]
     expect(getActiveKey(sections)).toBeUndefined()
   })
 

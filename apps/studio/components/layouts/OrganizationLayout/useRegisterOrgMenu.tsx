@@ -5,7 +5,6 @@ import { useLayoutEffect } from 'react'
 
 import { OrgMenuContent } from '../ProjectLayout/LayoutHeader/MobileMenuContent/OrgMenuContent'
 import { useMobileSheet } from '../ProjectLayout/NavigationBar/MobileSheetContext'
-
 import { getPathnameWithoutQuery, isOrgMenuScope } from './OrganizationLayout.utils'
 
 /**
@@ -21,9 +20,7 @@ export function useRegisterOrgMenu() {
     if (!isOrgMenuScope(pathname)) return
 
     const unregister = registerOpenMenu(() => {
-      setMobileSheetContent(
-        <OrgMenuContent onCloseSheet={() => setMobileSheetContent(null)} />
-      )
+      setMobileSheetContent(<OrgMenuContent onCloseSheet={() => setMobileSheetContent(null)} />)
     })
     return unregister
   }, [router.asPath, router.pathname, registerOpenMenu, setMobileSheetContent])

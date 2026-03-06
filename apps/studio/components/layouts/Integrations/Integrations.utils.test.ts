@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  getCategoryParamFromAsPath,
-  getIntegrationsPageFromPathname,
-} from './Integrations.utils'
+import { getCategoryParamFromAsPath, getIntegrationsPageFromPathname } from './Integrations.utils'
 
 describe('getIntegrationsPageFromPathname', () => {
   it('returns section only when no subsection', () => {
@@ -35,7 +32,9 @@ describe('getIntegrationsPageFromPathname', () => {
 describe('getCategoryParamFromAsPath', () => {
   it('returns category value when present', () => {
     expect(getCategoryParamFromAsPath('/project/ref/integrations?category=wrapper')).toBe('wrapper')
-    expect(getCategoryParamFromAsPath('/path?category=postgres_extension')).toBe('postgres_extension')
+    expect(getCategoryParamFromAsPath('/path?category=postgres_extension')).toBe(
+      'postgres_extension'
+    )
   })
 
   it('returns null when category absent', () => {

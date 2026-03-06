@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  getPathnameWithoutQuery,
-  isOrgMenuScope,
-} from './OrganizationLayout.utils'
+import { getPathnameWithoutQuery, isOrgMenuScope } from './OrganizationLayout.utils'
 
 describe('getPathnameWithoutQuery', () => {
   it('strips query string from path', () => {

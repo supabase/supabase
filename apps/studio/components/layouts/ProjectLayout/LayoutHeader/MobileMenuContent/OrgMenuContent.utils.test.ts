@@ -48,15 +48,15 @@ describe('isOrgMenuActive', () => {
 
   it('item is active when activeRoute matches item key', () => {
     expect(isOrgMenuActive(mockItem('team'), 1, '/org/foo/team', 'team')).toBe(true)
-    expect(isOrgMenuActive(mockItem('integrations'), 2, '/org/foo/integrations', 'integrations')).toBe(
-      true
-    )
+    expect(
+      isOrgMenuActive(mockItem('integrations'), 2, '/org/foo/integrations', 'integrations')
+    ).toBe(true)
   })
 
   it('settings item is active when pathname includes settings sub-routes', () => {
-    expect(
-      isOrgMenuActive(mockItem('settings'), 5, '/org/foo/settings/general', 'settings')
-    ).toBe(true)
+    expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/settings/general', 'settings')).toBe(
+      true
+    )
     expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/general', undefined)).toBe(true)
     expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/apps', undefined)).toBe(true)
     expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/audit', undefined)).toBe(true)
