@@ -1,4 +1,5 @@
 import { AlertCircle, Check, RefreshCwIcon } from 'lucide-react'
+import { SchemaInstallationStatus } from 'stripe-experiment-sync/supabase'
 
 import {
   hasInstallError,
@@ -6,17 +7,18 @@ import {
   isInstalled,
   isInstalling,
   isUninstalling,
-  StripeInstallationStatus,
 } from './stripe-sync-status'
 
 export const StatusDisplay = ({
   status,
   isInstallRequested,
   isUninstallRequested,
+  isUpgrade,
 }: {
-  status: StripeInstallationStatus
+  status: SchemaInstallationStatus
   isInstallRequested: boolean
   isUninstallRequested: boolean
+  isUpgrade?: boolean
 }) => {
   const installed = isInstalled(status)
   const installError = hasInstallError(status)
@@ -27,14 +29,6 @@ export const StatusDisplay = ({
   const installing = installInProgress || isInstallRequested
   const uninstalling = uninstallInProgress || isUninstallRequested
 
-  if (uninstallError) {
-    return (
-      <span className="flex items-center gap-2 text-foreground-light text-sm">
-        <AlertCircle size={14} className="text-destructive" />
-        Uninstallation error
-      </span>
-    )
-  }
   if (uninstalling) {
     return (
       <span className="flex items-center gap-2 text-foreground-light text-sm">
@@ -43,11 +37,11 @@ export const StatusDisplay = ({
       </span>
     )
   }
-  if (installError) {
+  if (uninstallError) {
     return (
       <span className="flex items-center gap-2 text-foreground-light text-sm">
         <AlertCircle size={14} className="text-destructive" />
-        Installation error
+        Uninstallation error
       </span>
     )
   }
@@ -55,7 +49,15 @@ export const StatusDisplay = ({
     return (
       <span className="flex items-center gap-2 text-foreground-light text-sm">
         <RefreshCwIcon size={14} className="animate-spin text-foreground-lighter" />
-        Installing...
+        {isUpgrade ? 'Upgrading...' : 'Installing...'}
+      </span>
+    )
+  }
+  if (installError) {
+    return (
+      <span className="flex items-center gap-2 text-foreground-light text-sm">
+        <AlertCircle size={14} className="text-destructive" />
+        {isUpgrade ? 'Upgrade error' : 'Installation error'}
       </span>
     )
   }

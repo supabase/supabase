@@ -8,10 +8,16 @@ export const InstallationError = ({
   error,
   handleUninstall,
   handleOpenInstallSheet,
+  isUpgrade,
+  installing,
+  uninstalling,
 }: {
   error: 'install' | 'uninstall'
   handleUninstall: () => void
   handleOpenInstallSheet: () => void
+  isUpgrade?: boolean
+  installing?: boolean
+  uninstalling?: boolean
 }) => {
   const { ref } = useParams()
 
@@ -24,8 +30,13 @@ export const InstallationError = ({
         description="There was an error during the uninstallation of the Stripe Sync Engine, please try again. If the problem persists, contact support."
         actions={
           <div className="flex items-center gap-x-2">
-            <Button type="default" onClick={handleUninstall}>
-              Retry uninstall
+            <Button
+              type="default"
+              onClick={handleUninstall}
+              disabled={uninstalling}
+              loading={uninstalling}
+            >
+              Retry uninstallation
             </Button>
             <ContactSupportButton
               projectRef={ref}
@@ -42,14 +53,34 @@ export const InstallationError = ({
       <Admonition
         type="warning"
         layout="responsive"
-        title="Failed to install Stripe Sync Engine"
-        description="There was an error during the installation of the Stripe Sync Engine, please try reinstalling the integration. If the problem persists, contact support."
+        title={
+          isUpgrade
+            ? 'Failed to upgrade Stripe Sync Engine'
+            : 'Failed to install Stripe Sync Engine'
+        }
+        description={
+          isUpgrade
+            ? 'There was an error during the upgrade of the Stripe Sync Engine, please try again. If the problem persists, contact support.'
+            : 'There was an error during the installation of the Stripe Sync Engine, please try reinstalling the integration. If the problem persists, contact support.'
+        }
         actions={
           <div className="flex items-center gap-x-2">
-            <Button type="default" onClick={handleOpenInstallSheet}>
-              Retry install
+            <Button
+              type="default"
+              onClick={handleOpenInstallSheet}
+              disabled={installing}
+              loading={installing}
+            >
+              {isUpgrade ? 'Retry upgrade' : 'Retry installation'}
             </Button>
-            <ContactSupportButton projectRef={ref} subject="Failed to install Stripe Sync Engine" />
+            <ContactSupportButton
+              projectRef={ref}
+              subject={
+                isUpgrade
+                  ? 'Failed to upgrade Stripe Sync Engine'
+                  : 'Failed to install Stripe Sync Engine'
+              }
+            />
           </div>
         }
       />
