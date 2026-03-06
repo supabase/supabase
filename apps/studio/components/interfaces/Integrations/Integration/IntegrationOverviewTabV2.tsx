@@ -1,26 +1,13 @@
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import Link from 'next/link'
-import { PropsWithChildren, ReactNode } from 'react'
-import { Badge, Card, CardContent, cn, Separator } from 'ui'
 
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 
-interface IntegrationOverviewTabProps {
-  actions?: ReactNode
-  status?: string | ReactNode
-}
-
 /**
  * [Joshen] This will serve as the overview tab for remotely fetched integrations
  */
-export const IntegrationOverviewTabV2 = ({
-  status,
-  children,
-}: PropsWithChildren<IntegrationOverviewTabProps>) => {
+export const IntegrationOverviewTabV2 = () => {
   const { id } = useParams()
 
   const { data: allIntegrations } = useAvailableIntegrations()
