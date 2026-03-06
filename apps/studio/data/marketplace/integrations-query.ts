@@ -4,7 +4,7 @@ import { handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { marketplaceIntegrationsKeys } from './keys'
-import type { Database, Tables } from './marketplace.types'
+import type { Database } from './marketplace.types'
 
 // [Joshen] There was a new way of writing queries IIRC - check with Alaister which file to reference
 // https://github.com/supabase/supabase/pull/43280/changes#diff-868487dea75aac9e001894eb61232c204181d67823bedd6d2e605e49957ec5e4
@@ -17,11 +17,9 @@ const createMarketplaceClient = () => {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
-      // @ts-expect-error
-      multiTab: false,
       detectSessionInUrl: false,
-      localStorage: {
-        getItem: (_key: string) => undefined,
+      storage: {
+        getItem: (_key: string) => null,
         setItem: (_key: string, _value: string) => {},
         removeItem: (_key: string) => {},
       },
@@ -29,13 +27,9 @@ const createMarketplaceClient = () => {
   })
 }
 
-// [Joshen] Something's wrong with this version of JS lib + generated types
-// Ping team-dev-workflows RE this
-type MarketplaceIntegration = Tables<'items'>[]
-
 async function getMarketplaceIntegrations() {
   const client = createMarketplaceClient()
-  const { data, error } = await client.from('items').select('*').returns<MarketplaceIntegration>()
+  const { data, error } = await client.from('items').select('*')
 
   if (error) handleError(error)
   return data ?? []
