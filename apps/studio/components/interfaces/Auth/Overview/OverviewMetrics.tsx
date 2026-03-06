@@ -41,6 +41,8 @@ import {
   getMetricValues,
 } from './OverviewUsage.constants'
 import { getStatusColor } from 'components/ui/DataTable/DataTable.utils'
+import { ErrorCodeTooltip } from '../../Settings/Logs/ErrorCodeTooltip'
+import { Service } from 'data/graphql/graphql'
 import { AiIconAnimation } from 'ui'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -398,9 +400,11 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         header: 'Error code',
                         className: 'w-full',
                         render: (row) => (
-                          <span className="line-clamp-1 font-mono uppercase text-xs inline-flex text-foreground-light">
-                            {row.error_code}
-                          </span>
+                          <ErrorCodeTooltip errorCode={row.error_code} service={Service.Auth}>
+                            <span className="line-clamp-1 font-mono uppercase text-xs inline-flex text-foreground-light cursor-default">
+                              {row.error_code}
+                            </span>
+                          </ErrorCodeTooltip>
                         ),
                       },
                       {

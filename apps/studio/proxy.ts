@@ -26,6 +26,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/generate-attachment-url',
   '/incident-status',
   '/api/integrations/stripe-sync',
+  '/content/graphql',
 ]
 
 export function proxy(request: NextRequest) {
