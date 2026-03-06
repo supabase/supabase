@@ -1,5 +1,6 @@
-import { get } from './fetchWrappers'
 import { queryOptions } from '@tanstack/react-query'
+
+import { get } from './fetchWrappers'
 
 export interface ProjectApiVariables {
   projectRef?: string
@@ -65,4 +66,3 @@ export const projectSettingsQueryOptions = (
     enabled: enabled && typeof projectRef !== 'undefined',
   })
 }
-

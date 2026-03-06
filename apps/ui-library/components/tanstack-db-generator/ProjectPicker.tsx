@@ -1,15 +1,16 @@
 'use client'
 
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { useIsLoggedIn, useIsUserLoading, LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
 import { useEffect, useMemo, useState } from 'react'
+
+import { ComboBox, type ComboBoxOption } from './ComboBox'
+import { fromOrgProjectValue, toDisplayNameOrgProject, toOrgProjectValue, type Org } from './utils'
 import { useDebounce } from '@/hooks/useDebounce'
 import { organizationsQueryOptions } from '@/lib/fetch/organizations'
-import { projectsInfiniteQueryOptions, type ProjectInfoInfinite } from '@/lib/fetch/projects'
 import { projectKeysQueryOptions } from '@/lib/fetch/projectApi'
+import { projectsInfiniteQueryOptions, type ProjectInfoInfinite } from '@/lib/fetch/projects'
 import { retrieve, storeOrRemoveNull } from '@/lib/storage'
-import { type Org, fromOrgProjectValue, toDisplayNameOrgProject, toOrgProjectValue } from './utils'
-import { ComboBox, type ComboBoxOption } from './ComboBox'
 
 interface ProjectPickerProps {
   onProjectResolved: (data: { projectRef: string; anonKey: string } | null) => void
@@ -178,7 +179,8 @@ export function ProjectPicker({ onProjectResolved }: ProjectPickerProps) {
       )}
       {missingAnonKey && selectedProject && (
         <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
-          This project does not have an anon key. Please enable the anon key in your project's API settings to use this block.
+          This project does not have an anon key. Please enable the anon key in your project&apos;s
+          API settings to use this block.
         </div>
       )}
     </div>
