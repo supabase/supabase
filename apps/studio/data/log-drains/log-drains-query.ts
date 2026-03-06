@@ -8,6 +8,9 @@ export type LogDrainsVariables = {
   ref?: string
 }
 
+export const normalizeLogDrainsData = (data: unknown): LogDrainsData =>
+  Array.isArray(data) ? (data as LogDrainsData) : []
+
 export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSignal) {
   if (!ref) {
     throw new Error('ref is required')
@@ -22,7 +25,7 @@ export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSi
     handleError(error)
   }
 
-  return data
+  return normalizeLogDrainsData(data)
 }
 
 export type LogDrainsData = Awaited<ReturnType<typeof getLogDrains>>
