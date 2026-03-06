@@ -111,9 +111,6 @@ export const ProjectAccessSection = () => {
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Project access</PageSectionTitle>
-          <PageSectionDescription>
-            View which members can access this project
-          </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
