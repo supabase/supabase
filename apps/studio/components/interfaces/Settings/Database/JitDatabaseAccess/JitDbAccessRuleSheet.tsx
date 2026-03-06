@@ -1,6 +1,8 @@
 import { InlineLink } from 'components/ui/InlineLink'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from 'lib/constants'
-import { useEffect } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
@@ -61,6 +63,34 @@ export function JitDbAccessRuleSheet({
   onCancel,
   onSave,
 }: JitDbAccessRuleSheetProps) {
+  const initialDraftSnapshotRef = useRef(JSON.stringify(draft))
+  const previousOpenRef = useRef(open)
+  const previousModeRef = useRef(mode)
+
+  const serializedDraft = useMemo(() => JSON.stringify(draft), [draft])
+  const isDirty = serializedDraft !== initialDraftSnapshotRef.current
+
+  useEffect(() => {
+    const justOpened = open && !previousOpenRef.current
+    const modeChangedWhileOpen = open && previousOpenRef.current && previousModeRef.current !== mode
+
+    if (justOpened || modeChangedWhileOpen) {
+      initialDraftSnapshotRef.current = JSON.stringify(draft)
+    }
+
+    previousOpenRef.current = open
+    previousModeRef.current = mode
+  }, [open, mode, draft])
+
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: closeConfirmationModalProps,
+  } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: onCancel,
+  })
+
   const updateGrant = (
     roleId: string,
     updater: (grant: JitUserRuleDraft['grants'][number]) => JitUserRuleDraft['grants'][number]
@@ -102,7 +132,7 @@ export function JitDbAccessRuleSheet({
   }, [form, inlineValidation.member, inlineValidation.roles, showInlineValidation])
 
   return (
-    <Sheet open={open} onOpenChange={(nextOpen) => !nextOpen && onCancel()}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         showClose={false}
         size="default"
@@ -213,7 +243,7 @@ export function JitDbAccessRuleSheet({
         </Form_Shadcn_>
 
         <SheetFooter className="mt-auto w-full border-t py-4">
-          <Button type="default" onClick={onCancel} disabled={isSubmitting}>
+          <Button type="default" onClick={confirmOnClose} disabled={isSubmitting}>
             Cancel
           </Button>
           <Button type="primary" onClick={onSave} disabled={isSubmitting}>
@@ -221,6 +251,7 @@ export function JitDbAccessRuleSheet({
           </Button>
         </SheetFooter>
       </SheetContent>
+      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
     </Sheet>
   )
 }
