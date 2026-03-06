@@ -98,13 +98,6 @@ export const useInstalledIntegrations = () => {
       .sort((a, b) => a.name.localeCompare(b.name))
   }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled])
 
-  // available integrations are all integrations that can be installed. If an integration can't be installed (needed
-  // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
-  const availableIntegrations = useMemo(
-    () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
-    [allIntegrations]
-  )
-
   const error = fdwError || extensionsError || schemasError
   const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading
   const isError = isErrorFDWs || isErrorExtensions || isErrorSchemas
@@ -113,7 +106,6 @@ export const useInstalledIntegrations = () => {
   return {
     // show all integrations at once instead of showing partial results
     installedIntegrations: isLoading ? EMPTY_ARR : installedIntegrations,
-    availableIntegrations: isLoading ? EMPTY_ARR : availableIntegrations,
     error,
     isError,
     isLoading,

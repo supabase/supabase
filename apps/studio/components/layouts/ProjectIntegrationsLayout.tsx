@@ -1,6 +1,3 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { ProjectLayout } from 'components/layouts/ProjectLayout'
 import AlertError from 'components/ui/AlertError'
@@ -10,6 +7,8 @@ import { ProductMenuItem } from 'components/ui/ProductMenu/ProductMenuItem'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
 import { Menu, Separator } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
@@ -17,7 +16,7 @@ import { GenericSkeletonLoader } from 'ui-patterns'
  * Layout component for the Integrations section
  * Provides sidebar navigation for integrations
  */
-const IntegrationsLayout = ({ children }: PropsWithChildren) => {
+const ProjectIntegrationsLayout = ({ children }: PropsWithChildren) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { integrationsWrappers: showWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
@@ -102,7 +101,7 @@ const IntegrationsLayout = ({ children }: PropsWithChildren) => {
 }
 
 // Wrap component with authentication HOC before exporting
-export default withAuth(IntegrationsLayout)
+export default withAuth(ProjectIntegrationsLayout)
 
 const generateIntegrationsMenu = ({
   projectRef,

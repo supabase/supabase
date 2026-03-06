@@ -31,7 +31,7 @@ const createMarketplaceClient = () => {
 
 // [Joshen] Something's wrong with this version of JS lib + generated types
 // Ping team-dev-workflows RE this
-type MarketplaceIntegration = Tables<'items'>[] & {}
+type MarketplaceIntegration = Tables<'items'>[]
 
 async function getMarketplaceIntegrations() {
   const client = createMarketplaceClient()
