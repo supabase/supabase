@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import type { UseCustomMutationOptions } from 'types'
 
 import type { ConnectionVars } from '../common.types'
-import { IGNORED_SCHEMAS } from './exposed-tables-infinite-query'
+import { getExposedSchemasSql } from './privileges.sql'
 
 export type UpdateExposedTablesVariables = ConnectionVars & {
   tableIdsToAdd: number[]
@@ -36,39 +36,6 @@ const buildTablePrivilegesSql = (oids: number[], action: 'grant' | 'revoke') => 
   `
 }
 
-const ignoredSchemasList = IGNORED_SCHEMAS.map((s) => `'${s}'`).join(', ')
-
-const EXPOSED_SCHEMAS_SQL = /* SQL */ `
-  select coalesce(
-    (
-      select jsonb_agg(distinct schema_name order by schema_name)
-      from (
-        select n.nspname as schema_name
-        from pg_class c
-        join pg_namespace n on n.oid = c.relnamespace
-        left join lateral aclexplode(coalesce(c.relacl, acldefault('r', c.relowner))) as acl on true
-        where c.relkind in ('r', 'p', 'v', 'm', 'f')
-          and n.nspname not in (${ignoredSchemasList})
-        group by c.oid, n.nspname
-        having
-          bool_or(
-            pg_catalog.pg_get_userbyid(acl.grantee) = 'anon'
-            and acl.privilege_type in ('SELECT', 'INSERT', 'UPDATE', 'DELETE')
-          )
-          and bool_or(
-            pg_catalog.pg_get_userbyid(acl.grantee) = 'authenticated'
-            and acl.privilege_type in ('SELECT', 'INSERT', 'UPDATE', 'DELETE')
-          )
-          and bool_or(
-            pg_catalog.pg_get_userbyid(acl.grantee) = 'service_role'
-            and acl.privilege_type in ('SELECT', 'INSERT', 'UPDATE', 'DELETE')
-          )
-      ) t
-    ),
-    '[]'::jsonb
-  ) as schemas;
-`
-
 export async function updateExposedTables({
   projectRef,
   connectionString,
@@ -87,7 +54,7 @@ export async function updateExposedTables({
     sqlParts.push(buildTablePrivilegesSql(tableIdsToRemove, 'revoke'))
   }
 
-  sqlParts.push(EXPOSED_SCHEMAS_SQL)
+  sqlParts.push(getExposedSchemasSql())
 
   const { result } = await executeSql({
     projectRef,
