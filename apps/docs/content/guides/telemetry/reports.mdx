@@ -6,7 +6,15 @@ description: 'Built-in observability for your Supabase project'
 
 {/* last LW we added that same report to every report page (pre-filtered) so, API Gateway report filtered by Auth will show the same data as going to Auth Report in the API Gateway section */}
 
-Supabase Reports provide comprehensive observability for your project through dedicated monitoring dashboards that visualize key metrics across your database, auth, storage, realtime, and API systems. Each report offers self-debugging tools to gain actionable insights for optimizing performance and troubleshooting issues.
+Supabase Reports provide comprehensive observability for your project through dedicated monitoring dashboards for servers:
+
+- Database
+- Auth
+- Storage
+- Realtime
+- API systems
+
+Each report offers self-debugging tools to gain actionable insights for optimizing performance and troubleshooting issues.
 
 <Admonition type="note">
 
@@ -263,6 +271,10 @@ Actions you can take:
 | Implement data archival                                                          | Archive historical data to reduce active storage needs               |
 | [Upgrade disk size](/docs/guides/platform/database-size)                         | Increase storage capacity when approaching limits                    |
 
+### Query Performance
+
+Links to the [Query Performance Advisory page](/docs/guides/platform/performance#examine-query-performance) in the dashboard, which provides a detailed analysis of slow database queries
+
 ### Database connections
 
 <Image
@@ -302,9 +314,9 @@ Actions you can take:
 | Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
 | Review application code                                                                    | Ensure proper connection handling and cleanup                   |
 
-#### Dedicated Pooler connections
+### Dedicated Pooler Client Connections
 
-#### Shared Pooler connections
+### Shared Pooler Client Connections
 
 ### Disk Usage
 
@@ -357,9 +369,6 @@ The Edge Functions report provides insights into serverless function performance
 | Edge Function Execution Time         | Average function duration and performance | Performance optimization opportunities         |
 | Edge Function Invocations by Region  | Geographic distribution of function calls | Global usage patterns and latency optimization |
 
-## Query Performance
-
-Links to the [Query Performance Advisory page](/docs/guides/platform/performance#examine-query-performance) in the dashboard, which provides a detailed analysis of slow database queries
 
 ## PostgREST
 
