@@ -6,11 +6,10 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { withAuth } from 'hooks/misc/withAuth'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { ExternalLink } from 'lucide-react'
-import { useLayoutEffect, type PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
-import { OrgMenuContent } from './ProjectLayout/LayoutHeader/MobileMenuContent/OrgMenuContent'
-import { useMobileSheet } from './ProjectLayout/NavigationBar/MobileSheetContext'
+import { useRegisterOrgMenu } from './OrganizationLayout/useRegisterOrgMenu'
 
 const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -61,15 +60,7 @@ const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
 }
 
 const OrganizationLayout = ({ children }: PropsWithChildren) => {
-  const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
-
-  useLayoutEffect(() => {
-    const unregister = registerOpenMenu(() => {
-      setMobileSheetContent(<OrgMenuContent onCloseSheet={() => setMobileSheetContent(null)} />)
-    })
-    return unregister
-  }, [registerOpenMenu, setMobileSheetContent])
-
+  useRegisterOrgMenu()
   return <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
 }
 
