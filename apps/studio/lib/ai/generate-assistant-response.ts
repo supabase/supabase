@@ -10,9 +10,9 @@ import {
 } from 'ai'
 import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
 import { source } from 'common-tags'
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { buildAssistantEvalOutput } from 'evals/output'
 import type { AssistantEvalInput, AssistantEvalOutput } from 'evals/scorer'
+import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
 import {
   CHAT_PROMPT,
@@ -159,7 +159,9 @@ export async function generateAssistantResponse({
               }
             }
           }
-          span.log({ output: buildAssistantEvalOutput(finishReason, steps) satisfies AssistantEvalOutput })
+          span.log({
+            output: buildAssistantEvalOutput(finishReason, steps) satisfies AssistantEvalOutput,
+          })
           span.end()
         },
       }),
