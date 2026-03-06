@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
 import { get, handleError } from '../fetchers'
-import { stripeProductKeys } from './keys'
+import { stripeFabricKeys } from './keys'
 
 type GetAccountRequestVariables = {
   arId?: string
@@ -13,7 +13,7 @@ export type AccountRequestDetails = components['schemas']['AccountRequestDetails
 async function getAccountRequest({ arId }: GetAccountRequestVariables, signal?: AbortSignal) {
   if (!arId) throw new Error('Account request ID is required')
 
-  const { data, error } = await get('/platform/stripe/product/provisioning/account_requests/{id}', {
+  const { data, error } = await get('/platform/stripe/fabric/provisioning/account_requests/{id}', {
     params: { path: { id: arId } },
     signal,
   })
@@ -27,7 +27,7 @@ export const accountRequestQueryOptions = (
   { enabled = true }: { enabled?: boolean } = { enabled: true }
 ) => {
   return queryOptions({
-    queryKey: stripeProductKeys.get(arId),
+    queryKey: stripeFabricKeys.get(arId),
     queryFn: ({ signal }) => getAccountRequest({ arId }, signal),
     enabled: enabled && typeof arId !== 'undefined',
   })

@@ -3,6 +3,7 @@ import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import { Button, Card, cn } from 'ui'
+
 import { AnimatedLogos } from './AnimatedLogos'
 import { VoteLink } from './VoteLink'
 
@@ -12,7 +13,7 @@ export const LogDrainsEmpty = () => {
       step: 1,
       title: 'Pricing',
       description:
-        'Log Drains are available as a project Add-On for all Team and Enterprise users. Each Log Drain costs $60 per month.',
+        'Log Drains are available as a project Add-On for all Pro, Team, and Enterprise users. Each Log Drain costs $60 per month.',
       label: 'See our pricing',
       link: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
     },
@@ -34,10 +35,11 @@ export const LogDrainsEmpty = () => {
             <AnimatedLogos />
             <h2 className="heading-section mb-1">Capture your logs, your way</h2>
             <p className="text-foreground-light mb-6">
-              Upgrade to a Team or Enterprise Plan to send your logs to your preferred platform
+              Upgrade to a Pro, Team or Enterprise Plan to send your logs to your preferred platform
             </p>
+            {/* This should only be shown to free tier users so upgrade to Pro makes sense */}
             <UpgradePlanButton
-              plan="Team"
+              plan="Pro"
               source="log-drains-empty-state"
               featureProposition="use Log Drains"
             />

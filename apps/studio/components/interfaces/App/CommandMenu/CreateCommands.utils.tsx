@@ -74,7 +74,7 @@ export function getIntegrationCommandName(integration: IntegrationDefinition): s
     case 'cron':
       return 'Create Cron Job'
     case 'webhooks':
-      return 'Create Webhook'
+      return 'Create Database Webhook'
     case 'queues':
       return 'Create Queue'
     default:
