@@ -49,10 +49,10 @@ export function UpdateBillingAddressModal() {
 
   const shouldShow =
     IS_PLATFORM &&
-    !!showMissingAddressModal &&
+    showMissingAddressModal &&
     !!org &&
     org.plan.id !== 'free' &&
-    !!org.organization_missing_address &&
+    org.organization_missing_address &&
     !org.billing_partner &&
     permissionsLoaded &&
     canBillingWrite
