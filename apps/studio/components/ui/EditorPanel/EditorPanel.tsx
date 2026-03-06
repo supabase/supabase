@@ -260,6 +260,7 @@ export const EditorPanel = () => {
   const onExecuteSqlFromButton = () => {
     shouldRefocusAfterRunRef.current = true
     onExecuteSql()
+    refocusEditor()
   }
 
   const handleClosePanel = () => {
@@ -553,6 +554,7 @@ export const EditorPanel = () => {
               shouldRefocusAfterRunRef.current = true
               setShowWarning(undefined)
               onExecuteSql(true)
+              refocusEditor()
             }}
           />
         )}

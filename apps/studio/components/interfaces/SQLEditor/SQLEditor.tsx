@@ -399,8 +399,9 @@ export const SQLEditor = () => {
 
   const executeQueryFromButton = useCallback(() => {
     shouldRefocusAfterRunRef.current = true
+    refocusEditor()
     void executeQuery()
-  }, [executeQuery])
+  }, [executeQuery, refocusEditor])
 
   const executeExplainQuery = useCallback(async () => {
     if (isDiffOpen) return
@@ -815,6 +816,7 @@ export const SQLEditor = () => {
           setShowPotentialIssuesModal(false)
           setQueryHasDestructiveOperations(false)
           setQueryHasUpdateWithoutWhere(false)
+          refocusEditor()
           void executeQuery(true)
         }}
       />
