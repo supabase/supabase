@@ -274,7 +274,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
   ])
 
   useEffect(() => {
-    if (open) form.reset(defaultValues)
+    if (open && !!pgCronExtension) form.reset(defaultValues)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
