@@ -1,23 +1,21 @@
 'use client'
 
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { getMenu } from 'data/nav'
+import { DevToolbarTrigger } from 'dev-tools'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
-
-import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
-import { DevToolbarTrigger } from 'dev-tools'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns'
 
-import { useSendTelemetryEvent } from 'lib/telemetry'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import useDropdownMenu from './useDropdownMenu'
-
-import { getMenu } from 'data/nav'
-import { usePathname } from 'next/navigation'
 
 const MenuItem = dynamic(() => import('./MenuItem'))
 const MobileMenu = dynamic(() => import('./MobileMenu'))
@@ -182,7 +180,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       </Button>
                       <Button className="hidden lg:block" asChild>
                         <Link
-                          href="https://supabase.com/dashboard"
+                          href="https://supabase.com/dashboard/sign-up"
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'start_project_button_clicked',
