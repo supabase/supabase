@@ -4,11 +4,7 @@ import { toast } from 'sonner'
 import type { UseCustomMutationOptions } from 'types'
 
 import type { ConnectionVars } from '../common.types'
-import {
-  buildFunctionPrivilegesSql,
-  buildTablePrivilegesSql,
-  getExposedSchemasSql,
-} from './privileges.sql'
+import { buildFunctionPrivilegesSql, buildTablePrivilegesSql } from './privileges.sql'
 
 export type UpdateExposedEntitiesVariables = ConnectionVars & {
   tableIdsToAdd: number[]
@@ -24,7 +20,7 @@ export async function updateExposedEntities({
   tableIdsToRemove,
   functionNamesToAdd,
   functionNamesToRemove,
-}: UpdateExposedEntitiesVariables): Promise<string[]> {
+}: UpdateExposedEntitiesVariables): Promise<void> {
   if (!projectRef) throw new Error('projectRef is required')
 
   const sqlParts: string[] = []
@@ -45,16 +41,12 @@ export async function updateExposedEntities({
     sqlParts.push(buildFunctionPrivilegesSql(functionNamesToRemove, 'revoke'))
   }
 
-  sqlParts.push(getExposedSchemasSql())
-
-  const { result } = await executeSql({
+  await executeSql({
     projectRef,
     connectionString,
     sql: sqlParts.join('\n'),
     queryKey: ['update-exposed-entities'],
   })
-
-  return (result[0] as { schemas: string[] }).schemas
 }
 
 type UpdateExposedEntitiesData = Awaited<ReturnType<typeof updateExposedEntities>>

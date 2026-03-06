@@ -279,36 +279,3 @@ export const buildFunctionPrivilegesSql = (schemaNames: string[], action: 'grant
     end $$;
   `
 }
-
-export function getExposedSchemasSql() {
-  return /* SQL */ `
-    select coalesce(
-      (
-        select jsonb_agg(distinct schema_name order by schema_name)
-        from (
-          select n.nspname as schema_name
-          from pg_class c
-          join pg_namespace n on n.oid = c.relnamespace
-          left join lateral aclexplode(coalesce(c.relacl, acldefault('r', c.relowner))) as acl on true
-          where c.relkind in ('r', 'p', 'v', 'm', 'f')
-            and n.nspname not in (${IGNORED_SCHEMAS_LIST})
-          group by c.oid, n.nspname
-          having
-            bool_or(
-              pg_catalog.pg_get_userbyid(acl.grantee) = 'anon'
-              and acl.privilege_type in ('SELECT', 'INSERT', 'UPDATE', 'DELETE')
-            )
-            and bool_or(
-              pg_catalog.pg_get_userbyid(acl.grantee) = 'authenticated'
-              and acl.privilege_type in ('SELECT', 'INSERT', 'UPDATE', 'DELETE')
-            )
-            and bool_or(
-              pg_catalog.pg_get_userbyid(acl.grantee) = 'service_role'
-              and acl.privilege_type in ('SELECT', 'INSERT', 'UPDATE', 'DELETE')
-            )
-        ) t
-      ),
-      '[]'::jsonb
-    ) as schemas;
-  `
-}
