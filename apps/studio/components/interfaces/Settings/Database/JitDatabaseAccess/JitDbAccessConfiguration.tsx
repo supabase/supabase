@@ -1,8 +1,9 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import AlertError from 'components/ui/AlertError'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useJitDbAccessGrantMutation } from 'data/jit-db-access/jit-db-access-grant-mutation'
 import { useJitDbAccessMembersQuery } from 'data/jit-db-access/jit-db-access-members-query'
@@ -16,8 +17,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Loader2 } from 'lucide-react'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { SupportCategories } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -413,7 +412,7 @@ const JitDbAccessConfiguration = () => {
       <PageSection id="jit-db-access-configuration">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Just-in-Time (JIT)</PageSectionTitle>
+            <PageSectionTitle>Just-in-Time (JIT) access</PageSectionTitle>
           </PageSectionSummary>
           <DocsButton href={`${DOCS_URL}/guides/platform/just-in-time-database-access`} />
         </PageSectionMeta>
