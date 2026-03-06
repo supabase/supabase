@@ -145,6 +145,21 @@ describe('shouldShowBanner', () => {
       ).toBe(true)
     })
 
+    it('shows when affected region has inconsistent casing (AI-generated cache)', () => {
+      expect(
+        shouldShowBanner({
+          incidents: [
+            {
+              id: 'test',
+              cache: { affected_regions: ['US-East-1'], affects_project_creation: false },
+            },
+          ],
+          hasProjects: true,
+          userRegions: new Set(['us-east-1']),
+        })
+      ).toBe(true)
+    })
+
     it('does not show when user has no databases in any affected region', () => {
       expect(
         shouldShowBanner({
@@ -278,6 +293,21 @@ describe('getRelevantIncidentIds', () => {
         userRegions: new Set(['eu-west-1', 'ap-southeast-1']),
       })
     ).toEqual(expect.arrayContaining(['ap-southeast-1-only', 'eu-west-1-only']))
+  })
+
+  it('returns the ID of a relevant incident when affected_regions has inconsistent casing', () => {
+    expect(
+      getRelevantIncidentIds({
+        incidents: [
+          {
+            id: 'mixed-case-region',
+            cache: { affected_regions: ['US-East-1'], affects_project_creation: false },
+          },
+        ],
+        hasProjects: true,
+        userRegions: new Set(['us-east-1']),
+      })
+    ).toEqual(['mixed-case-region'])
   })
 
   it('excludes incidents irrelevant to the user from the result', () => {
