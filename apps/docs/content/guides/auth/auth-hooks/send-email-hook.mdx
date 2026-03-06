@@ -372,7 +372,7 @@ Email sending depends on two settings: Email Provider and Auth Hook status.
 
 When `email_action_type` is `email_change`, the hook payload can include one or two OTPs and their hashes. This depends on your [Secure Email Change](/dashboard/project/_/auth/providers?provider=Email) setting.
 
-- Secure Email Change enabled: two OTPs are generated, one for the current email (`user.email`) and one for the new email (`user.email_new`). You must send two emails.
+- Secure Email Change enabled: two OTPs are generated, one for the current email (`user.email`) and one for the new email (`user.new_email`). You must send two emails.
 - Secure Email Change disabled: only one OTP is generated for the new email. You send a single email.
 
 <Admonition type="caution" title="Counterintuitive field naming">
@@ -380,7 +380,7 @@ When `email_action_type` is `email_change`, the hook payload can include one or 
 The token hash field names are reversed due to backward compatibility. Pay careful attention to which token/hash pair goes with which email address:
 
 - `token_hash_new` → use with the **current** email address (`user.email`) and `token`
-- `token_hash` → use with the **new** email address (`user.email_new`) and `token_new`
+- `token_hash` → use with the **new** email address (`user.new_email`) and `token_new`
 
 Do not assume the `_new` suffix refers to the new email address.
 
@@ -391,7 +391,7 @@ Do not assume the `_new` suffix refers to the new email address.
 When Secure Email Change is enabled (both token/hash pairs present):
 
 - Send to **current** email address (`user.email`): use `token` with `token_hash_new`
-- Send to **new** email address (`user.email_new`): use `token_new` with `token_hash`
+- Send to **new** email address (`user.new_email`): use `token_new` with `token_hash`
 
 When Secure Email Change is **disabled** (only one token/hash pair present):
 
