@@ -1,103 +1,100 @@
+import type {
+  OrganizationRole,
+  OrganizationRolesResponse,
+} from 'data/organization-members/organization-roles-query'
 import type { OrganizationMember } from 'data/organizations/organization-members-query'
-import type { ProjectMember } from 'data/projects/project-members-query'
+
+export interface ProjectAccessMember {
+  id: string
+  displayName?: string
+  email: string
+  role?: string
+}
 
 interface SummarizeProjectAccessParams {
-  projectMembers: ProjectMember[]
   organizationMembers: OrganizationMember[]
-  isSuccessOrganizationMembers: boolean
-  maxVisibleMembers?: number
-}
-
-export interface ProjectAccessSummary {
-  uniqueProjectMembers: ProjectMember[]
-  projectMemberCount: number
-  organizationMemberCount: number
-  canCompareWithOrganizationMembers: boolean
-  hasOrganizationWideAccess: boolean
-}
-
-interface ViewerProjectMembersParams {
-  uniqueProjectMembers: ProjectMember[]
-  organizationMembers: OrganizationMember[]
+  roles: OrganizationRolesResponse | undefined
+  projectRef?: string
   hasLimitedVisibility: boolean
   maxVisibleMembers?: number
 }
 
-export interface ViewerProjectMembersSummary {
-  viewerVisibleProjectMembers: ProjectMember[]
-  viewerVisibleMembers: ProjectMember[]
-  viewerVisibleProjectMemberCount: number
-  viewerHiddenMembersCount: number
+export interface ProjectAccessSummary {
+  projectMembers: ProjectAccessMember[]
+  visibleMembers: ProjectAccessMember[]
+  hiddenMembersCount: number
+  projectMemberCount: number
+  organizationMemberCount: number
+  shouldShowOrgComparison: boolean
+  hasOrganizationWideAccess: boolean
+}
+
+const getRoleDisplayName = (roleName: string | undefined) => {
+  if (!roleName) return undefined
+  return roleName.split('_')[0]
+}
+
+const roleAppliesToProject = (role: OrganizationRole | undefined, projectRef?: string) => {
+  if (!role) return false
+  if (role.projects.length === 0) return true
+  if (!projectRef) return false
+  return role.projects.some((project) => project.ref === projectRef)
 }
 
 export const summarizeProjectAccess = ({
-  projectMembers,
   organizationMembers,
-  isSuccessOrganizationMembers,
-  maxVisibleMembers = 12,
-}: SummarizeProjectAccessParams): ProjectAccessSummary => {
-  const uniqueMembersMap = new Map<string, ProjectMember>()
-  projectMembers.forEach((member) => {
-    uniqueMembersMap.set(member.user_id, member)
-  })
-
-  const uniqueProjectMembers = Array.from(uniqueMembersMap.values()).sort((a, b) =>
-    a.primary_email.localeCompare(b.primary_email)
-  )
-
-  const organizationMemberIds = new Set(
-    organizationMembers
-      .filter((member) => !member.invited_id)
-      .map((member) => member.gotrue_id)
-      .filter((id): id is string => typeof id === 'string' && id.length > 0)
-  )
-
-  const projectMemberCount = uniqueProjectMembers.length
-  const organizationMemberCount = organizationMemberIds.size
-  const canCompareWithOrganizationMembers =
-    isSuccessOrganizationMembers && organizationMemberCount > 0
-  const hasOrganizationWideAccess =
-    canCompareWithOrganizationMembers &&
-    projectMemberCount === organizationMemberCount &&
-    uniqueProjectMembers.every((member) => organizationMemberIds.has(member.user_id))
-
-  return {
-    uniqueProjectMembers,
-    projectMemberCount,
-    organizationMemberCount,
-    canCompareWithOrganizationMembers,
-    hasOrganizationWideAccess,
-  }
-}
-
-export const summarizeViewerProjectMembers = ({
-  uniqueProjectMembers,
-  organizationMembers,
+  roles,
+  projectRef,
   hasLimitedVisibility,
   maxVisibleMembers = 12,
-}: ViewerProjectMembersParams): ViewerProjectMembersSummary => {
-  const visibleOrganizationMemberIds = new Set(
-    organizationMembers
-      .filter((member) => !member.invited_id)
-      .map((member) => member.gotrue_id)
-      .filter((id): id is string => typeof id === 'string' && id.length > 0)
+}: SummarizeProjectAccessParams): ProjectAccessSummary => {
+  const allRoles = [...(roles?.org_scoped_roles ?? []), ...(roles?.project_scoped_roles ?? [])]
+  const rolesById = new Map(allRoles.map((role) => [role.id, role]))
+
+  const normalizedMembers = organizationMembers.filter(
+    (member) => !member.invited_id && typeof member.gotrue_id === 'string' && !!member.primary_email
   )
 
-  const viewerVisibleProjectMembers = hasLimitedVisibility
-    ? uniqueProjectMembers.filter((member) => visibleOrganizationMemberIds.has(member.user_id))
-    : uniqueProjectMembers
+  const membersWithProjectAccess = normalizedMembers
+    .filter((member) =>
+      member.role_ids.some((roleId) => roleAppliesToProject(rolesById.get(roleId), projectRef))
+    )
+    .sort((a, b) => (a.primary_email ?? '').localeCompare(b.primary_email ?? ''))
 
-  const viewerVisibleProjectMemberCount = viewerVisibleProjectMembers.length
-  const viewerVisibleMembers = viewerVisibleProjectMembers.slice(0, maxVisibleMembers)
-  const viewerHiddenMembersCount = Math.max(
-    viewerVisibleProjectMemberCount - viewerVisibleMembers.length,
-    0
-  )
+  const projectMembers = membersWithProjectAccess.map((member) => {
+    const matchingRoleNames = member.role_ids
+      .map((roleId) => rolesById.get(roleId))
+      .filter((role) => roleAppliesToProject(role, projectRef))
+      .map((role) => getRoleDisplayName(role?.name))
+      .filter((name): name is string => typeof name === 'string' && name.length > 0)
+
+    const uniqueRoleNames = [...new Set(matchingRoleNames)]
+    const hasDisplayName =
+      typeof member.username === 'string' &&
+      typeof member.primary_email === 'string' &&
+      member.username !== member.primary_email
+
+    return {
+      id: member.gotrue_id as string,
+      displayName: hasDisplayName ? member.username : undefined,
+      email: member.primary_email as string,
+      role: uniqueRoleNames.length > 0 ? uniqueRoleNames.join(', ') : undefined,
+    }
+  })
+
+  const projectMemberCount = projectMembers.length
+  const organizationMemberCount = normalizedMembers.length
+  const shouldShowOrgComparison = !hasLimitedVisibility && organizationMemberCount > 0
+  const hasOrganizationWideAccess =
+    shouldShowOrgComparison && projectMemberCount === organizationMemberCount
 
   return {
-    viewerVisibleProjectMembers,
-    viewerVisibleMembers,
-    viewerVisibleProjectMemberCount,
-    viewerHiddenMembersCount,
+    projectMembers,
+    visibleMembers: projectMembers.slice(0, maxVisibleMembers),
+    hiddenMembersCount: Math.max(projectMemberCount - maxVisibleMembers, 0),
+    projectMemberCount,
+    organizationMemberCount,
+    shouldShowOrgComparison,
+    hasOrganizationWideAccess,
   }
 }

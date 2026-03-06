@@ -1,95 +1,157 @@
 import { describe, expect, it } from 'vitest'
 
-import { summarizeProjectAccess, summarizeViewerProjectMembers } from './General.utils'
+import { summarizeProjectAccess } from './General.utils'
+
+const roles = {
+  org_scoped_roles: [
+    {
+      id: 1,
+      name: 'Owner',
+      description: null,
+      base_role_id: 1,
+      projects: [],
+    },
+  ],
+  project_scoped_roles: [
+    {
+      id: 2,
+      name: 'Developer',
+      description: null,
+      base_role_id: 3,
+      projects: [{ name: 'Project A', ref: 'ref-a' }],
+    },
+  ],
+} as any
 
 describe('summarizeProjectAccess', () => {
-  it('returns organization-wide access when project and org member sets match', () => {
+  it('includes org-scoped members for every project', () => {
     const summary = summarizeProjectAccess({
-      projectMembers: [
-        { user_id: 'a', primary_email: 'a@example.com', username: 'a' },
-        { user_id: 'b', primary_email: 'b@example.com', username: 'b' },
+      organizationMembers: [
+        {
+          gotrue_id: 'owner-id',
+          username: 'Owner User',
+          primary_email: 'owner@example.com',
+          role_ids: [1],
+        } as any,
       ],
-      organizationMembers: [{ gotrue_id: 'a' } as any, { gotrue_id: 'b' } as any],
-      isSuccessOrganizationMembers: true,
+      roles,
+      projectRef: 'ref-a',
+      hasLimitedVisibility: false,
     })
 
-    expect(summary.projectMemberCount).toBe(2)
-    expect(summary.organizationMemberCount).toBe(2)
-    expect(summary.canCompareWithOrganizationMembers).toBe(true)
+    expect(summary.projectMemberCount).toBe(1)
+    expect(summary.projectMembers[0].email).toBe('owner@example.com')
+    expect(summary.projectMembers[0].role).toBe('Owner')
     expect(summary.hasOrganizationWideAccess).toBe(true)
   })
 
-  it('returns restricted access when project member set is a subset of org members', () => {
+  it('filters project-scoped members to the selected project', () => {
     const summary = summarizeProjectAccess({
-      projectMembers: [{ user_id: 'a', primary_email: 'a@example.com', username: 'a' }],
-      organizationMembers: [{ gotrue_id: 'a' } as any, { gotrue_id: 'b' } as any],
-      isSuccessOrganizationMembers: true,
+      organizationMembers: [
+        {
+          gotrue_id: 'dev-visible',
+          username: 'Dev Visible',
+          primary_email: 'visible@example.com',
+          role_ids: [2],
+        } as any,
+        {
+          gotrue_id: 'dev-hidden',
+          username: 'Dev Hidden',
+          primary_email: 'hidden@example.com',
+          role_ids: [3],
+        } as any,
+      ],
+      roles: {
+        ...roles,
+        project_scoped_roles: [
+          {
+            ...roles.project_scoped_roles[0],
+            projects: [{ name: 'Project A', ref: 'ref-a' }],
+          },
+          {
+            ...roles.project_scoped_roles[0],
+            id: 3,
+            projects: [{ name: 'Project B', ref: 'ref-b' }],
+          },
+        ],
+      } as any,
+      projectRef: 'ref-a',
+      hasLimitedVisibility: false,
     })
 
     expect(summary.projectMemberCount).toBe(1)
-    expect(summary.organizationMemberCount).toBe(2)
-    expect(summary.canCompareWithOrganizationMembers).toBe(true)
-    expect(summary.hasOrganizationWideAccess).toBe(false)
+    expect(summary.projectMembers[0].email).toBe('visible@example.com')
   })
 
-  it('does not compare against organization members when org data is unavailable', () => {
+  it('excludes invited members', () => {
     const summary = summarizeProjectAccess({
-      projectMembers: [{ user_id: 'a', primary_email: 'a@example.com', username: 'a' }],
-      organizationMembers: [],
-      isSuccessOrganizationMembers: false,
+      organizationMembers: [
+        {
+          gotrue_id: 'member-id',
+          username: 'Member',
+          primary_email: 'member@example.com',
+          role_ids: [1],
+        } as any,
+        {
+          gotrue_id: 'invite-id',
+          username: 'invite',
+          primary_email: 'invite@example.com',
+          role_ids: [1],
+          invited_id: 123,
+        } as any,
+      ],
+      roles,
+      projectRef: 'ref-a',
+      hasLimitedVisibility: false,
     })
 
+    expect(summary.organizationMemberCount).toBe(1)
     expect(summary.projectMemberCount).toBe(1)
-    expect(summary.canCompareWithOrganizationMembers).toBe(false)
-    expect(summary.hasOrganizationWideAccess).toBe(false)
   })
 
-  it('deduplicates project members by user id and caps visible members', () => {
+  it('does not show org comparison in limited-visibility mode', () => {
     const summary = summarizeProjectAccess({
-      projectMembers: [
-        { user_id: 'a', primary_email: 'a@example.com', username: 'a' },
-        { user_id: 'a', primary_email: 'a@example.com', username: 'a-duplicate' },
-        { user_id: 'b', primary_email: 'b@example.com', username: 'b' },
+      organizationMembers: [
+        {
+          gotrue_id: 'member-id',
+          username: 'Member',
+          primary_email: 'member@example.com',
+          role_ids: [1],
+        } as any,
       ],
-      organizationMembers: [{ gotrue_id: 'a' } as any, { gotrue_id: 'b' } as any],
-      isSuccessOrganizationMembers: true,
-    })
-
-    expect(summary.projectMemberCount).toBe(2)
-    expect(summary.uniqueProjectMembers).toHaveLength(2)
-  })
-})
-
-describe('summarizeViewerProjectMembers', () => {
-  it('hides non-visible members when viewer has limited visibility', () => {
-    const summary = summarizeViewerProjectMembers({
-      uniqueProjectMembers: [
-        { user_id: 'a', primary_email: 'a@example.com', username: 'a' },
-        { user_id: 'b', primary_email: 'b@example.com', username: 'b' },
-      ],
-      organizationMembers: [{ gotrue_id: 'a' } as any],
+      roles,
+      projectRef: 'ref-a',
       hasLimitedVisibility: true,
     })
 
-    expect(summary.viewerVisibleProjectMemberCount).toBe(1)
-    expect(summary.viewerVisibleProjectMembers).toEqual([
-      { user_id: 'a', primary_email: 'a@example.com', username: 'a' },
-    ])
+    expect(summary.shouldShowOrgComparison).toBe(false)
+    expect(summary.hasOrganizationWideAccess).toBe(false)
   })
 
-  it('shows all project members for org-scoped visibility', () => {
-    const summary = summarizeViewerProjectMembers({
-      uniqueProjectMembers: [
-        { user_id: 'a', primary_email: 'a@example.com', username: 'a' },
-        { user_id: 'b', primary_email: 'b@example.com', username: 'b' },
+  it('caps visible members and tracks hidden count', () => {
+    const summary = summarizeProjectAccess({
+      organizationMembers: [
+        {
+          gotrue_id: '1',
+          username: 'A',
+          primary_email: 'a@example.com',
+          role_ids: [1],
+        } as any,
+        {
+          gotrue_id: '2',
+          username: 'B',
+          primary_email: 'b@example.com',
+          role_ids: [1],
+        } as any,
       ],
-      organizationMembers: [{ gotrue_id: 'a' } as any],
+      roles,
+      projectRef: 'ref-a',
       hasLimitedVisibility: false,
       maxVisibleMembers: 1,
     })
 
-    expect(summary.viewerVisibleProjectMemberCount).toBe(2)
-    expect(summary.viewerVisibleMembers).toHaveLength(1)
-    expect(summary.viewerHiddenMembersCount).toBe(1)
+    expect(summary.projectMemberCount).toBe(2)
+    expect(summary.visibleMembers).toHaveLength(1)
+    expect(summary.hiddenMembersCount).toBe(1)
   })
 })
