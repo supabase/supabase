@@ -47,7 +47,7 @@ In the [function dashboard's](/dashboard/project/_/functions/) `Logs` tab, you c
 
 ![image](/docs/img/troubleshooting/limit_logs.png)
 
-Alternatively, you can filter for the specific errors from the function using the [log explorer](https://supabase.com/dashboard/project/_/logs/explorer?q=SELECT%0A++fl.event_message%2C%0A++content.timestamp%2C%0A++fel.function_name%2C%0A++fel.status_code%0AFROM+function_logs+fl%0ALEFT+JOIN+UNNEST%28fl.metadata%29+AS+content+ON+TRUE%0ALEFT+JOIN+%28%0A++SELECT%0A++++em.execution_id%2C%0A++++req.pathname+AS+function_name%2C%0A++++res.status_code%0A++FROM+function_edge_logs%0A++LEFT+JOIN+UNNEST%28metadata%29+AS+em+ON+TRUE%0A++LEFT+JOIN+UNNEST%28em.request%29+AS+req+ON+TRUE%0A++LEFT+JOIN+UNNEST%28em.response%29+AS+res+ON+TRUE%0A%29+fel+ON+content.execution_id+%3D+fel.execution_id%0AWHERE+%0A++content.level+%3D+%27error%27%0A++++AND%0A++fel.status_code+%3D+546%0AORDER+BY+function_name%2C+timestamp%0ALIMIT+5)
+Alternatively, you can filter for the specific errors from the function using the [log explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++fl.event_message%2C%0A++content.timestamp%2C%0A++fel.function_name%2C%0A++fel.status_code%0AFROM+function_logs+fl%0ALEFT+JOIN+UNNEST%28fl.metadata%29+AS+content+ON+TRUE%0ALEFT+JOIN+%28%0A++SELECT%0A++++em.execution_id%2C%0A++++req.pathname+AS+function_name%2C%0A++++res.status_code%0A++FROM+function_edge_logs%0A++LEFT+JOIN+UNNEST%28metadata%29+AS+em+ON+TRUE%0A++LEFT+JOIN+UNNEST%28em.request%29+AS+req+ON+TRUE%0A++LEFT+JOIN+UNNEST%28em.response%29+AS+res+ON+TRUE%0A%29+fel+ON+content.execution_id+%3D+fel.execution_id%0AWHERE+%0A++content.level+%3D+%27error%27%0A++++AND%0A++fel.status_code+%3D+546%0AORDER+BY+function_name%2C+timestamp%0ALIMIT+5)
 
 ```sql
 SELECT
