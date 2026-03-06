@@ -128,6 +128,98 @@ export function getExposedTableCountsSql({ selectedSchemas }: { selectedSchemas:
   `
 }
 
+/**
+ * Builds the shared `function_privileges` and `function_grants` CTEs used by
+ * both the exposed-functions list query and the counts-only query.
+ *
+ * Returns SQL text meant to follow `WITH` (no leading `WITH` keyword).
+ * Callers that append additional CTEs should add a comma after interpolation.
+ */
+function getFunctionGrantsCTEs({ search }: { search?: string } = {}) {
+  return /* SQL */ `
+    function_privileges as (
+      select
+        n.nspname as schema_name,
+        p.proname as name,
+
+        -- Aggregate EXECUTE across all overloads + all 3 roles
+        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'EXECUTE') as anon_execute,
+        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'EXECUTE') as auth_execute,
+        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'EXECUTE') as srv_execute
+
+      from pg_proc p
+      join pg_namespace n
+        on n.oid = p.pronamespace
+      left join lateral aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) as acl
+        on true
+      left join pg_roles pr
+        on pr.oid = acl.grantee
+      where p.prokind in ('f', 'w')
+        and n.nspname not in (${IGNORED_SCHEMAS_LIST})
+        ${search ? `and (n.nspname || '.' || p.proname) ilike '%${search}%'` : ''}
+      group by n.nspname, p.proname
+    ),
+    function_grants as (
+      select
+        schema_name,
+        name,
+        case
+          when anon_execute and auth_execute and srv_execute then 'granted'
+          when not (anon_execute or auth_execute or srv_execute) then 'revoked'
+          else 'custom'
+        end as status
+      from function_privileges
+    )
+  `
+}
+
+export function getExposedFunctionsSql({
+  search,
+  offset,
+  limit,
+}: {
+  search?: string
+  offset: number
+  limit: number
+}) {
+  return /* SQL */ `
+    with ${getFunctionGrantsCTEs({ search })}
+    select
+      (select count(*)::int from function_grants) as total_count,
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'schema', fg.schema_name,
+              'name', fg.name,
+              'status', fg.status
+            )
+          )
+          from (
+            select *
+            from function_grants
+            order by schema_name, name
+            offset ${offset}
+            limit ${limit}
+          ) fg
+        ),
+        '[]'::jsonb
+      ) as functions;
+  `
+}
+
+export function getExposedFunctionCountsSql({ selectedSchemas }: { selectedSchemas: string[] }) {
+  const schemasList =
+    selectedSchemas.length > 0 ? selectedSchemas.map((s) => `'${s}'`).join(', ') : "''"
+
+  return /* SQL */ `
+    with ${getFunctionGrantsCTEs()}
+    select
+      (select count(*)::int from function_grants) as total_count,
+      (select count(*)::int from function_grants where status = 'granted' and schema_name in (${schemasList})) as grants_count;
+  `
+}
+
 export function getExposedSchemasSql() {
   return /* SQL */ `
     select coalesce(

@@ -19,7 +19,6 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Skeleton,
-  useWatch_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
@@ -35,6 +34,7 @@ import { z } from 'zod'
 
 import { ExposedSchemaSelector } from './ExposedSchemaSelector'
 import { HardenAPIModal } from './HardenAPIModal'
+import { ExposedFunctionSelector } from '@/components/interfaces/Settings/API/ExposedFunctionSelector'
 import { ExposedTableSelector } from '@/components/interfaces/Settings/API/ExposedTableSelector'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
@@ -42,7 +42,7 @@ import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-p
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { privilegeKeys } from '@/data/privileges/keys'
-import { useUpdateExposedTablesMutation } from '@/data/privileges/update-exposed-tables-mutation'
+import { useUpdateExposedEntitiesMutation } from '@/data/privileges/update-exposed-entities-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import useLatest from '@/hooks/misc/useLatest'
@@ -66,6 +66,8 @@ const formSchema = z.object({
   // Fields for expose toggles
   tableIdsToAdd: z.array(z.number()),
   tableIdsToRemove: z.array(z.number()),
+  functionNamesToAdd: z.array(z.string()),
+  functionNamesToRemove: z.array(z.string()),
 })
 
 export const PostgrestConfig = () => {
@@ -119,7 +121,7 @@ export const PostgrestConfig = () => {
 
   const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation()
 
-  const { mutateAsync: updateExposedTables } = useUpdateExposedTablesMutation()
+  const { mutateAsync: updateExposedEntities } = useUpdateExposedEntitiesMutation()
 
   const [isUpdating, setIsUpdating] = useState(false)
 
@@ -143,6 +145,8 @@ export const PostgrestConfig = () => {
       dbPool: config?.db_pool,
       tableIdsToAdd: [] as number[],
       tableIdsToRemove: [] as number[],
+      functionNamesToAdd: [] as string[],
+      functionNamesToRemove: [] as string[],
     }
   }, [config, configDbSchemas])
 
@@ -165,11 +169,13 @@ export const PostgrestConfig = () => {
       let dbSchema = values.dbSchema.join(',')
 
       if (isApiGrantTogglesEnabled) {
-        await updateExposedTables({
+        await updateExposedEntities({
           projectRef,
           connectionString: project?.connectionString,
           tableIdsToAdd: values.tableIdsToAdd,
           tableIdsToRemove: values.tableIdsToRemove,
+          functionNamesToAdd: values.functionNamesToAdd,
+          functionNamesToRemove: values.functionNamesToRemove,
         })
       }
 
@@ -191,6 +197,12 @@ export const PostgrestConfig = () => {
         queryClient.invalidateQueries({
           queryKey: privilegeKeys.exposedTableCounts(projectRef, watchedDbSchema),
         }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.exposedFunctionsInfinite(projectRef),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.exposedFunctionCounts(projectRef, watchedDbSchema),
+        }),
       ])
 
       toast.success('Successfully saved settings')
@@ -204,6 +216,8 @@ export const PostgrestConfig = () => {
         dbPool: values.dbPool,
         tableIdsToAdd: [],
         tableIdsToRemove: [],
+        functionNamesToAdd: [],
+        functionNamesToRemove: [],
       })
     } catch (error) {
       toast.error('Failed to save settings: ' + (error as ResponseError).message || 'Unknown error')
@@ -221,12 +235,11 @@ export const PostgrestConfig = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady])
 
-  const watchedDbSchema = useWatch_Shadcn_({ control: form.control, name: 'dbSchema' })
-  const watchedTableIdsToAdd = useWatch_Shadcn_({ control: form.control, name: 'tableIdsToAdd' })
-  const watchedTableIdsToRemove = useWatch_Shadcn_({
-    control: form.control,
-    name: 'tableIdsToRemove',
-  })
+  const watchedDbSchema = form.watch('dbSchema')
+  const watchedTableIdsToAdd = form.watch('tableIdsToAdd')
+  const watchedTableIdsToRemove = form.watch('tableIdsToRemove')
+  const watchedFunctionNamesToAdd = form.watch('functionNamesToAdd')
+  const watchedFunctionNamesToRemove = form.watch('functionNamesToRemove')
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
@@ -305,6 +318,47 @@ export const PostgrestConfig = () => {
                               )
                             } else {
                               form.setValue('tableIdsToRemove', [...current, tableId], {
+                                shouldDirty: true,
+                              })
+                            }
+                          }}
+                        />
+                      </FormItemLayout>
+
+                      <FormItemLayout
+                        isReactForm={false}
+                        layout="flex-row-reverse"
+                        label="Exposed functions"
+                        description="Toggle Data API access for individual functions."
+                      >
+                        <ExposedFunctionSelector
+                          selectedSchemas={watchedDbSchema}
+                          pendingAddFunctionNames={watchedFunctionNamesToAdd}
+                          pendingRemoveFunctionNames={watchedFunctionNamesToRemove}
+                          onTogglePendingAdd={(functionName) => {
+                            const current = form.getValues('functionNamesToAdd')
+                            if (current.includes(functionName)) {
+                              form.setValue(
+                                'functionNamesToAdd',
+                                current.filter((x) => x !== functionName),
+                                { shouldDirty: true }
+                              )
+                            } else {
+                              form.setValue('functionNamesToAdd', [...current, functionName], {
+                                shouldDirty: true,
+                              })
+                            }
+                          }}
+                          onTogglePendingRemove={(functionName) => {
+                            const current = form.getValues('functionNamesToRemove')
+                            if (current.includes(functionName)) {
+                              form.setValue(
+                                'functionNamesToRemove',
+                                current.filter((x) => x !== functionName),
+                                { shouldDirty: true }
+                              )
+                            } else {
+                              form.setValue('functionNamesToRemove', [...current, functionName], {
                                 shouldDirty: true,
                               })
                             }

@@ -20,30 +20,30 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { exposedTableCountsQueryOptions } from '@/data/privileges/exposed-table-counts-query'
-import { exposedTablesInfiniteQueryOptions } from '@/data/privileges/exposed-tables-infinite-query'
+import { exposedFunctionCountsQueryOptions } from '@/data/privileges/exposed-function-counts-query'
+import { exposedFunctionsInfiniteQueryOptions } from '@/data/privileges/exposed-functions-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
 
-interface ExposedTableSelectorProps {
+interface ExposedFunctionSelectorProps {
   className?: string
   disabled?: boolean
   selectedSchemas: string[]
-  pendingAddTableIds: number[]
-  pendingRemoveTableIds: number[]
-  onTogglePendingAdd: (tableId: number) => void
-  onTogglePendingRemove: (tableId: number) => void
+  pendingAddFunctionNames: string[]
+  pendingRemoveFunctionNames: string[]
+  onTogglePendingAdd: (functionName: string) => void
+  onTogglePendingRemove: (functionName: string) => void
 }
 
-export const ExposedTableSelector = ({
+export const ExposedFunctionSelector = ({
   className,
   disabled = false,
   selectedSchemas,
-  pendingAddTableIds,
-  pendingRemoveTableIds,
+  pendingAddFunctionNames,
+  pendingRemoveFunctionNames,
   onTogglePendingAdd,
   onTogglePendingRemove,
-}: ExposedTableSelectorProps) => {
+}: ExposedFunctionSelectorProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 300)
@@ -58,21 +58,21 @@ export const ExposedTableSelector = ({
   })
 
   const { data: countsData, isPending: isCountsPending } = useQuery({
-    ...exposedTableCountsQueryOptions({
+    ...exposedFunctionCountsQueryOptions({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       selectedSchemas,
     }),
     placeholderData: keepPreviousData,
   })
-  const pendingCount = pendingAddTableIds.length + pendingRemoveTableIds.length
+  const pendingCount = pendingAddFunctionNames.length + pendingRemoveFunctionNames.length
 
   const totalCount = countsData?.total_count ?? 0
   const grantsCount = countsData?.grants_count ?? 0
 
   const { data, isPending, isError, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
-      ...exposedTablesInfiniteQueryOptions({
+      ...exposedFunctionsInfiniteQueryOptions({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         search: search.length === 0 ? undefined : debouncedSearch || undefined,
@@ -80,10 +80,16 @@ export const ExposedTableSelector = ({
       placeholderData: search.length > 0 ? keepPreviousData : undefined,
     })
 
-  const tables = useMemo(() => data?.pages.flatMap((page) => page.tables) ?? [], [data?.pages])
+  const functions = useMemo(
+    () => data?.pages.flatMap((page) => page.functions) ?? [],
+    [data?.pages]
+  )
 
-  const pendingAddSet = useMemo(() => new Set(pendingAddTableIds), [pendingAddTableIds])
-  const pendingRemoveSet = useMemo(() => new Set(pendingRemoveTableIds), [pendingRemoveTableIds])
+  const pendingAddSet = useMemo(() => new Set(pendingAddFunctionNames), [pendingAddFunctionNames])
+  const pendingRemoveSet = useMemo(
+    () => new Set(pendingRemoveFunctionNames),
+    [pendingRemoveFunctionNames]
+  )
 
   useEffect(() => {
     if (!isPending && !isFetching && entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
@@ -107,10 +113,10 @@ export const ExposedTableSelector = ({
             <div className="w-full flex gap-1">
               <p className="text-foreground-lighter">
                 {isCountsPending
-                  ? 'Loading tables...'
+                  ? 'Loading functions...'
                   : totalCount === 0
-                    ? 'No tables available'
-                    : `${grantsCount} of ${totalCount} tables exposed${
+                    ? 'No functions available'
+                    : `${grantsCount} of ${totalCount} functions exposed${
                         pendingCount > 0
                           ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
                           : ''
@@ -128,7 +134,7 @@ export const ExposedTableSelector = ({
           <Command_Shadcn_ shouldFilter={false}>
             <CommandInput_Shadcn_
               className="text-xs"
-              placeholder="Find table..."
+              placeholder="Find function..."
               value={search}
               onValueChange={setSearch}
             />
@@ -145,35 +151,32 @@ export const ExposedTableSelector = ({
                   </>
                 ) : isError ? (
                   <div className="flex items-center py-3 justify-center">
-                    <p className="text-xs text-foreground-lighter">Failed to retrieve tables</p>
+                    <p className="text-xs text-foreground-lighter">Failed to retrieve functions</p>
                   </div>
                 ) : (
                   <>
-                    {tables.length === 0 && (
+                    {functions.length === 0 && (
                       <p className="text-xs text-center text-foreground-lighter py-3">
-                        {search.length > 0 ? 'No tables found' : 'No tables available'}
+                        {search.length > 0 ? 'No functions found' : 'No functions available'}
                       </p>
                     )}
                     <ScrollArea
                       ref={scrollRootRef}
-                      className={tables.length > 7 ? 'h-[210px]' : ''}
+                      className={functions.length > 7 ? 'h-[210px]' : ''}
                     >
-                      {tables.map((table) => {
-                        const isSchemaExposed = selectedSchemas.includes(table.schema)
-                        const hasPendingAdd = pendingAddSet.has(table.id)
-                        const hasPendingRemove = pendingRemoveSet.has(table.id)
+                      {functions.map((fn) => {
+                        const key = `${fn.schema}.${fn.name}`
+                        const isSchemaExposed = selectedSchemas.includes(fn.schema)
+                        const hasPendingAdd = pendingAddSet.has(key)
+                        const hasPendingRemove = pendingRemoveSet.has(key)
 
-                        const isCustomTable = table.status === 'custom'
-                        const isGranted = table.status === 'granted'
+                        const isCustom = fn.status === 'custom'
+                        const isGranted = fn.status === 'granted'
 
-                        const isCustomNeutral = isCustomTable && !hasPendingAdd && !hasPendingRemove
+                        const isCustomNeutral = isCustom && !hasPendingAdd && !hasPendingRemove
                         const isExposed =
                           isSchemaExposed &&
-                          (isCustomTable
-                            ? hasPendingAdd
-                            : isGranted
-                              ? !hasPendingRemove
-                              : hasPendingAdd)
+                          (isCustom ? hasPendingAdd : isGranted ? !hasPendingRemove : hasPendingAdd)
 
                         const customGrantsTooltip = getCustomGrantsTooltip({
                           hasPendingAdd,
@@ -182,8 +185,8 @@ export const ExposedTableSelector = ({
 
                         return (
                           <CommandItem_Shadcn_
-                            key={table.id}
-                            value={`${table.schema}.${table.name}-${table.id}`}
+                            key={key}
+                            value={key}
                             className={cn(
                               'w-full',
                               isSchemaExposed ? 'cursor-pointer' : 'opacity-50 !cursor-not-allowed'
@@ -191,23 +194,23 @@ export const ExposedTableSelector = ({
                             onSelect={() => {
                               if (!isSchemaExposed) return
 
-                              if (isCustomTable) {
+                              if (isCustom) {
                                 if (hasPendingAdd) {
-                                  onTogglePendingAdd(table.id)
-                                  onTogglePendingRemove(table.id)
+                                  onTogglePendingAdd(key)
+                                  onTogglePendingRemove(key)
                                 } else if (hasPendingRemove) {
-                                  onTogglePendingRemove(table.id)
-                                  onTogglePendingAdd(table.id)
+                                  onTogglePendingRemove(key)
+                                  onTogglePendingAdd(key)
                                 } else {
-                                  onTogglePendingAdd(table.id)
+                                  onTogglePendingAdd(key)
                                 }
                                 return
                               }
 
                               if (isGranted) {
-                                onTogglePendingRemove(table.id)
+                                onTogglePendingRemove(key)
                               } else {
-                                onTogglePendingAdd(table.id)
+                                onTogglePendingAdd(key)
                               }
                             }}
                           >
@@ -222,11 +225,11 @@ export const ExposedTableSelector = ({
                                   isCustomNeutral && isSchemaExposed && 'text-warning'
                                 )}
                               >
-                                {`${table.schema}.${table.name}`}
+                                {key}
                               </span>
 
                               <div className="ml-auto flex items-center gap-x-2">
-                                {isCustomTable && (
+                                {isCustom && (
                                   <Tooltip>
                                     <TooltipTrigger asChild>
                                       <div
@@ -261,7 +264,7 @@ export const ExposedTableSelector = ({
                                       </button>
                                     </TooltipTrigger>
                                     <TooltipContent side="right" className="max-w-[320px] text-xs">
-                                      {`The schema "${table.schema}" must be exposed before enabling this table.`}
+                                      {`The schema "${fn.schema}" must be exposed before enabling this function.`}
                                     </TooltipContent>
                                   </Tooltip>
                                 )}
@@ -296,12 +299,12 @@ const getCustomGrantsTooltip = ({
   hasPendingRemove: boolean
 }) => {
   if (hasPendingAdd) {
-    return 'This table has custom grants. Saving will override them with standard Data API grants for anon, authenticated, and service_role. Select again to revoke all grants instead.'
+    return 'This function has custom grants. Saving will override them with standard Data API grants for anon, authenticated, and service_role. Select again to revoke all grants instead.'
   }
 
   if (hasPendingRemove) {
-    return 'This table has custom grants. Saving will revoke all grants for anon, authenticated, and service_role. Select again to override with standard Data API grants instead.'
+    return 'This function has custom grants. Saving will revoke all grants for anon, authenticated, and service_role. Select again to override with standard Data API grants instead.'
   }
 
-  return 'This table has custom grants. Select it to override with standard Data API grants for anon, authenticated, and service_role.'
+  return 'This function has custom grants. Select it to override with standard Data API grants for anon, authenticated, and service_role.'
 }
