@@ -23,8 +23,11 @@ export const databaseKeys = {
     ['projects', projectRef, 'database', 'pooling-configuration'] as const,
   indexesFromQuery: (projectRef: string | undefined, query: string) =>
     ['projects', projectRef, 'indexes', { query }] as const,
-  indexAdvisorFromQuery: (projectRef: string | undefined, query: string) =>
-    ['projects', projectRef, 'index-advisor', { query }] as const,
+  indexAdvisorFromQuery: (
+    projectRef: string | undefined,
+    query: string,
+    connectionString?: string
+  ) => ['projects', projectRef, 'index-advisor', { query, connectionString }] as const,
   tableConstraints: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'table-constraints', id] as const,
   foreignKeyConstraints: (projectRef: string | undefined, schema?: string, options = {}) =>
