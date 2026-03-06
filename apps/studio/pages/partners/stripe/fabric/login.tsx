@@ -12,12 +12,12 @@ import {
 } from 'ui'
 
 import APIAuthorizationLayout from '@/components/layouts/APIAuthorizationLayout'
-import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-product-confirm-mutation'
-import { accountRequestQueryOptions } from '@/data/partners/stripe-product-query'
+import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-fabric-confirm-mutation'
+import { accountRequestQueryOptions } from '@/data/partners/stripe-fabric-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { useSignOut } from '@/lib/auth'
 
-const StripeProductLoginPage = () => {
+const StripeFabricLoginPage = () => {
   const router = useRouter()
   const { ar_id } = useParams()
 
@@ -74,9 +74,9 @@ const StripeProductLoginPage = () => {
           <LogoLoader />
         ) : isSuccess ? (
           <>
-            <h2 className="py-2 text-lg font-medium">Stripe Product Account Request</h2>
+            <h2 className="py-2 text-lg font-medium">Stripe Fabric Account Request</h2>
             <p className="text-center text-foreground-light">
-              Stripe Product wants to create a Supabase organization for{' '}
+              Stripe Fabric wants to create a Supabase organization for{' '}
               <strong>{accountRequest.email}</strong>
               {accountRequest.name && <> ({accountRequest.name})</>}.
             </p>
@@ -118,4 +118,4 @@ const StripeProductLoginPage = () => {
   )
 }
 
-export default withAuth(StripeProductLoginPage)
+export default withAuth(StripeFabricLoginPage)
