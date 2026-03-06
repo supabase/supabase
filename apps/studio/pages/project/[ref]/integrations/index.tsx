@@ -25,6 +25,8 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
 
+import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
+
 const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_sync_engine']
 
 // Featured integration images
@@ -44,6 +46,9 @@ const IntegrationsPage: NextPageWithLayout = () => {
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
+
+  const { data } = useAvailableIntegrations()
+  // console.log({ data })
 
   const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
     useInstalledIntegrations()
