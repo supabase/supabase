@@ -2078,6 +2078,144 @@
       ]
     },
     {
+      "name": "current-user-avatar-nuxtjs",
+      "type": "registry:block",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
+      "files": [
+        {
+          "path": "registry/default/current-user-avatar/nuxtjs/app/components/current-user-avatar.vue",
+          "type": "registry:component",
+          "target": "app/components/current-user-avatar.vue"
+        },
+        {
+          "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserImage.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "current-user-avatar-vue",
+      "type": "registry:block",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
+      "files": [
+        {
+          "path": "registry/default/current-user-avatar/vue/components/current-user-avatar.vue",
+          "type": "registry:component",
+          "target": "components/current-user-avatar.vue"
+        },
+        {
+          "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserImage.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "realtime-avatar-stack-nuxtjs",
+      "type": "registry:block",
+      "title": "Realtime Avatar Stack",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/components/realtime-avatar-stack.vue",
+          "type": "registry:component",
+          "target": "app/components/realtime-avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/components/avatar-stack.vue",
+          "type": "registry:component",
+          "target": "app/components/avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserImage.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/composables/useRealtimePresenceRoom.ts",
+          "type": "registry:component",
+          "target": "app/composables/useRealtimePresenceRoom.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "realtime-avatar-stack-vue",
+      "type": "registry:block",
+      "title": "Realtime Avatar Stack",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/components/realtime-avatar-stack.vue",
+          "type": "registry:component",
+          "target": "components/realtime-avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/components/avatar-stack.vue",
+          "type": "registry:component",
+          "target": "components/avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserImage.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/composables/useRealtimePresenceRoom.ts",
+          "type": "registry:component",
+          "target": "composables/useRealtimePresenceRoom.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "ai-editor-rules",
       "type": "registry:file",
