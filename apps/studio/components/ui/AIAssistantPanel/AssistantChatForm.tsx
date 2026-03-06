@@ -1,9 +1,9 @@
+import { useBreakpoint } from 'common'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
 import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
-
-import { useBreakpoint } from 'common'
 import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { type SqlSnippet } from './AIAssistant.types'
 import { ModelSelector } from './ModelSelector'
@@ -121,7 +121,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
             ref={textAreaRef}
             disabled={disabled}
             className={cn(
-              'text-sm pr-10 pb-9 max-h-64',
+              'text-base md:text-sm pr-10 pb-9 max-h-64',
               sqlSnippets && sqlSnippets.length > 0 && 'pt-10'
             )}
             placeholder={placeholder}
