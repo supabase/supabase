@@ -1,11 +1,11 @@
 import { expect, Page } from '@playwright/test'
 
-import { query } from '../utils/db/index.js'
-import { test } from '../utils/test.js'
+import { dropTable, query } from '../utils/db/index.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
+import { openTableContextMenu } from '../utils/table-helpers.js'
+import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { createApiResponseWaiter, waitForTableToLoad } from '../utils/wait-for-response.js'
-import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
-import { openTableContextMenu, deleteTable } from '../utils/table-helpers.js'
 
 const TABLE_NAME_PREFIX = 'pw_api_access'
 
@@ -100,6 +100,15 @@ test.describe('API Access Toggle', () => {
   test('API access is default on for a new table', async ({ page, ref }) => {
     const tableName = `${TABLE_NAME_PREFIX}_default_on`
 
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
     // Open new table dialog
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await expect(page.getByTestId('table-editor-side-panel')).toBeVisible()
@@ -148,6 +157,14 @@ test.describe('API Access Toggle', () => {
   test('can toggle API access off for a new table', async ({ page, ref }) => {
     const tableName = `${TABLE_NAME_PREFIX}_toggle_off`
 
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
     // Open new table dialog
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await expect(page.getByTestId('table-editor-side-panel')).toBeVisible()
@@ -197,7 +214,14 @@ test.describe('API Access Toggle', () => {
 
   test('shows API access toggle when editing an existing table', async ({ page, ref }) => {
     const tableName = `${TABLE_NAME_PREFIX}_edit`
-
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
     // Create a table first
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await expect(page.getByTestId('table-editor-side-panel')).toBeVisible()
@@ -263,7 +287,14 @@ test.describe('API Access Toggle', () => {
     ref,
   }) => {
     const tableName = `${TABLE_NAME_PREFIX}_partial_grants`
-
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
     // Open new table dialog
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await expect(page.getByTestId('table-editor-side-panel')).toBeVisible()
@@ -346,7 +377,14 @@ test.describe('API Access Toggle', () => {
     ref,
   }) => {
     const tableName = `${TABLE_NAME_PREFIX}_preserve_grants`
-
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
     // Step 1: Create a table with partial privileges (only SELECT and INSERT for anon)
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await expect(page.getByTestId('table-editor-side-panel')).toBeVisible()
@@ -431,13 +469,5 @@ test.describe('API Access Toggle', () => {
       anon: ['SELECT', 'INSERT'],
       authenticated: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
     })
-
-    // Navigate back to table editor for cleanup
-    loadPromise = waitForTableToLoad(page, ref)
-    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await loadPromise
-
-    // Clean up
-    await deleteTable(page, ref, tableName)
   })
 })
