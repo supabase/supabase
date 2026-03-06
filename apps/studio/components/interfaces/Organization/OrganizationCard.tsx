@@ -41,7 +41,7 @@ export const OrganizationCard = ({
             <span>{organization.plan.name} Plan</span>
             {numProjects > 0 && (
               <>
-                <span>•</span>
+                <span>·</span>
                 <span>
                   {numProjects} project{numProjects > 1 ? 's' : ''}
                 </span>
