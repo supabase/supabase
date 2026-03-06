@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -20,6 +21,7 @@ export const SettingsProductMenu = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 
   const page = router.pathname.includes('billing')
     ? router.pathname.split('/')[5]
@@ -54,6 +56,7 @@ export const SettingsProductMenu = () => {
     legacyJwtKeys: legacyJWTKeysEnabled,
     logDrains: projectSettingsLogDrains,
     billing: billingAll,
+    platformWebhooks: platformWebhooksEnabled,
   })
 
   return <ProductMenu page={page} menu={menuRoutes} />
