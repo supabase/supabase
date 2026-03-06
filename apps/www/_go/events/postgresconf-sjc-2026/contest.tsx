@@ -6,20 +6,20 @@ const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'postgresconf-sjc-2026/contest',
   metadata: {
-    title: 'Win an iPhone Pro Max | Supabase at PostgresConf San Jose 2026',
+    title: 'Win a Mac Mini | Supabase at PostgresConf San Jose 2026',
     description:
-      'Sign up for Supabase and enter the contest for a chance to win an iPhone Pro Max. PostgresConf San Jose 2026.',
+      'Sign up for Supabase and enter the contest for a chance to win a Mac Mini. PostgresConf San Jose 2026.',
   },
   hero: {
-    title: 'Win an iPhone Pro Max',
+    title: 'Win a Mac Mini',
     subtitle: 'Supabase at PostgresConf San Jose 2026',
     description:
-      'Supabase is Postgres with batteries included -- auth, storage, edge functions, vectors, and real-time, all built on top of the database you already know. Sign up, load some data, and enter below for a chance to win an iPhone Pro Max.',
+      'Supabase is Postgres with batteries included -- auth, storage, edge functions, vectors, and real-time, all built on top of the database you already know. Sign up, load some data, and enter below for a chance to win a Mac Mini.',
     image: {
-      src: '/images/landing-pages/stripe-sessions/iphone17-pro-max.png',
-      alt: 'iPhone Pro Max',
+      src: '/images/landing-pages/postgresconf-sjc-2026/mac-mini.png',
+      alt: 'Apple Mac Mini',
       width: 400,
-      height: 500,
+      height: 400,
     },
     ctas: [
       {

@@ -117,7 +117,7 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"Supabase enabled us to focus on building the best email infrastructure for developers, without worrying about backend complexity."',
+        text: 'Supabase enabled us to focus on building the best email infrastructure for developers, without worrying about backend complexity.',
         author: 'Zeno Rocha',
         role: 'CEO, Resend',
         link: '/customers/resend',
