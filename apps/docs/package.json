@@ -128,7 +128,7 @@
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/typescript": "4.1.6",
     "@graphql-codegen/typescript-resolvers": "4.5.0",
-    "@supabase/supa-mdx-lint": "0.3.1",
+    "@supabase/supa-mdx-lint": "0.3.2",
     "@testing-library/react": "^16.0.0",
     "@types/common-tags": "^1.8.4",
     "@types/estree": "1.0.5",

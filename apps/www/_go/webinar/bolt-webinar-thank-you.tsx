@@ -4,7 +4,7 @@ import { Button } from 'ui'
 
 const page: GoPageInput = {
   template: 'thank-you',
-  slug: 'bolt-webinar/thank-you',
+  slug: 'vibe-coding-done-right-webinar/thank-you',
   metadata: {
     title: 'Thank you',
     description: 'Thanks for getting in touch. We’ll be in touch with resources and next steps.',

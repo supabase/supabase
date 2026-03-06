@@ -64,9 +64,9 @@ export const CustomDomainConfig = () => {
     <PageSection id="custom-domains">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Custom Domains</PageSectionTitle>
+          <PageSectionTitle>Custom domains</PageSectionTitle>
           <PageSectionDescription>
-            Present a branded experience to your users.
+            Present a branded experience to your users
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>

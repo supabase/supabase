@@ -6,11 +6,11 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { copyToClipboard } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { fetchFileUrl } from './useFetchFileUrlQuery'
 
 export const useCopyUrl = () => {
-  const { projectRef, selectedBucket, getPathAlongOpenedFolders } =
-    useStorageExplorerStateSnapshot()
+  const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: projectRef })
 
@@ -20,7 +20,7 @@ export const useCopyUrl = () => {
 
   const getFileUrl = useCallback(
     (fileName: string, expiresIn?: URL_EXPIRY_DURATION) => {
-      const pathToFile = getPathAlongOpenedFolders(false)
+      const pathToFile = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
       const formattedPathToFile = [pathToFile, fileName].join('/')
 
       return fetchFileUrl(
@@ -31,7 +31,7 @@ export const useCopyUrl = () => {
         expiresIn
       )
     },
-    [projectRef, selectedBucket.id, selectedBucket.public, getPathAlongOpenedFolders]
+    [projectRef, selectedBucket, openedFolders]
   )
 
   const onCopyUrl = useCallback(

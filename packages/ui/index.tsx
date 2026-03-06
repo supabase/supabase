@@ -127,6 +127,8 @@ export {
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
 
+export * from './src/components/AlertCollapsible'
+
 export {
   Field as Field_Shadcn_,
   FieldContent as FieldContent_Shadcn_,

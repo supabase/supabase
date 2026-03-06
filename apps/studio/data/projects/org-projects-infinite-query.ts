@@ -24,7 +24,7 @@ interface GetOrgProjectsInfiniteVariables {
 export type OrgProjectsResponse = components['schemas']['OrganizationProjectsResponse']
 export type OrgProject = OrgProjectsResponse['projects'][number]
 
-async function getOrganizationProjects(
+export async function getOrganizationProjects(
   {
     slug,
     limit = DEFAULT_LIMIT,

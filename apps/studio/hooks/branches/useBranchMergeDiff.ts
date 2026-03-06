@@ -1,3 +1,4 @@
+import { useIsPgDeltaDiffEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
 import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useMemo } from 'react'
@@ -51,6 +52,8 @@ export const useBranchMergeDiff = ({
   parentBranchConnectionString,
   currentBranchCreatedAt,
 }: UseBranchMergeDiffProps): BranchMergeDiffResult => {
+  const pgDeltaDiffEnabled = useIsPgDeltaDiffEnabled()
+
   // Get database diff
   const {
     data: diffContent,
@@ -62,6 +65,7 @@ export const useBranchMergeDiff = ({
     {
       branchRef: currentBranchRef || '',
       projectRef: parentProjectRef || '',
+      pgdelta: pgDeltaDiffEnabled,
     },
     {
       enabled: !!currentBranchRef && !!parentProjectRef,
