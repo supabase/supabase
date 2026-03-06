@@ -115,13 +115,17 @@ ${selectFields}
                     <p className="font-medium truncate">
                       {item.${displayField} || 'Untitled'}
                     </p>
-                    <div className="flex items-center gap-3 text-muted-foreground text-xs">${secondaryInfo}${hasCreatedAt ? `
+                    <div className="flex items-center gap-3 text-muted-foreground text-xs">${secondaryInfo}${
+                      hasCreatedAt
+                        ? `
                       <span>
                         Created {new Date(item.created_at).toLocaleDateString()}
-                      </span>` : `
+                      </span>`
+                        : `
                       <span className="font-mono truncate max-w-[120px]" title={item.${primaryKey}}>
                         {item.${primaryKey}.slice(0, 8)}...
-                      </span>`}
+                      </span>`
+                    }
                     </div>
                   </div>
                 </div>
