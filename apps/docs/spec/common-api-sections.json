@@ -731,6 +731,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-database-disk",
+        "title": "Get database disk",
+        "slug": "v1-get-database-disk",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-disk-utilization",
         "title": "Get disk utilization",
         "slug": "v1-get-disk-utilization",

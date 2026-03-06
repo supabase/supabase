@@ -4,8 +4,6 @@ import { VERSION } from 'stripe-experiment-sync'
 import { install, uninstall } from 'stripe-experiment-sync/supabase'
 import { z } from 'zod'
 
-const ENABLE_FLAG_KEY = 'enableStripeSyncEngineIntegration'
-
 const InstallBodySchema = z.object({
   projectRef: z.string().min(1),
   stripeSecretKey: z.string().min(1),

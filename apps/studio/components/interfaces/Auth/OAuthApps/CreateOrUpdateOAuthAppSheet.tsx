@@ -7,7 +7,7 @@ import type {
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
-import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
 import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
@@ -111,7 +111,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
     control: form.control,
   })
 
-  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
+  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
 
   const { mutate: createOAuthApp, isPending: isCreating } = useOAuthServerAppCreateMutation({
     onSuccess: (data) => {
@@ -201,8 +201,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
       updateOAuthApp({
         projectRef,
+        clientEndpoint,
         clientId: appToEdit.client_id,
-        clientEndpoint: endpointData?.endpoint,
         ...payload,
       })
     } else {
@@ -216,7 +216,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
       createOAuthApp({
         projectRef,
-        clientEndpoint: endpointData?.endpoint,
+        clientEndpoint,
         ...payload,
       })
     }
@@ -234,8 +234,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
   const handleConfirmRegenerate = () => {
     regenerateSecret({
       projectRef,
+      clientEndpoint,
       clientId: appToEdit?.client_id,
-      clientEndpoint: endpointData?.endpoint,
     })
   }
 

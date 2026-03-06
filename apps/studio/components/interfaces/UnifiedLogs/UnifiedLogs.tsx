@@ -23,6 +23,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
   Separator,
+  useIsMobile,
 } from 'ui'
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
@@ -312,6 +313,17 @@ export const UnifiedLogs = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowSelection, selectedRow, isLoading, isFetching])
 
+  const isMobile = useIsMobile()
+  const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
+
+  useEffect(() => {
+    if (isMobile) {
+      setIsFilterBarOpen(false)
+    } else {
+      setIsFilterBarOpen(true)
+    }
+  }, [isMobile])
+
   return (
     <DataTableProvider
       table={table}
@@ -330,15 +342,14 @@ export const UnifiedLogs = () => {
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
-        <ResizablePanelGroup direction="horizontal" autoSaveId="logs-layout">
-          <FilterSideBar dateRangeDisabled={{ after: new Date() }} />
-          <ResizableHandle
-            withHandle
-            // disabled={resizableSidebar ? false : true}
-            className="group-data-[expanded=false]/controls:hidden hidden md:flex"
+        <ResizablePanelGroup orientation="horizontal" autoSaveId="logs-layout">
+          <FilterSideBar
+            isFilterBarOpen={isFilterBarOpen}
+            setIsFilterBarOpen={setIsFilterBarOpen}
+            dateRangeDisabled={{ after: new Date() }}
           />
+          <ResizableHandle withHandle />
           <ResizablePanel
-            order={2}
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
@@ -363,6 +374,8 @@ export const UnifiedLogs = () => {
                     />
                   ) : null,
                 ]}
+                isFilterBarOpen={isFilterBarOpen}
+                setIsFilterBarOpen={setIsFilterBarOpen}
               />
               <TimelineChart
                 data={unifiedLogsChart}
@@ -375,16 +388,12 @@ export const UnifiedLogs = () => {
               />
             </DataTableHeaderLayout>
             <Separator />
-            <ResizablePanelGroup direction="horizontal" className="w-full h-full">
-              <ResizablePanel
-                defaultSize={selectedRowKey ? 60 : 100}
-                minSize={30}
-                className="h-full"
-              >
-                <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
+            <ResizablePanelGroup orientation="horizontal" className="w-full h-full">
+              <ResizablePanel minSize="30" className="h-full">
+                <ResizablePanelGroup key="main-logs" orientation="vertical" className="h-full">
                   <ResizablePanel
-                    defaultSize={100}
-                    minSize={30}
+                    defaultSize="100"
+                    minSize="30"
                     className={cn(
                       'bg',
                       isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'

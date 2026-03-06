@@ -383,6 +383,13 @@
             "required": false,
             "in": "query",
             "schema": { "type": "string" }
+          },
+          {
+            "name": "pgdelta",
+            "required": false,
+            "in": "query",
+            "description": "Use pg-delta instead of Migra for diffing when true",
+            "schema": { "type": "boolean" }
           }
         ],
         "responses": {
@@ -5019,6 +5026,65 @@
         "x-oauth-scope": "storage:read"
       }
     },
+    "/v1/projects/{ref}/config/disk": {
+      "get": {
+        "operationId": "v1-get-database-disk",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/DiskResponse" } }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to get database disk attributes" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_read"] }],
+        "summary": "Get database disk attributes",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      },
+      "post": {
+        "operationId": "v1-modify-database-disk",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/DiskRequestBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to modify database disk" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_write"] }],
+        "summary": "Modify database disk",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
     "/v1/projects/{ref}/config/disk/util": {
       "get": {
         "operationId": "v1-get-disk-utilization",
@@ -5047,37 +5113,6 @@
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_read"] }],
         "summary": "Get disk utilization",
-        "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"]
-      }
-    },
-    "/v1/projects/{ref}/config/disk": {
-      "post": {
-        "operationId": "v1-modify-database-disk",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/DiskRequestBody" } }
-          }
-        },
-        "responses": {
-          "201": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to modify database disk" }
-        },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_write"] }],
-        "summary": "Modify database disk",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
       }
@@ -7832,9 +7867,15 @@
                     "description": "Deprecated. Use `status` instead."
                   },
                   "db_connected": { "type": "boolean" },
+                  "replication_connected": { "type": "boolean" },
                   "connected_cluster": { "type": "integer" }
                 },
-                "required": ["healthy", "db_connected", "connected_cluster"]
+                "required": [
+                  "healthy",
+                  "db_connected",
+                  "replication_connected",
+                  "connected_cluster"
+                ]
               },
               {
                 "type": "object",
@@ -8292,7 +8333,9 @@
           "uri_allow_list": { "type": "string", "nullable": true },
           "oauth_server_enabled": { "type": "boolean" },
           "oauth_server_allow_dynamic_registration": { "type": "boolean" },
-          "oauth_server_authorization_path": { "type": "string", "nullable": true }
+          "oauth_server_authorization_path": { "type": "string", "nullable": true },
+          "custom_oauth_enabled": { "type": "boolean" },
+          "custom_oauth_max_providers": { "type": "integer" }
         },
         "required": [
           "api_max_request_duration",
@@ -8525,7 +8568,9 @@
           "uri_allow_list",
           "oauth_server_enabled",
           "oauth_server_allow_dynamic_registration",
-          "oauth_server_authorization_path"
+          "oauth_server_authorization_path",
+          "custom_oauth_enabled",
+          "custom_oauth_max_providers"
         ]
       },
       "UpdateAuthConfigBody": {
@@ -8899,7 +8944,8 @@
           "nimbus_oauth_client_secret": { "type": "string", "nullable": true },
           "oauth_server_enabled": { "type": "boolean", "nullable": true },
           "oauth_server_allow_dynamic_registration": { "type": "boolean", "nullable": true },
-          "oauth_server_authorization_path": { "type": "string", "nullable": true }
+          "oauth_server_authorization_path": { "type": "string", "nullable": true },
+          "custom_oauth_enabled": { "type": "boolean" }
         }
       },
       "CreateThirdPartyAuthBody": {
@@ -9782,21 +9828,35 @@
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
       },
-      "DiskUtilMetricsResponse": {
+      "DiskResponse": {
         "type": "object",
         "properties": {
-          "timestamp": { "type": "string" },
-          "metrics": {
-            "type": "object",
-            "properties": {
-              "fs_size_bytes": { "type": "number" },
-              "fs_avail_bytes": { "type": "number" },
-              "fs_used_bytes": { "type": "number" }
-            },
-            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
-          }
+          "attributes": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "iops": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "size_gb": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "throughput_mibps": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "type": { "type": "string", "enum": ["gp3"] }
+                },
+                "required": ["iops", "size_gb", "type"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "iops": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "size_gb": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "type": { "type": "string", "enum": ["io2"] }
+                },
+                "required": ["iops", "size_gb", "type"]
+              }
+            ]
+          },
+          "last_modified_at": { "type": "string" }
         },
-        "required": ["timestamp", "metrics"]
+        "required": ["attributes"]
       },
       "DiskRequestBody": {
         "type": "object",
@@ -9827,6 +9887,22 @@
           }
         },
         "required": ["attributes"]
+      },
+      "DiskUtilMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": { "type": "string" },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "fs_size_bytes": { "type": "number" },
+              "fs_avail_bytes": { "type": "number" },
+              "fs_used_bytes": { "type": "number" }
+            },
+            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+          }
+        },
+        "required": ["timestamp", "metrics"]
       },
       "DiskAutoscaleConfig": {
         "type": "object",

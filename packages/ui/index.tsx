@@ -127,6 +127,8 @@ export {
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
 
+export * from './src/components/AlertCollapsible'
+
 export {
   Field as Field_Shadcn_,
   FieldContent as FieldContent_Shadcn_,
@@ -298,5 +300,6 @@ export * from './src/components/Icon/icons/IconYoutubeSolid'
 
 // Export hooks
 export * from './src/lib/Hooks'
+export * from './src/components/hooks/use-mobile'
 
 export * from './src/components/KeyboardShortcut/KeyboardShortcut'

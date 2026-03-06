@@ -72,7 +72,7 @@
     "react-hook-form": "^7.45.0",
     "react-intersection-observer": "^9.8.2",
     "react-medium-image-zoom": "^5.2.4",
-    "react-resizable-panels": "^3.0.0",
+    "react-resizable-panels": "^4.6.5",
     "react-syntax-highlighter": "^15.6.6",
     "recharts": "catalog:",
     "sonner": "^1.5.0",

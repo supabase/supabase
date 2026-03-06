@@ -45,7 +45,7 @@ export const InlineEditorButton = () => {
         },
       }}
     >
-      <SqlEditor size={18} strokeWidth={1.5} />
+      <SqlEditor size={16} strokeWidth={1.5} />
     </ButtonTooltip>
   )
 }

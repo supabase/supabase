@@ -934,7 +934,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Get database disk attributes */
+    get: operations['v1-get-database-disk']
     put?: never
     /** Modify database disk */
     post: operations['v1-modify-database-disk']
@@ -2091,6 +2092,8 @@ export interface components {
     }
     AuthConfigResponse: {
       api_max_request_duration: number | null
+      custom_oauth_enabled: boolean
+      custom_oauth_max_providers: number
       db_max_pool_size: number | null
       /** @enum {string|null} */
       db_max_pool_size_unit: 'connections' | 'percent' | null
@@ -2805,6 +2808,23 @@ export interface components {
             /** @enum {string} */
             type: 'io2'
           }
+    }
+    DiskResponse: {
+      attributes:
+        | {
+            iops: number
+            size_gb: number
+            throughput_mibps?: number
+            /** @enum {string} */
+            type: 'gp3'
+          }
+        | {
+            iops: number
+            size_gb: number
+            /** @enum {string} */
+            type: 'io2'
+          }
+      last_modified_at?: string
     }
     DiskUtilMetricsResponse: {
       metrics: {
@@ -3819,6 +3839,7 @@ export interface components {
     }
     UpdateAuthConfigBody: {
       api_max_request_duration?: number | null
+      custom_oauth_enabled?: boolean
       db_max_pool_size?: number | null
       /** @enum {string|null} */
       db_max_pool_size_unit?: 'connections' | 'percent' | null
@@ -4347,9 +4368,12 @@ export interface components {
     V1CreateProjectBody: {
       /** @description Database password */
       db_pass: string
-      /** @enum {string} */
+      /**
+       * @description Desired instance size. Omit this field to always default to the smallest possible size.
+       * @example nano
+       * @enum {string}
+       */
       desired_instance_size?:
-        | 'pico'
         | 'nano'
         | 'micro'
         | 'small'
@@ -4391,13 +4415,8 @@ export interface components {
       plan?: 'free' | 'pro'
       /**
        * @deprecated
-       * @description Postgres engine version. If not provided, the latest version will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '15' | '17' | '17-oriole'
-      /**
-       * @deprecated
        * @description Region you want your server to reside in. Use region_selection instead.
+       * @example us-east-1
        * @enum {string}
        */
       region?:
@@ -4461,12 +4480,6 @@ export interface components {
             /** @enum {string} */
             type: 'smartGroup'
           }
-      /**
-       * @deprecated
-       * @description Release channel. If not provided, GA will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
@@ -4821,6 +4834,7 @@ export interface components {
              * @description Deprecated. Use `status` instead.
              */
             healthy: boolean
+            replication_connected: boolean
           }
         | {
             db_schema: string
@@ -4989,6 +5003,8 @@ export interface operations {
     parameters: {
       query?: {
         included_schemas?: string
+        /** @description Use pg-delta instead of Migra for diffing when true */
+        pgdelta?: boolean
       }
       header?: never
       path: {
@@ -8283,6 +8299,56 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update project's Postgres config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-database-disk': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DiskResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get database disk attributes */
       500: {
         headers: {
           [name: string]: unknown
@@ -12243,9 +12309,8 @@ export interface operations {
       query: {
         /** @description Continent code to determine regional recommendations: NA (North America), SA (South America), EU (Europe), AF (Africa), AS (Asia), OC (Oceania), AN (Antarctica) */
         continent?: 'NA' | 'SA' | 'EU' | 'AF' | 'AS' | 'OC' | 'AN'
-        /** @description Desired instance size */
+        /** @description Desired instance size. Omit this field to always default to the smallest possible size. */
         desired_instance_size?:
-          | 'pico'
           | 'nano'
           | 'micro'
           | 'small'

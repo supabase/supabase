@@ -393,14 +393,12 @@ export const LogTable = ({
   return (
     <section className={'h-full flex w-full flex-col flex-1'}>
       {!queryType && <LogsExplorerTableHeader />}
-
-      <ResizablePanelGroup direction="horizontal" key="log-table">
+      <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel
           id="log-table-content"
-          order={1}
-          minSize={panelContentMinSize}
-          maxSize={panelContentMaxSize}
-          defaultSize={panelContentMaxSize}
+          minSize={`${panelContentMinSize}`}
+          maxSize={`${panelContentMaxSize}`}
+          defaultSize={`${panelContentMaxSize}`}
         >
           <DataGrid
             role="table"
@@ -459,10 +457,9 @@ export const LogTable = ({
             <ResizableHandle withHandle />
             <ResizablePanel
               id="log-table-panel"
-              order={2}
-              minSize={100 - panelContentMaxSize}
-              maxSize={100 - panelContentMinSize}
-              defaultSize={100 - panelContentMaxSize}
+              minSize={`${100 - panelContentMaxSize}`}
+              maxSize={`${100 - panelContentMinSize}`}
+              defaultSize={`${100 - panelContentMaxSize}`}
             >
               <LogSelection
                 isLoading={isSelectedLogLoading || false}

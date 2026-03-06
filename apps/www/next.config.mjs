@@ -49,6 +49,7 @@ const nextConfig = {
     'shared-data',
     'icons',
     'api-types',
+    'marketing',
     // needed to make the octokit packages work in /changelog
     '@octokit/plugin-paginate-graphql',
   ],

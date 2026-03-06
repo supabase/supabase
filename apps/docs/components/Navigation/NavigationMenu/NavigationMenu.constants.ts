@@ -1,8 +1,9 @@
-import type { ComponentProps } from 'react'
 // End of third-party imports
 
 import { isFeatureEnabled } from 'common/enabled-features'
+import type { ComponentProps } from 'react'
 import type { IconPanel } from 'ui-patterns/IconPanel'
+
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
 const {
@@ -1050,6 +1051,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/partitions' as `/${string}`,
         },
         {
+          name: 'Migrating to pg_partman',
+          url: '/guides/database/migrating-to-pg-partman' as `/${string}`,
+        },
+        {
           name: 'Managing connections',
           url: '/guides/database/connection-management' as `/${string}`,
         },
@@ -1248,6 +1253,10 @@ export const database: NavMenuConstant = {
         {
           name: 'pg_net: Async Networking',
           url: '/guides/database/extensions/pg_net' as `/${string}`,
+        },
+        {
+          name: 'pg_partman: Partition management',
+          url: '/guides/database/extensions/pg_partman' as `/${string}`,
         },
         {
           name: 'pg_plan_filter: Restrict Total Cost',
@@ -2840,10 +2849,20 @@ export const self_hosting: NavMenuConstant = {
     {
       name: 'How-to Guides',
       items: [
-        { name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' },
-        { name: 'Restore from Platform', url: '/guides/self-hosting/restore-from-platform' },
+        { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
+        {
+          name: 'Add Reverse Proxy with HTTPS',
+          url: '/guides/self-hosting/self-hosted-proxy-https',
+        },
+        {
+          name: 'Restore Project from Platform',
+          url: '/guides/self-hosting/restore-from-platform',
+        },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+        { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
+        { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
+        { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
       ],
     },
     {
@@ -2894,6 +2913,11 @@ export const self_hosting: NavMenuConstant = {
         {
           name: 'Reference',
           url: '/reference/self-hosting-functions/introduction',
+          items: [],
+        },
+        {
+          name: 'Guide',
+          url: '/guides/self-hosting/self-hosted-functions',
           items: [],
         },
       ],
