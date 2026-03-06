@@ -1,0 +1,127 @@
+---
+title: 'Use Supabase with XMLUI'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from an XMLUI app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <$Partial path="quickstart_db_setup.mdx" />
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create a Supabase + XMLUI app">
+
+    - Create an `index.html` that loads Supabase JS and XMLUI.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sh name=Terminal
+      cat <<'EOF' > index.html
+      <!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <title>Supabase + XMLUI</title>
+          <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+          <script src="https://cdn.xmlui.org/xmlui.js"></script>
+        </head>
+      </html>
+      EOF
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Add the XMLUI app markup">
+
+    - Create `Main.xmlui`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sh name=Terminal
+      cat <<'EOF' > Main.xmlui
+      <App name="Supabase + XMLUI">
+        <DataSource
+          id="instruments"
+          url="{appGlobals.supabaseUrl + '/rest/v1/instruments?select=*'}"
+          headers="{{
+            apikey: appGlobals.supabasePublishableKey,
+            Authorization: 'Bearer ' + appGlobals.supabasePublishableKey
+          }}"
+        />
+        <H1>instruments</H1>
+        <List data="{instruments}">
+          <Text value="{$item.name}" />
+        </List>
+      </App>
+      EOF
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Declare Supabase variables">
+
+    Create a `config.json` file with your Supabase project details.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sh name=Terminal
+      cat <<'EOF' > config.json
+      {
+        "appGlobals": {
+          "supabaseUrl": "<SUBSTITUTE_SUPABASE_URL>",
+          "supabasePublishableKey": "<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>"
+        }
+      }
+      EOF
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+
+    <StepHikeCompact.Details title="Start the app">
+
+    Start the app, visit http://localhost:8080 in a browser, and you should see the list of instruments.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      npx http-server
+      ```
+
+      or
+
+      ```bash name=Terminal
+      python -m http.server 8080
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
