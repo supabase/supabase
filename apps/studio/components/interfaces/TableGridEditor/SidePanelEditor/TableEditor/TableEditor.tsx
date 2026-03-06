@@ -10,7 +10,6 @@ import { useChanged } from 'hooks/misc/useChanged'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useTableCreateGeneratePolicies } from 'hooks/misc/useTableCreateGeneratePolicies'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
@@ -35,7 +34,6 @@ import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import { HeaderTitle } from './HeaderTitle'
 import { RLSDisableModalContent } from './RLSDisableModal'
-import { RLSManagement } from './RLSManagement/RLSManagement'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 import {
@@ -99,13 +97,6 @@ export const TableEditor = ({
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
   const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
-
-  const [generatedPolicies, setGeneratedPolicies] = useState<GeneratedPolicy[]>([])
-
-  const { enabled: generatePoliciesEnabled } = useTableCreateGeneratePolicies({
-    isNewRecord,
-    projectInsertedAt: project?.inserted_at,
-  })
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -233,7 +224,7 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies,
+            generatedPolicies: [],
           })
         } else if (isDuplicating) {
           const payload: SaveTablePayloadFor<'duplicate'> = {
@@ -283,7 +274,6 @@ export const TableEditor = ({
       setErrors({})
       setImportContent(undefined)
       setIsDuplicateRows(false)
-      setGeneratedPolicies([])
       if (isNewRecord) {
         const tableFields = generateTableField()
         if (templateData) {
@@ -339,7 +329,6 @@ export const TableEditor = ({
 
   if (!tableFields) return null
 
-  const isApiAccessAndPoliciesSectionShown = isApiGrantTogglesEnabled || generatePoliciesEnabled
   const isExposed = isApiGrantTogglesEnabled
     ? !!apiAccessToggleHandler.data?.schemaExposed &&
       checkDataApiPrivilegesNonEmpty(apiAccessToggleHandler.data.privileges)
@@ -387,9 +376,7 @@ export const TableEditor = ({
 
       <SidePanel.Separator />
 
-      {!generatePoliciesEnabled && (
-        <>
-          <SidePanel.Content className="space-y-10 py-6">
+      <SidePanel.Content className="space-y-10 py-6">
             <Checkbox
               id="enable-rls"
               // @ts-ignore
@@ -469,11 +456,9 @@ export const TableEditor = ({
                 size="medium"
               />
             )}
-          </SidePanel.Content>
+      </SidePanel.Content>
 
-          <SidePanel.Separator />
-        </>
-      )}
+      <SidePanel.Separator />
 
       <SidePanel.Content className="space-y-10 py-6">
         {!isDuplicating && (
@@ -517,21 +502,19 @@ export const TableEditor = ({
           closePanel={() => setIsImportingSpreadsheet(false)}
         />
 
-        {!generatePoliciesEnabled && (
-          <ConfirmationModal
-            visible={rlsConfirmVisible}
-            title="Turn off Row Level Security"
-            confirmLabel="Confirm"
-            size="medium"
-            onCancel={() => setRlsConfirmVisible(false)}
-            onConfirm={() => {
-              onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-              setRlsConfirmVisible(false)
-            }}
-          >
-            <RLSDisableModalContent />
-          </ConfirmationModal>
-        )}
+        <ConfirmationModal
+          visible={rlsConfirmVisible}
+          title="Turn off Row Level Security"
+          confirmLabel="Confirm"
+          size="medium"
+          onCancel={() => setRlsConfirmVisible(false)}
+          onConfirm={() => {
+            onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+            setRlsConfirmVisible(false)
+          }}
+        >
+          <RLSDisableModalContent />
+        </ConfirmationModal>
       </SidePanel.Content>
 
       {!isDuplicating && (
@@ -549,37 +532,19 @@ export const TableEditor = ({
         </>
       )}
 
-      {isApiAccessAndPoliciesSectionShown && (
+      {isApiGrantTogglesEnabled && (
         <>
           <SidePanel.Separator />
           <SidePanel.Content className="py-6 space-y-6">
-            {isApiGrantTogglesEnabled && (
-              <ApiAccessToggle
-                projectRef={project?.ref}
-                schemaName={isNewRecord ? selectedSchema : table?.schema}
-                tableName={
-                  isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
-                }
-                isNewRecord={isNewRecord || isDuplicating}
-                handler={apiAccessToggleHandler}
-              />
-            )}
-
-            {/* [Joshen] Temporarily hide this section if duplicating, as we aren't duplicating policies atm when duplicating tables */}
-            {/* We should do this thought, but let's do this in another PR as the current one is already quite big */}
-            {generatePoliciesEnabled && !isDuplicating && (
-              <RLSManagement
-                table={table}
-                tableFields={tableFields}
-                foreignKeyRelations={isNewRecord ? fkRelations : undefined}
-                isNewRecord={isNewRecord}
-                isDuplicating={isDuplicating}
-                isExposed={isExposed}
-                generatedPolicies={generatedPolicies}
-                onGeneratedPoliciesChange={setGeneratedPolicies}
-                onRLSUpdate={(value) => onUpdateField({ isRLSEnabled: value })}
-              />
-            )}
+            <ApiAccessToggle
+              projectRef={project?.ref}
+              schemaName={isNewRecord ? selectedSchema : table?.schema}
+              tableName={
+                isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
+              }
+              isNewRecord={isNewRecord || isDuplicating}
+              handler={apiAccessToggleHandler}
+            />
           </SidePanel.Content>
         </>
       )}
