@@ -18,6 +18,18 @@ We have two main ways of handling modality:
 
 As a general rule: use dialogs for short, focused tasks and use sheets for longer forms or more detailed views.
 
+### Dirty form dismissal pattern
+
+When a dialog or sheet contains a form, users should generally be allowed to attempt dismissal via all normal affordances (backdrop click, Escape key, close icon, and footer `Cancel` button).
+
+If the form is clean, close immediately. If the form has unsaved changes, show a discard-confirmation dialog instead of closing immediately.
+
+This pattern is implemented in Studio with `useConfirmOnClose` plus `DiscardChangesConfirmationDialog`.
+
+- **Prompt on footer `Cancel` too:** If a button is labeled `Cancel`, users expect it to stop the current action, not silently discard edits. Prompting keeps behavior consistent with backdrop/Escape dismissal and prevents accidental loss.
+- **Use explicit labels for no-prompt discard:** If you intentionally want a one-click destructive exit, label the action `Discard` (or `Discard changes`) rather than `Cancel`.
+- **Guard close attempts, not unmounts:** This pattern should intercept controlled modal/sheet close attempts (`onOpenChange`, close buttons, footer actions). It should not attempt to block route changes or arbitrary component unmounts.
+
 ## Dialogs
 
 Dialogs are centered overlays used for short, focused tasks. All dialogs should follow these best practices:
@@ -40,6 +52,22 @@ There are quite a few dialog components, each suited to a different task or cont
 [Alert Dialog](../components/alert-dialog) is used to confirm or acknowledge a critical action with a single, short paragraph and a clear decision.
 
 <ComponentPreview name="alert-dialog-demo" />
+
+#### Discard changes confirmation dialog (pattern)
+
+For dirty form dismissal, use a short discard-confirmation dialog after a close attempt instead of disabling dismissal entirely.
+
+- The primary form remains in a `Dialog` or `Sheet` (dismissible).
+- Closing is intercepted only when the form is dirty.
+- The follow-up confirmation is an `AlertDialog` pattern (`DiscardChangesConfirmationDialog` in Studio).
+
+Typical flow:
+
+1. User attempts to close the dialog/sheet (backdrop, Escape, close icon, or `Cancel`)
+2. If the form is clean, close immediately
+3. If the form is dirty, show discard confirmation
+4. `Keep editing` returns to the form
+5. `Discard changes` closes and resets the form
 
 #### Text Confirm Dialog
 

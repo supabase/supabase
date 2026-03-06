@@ -12,6 +12,7 @@ import {
   isGroup,
   MenuItem,
   MenuItemGroup,
+  ResolvedPropertyChange,
   SyncOptionsFunction,
 } from './types'
 
@@ -222,6 +223,54 @@ export function updateNestedOperator(
         : condition
     ),
   }
+}
+
+export function updateNestedPropertyName(
+  group: FilterGroup,
+  path: number[],
+  newPropertyName: string,
+  newOperator?: string,
+  newValue?: string
+): FilterGroup {
+  return updateNestedFilter(group, path, (condition) => ({
+    ...condition,
+    propertyName: newPropertyName,
+    ...(newOperator !== undefined ? { operator: newOperator } : {}),
+    ...(newValue !== undefined ? { value: newValue } : {}),
+  }))
+}
+
+export function resolvePropertyChange(
+  currentOperator: string,
+  currentValue: string,
+  newProperty: FilterProperty
+): ResolvedPropertyChange {
+  if (!currentOperator || !newProperty.operators) {
+    return { operator: '', value: '', focusTarget: 'operator' }
+  }
+
+  const operatorValues = newProperty.operators.map((op) =>
+    isFilterOperatorObject(op) ? op.value : op
+  )
+
+  if (!operatorValues.includes(currentOperator)) {
+    return { operator: '', value: '', focusTarget: 'operator' }
+  }
+
+  if (!currentValue) {
+    return { operator: currentOperator, value: '', focusTarget: 'value' }
+  }
+
+  if (newProperty.options && Array.isArray(newProperty.options)) {
+    // New property has fixed options — only preserve value if it's in the list
+    const optionValues = newProperty.options.map((opt) =>
+      typeof opt === 'string' ? opt : 'value' in opt ? opt.value : ''
+    )
+    const preservedValue = optionValues.includes(currentValue) ? currentValue : ''
+    return { operator: currentOperator, value: preservedValue, focusTarget: 'value' }
+  }
+
+  return { operator: currentOperator, value: currentValue, focusTarget: 'value' }
 }
 
 export function updateNestedLogicalOperator(group: FilterGroup, path: number[]): FilterGroup {
