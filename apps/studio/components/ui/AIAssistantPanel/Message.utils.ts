@@ -1,4 +1,21 @@
-import { type SafeParseReturnType, z } from 'zod'
+import { z, type SafeParseReturnType } from 'zod'
+
+/**
+ * Wraps bare URLs containing <placeholder> patterns in backticks so they render in code font,
+ * regardless of whether the LLM remembered to wrap them. Skips URLs already inside code spans.
+ */
+export function wrapPlaceholderUrls(markdown: string): string {
+  const segments = markdown.split(/(```[\s\S]*?```|`[^`]*`)/g)
+  return segments
+    .map((segment, i) => {
+      if (i % 2 === 1) return segment // already in code — leave unchanged
+      return segment.replace(
+        /https?:\/\/\S*<[a-z][a-z0-9]*(?:-[a-z0-9]+)+>\S*/g,
+        (url) => `\`${url}\``
+      )
+    })
+    .join('')
+}
 
 // [Joshen] From https://github.com/remarkjs/react-markdown/blob/fda7fa560bec901a6103e195f9b1979dab543b17/lib/index.js#L425
 export function defaultUrlTransform(value: string) {
