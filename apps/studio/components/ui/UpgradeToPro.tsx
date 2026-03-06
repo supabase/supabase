@@ -9,7 +9,7 @@ interface UpgradeToProProps {
   primaryText: string
   secondaryText: string
   plan?: 'Pro' | 'Team' | 'Enterprise'
-  addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+  addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
   /** Used in the default message template for request upgrade dialog, e.g: "Upgrade to ..." */
   featureProposition?: string
   /** As an override for the button text in both upgrade + request to upgrade scenario */

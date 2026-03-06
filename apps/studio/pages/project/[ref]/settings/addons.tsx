@@ -1,23 +1,26 @@
 import { Addons } from 'components/interfaces/Settings/Addons/Addons'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
 const ProjectAddons: NextPageWithLayout = () => {
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Add ons</ScaffoldTitle>
-          <ScaffoldDescription>Level up your project with add-ons</ScaffoldDescription>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Add-ons</PageHeaderTitle>
+            <PageHeaderDescription>Level up your project with add-ons</PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
       <Addons />
     </>
   )
@@ -25,7 +28,7 @@ const ProjectAddons: NextPageWithLayout = () => {
 
 ProjectAddons.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout title="Add ons">{page}</SettingsLayout>
+    <SettingsLayout title="Add-ons">{page}</SettingsLayout>
   </DefaultLayout>
 )
 export default ProjectAddons
