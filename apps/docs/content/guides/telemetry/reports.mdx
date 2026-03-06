@@ -314,9 +314,49 @@ Actions you can take:
 | Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
 | Review application code                                                                    | Ensure proper connection handling and cleanup                   |
 
-### Dedicated Pooler Client Connections
+### Dedicated Pooler (pgbouncer) Client Connections
 
-### Shared Pooler Client Connections
+Available on Team and Enterprise plans.
+
+This chart displays the number of pgbouncer connections over time.
+
+How it helps debug issues:
+
+| Issue                           | Description                                                 |
+| ------------------------------- | ----------------------------------------------------------- |
+| Connection pool exhaustion      | Identify when approaching maximum connection limits         |
+| Connection leak detection       | Spot applications not properly closing connections          |
+| Service distribution monitoring | Monitor connection usage across different Supabase services |
+
+Actions you can take:
+
+| Action                                                                                     | Description                                                     |
+| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
+| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
+| Review application code                                                                    | Ensure proper connection handling and cleanup                   |
+
+### Shared Pooler (Supavisor) Client Connections
+
+Available on Team and Enterprise plans.
+
+This chart displays the number of Supavisor connections over time.
+
+How it helps debug issues:
+
+| Issue                           | Description                                                 |
+| ------------------------------- | ----------------------------------------------------------- |
+| Connection pool exhaustion      | Identify when approaching maximum connection limits         |
+| Connection leak detection       | Spot applications not properly closing connections          |
+| Service distribution monitoring | Monitor connection usage across different Supabase services |
+
+Actions you can take:
+
+| Action                                                                                     | Description                                                     |
+| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
+| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
+| Review application code                                                                    | Ensure proper connection handling and cleanup                   |
 
 ### Disk Usage
 
