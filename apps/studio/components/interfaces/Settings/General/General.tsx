@@ -7,7 +7,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
-import type { ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -40,12 +39,9 @@ import * as z from 'zod'
 
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
+import { ProjectAccessSection } from './ProjectAccessSection'
 
-interface GeneralProps {
-  projectAccessSection?: ReactNode
-}
-
-export const General = ({ projectAccessSection }: GeneralProps) => {
+export const General = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
@@ -235,7 +231,7 @@ export const General = ({ projectAccessSection }: GeneralProps) => {
         </PageSectionContent>
       </PageSection>
 
-      {projectAccessSection}
+      <ProjectAccessSection />
 
       {!isBranch && (
         <PageSection>
