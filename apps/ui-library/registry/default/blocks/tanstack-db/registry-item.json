@@ -7,20 +7,10 @@
   "registryDependencies": ["button", "input", "label", "sheet"],
   "dependencies": [
     "@tanstack/react-query@latest",
-    "github:ivasilov/supabase-collection",
+    "supa-tdb-collection@latest",
     "zod@latest",
     "@tanstack/react-db@latest"
   ],
-  "files": [
-    {
-      "path": "registry/default/blocks/tanstack-db/lib/query-client.ts",
-      "type": "registry:lib"
-    },
-    {
-      "path": "registry/default/blocks/tanstack-db/app/providers.tsx",
-      "type": "registry:component",
-      "target": "app/providers.tsx"
-    }
-  ],
+  "files": [],
   "docs": "This block provides TanStack Query integration with Supabase collections. The schemas and collections are generated based on your database schema."
 }
