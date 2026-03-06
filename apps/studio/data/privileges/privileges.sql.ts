@@ -225,21 +225,22 @@ export const buildTablePrivilegesSql = (oids: number[], action: 'grant' | 'revok
 
   const privilegeClause =
     action === 'grant'
-      ? 'grant select, insert, update, delete on table %s to anon, authenticated, service_role'
-      : 'revoke all on table %s from anon, authenticated, service_role'
+      ? 'grant select, insert, update, delete on table %I.%I to anon, authenticated, service_role'
+      : 'revoke all on table %I.%I from anon, authenticated, service_role'
 
   return /* SQL */ `
     do $$
     declare
-      rec record;
+      nspname name;
+      relname name;
     begin
-      for rec in
-        select quote_ident(n.nspname) || '.' || quote_ident(c.relname) as relation
+      for nspname, relname in
+        select n.nspname, c.relname
         from pg_class c
         join pg_namespace n on n.oid = c.relnamespace
         where c.oid in (${oids.join(', ')})
       loop
-        execute format('${privilegeClause}', rec.relation);
+        execute format('${privilegeClause}', nspname, relname);
       end loop;
     end $$;
   `
@@ -259,22 +260,23 @@ export const buildFunctionPrivilegesSql = (schemaNames: string[], action: 'grant
 
   const privilegeClause =
     action === 'grant'
-      ? 'grant execute on function %s to anon, authenticated, service_role'
-      : 'revoke all on function %s from anon, authenticated, service_role'
+      ? 'grant execute on function %I.%I(%s) to anon, authenticated, service_role'
+      : 'revoke all on function %I.%I(%s) from anon, authenticated, service_role'
 
   return /* SQL */ `
     do $$
     declare
-      rec record;
+      nspname name;
+      proname name;
+      arg_types text;
     begin
-      for rec in
-        select quote_ident(n.nspname) || '.' || quote_ident(p.proname)
-          || '(' || pg_get_function_identity_arguments(p.oid) || ')' as func_sig
+      for nspname, proname, arg_types in
+        select n.nspname, p.proname, pg_get_function_identity_arguments(p.oid)
         from pg_proc p
         join pg_namespace n on n.oid = p.pronamespace
         where (n.nspname, p.proname) in (${tuples})
       loop
-        execute format('${privilegeClause}', rec.func_sig);
+        execute format('${privilegeClause}', nspname, proname, arg_types);
       end loop;
     end $$;
   `
