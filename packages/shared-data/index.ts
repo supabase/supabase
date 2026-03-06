@@ -7,8 +7,8 @@ import {
   computeInstanceAddonVariantIdSchema,
 } from './compute-disk-limits'
 import config from './config'
-import { ERROR_CODE_DOCS_URLS, ERROR_CODES, HTTP_ERROR_CODES } from './errorCodes'
-import type { ErrorCodeDefinition, ErrorCodeService } from './errorCodes'
+import { ERROR_CODE_DOCS_URLS, ERROR_CODES, HTTP_ERROR_CODES } from './error-codes'
+import type { ErrorCodeDefinition, ErrorCodeService } from './error-codes'
 import extensions from './extensions.json'
 import logConstants from './logConstants'
 import { plans, PricingInformation } from './plans'
