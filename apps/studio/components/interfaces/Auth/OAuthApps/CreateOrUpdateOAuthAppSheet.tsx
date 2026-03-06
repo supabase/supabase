@@ -64,7 +64,7 @@ const FormSchema = z.object({
   client_type: z.enum(['public', 'confidential']).default('confidential'),
   client_id: z.string().optional(),
   client_secret: z.string().optional(),
-  logo_uri: z.string().optional(),
+  logo_uri: z.string().trim().optional(),
 })
 
 const FORM_ID = 'create-or-update-oauth-app-form'
@@ -169,6 +169,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
       setLogoFile(file)
       setLogoUrl(URL.createObjectURL(file))
       setLogoRemoved(false)
+      form.setValue('logo_uri', '')
       event.target.value = ''
     }
   }
@@ -178,10 +179,13 @@ export const CreateOrUpdateOAuthAppSheet = ({
       .map((uri) => uri.value.trim())
       .filter((uri) => uri !== '')
 
+    const logoUriFromInput = data.logo_uri?.trim()
     let uploadedLogoUri: string | undefined = undefined
 
     if (logoRemoved) {
       uploadedLogoUri = ''
+    } else if (logoUriFromInput) {
+      uploadedLogoUri = logoUriFromInput
     } else if (logoFile) {
       const reader = new FileReader()
       uploadedLogoUri = await new Promise<string>((resolve) => {
@@ -244,6 +248,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
     setLogoFile(undefined)
     setLogoUrl(undefined)
     setLogoRemoved(true)
+    form.setValue('logo_uri', '')
   }
 
   return (
@@ -334,6 +339,30 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                 onChange={onFileUpload}
                               />
                             </div>
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="logo_uri"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          label="Logo URL"
+                          description="Paste a public URL for your logo (used instead of uploaded file)"
+                        >
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              {...field}
+                              value={field.value ?? ''}
+                              placeholder="https://example.com/logo.png"
+                              onChange={(event) => {
+                                field.onChange(event)
+                                setLogoFile(undefined)
+                                setLogoRemoved(false)
+                                setLogoUrl(event.target.value || undefined)
+                              }}
+                            />
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
