@@ -77,7 +77,6 @@ export const SupabaseGrid = ({
   } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId,
       sorts,
       filters,

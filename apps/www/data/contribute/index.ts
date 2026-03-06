@@ -1,7 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 import type {
-  LeaderboardPeriod,
   LeaderboardRow,
+  SimilarSolvedThread,
+  SimilarThreadFeedbackResult,
+  SimilarThreadFeedbackSubmission,
   Thread,
   ThreadRow,
   ThreadSource,
@@ -25,6 +27,10 @@ function normalizeSource(source: string | null): ThreadSource {
   return source.toLowerCase().trim() as ThreadSource
 }
 
+export function getChannelDisplayName(source: ThreadSource): string {
+  return source === 'discord' ? 'Discord' : source === 'reddit' ? 'Reddit' : 'GitHub'
+}
+
 function mapThreadRowToThread(row: Thread): ThreadRow {
   const firstMsgTime = row.first_msg_time ? new Date(row.first_msg_time) : null
   const source = normalizeSource(row.source)
@@ -34,6 +40,7 @@ function mapThreadRowToThread(row: Thread): ThreadRow {
     title: row.subject ?? row.title ?? '',
     user: row.author,
     channel: source,
+    channelDisplayName: getChannelDisplayName(source),
     conversation: row.conversation ?? '',
     tags: row.product_areas ?? [],
     product_areas: row.product_areas ?? [],
@@ -51,6 +58,8 @@ function mapThreadRowToThread(row: Thread): ThreadRow {
     summary: row.summary,
     thread_key: row.thread_key ?? null,
     message_count: row.message_count ?? null,
+    similar_solved_threads:
+      (row.similar_solved_threads as unknown as SimilarSolvedThread[] | null) ?? null,
   }
 }
 
@@ -176,9 +185,9 @@ export async function getThreadById(id: string): Promise<ThreadRow | null> {
   const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
   const { data, error } = await supabase
-    .from('v_contribute_threads')
+    .from('contribute_threads')
     .select(
-      'thread_id, subject, status, author, conversation, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count, thread_key'
+      'thread_id, subject, status, author, conversation, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count, thread_key, contribute_thread_triage(similar_solved_threads)'
     )
     .eq('thread_id', id)
     .single()
@@ -192,7 +201,15 @@ export async function getThreadById(id: string): Promise<ThreadRow | null> {
     return null
   }
 
-  return mapThreadRowToThread(data as Thread)
+  const triage = Array.isArray(data.contribute_thread_triage)
+    ? data.contribute_thread_triage[0]
+    : data.contribute_thread_triage
+  const threadWithTriage = {
+    ...data,
+    similar_solved_threads: triage?.similar_solved_threads ?? null,
+  }
+
+  return mapThreadRowToThread(threadWithTriage as unknown as Thread)
 }
 
 export async function getThreadRepliesById(thread_key: string | null) {
@@ -338,4 +355,66 @@ export async function getUserActivity(author: string) {
       replyCount: replies?.length ?? 0,
     },
   }
+}
+
+const CONTRIBUTE_FEEDBACK_FN = 'contribute-feedback'
+
+export async function submitSimilarThreadFeedback(
+  submission: SimilarThreadFeedbackSubmission
+): Promise<SimilarThreadFeedbackResult> {
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
+
+  const { data, error } = await supabase.functions.invoke<{ id: string }>(CONTRIBUTE_FEEDBACK_FN, {
+    body: {
+      action: 'create',
+      parent_thread_id: submission.parentThreadId,
+      similar_thread_key: submission.similarThreadKey ?? null,
+      reaction: submission.reaction,
+    },
+  })
+
+  if (error) {
+    console.error('[SimilarThreadFeedback] create error:', error)
+    return { success: false }
+  }
+
+  const id = data?.id
+  if (!id) {
+    console.error('[SimilarThreadFeedback] create: no id in response')
+    return { success: false }
+  }
+
+  return { success: true, id }
+}
+
+export async function updateSimilarThreadFeedback(
+  id: string,
+  reaction: 'positive' | 'negative',
+  feedback: string | null
+): Promise<SimilarThreadFeedbackResult> {
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
+
+  const { data, error } = await supabase.functions.invoke<{ success: boolean }>(
+    CONTRIBUTE_FEEDBACK_FN,
+    {
+      body: {
+        action: 'update',
+        id,
+        reaction,
+        feedback: feedback ?? null,
+      },
+    }
+  )
+
+  if (error) {
+    console.error('[SimilarThreadFeedback] update error:', error)
+    return { success: false }
+  }
+
+  if (!data?.success) {
+    console.error('[SimilarThreadFeedback] update: unexpected response')
+    return { success: false }
+  }
+
+  return { success: true }
 }

@@ -19,7 +19,8 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
     useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true'
 
   const { data: allStatusPageEvents } = useIncidentStatusQuery()
-  const { incidents = [] } = allStatusPageEvents ?? {}
+  const { incidents: allIncidents = [] } = allStatusPageEvents ?? {}
+  const incidents = allIncidents.filter((i) => i.impact !== 'none')
 
   const hasActiveIncidents = incidents.length > 0
 
