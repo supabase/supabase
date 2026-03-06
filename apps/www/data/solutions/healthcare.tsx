@@ -114,7 +114,7 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"For me, the biggest benefit of Supabase is developer experience. My expertise doesn\'t lie in databases and infrastructure."',
+        text: 'You have to expect, plan, and build for scale. We can scale exponentially with Supabase.',
         author: 'Nick Farrant',
         role: 'Founding Engineer, Juniver',
         link: '/customers/juniver',

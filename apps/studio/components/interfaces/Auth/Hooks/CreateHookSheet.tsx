@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from 'components/ui/DocsButton'
 import FunctionSelector from 'components/ui/FunctionSelector'
@@ -9,6 +10,7 @@ import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from 'lib/constants'
 import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
@@ -156,7 +158,16 @@ export const CreateHookSheet = ({
     },
   })
 
+  const isDirty = form.formState.isDirty
   const values = form.watch()
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: discardChangesModalProps,
+  } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose,
+  })
 
   const statements = useMemo(() => {
     let permissionChanges: string[] = []
@@ -270,7 +281,7 @@ export const CreateHookSheet = ({
   }, [authConfig, title, visible, definition])
 
   return (
-    <Sheet open={visible} onOpenChange={() => onClose()}>
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent
         aria-describedby={undefined}
         size="lg"
@@ -411,17 +422,20 @@ export const CreateHookSheet = ({
                       )}
                     />
                   </div>
-                  <div className="h-72 w-full gap-3 flex flex-col">
-                    <p className="text-sm text-foreground-light px-5">
-                      The following statements will be executed on the selected function:
-                    </p>
-                    <CodeEditor
-                      id="postgres-hook-editor"
-                      isReadOnly={true}
-                      language="pgsql"
-                      value={statements.join('\n\n')}
-                    />
-                  </div>
+
+                  {statements.length > 0 && (
+                    <div className="h-72 w-full gap-3 flex flex-col">
+                      <p className="text-sm text-foreground-light px-5">
+                        The following statements will be executed on the selected function:
+                      </p>
+                      <CodeEditor
+                        isReadOnly
+                        id="postgres-hook-editor"
+                        language="pgsql"
+                        value={statements.join('\n\n')}
+                      />
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="flex flex-col gap-4 px-5">
@@ -470,7 +484,9 @@ export const CreateHookSheet = ({
                               className="rounded-l-none text-xs"
                               onClick={() => {
                                 const authHookSecret = generateAuthHookSecret()
-                                form.setValue('httpsValues.secret', authHookSecret)
+                                form.setValue('httpsValues.secret', authHookSecret, {
+                                  shouldDirty: true,
+                                })
                               }}
                             >
                               Generate secret
@@ -494,7 +510,7 @@ export const CreateHookSheet = ({
             </div>
           )}
 
-          <Button disabled={isUpdatingAuthHooks} type="default" onClick={() => onClose()}>
+          <Button disabled={isUpdatingAuthHooks} type="default" onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button
@@ -507,6 +523,7 @@ export const CreateHookSheet = ({
           </Button>
         </SheetFooter>
       </SheetContent>
+      <DiscardChangesConfirmationDialog {...discardChangesModalProps} />
     </Sheet>
   )
 }

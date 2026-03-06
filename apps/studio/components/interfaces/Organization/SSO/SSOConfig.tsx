@@ -168,7 +168,7 @@ export const SSOConfig = () => {
             plan="Team"
             source="organizationSso"
             primaryText="Organization Single Sign-on (SSO) is available from Team plan and above"
-            secondaryText="SSO as a login option provides additional acccount security for your team by enforcing the use of an identity provider when logging into Supabase. Upgrade to Team or above to set up SSO for your organization."
+            secondaryText="SSO as a login option provides additional account security for your team by enforcing the use of an identity provider when logging into Supabase. Upgrade to Team or above to set up SSO for your organization."
             featureProposition="enable Single Sign-on (SSO)"
           />
         ) : isSuccess || isSSOProviderNotFound ? (

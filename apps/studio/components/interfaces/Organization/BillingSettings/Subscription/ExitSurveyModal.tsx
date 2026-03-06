@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useFlag, useParams } from 'common'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Alert, Button, cn, Input, Modal } from 'ui'
-import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
+
+import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 
 export interface ExitSurveyModalProps {
   visible: boolean
@@ -104,7 +104,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
       <Modal.Content>
         <div className="space-y-4">
           <p className="text-sm text-foreground-light">
-            Share with us why you're downgrading your plan.
+            What made you decide to downgrade your plan?
           </p>
           <div className="space-y-8 mt-6">
             <div className="flex flex-wrap gap-2" data-toggle="buttons">

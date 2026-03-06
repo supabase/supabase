@@ -1,10 +1,10 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
-import { has, isEmpty, isEqual } from 'lodash'
-
 import { ident } from '@supabase/pg-meta/src/pg-format'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { generateSqlPolicy } from 'data/ai/sql-policy-mutation'
 import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { has, isEmpty, isEqual } from 'lodash'
+
 import {
   PolicyFormField,
   PolicyForReview,
@@ -19,7 +19,7 @@ import {
 
 export const createSQLPolicy = (
   policyFormFields: PolicyFormField,
-  originalPolicyFormFields: PostgresPolicy
+  originalPolicyFormFields?: PostgresPolicy
 ) => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
@@ -32,7 +32,7 @@ export const createSQLPolicy = (
     check: check ? check.replace(/\s+/g, ' ').trim() : check === undefined ? null : check,
   }
 
-  if (isEmpty(originalPolicyFormFields)) {
+  if (!originalPolicyFormFields || isEmpty(originalPolicyFormFields)) {
     return createSQLStatementForCreatePolicy(formattedPolicyFormFields)
   }
 

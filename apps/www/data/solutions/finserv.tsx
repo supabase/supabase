@@ -115,7 +115,7 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"We wanted a backend that could accelerate our development while maintaining security and scalability. Supabase stood out due to its automation, integrations, and ecosystem."',
+        text: 'We wanted a backend that could accelerate our development while maintaining security and scalability. Supabase stood out due to its automation, integrations, and ecosystem.',
         author: 'Raunak Kathuria',
         role: 'VP of Engineering, Deriv',
         link: '/customers/deriv',
