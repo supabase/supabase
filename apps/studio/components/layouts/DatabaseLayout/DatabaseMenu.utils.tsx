@@ -93,7 +93,7 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
           rightIcon: ExternalLinkIcon,
         },
         pgNetExtensionExists && {
-          name: 'Webhooks',
+          name: 'Database Webhooks',
           key: 'hooks',
           url: `/project/${ref}/integrations/webhooks/overview`,
           rightIcon: ExternalLinkIcon,
