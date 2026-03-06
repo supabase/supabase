@@ -10,7 +10,7 @@ Use Confirmation Modal when the user needs extra context to make a decision, suc
 
 If the confirmation can be expressed as a single short paragraph, use [Alert Dialog](../components/alert-dialog). If the action is highly destructive and requires explicit typed intent, use [Text Confirm Dialog](../fragments/text-confirm-dialog). See [Modality](../ui-patterns/modality) for broader guidance on choosing the appropriate pattern.
 
-For dirty-form dismissal in dialogs/sheets, prefer the dedicated discard-confirmation pattern (`DiscardChangesConfirmationDialog` + `useConfirmOnClose`) rather than creating new local `CloseConfirmationModal` wrappers. The ad-hoc `CloseConfirmationModal` wrapper pattern is deprecated for new implementations.
+For dirty-form dismissal in dialogs/sheets, use the dedicated discard-confirmation pattern (`DiscardChangesConfirmationDialog` + `useConfirmOnClose`) instead of `ConfirmationModal`. Avoid creating custom wrapper components for this flow; wire `modalProps` from `useConfirmOnClose` directly into `DiscardChangesConfirmationDialog`.
 
 <ComponentPreview name="confirmation-modal-demo" peekCode wide />
 
