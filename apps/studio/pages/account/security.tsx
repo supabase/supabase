@@ -5,11 +5,6 @@ import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -23,6 +18,14 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
 import type { NextPageWithLayout } from 'types'
 import { useState } from 'react'
@@ -63,12 +66,17 @@ const Security: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader className="pt-0">
-          <ScaffoldSectionTitle>Security</ScaffoldSectionTitle>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer>
+      <PageHeader size="small">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Security</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage your account security settings and authentication methods.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="small">
         <div className="space-y-4">
           {verifiedFactors?.length === 1 && (
             <Alert_Shadcn_ variant="default" className="mb-2">
@@ -172,7 +180,7 @@ const Security: NextPageWithLayout = () => {
             </Collapsible_Shadcn_>
           )}
         </div>
-      </ScaffoldContainer>
+      </PageContainer>
     </>
   )
 }

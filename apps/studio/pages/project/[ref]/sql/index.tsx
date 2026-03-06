@@ -22,14 +22,15 @@ const SQLEditorIndexPage: NextPageWithLayout = () => {
       // Handle redirect to last opened snippet tab, or last snippet tab
       const lastOpenedTab = history.sql
       const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
-
       if (lastOpenedTab !== undefined) {
-        router.push(`/project/${projectRef}/sql/${history.sql}`)
+        router.replace(`/project/${projectRef}/sql/${history.sql}`)
       } else if (lastTabId) {
         const lastTab = store.tabsMap[lastTabId]
-        if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+        if (lastTab) {
+          router.replace(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+        }
       } else {
-        router.push(`/project/${projectRef}/sql/new`)
+        router.replace(`/project/${projectRef}/sql/new`)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

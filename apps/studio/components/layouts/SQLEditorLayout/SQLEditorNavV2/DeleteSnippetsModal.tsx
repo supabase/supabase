@@ -37,7 +37,7 @@ export const DeleteSnippetsModal = ({
     if (ids.length > 0) ids.forEach((id) => snapV2.removeSnippet(id))
   }
 
-  const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteContent, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => {
       toast.success(
         `Successfully deleted ${snippets.length.toLocaleString()} quer${snippets.length > 1 ? 'ies' : 'y'}`

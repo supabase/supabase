@@ -1,5 +1,5 @@
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Switch, TableCell, TableRow } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface PublicationSkeletonProps {
   index?: number

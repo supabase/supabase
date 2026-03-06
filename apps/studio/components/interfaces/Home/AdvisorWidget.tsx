@@ -1,19 +1,19 @@
+import { useParams } from 'common'
+import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+import { createLintSummaryPrompt, EntityTypeIcon } from 'components/interfaces/Linter/Linter.utils'
+import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { useTrack } from 'lib/telemetry/track'
 import { Activity, ExternalLink, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { EntityTypeIcon, createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
-import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
-  AiIconAnimation,
   Card,
   CardContent,
   CardHeader,
@@ -29,7 +29,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface SlowQuery {
   rolname: string
@@ -41,7 +41,7 @@ interface SlowQuery {
 export const AdvisorWidget = () => {
   const { ref: projectRef } = useParams()
   const [selectedTab, setSelectedTab] = useState<'security' | 'performance'>('security')
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery({ projectRef })
   const { data: slowestQueriesData, isLoading: isLoadingSlowestQueries } = useQueryPerformanceQuery(
     {
       preset: 'slowestExecutionTime',
@@ -50,6 +50,7 @@ export const AdvisorWidget = () => {
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { setSelectedItem } = useAdvisorStateSnapshot()
+  const track = useTrack()
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
@@ -153,23 +154,36 @@ export const AdvisorWidget = () => {
                         {lintText.replace(/\\`/g, '`')}
                       </p>
                     </button>
-                    <ButtonTooltip
-                      type="text"
-                      className="px-1 opacity-0 group-hover:opacity-100 w-7"
-                      icon={<AiIconAnimation size={16} />}
+                    <div
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
-                        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                        snap.newChat({
-                          name: 'Summarize lint',
-                          initialInput: createLintSummaryPrompt(lint),
-                        })
                       }}
-                      tooltip={{
-                        content: { side: 'bottom', text: 'Help me fix this issue' },
-                      }}
-                    />
+                      className="opacity-0 group-hover:opacity-100"
+                    >
+                      <AiAssistantDropdown
+                        label="Ask Assistant"
+                        iconOnly
+                        tooltip="Help me fix this issue"
+                        buildPrompt={() => createLintSummaryPrompt(lint)}
+                        onOpenAssistant={() => {
+                          openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                          snap.newChat({
+                            name: 'Summarize lint',
+                            initialInput: createLintSummaryPrompt(lint),
+                          })
+                          track('advisor_assistant_button_clicked', {
+                            origin: 'homepage',
+                            advisorCategory: lint.categories[0],
+                            advisorType: lint.name,
+                            advisorLevel: lint.level,
+                          })
+                        }}
+                        telemetrySource="advisor_widget"
+                        type="text"
+                        className="px-1 w-7"
+                      />
+                    </div>
                   </div>
                 </li>
               )

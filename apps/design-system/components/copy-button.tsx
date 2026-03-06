@@ -1,11 +1,10 @@
 'use client'
 
-import * as React from 'react'
-
 // import { NpmCommands } from 'types/unist'
 
 // import { Event, trackEvent } from '@/lib/events'
 import { Check, Copy } from 'lucide-react'
+import * as React from 'react'
 import {
   Button,
   cn,

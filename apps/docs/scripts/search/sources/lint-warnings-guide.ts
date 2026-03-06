@@ -1,6 +1,11 @@
+import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
+import crypto, { createHash } from 'node:crypto'
 import { BaseLoader, BaseSource } from './base.js'
-import { createHash } from 'node:crypto'
+
+const appId = process.env.DOCS_GITHUB_APP_ID
+const installationId = process.env.DOCS_GITHUB_APP_INSTALLATION_ID
+const privateKey = process.env.DOCS_GITHUB_APP_PRIVATE_KEY
 
 const getBasename = (path: string) => path.split('/').at(-1)!.replace(/\.md$/, '')
 
@@ -19,7 +24,18 @@ export class LintWarningsGuideLoader extends BaseLoader {
   }
 
   async load() {
-    const octokit = new Octokit()
+    if (!appId || !installationId || !privateKey) {
+      throw new Error('Missing DOCS_GITHUB_APP_* environment variables')
+    }
+
+    const octokit = new Octokit({
+      authStrategy: createAppAuth,
+      auth: {
+        appId,
+        installationId,
+        privateKey: crypto.createPrivateKey(privateKey).export({ type: 'pkcs8', format: 'pem' }),
+      },
+    })
 
     const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
       owner: this.org,

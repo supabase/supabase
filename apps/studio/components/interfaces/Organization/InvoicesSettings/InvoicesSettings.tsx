@@ -1,23 +1,34 @@
-import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
 import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { getInvoice } from 'data/invoices/invoice-query'
+import { getInvoiceReceipt } from 'data/invoices/invoice-receipt-query'
 import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
+import dayjs from 'dayjs'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { formatCurrency } from 'lib/helpers'
-import { ChevronLeft, ChevronRight, Download, FileText } from 'lucide-react'
+import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Organization } from 'types/base'
-import { Button } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import {
+  Button,
+  Card,
+  CardFooter,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  cn,
+} from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import InvoicePayButton from './InvoicePayButton'
 
 const PAGE_LIMIT = 5
@@ -49,7 +60,12 @@ export const InvoicesSettings = () => {
     },
     { enabled: selectedOrganization?.managed_by === 'supabase' }
   )
-  const { data, error, isLoading, isError } = useInvoicesQuery(
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isError,
+  } = useInvoicesQuery(
     {
       slug,
       offset,
@@ -72,6 +88,17 @@ export const InvoicesSettings = () => {
     }
   }
 
+  const fetchReceipt = async (invoiceId: string) => {
+    if (!slug) return
+
+    try {
+      const receipt = await getInvoiceReceipt({ invoiceId, slug })
+      if (receipt?.receipt_pdf) window.open(receipt.receipt_pdf, '_blank')
+    } catch (error: any) {
+      toast.error(`Failed to fetch receipt: ${error.message}`)
+    }
+  }
+
   if (
     selectedOrganization?.managed_by !== undefined &&
     selectedOrganization?.managed_by !== 'supabase'
@@ -85,73 +112,85 @@ export const InvoicesSettings = () => {
     )
   }
 
+  // Handle loading state faded text for table headers
+  const tableHeadClassName =
+    isLoading || invoices.length === 0 ? 'text-foreground-muted' : undefined
+
   return (
-    <div className="overflow-hidden md:overflow-auto overflow-x-scroll">
-      <Table
-        head={[
-          <Table.th key="header-icon" />,
-          <Table.th key="header-date">Date</Table.th>,
-          <Table.th key="header-amount">Amount</Table.th>,
-          <Table.th key="header-invoice">Invoice number</Table.th>,
-          <Table.th key="header-status" className="flex items-center">
-            Status
-          </Table.th>,
-          <Table.th key="header-download" className="text-right"></Table.th>,
-        ]}
-        body={
-          isLoading ? (
+    <Card>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {invoices.length > 0 && (
+              <TableHead className="w-2">
+                <span className="sr-only">Icon</span>
+              </TableHead>
+            )}
+            <TableHead className={cn(tableHeadClassName)}>Date</TableHead>
+            <TableHead className={cn(tableHeadClassName)}>Amount</TableHead>
+            <TableHead className={cn(tableHeadClassName)}>Invoice number</TableHead>
+            <TableHead className={cn(tableHeadClassName)}>Status</TableHead>
+            <TableHead>
+              <span className="sr-only">Actions</span>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading ? (
             new Array(6).fill(0).map((_, idx) => (
-              <Table.tr key={`loading-${idx}`}>
-                <Table.td>{idx !== 5 && <FileText size="24" />}</Table.td>
-                <Table.td colSpan={5}>
+              <TableRow key={`loading-${idx}`}>
+                <TableCell colSpan={invoices.length > 0 ? 6 : 5}>
                   <ShimmeringLoader />
-                </Table.td>
-              </Table.tr>
+                </TableCell>
+              </TableRow>
             ))
           ) : isError ? (
-            <Table.tr className="rounded-b">
-              <Table.td colSpan={6} className="!p-0 !rounded-b overflow-hidden">
+            <TableRow className="rounded-b">
+              <TableCell
+                colSpan={invoices.length > 0 ? 6 : 5}
+                className="!p-0 !rounded-b overflow-hidden"
+              >
                 <AlertError
                   className="border-0 rounded-none"
                   error={error}
                   subject="Failed to retrieve invoices"
                 />
-              </Table.td>
-            </Table.tr>
+              </TableCell>
+            </TableRow>
           ) : invoices.length === 0 ? (
-            <Table.tr>
-              <Table.td colSpan={6} className="p-3 py-12 text-center">
-                <p className="text-foreground-light">
-                  {isLoading ? 'Checking for invoices' : 'No invoices for this organization yet'}
-                </p>
-              </Table.td>
-            </Table.tr>
+            <TableRow className="[&>td]:hover:bg-inherit">
+              <TableCell colSpan={5} className="py-6">
+                <p className="text-foreground-lighter">No invoices for this organization yet</p>
+              </TableCell>
+            </TableRow>
           ) : (
             <>
               {invoices.map((x) => {
                 return (
-                  <Table.tr key={x.id}>
-                    <Table.td>
-                      <FileText size="24" />
-                    </Table.td>
-                    <Table.td>
+                  <TableRow key={x.id}>
+                    <TableCell className="w-2">
+                      <FileText aria-hidden="true" size={16} className="text-foreground-muted" />
+                    </TableCell>
+                    <TableCell>
                       <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>
-                    </Table.td>
-                    <Table.td translate="no">
+                    </TableCell>
+                    <TableCell translate="no">
                       <p>{formatCurrency(x.amount_due / 100)}</p>
-                    </Table.td>
-                    <Table.td>
-                      <p>{x.number}</p>
-                    </Table.td>
-                    <Table.td>
+                    </TableCell>
+                    <TableCell>
+                      <p className="font-mono text-foreground-light">{x.number}</p>
+                    </TableCell>
+                    <TableCell>
                       <InvoiceStatusBadge
                         status={x.status as InvoiceStatus}
                         paymentAttempted={x.payment_attempted}
+                        paymentProcessing={x.payment_is_processing}
                       />
-                    </Table.td>
-                    <Table.td className="align-right">
+                    </TableCell>
+                    <TableCell className="text-right">
                       <div className="flex items-center justify-end space-x-2">
                         {x.amount_due > 0 &&
+                          !x.payment_is_processing &&
                           [
                             InvoiceStatus.UNCOLLECTIBLE,
                             InvoiceStatus.OPEN,
@@ -163,48 +202,58 @@ export const InvoicesSettings = () => {
                         <ButtonTooltip
                           type="outline"
                           className="w-7"
-                          icon={<Download size={16} strokeWidth={1.5} />}
+                          icon={<ScrollText size={16} strokeWidth={1.5} />}
                           onClick={() => fetchInvoice(x.id)}
                           tooltip={{ content: { side: 'bottom', text: 'Download invoice' } }}
                         />
+
+                        {x.status === InvoiceStatus.PAID && x.amount_due > 0 && (
+                          <ButtonTooltip
+                            type="outline"
+                            className="w-7"
+                            icon={<Receipt size={16} strokeWidth={1.5} />}
+                            onClick={() => fetchReceipt(x.id)}
+                            tooltip={{ content: { side: 'bottom', text: 'Download receipt' } }}
+                          />
+                        )}
                       </div>
-                    </Table.td>
-                  </Table.tr>
+                    </TableCell>
+                  </TableRow>
                 )
               })}
-              <Table.tr key="navigation">
-                <Table.td colSpan={6}>
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm opacity-50">
-                      {isErrorCount
-                        ? 'Failed to retrieve total number of invoices'
-                        : `Showing ${offset + 1} to ${
-                            offset + invoices.length
-                          } out of ${count} invoices`}
-                    </p>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        icon={<ChevronLeft />}
-                        type="default"
-                        size="tiny"
-                        disabled={page === 1}
-                        onClick={async () => setPage(page - 1)}
-                      />
-                      <Button
-                        icon={<ChevronRight />}
-                        type="default"
-                        size="tiny"
-                        disabled={page * PAGE_LIMIT >= (count ?? 0)}
-                        onClick={async () => setPage(page + 1)}
-                      />
-                    </div>
-                  </div>
-                </Table.td>
-              </Table.tr>
             </>
-          )
-        }
-      />
-    </div>
+          )}
+        </TableBody>
+      </Table>
+      {invoices.length > 0 && (
+        <CardFooter className="border-t p-4 flex items-center justify-between">
+          <p className="text-foreground-muted text-sm">
+            {isErrorCount
+              ? 'Failed to retrieve total number of invoices'
+              : typeof count === 'number'
+                ? `Showing ${offset + 1} to ${offset + invoices.length} out of ${count} invoices`
+                : `Showing ${offset + 1} to ${offset + invoices.length} invoices`}
+          </p>
+          <div className="flex items-center gap-x-2" aria-label="Pagination">
+            <Button
+              icon={<ChevronLeft />}
+              aria-label="Previous page"
+              type="default"
+              size="tiny"
+              disabled={page === 1}
+              onClick={async () => setPage(page - 1)}
+            />
+            <Button
+              icon={<ChevronRight />}
+              aria-label="Next page"
+              type="default"
+              size="tiny"
+              disabled={page * PAGE_LIMIT >= (count ?? 0)}
+              onClick={async () => setPage(page + 1)}
+            />
+          </div>
+        </CardFooter>
+      )}
+    </Card>
   )
 }

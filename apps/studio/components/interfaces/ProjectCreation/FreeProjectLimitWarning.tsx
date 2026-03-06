@@ -32,7 +32,10 @@ export const FreeProjectLimitWarning = ({ membersExceededLimit }: FreeProjectLim
               projects before you're able to create a free project within this organization.
             </p>
 
-            <UpgradePlanButton source="freeProjectLimitWarning">Upgrade plan</UpgradePlanButton>
+            <UpgradePlanButton
+              source="freeProjectLimitWarning"
+              featureProposition="create more projects"
+            />
           </div>
         }
       />

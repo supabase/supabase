@@ -3,8 +3,9 @@ import { useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { DATETIME_FORMAT } from 'lib/constants'
-import { Button, CardContent, CardFooter } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, CardContent, CardFooter } from 'ui'
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
 import type { AuthMFAListFactorsResponse } from '@supabase/auth-js'
@@ -26,6 +27,7 @@ export const TOTPFactors = ({
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
 
   const totpFactors = data?.totp ?? []
+  const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
 
   return (
     <>

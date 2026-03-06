@@ -36,7 +36,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const Home = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -66,15 +66,15 @@ export const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enableBranching])
 
-  const { data: tablesData, isLoading: isLoadingTables } = useTablesQuery({
+  const { data: tablesData, isPending: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'public',
   })
-  const { data: functionsData, isLoading: isLoadingFunctions } = useEdgeFunctionsQuery({
+  const { data: functionsData, isPending: isLoadingFunctions } = useEdgeFunctionsQuery({
     projectRef: project?.ref,
   })
-  const { data: replicasData, isLoading: isLoadingReplicas } = useReadReplicasQuery({
+  const { data: replicasData, isPending: isLoadingReplicas } = useReadReplicasQuery({
     projectRef: project?.ref,
   })
 
@@ -167,21 +167,19 @@ export const Home = () => {
                     )}
                   </div>
 
-                  {IS_PLATFORM && (
-                    <div className="flex flex-col gap-y-1">
-                      <Link
-                        href={`/project/${ref}/functions`}
-                        className="transition text-foreground-light hover:text-foreground text-sm"
-                      >
-                        Functions
-                      </Link>
-                      {isLoadingFunctions ? (
-                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                      ) : (
-                        <p className="text-2xl tabular-nums">{functionsCount}</p>
-                      )}
-                    </div>
-                  )}
+                  <div className="flex flex-col gap-y-1">
+                    <Link
+                      href={`/project/${ref}/functions`}
+                      className="transition text-foreground-light hover:text-foreground text-sm"
+                    >
+                      Functions
+                    </Link>
+                    {isLoadingFunctions ? (
+                      <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                    ) : (
+                      <p className="text-2xl tabular-nums">{functionsCount}</p>
+                    )}
+                  </div>
 
                   {IS_PLATFORM && (
                     <div className="flex flex-col gap-y-1">

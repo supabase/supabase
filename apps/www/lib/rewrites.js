@@ -29,6 +29,14 @@ const rewrites = [
     source: '/ui/:path*',
     destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}/:path*`,
   },
+  {
+    source: '/design-system',
+    destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}`,
+  },
+  {
+    source: '/design-system/:path*',
+    destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
+  },
 
   {
     source: '/new-docs',

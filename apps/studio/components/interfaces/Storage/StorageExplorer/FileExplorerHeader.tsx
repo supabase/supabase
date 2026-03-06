@@ -1,5 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { compact, debounce, isEqual, noop } from 'lodash'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { compact, isEqual, noop } from 'lodash'
 import {
   Check,
   ChevronLeft,
@@ -14,12 +18,7 @@ import {
   Upload,
   X,
 } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useEffect, useRef, useState } from 'react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -34,6 +33,7 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
+
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 
 const VIEW_OPTIONS = [
@@ -146,12 +146,10 @@ export const FileExplorerHeader = ({
   setItemSearchString = noop,
   onFilesUpload = noop,
 }: FileExplorerHeader) => {
-  const debounceDuration = 300
   const snap = useStorageExplorerStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [pathString, setPathString] = useState('')
-  const [searchString, setSearchString] = useState('')
   const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   const [isEditingPath, setIsEditingPath] = useState(false)
@@ -183,10 +181,6 @@ export const FileExplorerHeader = ({
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
-    if (itemSearchString) setSearchString(itemSearchString)
-  }, [])
-
-  useEffect(() => {
     // [Joshen] Somehow toggle search triggers this despite breadcrumbs
     // being unchanged. Manually doing a prop check to fix this
     if (!isEqual(previousBreadcrumbs.current, breadcrumbs)) {
@@ -194,13 +188,6 @@ export const FileExplorerHeader = ({
       previousBreadcrumbs.current = breadcrumbs
     }
   }, [breadcrumbs])
-
-  const searchInputHandler = useCallback(debounce(setItemSearchString, debounceDuration), [])
-  const onSearchInputUpdate = (event: any) => {
-    setSearchString(event.target.value)
-    // @ts-ignore
-    searchInputHandler(event.target.value)
-  }
 
   const onSelectBack = () => {
     popColumn()
@@ -260,7 +247,6 @@ export const FileExplorerHeader = ({
   }
 
   const onCancelSearch = () => {
-    setSearchString('')
     snap.setIsSearching(false)
     setItemSearchString('')
   }
@@ -468,24 +454,25 @@ export const FileExplorerHeader = ({
               size="tiny"
               autoFocus
               className="w-52"
-              icon={<Search size={14} strokeWidth={2} />}
+              icon={<Search />}
               actions={[
-                <X
-                  key="close"
-                  className="mx-2 cursor-pointer text-foreground"
-                  size={14}
-                  strokeWidth={2}
+                <Button
+                  key="cancel"
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
                   onClick={onCancelSearch}
+                  className="p-0 h-5 w-5"
                 />,
               ]}
               placeholder="Search for a file or folder"
               type="text"
-              value={searchString}
-              onChange={onSearchInputUpdate}
+              value={itemSearchString}
+              onChange={(event) => setItemSearchString(event.target.value)}
             />
           ) : (
             <Button
-              icon={<Search size={16} strokeWidth={2} />}
+              icon={<Search />}
               size="tiny"
               type="text"
               className="px-1"

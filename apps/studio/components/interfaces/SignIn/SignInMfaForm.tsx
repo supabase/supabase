@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { Lock, Fingerprint } from 'lucide-react'
@@ -11,7 +12,6 @@ import z from 'zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useAuthError } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaAuthenticateWebAuthnMutation } from 'data/profile/mfa-webauthn-authenticate-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
@@ -28,6 +28,9 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Alert, AlertDescription, AlertTitle } from 'ui/src/components/shadcn/ui/alert'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import z from 'zod'
+
 import { SupportLink } from '../Support/SupportLink'
 
 const schema = z.object({
@@ -71,12 +74,13 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     error: factorsError,
     isError: isErrorFactors,
     isSuccess: isSuccessFactors,
-    isLoading: isLoadingFactors,
+    isPending: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,
     isLoading: isTotpVerifying,
     isSuccess: isTotpSuccess,
+    isPending: isVerifying,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: handleSuccess,
   })
@@ -136,7 +140,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
         error={error}
         subject="Error while signing in"
         additionalActions={
-          <Button asChild type="warning" className="w-min">
+          <Button asChild type="default">
             <Link href="/sign-in">Back to sign in</Link>
           </Button>
         }

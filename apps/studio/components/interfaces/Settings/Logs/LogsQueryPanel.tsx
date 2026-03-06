@@ -1,12 +1,10 @@
-import dayjs from 'dayjs'
-import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode, useState } from 'react'
-
 import { IS_PLATFORM } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
+import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
+import Link from 'next/link'
+import { ReactNode, useEffect, useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Badge,
@@ -22,6 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LOGS_SOURCE_DESCRIPTION,
@@ -32,8 +31,7 @@ import { LogsWarning, LogTemplate } from './Logs.types'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
-  defaultFrom: string
-  defaultTo: string
+  value: DatePickerValue
   warnings: LogsWarning[]
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: string) => void
@@ -51,8 +49,7 @@ function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: strin
 
 const LogsQueryPanel = ({
   templates = [],
-  defaultFrom,
-  defaultTo,
+  value,
   warnings,
   onSelectTemplate,
   onSelectSource,
@@ -77,29 +74,14 @@ const LogsQueryPanel = ({
     })
     .map(([, value]) => value)
 
-  function getDefaultDatePickerValue() {
-    if (defaultFrom && defaultTo) {
-      return {
-        to: defaultTo,
-        from: defaultFrom,
-        text: `${dayjs(defaultFrom).format('DD MMM, HH:mm')} - ${dayjs(defaultTo).format('DD MMM, HH:mm')}`,
-        isHelper: false,
-      }
-    }
-    return {
-      to: EXPLORER_DATEPICKER_HELPERS[0].calcTo(),
-      from: EXPLORER_DATEPICKER_HELPERS[0].calcFrom(),
-      text: EXPLORER_DATEPICKER_HELPERS[0].text,
-      isHelper: true,
-    }
-  }
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(value)
 
-  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
-    getDefaultDatePickerValue()
-  )
+  useEffect(() => {
+    setSelectedDatePickerValue(value)
+  }, [value.from, value.to, value.text, value.isHelper])
 
   return (
-    <div className="border-b bg-surface-100">
+    <div className="flex items-center border-b bg-surface-100 h-[var(--header-height)]">
       <div className="flex w-full items-center justify-between px-4 md:px-5 py-2 overflow-x-scroll no-scrollbar">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">

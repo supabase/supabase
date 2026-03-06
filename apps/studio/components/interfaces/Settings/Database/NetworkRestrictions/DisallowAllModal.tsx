@@ -11,7 +11,7 @@ interface DisallowAllModalProps {
 
 const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
   const { ref } = useParams()
-  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({ onSuccess: () => onClose() })
 
   const onSubmit = async () => {

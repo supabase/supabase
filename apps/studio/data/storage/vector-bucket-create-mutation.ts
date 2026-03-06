@@ -41,7 +41,7 @@ export const useVectorBucketCreateMutation = ({
     mutationFn: (vars) => createVectorBucket(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(storageKeys.vectorBuckets(projectRef))
+      await queryClient.invalidateQueries({ queryKey: storageKeys.vectorBuckets(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

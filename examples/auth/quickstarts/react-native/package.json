@@ -1,0 +1,27 @@
+{
+  "name": "supabase-auth-react-native",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@supabase/supabase-js": "^2.93.2",
+    "expo": "~54.0.32",
+    "expo-status-bar": "~3.0.9",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-url-polyfill": "^3.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.6",
+    "@types/react": "~19.1.10",
+    "typescript": "~5.9.3"
+  },
+  "private": true
+}

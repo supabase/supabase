@@ -6,13 +6,21 @@ type Template = {
   content: string
 }
 
+export type SqlError = {
+  error?: string
+  formattedError?: string
+  message?: string
+}
+
 type EditorPanelState = {
   value: string
   templates: Template[]
-  results: any[] | undefined
-  error: any
+  results: Record<string, unknown>[] | undefined
+  error: SqlError | undefined
   initialPrompt: string
   onChange: ((value: string) => void) | undefined
+  activeSnippetId: string | null
+  pendingReset: boolean
 }
 
 const initialState: EditorPanelState = {
@@ -22,6 +30,8 @@ const initialState: EditorPanelState = {
   error: undefined,
   initialPrompt: '',
   onChange: undefined,
+  activeSnippetId: null,
+  pendingReset: false,
 }
 
 export const editorPanelState = proxy({
@@ -35,14 +45,23 @@ export const editorPanelState = proxy({
   setTemplates(templates: Template[]) {
     editorPanelState.templates = templates
   },
-  setResults(results: any[] | undefined) {
+  setResults(results: Record<string, unknown>[] | undefined) {
     editorPanelState.results = results
   },
-  setError(error: any) {
+  setError(error: SqlError | undefined) {
     editorPanelState.error = error
   },
   setInitialPrompt(initialPrompt: string) {
     editorPanelState.initialPrompt = initialPrompt
+  },
+  setActiveSnippetId(id: string | null) {
+    editorPanelState.activeSnippetId = id
+  },
+  openAsNew() {
+    editorPanelState.value = ''
+    editorPanelState.results = undefined
+    editorPanelState.error = undefined
+    editorPanelState.pendingReset = true
   },
   reset() {
     Object.assign(editorPanelState, initialState)

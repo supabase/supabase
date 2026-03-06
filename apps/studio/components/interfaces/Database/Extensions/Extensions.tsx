@@ -4,14 +4,11 @@ import { AlertCircle, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Card,
   Input,
@@ -23,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ExtensionRow } from './ExtensionRow'
 import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
 
@@ -31,7 +29,7 @@ export const Extensions = () => {
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data, isLoading } = useDatabaseExtensionsQuery({
+  const { data, isPending: isLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -64,17 +62,14 @@ export const Extensions = () => {
   return (
     <>
       <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <Input
-            size="tiny"
-            placeholder="Search for an extension"
-            value={filterString}
-            onChange={(e) => setFilterString(e.target.value)}
-            className="w-52"
-            icon={<Search size={14} />}
-          />
-          <DocsButton href={`${DOCS_URL}/guides/database/extensions`} />
-        </div>
+        <Input
+          size="tiny"
+          placeholder="Search for an extension"
+          value={filterString}
+          onChange={(e) => setFilterString(e.target.value)}
+          className="w-52"
+          icon={<Search />}
+        />
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (

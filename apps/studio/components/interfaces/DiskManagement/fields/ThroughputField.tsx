@@ -34,7 +34,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
   const watchedComputeSize = watch('computeSize')
   const throughput_mbps = formState.defaultValues?.throughput
 
-  const { isLoading, error } = useDiskAttributesQuery({ projectRef })
+  const { isPending: isLoading, error } = useDiskAttributesQuery({ projectRef })
 
   const throughputPrice = calculateThroughputPrice({
     storageType: form.getValues('storageType') as DiskType,

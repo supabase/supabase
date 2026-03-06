@@ -1,14 +1,15 @@
-export type { webhooks, $defs } from './types/api'
 import type {
-  paths as apiPaths,
   components as apiComponents,
   operations as apiOperations,
+  paths as apiPaths,
 } from './types/api'
 import type {
-  paths as platformPaths,
   components as platformComponents,
   operations as platformOperations,
+  paths as platformPaths,
 } from './types/platform'
+
+export type { webhooks, $defs } from './types/api'
 
 export interface paths extends apiPaths, platformPaths {}
 export interface operations extends apiOperations, platformOperations {}

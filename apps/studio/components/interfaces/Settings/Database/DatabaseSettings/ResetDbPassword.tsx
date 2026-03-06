@@ -1,19 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import Panel from 'components/ui/Panel'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProjectActive, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import { passwordStrength } from 'lib/password-strength'
+import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
-import { Button, Input, Modal } from 'ui'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Modal } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionDescription,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
@@ -35,9 +40,9 @@ const ResetDbPassword = ({ disabled = false }) => {
   const [password, setPassword] = useState<string>('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState<string>('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState<string>('')
-  const [passwordStrengthScore, setPasswordStrengthScore] = useState<number>(0)
+  const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
 
-  const { mutate: resetDatabasePassword, isLoading: isUpdatingPassword } =
+  const { mutate: resetDatabasePassword, isPending: isUpdatingPassword } =
     useDatabasePasswordResetMutation({
       onSuccess: async () => {
         toast.success('Successfully updated database password')
@@ -86,19 +91,25 @@ const ResetDbPassword = ({ disabled = false }) => {
 
   return (
     <>
-      <Panel className="!m-0">
-        <Panel.Content>
-          <div
-            className="grid grid-cols-1 items-center lg:grid-cols-3 scroll-mt-6"
-            id="database-password"
-          >
-            <div className="col-span-2 space-y-1">
-              <p className="block">Database password</p>
-              <p className="text-sm opacity-50">
-                You can use this password to connect directly to your Postgres database.
-              </p>
-            </div>
-            <div className="flex items-end justify-end">
+      <PageSection id="database-password">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Database password</PageSectionTitle>
+
+            <PageSectionDescription>Used for direct Postgres connections</PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Card>
+            <CardContent className="flex flex-row items-center gap-x-2 justify-between">
+              <div className="space-y-0.5">
+                <h3 className="text-sm text-foreground">Reset database password</h3>
+                <p className="text-sm text-foreground-light text-balance">
+                  The database password isn’t viewable after creation. Resetting it will break any
+                  existing connections.
+                </p>
+              </div>
+
               <ButtonTooltip
                 type="default"
                 disabled={!canResetDbPassword || !isProjectActive || disabled}
@@ -114,15 +125,15 @@ const ResetDbPassword = ({ disabled = false }) => {
                   },
                 }}
               >
-                Reset database password
+                Reset password
               </ButtonTooltip>
-            </div>
-          </div>
-        </Panel.Content>
-      </Panel>
+            </CardContent>
+          </Card>
+        </PageSectionContent>
+      </PageSection>
       <Modal
         hideFooter
-        header={<h5 className="text-foreground">Reset database password</h5>}
+        header="Reset database password"
         confirmText="Reset password"
         size="medium"
         visible={showResetDbPass}
@@ -139,7 +150,7 @@ const ResetDbPassword = ({ disabled = false }) => {
             // @ts-ignore
             descriptionText={
               <PasswordStrengthBar
-                passwordStrengthScore={passwordStrengthScore}
+                passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
                 passwordStrengthMessage={passwordStrengthMessage}
                 password={password}
                 generateStrongPassword={generatePassword}

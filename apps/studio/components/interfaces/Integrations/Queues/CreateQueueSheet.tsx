@@ -8,7 +8,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseQueueCreateMutation } from 'data/database-queues/database-queues-create-mutation'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import {
@@ -31,7 +31,7 @@ import {
   SheetTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
 import { QueryNameSchema } from './Queues.utils'
@@ -79,7 +79,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
     connectionString: project?.connectionString,
   })
 
-  const { mutate: createQueue, isLoading } = useDatabaseQueueCreateMutation()
+  const { mutate: createQueue, isPending } = useDatabaseQueueCreateMutation()
 
   const form = useForm<CreateQueueForm>({
     resolver: zodResolver(FormSchema),
@@ -102,7 +102,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
 
   const checkIsDirty = () => form.formState.isDirty
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty,
     onClose,
   })
@@ -144,7 +144,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
   const queueType = form.watch('values.type')
 
   return (
-    <Sheet open={visible} onOpenChange={confirmOnClose}>
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent size="default" className="w-[35%]" tabIndex={undefined}>
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
@@ -208,7 +208,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
                                         {definition.label}
                                       </p>
                                       {definition.value === 'partitioned' && (
-                                        <Badge variant="warning">Coming soon</Badge>
+                                        <Badge>Coming soon</Badge>
                                       )}
                                     </div>
                                     <p className="text-foreground-lighter text-left">
@@ -270,7 +270,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
                         label={
                           <div className="flex items-center gap-x-2">
                             <p>Enable Row Level Security (RLS)</p>
-                            <Badge color="scale">Recommended</Badge>
+                            <Badge variant="success">Recommended</Badge>
                           </div>
                         }
                         description="Restrict access to your queue by enabling RLS and writing Postgres policies to control access for each role."
@@ -313,39 +313,17 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
               type="default"
               htmlType="button"
               onClick={confirmOnClose}
-              disabled={isLoading}
+              disabled={isPending}
             >
               Cancel
             </Button>
-            <Button
-              size="tiny"
-              type="primary"
-              form={FORM_ID}
-              htmlType="submit"
-              disabled={isLoading}
-              loading={isLoading}
-            >
+            <Button size="tiny" type="primary" form={FORM_ID} htmlType="submit" loading={isPending}>
               Create queue
             </Button>
           </SheetFooter>
         </div>
-        <CloseConfirmationModal {...closeConfirmationModalProps} />
+        <DiscardChangesConfirmationDialog {...modalProps} />
       </SheetContent>
     </Sheet>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

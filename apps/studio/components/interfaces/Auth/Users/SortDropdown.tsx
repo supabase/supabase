@@ -1,6 +1,5 @@
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ArrowDownNarrowWide, ArrowDownWideNarrow } from 'lucide-react'
-
 import {
   Button,
   DropdownMenu,
@@ -21,8 +20,10 @@ interface SortDropdownProps {
   showSortByEmail: boolean
   showSortByPhone: boolean
   setSortByValue: (value: string) => void
+  improvedSearchEnabled: boolean
 }
 
+/** [Joshen] To refactor to use the SortDropdown component in components/ui */
 export const SortDropdown = ({
   specificFilterColumn,
   sortColumn,
@@ -31,8 +32,9 @@ export const SortDropdown = ({
   showSortByEmail,
   showSortByPhone,
   setSortByValue,
+  improvedSearchEnabled = false,
 }: SortDropdownProps) => {
-  if (specificFilterColumn !== 'freeform') {
+  if (specificFilterColumn !== 'freeform' && !improvedSearchEnabled) {
     return (
       <ButtonTooltip
         disabled

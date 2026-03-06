@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, patch } from 'data/fetchers'
+import { lintKeys } from 'data/lint/keys'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { configKeys } from './keys'
 
@@ -63,7 +64,10 @@ export const useProjectPostgrestConfigUpdateMutation = ({
     mutationFn: (vars) => updateProjectPostgrestConfig(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      queryClient.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

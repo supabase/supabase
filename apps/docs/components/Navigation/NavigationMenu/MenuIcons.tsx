@@ -556,6 +556,28 @@ export function IconBranching({ width = 16, height = 16, className }: HomeMenuIc
   )
 }
 
+export function IconGitBranch({ width = 16, height = 16, className }: HomeMenuIcon) {
+  return (
+    <svg
+      className={className}
+      width={width}
+      height={height}
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M4.5 2.25L4.5 11.25M15.75 4.5A2.25 2.25 0 1 1 11.25 4.5A2.25 2.25 0 1 1 15.75 4.5ZM6.75 13.5A2.25 2.25 0 1 1 2.25 13.5A2.25 2.25 0 1 1 6.75 13.5ZM13.5 6.75A6.75 6.75 0 0 1 6.75 13.5"
+        stroke="currentColor"
+        strokeMiterlimit="10"
+        strokeLinejoin="bevel"
+      />
+    </svg>
+  )
+}
+
 export function IconGitHub({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg

@@ -1,8 +1,10 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
+import { UseCustomQueryOptions } from 'types'
 
+import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string
@@ -39,9 +41,7 @@ export type ForeignKeyConstraint = {
 }
 
 export const getForeignKeyConstraintsSql = ({ schema }: GetForeignKeyConstraintsVariables) => {
-  if (!schema) {
-    throw new Error('schema is required')
-  }
+  if (!schema) throw new Error('schema is required')
 
   const sql = /* SQL */ `
 SELECT 
@@ -129,19 +129,32 @@ export type ForeignKeyConstraintsData = Awaited<ReturnType<typeof getForeignKeyC
 export type ForeignKeyConstraintsError = ExecuteSqlError
 
 export const useForeignKeyConstraintsQuery = <TData = ForeignKeyConstraintsData>(
-  { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables,
+  {
+    projectRef,
+    connectionString: connectionStringOverride,
+    schema,
+  }: ForeignKeyConstraintsVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData> = {}
-) =>
-  useQuery<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData>({
-    queryKey: databaseKeys.foreignKeyConstraints(projectRef, schema),
+) => {
+  const { connectionString: connectionStringReadOps } = useConnectionStringForReadOps()
+  const connectionString = connectionStringOverride || connectionStringReadOps
+
+  return useQuery<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData>({
+    queryKey: databaseKeys.foreignKeyConstraints(projectRef, schema, { connectionString }),
     queryFn: ({ signal }) =>
       getForeignKeyConstraints({ projectRef, connectionString, schema }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof schema !== 'undefined' &&
+      (!IS_PLATFORM || typeof connectionString !== 'undefined') &&
+      schema.length > 0,
     ...options,
   })
+}
 
 export function prefetchForeignKeyConstraints(
   client: QueryClient,

@@ -14,7 +14,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
@@ -23,7 +23,7 @@ const DatabaseTables: NextPageWithLayout = () => {
   const id = _id ? Number(_id) : undefined
 
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedTable, isLoading } = useTableEditorQuery({
+  const { data: selectedTable, isPending: isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,

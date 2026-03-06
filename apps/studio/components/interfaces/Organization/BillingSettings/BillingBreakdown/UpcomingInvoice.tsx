@@ -1,7 +1,6 @@
 import Link from 'next/link'
 
 import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import {
   UpcomingInvoiceResponse,
@@ -12,6 +11,7 @@ import { formatCurrency } from 'lib/helpers'
 import React from 'react'
 import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { billingMetricUnit, formatUsage } from '../helpers'
 
 export interface UpcomingInvoiceProps {
@@ -52,18 +52,15 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const {
     data: upcomingInvoice,
     error: error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useOrgUpcomingInvoiceQuery({ orgSlug: slug })
 
+  // For non-platform customers, compute is broken down per project and contains a breakdown array
   const computeItems =
-    upcomingInvoice?.lines?.filter(
-      (item) =>
-        item.description?.toLowerCase().includes('compute') &&
-        item.breakdown &&
-        item.breakdown?.length > 0
-    ) || []
+    upcomingInvoice?.lines?.filter((item) => item.description?.toLowerCase().includes('compute')) ||
+    []
 
   const computeCreditsItem =
     upcomingInvoice?.lines?.find((item) => item.description.startsWith('Compute Credits')) ?? null
@@ -79,11 +76,14 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const replicaComputeItems = computeItems.filter((it) => it.metadata?.is_read_replica)
 
   const otherItems =
-    upcomingInvoice?.lines?.filter(
-      (item) =>
-        !item.description?.toLowerCase().includes('compute') &&
-        !item.description?.toLowerCase().includes('plan')
-    ) || []
+    upcomingInvoice?.lines
+      ?.filter(
+        (item) =>
+          !item.description?.toLowerCase().includes('compute') &&
+          !item.description?.toLowerCase().includes('plan') &&
+          item.amount_before_discount > 0
+      )
+      .sort((a, b) => b.amount_before_discount - a.amount_before_discount) || []
 
   return (
     <>
@@ -286,20 +286,23 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
                   </TableCell>
                 </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium py-2 px-0 flex items-center">
-                    <span className="mr-2">Projected Costs</span>
-                    <InfoTooltip className="max-w-xs">
-                      Projected costs at the end of the billing cycle. Includes predictable costs
-                      for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no
-                      costs for metrics like MAU, storage or function invocations. Final amounts may
-                      vary depending on your usage.
-                    </InfoTooltip>
-                  </TableCell>
-                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
-                    {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
-                  </TableCell>
-                </TableRow>
+
+                {upcomingInvoice?.amount_projected && (
+                  <TableRow>
+                    <TableCell className="font-medium py-2 px-0 flex items-center">
+                      <span className="mr-2">Projected Costs</span>
+                      <InfoTooltip className="max-w-xs">
+                        Projected costs at the end of the billing cycle. Includes predictable costs
+                        for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no
+                        costs for metrics like MAU, storage or function invocations. Final amounts
+                        may vary depending on your usage.
+                      </InfoTooltip>
+                    </TableCell>
+                    <TableCell className="text-right font-medium py-2 px-0" translate="no">
+                      {formatCurrency(upcomingInvoice.amount_projected) ?? '-'}
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableFooter>
             </Table>
           </div>
@@ -352,6 +355,10 @@ function ComputeLineItem({
     // descending by cost
     .sort((a, b) => b.computeCosts - a.computeCosts)
 
+  const computeItemsSortedByCost = computeItems
+    // descending by cost
+    .sort((a, b) => b.amount - a.amount)
+
   const computeCosts = Math.max(
     0,
     computeItems.reduce((prev, cur) => prev + cur.amount_before_discount, 0)
@@ -389,6 +396,23 @@ function ComputeLineItem({
           </TableCell>
         </TableRow>
       ))}
+
+      {/* Fallback to breakdown by instance size if project breakdown not available  */}
+      {!computeProjects.length &&
+        computeItemsSortedByCost.map((computeItem) => (
+          <TableRow
+            key={title + computeItem.usage_metric}
+            className="text-foreground-light text-xs"
+          >
+            <TableCell className="!py-2 px-0 pl-6">
+              {computeItem.description} - {computeItem.usage_original} Hours
+            </TableCell>
+
+            <TableCell className="!py-2 px-0 text-right" translate="no">
+              {formatCurrency(computeItem.amount)}
+            </TableCell>
+          </TableRow>
+        ))}
 
       {computeCredits && (
         <TableRow className="text-foreground-light text-xs">

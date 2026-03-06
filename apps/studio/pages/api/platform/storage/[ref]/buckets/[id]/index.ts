@@ -10,14 +10,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
   switch (method) {
+    case 'GET':
+      return handleGet(req, res)
     case 'PATCH':
       return handlePatch(req, res)
     case 'DELETE':
       return handleDelete(req, res)
     default:
-      res.setHeader('Allow', ['PATCH', 'DELETE'])
+      res.setHeader('Allow', ['GET', 'PATCH', 'DELETE'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
+}
+
+const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { id } = req.query
+
+  const { data, error } = await supabase.storage.getBucket(id as string)
+  if (error) {
+    return res.status(400).json({ error: { message: error.message } })
+  }
+
+  return res.status(200).json(data)
 }
 
 const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {

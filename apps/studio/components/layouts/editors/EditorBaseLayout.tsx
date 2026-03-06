@@ -1,9 +1,9 @@
+import { useParams } from 'common'
 import { usePathname } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
-
-import { useParams } from 'common'
 import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
+
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
@@ -44,7 +44,7 @@ export const EditorBaseLayout = ({
       <div className="flex flex-col h-full">
         <div
           className={cn(
-            'h-10 flex items-center',
+            'h-10 md:min-h-[var(--header-height)] flex items-center',
             !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
           )}
         >

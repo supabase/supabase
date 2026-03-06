@@ -1,14 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { X } from 'lucide-react'
-import randomBytes from 'randombytes'
-import { useEffect, useMemo } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import ReactMarkdown from 'react-markdown'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from 'components/ui/DocsButton'
 import FunctionSelector from 'components/ui/FunctionSelector'
@@ -17,28 +10,34 @@ import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from 'lib/constants'
+import randomBytes from 'randombytes'
+import { useEffect, useMemo } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
   Sheet,
-  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetSection,
   SheetTitle,
   Switch,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import * as z from 'zod'
+
+import { Hook, HOOK_DEFINITION_TITLE, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 
 interface CreateHookSheetProps {
@@ -159,7 +158,16 @@ export const CreateHookSheet = ({
     },
   })
 
+  const isDirty = form.formState.isDirty
   const values = form.watch()
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: discardChangesModalProps,
+  } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose,
+  })
 
   const statements = useMemo(() => {
     let permissionChanges: string[] = []
@@ -187,7 +195,7 @@ export const CreateHookSheet = ({
     return permissionChanges
   }, [hook, values.postgresValues.schema, values.postgresValues.functionName])
 
-  const { mutate: updateAuthHooks, isLoading: isUpdatingAuthHooks } = useAuthHooksUpdateMutation({
+  const { mutate: updateAuthHooks, isPending: isUpdatingAuthHooks } = useAuthHooksUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully created ${values.hookType}.`)
       if (statements.length > 0) {
@@ -242,7 +250,7 @@ export const CreateHookSheet = ({
 
         form.reset({
           hookType: definition.title,
-          enabled: authConfig?.[definition.enabledKey] || true,
+          enabled: isCreating ? true : authConfig?.[definition.enabledKey],
           selectedType: values.type,
           httpsValues: {
             url: (values.type === 'https' && values.url) || '',
@@ -269,28 +277,21 @@ export const CreateHookSheet = ({
         })
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authConfig, title, visible, definition])
 
   return (
-    <Sheet open={visible} onOpenChange={() => onClose()}>
-      <SheetContent size="lg" showClose={false} className="flex flex-col gap-0">
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
+      <SheetContent
+        aria-describedby={undefined}
+        size="lg"
+        showClose={false}
+        className="flex flex-col gap-0"
+      >
         <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
-          <div className="flex flex-row gap-3 items-center">
-            <SheetClose
-              className={cn(
-                'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                'disabled:pointer-events-none data-[state=open]:bg-secondary',
-                'transition'
-              )}
-            >
-              <X className="h-3 w-3" />
-              <span className="sr-only">Close</span>
-            </SheetClose>
-            <SheetTitle className="truncate">
-              {isCreating ? `Add ${title}` : `Update ${title}`}
-            </SheetTitle>
-          </div>
+          <SheetTitle className="truncate">
+            {isCreating ? `Add ${title}` : `Update ${title}`}
+          </SheetTitle>
           <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </SheetHeader>
         <Separator />
@@ -370,7 +371,6 @@ export const CreateHookSheet = ({
                         >
                           <FormControl_Shadcn_>
                             <SchemaSelector
-                              portal={false}
                               size="small"
                               showError={false}
                               selectedSchemaName={field.value}
@@ -422,17 +422,20 @@ export const CreateHookSheet = ({
                       )}
                     />
                   </div>
-                  <div className="h-72 w-full gap-3 flex flex-col">
-                    <p className="text-sm text-foreground-light px-5">
-                      The following statements will be executed on the selected function:
-                    </p>
-                    <CodeEditor
-                      id="postgres-hook-editor"
-                      isReadOnly={true}
-                      language="pgsql"
-                      value={statements.join('\n\n')}
-                    />
-                  </div>
+
+                  {statements.length > 0 && (
+                    <div className="h-72 w-full gap-3 flex flex-col">
+                      <p className="text-sm text-foreground-light px-5">
+                        The following statements will be executed on the selected function:
+                      </p>
+                      <CodeEditor
+                        isReadOnly
+                        id="postgres-hook-editor"
+                        language="pgsql"
+                        value={statements.join('\n\n')}
+                      />
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="flex flex-col gap-4 px-5">
@@ -459,11 +462,17 @@ export const CreateHookSheet = ({
                       <FormItemLayout
                         label="Secret"
                         description={
-                          <ReactMarkdown>
-                            It should be a base64 encoded hook secret with a prefix `v1,whsec_`.
-                            `v1` denotes the signature version, and `whsec_` signifies a symmetric
-                            secret.
-                          </ReactMarkdown>
+                          <div className="flex items-center gap-x-2">
+                            <p>
+                              Should be a base64 encoded hook secret with a prefix{' '}
+                              <code className="text-code-inline">v1,whsec_</code>.
+                            </p>
+                            <InfoTooltip side="bottom" className="w-60 text-center">
+                              <code className="text-code-inline">v1</code> denotes the signature
+                              version and <code className="text-code-inline">whsec_</code> signifies
+                              a symmetric secret.
+                            </InfoTooltip>
+                          </div>
                         }
                       >
                         <FormControl_Shadcn_>
@@ -472,10 +481,12 @@ export const CreateHookSheet = ({
                             <Button
                               type="default"
                               size="small"
-                              className="rounded-l-none"
+                              className="rounded-l-none text-xs"
                               onClick={() => {
                                 const authHookSecret = generateAuthHookSecret()
-                                form.setValue('httpsValues.secret', authHookSecret)
+                                form.setValue('httpsValues.secret', authHookSecret, {
+                                  shouldDirty: true,
+                                })
                               }}
                             >
                               Generate secret
@@ -499,7 +510,7 @@ export const CreateHookSheet = ({
             </div>
           )}
 
-          <Button disabled={isUpdatingAuthHooks} type="default" onClick={() => onClose()}>
+          <Button disabled={isUpdatingAuthHooks} type="default" onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button
@@ -512,6 +523,7 @@ export const CreateHookSheet = ({
           </Button>
         </SheetFooter>
       </SheetContent>
+      <DiscardChangesConfirmationDialog {...discardChangesModalProps} />
     </Sheet>
   )
 }

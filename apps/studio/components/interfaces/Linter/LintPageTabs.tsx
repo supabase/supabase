@@ -13,9 +13,9 @@ import {
 } from 'ui'
 
 import { LINTER_LEVELS, LINT_TABS } from 'components/interfaces/Linter/Linter.constants'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Lint } from 'data/lint/lint-query'
 import { useRouter } from 'next/router'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface LintPageTabsProps {
   currentTab: string

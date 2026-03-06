@@ -40,7 +40,7 @@ export const useMfaChallengeAndVerifyMutation = ({
       return mfaChallengeAndVerify(params)
     },
     async onSuccess(data, variables, context) {
-      // when a MFA is added, the aaLevel is bumped up
+      // when an MFA is added, the aaLevel is bumped up
       const refreshFactors = variables.refreshFactors ?? true
 
       await Promise.all([

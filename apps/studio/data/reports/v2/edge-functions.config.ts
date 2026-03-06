@@ -213,7 +213,7 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations over time.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = METRIC_SQL.TotalInvocations(interval, filters)
       const response = await fetchLogs(projectRef, sql, startDate, endDate)
@@ -245,7 +245,7 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function executions by status code.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
@@ -277,7 +277,7 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -339,7 +339,7 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations by region.',
-    availableIn: ['pro', 'team', 'enterprise'],
+    availableIn: ['pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = METRIC_SQL.InvocationsByRegion(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)

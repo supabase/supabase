@@ -1,6 +1,5 @@
 import { Megaphone } from 'lucide-react'
 import { forwardRef, PropsWithChildren, ReactNode } from 'react'
-
 import { Badge, Button, cn, Loading } from 'ui'
 
 interface PanelProps {
@@ -34,7 +33,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
       {props.title && (
         <div
           className={cn(
-            'bg-surface-100 border-b border-default flex items-center px-4 py-4',
+            'bg-surface-100 border-b border-default flex items-center px-card py-4',
             props.titleClasses
           )}
         >
@@ -54,13 +53,13 @@ function Panel(props: PropsWithChildren<PanelProps>) {
 }
 
 function Content({ children, className }: { children: ReactNode; className?: string | false }) {
-  return <div className={cn('px-4 py-4', className)}>{children}</div>
+  return <div className={cn('px-card py-4', className)}>{children}</div>
 }
 
 function Footer({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div className={cn('bg-surface-100 border-t border-default', className)}>
-      <div className="flex h-12 items-center px-4">{children}</div>
+      <div className="flex h-12 items-center px-card">{children}</div>
     </div>
   )
 }
@@ -70,7 +69,7 @@ const PanelNotice = forwardRef<
   {
     className?: string | false
     title?: string
-    description?: string
+    description?: ReactNode
     href?: string
     buttonText?: string
     layout?: 'horizontal' | 'vertical'
@@ -95,7 +94,7 @@ const PanelNotice = forwardRef<
         ref={ref}
         {...props}
         className={cn(
-          'relative px-4 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
+          'relative px-card py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
           layout === 'vertical' && '!flex-col !items-start gap-y-2',
           className
         )}

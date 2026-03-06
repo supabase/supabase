@@ -20,6 +20,9 @@ import {
 import { Skeleton, cn } from 'ui'
 
 // Regular memo erases generics, so this helper adds them back
+// any here is intentional to allow for generic components and does not affect
+// type safety of the wrapped component
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const typedMemo = <Component extends (props: any) => JSX.Element | null>(
   component: Component,
   propsAreEqual?: (
@@ -86,6 +89,7 @@ type InfiniteListWrapperProps<Item, Component extends ElementType = 'div'> = {
   items: Item[]
   getItemKey?: (index: number) => string
   getItemSize: (index: number) => number
+  gap?: number
   hasNextPage?: boolean
   isLoadingNextPage?: boolean
   onLoadNextPage?: () => void
@@ -97,6 +101,7 @@ export const InfiniteListScrollWrapper = <Item, Wrapper extends ElementType = 'd
   items,
   getItemKey,
   getItemSize,
+  gap,
   hasNextPage = false,
   isLoadingNextPage = false,
   onLoadNextPage = () => {},
@@ -111,6 +116,7 @@ export const InfiniteListScrollWrapper = <Item, Wrapper extends ElementType = 'd
     getItemKey,
     estimateSize: getItemSize,
     overscan: 5,
+    gap,
   })
 
   const virtualItems = rowVirtualizer.getVirtualItems()
@@ -175,7 +181,7 @@ export const InfiniteListSizer = ({
   )
 }
 
-type RowComponentBaseProps<Item> = {
+export type RowComponentBaseProps<Item> = {
   index: number
   item: Item
   style?: CSSProperties
@@ -301,6 +307,7 @@ type InfiniteListDefaultProps<Item, ItemComponentProps extends object = Record<s
   itemProps?: ItemComponentProps
   getItemKey?: (index: number) => string
   getItemSize: (index: number) => number
+  gap?: number
   hasNextPage?: boolean
   isLoadingNextPage?: boolean
   onLoadNextPage?: () => void
@@ -317,6 +324,7 @@ export const InfiniteListDefault = <
   itemProps,
   getItemKey,
   getItemSize,
+  gap,
   hasNextPage = false,
   isLoadingNextPage = false,
   onLoadNextPage = () => {},
@@ -329,6 +337,7 @@ export const InfiniteListDefault = <
       items={items}
       getItemKey={getItemKey}
       getItemSize={getItemSize}
+      gap={gap}
       hasNextPage={hasNextPage}
       isLoadingNextPage={isLoadingNextPage}
       onLoadNextPage={onLoadNextPage}

@@ -1,9 +1,10 @@
 'use client'
 
 import { Slot } from '@radix-ui/react-slot'
-import { VariantProps, cva } from 'class-variance-authority'
+import { cva, VariantProps } from 'class-variance-authority'
 import { PanelLeft } from 'lucide-react'
 import * as React from 'react'
+
 import { cn } from './../../../lib/utils'
 import { useIsMobile } from './../../hooks/use-mobile'
 import { Button } from './button'
@@ -553,6 +554,13 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const Comp = asChild ? Slot : 'button'
     const { isMobile, state } = useSidebar()
+    const { disabled, tabIndex } = props
+
+    // Set default tabIndex for proper Safari focus handling
+    // - Explicit tabIndex prop takes precedence
+    // - If disabled, default to -1 (unless explicitly set)
+    // - Otherwise, default to 0 for keyboard accessibility
+    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
     const button = (
       <Comp
@@ -561,6 +569,7 @@ const SidebarMenuButton = React.forwardRef<
         data-size={size}
         data-active={isActive}
         data-has-icon={hasIcon}
+        tabIndex={computedTabIndex}
         className={cn(sidebarMenuButtonVariants({ variant, size, hasIcon }), className)}
         {...props}
       />

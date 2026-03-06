@@ -1,12 +1,13 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import type { Content } from 'data/content/content-query'
 import { SNIPPET_PAGE_LIMIT } from 'data/content/sql-folders-query'
+import { Plus } from 'lucide-react'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { editorPanelState } from 'state/editor-panel-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Command_Shadcn_,
   CommandGroup_Shadcn_,
@@ -18,7 +19,7 @@ import {
   DropdownMenuTrigger,
   ScrollArea,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 type SnippetDropdownProps = {
   projectRef?: string
@@ -41,23 +42,28 @@ export const SnippetDropdown = ({
   autoFocus = false,
   onSelect,
 }: SnippetDropdownProps) => {
-  const router = useRouter()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const scrollRootRef = useRef<HTMLDivElement | null>(null)
 
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
 
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useContentInfiniteQuery(
-      {
-        projectRef,
-        type: 'sql',
-        limit: SNIPPET_PAGE_LIMIT,
-        name: search.length === 0 ? search : debouncedSearch,
-      },
-      { keepPreviousData: true }
-    )
+  const {
+    data,
+    isPending: isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useContentInfiniteQuery(
+    {
+      projectRef,
+      type: 'sql',
+      limit: SNIPPET_PAGE_LIMIT,
+      name: search.length === 0 ? search : debouncedSearch,
+    },
+    { placeholderData: keepPreviousData }
+  )
 
   const snippets = useMemo(() => {
     const items = data?.pages.flatMap((page) => page.content) ?? []
@@ -127,20 +133,14 @@ export const SnippetDropdown = ({
                 className="cursor-pointer w-full"
                 onSelect={() => {
                   setOpen(false)
-                  router.push(`/project/${projectRef}/sql/new`)
+                  editorPanelState.openAsNew()
+                  openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
                 }}
-                onClick={() => setOpen(false)}
               >
-                <Link
-                  href={`/project/${projectRef}/sql/new`}
-                  onClick={() => {
-                    setOpen(false)
-                  }}
-                  className="w-full flex items-center gap-2"
-                >
+                <div className="w-full flex items-center gap-2">
                   <Plus size={14} strokeWidth={1.5} />
-                  <p>Create a report block with SQL</p>
-                </Link>
+                  <p>Create snippet</p>
+                </div>
               </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>

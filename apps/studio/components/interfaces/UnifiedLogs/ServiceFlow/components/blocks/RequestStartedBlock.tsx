@@ -9,8 +9,13 @@ export const MemoizedRequestStartedBlock = memo(function RequestStartedBlock({
 }: {
   data: ColumnSchema
 }) {
-  const timestamp = data?.timestamp || data?.date
-  const formattedTime = timestamp ? new Date(timestamp).toLocaleString() : null
+  // Convert microseconds to milliseconds for JavaScript Date
+  const timestampMs = data?.timestamp
+    ? data.timestamp / 1000
+    : data?.date
+      ? data.date.getTime()
+      : null
+  const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   return (
     <div>

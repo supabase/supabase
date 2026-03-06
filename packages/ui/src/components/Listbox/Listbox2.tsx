@@ -2,6 +2,7 @@
 
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { flatten } from 'lodash'
+import { Check } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
@@ -11,7 +12,6 @@ import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
 import { useFormContext } from '../Form/FormContext'
 import { SelectContext } from './SelectContext'
-import { Check } from 'lucide-react'
 
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
   className?: string
@@ -191,7 +191,7 @@ function Listbox({
   if (error) selectClasses.push(__styles.variants.error)
   if (!error) selectClasses.push(__styles.variants.standard)
   // if (icon) selectClasses.push(SelectStyles['sbui-listbox--with-icon'])
-  if (icon) addonBeforeClasses.push(__styles.with_icon)
+  if (icon) addonBeforeClasses.push(__styles.with_icon[size])
   // if (size) selectClasses.push(SelectStyles[`sbui-listbox--${size}`])
   if (size) selectClasses.push(__styles.size[size])
   // if (borderless) selectClasses.push(SelectStyles['sbui-listbox--borderless'])

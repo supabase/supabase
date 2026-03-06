@@ -1,53 +1,48 @@
+import { useFlag, useParams } from 'common'
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
-export const generateAuthMenu = (
-  ref: string,
-  flags?: {
-    authenticationSignInProviders: boolean
-    authenticationRateLimits: boolean
-    authenticationEmails: boolean
-    authenticationMultiFactor: boolean
-    authenticationAttackProtection: boolean
-    authenticationAdvanced: boolean
-    authenticationShowOverview: boolean
-    authenticationShowSecurityNotifications: boolean
-    authenticationOauth21: boolean
-  }
-): ProductMenuGroup[] => {
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+
+export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
+  const { ref } = useParams()
+  const authenticationShowOverview = useFlag('authOverviewPage')
+
   const {
     authenticationSignInProviders,
     authenticationRateLimits,
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
-    authenticationShowOverview,
-    authenticationShowSecurityNotifications,
-    authenticationOauth21,
-  } = flags ?? {}
+    authenticationPerformance,
+  } = useIsFeatureEnabled([
+    'authentication:sign_in_providers',
+    'authentication:rate_limits',
+    'authentication:emails',
+    'authentication:multi_factor',
+    'authentication:attack_protection',
+    'authentication:performance',
+  ])
+
+  const baseUrl = `/project/${ref}/auth`
 
   return [
     {
       title: 'Manage',
       items: [
         ...(authenticationShowOverview
-          ? [{ name: 'Overview', key: 'overview', url: `/project/${ref}/auth/overview`, items: [] }]
+          ? [{ name: 'Overview', key: 'overview', url: `${baseUrl}/overview`, items: [] }]
           : []),
-        { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
-        ...(authenticationOauth21
-          ? [
-              {
-                name: 'OAuth Apps',
-                key: 'oauth-apps',
-                url: `/project/${ref}/auth/oauth-apps`,
-                items: [],
-              },
-            ]
-          : []),
+        { name: 'Users', key: 'users', url: `${baseUrl}/users`, items: [] },
+        {
+          name: 'OAuth Apps',
+          key: 'oauth-apps',
+          url: `${baseUrl}/oauth-apps`,
+          items: [],
+        },
       ],
     },
-    ...(authenticationEmails && authenticationShowSecurityNotifications && IS_PLATFORM
+    ...(authenticationEmails && IS_PLATFORM
       ? [
           {
             title: 'Notifications',
@@ -58,7 +53,7 @@ export const generateAuthMenu = (
                       name: 'Email',
                       key: 'email',
                       pages: ['templates', 'smtp'],
-                      url: `/project/${ref}/auth/templates`,
+                      url: `${baseUrl}/templates`,
                       items: [],
                     },
                   ]
@@ -73,7 +68,7 @@ export const generateAuthMenu = (
         {
           name: 'Policies',
           key: 'policies',
-          url: `/project/${ref}/auth/policies`,
+          url: `${baseUrl}/policies`,
           items: [],
         },
         ...(IS_PLATFORM
@@ -84,25 +79,21 @@ export const generateAuthMenu = (
                       name: 'Sign In / Providers',
                       key: 'sign-in-up',
                       pages: ['providers', 'third-party'],
-                      url: `/project/${ref}/auth/providers`,
+                      url: `${baseUrl}/providers`,
                       items: [],
                     },
                   ]
                 : []),
-              ...(authenticationOauth21
-                ? [
-                    {
-                      name: 'OAuth Server',
-                      key: 'oauth-server',
-                      url: `/project/${ref}/auth/oauth-server`,
-                      label: 'BETA',
-                    },
-                  ]
-                : []),
+              {
+                name: 'OAuth Server',
+                key: 'oauth-server',
+                url: `${baseUrl}/oauth-server`,
+                label: 'Beta',
+              },
               {
                 name: 'Sessions',
                 key: 'sessions',
-                url: `/project/${ref}/auth/sessions`,
+                url: `${baseUrl}/sessions`,
                 items: [],
               },
               ...(authenticationRateLimits
@@ -110,18 +101,7 @@ export const generateAuthMenu = (
                     {
                       name: 'Rate Limits',
                       key: 'rate-limits',
-                      url: `/project/${ref}/auth/rate-limits`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              ...(authenticationEmails && !authenticationShowSecurityNotifications
-                ? [
-                    {
-                      name: 'Emails',
-                      key: 'emails',
-                      pages: ['templates', 'smtp'],
-                      url: `/project/${ref}/auth/templates`,
+                      url: `${baseUrl}/rate-limits`,
                       items: [],
                     },
                   ]
@@ -131,7 +111,7 @@ export const generateAuthMenu = (
                     {
                       name: 'Multi-Factor',
                       key: 'mfa',
-                      url: `/project/${ref}/auth/mfa`,
+                      url: `${baseUrl}/mfa`,
                       items: [],
                     },
                   ]
@@ -139,7 +119,7 @@ export const generateAuthMenu = (
               {
                 name: 'URL Configuration',
                 key: 'url-configuration',
-                url: `/project/${ref}/auth/url-configuration`,
+                url: `${baseUrl}/url-configuration`,
                 items: [],
               },
               ...(authenticationAttackProtection
@@ -147,7 +127,7 @@ export const generateAuthMenu = (
                     {
                       name: 'Attack Protection',
                       key: 'protection',
-                      url: `/project/${ref}/auth/protection`,
+                      url: `${baseUrl}/protection`,
                       items: [],
                     },
                   ]
@@ -155,22 +135,22 @@ export const generateAuthMenu = (
               {
                 name: 'Auth Hooks',
                 key: 'hooks',
-                url: `/project/${ref}/auth/hooks`,
+                url: `${baseUrl}/hooks`,
                 items: [],
-                label: 'BETA',
+                label: 'Beta',
               },
               {
                 name: 'Audit Logs',
                 key: 'audit-logs',
-                url: `/project/${ref}/auth/audit-logs`,
+                url: `${baseUrl}/audit-logs`,
                 items: [],
               },
-              ...(authenticationAdvanced
+              ...(authenticationPerformance
                 ? [
                     {
-                      name: 'Advanced',
-                      key: 'advanced',
-                      url: `/project/${ref}/auth/advanced`,
+                      name: 'Performance',
+                      key: 'performance',
+                      url: `${baseUrl}/performance`,
                       items: [],
                     },
                   ]

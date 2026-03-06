@@ -1,0 +1,81 @@
+---
+title: Dropzone (File Upload)
+description: Displays a control for easier uploading of files directly to Supabase Storage
+---
+
+<ComponentPreview
+  name="dropzone-demo"
+  description="A file upload dropzone component that allows users to drag-and-drop files or select them manually. It supports multiple files, displays upload progress, previews images, and shows validation errors."
+  showCode={false}
+/>
+
+## Installation
+
+<BlockItem
+  name="dropzone-vue"
+  description="Displays a control for easier uploading of files directly to Supabase Storage"
+/>
+
+## Folder structure
+
+This block assumes that you have already installed a Supabase client for Vue from the previous step.
+
+<RegistryBlock itemName="dropzone-vue" />
+
+## Introduction
+
+Uploading files should be easy—this component handles the tricky parts for you.
+
+The File Upload component makes it easy to add file uploads to your app, with built-in support for drag-and-drop, file type restrictions, image previews, and configurable limits on file size and number of files. All the essentials, ready to go.
+
+**Features**
+
+- Drag-and-drop support
+- Multiple file uploads
+- File size and count limits
+- Image previews for supported file types
+- MIME type restrictions
+- Invalid file handling
+- Success and error states with clear feedback
+
+## Usage
+
+- Simply add this `<Dropzone />` component to your page and it will handle the rest.
+
+```html
+<script setup>
+  import { Dropzone, DropzoneContent, DropzoneEmptyState } from '@/components/dropzone'
+  import { useSupabaseUpload } from '@/composables/use-supabase-upload'
+
+  const upload = useSupabaseUpload({
+    bucketName: 'test',
+    path: 'test',
+    allowedMimeTypes: ['image/*'],
+    maxFiles: 2,
+    maxFileSize: 1000 * 1000 * 10, // 10MB,
+  })
+</script>
+
+<template>
+  <Dropzone v-bind="upload">
+    <DropzoneEmptyState />
+    <DropzoneContent />
+  </Dropzone>
+</template>
+```
+
+## Props
+
+| Prop               | Type       | Default    | Description                                          |
+| ------------------ | ---------- | ---------- | ---------------------------------------------------- |
+| `bucketName`       | `string`   | `null`     | The name of the Supabase Storage bucket to upload to |
+| `path`             | `string`   | `null`     | The path or subfolder to upload the file to          |
+| `allowedMimeTypes` | `string[]` | `[]`       | The MIME types to allow for upload                   |
+| `maxFiles`         | `number`   | `1`        | Maximum number of files to upload                    |
+| `maxFileSize`      | `number`   | `Infinity` | Maximum file size in bytes                           |
+
+## Further reading
+
+- [Creating buckets](https://supabase.com/docs/guides/storage/buckets/creating-buckets)
+- [Access control](https://supabase.com/docs/guides/storage/security/access-control)
+- [Standard uploads](https://supabase.com/docs/guides/storage/uploads/standard-uploads)

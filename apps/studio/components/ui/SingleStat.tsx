@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import type { ReactNode } from 'react'
-
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
+import type { ReactNode } from 'react'
+import { cn } from 'ui'
 
 type SingleStatProps = {
   icon: ReactNode
@@ -44,11 +44,11 @@ export const SingleStat = ({
     }
   }
   const content = (
-    <div className={`group flex items-center gap-4 p-0 text-base justify-start ${className || ''}`}>
-      <div className="w-16 h-16 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
+    <div className={cn('group flex items-center gap-4 p-0 text-base justify-start', className)}>
+      <div className="min-w-16 w-16 h-16 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
         {icon}
       </div>
-      <div>
+      <div className="truncate">
         <div className="text-left heading-meta text-foreground-light">{label}</div>
         <div className="text-foreground truncate h-[34px] flex items-center capitalize-sentence">
           {value}

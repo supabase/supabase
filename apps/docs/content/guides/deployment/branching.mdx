@@ -10,8 +10,8 @@ Supabase branches create separate environments that spin off from your main proj
 ## How branching works
 
 - **Separate Environments**: Each branch is a separate environment with its own Supabase instance and API credentials.
-- **Preview Branches**: You can create multiple Preview Branches for testing.
-- **Persistent Branches**: Persistent branches are long-lived branches. They aren't automatically paused or deleted due to non-inactivity or merging.
+- **Preview Branches**: Preview branches are ephemeral and best suited for focused testing. They are automatically paused after inactivity or deleted when a PR is merged or closed.
+- **Persistent Branches**: Persistent branches are long-lived and recommended for environments like staging, QA, or development. Unlike preview branches, they aren't automatically paused or deleted due to inactivity or when a PR is merged or closed.
 - **Managing Branches**: You can create, review, and merge branches either automatically via our [GitHub integration](/docs/guides/deployment/branching/github-integration) or directly [through the dashboard](/docs/guides/deployment/branching/dashboard) (currently in beta). All branches show up in the branches page in the dashboard, regardless of how they were created.
 - **Data-less**: New branches do not start with any data from your main project. This is meant to better protect your sensitive production data. To start your branches with data, you can use a [seed file](/docs/guides/deployment/branching/github-integration#seeding) if using the GitHub integration.
 

@@ -101,10 +101,10 @@ Supabase হল ওপেন সোর্স টুলের সংমিশ্�
   <tr>
     <td>জাভাস্ক্রিপ্ট (টাইপস্ক্রিপ্ট)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">সুপাবেস-জেএস</a></td>
-    <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
-    <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">গোট্রু-জেএস</a></td>
-    <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">রিয়েলটাইম-জেএস</a></td>
-    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">স্টোরেজ-জেএস</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js" target="_blank" rel="noopener noreferrer">গোট্রু-জেএস</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/realtime-js" target="_blank" rel="noopener noreferrer">রিয়েলটাইম-জেএস</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/storage-js" target="_blank" rel="noopener noreferrer">স্টোরেজ-জেএস</a></td>
   </tr>
   <th colspan="6">💚 সম্প্রদায় 💚</th>
   <tr>

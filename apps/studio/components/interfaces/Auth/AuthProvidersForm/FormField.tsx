@@ -1,13 +1,13 @@
+import { Markdown } from 'components/interfaces/Markdown'
+import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
+import { BASE_PATH } from 'lib/constants'
 import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import { DatePicker } from 'components/ui/DatePicker'
-import { BASE_PATH } from 'lib/constants'
 import { Button, Input, InputNumber, Listbox, Toggle } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import type { Enum } from './AuthProvidersForm.types'
 
 interface FormFieldProps {
@@ -269,7 +269,11 @@ const FormField = ({
                 value={option.value}
                 addOnBefore={() => {
                   return option.icon ? (
-                    <img className="h-6 w-6" src={`${BASE_PATH}/img/icons/${option.icon}`} />
+                    <img
+                      alt={`${option.label} icon`}
+                      className="h-6 w-6"
+                      src={`${BASE_PATH}/img/icons/${option.icon}`}
+                    />
                   ) : null
                 }}
               >

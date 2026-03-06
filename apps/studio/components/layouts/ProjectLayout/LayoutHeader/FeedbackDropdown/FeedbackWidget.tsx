@@ -1,20 +1,19 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { toPng } from 'html-to-image'
-import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { Camera, CircleCheck, HelpCircle, Image as ImageIcon, Upload, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { InlineLinkClassName } from 'components/ui/InlineLink'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
@@ -29,13 +28,18 @@ import {
   TextArea_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
+import {
+  convertB64toBlob,
+  isLikelySupportRequest,
+  uploadAttachment,
+} from './FeedbackDropdown.utils'
 
 interface FeedbackWidgetProps {
   onClose: () => void
+  onSwitchToIssueOptions: () => void
 }
 
-export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
+export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidgetProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, slug } = useParams()
@@ -60,11 +64,16 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
 
   const { data: category } = useFeedbackCategoryQuery({ prompt: debouncedFeedback })
 
+  // Use client-side heuristic for immediate feedback, AI result takes precedence when available
+  const isLikelySupport = isLikelySupportRequest(feedback)
+  const effectiveCategory = category ?? (isLikelySupport ? 'support' : null)
+
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
       setIsFeedbackSent(true)
       setFeedback('')
+      setStoredFeedback(null)
       setScreenshot(null)
       setSending(false)
     },
@@ -145,85 +154,94 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
     }
   }
 
+  // Hydrate form from localStorage once it's ready; deps intentionally omit storedFeedback/screenshot
+  // so we don't overwrite user edits when those values change after initial load.
   useEffect(() => {
     if (storedFeedback) setFeedback(storedFeedback)
     if (screenshot) setScreenshot(screenshot)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate once when localStorage is ready only
   }, [isSuccess])
 
+  // Persist debounced input to localStorage; only re-run when debounced value changes.
   useEffect(() => {
     if (debouncedFeedback.length > 0) setStoredFeedback(debouncedFeedback)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setStoredFeedback is stable; only sync on debounced value
   }, [debouncedFeedback])
 
+  const ThanksMessageView = () => (
+    <>
+      <div className="py-6 px-4 grid gap-4 text-center text-foreground-light">
+        <CircleCheck className="mx-auto text-brand-500" size={24} />
+        <div className="flex flex-col gap-1">
+          <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
+          <p className="text-sm text-balance">
+            We don’t always respond to feedback. If you need help with your project, use the button
+            below.
+          </p>
+        </div>
+      </div>
+      <PopoverSeparator_Shadcn_ />
+      <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
+        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+          Get help
+        </Button>
+        <Button type="default" size="tiny" onClick={onClose}>
+          Close
+        </Button>
+      </div>
+    </>
+  )
+
   return isFeedbackSent ? (
-    <ThanksMessage onClose={onClose} />
+    <ThanksMessageView />
   ) : (
     <>
-      <div>
-        <div className="px-5 pb-4">
-          <TextArea_Shadcn_
-            placeholder="It would be great if..."
-            rows={5}
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            onPaste={handlePasteEvent}
-            className="text-sm mt-4 mb-1"
-          />
-        </div>
-
-        <AnimatePresence>
-          {category === 'support' && (
-            <motion.div
-              key="support-alert"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 16 }}
-              transition={{ duration: 0.25 }}
-            >
-              <Admonition
-                type="caution"
-                title="This looks like an issue that's better handled by support"
-                className="rounded-none border-x-0 border-b-0 mb-0 [&>h5]:text-xs [&>h5]:mb-0.5"
-              >
-                <p className="text-xs text-foreground-light !leading-tight">
-                  Please{' '}
-                  <SupportLink
-                    className={cn(
-                      InlineLinkClassName,
-                      'text-foreground-light hover:text-foreground'
-                    )}
-                    queryParams={{ projectRef: slug, message: feedback }}
-                  >
-                    open a support ticket
-                  </SupportLink>{' '}
-                  to get help with this issue, as we do not reply to all product feedback.
-                </p>
-              </Admonition>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <div className="p-4">
+        <TextArea_Shadcn_
+          placeholder="My idea for improving Supabase is..."
+          rows={6}
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          onPaste={handlePasteEvent}
+          className="text-sm mb-1 resize-none"
+        />
       </div>
+
+      <AnimatePresence>
+        {effectiveCategory === 'support' && (
+          <motion.div
+            key="support-alert"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Admonition
+              type="caution"
+              title="This looks like an issue that’s better handled by support"
+              className="rounded-none border-x-0 border-b-0"
+            >
+              <p>
+                Please{' '}
+                <SupportLink
+                  className={cn(InlineLinkClassName)}
+                  queryParams={{ projectRef: slug, message: feedback }}
+                >
+                  open a support ticket
+                </SupportLink>{' '}
+                to get help, as we do not reply to all product feedback.
+              </p>
+            </Admonition>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <PopoverSeparator_Shadcn_ />
 
-      <div className="px-5 flex flex-row justify-between items-start mt-4">
-        <div>
-          <p className="text-xs text-foreground">Have a technical issue?</p>
-          <p className="text-xs text-foreground-light">
-            Contact{' '}
-            <SupportLink>
-              <span className="cursor-pointer text-brand-link transition-colors hover:text-brand-600">
-                support
-              </span>
-            </SupportLink>{' '}
-            or{' '}
-            <a href={`${DOCS_URL}`} target="_blank" rel="noreferrer">
-              <span className="cursor-pointer text-brand-link transition-colors hover:text-brand-600">
-                see docs
-              </span>
-            </a>
-            .
-          </p>
-        </div>
+      <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
+        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+          Get help instead
+        </Button>
         <div className="flex items-center gap-2 flex-row">
           {!!screenshot ? (
             <div
@@ -305,36 +323,5 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
         </div>
       </div>
     </>
-  )
-}
-
-const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
-  return (
-    <div className="px-0 pt-3 pb-0">
-      <div className="grid gap-3">
-        <div className="px-6 grid gap-3 py-2 text-center text-foreground-light">
-          <CircleCheck className="mx-auto text-brand-500" size={24} />
-          <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
-          <p className="text-sm ">
-            We do not always respond to feedback. If you require assistance, please contact support
-            instead.
-          </p>
-        </div>
-        <PopoverSeparator_Shadcn_ />
-        <div className="flex items-center justify-between px-4">
-          <p className="text-xs text-foreground-light">
-            <SupportLink>
-              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
-                Create a Support Ticket
-              </span>
-            </SupportLink>
-          </p>
-
-          <Button type="default" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      </div>
-    </div>
   )
 }

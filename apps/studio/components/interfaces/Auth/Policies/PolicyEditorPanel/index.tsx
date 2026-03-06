@@ -12,12 +12,13 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -33,7 +34,6 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
 import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { checkIfPolicyHasChanged, generateCreatePolicyQuery } from './PolicyEditorPanel.utils'
@@ -50,6 +50,22 @@ interface PolicyEditorPanelProps {
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
   authContext: 'database' | 'realtime'
+}
+
+const FORM_ID = 'rls-editor'
+const FormSchema = z.object({
+  name: z.string().min(1, 'Please provide a name'),
+  table: z.string(),
+  behavior: z.string(),
+  command: z.string(),
+  roles: z.string(),
+})
+const defaultValues = {
+  name: '',
+  table: '',
+  behavior: 'permissive',
+  command: 'select',
+  roles: '',
 }
 
 /**
@@ -96,21 +112,6 @@ export const PolicyEditorPanel = memo(function ({
 
   const [showTools, setShowTools] = useState<boolean>(false)
 
-  const formId = 'rls-editor'
-  const FormSchema = z.object({
-    name: z.string().min(1, 'Please provide a name'),
-    table: z.string(),
-    behavior: z.string(),
-    command: z.string(),
-    roles: z.string(),
-  })
-  const defaultValues = {
-    name: '',
-    table: '',
-    behavior: 'permissive',
-    command: 'select',
-    roles: '',
-  }
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -122,7 +123,7 @@ export const PolicyEditorPanel = memo(function ({
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
-  const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: executeMutation, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess: async () => {
       // refresh all policies
       await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(ref) })
@@ -132,7 +133,7 @@ export const PolicyEditorPanel = memo(function ({
     onError: (error) => setError(error),
   })
 
-  const { mutate: updatePolicy, isLoading: isUpdating } = useDatabasePolicyUpdateMutation({
+  const { mutate: updatePolicy, isPending: isUpdating } = useDatabasePolicyUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully updated policy')
       onSelectCancel()
@@ -164,7 +165,7 @@ export const PolicyEditorPanel = memo(function ({
     return policyCreateUnsaved || policyUpdateUnsaved
   }, [command, name, roles, selectedPolicy])
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: hasUnsavedChanges,
     onClose: onSelectCancel,
   })
@@ -290,8 +291,8 @@ export const PolicyEditorPanel = memo(function ({
   return (
     <>
       <Form_Shadcn_ {...form}>
-        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-          <Sheet open={visible} onOpenChange={confirmOnClose}>
+        <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+          <Sheet open={visible} onOpenChange={handleOpenChange}>
             <SheetContent
               showClose={false}
               size={showTools ? 'lg' : 'default'}
@@ -490,7 +491,7 @@ export const PolicyEditorPanel = memo(function ({
                       </Button>
 
                       <ButtonTooltip
-                        form={formId}
+                        form={FORM_ID}
                         htmlType="submit"
                         loading={isExecuting || isUpdating}
                         disabled={!canUpdatePolicies || isExecuting || isUpdating}
@@ -572,24 +573,12 @@ export const PolicyEditorPanel = memo(function ({
         </form>
       </Form_Shadcn_>
 
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog
+        {...modalProps}
+        description="Are you sure you want to close the editor? Any unsaved changes on your policy and conversations with the Assistant will be lost."
+      />
     </>
   )
 })
 
 PolicyEditorPanel.displayName = 'PolicyEditorPanel'
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      Are you sure you want to close the editor? Any unsaved changes on your policy and
-      conversations with the Assistant will be lost.
-    </p>
-  </ConfirmationModal>
-)

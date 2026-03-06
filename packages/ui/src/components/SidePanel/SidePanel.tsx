@@ -2,6 +2,7 @@
 
 import * as Dialog from '@radix-ui/react-dialog'
 import React from 'react'
+
 import { Button } from '../../components/Button/Button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../components/shadcn/ui/tooltip'
 import styleHandler from '../../lib/theme/styleHandler'
@@ -104,6 +105,14 @@ const SidePanel = ({
 
   open = open || visible
 
+  const {
+    onOpenAutoFocus,
+    onCloseAutoFocus,
+    onEscapeKeyDown,
+    onPointerDownOutside,
+    onInteractOutside,
+  } = props
+
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange} defaultOpen={defaultOpen}>
       {triggerElement && <Dialog.Trigger asChild>{triggerElement}</Dialog.Trigger>}
@@ -117,15 +126,16 @@ const SidePanel = ({
             __styles.align[align],
             className && className,
           ].join(' ')}
-          onOpenAutoFocus={props.onOpenAutoFocus}
-          onCloseAutoFocus={props.onCloseAutoFocus}
-          onEscapeKeyDown={props.onEscapeKeyDown}
-          onPointerDownOutside={props.onPointerDownOutside}
+          onOpenAutoFocus={onOpenAutoFocus}
+          onCloseAutoFocus={onCloseAutoFocus}
+          onEscapeKeyDown={onEscapeKeyDown}
+          onPointerDownOutside={onPointerDownOutside}
           onInteractOutside={(event) => {
             const isToast = (event.target as Element)?.closest('#toast')
             if (isToast) event.preventDefault()
-            if (props.onInteractOutside) props.onInteractOutside(event)
+            if (onInteractOutside) onInteractOutside(event)
           }}
+          {...props}
         >
           {header && <header className={__styles.header}>{header}</header>}
           <div className={__styles.contents}>{children}</div>

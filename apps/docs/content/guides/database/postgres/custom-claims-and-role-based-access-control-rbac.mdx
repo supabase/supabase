@@ -134,7 +134,7 @@ revoke all
 create policy "Allow auth admin to read user roles" ON public.user_roles
 as permissive for select
 to supabase_auth_admin
-using (true)
+using (true);
 ```
 
 </TabPanel>

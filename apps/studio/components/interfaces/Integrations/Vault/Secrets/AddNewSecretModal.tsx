@@ -1,27 +1,27 @@
-import { Eye, EyeOff } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Eye, EyeOff } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Button, Form, Input, Modal } from 'ui'
 
-interface AddNewSecretModalProps {
-  visible: boolean
-  onClose: () => void
-}
-
-const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
+export const AddNewSecretModal = () => {
   const { data: project } = useSelectedProjectQuery()
   const [showSecretValue, setShowSecretValue] = useState(false)
 
   const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 
+  const [showAddSecretModal, setShowAddSecretModal] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false)
+  )
+
   useEffect(() => {
-    if (visible) {
+    if (showAddSecretModal) {
       setShowSecretValue(false)
     }
-  }, [visible])
+  }, [showAddSecretModal])
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -46,7 +46,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
         secret: values.secret,
       })
       toast.success(`Successfully added new secret ${values.name}`)
-      onClose()
+      setShowAddSecretModal(null)
     } catch (error: any) {
       // [Joshen] No error handler required as they are all handled within the mutations already
     } finally {
@@ -55,7 +55,13 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   }
 
   return (
-    <Modal hideFooter size="medium" visible={visible} onCancel={onClose} header="Add new secret">
+    <Modal
+      hideFooter
+      size="medium"
+      visible={showAddSecretModal}
+      onCancel={() => setShowAddSecretModal(null)}
+      header="Add new secret"
+    >
       <Form
         id="add-new-secret-form"
         initialValues={{ name: '', description: '', secret: '' }}
@@ -86,7 +92,11 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content className="flex items-center justify-end space-x-2">
-                <Button type="default" disabled={isSubmitting} onClick={onClose}>
+                <Button
+                  type="default"
+                  disabled={isSubmitting}
+                  onClick={() => setShowAddSecretModal(null)}
+                >
                   Cancel
                 </Button>
                 <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
@@ -100,5 +110,3 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
     </Modal>
   )
 }
-
-export default AddNewSecretModal

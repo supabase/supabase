@@ -29,6 +29,7 @@ type TableComponentProps = React.ComponentProps<typeof Table>
 
 interface VirtualizedTableProps<TItem> extends TableComponentProps {
   scrollContainerProps?: HTMLAttributes<HTMLDivElement>
+  scrollContainerRef: React.Ref<HTMLDivElement>
   data: TItem[]
   children: ReactNode
   overscan?: number
@@ -57,6 +58,7 @@ const useVirtualizedTableContext = <TItem,>() => {
 
 export const VirtualizedTable = <TItem,>({
   scrollContainerProps,
+  scrollContainerRef: externalScrollContainerRef,
   containerProps,
   data,
   children,
@@ -66,6 +68,7 @@ export const VirtualizedTable = <TItem,>({
   ...tableProps
 }: VirtualizedTableProps<TItem>) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollContainerMergedRef = mergeRefs(scrollContainerRef, externalScrollContainerRef)
 
   const rowKeyGetter = useCallback(
     (item: TItem, index: number) => {
@@ -121,7 +124,7 @@ export const VirtualizedTable = <TItem,>({
 
   return (
     <div
-      ref={scrollContainerRef}
+      ref={scrollContainerMergedRef}
       className={cn('h-full overflow-auto', scrollClassName)}
       {...restScrollContainerProps}
     >

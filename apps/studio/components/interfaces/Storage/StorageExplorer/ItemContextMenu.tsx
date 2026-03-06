@@ -8,7 +8,6 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
-import { downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 
 interface ItemContextMenuProps {
@@ -16,7 +15,6 @@ interface ItemContextMenuProps {
 }
 
 export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
-  const { ref: projectRef, bucketId } = useParams()
   const snap = useStorageExplorerStateSnapshot()
   const { setSelectedFileCustomExpiry } = snap
 
@@ -25,6 +23,7 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     setSelectedItemsToDelete,
     setSelectedItemToRename,
     setSelectedItemsToMove,
+    downloadFile,
   } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
   const isPublic = selectedBucket.public
@@ -41,7 +40,7 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
       case 'move':
         return setSelectedItemsToMove([item])
       case 'download':
-        return await downloadFile({ projectRef, bucketId, file: item })
+        return await downloadFile(item)
       default:
         break
     }

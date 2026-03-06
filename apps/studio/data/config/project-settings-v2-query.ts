@@ -19,13 +19,15 @@ export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] &
 
 export async function getProjectSettings(
   { projectRef }: ProjectSettingsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: Record<string, string>
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get('/platform/projects/{ref}/settings', {
     params: { path: { ref: projectRef } },
     signal,
+    headers,
   })
 
   if (error) handleError(error)
@@ -43,7 +45,7 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
   }: UseCustomQueryOptions<ProjectSettingsData, ProjectSettingsError, TData> = {}
 ) => {
   // [Joshen] Sync with API perms checking here - shouldReturnApiKeys
-  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/settings.controller.ts#L92
+  // https://github.com/supabase/platform/blob/develop/api/src/routes/platform/projects/ref/settings.controller.ts#L92
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     '*'
@@ -53,8 +55,8 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
     queryKey: configKeys.settingsV2(projectRef),
     queryFn: ({ signal }) => getProjectSettings({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchInterval(_data) {
-      const data = _data as ProjectSettings | undefined
+    refetchInterval: (query) => {
+      const data = query.state.data
       const apiKeys = data?.service_api_keys ?? []
       const interval =
         canReadAPIKeys && data?.status !== 'INACTIVE' && apiKeys.length === 0 ? 2000 : 0

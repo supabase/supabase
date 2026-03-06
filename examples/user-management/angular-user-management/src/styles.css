@@ -270,30 +270,18 @@ input[disabled] {
 .text-right {
     text-align: right;
 }
-
-.font-light {
-    font-weight: 300;
-}
-
-.opacity-half {
-    opacity: 50%;
-}
-
-/* Button */
-
 button,
 .button {
-    color: var(--custom-color);
-    border: var(--custom-border);
-    background-color: var(--custom-bg-color);
-    display: inline-block;
-    text-align: center;
-    border-radius: var(--custom-border-radius);
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    text-align: center;
-    font-size: 0.9rem;
-    text-transform: uppercase;
+  color: var(--custom-color);
+  border: var(--custom-border);
+  background-color: var(--custom-bg-color);
+  display: inline-block;
+  text-align: center;
+  border-radius: var(--custom-border-radius);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-transform: uppercase;
 }
 
 button.primary,

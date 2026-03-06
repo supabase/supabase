@@ -1,0 +1,32 @@
+# A string used to distinguish different Supabase projects on the same host. Defaults to the
+# working directory name when running `supabase init`.
+project_id = "resumable-upload-uppy"
+
+[api]
+# Disable data API since we are not using the PostgREST client in this example.
+enabled = false
+
+[storage]
+# The maximum file size allowed for all buckets in the project.
+file_size_limit = "50MiB"
+
+[storage.image_transformation]
+enabled = false
+
+[storage.buckets.uploads]
+public = true
+# file_size_limit = "50MiB"
+# allowed_mime_types = ["image/png", "image/jpeg"]
+# Uncomment to specify a local directory to upload objects to the bucket.
+# objects_path = "./buckets/uploads"
+
+[functions.create-upload-token]
+enabled = true
+verify_jwt = true
+import_map = "./functions/create-upload-token/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/create-upload-token/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/create-upload-token/*.html" ]

@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from 'components/ui/DocsButton'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseIndexCreateMutation } from 'data/database-indexes/index-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
@@ -36,6 +35,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
 
@@ -44,7 +44,7 @@ interface CreateIndexSidePanelProps {
   onClose: () => void
 }
 
-const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
+export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
   const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = useIsOrioleDb()
 
@@ -60,7 +60,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: entities, isLoading: isLoadingEntities } = useEntityTypesQuery({
+  const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',
     search: searchTerm,
@@ -69,7 +69,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   })
   const {
     data: tableColumns,
-    isLoading: isLoadingTableColumns,
+    isPending: isLoadingTableColumns,
     isSuccess: isSuccessTableColumns,
   } = useTableColumnsQuery({
     schema: selectedSchema,
@@ -78,7 +78,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     connectionString: project?.connectionString,
   })
 
-  const { mutate: createIndex, isLoading: isExecuting } = useDatabaseIndexCreateMutation({
+  const { mutate: createIndex, isPending: isExecuting } = useDatabaseIndexCreateMutation({
     onSuccess: () => {
       onClose()
       toast.success(`Successfully created index`)
@@ -420,5 +420,3 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     </SidePanel>
   )
 }
-
-export default CreateIndexSidePanel

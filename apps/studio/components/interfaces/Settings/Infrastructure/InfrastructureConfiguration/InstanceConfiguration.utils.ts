@@ -4,6 +4,7 @@ import { Edge, Node, Position } from 'reactflow'
 
 import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
 import type { Database } from 'data/read-replicas/replicas-query'
+import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 import {
   AVAILABLE_REPLICA_REGIONS,
   AWS_REGIONS_COORDINATES,
@@ -11,7 +12,6 @@ import {
   NODE_SEP,
   NODE_WIDTH,
 } from './InstanceConfiguration.constants'
-import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 
 // [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
 // Will need to change if this eventually becomes otherwise

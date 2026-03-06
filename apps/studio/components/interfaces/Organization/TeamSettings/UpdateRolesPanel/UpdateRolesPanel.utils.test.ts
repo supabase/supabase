@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { deriveRoleChangeActions } from './UpdateRolesPanel.utils'
 
 // [Joshen] This is specifically testing the project scope changes
@@ -9,23 +9,23 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
         id: 3,
         name: 'Developer',
         description: null,
-        project_ids: null,
+        projects: [],
         base_role_id: 6,
       },
     ]
     const changesToRoles = {
       removed: [],
       added: [
-        { projectId: 1, ref: 'ref_1', roleId: 3 },
-        { projectId: 2, ref: 'ref_2', roleId: 3 },
-        { projectId: 3, ref: 'ref_3', roleId: 3 },
+        { ref: 'ref_1', roleId: 3 },
+        { ref: 'ref_2', roleId: 3 },
+        { ref: 'ref_3', roleId: 3 },
       ],
       updated: [],
     }
 
     const { toAssign, toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
     expect(toRemove).toStrictEqual([3])
-    expect(toAssign).toStrictEqual([{ roleId: 3, projectIds: [1, 2, 3] }])
+    expect(toAssign).toStrictEqual([{ roleId: 3, refs: ['ref_1', 'ref_2', 'ref_3'] }])
     expect(toUpdate).toStrictEqual([])
   })
   test('Should update role for a single project (Project 1, Developer to Admin)', () => {
@@ -34,7 +34,7 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
         id: 29,
         name: 'Developer_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [1],
+        projects: [{ ref: 'ref_1', name: 'Project 1' }],
         base_role_id: 3,
       },
     ]
@@ -44,7 +44,6 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
       updated: [
         {
           ref: 'ref_1',
-          projectId: 1,
           originalRole: 29,
           originalBaseRole: 3,
           updatedRole: 1,
@@ -54,7 +53,7 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
 
     const { toAssign, toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
     expect(toRemove).toStrictEqual([29])
-    expect(toAssign).toStrictEqual([{ roleId: 1, projectIds: [1] }])
+    expect(toAssign).toStrictEqual([{ roleId: 1, refs: ['ref_1'] }])
     expect(toUpdate).toStrictEqual([])
   })
   test('Should remove role if role changes completely involve either removing role or updating role to another', () => {
@@ -66,21 +65,23 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
         id: 29,
         name: 'Developer_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [1, 2, 3],
         base_role_id: 3,
+        projects: [
+          { ref: 'ref_1', name: 'Project 1' },
+          { ref: 'ref_2', name: 'Project 2' },
+          { ref: 'ref_3', name: 'Project 3' },
+        ],
       },
     ]
     const changesToRoles = {
       removed: [
         {
           ref: 'ref_1',
-          projectId: 1,
           roleId: 29,
           baseRoleId: 3,
         },
         {
           ref: 'ref_2',
-          projectId: 2,
           roleId: 29,
           baseRoleId: 3,
         },
@@ -89,7 +90,6 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
       updated: [
         {
           ref: 'ref_3',
-          projectId: 3,
           originalRole: 29,
           originalBaseRole: 3,
           updatedRole: 1,
@@ -99,7 +99,7 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
 
     const { toAssign, toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
     expect(toRemove).toStrictEqual([29])
-    expect(toAssign).toStrictEqual([{ roleId: 1, projectIds: [3] }])
+    expect(toAssign).toStrictEqual([{ roleId: 1, refs: ['ref_3'] }])
     expect(toUpdate).toStrictEqual([])
   })
   test('Should not remove role if role changes partially involve either removing role or updating role to another', () => {
@@ -108,15 +108,18 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
         id: 29,
         name: 'Developer_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [1, 2, 3],
         base_role_id: 3,
+        projects: [
+          { ref: 'ref_1', name: 'Project 1' },
+          { ref: 'ref_2', name: 'Project 2' },
+          { ref: 'ref_3', name: 'Project 3' },
+        ],
       },
     ]
     const changesToRoles = {
       removed: [
         {
           ref: 'ref_1',
-          projectId: 1,
           roleId: 29,
           baseRoleId: 3,
         },
@@ -125,7 +128,6 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
       updated: [
         {
           ref: 'ref_3',
-          projectId: 3,
           originalRole: 29,
           originalBaseRole: 3,
           updatedRole: 1,
@@ -135,7 +137,7 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
 
     const { toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
     expect(toRemove).toStrictEqual([])
-    expect(toUpdate).toStrictEqual([{ roleId: 29, projectIds: [2] }])
+    expect(toUpdate).toStrictEqual([{ roleId: 29, refs: ['ref_2'] }])
   })
   test('Should update role if newly added role(s) has the same base_role_id, and if removed role has same base_role_id', () => {
     const existingRoles = [
@@ -143,52 +145,59 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
         id: 29,
         name: 'Developer_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [1, 2, 3],
         base_role_id: 3,
+        projects: [
+          { ref: 'ref_1', name: 'Project 1' },
+          { ref: 'ref_2', name: 'Project 2' },
+          { ref: 'ref_3', name: 'Project 3' },
+        ],
       },
     ]
     const changesToRoles = {
       removed: [
         {
           ref: 'ref_1',
-          projectId: 1,
           roleId: 29,
           baseRoleId: 3,
         },
       ],
       added: [
-        { projectId: 4, ref: 'ref_2', roleId: 3 },
-        { projectId: 5, ref: 'ref_3', roleId: 3 },
+        { ref: 'ref_4', roleId: 3 },
+        { ref: 'ref_5', roleId: 3 },
       ],
       updated: [],
     }
 
     const { toAssign, toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
-    expect(toUpdate).toStrictEqual([{ roleId: 29, projectIds: [2, 3, 4, 5] }])
+    expect(toUpdate).toStrictEqual([{ roleId: 29, refs: ['ref_2', 'ref_3', 'ref_4', 'ref_5'] }])
     expect(toAssign).toStrictEqual([])
     expect(toRemove).toStrictEqual([])
   })
-  test('Should assign new role if newly added role(s) has the no base_role_id as any existing role', () => {
+  test('Should assign new role if newly added role(s) has no base_role_id as any existing role', () => {
     const existingRoles = [
       {
         id: 29,
         name: 'Developer_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [1, 2, 3],
         base_role_id: 3,
+        projects: [
+          { ref: 'ref_1', name: 'Project 1' },
+          { ref: 'ref_2', name: 'Project 2' },
+          { ref: 'ref_3', name: 'Project 3' },
+        ],
       },
     ]
     const changesToRoles = {
       removed: [],
       added: [
-        { projectId: 4, ref: 'ref_2', roleId: 1 },
-        { projectId: 5, ref: 'ref_3', roleId: 1 },
+        { ref: 'ref_4', roleId: 1 },
+        { ref: 'ref_5', roleId: 1 },
       ],
       updated: [],
     }
 
     const { toAssign, toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
-    expect(toAssign).toStrictEqual([{ roleId: 1, projectIds: [4, 5] }])
+    expect(toAssign).toStrictEqual([{ roleId: 1, refs: ['ref_4', 'ref_5'] }])
     expect(toUpdate).toStrictEqual([])
     expect(toRemove).toStrictEqual([])
   })
@@ -198,18 +207,18 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
         id: 3,
         name: 'Developer',
         description: null,
-        project_ids: null,
         base_role_id: 6,
+        projects: [],
       },
     ]
     const changesToRoles = {
-      removed: [{ projectId: undefined, ref: undefined, roleId: 3 }],
-      added: [{ projectId: 1, ref: 'ref_1', roleId: 6 }],
+      removed: [{ ref: undefined, roleId: 3 }],
+      added: [{ ref: 'ref_1', roleId: 6 }],
       updated: [],
     }
 
     const { toAssign, toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
-    expect(toAssign).toStrictEqual([{ roleId: 6, projectIds: [1] }])
+    expect(toAssign).toStrictEqual([{ roleId: 6, refs: ['ref_1'] }])
     expect(toUpdate).toStrictEqual([])
     expect(toRemove).toStrictEqual([3])
   })
@@ -221,22 +230,26 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
         id: 30,
         name: 'Developer_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [1, 2, 3],
         base_role_id: 3, // Developer
+        projects: [
+          { ref: 'ref_1', name: 'Project 1' },
+          { ref: 'ref_2', name: 'Project 2' },
+          { ref: 'ref_3', name: 'Project 3' },
+        ],
       },
       {
         id: 31,
         name: 'Administrator_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [4],
         base_role_id: 1, // Admin,
+        projects: [{ ref: 'ref_4', name: 'Project 4' }],
       },
       {
         id: 32,
         name: 'Owner_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [5],
         base_role_id: 5, // Owner,
+        projects: [{ ref: 'ref_5', name: 'Project 5' }],
       },
     ]
 
@@ -249,30 +262,26 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
       removed: [
         {
           ref: 'ref_1',
-          projectId: 1,
           roleId: 30,
           baseRoleId: 3,
         },
       ],
-      added: [{ projectId: 6, ref: 'ref_6', roleId: 1 }],
+      added: [{ ref: 'ref_6', roleId: 1 }],
       updated: [
         {
           ref: 'ref_2',
-          projectId: 2,
           originalRole: 30,
           originalBaseRole: 3,
           updatedRole: 1,
         },
         {
           ref: 'ref_3',
-          projectId: 3,
           originalRole: 30,
           originalBaseRole: 3,
           updatedRole: 5,
         },
         {
           ref: 'ref_4',
-          projectId: 4,
           originalRole: 31,
           originalBaseRole: 1,
           updatedRole: 5,
@@ -283,8 +292,8 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
     const { toAssign, toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
     expect(toAssign).toStrictEqual([])
     expect(toUpdate).toStrictEqual([
-      { roleId: 31, projectIds: [2, 6] },
-      { roleId: 32, projectIds: [3, 4, 5] },
+      { roleId: 31, refs: ['ref_2', 'ref_6'] },
+      { roleId: 32, refs: ['ref_3', 'ref_4', 'ref_5'] },
     ])
     expect(toRemove).toStrictEqual([30])
   })
@@ -296,15 +305,15 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
         id: 30,
         name: 'Developer_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [1],
         base_role_id: 3, // Developer
+        projects: [{ ref: 'ref_1', name: 'Project 1' }],
       },
       {
         id: 31,
         name: 'Administrator_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [2],
         base_role_id: 1, // Admin,
+        projects: [{ ref: 'ref_2', name: 'Project 2' }],
       },
     ]
 
@@ -315,20 +324,18 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
     const changesToRoles = {
       removed: [],
       added: [
-        { projectId: 4, ref: 'ref_4', roleId: 3 },
-        { projectId: 5, ref: 'ref_5', roleId: 5 },
+        { ref: 'ref_4', roleId: 3 },
+        { ref: 'ref_5', roleId: 5 },
       ],
       updated: [
         {
           ref: 'ref_1',
-          projectId: 1,
           originalRole: 30,
           originalBaseRole: 3,
           updatedRole: 1,
         },
         {
           ref: 'ref_2',
-          projectId: 2,
           originalRole: 31,
           originalBaseRole: 1,
           updatedRole: 3,
@@ -337,10 +344,10 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
     }
 
     const { toAssign, toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
-    expect(toAssign).toStrictEqual([{ roleId: 5, projectIds: [5] }])
+    expect(toAssign).toStrictEqual([{ roleId: 5, refs: ['ref_5'] }])
     expect(toUpdate).toStrictEqual([
-      { roleId: 30, projectIds: [2, 4] },
-      { roleId: 31, projectIds: [1] },
+      { roleId: 30, refs: ['ref_2', 'ref_4'] },
+      { roleId: 31, refs: ['ref_1'] },
     ])
     expect(toRemove).toStrictEqual([])
   })
@@ -352,22 +359,30 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
         id: 30,
         name: 'Developer_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [1, 2, 3],
         base_role_id: 3, // Developer
+        projects: [
+          { ref: 'ref_1', name: 'Project 1' },
+          { ref: 'ref_2', name: 'Project 2' },
+          { ref: 'ref_3', name: 'Project 3' },
+        ],
       },
       {
         id: 31,
         name: 'Administrator_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [4, 5, 6],
         base_role_id: 1, // Admin,
+        projects: [
+          { ref: 'ref_4', name: 'Project 4' },
+          { ref: 'ref_5', name: 'Project 5' },
+          { ref: 'ref_6', name: 'Project 6' },
+        ],
       },
       {
         id: 32,
         name: 'Owner_qggwcbikivagivlidfhw',
         description: '',
-        project_ids: [7],
         base_role_id: 5, // Owner
+        projects: [{ ref: 'ref_7', name: 'Project 7' }],
       },
     ]
 
@@ -380,33 +395,29 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
       removed: [
         {
           ref: 'ref_2',
-          projectId: 2,
           roleId: 30,
           baseRoleId: 3,
         },
         {
           ref: 'ref_7',
-          projectId: 7,
           roleId: 32,
           baseRoleId: 5,
         },
       ],
       added: [
-        { projectId: 8, ref: 'ref_8', roleId: 1 },
-        { projectId: 9, ref: 'ref_9', roleId: 3 },
-        { projectId: 10, ref: 'ref_10', roleId: 3 },
+        { ref: 'ref_8', roleId: 1 },
+        { ref: 'ref_9', roleId: 3 },
+        { ref: 'ref_10', roleId: 3 },
       ],
       updated: [
         {
           ref: 'ref_3',
-          projectId: 3,
           originalRole: 30,
           originalBaseRole: 3,
           updatedRole: 5,
         },
         {
           ref: 'ref_5',
-          projectId: 5,
           originalRole: 31,
           originalBaseRole: 1,
           updatedRole: 5,
@@ -418,9 +429,9 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
     expect(toAssign).toStrictEqual([])
     expect(toRemove).toStrictEqual([])
     expect(toUpdate).toStrictEqual([
-      { roleId: 30, projectIds: [1, 9, 10] },
-      { roleId: 31, projectIds: [4, 6, 8] },
-      { roleId: 32, projectIds: [3, 5] },
+      { roleId: 30, refs: ['ref_1', 'ref_10', 'ref_9'] },
+      { roleId: 31, refs: ['ref_4', 'ref_6', 'ref_8'] },
+      { roleId: 32, refs: ['ref_3', 'ref_5'] },
     ])
   })
 })
