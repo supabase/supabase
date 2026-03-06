@@ -1,8 +1,7 @@
-import { expect } from '@playwright/test'
 import path from 'path'
+import { expect } from '@playwright/test'
+
 import { env } from '../env.config.js'
-import { test } from '../utils/test.js'
-import { waitForApiResponse } from '../utils/wait-for-response.js'
 import {
   createBucket,
   createFolder,
@@ -18,6 +17,8 @@ import {
   createBucket as createBucketViaApi,
   deleteBucket as deleteBucketViaApi,
 } from '../utils/storage/index.js'
+import { test } from '../utils/test.js'
+import { waitForApiResponse } from '../utils/wait-for-response.js'
 
 const bucketNamePrefix = 'pw_bucket'
 
@@ -289,6 +290,34 @@ test.describe('Storage', () => {
       page.getByTitle(folderName),
       'Folder should retain its original name after blur'
     ).toBeVisible()
+  })
+
+  test('resets storage view when switching buckets', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_navigation`
+    const bucketName2 = `${bucketNamePrefix}2_navigation`
+    const folderName = 'folder_navigation'
+    const fileName = 'test-file.txt'
+
+    // Create 2 bucket via API, navigate to the first
+    await deleteBucketViaApi(bucketName)
+    await deleteBucketViaApi(bucketName2)
+    await createBucketViaApi(bucketName, false)
+    await createBucketViaApi(bucketName2, false)
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // create a folder and add a file
+    await createFolder(page, folderName)
+    // Open the folder
+    await page.getByTitle(folderName).click()
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Navigate to bucket list
+    await page.getByRole('link', { name: 'Files' }).nth(1).click()
+    // Navigate to the 2nd bucket
+    await navigateToBucket(page, ref, bucketName2)
+    await expect(page.getByTitle(fileName)).not.toBeVisible()
   })
 
   test('can delete a file', async ({ page, ref }) => {

@@ -68,7 +68,7 @@ export const ClientSelectDropdown = ({
                   iconFolder="mcp-clients"
                   connection={selectedClient.icon}
                   theme={theme}
-                  supportsDarkMode={true}
+                  hasDistinctDarkIcon={selectedClient.hasDistinctDarkIcon}
                 />
               ) : (
                 <Bot size={12} aria-hidden={true} />
@@ -100,7 +100,7 @@ export const ClientSelectDropdown = ({
                       iconFolder="mcp-clients"
                       connection={client.icon}
                       theme={theme}
-                      supportsDarkMode={true}
+                      hasDistinctDarkIcon={client.hasDistinctDarkIcon}
                     />
                   ) : (
                     <Bot size={12} aria-hidden={true} />

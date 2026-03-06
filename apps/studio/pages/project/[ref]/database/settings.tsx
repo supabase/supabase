@@ -9,7 +9,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
-import dynamic from 'next/dynamic'
 import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -20,27 +19,12 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
-
-const SSLConfiguration = dynamic(
-  () => import('components/interfaces/Settings/Database/SSLConfiguration')
-)
-const DiskSizeConfiguration = dynamic(
-  () => import('components/interfaces/Settings/Database/DiskSizeConfiguration')
-)
-const NetworkRestrictions = dynamic(() =>
-  import('components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions').then(
-    (mod) => mod.NetworkRestrictions
-  )
-)
-const BannedIPs = dynamic(() => import('components/interfaces/Settings/Database/BannedIPs'))
-const DiskManagementPanelForm = dynamic(() =>
-  import('components/interfaces/DiskManagement/DiskManagementPanelForm').then(
-    (mod) => mod.DiskManagementPanelForm
-  )
-)
-const JitDbAccessConfiguration = dynamic(
-  () => import('components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration')
-)
+import { DiskManagementPanelForm } from '@/components/interfaces/DiskManagement/DiskManagementPanelForm'
+import { BannedIPs } from '@/components/interfaces/Settings/Database/BannedIPs'
+import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database/DiskSizeConfiguration'
+import JitDbAccessConfiguration from '@/components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration'
+import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions'
+import { SSLConfiguration } from '@/components/interfaces/Settings/Database/SSLConfiguration'
 
 const DatabaseSettings: NextPageWithLayout = () => {
   const isAws = useIsAwsCloudProvider()

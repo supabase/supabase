@@ -23,7 +23,7 @@ import {
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-const BannedIPs = () => {
+export const BannedIPs = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -153,5 +153,3 @@ const BannedIPs = () => {
     </>
   )
 }
-
-export default BannedIPs
