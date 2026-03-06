@@ -3205,6 +3205,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/restore/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the latest restore initiated event for a project if a project is restored */
+    get: operations['UnpauseController_getRestoreInitiatedEvent']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/restore/versions': {
     parameters: {
       query?: never
@@ -4320,24 +4337,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/stripe/invoices/overdue': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets information about overdue invoices that relate to the authenticated user */
-    get: operations['InvoicesController_getOverdueInvoices']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/stripe/product/provisioning/account_requests/{id}': {
+  '/platform/stripe/fabric/provisioning/account_requests/{id}': {
     parameters: {
       query?: never
       header?: never
@@ -4354,7 +4354,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/stripe/product/provisioning/account_requests/{id}/confirm': {
+  '/platform/stripe/fabric/provisioning/account_requests/{id}/confirm': {
     parameters: {
       query?: never
       header?: never
@@ -4365,6 +4365,23 @@ export interface paths {
     put?: never
     /** Confirm account request (from Studio) */
     post: operations['AccountRequestsController_confirmAccountRequest']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/invoices/overdue': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets information about overdue invoices that relate to the authenticated user */
+    get: operations['InvoicesController_getOverdueInvoices']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -4645,6 +4662,7 @@ export interface components {
     }
     AccountRequestDetailsDto: {
       email: string
+      email_matches: boolean
       expires_at: string
       id: string
       name?: string
@@ -7204,6 +7222,7 @@ export interface components {
             | 'auth.leaked_password_protection'
             | 'auth.advanced_auth_settings'
             | 'auth.performance_settings'
+            | 'auth.password_hibp'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
             | 'function.max_count'
@@ -8382,6 +8401,9 @@ export interface components {
       /** @enum {string|null} */
       need_pitr: 'critical' | 'warning' | null
       project: string
+    }
+    ProjectRestoreInitiatedEventResponse: {
+      restore_initiated_on: string | null
     }
     ProjectSensitivityResponse: {
       is_sensitive: boolean
@@ -17241,6 +17263,7 @@ export interface operations {
           | 'auth.leaked_password_protection'
           | 'auth.advanced_auth_settings'
           | 'auth.performance_settings'
+          | 'auth.password_hibp'
           | 'backup.retention_days'
           | 'backup.restore_to_new_project'
           | 'function.max_count'
@@ -22263,6 +22286,49 @@ export interface operations {
       }
     }
   }
+  UnpauseController_getRestoreInitiatedEvent: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectRestoreInitiatedEventResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   UnpauseController_getAvailableImageVersions: {
     parameters: {
       query?: never
@@ -26412,25 +26478,6 @@ export interface operations {
       }
     }
   }
-  InvoicesController_getOverdueInvoices: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['OverdueInvoiceCount'][]
-        }
-      }
-    }
-  }
   AccountRequestsController_getAccountRequest: {
     parameters: {
       query?: never
@@ -26469,6 +26516,25 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ConfirmResponseDto']
+        }
+      }
+    }
+  }
+  InvoicesController_getOverdueInvoices: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OverdueInvoiceCount'][]
         }
       }
     }
