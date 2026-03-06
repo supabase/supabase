@@ -24,11 +24,13 @@ import { APISidePanelPreview } from './APISidePanelPreview'
 import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
+import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { QueueOperationsPreview } from './QueueOperationsPreview'
 import { TableFilterBarPreview } from './TableFilterBarPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
@@ -41,6 +43,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]: <QueueOperationsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]: <TableFilterBarPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
 }
 
 export const FeaturePreviewModal = () => {
@@ -55,6 +58,11 @@ export const FeaturePreviewModal = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const [isDismissedTableFilterBar, setIsDismissedTableFilterBar] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature =
@@ -72,6 +80,13 @@ export const FeaturePreviewModal = () => {
       properties: { feature: selectedFeature.key },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
+
+    if (
+      selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR &&
+      !isDismissedTableFilterBar
+    ) {
+      setIsDismissedTableFilterBar(true)
+    }
   }
 
   return (

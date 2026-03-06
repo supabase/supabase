@@ -16,7 +16,7 @@ function ThreadCard({ thread }: { thread: ThreadRow }) {
           {thread.channel === 'discord' && <DiscordIcon className="h-4 w-4 text-[#5865F2]" />}
           {thread.channel === 'reddit' && <RedditIcon className="h-4 w-4 text-[#FF4500]" />}
           {thread.channel === 'github' && <GitHubIcon className="h-4 w-4 text-foreground" />}
-          <span className="capitalize">{thread.channel}</span>
+          <span>{thread.channelDisplayName}</span>
           <span>•</span>
           <span>{thread.posted}</span>
         </div>
@@ -56,9 +56,7 @@ interface Reply {
 }
 
 function ReplyCard({ reply, thread }: { reply: Reply; thread?: ThreadRow }) {
-  const platformName = thread?.channel
-    ? thread.channel.charAt(0).toUpperCase() + thread.channel.slice(1)
-    : 'platform'
+  const platformName = thread?.channelDisplayName ?? 'platform'
 
   return (
     <div className="border border-border rounded-lg p-4 bg-surface-75 min-w-0">

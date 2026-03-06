@@ -4,9 +4,10 @@ import {
   ReportsDatetimeHelper,
 } from 'components/interfaces/Reports/Reports.constants'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
+import { maybeShowUpgradePromptIfNotEntitled } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import dayjs from 'dayjs'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { createParser, useQueryState } from 'nuqs'
 import { useCallback, useMemo, useState } from 'react'
@@ -46,10 +47,11 @@ export const useReportDateRange = (
   defaultHelper:
     | REPORT_DATERANGE_HELPER_LABELS
     | string
-    | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
-  useV2Granularity = false
+    | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
 ) => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
   // Get filtered date picker helpers based on organization plan
@@ -68,6 +70,15 @@ export const useReportDateRange = (
   const [isHelperValue, setIsHelper] = useQueryState('isHelper', booleanWithDefault(false))
   const [helperTextValue, setHelperText] = useQueryState('helperText', stringWithDefault(''))
 
+  const hasAccessToHelper = useCallback(
+    (helper: ReportsDatetimeHelper) => {
+      if (!entitledToAuditLogDays) return true
+      const days = Math.abs(dayjs().diff(dayjs(helper.calcFrom()), 'day'))
+      return days <= entitledToAuditLogDays
+    },
+    [entitledToAuditLogDays]
+  )
+
   const getDefaultHelper = useCallback(() => {
     let targetHelper: ReportsDatetimeHelper | undefined
 
@@ -79,8 +90,8 @@ export const useReportDateRange = (
       targetHelper = defaultHelper
     }
 
-    // Check if the target helper is available for the current plan
-    if (targetHelper && targetHelper.availableIn?.includes(orgPlan?.id || 'free')) {
+    // Check if the target helper is available for the current entitlement
+    if (targetHelper && hasAccessToHelper(targetHelper)) {
       return {
         start: targetHelper.calcFrom(),
         end: targetHelper.calcTo(),
@@ -90,7 +101,7 @@ export const useReportDateRange = (
 
     // Fallback: look for default helper marked in REPORTS_DATEPICKER_HELPERS
     const fallbackHelper = REPORTS_DATEPICKER_HELPERS.find(
-      (helper) => helper.default && helper.availableIn?.includes(orgPlan?.id || 'free')
+      (helper) => helper.default && hasAccessToHelper(helper)
     )
 
     if (fallbackHelper) {
@@ -102,9 +113,7 @@ export const useReportDateRange = (
     }
 
     // Final fallback: use first available helper
-    const firstAvailable = REPORTS_DATEPICKER_HELPERS.find((helper) =>
-      helper.availableIn?.includes(orgPlan?.id || 'free')
-    )
+    const firstAvailable = REPORTS_DATEPICKER_HELPERS.find((helper) => hasAccessToHelper(helper))
 
     if (firstAvailable) {
       return {
@@ -122,7 +131,7 @@ export const useReportDateRange = (
       end: defaultEnd,
       helper: { isHelper: false },
     }
-  }, [defaultHelper, orgPlan?.id])
+  }, [defaultHelper, hasAccessToHelper])
 
   // Get current effective values (from URL or defaults, but don't set URL)
   const timestampStart = useMemo(() => {
@@ -133,14 +142,15 @@ export const useReportDateRange = (
       if (
         storedFrom.isValid() &&
         storedFrom.isAfter(now.subtract(90, 'day')) &&
-        storedFrom.isBefore(now.add(1, 'day'))
+        storedFrom.isBefore(now.add(1, 'day')) &&
+        !maybeShowUpgradePromptIfNotEntitled(timestampStartValue, entitledToAuditLogDays)
       ) {
         return timestampStartValue
       }
     }
     // Return default without setting URL
     return getDefaultHelper().start
-  }, [timestampStartValue, getDefaultHelper])
+  }, [timestampStartValue, getDefaultHelper, entitledToAuditLogDays])
 
   const timestampEnd = useMemo(() => {
     if (timestampEndValue) {
@@ -180,35 +190,11 @@ export const useReportDateRange = (
     const diffInDays = dayjs(to).diff(from, 'day', true)
     const diffInHours = dayjs(to).diff(from, 'hour', true)
 
-    if (useV2Granularity) {
-      if (diffInHours <= 1) return '1m'
-      if (diffInHours <= 12) return '2m'
-      if (diffInHours <= 24) return '10m'
-      if (diffInDays <= 7) return '1h'
-      return '1d'
-    }
-
-    const conditions = {
-      '1m': diffInHours < 1.1, // less than 1.1 hours
-      '5m': diffInHours < 3.1, // less than 3.1 hours
-      '10m': diffInHours < 6.1, // less than 6.1 hours
-      '30m': diffInHours < 25, // less than 25 hours
-      '1h': diffInDays < 10, // less than 10 days
-      '1d': diffInDays >= 10, // more than 10 days
-    }
-
-    switch (true) {
-      case conditions['1m']:
-        return '1m'
-      case conditions['5m']:
-        return '5m'
-      case conditions['10m']:
-        return '10m'
-      case conditions['30m']:
-        return '30m'
-      default:
-        return '1h'
-    }
+    if (diffInHours <= 1) return '1m'
+    if (diffInHours <= 12) return '2m'
+    if (diffInHours <= 24) return '10m'
+    if (diffInDays <= 7) return '1h'
+    return '1d'
   }
 
   // Derive selectedDateRange from current values
@@ -218,7 +204,7 @@ export const useReportDateRange = (
       period_end: { date: timestampEnd, time_period: 'today' },
       interval: handleIntervalGranularity(timestampStart, timestampEnd),
     }),
-    [timestampStart, timestampEnd, useV2Granularity]
+    [timestampStart, timestampEnd]
   )
 
   const updateDateRange = useCallback(
@@ -255,7 +241,10 @@ export const useReportDateRange = (
   )
 
   const handleDatePickerChange = (values: DatePickerValue) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(values.from, orgPlan?.id)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      values.from,
+      entitledToAuditLogDays
+    )
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)
       return true
