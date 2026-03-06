@@ -1,0 +1,848 @@
+'use server'
+
+import JSZip from 'jszip'
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+import {
+  ensureItemDraftConstraints,
+  parseItemType,
+  parseNumberList,
+  parseOptionalString,
+  parseRequiredString,
+  parseTemplateZip,
+  slugify,
+} from '@/lib/marketplace/item-draft'
+import {
+  getItemFilesStoragePath,
+  getItemTemplateRegistryFilePath,
+  getItemTemplateStoragePath,
+  MARKETPLACE_DRAFT_STORAGE_BUCKET,
+  MARKETPLACE_PUBLIC_STORAGE_BUCKET,
+} from '@/lib/marketplace/item-storage'
+import { isReviewStatus, shouldRequestReview } from '@/lib/marketplace/review-state'
+import {
+  hasRequiredTemplateEntries,
+  inferTemplateRootPrefix,
+  normalizeTemplatePath,
+  shouldIgnoreTemplatePath,
+} from '@/lib/marketplace/template-package'
+import { createClient } from '@/lib/supabase/server'
+
+type MarketplaceSupabaseClient = Awaited<ReturnType<typeof createClient>>
+
+async function listStorageFilesRecursively(
+  supabase: MarketplaceSupabaseClient,
+  bucket: string,
+  basePath: string,
+  prefix = ''
+): Promise<string[]> {
+  const targetPath = prefix ? `${basePath}/${prefix}` : basePath
+  const { data, error } = await supabase.storage.from(bucket).list(targetPath, {
+    limit: 1000,
+    sortBy: { column: 'name', order: 'asc' },
+  })
+
+  if (error || !data) return []
+
+  const nested = await Promise.all(
+    data.map(async (entry) => {
+      const isDirectory = entry.metadata == null
+      const nextPrefix = prefix ? `${prefix}/${entry.name}` : entry.name
+      if (isDirectory) {
+        return listStorageFilesRecursively(supabase, bucket, basePath, nextPrefix)
+      }
+      return [`${basePath}/${nextPrefix}`]
+    })
+  )
+
+  return nested.flat()
+}
+
+async function removeStoragePrefix(
+  supabase: MarketplaceSupabaseClient,
+  bucket: string,
+  basePath: string
+) {
+  const existingPaths = await listStorageFilesRecursively(supabase, bucket, basePath)
+  if (existingPaths.length === 0) return
+
+  const { error } = await supabase.storage.from(bucket).remove(existingPaths)
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
+async function syncStoragePrefixToPublicBucket(
+  supabase: MarketplaceSupabaseClient,
+  basePath: string
+) {
+  const [draftPaths, publicPaths] = await Promise.all([
+    listStorageFilesRecursively(supabase, MARKETPLACE_DRAFT_STORAGE_BUCKET, basePath),
+    listStorageFilesRecursively(supabase, MARKETPLACE_PUBLIC_STORAGE_BUCKET, basePath),
+  ])
+
+  const draftPathSet = new Set(draftPaths)
+  const stalePublicPaths = publicPaths.filter((path) => !draftPathSet.has(path))
+  if (stalePublicPaths.length > 0) {
+    const { error } = await supabase.storage
+      .from(MARKETPLACE_PUBLIC_STORAGE_BUCKET)
+      .remove(stalePublicPaths)
+    if (error) {
+      throw new Error(error.message)
+    }
+  }
+
+  for (const draftPath of draftPaths) {
+    const { data, error: downloadError } = await supabase.storage
+      .from(MARKETPLACE_DRAFT_STORAGE_BUCKET)
+      .download(draftPath)
+
+    if (downloadError) {
+      throw new Error(downloadError.message)
+    }
+
+    const { error: uploadError } = await supabase.storage
+      .from(MARKETPLACE_PUBLIC_STORAGE_BUCKET)
+      .upload(draftPath, data, {
+        upsert: true,
+        contentType: data.type || undefined,
+      })
+
+    if (uploadError) {
+      throw new Error(uploadError.message)
+    }
+  }
+}
+
+function getTemplateRegistryPublicUrl(
+  supabase: MarketplaceSupabaseClient,
+  partnerId: number,
+  itemId: number
+) {
+  const {
+    data: { publicUrl },
+  } = supabase.storage
+    .from(MARKETPLACE_PUBLIC_STORAGE_BUCKET)
+    .getPublicUrl(getItemTemplateRegistryFilePath(partnerId, itemId))
+
+  return publicUrl
+}
+
+async function syncPublicItemAssets(supabase: MarketplaceSupabaseClient, itemId: number) {
+  const { data: item, error: itemError } = await supabase
+    .from('items')
+    .select('id, partner_id, published, type, registry_item_url')
+    .eq('id', itemId)
+    .single<{
+      id: number
+      partner_id: number
+      published: boolean
+      type: 'oauth' | 'template'
+      registry_item_url: string | null
+    }>()
+
+  if (itemError || !item) {
+    throw new Error(itemError?.message ?? 'Unable to load item')
+  }
+
+  const { data: review, error: reviewError } = await supabase
+    .from('item_reviews')
+    .select('status')
+    .eq('item_id', itemId)
+    .maybeSingle<{ status: string | null }>()
+
+  if (reviewError) {
+    throw new Error(reviewError.message)
+  }
+
+  const itemFilesBasePath = getItemFilesStoragePath(item.partner_id, item.id)
+  const itemTemplateBasePath = getItemTemplateStoragePath(item.partner_id, item.id)
+  const shouldExposePublicAssets = item.published && review?.status === 'approved'
+
+  if (!shouldExposePublicAssets) {
+    await Promise.all([
+      removeStoragePrefix(supabase, MARKETPLACE_PUBLIC_STORAGE_BUCKET, itemFilesBasePath),
+      removeStoragePrefix(supabase, MARKETPLACE_PUBLIC_STORAGE_BUCKET, itemTemplateBasePath),
+    ])
+    return
+  }
+
+  await syncStoragePrefixToPublicBucket(supabase, itemFilesBasePath)
+  if (item.type === 'template' && item.registry_item_url) {
+    await syncStoragePrefixToPublicBucket(supabase, itemTemplateBasePath)
+  } else {
+    await removeStoragePrefix(supabase, MARKETPLACE_PUBLIC_STORAGE_BUCKET, itemTemplateBasePath)
+  }
+}
+
+async function uploadTemplatePackage({
+  zipFile,
+  supabase,
+  partnerId,
+  itemId,
+}: {
+  zipFile: File
+  supabase: MarketplaceSupabaseClient
+  partnerId: number
+  itemId: number
+}) {
+  const arrayBuffer = await zipFile.arrayBuffer()
+  const zip = await JSZip.loadAsync(arrayBuffer)
+  const entries = Object.values(zip.files).filter(
+    (entry) => !entry.dir && !shouldIgnoreTemplatePath(entry.name)
+  )
+
+  if (entries.length === 0) {
+    throw new Error('Template package must contain files')
+  }
+
+  const entryPaths = entries.map((entry) => entry.name)
+  const rootPrefix = inferTemplateRootPrefix(entryPaths)
+
+  const normalizedEntries = entries
+    .map((entry) => ({
+      entry,
+      relativePath: normalizeTemplatePath(entry.name, rootPrefix),
+    }))
+    .filter((entry) => entry.relativePath.length > 0)
+
+  if (!hasRequiredTemplateEntries(entryPaths)) {
+    throw new Error(
+      'Template package must include template.json and functions/, plus at least one of migrations/, schemas/, or config.toml'
+    )
+  }
+
+  const basePath = getItemTemplateStoragePath(partnerId, itemId)
+
+  await removeStoragePrefix(supabase, MARKETPLACE_DRAFT_STORAGE_BUCKET, basePath)
+
+  for (const normalizedEntry of normalizedEntries) {
+    const blob = await normalizedEntry.entry.async('blob')
+    const objectPath = `${basePath}/${normalizedEntry.relativePath}`
+    const { error } = await supabase.storage
+      .from(MARKETPLACE_DRAFT_STORAGE_BUCKET)
+      .upload(objectPath, blob, {
+        upsert: true,
+        contentType: blob.type || undefined,
+      })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+  }
+
+  return getTemplateRegistryPublicUrl(supabase, partnerId, itemId)
+}
+
+export async function createPartnerAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const title = parseRequiredString(formData, 'title')
+  const slugInput = formData.get('slug')
+  const description = formData.get('description')
+  const slugSource = typeof slugInput === 'string' && slugInput.trim() ? slugInput : title
+  const slug = slugify(slugSource)
+
+  if (!slug) {
+    throw new Error('Partner slug cannot be empty')
+  }
+
+  const { data: partner, error } = await supabase
+    .from('partners')
+    .insert({
+      title,
+      slug,
+      description: typeof description === 'string' ? description : null,
+      created_by: user.id,
+    })
+    .select('id, slug')
+    .single()
+
+  if (error || !partner) {
+    throw new Error(error?.message ?? 'Unable to create partner')
+  }
+
+  // Best effort while policies are being finalized. Ignore duplicate membership rows.
+  const { error: membershipError } = await supabase.from('partner_members').insert({
+    partner_id: partner.id,
+    user_id: user.id,
+    role: 'admin',
+  })
+
+  if (membershipError && membershipError.code !== '23505') {
+    throw new Error(membershipError.message)
+  }
+
+  revalidatePath('/protected')
+  redirect(`/protected/${partner.slug}`)
+}
+
+export async function updatePartnerAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const partnerId = Number(parseRequiredString(formData, 'partnerId'))
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const title = parseRequiredString(formData, 'title')
+  const description = formData.get('description')
+  const website = formData.get('website')
+  const logoUrl = formData.get('logoUrl')
+
+  const { error } = await supabase
+    .from('partners')
+    .update({
+      title,
+      description: typeof description === 'string' ? description : null,
+      website: typeof website === 'string' ? website : null,
+      logo_url: typeof logoUrl === 'string' ? logoUrl : null,
+    })
+    .eq('id', partnerId)
+    .eq('slug', partnerSlug)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  revalidatePath(`/protected/${partnerSlug}`)
+  revalidatePath(`/protected/${partnerSlug}/settings`)
+  redirect(`/protected/${partnerSlug}/settings`)
+}
+
+export async function addPartnerMemberAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const partnerId = Number(parseRequiredString(formData, 'partnerId'))
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const email = parseRequiredString(formData, 'email')
+  const roleInput = parseRequiredString(formData, 'role').toLowerCase()
+  const role = roleInput === 'admin' ? 'admin' : 'member'
+
+  const { error } = await supabase.rpc('add_partner_member', {
+    target_partner_id: partnerId,
+    target_email: email,
+    target_role: role,
+  })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  revalidatePath(`/protected/${partnerSlug}/settings`)
+  redirect(`/protected/${partnerSlug}/settings`)
+}
+
+export async function createCategoryAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const title = parseRequiredString(formData, 'title')
+  const description = parseOptionalString(formData, 'description')
+  const slug = slugify(title)
+
+  if (!slug) {
+    throw new Error('Category slug cannot be empty')
+  }
+
+  const { data: partner, error: partnerError } = await supabase
+    .from('partners')
+    .select('id')
+    .eq('slug', partnerSlug)
+    .eq('role', 'admin')
+    .maybeSingle()
+
+  if (partnerError || !partner) {
+    throw new Error('Only admin partners can manage categories')
+  }
+
+  const { error } = await supabase.from('categories').insert({
+    slug,
+    title,
+    description,
+  })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  revalidatePath(`/protected/${partnerSlug}/categories`)
+  revalidatePath(`/protected/${partnerSlug}/reviews`)
+}
+
+export async function updateCategoryAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const categoryId = Number(parseRequiredString(formData, 'categoryId'))
+  const title = parseRequiredString(formData, 'title')
+  const description = parseOptionalString(formData, 'description')
+  const slug = slugify(title)
+
+  if (!slug) {
+    throw new Error('Category slug cannot be empty')
+  }
+
+  const { data: partner, error: partnerError } = await supabase
+    .from('partners')
+    .select('id')
+    .eq('slug', partnerSlug)
+    .eq('role', 'admin')
+    .maybeSingle()
+
+  if (partnerError || !partner) {
+    throw new Error('Only admin partners can manage categories')
+  }
+
+  const { error } = await supabase
+    .from('categories')
+    .update({
+      slug,
+      title,
+      description,
+    })
+    .eq('id', categoryId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  revalidatePath(`/protected/${partnerSlug}/categories`)
+  revalidatePath(`/protected/${partnerSlug}/reviews`)
+}
+
+export async function createItemAction(formData: FormData) {
+  const created = await createItemDraftAction(formData)
+  redirect(`/protected/${created.partnerSlug}/items/${created.itemSlug}`)
+}
+
+export async function createItemDraftAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const partnerId = Number(parseRequiredString(formData, 'partnerId'))
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const title = parseRequiredString(formData, 'title')
+  const slugInput = formData.get('slug')
+  const summary = formData.get('summary')
+  const content = formData.get('content')
+  const rawType = parseRequiredString(formData, 'type')
+  const type = parseItemType(rawType)
+  const publishedRaw = formData.get('published')
+  const published = publishedRaw === 'true' || publishedRaw === 'on' || publishedRaw === '1'
+  const url = parseOptionalString(formData, 'url')
+  const templateZip = parseTemplateZip(formData)
+  const documentationUrl = formData.get('documentationUrl')
+  const normalizedDocumentationUrl =
+    typeof documentationUrl === 'string' && documentationUrl.trim() ? documentationUrl.trim() : null
+  const intentRaw = formData.get('intent')
+  const intent = intentRaw === 'request_review' ? 'request_review' : 'save'
+  const slugSource = typeof slugInput === 'string' && slugInput.trim() ? slugInput : title
+  const slug = slugify(slugSource)
+
+  ensureItemDraftConstraints({ type, slug, url, templateZip, published, intent })
+
+  const { data: item, error } = await supabase
+    .from('items')
+    .insert({
+      partner_id: partnerId,
+      title,
+      slug,
+      summary: typeof summary === 'string' ? summary : null,
+      content: typeof content === 'string' ? content : null,
+      published,
+      type,
+      url: type === 'oauth' ? url : null,
+      registry_item_url: null,
+      documentation_url: normalizedDocumentationUrl,
+      submitted_by: user.id,
+    })
+    .select('id, slug')
+    .single()
+
+  if (error || !item) {
+    throw new Error(error?.message ?? 'Unable to create item')
+  }
+
+  if (type === 'template' && templateZip) {
+    const registryItemUrl = await uploadTemplatePackage({
+      zipFile: templateZip,
+      supabase,
+      partnerId,
+      itemId: item.id,
+    })
+    const { error: templateUrlError } = await supabase
+      .from('items')
+      .update({ registry_item_url: registryItemUrl })
+      .eq('id', item.id)
+
+    if (templateUrlError) {
+      throw new Error(templateUrlError.message)
+    }
+  }
+
+  if (intent === 'request_review') {
+    const { error: reviewError } = await supabase.from('item_reviews').upsert(
+      {
+        item_id: item.id,
+        status: 'pending_review',
+        featured: false,
+        reviewed_by: null,
+        reviewed_at: null,
+        review_notes: null,
+        published_at: null,
+      },
+      { onConflict: 'item_id' }
+    )
+
+    if (reviewError) {
+      throw new Error(reviewError.message)
+    }
+  }
+
+  revalidatePath(`/protected/${partnerSlug}`)
+  return {
+    itemId: item.id,
+    itemSlug: item.slug,
+    partnerSlug,
+  }
+}
+
+export async function updateItemAction(formData: FormData) {
+  const updated = await updateItemDraftAction(formData)
+  redirect(`/protected/${updated.partnerSlug}/items/${updated.itemSlug}`)
+}
+
+export async function syncItemAssetsAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const itemId = Number(parseRequiredString(formData, 'itemId'))
+  await syncPublicItemAssets(supabase, itemId)
+  return { itemId }
+}
+
+export async function updateItemDraftAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const itemId = Number(parseRequiredString(formData, 'itemId'))
+  const partnerId = Number(parseRequiredString(formData, 'partnerId'))
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const name = parseRequiredString(formData, 'name')
+  const slugInput = formData.get('slug')
+  const summary = formData.get('summary')
+  const content = formData.get('content')
+  const url = parseOptionalString(formData, 'url')
+  const templateZip = parseTemplateZip(formData)
+  const existingRegistryItemUrl = parseOptionalString(formData, 'existingRegistryItemUrl')
+  const documentationUrl = formData.get('documentationUrl')
+  const normalizedDocumentationUrl =
+    typeof documentationUrl === 'string' && documentationUrl.trim() ? documentationUrl.trim() : null
+  const rawType = parseRequiredString(formData, 'type')
+  const type = parseItemType(rawType)
+  const publishedRaw = formData.get('published')
+  const published = publishedRaw === 'true' || publishedRaw === 'on' || publishedRaw === '1'
+  const removedFileIds = parseNumberList(formData, 'removedFileIds[]')
+
+  const slugSource = typeof slugInput === 'string' && slugInput.trim() ? slugInput : name
+  const slug = slugify(slugSource)
+
+  ensureItemDraftConstraints({
+    type,
+    slug,
+    url,
+    templateZip,
+    existingRegistryItemUrl,
+    published,
+  })
+
+  const templateRegistryUrl =
+    type === 'template'
+      ? templateZip
+        ? await uploadTemplatePackage({
+            zipFile: templateZip,
+            supabase,
+            partnerId,
+            itemId,
+          })
+        : existingRegistryItemUrl
+          ? getTemplateRegistryPublicUrl(supabase, partnerId, itemId)
+          : null
+      : null
+
+  const { data: item, error } = await supabase
+    .from('items')
+    .update({
+      title: name,
+      slug,
+      summary: typeof summary === 'string' ? summary : null,
+      content: typeof content === 'string' ? content : null,
+      published,
+      url: type === 'oauth' ? url : null,
+      documentation_url: normalizedDocumentationUrl,
+      type,
+      registry_item_url: type === 'template' ? templateRegistryUrl : null,
+    })
+    .eq('id', itemId)
+    .select('slug')
+    .single()
+
+  if (error || !item) {
+    throw new Error(error?.message ?? 'Unable to update item')
+  }
+
+  if (removedFileIds.length > 0) {
+    const { data: filesToDelete, error: filesToDeleteError } = await supabase
+      .from('item_files')
+      .select('id, file_path')
+      .eq('item_id', itemId)
+      .in('id', removedFileIds)
+
+    if (filesToDeleteError) {
+      throw new Error(filesToDeleteError.message)
+    }
+
+    if ((filesToDelete?.length ?? 0) > 0) {
+      const pathsToDelete = filesToDelete.map((file: { file_path: string }) => file.file_path)
+      const idsToDelete = filesToDelete.map((file: { id: number }) => file.id)
+
+      const { error: storageDeleteError } = await supabase.storage
+        .from(MARKETPLACE_DRAFT_STORAGE_BUCKET)
+        .remove(pathsToDelete)
+
+      if (storageDeleteError) {
+        throw new Error(storageDeleteError.message)
+      }
+
+      const { error: rowDeleteError } = await supabase
+        .from('item_files')
+        .delete()
+        .eq('item_id', itemId)
+        .in('id', idsToDelete)
+
+      if (rowDeleteError) {
+        throw new Error(rowDeleteError.message)
+      }
+    }
+  }
+
+  await syncPublicItemAssets(supabase, itemId)
+
+  revalidatePath(`/protected/${partnerSlug}`)
+  return {
+    itemId,
+    itemSlug: item.slug,
+    partnerSlug,
+  }
+}
+
+export async function requestItemReviewAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const itemId = Number(parseRequiredString(formData, 'itemId'))
+  const itemSlug = parseRequiredString(formData, 'itemSlug')
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const { data: item, error: itemError } = await supabase
+    .from('items')
+    .select('type, registry_item_url, url')
+    .eq('id', itemId)
+    .single()
+
+  if (itemError || !item) {
+    throw new Error(itemError?.message ?? 'Unable to load item')
+  }
+
+  ensureItemDraftConstraints({
+    type: parseItemType(item.type),
+    slug: itemSlug,
+    url: item.url,
+    templateZip: null,
+    existingRegistryItemUrl: item.registry_item_url,
+    intent: 'request_review',
+  })
+
+  const { data: existingReview, error: existingReviewError } = await supabase
+    .from('item_reviews')
+    .select('status')
+    .eq('item_id', itemId)
+    .maybeSingle()
+
+  if (existingReviewError) {
+    throw new Error(existingReviewError.message)
+  }
+
+  if (shouldRequestReview(existingReview?.status)) {
+    const { error: upsertError } = await supabase.from('item_reviews').upsert(
+      {
+        item_id: itemId,
+        status: 'pending_review',
+        featured: false,
+        reviewed_by: null,
+        reviewed_at: null,
+        review_notes: null,
+        published_at: null,
+      },
+      { onConflict: 'item_id' }
+    )
+
+    if (upsertError) {
+      throw new Error(upsertError.message)
+    }
+  }
+
+  revalidatePath(`/protected/${partnerSlug}`)
+  revalidatePath(`/protected/${partnerSlug}/items/${itemSlug}`)
+  redirect(`/protected/${partnerSlug}/items/${itemSlug}`)
+}
+
+export async function updateItemReviewAction(formData: FormData) {
+  const { itemId, partnerSlug } = await saveItemReviewAction(formData)
+  redirect(`/protected/${partnerSlug}/reviews/${itemId}`)
+}
+
+export async function saveItemReviewAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const itemId = Number(parseRequiredString(formData, 'itemId'))
+  const partnerSlug = parseRequiredString(formData, 'partnerSlug')
+  const status = parseRequiredString(formData, 'status')
+  const reviewNotes = formData.get('reviewNotes')
+  const featured = formData.get('featured') === 'on'
+  const categoryIds = parseNumberList(formData, 'categoryIds[]')
+  if (!isReviewStatus(status)) {
+    throw new Error('Invalid review status')
+  }
+
+  const { error } = await supabase.from('item_reviews').upsert(
+    {
+      item_id: itemId,
+      status,
+      featured,
+      review_notes: typeof reviewNotes === 'string' ? reviewNotes : null,
+      reviewed_by: user.id,
+      reviewed_at: new Date().toISOString(),
+    },
+    { onConflict: 'item_id' }
+  )
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  const { data: existingCategoryItems, error: existingCategoryItemsError } = await supabase
+    .from('category_items')
+    .select('category_id')
+    .eq('item_id', itemId)
+
+  if (existingCategoryItemsError) {
+    throw new Error(existingCategoryItemsError.message)
+  }
+
+  const existingCategoryIds = new Set(
+    (existingCategoryItems ?? []).map((entry) => entry.category_id)
+  )
+  const nextCategoryIds = new Set(categoryIds)
+  const categoryIdsToInsert = categoryIds.filter(
+    (categoryId) => !existingCategoryIds.has(categoryId)
+  )
+  const categoryIdsToDelete = Array.from(existingCategoryIds).filter(
+    (categoryId) => !nextCategoryIds.has(categoryId)
+  )
+
+  if (categoryIdsToDelete.length > 0) {
+    const { error: deleteCategoryItemsError } = await supabase
+      .from('category_items')
+      .delete()
+      .eq('item_id', itemId)
+      .in('category_id', categoryIdsToDelete)
+
+    if (deleteCategoryItemsError) {
+      throw new Error(deleteCategoryItemsError.message)
+    }
+  }
+
+  if (categoryIdsToInsert.length > 0) {
+    const { error: insertCategoryItemsError } = await supabase.from('category_items').insert(
+      categoryIdsToInsert.map((categoryId) => ({
+        item_id: itemId,
+        category_id: categoryId,
+      }))
+    )
+
+    if (insertCategoryItemsError) {
+      throw new Error(insertCategoryItemsError.message)
+    }
+  }
+
+  await syncPublicItemAssets(supabase, itemId)
+
+  revalidatePath(`/protected/${partnerSlug}/reviews`)
+  revalidatePath(`/protected/${partnerSlug}/reviews/${itemId}`)
+  return { itemId, partnerSlug }
+}

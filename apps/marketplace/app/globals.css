@@ -1,0 +1,66 @@
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/classic-dark.css';
+@import './../../../packages/ui/build/css/themes/light.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --chart-1: var(--brand-default);
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --chart-warning: hsl(var(--warning-default));
+    --chart-destructive: hsl(var(--destructive-default));
+    --sidebar-background: var(--background-dash-sidebar);
+    --sidebar-foreground: var(--foreground-default);
+    --sidebar-primary: var(--foreground-default);
+    --sidebar-primary-foreground: var(--warning-default);
+    --sidebar-accent: var(--background-selection);
+    --sidebar-accent-foreground: var(--foreground-default);
+    --sidebar-border: var(--border-default);
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    --header-height: 3rem;
+  }
+
+  [data-theme='deep-dark'],
+  .deep-dark,
+  [data-theme='dark'],
+  .dark {
+    --chart-1: var(--brand-default);
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --chart-warning: hsl(var(--warning-default));
+    --chart-destructive: hsl(var(--destructive-default));
+    --sidebar-background: var(--background-dash-sidebar);
+    --sidebar-foreground: var(--foreground-default);
+    --sidebar-primary: var(--foreground-default);
+    --sidebar-primary-foreground: var(--warning-default);
+    --sidebar-accent: var(--background-selection);
+    --sidebar-accent-foreground: var(--foreground-default);
+    --sidebar-border: var(--border-default);
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg text-foreground;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

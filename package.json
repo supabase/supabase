@@ -27,6 +27,8 @@
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
+    "test:marketplace": "turbo run test --filter=marketplace",
+    "test:marketplace:smoke": "turbo run test:smoke --filter=marketplace",
     "e2e:setup:cli": "supabase stop --all --no-backup ; supabase start --exclude studio && if [ -z \"${CI}\" ]; then supabase db reset; fi && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "e2e:setup:selfhosted": "SKIP_ASSET_UPLOAD=1 pnpm e2e:setup:cli && NODE_ENV=test NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:studio && NODE_ENV=test pnpm --prefix ./apps/studio start",
     "e2e:setup:platform": "SKIP_ASSET_UPLOAD=1 NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:studio && pnpm --prefix ./apps/studio start",

@@ -382,6 +382,10 @@
       "import": "./src/LogsBarChart/index.tsx",
       "types": "./src/LogsBarChart/index.tsx"
     },
+    "./MarketplaceItem": {
+      "import": "./src/MarketplaceItem/index.tsx",
+      "types": "./src/MarketplaceItem/index.tsx"
+    },
     "./McpUrlBuilder/McpConfigPanel": {
       "import": "./src/McpUrlBuilder/McpConfigPanel.tsx",
       "types": "./src/McpUrlBuilder/McpConfigPanel.tsx"
