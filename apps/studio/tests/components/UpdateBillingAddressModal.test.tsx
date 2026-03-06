@@ -1,10 +1,8 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, createMockOrganization } from 'tests/helpers'
 import { UpdateBillingAddressModal } from 'components/interfaces/App/UpdateBillingAddressModal'
-
-// --- Mocks ---
+import { createMockOrganization, render } from 'tests/helpers'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRouterAsPath = vi.fn(() => '/org/test-org/settings')
 vi.mock('next/router', () => ({
@@ -28,11 +26,13 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-const mockOrg = vi.fn(() => createMockOrganization({
-  slug: 'test-org',
-  organization_missing_address: true,
-  billing_partner: null,
-}))
+const mockOrg = vi.fn(() =>
+  createMockOrganization({
+    slug: 'test-org',
+    organization_missing_address: true,
+    billing_partner: null,
+  })
+)
 vi.mock('hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: mockOrg() }),
 }))
@@ -85,8 +85,6 @@ vi.mock('data/organizations/organizations-query', () => ({
   invalidateOrganizationsQuery: vi.fn(() => Promise.resolve()),
 }))
 
-// --- Tests ---
-
 describe('UpdateBillingAddressModal', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -122,9 +120,7 @@ describe('UpdateBillingAddressModal', () => {
   })
 
   it('does not render when org has no missing address', () => {
-    mockOrg.mockReturnValue(
-      createMockOrganization({ organization_missing_address: false })
-    )
+    mockOrg.mockReturnValue(createMockOrganization({ organization_missing_address: false }))
     render(<UpdateBillingAddressModal />)
     expect(screen.queryByText('Billing address required')).not.toBeInTheDocument()
   })
