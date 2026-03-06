@@ -66,6 +66,7 @@ export function UpdateBillingAddressModal() {
     (IS_PLATFORM || DEV_FORCE_SHOW) &&
     (!!showMissingAddressModal || DEV_FORCE_SHOW) &&
     !!org &&
+    org.plan.id !== 'free' &&
     (!!org.organization_missing_address || DEV_FORCE_SHOW) &&
     !org.billing_partner &&
     permissionsLoaded &&

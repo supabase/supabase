@@ -96,6 +96,7 @@ describe('UpdateBillingAddressModal', () => {
         slug: 'test-org',
         organization_missing_address: true,
         billing_partner: null,
+        plan: { id: 'pro', name: 'Pro' },
       })
     )
     mockCanWrite.mockReturnValue(true)
@@ -123,6 +124,17 @@ describe('UpdateBillingAddressModal', () => {
   it('does not render when org has no missing address', () => {
     mockOrg.mockReturnValue(
       createMockOrganization({ organization_missing_address: false })
+    )
+    render(<UpdateBillingAddressModal />)
+    expect(screen.queryByText('Billing address required')).not.toBeInTheDocument()
+  })
+
+  it('does not render for free orgs', () => {
+    mockOrg.mockReturnValue(
+      createMockOrganization({
+        organization_missing_address: true,
+        plan: { id: 'free', name: 'Free' },
+      })
     )
     render(<UpdateBillingAddressModal />)
     expect(screen.queryByText('Billing address required')).not.toBeInTheDocument()
