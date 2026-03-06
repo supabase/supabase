@@ -24,7 +24,8 @@
     "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch",
     "evals:setup": "cp node_modules/libpg-query/wasm/libpg-query.wasm evals/libpg-query.wasm",
     "evals:run": "braintrust eval --no-send-logs evals/assistant.eval.ts",
-    "evals:upload": "braintrust eval evals/assistant.eval.ts"
+    "evals:upload": "braintrust eval evals/assistant.eval.ts",
+    "scorers:deploy": "IS_BRAINTRUST_PUSH=true braintrust push evals/scorer-online.ts"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^3.0.0",
@@ -183,7 +184,7 @@
     "@vitest/coverage-v8": "^3.2.0",
     "@vitest/ui": "^3.2.0",
     "api-types": "workspace:*",
-    "autoevals": "^0.0.131",
+    "autoevals": "^0.0.132",
     "braintrust": "^3.0.0",
     "common": "workspace:*",
     "config": "workspace:*",
