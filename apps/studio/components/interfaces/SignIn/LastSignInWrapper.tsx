@@ -24,7 +24,7 @@ export function LastSignInWrapper({
       )}
       <div
         className={cn('w-full', {
-          'outline outline-1 outline-offset-4 outline-foreground-lighter/50 rounded-md ':
+          'outline outline-1 outline-offset-2 outline-foreground-lighter/50 rounded-md ':
             lastSignIn === type,
         })}
       >
