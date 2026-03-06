@@ -15,7 +15,6 @@ describe('isFilterRelatedError', () => {
   test('returns false for unrelated error messages', () => {
     expect(isFilterRelatedError('connection refused')).toBe(false)
     expect(isFilterRelatedError('permission denied for table users')).toBe(false)
-    expect(isFilterRelatedError('relation "users" does not exist')).toBe(false)
     expect(isFilterRelatedError('Query cost exceeds threshold')).toBe(false)
   })
 
@@ -82,6 +81,17 @@ describe('isFilterRelatedError', () => {
       isFilterRelatedError(
         'Failed to run sql query: ERROR: 42601: syntax error at or near "sdfsdf"'
       )
+    ).toBe(true)
+  })
+
+  test('detects column does not exist errors from stale filters', () => {
+    expect(
+      isFilterRelatedError(
+        'Failed to run sql query: ERROR: 42703: column "first_name" does not exist'
+      )
+    ).toBe(true)
+    expect(
+      isFilterRelatedError('Failed to run sql query: ERROR: 42P01: relation "users" does not exist')
     ).toBe(true)
   })
 })
