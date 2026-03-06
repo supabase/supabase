@@ -19,7 +19,7 @@ export const UpdateCustomReportModal = ({
   onCancel,
 }: UpdateCustomReportProps) => {
   const { ref } = useParams()
-  const { mutate: updateReport, isLoading: isUpdating } = useContentUpsertMutation({
+  const { mutate: updateReport, isPending: isUpdating } = useContentUpsertMutation({
     onSuccess: () => {
       toast.success('Successfully updated report')
       onCancel()

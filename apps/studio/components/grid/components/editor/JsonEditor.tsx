@@ -73,7 +73,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(jsonString)
 
-  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+  const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
 
   const loadFullValue = () => {
     if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
@@ -167,7 +167,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               value={value ?? ''}
               language="markdown"
             />
-            <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
+            <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
           </div>
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>

@@ -179,7 +179,7 @@ export const SignInForm = () => {
             href={forgotPasswordUrl}
             className="absolute top-0 right-0 text-sm text-foreground-lighter"
           >
-            Forgot Password?
+            Forgot password?
           </Link>
         </div>
 
@@ -199,7 +199,7 @@ export const SignInForm = () => {
 
         <LastSignInWrapper type="email">
           <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
-            Sign In
+            Sign in
           </Button>
         </LastSignInWrapper>
       </form>

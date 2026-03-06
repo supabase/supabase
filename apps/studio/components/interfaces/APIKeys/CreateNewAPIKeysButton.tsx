@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
@@ -16,10 +17,11 @@ import {
 
 export const CreateNewAPIKeysButton = () => {
   const { ref: projectRef } = useParams()
-  const [createKeysDialogOpen, setCreateKeysDialogOpen] = useState(false)
-  const [isCreatingKeys, setIsCreatingKeys] = useState(false)
 
-  const { mutate: createAPIKey } = useAPIKeyCreateMutation()
+  const [isCreatingKeys, setIsCreatingKeys] = useState(false)
+  const [createKeysDialogOpen, setCreateKeysDialogOpen] = useState(false)
+
+  const { mutateAsync: createAPIKey } = useAPIKeyCreateMutation()
 
   const handleCreateNewApiKeys = async () => {
     if (!projectRef) return
@@ -27,20 +29,13 @@ export const CreateNewAPIKeysButton = () => {
 
     try {
       // Create publishable key
-      await createAPIKey({
-        projectRef,
-        type: 'publishable',
-        name: 'default',
-      })
+      await createAPIKey({ projectRef, type: 'publishable', name: 'default' })
 
       // Create secret key
-      await createAPIKey({
-        projectRef,
-        type: 'secret',
-        name: 'default',
-      })
+      await createAPIKey({ projectRef, type: 'secret', name: 'default' })
 
       setCreateKeysDialogOpen(false)
+      toast.success('Successfully created a new set of API keys!')
     } catch (error) {
       console.error('Failed to create API keys:', error)
     } finally {
@@ -55,9 +50,9 @@ export const CreateNewAPIKeysButton = () => {
         <AlertDialogHeader>
           <AlertDialogTitle>Create new API keys</AlertDialogTitle>
           <AlertDialogDescription>
-            This will create a default publishable key and a default secret key named{' '}
-            <code>default</code>. These keys are required to connect your application to your
-            Supabase project.
+            This will create a default publishable key and a default secret key both named{' '}
+            <code className="!break-keep text-code-inline">default</code>. These keys are required
+            to connect your application to your Supabase project.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -5,7 +5,7 @@ export function getTableEditorSql(id?: number) {
 
   return minify(/* SQL */ `
     with base_table_info as (
-        select 
+        select
             c.oid::int8 as id,
             nc.nspname as schema,
             c.relname as name,
@@ -36,7 +36,7 @@ export function getTableEditorSql(id?: number) {
             )
     ),
     table_stats as (
-        select 
+        select
             b.id,
             case
                 when b.relreplident = 'd' then 'DEFAULT'
@@ -52,23 +52,58 @@ export function getTableEditorSql(id?: number) {
         where b.relkind in ('r', 'p')
     ),
     primary_keys as (
-        select 
+        select
             i.indrelid as table_id,
-            jsonb_agg(jsonb_build_object(
-                'schema', n.nspname,
-                'table_name', c.relname,
-                'table_id', i.indrelid::int8,
-                'name', a.attname
-            )) as primary_keys
+            jsonb_agg(
+                jsonb_build_object(
+                    'schema', n.nspname,
+                    'table_name', c.relname,
+                    'table_id', i.indrelid::int8,
+                    'name', a.attname
+                )
+                order by array_position(i.indkey, a.attnum)
+            ) as primary_keys
         from pg_index i
         join pg_class c on i.indrelid = c.oid
-        join pg_attribute a on (a.attrelid = c.oid and a.attnum = any(i.indkey))
         join pg_namespace n on c.relnamespace = n.oid
+		join pg_attribute a on a.attrelid = c.oid and a.attnum = any(i.indkey)
         where i.indisprimary
         group by i.indrelid
     ),
+    index_cols as (
+        select
+            i.indrelid as table_id,
+            i.indkey,
+            array_agg(
+                a.attname
+                order by array_position(i.indkey, a.attnum)
+            ) as columns
+        from pg_index i
+        join pg_class c on i.indrelid = c.oid
+        join pg_attribute a on a.attrelid = c.oid
+            and a.attnum = any(i.indkey)
+        where i.indisunique
+            and i.indisprimary = false
+        group by i.indrelid, i.indkey
+    ),
+    unique_indexes as (
+        select
+            ic.table_id,
+            jsonb_agg(
+                jsonb_build_object(
+                    'schema', n.nspname,
+                    'table_name', c.relname,
+                    'table_id', ic.table_id::int8,
+                    'columns', ic.columns
+                )
+            ) as unique_indexes
+        from index_cols ic
+        join pg_class c on c.oid = ic.table_id
+        join pg_namespace n on n.oid = c.relnamespace
+        group by ic.table_id
+    ),
     relationships as (
-        select 
+        select
             c.conrelid as source_id,
             c.confrelid as target_id,
             jsonb_build_object(
@@ -93,7 +128,7 @@ export function getTableEditorSql(id?: number) {
         where c.contype = 'f'
     ),
     columns as (
-        select 
+        select
             a.attrelid as table_id,
             jsonb_agg(jsonb_build_object(
                 'id', (a.attrelid || '.' || a.attnum),
@@ -102,19 +137,19 @@ export function getTableEditorSql(id?: number) {
                 'table', c.relname,
                 'ordinal_position', a.attnum,
                 'name', a.attname,
-                'default_value', case 
+                'default_value', case
                     when a.atthasdef then pg_get_expr(ad.adbin, ad.adrelid)
                     else null
                 end,
-                'data_type', case 
-                    when t.typtype = 'd' then 
-                        case 
+                'data_type', case
+                    when t.typtype = 'd' then
+                        case
                             when bt.typelem <> 0::oid and bt.typlen = -1 then 'ARRAY'
                             when nbt.nspname = 'pg_catalog' then format_type(t.typbasetype, null)
                             else 'USER-DEFINED'
                         end
-                    else 
-                        case 
+                    else
+                        case
                             when t.typelem <> 0::oid and t.typlen = -1 then 'ARRAY'
                             when nt.nspname = 'pg_catalog' then format_type(a.atttypid, null)
                             else 'USER-DEFINED'
@@ -138,7 +173,7 @@ export function getTableEditorSql(id?: number) {
                 'is_generated', a.attgenerated in ('s'),
                 'is_nullable', not (a.attnotnull or t.typtype = 'd' and t.typnotnull),
                 'is_updatable', (
-                    b.relkind in ('r', 'p') or 
+                    b.relkind in ('r', 'p') or
                     (b.relkind in ('v', 'f') and pg_column_is_updatable(b.id, a.attnum, false))
                 ),
                 'is_unique', uniques.table_id is not null,
@@ -164,7 +199,7 @@ export function getTableEditorSql(id?: number) {
         left join pg_type bt on (t.typtype = 'd' and t.typbasetype = bt.oid)
         left join pg_namespace nbt on bt.typnamespace = nbt.oid
         left join (
-            select 
+            select
                 conrelid as table_id,
                 conkey[1] as ordinal_position
             from pg_catalog.pg_constraint
@@ -183,13 +218,13 @@ export function getTableEditorSql(id?: number) {
             from pg_constraint
             where contype = 'c' and cardinality(conkey) = 1
             order by conrelid, conkey[1], oid asc
-        ) as check_constraints on check_constraints.table_id = a.attrelid 
+        ) as check_constraints on check_constraints.table_id = a.attrelid
                             and check_constraints.ordinal_position = a.attnum
-        where a.attnum > 0 
+        where a.attnum > 0
         and not a.attisdropped
         group by a.attrelid
     )
-    select 
+    select
         case b.relkind
             when 'r' then jsonb_build_object(
                 'entity_type', b.relkind,
@@ -205,10 +240,11 @@ export function getTableEditorSql(id?: number) {
                 'dead_rows_estimate', ts.dead_rows_estimate,
                 'comment', b.comment,
                 'primary_keys', coalesce(pk.primary_keys, '[]'::jsonb),
+                'unique_indexes', coalesce(ui.unique_indexes, '[]'::jsonb),
                 'relationships', coalesce(
                     (select jsonb_agg(r.rel_info)
                     from relationships r
-                    where r.source_id = b.id or r.target_id = b.id), 
+                    where r.source_id = b.id or r.target_id = b.id),
                     '[]'::jsonb
                 ),
                 'columns', coalesce(c.columns, '[]'::jsonb)
@@ -227,10 +263,11 @@ export function getTableEditorSql(id?: number) {
                 'dead_rows_estimate', ts.dead_rows_estimate,
                 'comment', b.comment,
                 'primary_keys', coalesce(pk.primary_keys, '[]'::jsonb),
+                'unique_indexes', coalesce(ui.unique_indexes, '[]'::jsonb),
                 'relationships', coalesce(
                     (select jsonb_agg(r.rel_info)
                     from relationships r
-                    where r.source_id = b.id or r.target_id = b.id), 
+                    where r.source_id = b.id or r.target_id = b.id),
                     '[]'::jsonb
                 ),
                 'columns', coalesce(c.columns, '[]'::jsonb)
@@ -268,6 +305,7 @@ export function getTableEditorSql(id?: number) {
     from base_table_info b
     left join table_stats ts on b.id = ts.id
     left join primary_keys pk on b.id = pk.table_id
+    left join unique_indexes ui on b.id = ui.table_id
     left join columns c on b.id = c.table_id;
   `)
 }

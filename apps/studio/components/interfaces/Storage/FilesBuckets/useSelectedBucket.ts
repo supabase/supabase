@@ -1,15 +1,18 @@
 import { useParams } from 'common'
-import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useBucketQuery } from 'data/storage/buckets-query'
 
 export const useSelectedBucket = () => {
   const { ref, bucketId } = useParams()
 
-  return useBucketsQuery(
-    { projectRef: ref },
+  const query = useBucketQuery(
     {
-      select(data) {
-        return data.find((b) => b.id === bucketId)
-      },
+      projectRef: ref,
+      bucketId,
+    },
+    {
+      enabled: !!bucketId,
     }
   )
+
+  return query
 }

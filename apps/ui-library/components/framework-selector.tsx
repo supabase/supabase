@@ -1,9 +1,6 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-
-import { componentPages, frameworkTitles } from '@/config/docs'
-import { useFramework } from '@/context/framework-context'
 import {
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -12,6 +9,9 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+
+import { componentPages, frameworkTitles } from '@/config/docs'
+import { useFramework } from '@/context/framework-context'
 
 const frameworks = Object.keys(frameworkTitles)
 

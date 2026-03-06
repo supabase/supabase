@@ -64,22 +64,28 @@ const DatabaseSizeUsage = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-b py-1">
-              <p className="text-xs text-foreground-light">
-                Included in {subscription?.plan?.name} Plan
-              </p>
-              <p className="text-xs">0.5 GB per project</p>
-            </div>
+            {subscription?.plan.id !== 'platform' && (
+              <>
+                <div className="flex items-center justify-between border-b py-1">
+                  <p className="text-xs text-foreground-light">
+                    Included in {subscription?.plan?.name} Plan
+                  </p>
+                  <p className="text-xs">0.5 GB per project</p>
+                </div>
 
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-foreground-light">Max database size</p>
-              <p className="text-xs">
-                {databaseSizeUsage?.usage ? formatBytes(databaseSizeUsage?.usage_original) : '-'}
-              </p>
-            </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-foreground-light">Max database size</p>
+                  <p className="text-xs">
+                    {databaseSizeUsage?.usage
+                      ? formatBytes(databaseSizeUsage?.usage_original)
+                      : '-'}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
-          {currentBillingCycleSelected ? (
+          {currentBillingCycleSelected && subscription?.plan.id !== 'platform' ? (
             <div className="space-y-4">
               <div className="space-y-1">
                 <p className="text-sm">Current database size per project</p>

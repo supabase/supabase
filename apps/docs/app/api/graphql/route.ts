@@ -1,11 +1,19 @@
 import * as Sentry from '@sentry/nextjs'
-import { type DocumentNode, graphql, GraphQLError, parse, specifiedRules, validate } from 'graphql'
+import {
+  getOperationAST,
+  graphql,
+  GraphQLError,
+  parse,
+  specifiedRules,
+  validate,
+  type DocumentNode,
+} from 'graphql'
 import { createComplexityLimitRule } from 'graphql-validation-complexity'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { ApiError, convertZodToInvalidRequestError, InvalidRequestError } from '~/app/api/utils'
 import { BASE_PATH, IS_DEV } from '~/lib/constants'
-import { sendToLogflare, LOGGING_CODES } from '~/lib/logger'
+import { LOGGING_CODES, sendToLogflare } from '~/lib/logger'
 import { rootGraphQLSchema } from '~/resources/rootSchema'
 import { createQueryDepthLimiter } from './validators'
 
@@ -55,12 +63,22 @@ function getCorsHeaders(request: Request): Record<string, string> {
   if (origin && isAllowedCorsOrigin(origin)) {
     return {
       'Access-Control-Allow-Origin': origin,
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Accept',
     }
   }
 
   return {}
+}
+
+function getCacheHeaders(): Record<string, string> {
+  return {
+    /**
+     * Cache on CDN for 1 hour
+     * Serve stale content while revalidating for 5 minutes
+     */
+    'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300',
+  }
 }
 
 const validationRules = [
@@ -88,21 +106,18 @@ const graphQLRequestSchema = z.object({
   variables: z.record(z.any()).optional(),
   operationName: z.string().optional(),
 })
+type GraphQLRequestPayload = z.infer<typeof graphQLRequestSchema>
 
 async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
-  const body = await request.json().catch((error) => {
-    throw new InvalidRequestError('Request body must be valid JSON', error)
-  })
-  const parsedBody = graphQLRequestSchema.safeParse(body)
-  if (!parsedBody.success) {
-    throw convertZodToInvalidRequestError(
-      parsedBody.error,
-      'Request body must be valid GraphQL request object'
-    )
-  }
+  const { method } = request
+  const isGetRequest = method === 'GET'
 
-  const { query, variables, operationName } = parsedBody.data
-  const validationErrors = validateGraphQLRequest(query, isDevGraphiQL(request))
+  const { query, variables, operationName } = await parseGraphQLRequestPayload(request)
+  const validationErrors = validateGraphQLRequest(query, {
+    isDevGraphiQL: isDevGraphiQL(request),
+    isGetRequest,
+    operationName,
+  })
   if (validationErrors.length > 0) {
     return NextResponse.json(
       {
@@ -113,7 +128,7 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
         })),
       },
       {
-        headers: getCorsHeaders(request),
+        headers: getResponseHeaders(request, isGetRequest),
       }
     )
   }
@@ -126,11 +141,83 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
     operationName,
   })
   return NextResponse.json(result, {
-    headers: getCorsHeaders(request),
+    headers: getResponseHeaders(request, isGetRequest),
   })
 }
 
-function validateGraphQLRequest(query: string, isDevGraphiQL = false): ReadonlyArray<GraphQLError> {
+function getResponseHeaders(request: Request, isGetRequest: boolean): Record<string, string> {
+  const headers = {
+    ...getCorsHeaders(request),
+  }
+
+  if (isGetRequest) {
+    Object.assign(headers, getCacheHeaders())
+  }
+
+  return headers
+}
+
+async function parseGraphQLRequestPayload(request: Request): Promise<GraphQLRequestPayload> {
+  if (request.method === 'GET') {
+    return parseGraphQLGetRequest(request)
+  }
+
+  return parseGraphQLJsonBody(request)
+}
+
+async function parseGraphQLJsonBody(request: Request): Promise<GraphQLRequestPayload> {
+  const body = await request.json().catch((error) => {
+    throw new InvalidRequestError('Request body must be valid JSON', error)
+  })
+  const parsedBody = graphQLRequestSchema.safeParse(body)
+  if (!parsedBody.success) {
+    throw convertZodToInvalidRequestError(
+      parsedBody.error,
+      'GraphQL request payload must be valid GraphQL request object'
+    )
+  }
+
+  return parsedBody.data
+}
+
+function parseGraphQLGetRequest(request: Request): GraphQLRequestPayload {
+  const url = new URL(request.url)
+  const query = url.searchParams.get('query')
+  const operationName = url.searchParams.get('operationName') ?? undefined
+
+  const variablesParam = url.searchParams.get('variables')
+  let variables: GraphQLRequestPayload['variables'] = undefined
+  if (variablesParam !== null) {
+    try {
+      variables = JSON.parse(variablesParam)
+    } catch (error) {
+      throw new InvalidRequestError('Variables query parameter must be valid JSON', error)
+    }
+  }
+
+  const parsedBody = graphQLRequestSchema.safeParse({
+    query,
+    variables,
+    operationName,
+  })
+  if (!parsedBody.success) {
+    throw convertZodToInvalidRequestError(
+      parsedBody.error,
+      'GraphQL request payload must be valid GraphQL request object'
+    )
+  }
+
+  return parsedBody.data
+}
+
+function validateGraphQLRequest(
+  query: string,
+  options?: {
+    isDevGraphiQL?: boolean
+    isGetRequest?: boolean
+    operationName?: string
+  }
+): ReadonlyArray<GraphQLError> {
   let documentAST: DocumentNode
   try {
     documentAST = parse(query)
@@ -141,23 +228,35 @@ function validateGraphQLRequest(query: string, isDevGraphiQL = false): ReadonlyA
       throw error
     }
   }
-  const rules = isDevGraphiQL ? specifiedRules : validationRules
-  return validate(rootGraphQLSchema, documentAST, rules)
+  const rules = options?.isDevGraphiQL ? specifiedRules : validationRules
+  const validationErrors = validate(rootGraphQLSchema, documentAST, rules)
+  if (!options?.isGetRequest) {
+    return validationErrors
+  }
+
+  const operationAST = getOperationAST(documentAST, options.operationName)
+  if (!operationAST) {
+    return [
+      ...validationErrors,
+      new GraphQLError(
+        'GET requests must specify an operation name or send only a single operation'
+      ),
+    ]
+  }
+  if (operationAST.operation !== 'query') {
+    return [...validationErrors, new GraphQLError('GET requests may only execute query operations')]
+  }
+
+  return validationErrors
 }
 
-export async function OPTIONS(request: Request): Promise<NextResponse> {
-  const corsHeaders = getCorsHeaders(request)
-  return new NextResponse(null, {
-    status: 204,
-    headers: corsHeaders,
-  })
-}
-
-export async function POST(request: Request): Promise<NextResponse> {
+async function handleRequest(request: Request): Promise<NextResponse> {
   try {
+    const method = request.method
     const vercelId = request.headers.get('x-vercel-id')
     sendToLogflare(LOGGING_CODES.CONTENT_API_REQUEST_RECEIVED, {
       vercelId,
+      method,
       origin: request.headers.get('Origin'),
       userAgent: request.headers.get('User-Agent'),
     })
@@ -202,4 +301,20 @@ export async function POST(request: Request): Promise<NextResponse> {
       )
     }
   }
+}
+
+export async function OPTIONS(request: Request): Promise<NextResponse> {
+  const corsHeaders = getCorsHeaders(request)
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  })
+}
+
+export async function GET(request: Request): Promise<NextResponse> {
+  return handleRequest(request)
+}
+
+export async function POST(request: Request): Promise<NextResponse> {
+  return handleRequest(request)
 }

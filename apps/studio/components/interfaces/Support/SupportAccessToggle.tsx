@@ -1,26 +1,26 @@
-import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
-import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import type { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
-  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   FormField_Shadcn_,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 
-export const SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
-  SupportCategories.DATABASE_UNRESPONSIVE,
-  SupportCategories.PERFORMANCE_ISSUES,
-  SupportCategories.PROBLEM,
-  SupportCategories.DASHBOARD_BUG,
+export const DISABLE_SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
+  SupportCategories.ACCOUNT_DELETION,
+  SupportCategories.SALES_ENQUIRY,
+  SupportCategories.REFUND,
 ]
 
 interface SupportAccessToggleProps {

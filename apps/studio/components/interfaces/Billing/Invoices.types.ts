@@ -1,5 +1,4 @@
 export enum InvoiceStatus {
-  DRAFT = 'draft',
   PAID = 'paid',
   VOID = 'void',
   UNCOLLECTIBLE = 'uncollectible',

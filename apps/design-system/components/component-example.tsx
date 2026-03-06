@@ -1,18 +1,18 @@
 'use client'
 
 import * as React from 'react'
-
-import { cn } from 'ui'
 import {
-  // CopyButton,
-  CopyWithClassNames,
-} from '@/components/copy-button'
-import {
+  cn,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+
+import {
+  // CopyButton,
+  CopyWithClassNames,
+} from '@/components/copy-button'
 
 interface ComponentExampleProps extends React.HTMLAttributes<HTMLDivElement> {
   extractClassname?: boolean

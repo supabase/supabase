@@ -1,6 +1,3 @@
-import { handleError } from 'data/fetchers'
-import { toast } from 'sonner'
-
 import { authKeys } from 'data/auth/keys'
 import { databaseExtensionsKeys } from 'data/database-extensions/keys'
 import { databaseIndexesKeys } from 'data/database-indexes/keys'
@@ -8,9 +5,12 @@ import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { databaseTriggerKeys } from 'data/database-triggers/keys'
 import { databaseKeys } from 'data/database/keys'
 import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
+import { handleError } from 'data/fetchers'
 import { tableKeys } from 'data/tables/keys'
 import { tryParseJson } from 'lib/helpers'
+import { toast } from 'sonner'
 import { ResponseError } from 'types'
+
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
 
 // [Joshen] This is just very basic identification, but possible can extend perhaps
@@ -73,7 +73,7 @@ export const isReadOnlySelect = (query: string): boolean => {
 }
 
 const getContextKey = (pathname: string) => {
-  const [_, __, ___, ...rest] = pathname.split('/')
+  const [, , , ...rest] = pathname.split('/')
   const key = rest.join('/')
   return key
 }

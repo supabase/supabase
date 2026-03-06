@@ -1,8 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import Link from 'next/link'
+import type { ReactNode } from 'react'
 
 import { useOrganizationRestrictions } from 'hooks/misc/useOrganizationRestrictions'
-import { cn, CriticalIcon, WarningIcon } from 'ui'
+import { XIcon } from 'lucide-react'
+import { Button, cn, CriticalIcon, WarningIcon } from 'ui'
 
 const bannerMotionProps = {
   initial: { height: 0, opacity: 0 },
@@ -11,104 +12,110 @@ const bannerMotionProps = {
   transition: { duration: 0.2, delay: 0.5 },
 } as const
 
+const linkStyles =
+  '[&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-foreground-muted/80 [&_a]:hover:decoration-foreground [&_a]:hover:text-foreground [&_a]:transition-all'
+
 export const OrganizationResourceBanner = () => {
   const { warnings } = useOrganizationRestrictions()
 
   return (
     <AnimatePresence initial={false}>
-      {warnings.map((warning, i) => (
-        <HeaderBanner key={i} {...warning} />
+      {warnings.map((warning) => (
+        <HeaderBanner key={`${warning.variant}-${warning.title}`} {...warning} />
       ))}
     </AnimatePresence>
   )
 }
 
-export const HeaderBanner = ({
-  type,
-  title,
-  message,
-  link,
-}: {
-  type: 'danger' | 'warning' | 'note' | 'incident'
+interface HeaderBannerProps {
+  variant: 'danger' | 'warning' | 'note'
   title: string
-  message: string
-  link?: string
-}) => {
-  const bannerStyles =
-    type === 'danger'
-      ? 'bg-destructive-300 dark:bg-destructive-200'
-      : type === 'incident'
-        ? 'bg-brand-400'
-        : 'bg-warning-300 dark:bg-warning-200'
-  const Icon = type === 'danger' ? CriticalIcon : WarningIcon
+  description: string | ReactNode
+  onDismiss?: () => void
+}
+const variantStyles = {
+  danger: {
+    banner: 'bg-destructive-200 border-destructive-400',
+    icon: 'text-destructive-200 bg-destructive-600',
+  },
+  warning: {
+    banner: 'bg-warning-200 border-warning-400',
+    icon: 'text-warning-200 bg-warning-600',
+  },
+  note: {
+    banner: 'bg-surface-200/25 border-default',
+    icon: 'text-background bg-foreground',
+  },
+} as const
+
+export const HeaderBanner = ({ variant, title, description, onDismiss }: HeaderBannerProps) => {
+  const { banner: bannerStyles, icon: iconStyles } = variantStyles[variant]
+  const Icon = variant === 'danger' ? CriticalIcon : WarningIcon
 
   return (
     <motion.div
       {...bannerMotionProps}
-      className={cn(
-        `relative ${bannerStyles} border-b border-muted py-1 flex items-center justify-center flex-shrink-0 px-0`,
-        type === 'incident' && 'hover:bg-brand-300',
-        'flex-shrink-0'
-      )}
+      className={cn('relative border-b overflow-hidden', bannerStyles)}
       layout="position"
     >
-      <div className={cn('items-center flex flex-row gap-3')}>
-        <div className="absolute inset-y-0 left-0 right-0 overflow-hidden z-0">
-          <div
-            className="absolute inset-0 opacity-[0.8%]"
-            style={{
-              background: `repeating-linear-gradient(
-                    45deg,
-                    currentColor,
-                    currentColor 10px,
-                    transparent 10px,
-                    transparent 20px
-                  )`,
-              maskImage: 'linear-gradient(to top, black, transparent)',
-              WebkitMaskImage: 'linear-gradient(to top, black, transparent)',
-            }}
-          />
-        </div>
-        <Icon
-          className={cn('z-[1] flex-shrink-0', type === 'incident' && 'bg-brand text-brand-200')}
+      {/* Wrapped content for smooth reveal animation */}
+      <div className="px-4 py-4 md:py-3 flex items-center md:justify-center">
+        {/* Striped background */}
+        <div
+          className="absolute inset-0 opacity-[1.6%] dark:opacity-[0.8%]"
+          style={{
+            background: `repeating-linear-gradient(
+              45deg,
+              currentColor,
+              currentColor 10px,
+              transparent 10px,
+              transparent 20px
+            )`,
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 90%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 90%)',
+          }}
         />
-        <div className="flex flex-col md:flex-row gap-0 md:gap-3">
-          <span
+        {/* Icon and text content */}
+        <div
+          className={cn(
+            'relative items-start md:items-center flex flex-row gap-3 min-w-0',
+            // Avoid collision with the dismiss button
+            onDismiss && 'pr-7 md:px-7'
+          )}
+        >
+          <Icon className={cn('flex-shrink-0 w-5 h-5 md:w-4 md:h-4', iconStyles)} />
+          {/* Title and description */}
+          <div
             className={cn(
-              'text-xs sm:text-sm z-[1]',
-              type === 'danger'
-                ? 'text-destructive'
-                : type === 'incident'
-                  ? 'text-foreground'
-                  : 'text-warning'
+              'flex flex-col md:flex-row gap-0.5 md:gap-1.5 text-balance md:flex-nowrap min-w-0 flex-1'
             )}
           >
-            {title}
-          </span>
-          <span
-            className={cn(
-              'text-xs sm:text-sm z-[1] opacity-75',
-              type === 'danger'
-                ? 'text-destructive'
-                : type === 'incident'
-                  ? 'text-foreground'
-                  : 'text-warning'
-            )}
-          >
-            {message}
-          </span>
+            {/* Title */}
+            <p className="text-sm text-foreground font-medium md:truncate">{title}</p>
+            {/* Description */}
+            <div className="flex flex-row items-center gap-1.5 min-w-0 md:flex-nowrap text-sm">
+              <span className="hidden md:inline text-foreground-muted">·</span>
+              {typeof description === 'string' ? (
+                <p className="text-foreground-light md:truncate">{description}</p>
+              ) : (
+                <div className={cn('text-foreground-light md:truncate', linkStyles)}>
+                  {description}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        {link && (
-          <Link
-            href={link}
-            className={cn(
-              'lg:block hidden',
-              'text-foreground-lighter text-sm z-[1] m-0',
-              type === 'danger' ? 'text-destructive' : 'text-warning'
-            )}
+
+        {onDismiss && (
+          <Button
+            type="text"
+            size="tiny"
+            className="opacity-75 z-[1] flex-shrink-0 p-0.5 h-auto absolute right-5 md:right-4 top-1/2 -translate-y-1/2"
+            onClick={onDismiss}
+            aria-label="Dismiss banner"
           >
-            View Details
-          </Link>
+            <XIcon size={16} className="text-foreground" />
+          </Button>
         )}
       </div>
     </motion.div>

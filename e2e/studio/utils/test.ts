@@ -1,6 +1,7 @@
+import path from 'path'
 import { test as base } from '@playwright/test'
 import dotenv from 'dotenv'
-import path from 'path'
+
 import { env } from '../env.config.js'
 
 dotenv.config({
@@ -16,6 +17,13 @@ export interface TestOptions {
 
 export const test = base.extend<TestOptions>({
   env: env.STUDIO_URL,
-  ref: 'default',
+  ref: env.PROJECT_REF ?? 'default',
   apiUrl: env.API_URL,
+  page: async ({ page }, use) => {
+    const ref = env.PROJECT_REF ?? 'default'
+    await page.addInitScript((ref) => {
+      localStorage.setItem(`table-editor-new-filter-banner-dismissed-${ref}`, JSON.stringify(true))
+    }, ref)
+    await use(page)
+  },
 })

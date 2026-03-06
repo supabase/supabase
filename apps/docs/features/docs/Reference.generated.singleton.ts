@@ -16,7 +16,7 @@ async function _typeSpecSingleton() {
       'utf-8'
     )
     typeSpec = JSON.parse(rawJson, (key, value) => {
-      if (key === 'methods') {
+      if (key === 'methods' || key === 'variables') {
         return new Map(Object.entries(value))
       } else {
         return value
@@ -27,14 +27,20 @@ async function _typeSpecSingleton() {
   return typeSpec
 }
 
+function normalizeRefPath(path: string) {
+  return path.replace(/\.index(?=\.|$)/g, '').replace(/\.+/g, '.')
+}
+
 export async function getTypeSpec(ref: string) {
   const modules = await _typeSpecSingleton()
 
-  const delimiter = ref.indexOf('.')
-  const refMod = ref.substring(0, delimiter)
+  const normalizedRef = normalizeRefPath(ref)
+  const delimiter = normalizedRef.indexOf('.')
+  const refMod = normalizedRef.substring(0, delimiter)
 
   const mod = modules.find((mod) => mod.name === refMod)
-  return mod?.methods.get(ref)
+  // Check methods first, then variables
+  return mod?.methods.get(normalizedRef) ?? mod?.variables.get(normalizedRef)
 }
 
 let cliSpec: Json

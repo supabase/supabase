@@ -16,6 +16,10 @@ import {
   Wrench,
   Shield,
   Lock,
+  Video,
+  Users,
+  Mic,
+  Tag,
 } from 'lucide-react'
 
 const ICONS = {
@@ -32,6 +36,10 @@ const ICONS = {
   wrench: Wrench,
   shield: Shield,
   lock: Lock,
+  video: Video,
+  users: Users,
+  mic: Mic,
+  tag: Tag,
 } as const
 
 type IconName = keyof typeof ICONS

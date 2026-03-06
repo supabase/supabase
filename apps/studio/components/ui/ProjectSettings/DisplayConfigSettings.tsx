@@ -13,7 +13,7 @@ export const DisplayConfigSettings = () => {
   const { ref: projectRef } = useParams()
   const {
     data: settings,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
     isError: isProjectSettingsError,
   } = useProjectSettingsV2Query({
     projectRef,
@@ -23,7 +23,7 @@ export const DisplayConfigSettings = () => {
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
   const isNotUpdatingJwtSecret =

@@ -1,3 +1,4 @@
+import { IS_PLATFORM } from 'common'
 import type { SqlSnippets, UserContent } from 'types'
 
 const SQL_SNIPPET_SCHEMA_VERSION = '1.0'
@@ -20,7 +21,19 @@ export const sqlAiDisclaimerComment = `
 -- Always verify the output before executing
 `.trim()
 
+// Should only be used for comparisons. If you need a new title, use generateSnippetTitle()
 export const untitledSnippetTitle = 'Untitled query'
+
+/**
+ * Generates a snippet title. If the platform is self-hosted, it will return a random number to avoid conflicts.
+ */
+export const generateSnippetTitle = () => {
+  if (IS_PLATFORM) {
+    return untitledSnippetTitle
+  } else {
+    return `${untitledSnippetTitle} ${Math.floor(Math.random() * 900) + 100}`
+  }
+}
 
 export const destructiveSqlRegex = [
   /^(.*;)?\s*(drop|delete|truncate|alter\s+table\s+.*\s+drop\s+column)\s/is,

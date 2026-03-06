@@ -5,10 +5,11 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -19,7 +20,6 @@ import {
   SheetContent,
   WarningIcon,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
@@ -45,7 +45,7 @@ export const WrapperOverviewTab = () => {
   })
 
   const [isDirty, setIsDirty] = useState(false)
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       setCreateWrapperShown(false)
@@ -92,8 +92,8 @@ export const WrapperOverviewTab = () => {
                   {wrapperMeta.minimumExtensionVersion}. You have version{' '}
                   {wrappersExtension?.installed_version} installed. Please{' '}
                   {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by
-                  disabling and enabling the <code className="text-xs">wrappers</code> extension to
-                  create this wrapper.
+                  disabling and enabling the <code className="text-code-inline">wrappers</code>{' '}
+                  extension to create this wrapper.
                 </p>
                 <p className="text-warning">
                   Warning: Before reinstalling the wrapper extension, you must first remove all
@@ -141,7 +141,7 @@ export const WrapperOverviewTab = () => {
       </div>
       <Separator />
 
-      <Sheet open={!!createWrapperShown} onOpenChange={confirmOnClose}>
+      <Sheet open={!!createWrapperShown} onOpenChange={handleOpenChange}>
         <SheetContent size="lg" tabIndex={undefined}>
           <CreateWrapperSheetComponent
             wrapperMeta={wrapperMeta}
@@ -153,22 +153,7 @@ export const WrapperOverviewTab = () => {
           />
         </SheetContent>
       </Sheet>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </IntegrationOverviewTab>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

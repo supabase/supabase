@@ -1,18 +1,22 @@
 'use client'
+
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 import { useTheme } from 'next-themes'
 import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
+
 import { copyToClipboard } from '../../lib/utils'
 import { cn } from './../../lib/utils/cn'
 import { Button } from './../Button'
 import { dart } from './prism'
+
+// Context for copy callback - can be provided by parent components
+export const CopyCallbackContext = createContext<(() => void) | undefined>(undefined)
 
 dart(Prism)
 
@@ -41,6 +45,7 @@ export const SimpleCodeBlock = ({
   const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
   const target = useRef(null)
+  const contextOnCopy = useContext(CopyCallbackContext)
   let highlightLines: any = []
 
   useEffect(() => {
@@ -62,7 +67,9 @@ export const SimpleCodeBlock = ({
       copyToClipboard(code)
     }
     setShowCopied(true)
-    onCopy?.()
+    // Use prop onCopy if provided, otherwise fall back to context
+    const copyCallback = onCopy || contextOnCopy
+    copyCallback?.()
   }
 
   return (

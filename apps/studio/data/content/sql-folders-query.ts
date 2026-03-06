@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
@@ -60,13 +60,20 @@ export const useSQLSnippetFoldersQuery = <TData = SQLSnippetFoldersData>(
   {
     enabled = true,
     ...options
-  }: UseCustomInfiniteQueryOptions<SQLSnippetFoldersData, SQLSnippetFoldersError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    SQLSnippetFoldersData,
+    SQLSnippetFoldersError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) =>
-  useInfiniteQuery<SQLSnippetFoldersData, SQLSnippetFoldersError, TData>({
+  useInfiniteQuery({
     queryKey: contentKeys.folders(projectRef, { name, sort }),
     queryFn: ({ signal, pageParam }) =>
       getSQLSnippetFolders({ projectRef, cursor: pageParam, name, sort }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: undefined,
     getNextPageParam(lastPage) {
       return lastPage.cursor
     },

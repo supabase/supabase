@@ -1,0 +1,29 @@
+---
+title = "Keeping your 2 Free projects after upgrading to Pro"
+date_created = "2026-01-23T00:00:00+00:00"
+topics = [ "platform" ]
+keywords = [ "free tier", "pro plan", "billing", "organizations", "project transfer" ]
+database_id = "449482fb-6e21-4a25-99ee-1ce6fffbc975"
+---
+
+## Can you keep your 2 free projects after upgrading to pro?
+
+Yes! You still get 2 free projects after you upgrade to Pro. They just need to be in a **separate** Free Plan organization.
+
+## Why do free projects need to be in a separate organization?
+
+Because billing is managed at the organization level, not the project level. We need to keep Free tier usage separate from Pro tier usage for accurate billing and cost transparency.
+
+To keep both free projects and Pro organization:
+Create a new Free Plan organization (or use an existing free organization if you have one)
+
+- Go to the [Dashboard](/dashboard)
+- Click on the organization dropdown
+- Select "New organization" (or visit [https://supabase.com/dashboard/new](/dashboard/new))
+- Create a new organization on the default Free Plan
+
+## Additional resources
+
+- [Organization-based billing](/docs/guides/platform/billing-on-supabase#organization-based-billing)
+- [Project transfer guide](/docs/guides/platform/project-transfer)
+- [Billing FAQ](/docs/guides/platform/billing-faq)

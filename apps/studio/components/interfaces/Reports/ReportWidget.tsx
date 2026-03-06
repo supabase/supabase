@@ -15,6 +15,8 @@ export interface ReportWidgetProps<T = any> {
   error?: string | Object | null
   tooltip?: string | ReactNode
   className?: string
+  contentClassName?: string
+  headerClassName?: string
   renderer: (props: ReportWidgetRendererProps) => ReactNode
   append?: (props: ReportWidgetRendererProps) => ReactNode
   // for overriding props, such as data
@@ -38,8 +40,8 @@ const ReportWidget = (props: ReportWidgetProps) => {
 
   return (
     <Panel noMargin noHideOverflow className={cn('pb-0', props.className)} wrapWithLoading={false}>
-      <Panel.Content className="space-y-4">
-        <div className="flex flex-row items-start justify-between">
+      <Panel.Content className={cn('space-y-4', props.contentClassName)}>
+        <div className={cn('flex flex-row items-start justify-between', props.headerClassName)}>
           <div className="gap-2">
             <div className="flex flex-row gap-2">
               <h3 className="w-full h-6">{props.title}</h3>{' '}

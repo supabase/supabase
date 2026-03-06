@@ -103,7 +103,7 @@ function InputNumber({
 
   if (error) inputClasses.push(__styles.variants.error)
   if (!error) inputClasses.push(__styles.variants.standard)
-  if (icon) inputClasses.push(__styles.with_icon)
+  if (icon) inputClasses.push(__styles.with_icon[size])
   if (size) inputClasses.push(__styles.size[size])
   if (props.disabled) inputClasses.push(__styles.disabled)
   // if (borderless)

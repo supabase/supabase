@@ -23,23 +23,23 @@ export const NewOAuthAppBanner = ({ oauthApp, onClose }: NewOAuthAppBannerProps)
             Do copy this client id and client secret and store it in a secure place - you will not
             be able to see it again.
           </p>
-          <div className="max-w-xl">
+          <div className="">
             <Input
               copy
               readOnly
               size="small"
-              className="max-w-xl input-mono"
+              className="input-mono"
               value={oauthApp?.client_id}
               onChange={() => {}}
               onCopy={() => toast.success('Client Id copied to clipboard')}
             />
           </div>
-          <div className="max-w-xl">
+          <div className="">
             <Input
               copy
               readOnly
               size="small"
-              className="max-w-xl input-mono"
+              className=" input-mono"
               value={oauthApp?.client_secret}
               onChange={() => {}}
               onCopy={() => toast.success('Client secret copied to clipboard')}
@@ -51,7 +51,7 @@ export const NewOAuthAppBanner = ({ oauthApp, onClose }: NewOAuthAppBannerProps)
       <Button
         type="text"
         icon={<X />}
-        className="w-7 h-7 absolute top-3 right-3"
+        className="w-7 h-7 absolute top-0 right-0"
         onClick={onClose}
       />
     </Admonition>

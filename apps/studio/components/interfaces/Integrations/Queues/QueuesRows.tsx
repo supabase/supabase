@@ -27,7 +27,7 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
   const queueTable = queueTables?.find((x) => x.name === `q_${queue.queue_name}`)
   const isRlsEnabled = !!queueTable?.rls_enabled
 
-  const { data: metrics, isLoading } = useQueuesMetricsQuery(
+  const { data: metrics, isPending: isLoading } = useQueuesMetricsQuery(
     {
       queueName: queue.queue_name,
       projectRef: selectedProject?.ref,

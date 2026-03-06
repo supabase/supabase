@@ -1,23 +1,25 @@
-import { PropsWithChildren, createContext, useContext, useEffect, useRef } from 'react'
-import { CalculatedColumn } from 'react-data-grid'
-import { proxy, ref, subscribe, useSnapshot } from 'valtio'
-import { proxySet } from 'valtio/utils'
-
+import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
 import {
   loadTableEditorStateFromLocalStorage,
   parseSupaTable,
   saveTableEditorStateToLocalStorageDebounced,
 } from 'components/grid/SupabaseGrid.utils'
-import { SupaRow } from 'components/grid/types'
+import { Filter, SupaRow } from 'components/grid/types'
 import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
 import { Entity } from 'data/table-editor/table-editor-types'
+import { createContext, PropsWithChildren, useContext, useEffect, useRef } from 'react'
+import { CalculatedColumn } from 'react-data-grid'
+import { proxy, ref, subscribe, useSnapshot } from 'valtio'
+import { proxySet } from 'valtio/utils'
+
 import { useTableEditorStateSnapshot } from './table-editor'
 
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
   editable = true,
+  preflightCheck = true,
   onAddColumn,
   onExpandJSONEditor,
   onExpandTextEditor,
@@ -26,13 +28,14 @@ export const createTableEditorTableState = ({
   table: Entity
   /** If set to true, render an additional "+" column to support adding a new column in the grid editor */
   editable?: boolean
+  preflightCheck?: boolean
   onAddColumn: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   onExpandTextEditor: (column: string, row: SupaRow) => void
 }) => {
   const table = parseSupaTable(originalTable)
 
-  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.id)
   const gridColumns = getInitialGridColumns(
     getGridColumns(table, {
       tableId: table.id,
@@ -81,6 +84,10 @@ export const createTableEditorTableState = ({
     setSelectedRows: (rows: Set<number>, selectAll?: boolean) => {
       state.allRowsSelected = selectAll ?? false
       state.selectedRows = proxySet(rows)
+    },
+    resetSelectedRows: () => {
+      state.allRowsSelected = false
+      state.selectedRows = proxySet(new Set())
     },
 
     /* Columns */
@@ -156,6 +163,18 @@ export const createTableEditorTableState = ({
         { gridColumns: state.gridColumns }
       )
     },
+
+    /* Filters (NOTE: this is only for the new AI filter bar) */
+    filters: [] as Filter[],
+    setFilters: (filters: Filter[]) => {
+      state.filters = filters
+    },
+    clearFilters: () => {
+      state.filters = []
+    },
+
+    preflightCheck,
+    setPreflightCheck: (value: boolean) => (state.preflightCheck = value),
   })
 
   return state
@@ -202,8 +221,7 @@ export const TableEditorTableStateContextProvider = ({
         saveTableEditorStateToLocalStorageDebounced({
           gridColumns: state.gridColumns,
           projectRef,
-          tableName: state.table.name,
-          schema: state.table.schema,
+          tableId: state.table.id,
         })
       })
     }
@@ -226,7 +244,13 @@ export const TableEditorTableStateContextProvider = ({
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
-      {children}
+      {state.table.schema ? (
+        <TableIndexAdvisorProvider schema={state.table.schema ?? 'public'} table={state.table.name}>
+          {children}
+        </TableIndexAdvisorProvider>
+      ) : (
+        children
+      )}
     </TableEditorTableStateContext.Provider>
   )
 }

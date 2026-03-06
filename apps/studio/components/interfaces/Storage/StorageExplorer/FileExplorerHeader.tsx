@@ -1,4 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { compact, isEqual, noop } from 'lodash'
 import {
   Check,
@@ -15,11 +19,6 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -34,6 +33,7 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
+
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 
 const VIEW_OPTIONS = [
@@ -454,14 +454,15 @@ export const FileExplorerHeader = ({
               size="tiny"
               autoFocus
               className="w-52"
-              icon={<Search size={14} strokeWidth={2} />}
+              icon={<Search />}
               actions={[
-                <X
-                  key="close"
-                  className="mx-2 cursor-pointer text-foreground"
-                  size={14}
-                  strokeWidth={2}
+                <Button
+                  key="cancel"
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
                   onClick={onCancelSearch}
+                  className="p-0 h-5 w-5"
                 />,
               ]}
               placeholder="Search for a file or folder"
@@ -471,7 +472,7 @@ export const FileExplorerHeader = ({
             />
           ) : (
             <Button
-              icon={<Search size={16} strokeWidth={2} />}
+              icon={<Search />}
               size="tiny"
               type="text"
               className="px-1"

@@ -10,19 +10,15 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -34,9 +30,9 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const schema = z.object({
   enforceMfa: z.boolean(),
@@ -45,7 +41,6 @@ const schema = z.object({
 export const SecuritySettings = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
 
   const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -58,17 +53,18 @@ export const SecuritySettings = () => {
   )
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const isPaidPlan = selectedOrganization?.plan.id !== 'free'
+  const { hasAccess: hasAccessToEnforceMfa, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('security.enforce_mfa')
 
   const {
     data: mfaConfig,
     error: mfaError,
-    isLoading: isLoadingMfa,
+    isPending: isLoadingMfa,
     isError: isErrorMfa,
     isSuccess: isSuccessMfa,
-  } = useOrganizationMfaQuery({ slug }, { enabled: isPaidPlan && canReadMfaConfig })
+  } = useOrganizationMfaQuery({ slug }, { enabled: hasAccessToEnforceMfa && canReadMfaConfig })
 
-  const { mutate: toggleMfa, isLoading: isUpdatingMfa } = useOrganizationMfaToggleMutation({
+  const { mutate: toggleMfa, isPending: isUpdatingMfa } = useOrganizationMfaToggleMutation({
     onError: (error) => {
       toast.error(`Failed to update MFA enforcement: ${error.message}`)
       if (mfaConfig !== undefined) form.reset({ enforceMfa: mfaConfig })
@@ -104,39 +100,23 @@ export const SecuritySettings = () => {
     members?.find((member) => member.primary_email == profile?.primary_email)?.mfa_enabled || false
 
   const onSubmit = (values: { enforceMfa: boolean }) => {
-    if (!slug || !isPaidPlan) return
+    if (!slug || !hasAccessToEnforceMfa) return
     toggleMfa({ slug, setEnforced: values.enforceMfa })
   }
 
   return (
-    <ScaffoldContainer>
+    <ScaffoldContainer size="small" className="px-6 xl:px-10">
       <ScaffoldSection isFullWidth>
-        {!isPaidPlan ? (
-          <Alert_Shadcn_
-            variant="default"
-            title="Organization MFA enforcement is not available on Free plan"
-          >
-            <WarningIcon />
-            <div className="flex flex-col md:flex-row pt-1 gap-4">
-              <div className="grow">
-                <AlertTitle_Shadcn_>
-                  Organization MFA enforcement is not available on Free plan
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                  <p>Upgrade to Pro or above to enforce MFA requirements for your organization.</p>
-                </AlertDescription_Shadcn_>
-              </div>
-
-              <div className="flex items-center">
-                <UpgradePlanButton type="primary" source="mfa" plan="Pro">
-                  Upgrade subscription
-                </UpgradePlanButton>
-              </div>
-            </div>
-          </Alert_Shadcn_>
+        {!hasAccessToEnforceMfa && !isLoadingEntitlement ? (
+          <UpgradeToPro
+            source="organizationMfa"
+            primaryText="Organization MFA enforcement is not available on Free Plan"
+            secondaryText="Upgrade to Pro or above to enforce MFA requirements for your organization."
+            featureProposition="enforce MFA requirements"
+          />
         ) : (
           <>
-            {isLoadingMfa || isLoadingPermissions ? (
+            {isLoadingMfa || isLoadingPermissions || isLoadingEntitlement ? (
               <Card>
                 <CardContent>
                   <GenericSkeletonLoader />
@@ -146,11 +126,11 @@ export const SecuritySettings = () => {
               <NoPermission resourceText="view organization security settings" />
             ) : null}
 
-            {(isErrorMfa || mfaError) && isPaidPlan && (
+            {(isErrorMfa || mfaError) && hasAccessToEnforceMfa && (
               <AlertError error={mfaError} subject="Failed to retrieve MFA enforcement status" />
             )}
 
-            {isSuccessMfa && isPaidPlan && (
+            {isSuccessMfa && hasAccessToEnforceMfa && (
               <Form_Shadcn_ {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
@@ -167,18 +147,16 @@ export const SecuritySettings = () => {
                             <FormControl_Shadcn_>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <div>
-                                    <Switch
-                                      checked={field.value}
-                                      onCheckedChange={field.onChange}
-                                      disabled={
-                                        !isPaidPlan ||
-                                        !canUpdateMfaConfig ||
-                                        !hasMFAEnabled ||
-                                        isUpdatingMfa
-                                      }
-                                    />
-                                  </div>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    disabled={
+                                      !hasAccessToEnforceMfa ||
+                                      !canUpdateMfaConfig ||
+                                      !hasMFAEnabled ||
+                                      isUpdatingMfa
+                                    }
+                                  />
                                 </TooltipTrigger>
                                 {(!canUpdateMfaConfig || !hasMFAEnabled) && (
                                   <TooltipContent side="bottom">
@@ -203,7 +181,9 @@ export const SecuritySettings = () => {
                         <Button
                           type="default"
                           disabled={isLoadingMfa || isUpdatingMfa}
-                          onClick={() => form.reset({ enforceMfa: isPaidPlan ? mfaConfig : false })}
+                          onClick={() =>
+                            form.reset({ enforceMfa: hasAccessToEnforceMfa ? mfaConfig : false })
+                          }
                         >
                           Cancel
                         </Button>
@@ -212,7 +192,7 @@ export const SecuritySettings = () => {
                         type="primary"
                         htmlType="submit"
                         disabled={
-                          !isPaidPlan ||
+                          !hasAccessToEnforceMfa ||
                           !canUpdateMfaConfig ||
                           isUpdatingMfa ||
                           isLoadingMfa ||

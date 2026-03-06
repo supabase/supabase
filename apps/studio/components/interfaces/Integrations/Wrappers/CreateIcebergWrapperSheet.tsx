@@ -69,7 +69,7 @@ export const CreateIcebergWrapperSheet = ({
 
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const { mutateAsync: createFDW, isLoading: isCreatingWrapper } = useFDWCreateMutation({
+  const { mutateAsync: createFDW, isPending: isCreatingWrapper } = useFDWCreateMutation({
     onSuccess: () => {
       toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
       onClose()
@@ -111,7 +111,7 @@ export const CreateIcebergWrapperSheet = ({
     ),
   }
 
-  const { mutateAsync: createSchema, isLoading: isCreatingSchema } = useSchemaCreateMutation()
+  const { mutateAsync: createSchema, isPending: isCreatingSchema } = useSchemaCreateMutation()
 
   const onSubmit = async (values: any) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
@@ -206,7 +206,7 @@ export const CreateIcebergWrapperSheet = ({
                           (values?.wrapper_name ?? '').length > 0 ? (
                             <>
                               Your wrapper's server name will be{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           ) : (
                             ''

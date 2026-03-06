@@ -17,6 +17,8 @@ interface InformationBoxProps {
   block?: boolean
 }
 
+/** @deprecated Use `Admonition` from 'ui-patterns' instead. */
+
 const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
   (
     {

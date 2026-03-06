@@ -4,11 +4,11 @@ import {
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
-
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -50,9 +50,8 @@ import {
   Modal,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { number, object } from 'yup'
-import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
+
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
@@ -66,8 +65,6 @@ const schema = object({
 
 const JWTSettings = () => {
   const { ref: projectRef } = useParams()
-
-  const newJwtSecrets = useFlag('newJwtSecrets')
 
   const [customToken, setCustomToken] = useState<string>('')
   const [showCustomTokenInput, setShowCustomTokenInput] = useState(false)
@@ -89,10 +86,10 @@ const JWTSettings = () => {
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
-  const { mutateAsync: updateJwt, isLoading: isSubmittingJwtSecretUpdateRequest } =
+  const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: legacyKey } = useLegacyJWTSigningKeyQuery(
     {
       projectRef,
@@ -104,8 +101,8 @@ const JWTSettings = () => {
     { enabled: canReadAPIKeys }
   )
 
-  const { data: authConfig, isLoading: isLoadingAuthConfig } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingAuthConfig } =
+  const { data: authConfig, isPending: isLoadingAuthConfig } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig, isPending: isUpdatingAuthConfig } =
     useAuthConfigUpdateMutation()
 
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
@@ -277,7 +274,7 @@ const JWTSettings = () => {
                       disabled={!canUpdateConfig || isLoadingAuthConfig}
                     />
 
-                    {newJwtSecrets && !legacyKey && (
+                    {!legacyKey && (
                       <>
                         {isUpdatingJwtSecret && (
                           <div className="flex items-center space-x-2">
@@ -388,89 +385,6 @@ const JWTSettings = () => {
                           </div>
                         </div>
                       </>
-                    )}
-
-                    {!newJwtSecrets && (
-                      <div className="space-y-3">
-                        <div className="p-3 px-6 border rounded-md shadow-sm bg-studio">
-                          {isUpdatingJwtSecret ? (
-                            <div className="flex items-center space-x-2">
-                              <Loader2 className="animate-spin" size={14} />
-                              <p className="text-sm">
-                                Updating JWT secret: {jwtSecretUpdateProgressMessage}
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="w-full space-y-2">
-                              <div className="flex items-center justify-between w-full">
-                                <div className="flex flex-col space-y-1">
-                                  <p className="text-sm">Generate a new JWT secret</p>
-                                  <p className="text-sm opacity-50">
-                                    A random secret will be created, or you can create your own.
-                                  </p>
-                                </div>
-                                <div className="flex flex-col items-end">
-                                  {isUpdatingJwtSecret ? (
-                                    <Button loading type="secondary">
-                                      Updating JWT secret...
-                                    </Button>
-                                  ) : !canGenerateNewJWTSecret ? (
-                                    <ButtonTooltip
-                                      disabled
-                                      type="default"
-                                      iconRight={<ChevronDown size={14} />}
-                                      tooltip={{
-                                        content: {
-                                          side: 'bottom',
-                                          text: 'You need additional permissions to generate a new JWT secret',
-                                        },
-                                      }}
-                                    >
-                                      Generate a new secret
-                                    </ButtonTooltip>
-                                  ) : (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button
-                                          type="default"
-                                          iconRight={<ChevronDown size={14} />}
-                                        >
-                                          <span>Generate a new secret</span>
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end" side="bottom">
-                                        <DropdownMenuItem
-                                          className="space-x-2"
-                                          onClick={() => setIsGeneratingKey(true)}
-                                        >
-                                          <RefreshCw size={16} />
-                                          <p>Generate a random secret</p>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem
-                                          className="space-x-2"
-                                          onClick={() => setIsCreatingKey(true)}
-                                        >
-                                          <PenTool size={16} />
-                                          <p>Create my own secret</p>
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        {isJwtSecretUpdateFailed ? (
-                          <Admonition type="warning" title="Failed to update JWT secret">
-                            Please try again. If the failures persist, please contact Supabase
-                            support with the following details: <br />
-                            Change tracking ID: {data?.changeTrackingId} <br />
-                            Error message: {jwtSecretUpdateErrorMessage}
-                          </Admonition>
-                        ) : null}
-                      </div>
                     )}
                   </>
                 )}

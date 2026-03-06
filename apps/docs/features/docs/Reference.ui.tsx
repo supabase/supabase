@@ -3,7 +3,13 @@ import { ChevronRight, XCircle } from 'lucide-react'
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
 
-import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
+import {
+  Badge,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+} from 'ui'
 
 import ApiSchema from '~/components/ApiSchema'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
@@ -214,11 +220,11 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
             ? '[Anonymous]'
             : (paramOrType.name as string)}
         </span>
-        <RequiredBadge
-          isOptional={
-            'isOptional' in paramOrType ? (paramOrType.isOptional as boolean | 'NA') : false
-          }
-        />
+        {'isOptional' in paramOrType && paramOrType.isOptional === true ? (
+          <Badge variant="default">Optional</Badge>
+        ) : 'isOptional' in paramOrType && paramOrType.isOptional === false ? (
+          <Badge variant="warning">Required</Badge>
+        ) : null}
         {/* @ts-ignore */}
         {paramOrType?.comment?.tags?.some((tag) => tag.tag === 'deprecated') && (
           <span className="text-xs text-warning">Deprecated</span>
@@ -327,24 +333,6 @@ function TypeSubDetails({
   )
 }
 
-export function RequiredBadge({ isOptional }: { isOptional: boolean | 'NA' }) {
-  return isOptional === true ? (
-    <span className="font-mono text-[10px] text-foreground-lighter tracking-wide">Optional</span>
-  ) : isOptional === false ? (
-    <span
-      className={cn(
-        'inline-block',
-        'px-2 py-0.25 rounded-full',
-        '-translate-y-[0.125rem]', // retranslate to undo visual misalignment from the y-padding
-        'border border-amber-700 bg-amber-300',
-        'font-mono text-[10px] text-amber-900 uppercase tracking-wide'
-      )}
-    >
-      Required
-    </span>
-  ) : undefined
-}
-
 export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['parameters'][number] }) {
   return (
     <li className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
@@ -352,7 +340,11 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
         <span className="font-mono text-sm font-medium text-foreground break-all">
           {param.name}
         </span>
-        <RequiredBadge isOptional={!param.required} />
+        {param.required ? (
+          <Badge variant="warning">Required</Badge>
+        ) : (
+          <Badge variant="default">Optional</Badge>
+        )}
         {param.schema?.deprecated && <span className="text-xs text-warning">Deprecated</span>}
         {param.schema && (
           <span className="text-xs text-foreground-muted">

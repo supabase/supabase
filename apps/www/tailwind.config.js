@@ -8,8 +8,10 @@ module.exports = config({
     './layouts/**/*.tsx',
     './lib/mdx/mdxComponents.tsx',
     './pages/**/*.{tsx,mdx}',
+    './app/**/*.{tsx,ts,js}',
     './../../packages/ui/src/**/*.{tsx,ts,js}',
     './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
+    './../../packages/marketing/src/**/*.{tsx,ts,js}',
   ],
   theme: {
     extend: {

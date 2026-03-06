@@ -25,6 +25,7 @@ export const TYPESPEC_NODE_ANONYMOUS = Symbol('anonymous')
 export interface ModuleTypes {
   name: string
   methods: Map<string, MethodTypes>
+  variables: Map<string, VariableTypes>
 }
 
 /**
@@ -41,6 +42,16 @@ export interface MethodTypes {
       ret: ReturnType | undefined
     },
   ]
+}
+
+/**
+ * Type definitions for a variable or constant.
+ */
+export interface VariableTypes {
+  name: string | typeof TYPESPEC_NODE_ANONYMOUS
+  comment?: Comment
+  type: TypeDetails | undefined
+  isConst?: boolean
 }
 
 interface Comment {
@@ -160,6 +171,7 @@ export interface CustomTypePropertyType {
 // The meaning of kind flags from `typedoc`:
 // https://github.com/TypeStrong/typedoc/blob/2953b0148253589448176881a7acb46090f941bd/src/lib/output/themes/default/assets/typedoc/Application.ts#L36
 const KIND_MODULE = 2
+const KIND_VARIABLE = 32
 const KIND_CLASS = 128
 const KIND_INTERFACE = 256
 const KIND_CONSTRUCTOR = 512
@@ -285,6 +297,7 @@ function parseMod(mod: (typeof typeSpec)['children'][number]) {
   const res: ModuleTypes = {
     name: mod.name,
     methods: new Map(),
+    variables: new Map(),
   }
 
   // Build a map of nodes by their IDs for easy cross-referencing.
@@ -365,6 +378,8 @@ function parseModInternal(
         parseConstructor(node, map, currentPath, res)
       } else if (node.kind === KIND_METHOD) {
         return parseMethod(node, map, currentPath, res)
+      } else if (node.kind === KIND_VARIABLE) {
+        return parseVariable(node, map, currentPath, res)
       } else if (node.kind === KIND_PROPERTY) {
         parsePropertyReference(node, map, currentPath, res, processingRefs)
       }
@@ -490,6 +505,27 @@ function parseMethod(
   res.methods.set($ref, types)
 }
 
+function parseVariable(
+  node: any,
+  map: Map<number, any>,
+  currentPath: Array<string>,
+  res: ModuleTypes
+) {
+  const $ref = buildRefPath([...currentPath, node.name])
+
+  const type = parseType(node.type, map)
+  const comment = node.comment ? normalizeComment(node.comment) : undefined
+
+  const types: VariableTypes = {
+    name: $ref,
+    type,
+    comment,
+    isConst: node.flags?.isConst ?? false,
+  }
+
+  res.variables.set($ref, types)
+}
+
 function parseSignature(
   signature: any,
   map: Map<number, any>
@@ -574,10 +610,10 @@ function parseType(type: any, map: Map<number, any>, typeArguments?: any, debug 
   switch (type.kindString) {
     case 'Type alias':
       if (typeof type.type === 'object') {
-        return parseType(type.type, map)
+        return parseType(type.type, map, typeArguments)
       }
     case 'Interface':
-      return parseInterface(type, map)
+      return parseInterface(type, map, typeArguments)
     default:
       break
   }
@@ -599,10 +635,16 @@ function delegateParsing(
   const dereferencedType = parseType(referenced, map, typeArguments)
 
   if (dereferencedType) {
-    dereferencedType.name = nameOrAnonymous([original, dereferencedType])
+    // When resolving a type parameter (e.g., T -> { vectorBucket: VectorBucket }),
+    // don't override the name or comment - let the resolved type speak for itself
+    const isTypeParameterResolution = original.refersToTypeParameter === true
+
+    if (!isTypeParameterResolution) {
+      dereferencedType.name = nameOrAnonymous([original, dereferencedType])
+    }
   }
 
-  if (original.comment) {
+  if (original.comment && !original.refersToTypeParameter) {
     dereferencedType.comment = {
       ...normalizeComment(dereferencedType.comment),
       ...normalizeComment(original.comment),
@@ -696,14 +738,14 @@ function parseReferenceType(type: any, map: Map<number, any>, typeArguments?: an
             type,
             referenced.type,
             map,
-            type.typeArguments
+            typeArguments ?? type.typeArguments
           )
-        : delegateParsing(type, referenced, map, type.typeArguments)
+        : delegateParsing(type, referenced, map, typeArguments ?? type.typeArguments)
 
     if (maybeType) {
       return maybeType
     } else if (isNewTypedoc(referenced) && referenced.kind === KIND_INTERFACE) {
-      return parseInterface(referenced, map)
+      return parseInterface(referenced, map, typeArguments ?? type.typeArguments)
     } else if (isNewTypedoc(referenced) && referenced.kind === KIND_CLASS) {
       // Class is too complicated to display here, just return its name
       return {
@@ -919,9 +961,9 @@ function parseTypeOperatorType(
   }
 }
 
-function parseInterface(type: any, map: Map<number, any>): CustomObjectType {
+function parseInterface(type: any, map: Map<number, any>, typeArguments?: any): CustomObjectType {
   const properties = (type.children ?? [])
-    .map((child) => parseTypeInternals(child, map))
+    .map((child) => parseTypeInternals(child, map, typeArguments))
     .filter(Boolean)
 
   return {

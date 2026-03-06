@@ -1,8 +1,9 @@
-import { numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { compactNumberFormatter, numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import type { Organization } from 'types'
+
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
 import { Project } from '../projects/project-detail-query'
@@ -23,12 +24,12 @@ export const getReportAttributesV2: (
       id: 'ram-usage',
       label: 'Memory usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
-      availableIn: ['free', 'pro', 'team', 'enterprise'],
+      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       showMaxValue: false,
       showGrid: true,
       syncId: 'database-reports',
@@ -68,7 +69,7 @@ export const getReportAttributesV2: (
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team', 'enterprise'],
+      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -76,10 +77,14 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 45,
-        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+        tickFormatter: (value: any) => {
+          // avoid displaying 100.00%
+          if (value === 100) return '100%'
+          return `${numberFormatter(value, 2)}%`
+        },
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'cpu_usage_busy_system',
@@ -135,19 +140,19 @@ export const getReportAttributesV2: (
       label: 'Disk Input/Output operations per second (IOPS)',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
       syncId: 'database-reports',
-      availableIn: ['free', 'pro', 'team', 'enterprise'],
+      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
-      valuePrecision: 2,
+      valuePrecision: 0,
       showLegend: true,
       hideChartType: false,
       showGrid: true,
       showMaxValue: true,
       YAxisProps: {
-        width: 35,
-        tickFormatter: (value: any) => numberFormatter(value, 2),
+        width: 55,
+        tickFormatter: (value: any) => compactNumberFormatter(value),
       },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'disk_iops_write',
@@ -175,31 +180,48 @@ export const getReportAttributesV2: (
       ],
     },
     {
-      id: 'disk-io-usage',
-      label: 'Disk IO Usage',
-      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-io-usage`,
+      id: 'disk-throughput',
+      label: 'Disk throughput',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
-      availableIn: ['team', 'enterprise'],
+      availableIn: ['team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
-      format: '%',
-      valuePrecision: 6,
-      showLegend: false,
-      showMaxValue: false,
+      format: 'bytes-per-second',
+      valuePrecision: 1,
+      showLegend: true,
+      showMaxValue: true,
       hideChartType: false,
       showGrid: true,
       YAxisProps: {
         width: 70,
-        tickFormatter: (value: any) => `${numberFormatter(value, 6)}%`,
+        tickFormatter: (value: any) => `${formatBytes(value, 1)}/s`,
       },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'stackedAreaLine',
       attributes: [
         {
-          attribute: 'disk_io_usage',
+          attribute: 'disk_bytes_read',
           provider: 'infra-monitoring',
-          label: 'IO Usage',
-          tooltip:
-            'The actual number of IO operations per second that the database is currently using',
+          label: 'Read throughput',
+          tooltip: 'Disk read throughput (bytes per second)',
+        },
+        {
+          attribute: 'disk_bytes_written',
+          provider: 'infra-monitoring',
+          label: 'Write throughput',
+          tooltip: 'Disk write throughput (bytes per second)',
+        },
+        {
+          attribute: 'disk_throughput_max',
+          provider: 'reference-line',
+          label: 'Max throughput',
+          value:
+            diskConfig?.attributes?.type === 'gp3' &&
+            typeof diskConfig.attributes.throughput_mbps === 'number'
+              ? diskConfig.attributes.throughput_mbps * 1024 * 1024
+              : undefined,
+          tooltip: 'Maximum disk throughput for your current compute size',
+          isMaxValue: true,
         },
       ],
     },
@@ -217,7 +239,7 @@ export const getReportAttributesV2: (
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
@@ -242,7 +264,7 @@ export const getReportAttributesV2: (
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise'],
+      availableIn: ['pro', 'team', 'enterprise', 'platform'],
       hide: isFreePlan,
       showTooltip: true,
       showLegend: true,
@@ -250,7 +272,7 @@ export const getReportAttributesV2: (
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
@@ -306,7 +328,7 @@ export const getReportAttributesV2: (
       label: 'Dedicated Pooler Client Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise'],
+      availableIn: ['pro', 'team', 'enterprise', 'platform'],
       hide: isFreePlan,
       showTooltip: true,
       showLegend: true,
@@ -314,7 +336,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
@@ -338,7 +360,7 @@ export const getReportAttributesV2: (
       label: 'Shared Pooler (Supavisor) client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise'],
+      availableIn: ['pro', 'team', 'enterprise', 'platform'],
       hide: isFreePlan,
       showTooltip: false,
       showLegend: false,
@@ -346,7 +368,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'supavisor_connections_active',
@@ -361,7 +383,7 @@ export const getReportAttributesV2: (
       label: 'Disk Usage',
       syncId: 'database-reports',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team', 'enterprise'],
+      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -372,7 +394,7 @@ export const getReportAttributesV2: (
         tickFormatter: (value: any) => formatBytes(value, 1),
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-size`,
       attributes: [
         {

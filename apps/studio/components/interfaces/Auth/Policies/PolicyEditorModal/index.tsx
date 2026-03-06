@@ -1,15 +1,17 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
+import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import useLatest from 'hooks/misc/useLatest'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { isEmpty, noop } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import useLatest from 'hooks/misc/useLatest'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { Modal } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
   PolicyFormField,
+  PolicyForReview,
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
 } from '../Policies.types'
@@ -18,8 +20,8 @@ import {
   createPayloadForUpdatePolicy,
   createSQLPolicy,
 } from '../Policies.utils'
-import PolicyEditor from '../PolicyEditor'
-import PolicyReview from '../PolicyReview'
+import { PolicyEditor } from '../PolicyEditor'
+import { PolicyReview } from '../PolicyReview'
 import PolicySelection from '../PolicySelection'
 import PolicyTemplates from '../PolicyTemplates'
 import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
@@ -30,7 +32,7 @@ interface PolicyEditorModalProps {
   visible?: boolean
   schema?: string
   table?: string
-  selectedPolicyToEdit: any
+  selectedPolicyToEdit?: PostgresPolicy
   showAssistantPreview?: boolean
   onSelectCancel: () => void
   onCreatePolicy: (payload: PostgresPolicyCreatePayload) => Promise<boolean>
@@ -38,11 +40,11 @@ interface PolicyEditorModalProps {
   onSaveSuccess: () => void
 }
 
-const PolicyEditorModal = ({
+export const PolicyEditorModal = ({
   visible = false,
   schema = '',
   table = '',
-  selectedPolicyToEdit = {},
+  selectedPolicyToEdit,
   showAssistantPreview = false,
   onSelectCancel = noop,
   onCreatePolicy,
@@ -71,10 +73,10 @@ const PolicyEditorModal = ({
   const [policyFormFields, setPolicyFormFields] = useState<PolicyFormField>(
     initializedPolicyFormFields
   )
-  const [policyStatementForReview, setPolicyStatementForReview] = useState<any>('')
+  const [policyStatementForReview, setPolicyStatementForReview] = useState<PolicyForReview>()
   const [isDirty, setIsDirty] = useState(false)
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       onSelectCancel()
@@ -114,7 +116,7 @@ const PolicyEditorModal = ({
   /* Methods that are for the UI */
 
   const onToggleFeaturePreviewModal = () => {
-    toggleFeaturePreviewModal()
+    toggleFeaturePreviewModal(true)
     onSelectCancel()
   }
 
@@ -198,7 +200,7 @@ const PolicyEditorModal = ({
       onCancel={confirmOnClose}
     >
       <div>
-        <CloseConfirmationModal {...closeConfirmationModalProps} />
+        <DiscardChangesConfirmationDialog {...modalProps} />
         {view === POLICY_MODAL_VIEWS.SELECTION ? (
           <PolicySelection
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
@@ -221,7 +223,7 @@ const PolicyEditorModal = ({
             templatesNote="* References a specific column in the table"
             onUseTemplate={onUseTemplate}
           />
-        ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
+        ) : view === POLICY_MODAL_VIEWS.REVIEW && !!policyStatementForReview ? (
           <PolicyReview
             policy={policyStatementForReview}
             onSelectBack={onViewEditor}
@@ -232,20 +234,3 @@ const PolicyEditorModal = ({
     </Modal>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the editor? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)
-
-export default PolicyEditorModal

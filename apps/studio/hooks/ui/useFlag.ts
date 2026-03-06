@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-
-import { useFeatureFlags } from 'common'
+import { IS_PLATFORM, useFeatureFlags } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { trackFeatureFlag } from 'lib/posthog'
 
@@ -41,6 +40,8 @@ export function usePHFlag<T = string | boolean>(name: string) {
 
   const store = flagStore.posthog
   const flagValue = store[name]
+
+  if (!IS_PLATFORM) return false
 
   // Flag store has not been initialized
   if (isObjectEmpty(store)) return undefined

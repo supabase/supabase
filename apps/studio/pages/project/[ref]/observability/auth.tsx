@@ -34,10 +34,11 @@ import {
   createLatencyReportConfig,
   createUsageReportConfig,
 } from 'data/reports/v2/auth.config'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { useRouter } from 'next/router'
 import { parseAsJson, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -155,14 +156,18 @@ const AuthUsage = () => {
     filters: {},
   })
 
-  const onRefreshReport = async () => {
-    if (!selectedDateRange) return
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatePickerChange,
+    async () => {
+      if (!selectedDateRange) return
 
-    setIsRefreshing(true)
-
-    refetch()
-    setTimeout(() => setIsRefreshing(false), 1000)
-  }
+      setIsRefreshing(true)
+      refetch()
+      setTimeout(() => setIsRefreshing(false), 1000)
+    }
+  )
 
   const router = useRouter()
 
@@ -239,7 +244,7 @@ const AuthUsage = () => {
           </div>
         }
       >
-        <div className="mt-8 flex flex-col gap-8 pb-24">
+        <div className="mt-8 flex flex-col gap-8 pb-8">
           <div className="flex flex-col gap-4" id="usage">
             <div>
               <ReportSectionHeader
@@ -359,6 +364,9 @@ const AuthUsage = () => {
           </div>
         </div>
       </ReportStickyNav>
+      <div className="pb-8">
+        <ObservabilityLink />
+      </div>
     </>
   )
 }

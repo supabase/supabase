@@ -5,9 +5,10 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { InlineLink } from 'components/ui/InlineLink'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import Link from 'next/link'
 import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const ProjectsPage: NextPageWithLayout = () => {
@@ -18,20 +19,27 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <ScaffoldContainer className="flex-grow flex">
-      <ScaffoldSection isFullWidth className="flex-grow pb-0">
+      <ScaffoldSection isFullWidth className="pb-0">
         {disableAccessMfa ? (
-          <Admonition type="note" title={`The organization "${org?.name}" has MFA enforced`}>
-            <p className="!m-0">
-              Set up MFA on your account through your{' '}
-              <InlineLink href="/account/security">account preferences</InlineLink> to access this
-              organization
-            </p>
-          </Admonition>
+          <Admonition
+            type="note"
+            layout="horizontal"
+            title={`${org?.name} requires MFA`}
+            description={
+              <>
+                Set up multi-factor authentication (MFA) on your account to access this
+                organization’s projects.
+              </>
+            }
+            actions={
+              <Button asChild type="default">
+                <Link href="/account/security">Set up MFA</Link>
+              </Button>
+            }
+          />
         ) : (
-          // [Joshen] Very odd, but the h-px here is required for ProjectList to have a max
-          // height based on the remaining space that it can grow to
-          <div className="flex flex-col gap-y-4 flex-grow h-px">
-            <HomePageActions showViewToggle={true} />
+          <div className="flex flex-col gap-y-4">
+            <HomePageActions />
             <ProjectList />
           </div>
         )}

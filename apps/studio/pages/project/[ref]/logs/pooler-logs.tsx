@@ -1,3 +1,5 @@
+import { parseAsString, useQueryState } from 'nuqs'
+
 import { useParams } from 'common'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
@@ -9,17 +11,19 @@ import { LogoLoader } from 'ui'
 
 export const LogPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { isLoading } = useSupavisorConfigurationQuery({ projectRef: ref ?? 'default' })
+  const [identifier] = useQueryState('db', parseAsString)
+  const { isPending: isLoading } = useSupavisorConfigurationQuery({ projectRef: ref ?? 'default' })
 
   // this prevents initial load of pooler logs before config has been retrieved
   if (isLoading) return <LogoLoader />
 
   return (
     <LogsPreviewer
+      condensedLayout
+      queryType="supavisor"
       projectRef={ref as string}
-      condensedLayout={true}
       tableName={LogsTableName.SUPAVISOR}
-      queryType={'supavisor'}
+      filterOverride={!!identifier ? { identifier } : undefined}
     />
   )
 }

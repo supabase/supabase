@@ -3,8 +3,9 @@ import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
+
 import 'reactflow/dist/style.css'
 
 import { useParams } from 'common'
@@ -24,47 +25,45 @@ import {
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
-import { type AWS_REGIONS_KEYS } from 'shared-data'
+import { useRouter } from 'next/router'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  cn,
 } from 'ui'
-import DeployNewReplicaPanel from './DeployNewReplicaPanel'
+
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
-import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
+import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'
 import { SmoothstepEdge } from './Edge'
 import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
-import { useShowNewReplicaPanel } from './use-show-new-replica'
 
 interface InstanceConfigurationUIProps {
   diagramOnly?: boolean
 }
 
 const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationUIProps) => {
+  const router = useRouter()
   const reactFlow = useReactFlow()
   const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const numTransition = useRef<number>()
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { isPending: isLoadingProject } = useSelectedProjectQuery()
 
   const isAws = useIsAwsCloudProvider()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
+  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
-  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
-  const [refetchInterval, setRefetchInterval] = useState<number | boolean>(10000)
-  const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(10000)
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
 
@@ -74,60 +73,65 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     data: loadBalancers,
     refetch: refetchLoadBalancers,
     isSuccess: isSuccessLoadBalancers,
-  } = useLoadBalancersQuery({
-    projectRef,
-  })
+  } = useLoadBalancersQuery({ projectRef })
   const {
     data,
     error,
     refetch: refetchReplicas,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess: isSuccessReplicas,
-  } = useReadReplicasQuery({
-    projectRef,
-  })
+  } = useReadReplicasQuery({ projectRef })
   const [[primary], replicas] = useMemo(
     () => partition(data ?? [], (db) => db.identifier === projectRef),
     [data, projectRef]
   )
+  const numReplicas = useMemo(() => data?.length ?? 0, [data])
 
-  useReadReplicasStatusesQuery(
-    { projectRef },
-    {
-      refetchInterval: refetchInterval as any,
-      refetchOnWindowFocus: false,
-      onSuccess: async (res) => {
-        const fixedStatues = [
-          REPLICA_STATUS.ACTIVE_HEALTHY,
-          REPLICA_STATUS.ACTIVE_UNHEALTHY,
-          REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
-        ]
-        const replicasInTransition = res.filter((db) => {
-          const { status } = db.replicaInitializationStatus || {}
-          return (
-            !fixedStatues.includes(db.status) || status === ReplicaInitializationStatus.InProgress
-          )
-        })
-        const hasTransientStatus = replicasInTransition.length > 0
+  const { data: replicasStatuses, isSuccess: isSuccessReplicasStatuses } =
+    useReadReplicasStatusesQuery(
+      { projectRef },
+      {
+        refetchInterval: refetchInterval,
+        refetchOnWindowFocus: false,
+      }
+    )
 
-        // If any replica's status has changed, refetch databases
-        if (
-          numTransition.current !== replicasInTransition.length ||
-          res.length !== (data ?? []).length
-        ) {
-          numTransition.current = replicasInTransition.length
-          await refetchReplicas()
-          setTimeout(() => refetchLoadBalancers(), 2000)
-        }
+  useEffect(() => {
+    if (!isSuccessReplicasStatuses) return
+    const refetch = async () => {
+      const fixedStatues = [
+        REPLICA_STATUS.ACTIVE_HEALTHY,
+        REPLICA_STATUS.ACTIVE_UNHEALTHY,
+        REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
+      ]
+      const replicasInTransition = replicasStatuses.filter((db) => {
+        const { status } = db.replicaInitializationStatus || {}
+        return (
+          !fixedStatues.includes(db.status) || status === ReplicaInitializationStatus.InProgress
+        )
+      })
+      const hasTransientStatus = replicasInTransition.length > 0
 
-        // If all replicas are active healthy, stop fetching statuses
-        if (!hasTransientStatus) {
-          setRefetchInterval(false)
-        }
-      },
+      // If any replica's status has changed, refetch databases
+      if (replicasStatuses.length !== numReplicas) {
+        await refetchReplicas()
+        setTimeout(() => refetchLoadBalancers(), 2000)
+      }
+
+      // If all replicas are active healthy, stop fetching statuses
+      if (!hasTransientStatus) {
+        setRefetchInterval(false)
+      }
     }
-  )
+    refetch()
+  }, [
+    numReplicas,
+    isSuccessReplicasStatuses,
+    refetchLoadBalancers,
+    refetchReplicas,
+    replicasStatuses,
+  ])
 
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
@@ -237,10 +241,10 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
               <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
                 <div className="flex items-center justify-center">
                   <ButtonTooltip
+                    asChild
                     type="default"
                     disabled={!canManageReplicas || isOrioleDb}
                     className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
-                    onClick={() => setShowNewReplicaPanel(true)}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -252,7 +256,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                       },
                     }}
                   >
-                    Deploy a new replica
+                    <Link href={newReplicaURL}>Deploy a new replica</Link>
                   </ButtonTooltip>
                   {replicas.length > 0 && (
                     <DropdownMenu>
@@ -321,10 +325,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
               </ReactFlow>
             ) : (
               <MapView
-                onSelectDeployNewReplica={(region) => {
-                  setNewReplicaRegion(region)
-                  setShowNewReplicaPanel(true)
-                }}
+                onSelectDeployNewReplica={() => router.push(newReplicaURL)}
                 onSelectRestartReplica={setSelectedReplicaToRestart}
                 onSelectDropReplica={setSelectedReplicaToDrop}
               />
@@ -335,16 +336,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
 
       {!diagramOnly && (
         <>
-          <DeployNewReplicaPanel
-            visible={showNewReplicaPanel}
-            selectedDefaultRegion={newReplicaRegion}
-            onSuccess={() => setRefetchInterval(5000)}
-            onClose={() => {
-              setNewReplicaRegion(undefined)
-              setShowNewReplicaPanel(false)
-            }}
-          />
-
           <DropReplicaConfirmationModal
             selectedReplica={selectedReplicaToDrop}
             onSuccess={() => setRefetchInterval(5000)}

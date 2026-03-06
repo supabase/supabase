@@ -1,18 +1,19 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { isEmpty } from 'lodash'
+import { compact, isEmpty, mapValues } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { UUID_REGEX } from '@/lib/constants'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { FDW } from 'data/fdw/fdws-query'
-import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
+import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
@@ -44,12 +45,7 @@ export const EditWrapperSheet = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: secrets, isLoading: isSecretsLoading } = useVaultSecretsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
+  const { mutate: updateFDW, isPending: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated ${wrapperMeta?.label} foreign data wrapper`)
       setWrapperTables([])
@@ -67,6 +63,8 @@ export const EditWrapperSheet = ({
     undefined
   )
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
+  const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false)
+  const [pendingFormState, setPendingFormState] = useState<Record<string, string> | null>(null)
   const hasChangesRef = useRef(false)
 
   const initialValues = {
@@ -75,7 +73,7 @@ export const EditWrapperSheet = ({
     ...convertKVStringArrayToJson(wrapper?.server_options ?? []),
   }
 
-  const onUpdateTable = (values: any) => {
+  const onUpdateTable = (values: FormattedWrapperTable) => {
     setWrapperTables((prev) => {
       // if the new values have tableIndex, we are editing an existing table
       if (values.tableIndex !== undefined) {
@@ -91,29 +89,27 @@ export const EditWrapperSheet = ({
     setSelectedTableToEdit(undefined)
   }
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: Record<string, string>) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
-    const errors: any = validate(values)
+    const errors = validate(values)
 
     const { wrapper_name } = values
     if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
     if (!wrapperMeta.canTargetSchema && wrapperTables.length === 0)
       errors.tables = 'Please add at least one table'
-    if (!isEmpty(errors)) return setFormErrors(errors)
+    if (!isEmpty(errors)) {
+      setFormErrors(errors)
+      return
+    }
 
-    updateFDW({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      wrapper,
-      wrapperMeta,
-      formState: { ...values, server_name: `${wrapper_name}_server` },
-      tables: wrapperTables,
-    })
+    setFormErrors({})
+    setPendingFormState({ ...values, server_name: `${wrapper_name}_server` })
+    setIsUpdateConfirmationOpen(true)
   }
 
   const checkIsDirty = useCallback(() => hasChangesRef.current, [])
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty,
     onClose,
   })
@@ -137,7 +133,15 @@ export const EditWrapperSheet = ({
           onSubmit={onSubmit}
           className="h-full flex flex-col"
         >
-          {({ values, initialValues, resetForm }: any) => {
+          {({
+            values,
+            initialValues,
+            resetForm,
+          }: {
+            values: Record<string, string>
+            initialValues: Record<string, string>
+            resetForm: (value: Record<string, Record<string, string>>) => void
+          }) => {
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -152,50 +156,60 @@ export const EditWrapperSheet = ({
             const hasChanges = hasFormChanges || hasTableChanges
             hasChangesRef.current = hasChanges
 
-            const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
-
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
-              const fetchEncryptedValues = async () => {
-                setLoadingSecrets(true)
-                // If the secrets haven't loaded, escape and run the effect again when they're loaded
-                if (isSecretsLoading) {
-                  return
-                }
-
-                const res = await Promise.all(
-                  encryptedOptions.map(async (option) => {
-                    const secret = secrets?.find(
-                      (secret) => secret.name === `${wrapper.name}_${option.name}`
-                    )
-                    if (secret !== undefined) {
-                      const value = await getDecryptedValue({
-                        projectRef: project?.ref,
-                        connectionString: project?.connectionString,
-                        id: secret.id,
-                      })
-                      return { [option.name]: value[0]?.decrypted_secret ?? '' }
-                    } else {
-                      return { [option.name]: '' }
-                    }
+              const fetchEncryptedValues = async (ids: string[]) => {
+                try {
+                  setLoadingSecrets(true)
+                  // If the secrets haven't loaded, escape and run the effect again when they're loaded
+                  const decryptedValues = await getDecryptedValues({
+                    projectRef: project?.ref,
+                    connectionString: project?.connectionString,
+                    ids: ids,
                   })
-                )
-                const secretValues = res.reduce((a: any, b: any) => {
-                  const [key] = Object.keys(b)
-                  return { ...a, [key]: b[key] }
-                }, {})
 
-                resetForm({
-                  values: { ...values, ...secretValues },
-                  initialValues: { ...initialValues, ...secretValues },
-                })
-                setLoadingSecrets(false)
+                  // replace all values which are in the decryptedValues object with the decrypted value
+                  const transformValues = (values: Record<string, string>) => {
+                    return mapValues(values, (value) => {
+                      return decryptedValues[value] ?? value
+                    })
+                  }
+
+                  resetForm({
+                    values: transformValues(values),
+                    initialValues: transformValues(initialValues),
+                  })
+                } catch (error) {
+                  toast.error('Failed to fetch encrypted values')
+                } finally {
+                  setLoadingSecrets(false)
+                }
               }
 
-              if (encryptedOptions.length > 0) fetchEncryptedValues()
-            }, [isSecretsLoading])
+              const encryptedOptions = wrapperMeta.server.options.filter(
+                (option) => option.encrypted
+              )
+
+              const encryptedIdsToFetch = compact(
+                encryptedOptions.map((option) => {
+                  const value = initialValues[option.name]
+                  return value ?? null
+                })
+              ).filter((x) => UUID_REGEX.test(x))
+              // [Joshen] ^ Validate UUID to filter out already decrypted values
+
+              if (encryptedIdsToFetch.length > 0) {
+                fetchEncryptedValues(encryptedIdsToFetch)
+              }
+              /**
+               * [Joshen] We're deliberately not adding values and initialValues to the dependency array here
+               * as we only want to fetch the encrypted values once on load + values and initialValues will be updated
+               * as a result of that
+               */
+              // eslint-disable-next-line react-hooks/exhaustive-deps
+            }, [project?.ref, project?.connectionString])
 
             return (
               <>
@@ -215,12 +229,12 @@ export const EditWrapperSheet = ({
                           values.wrapper_name !== initialValues.wrapper_name ? (
                             <>
                               Your wrapper's server name will be updated to{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           ) : (
                             <>
                               Your wrapper's server name is{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           )
                         }
@@ -279,8 +293,7 @@ export const EditWrapperSheet = ({
                                     Target: {target}
                                   </p>
                                   <p className="text-sm text-foreground-light">
-                                    Columns:{' '}
-                                    {table.columns.map((column: any) => column.name).join(', ')}
+                                    Columns: {table.columns.map((column) => column.name).join(', ')}
                                   </p>
                                 </div>
                                 <div className="flex items-center space-x-2">
@@ -350,7 +363,42 @@ export const EditWrapperSheet = ({
         </Form>
       </div>
 
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <ConfirmationModal
+        visible={isUpdateConfirmationOpen}
+        title="Recreate wrapper?"
+        size="medium"
+        variant="warning"
+        confirmLabel="Recreate wrapper"
+        confirmLabelLoading="Recreating wrapper"
+        loading={isSaving}
+        onCancel={() => {
+          setIsUpdateConfirmationOpen(false)
+          setPendingFormState(null)
+          onClose()
+        }}
+        onConfirm={() => {
+          if (pendingFormState === null) return
+          updateFDW({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            wrapper,
+            wrapperMeta,
+            formState: pendingFormState,
+            tables: wrapperTables,
+          })
+          setIsUpdateConfirmationOpen(false)
+          setPendingFormState(null)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Saving changes will drop the existing wrapper and recreate it. Foreign servers and tables
+          will be recreated, and dependent objects like functions or views that reference those
+          tables may need to be updated manually afterwards.
+        </p>
+        <p className="text-sm text-foreground-light mt-2">Are you sure you want to continue?</p>
+      </ConfirmationModal>
+
+      <DiscardChangesConfirmationDialog {...modalProps} />
 
       <WrapperTableEditor
         visible={isEditingTable}
@@ -365,18 +413,3 @@ export const EditWrapperSheet = ({
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

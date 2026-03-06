@@ -24,3 +24,9 @@ export const DESCRIPTIONS: Record<string, string> = {
   's3.endpoint': '',
   catalog_uri: '',
 }
+
+// [Joshen] For context we've decided to decouple ETL from Analytics Buckets for now
+// So this flag just hides all "connect table" ETL flow related UI
+// Depending on future decision if we intend to keep it that way, then we might be able
+// to clean up + deprecate ConnectTablesDialog and other ETL related UI within Analytics Buckets
+export const HIDE_REPLICATION_USER_FLOW = true

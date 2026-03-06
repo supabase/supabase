@@ -15,7 +15,8 @@ export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInf
     projectCount > 0 ||
     organization?.plan === undefined ||
     organization.plan.id === 'free' ||
-    organization.plan.id === 'enterprise'
+    organization.plan.id === 'enterprise' ||
+    organization.plan.id === 'platform'
   )
     return null
 

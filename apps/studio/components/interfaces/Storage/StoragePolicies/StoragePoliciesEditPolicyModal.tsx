@@ -1,14 +1,14 @@
-import { noop, pull } from 'lodash'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies/Policies.constants'
 import PolicySelection from 'components/interfaces/Auth/Policies/PolicySelection'
 import PolicyTemplates from 'components/interfaces/Auth/Policies/PolicyTemplates'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
+import { noop, pull } from 'lodash'
 import { ChevronLeft } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
+
 import {
   applyBucketIdToTemplateDefinition,
   createPayloadsForAddPolicy,
@@ -26,7 +26,7 @@ const newPolicyTemplate: any = {
   allowedOperations: [],
 }
 
-const StoragePoliciesEditPolicyModal = ({
+export const StoragePoliciesEditPolicyModal = ({
   visible = false,
   bucketName = '',
   onSelectCancel = () => {},
@@ -102,9 +102,25 @@ const StoragePoliciesEditPolicyModal = ({
         allowedOperations: [operation],
       })
     }
-    const updatedAllowedOperations = policyFormFields.allowedOperations.includes(operation)
-      ? pull(policyFormFields.allowedOperations.slice(), operation)
-      : policyFormFields.allowedOperations.concat([operation])
+
+    const currentOps = policyFormFields.allowedOperations
+    const isRemoving = currentOps.includes(operation)
+    let updatedAllowedOperations = isRemoving
+      ? pull(currentOps.slice(), operation)
+      : currentOps.concat([operation])
+
+    if (!isRemoving && (operation === 'UPDATE' || operation === 'DELETE')) {
+      if (!updatedAllowedOperations.includes('SELECT')) {
+        updatedAllowedOperations = updatedAllowedOperations.concat(['SELECT'])
+      }
+    }
+
+    if (isRemoving && operation === 'SELECT') {
+      updatedAllowedOperations = updatedAllowedOperations.filter(
+        (op: string) => op !== 'UPDATE' && op !== 'DELETE'
+      )
+    }
+
     return setPolicyFormFields({
       ...policyFormFields,
       allowedOperations: updatedAllowedOperations,
@@ -244,5 +260,3 @@ const StoragePoliciesEditPolicyModal = ({
     </Modal>
   )
 }
-
-export default StoragePoliciesEditPolicyModal

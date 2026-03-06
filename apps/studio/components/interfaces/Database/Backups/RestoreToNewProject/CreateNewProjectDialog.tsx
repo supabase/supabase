@@ -4,12 +4,11 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
 import { useProjectCloneMutation } from 'data/projects/clone-mutation'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { passwordStrength } from 'lib/password-strength'
+import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import {
   Button,
@@ -37,6 +36,7 @@ interface CreateNewProjectDialogProps {
   onOpenChange: (value: boolean) => void
   onCloneSuccess: () => void
   additionalMonthlySpend: NewProjectPrice
+  hasAccess?: boolean
 }
 
 export const CreateNewProjectDialog = ({
@@ -46,10 +46,9 @@ export const CreateNewProjectDialog = ({
   onOpenChange,
   onCloneSuccess,
   additionalMonthlySpend,
+  hasAccess,
 }: CreateNewProjectDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
 
@@ -66,15 +65,13 @@ export const CreateNewProjectDialog = ({
     },
   })
 
-  const isFreePlan = organization?.plan?.id === 'free'
-
   const { data: cloneBackups } = useCloneBackupsQuery(
     { projectRef: project?.ref },
-    { enabled: !isFreePlan }
+    { enabled: hasAccess }
   )
   const hasPITREnabled = cloneBackups?.pitr_enabled
 
-  const { mutate: triggerClone, isLoading: cloneMutationLoading } = useProjectCloneMutation({
+  const { mutate: triggerClone, isPending: cloneMutationLoading } = useProjectCloneMutation({
     onError: (error) => {
       toast.error(`Failed to restore to new project: ${error.message}`)
     },
@@ -171,7 +168,7 @@ export const CreateNewProjectDialog = ({
                         }}
                         descriptionText={
                           <PasswordStrengthBar
-                            passwordStrengthScore={passwordStrengthScore}
+                            passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
                             password={field.value}
                             passwordStrengthMessage={passwordStrengthMessage}
                             generateStrongPassword={generatePassword}

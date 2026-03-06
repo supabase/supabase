@@ -3,6 +3,7 @@ import { filterToolsByOptInLevel } from '../tool-filter'
 import { getFallbackTools } from './fallback-tools'
 import { ToolSet } from 'ai'
 import { IS_PLATFORM } from 'common'
+import { getIncidentTools } from './incident-tools'
 import { getMcpTools } from './mcp-tools'
 import { getSchemaTools } from './schema-tools'
 import { getRenderingTools } from './rendering-tools'
@@ -13,12 +14,14 @@ export const getTools = async ({
   authorization,
   aiOptInLevel,
   accessToken,
+  baseUrl,
 }: {
   projectRef: string
   connectionString: string
   authorization?: string
   aiOptInLevel: AiOptInLevel
   accessToken?: string
+  baseUrl?: string
 }) => {
   // Always include rendering tools
   let tools: ToolSet = getRenderingTools()
@@ -50,6 +53,7 @@ export const getTools = async ({
         connectionString,
         authorization,
       }),
+      ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
     }
   }
 

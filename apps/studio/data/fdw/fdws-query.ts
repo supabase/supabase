@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { fdwKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
 
 export const getFDWsSql = () => {
   const sql = /* SQL */ `
@@ -60,7 +60,7 @@ export type FDW = {
   name: string
   handler: string
   server_name: string
-  server_options: string[]
+  server_options: string[] | null
   tables: FDWTable[]
 }
 

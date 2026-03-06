@@ -15,7 +15,6 @@ vi.mock('lib/constants', () => ({
 describe('apiHelpers', () => {
   describe('constructHeaders', () => {
     beforeEach(() => {
-      process.env.READ_ONLY_API_KEY = 'test-readonly-key'
       process.env.SUPABASE_SERVICE_KEY = 'test-service-key'
     })
 
