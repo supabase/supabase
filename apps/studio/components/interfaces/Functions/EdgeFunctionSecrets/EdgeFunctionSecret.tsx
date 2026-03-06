@@ -26,12 +26,15 @@ interface EdgeFunctionSecretProps {
 const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFunctionSecretProps) => {
   const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
   const [isValueVisible, setIsValueVisible] = useState(false)
-  
+
   // [Joshen] Following API's validation:
   // https://github.com/supabase/platform/blob/develop/api/src/routes/v1/projects/ref/secrets/secrets.controller.ts#L106
   const isReservedSecret = !!secret.name.match(/^(SUPABASE_).*/)
 
-  const displayValue = isValueVisible ? secret.value : '•'.repeat(Math.min(secret.value.length, 20))
+  const displayValue = isValueVisible
+    ? secret.value
+    : '•'.repeat(Math.min(secret.value.length, 20))
+
   return (
     <TableRow>
       <TableCell>
