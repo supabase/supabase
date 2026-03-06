@@ -47,9 +47,11 @@ export function isOrgMenuActive(
     return activeRoute === undefined
   }
   if (item.key === 'settings') {
+    const route = activeRoute ?? getOrgActiveRoute(pathname)
+    if (route === undefined) return false
     return (
-      activeRoute !== undefined &&
-      ORG_SETTINGS_ROUTES.includes(activeRoute as (typeof ORG_SETTINGS_ROUTES)[number])
+      route === 'settings' ||
+      ORG_SETTINGS_ROUTES.includes(route as (typeof ORG_SETTINGS_ROUTES)[number])
     )
   }
   return activeRoute === item.key
