@@ -26,7 +26,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
 
 interface ExposedFunctionSelectorProps {
-  className?: string
   disabled?: boolean
   selectedSchemas: string[]
   pendingAddFunctionNames: string[]
@@ -36,7 +35,6 @@ interface ExposedFunctionSelectorProps {
 }
 
 export const ExposedFunctionSelector = ({
-  className,
   disabled = false,
   selectedSchemas,
   pendingAddFunctionNames,
@@ -98,196 +96,193 @@ export const ExposedFunctionSelector = ({
   }, [entry?.isIntersecting, hasNextPage, isFetching, isFetchingNextPage, isPending, fetchNextPage])
 
   return (
-    <div className={className}>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            size="small"
-            disabled={disabled}
-            type="default"
-            className="w-full [&>span]:w-full !pr-1 space-x-1"
-            iconRight={
-              <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
-            }
-          >
-            <div className="w-full flex gap-1">
-              <p className="text-foreground-lighter">
-                {isCountsPending
-                  ? 'Loading functions...'
-                  : totalCount === 0
-                    ? 'No functions available'
-                    : `${grantsCount} of ${totalCount} functions exposed${
-                        pendingCount > 0
-                          ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
-                          : ''
-                      }`}
-              </p>
-            </div>
-          </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          className="p-0 min-w-[200px] pointer-events-auto"
-          side="bottom"
-          align="start"
-          sameWidthAsTrigger
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button
+          size="small"
+          disabled={disabled}
+          type="default"
+          className="w-full [&>span]:w-full !pr-1 space-x-1"
+          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
-          <Command_Shadcn_ shouldFilter={false}>
-            <CommandInput_Shadcn_
-              className="text-xs"
-              placeholder="Find function..."
-              value={search}
-              onValueChange={setSearch}
-            />
-            <CommandList_Shadcn_>
-              <CommandGroup_Shadcn_>
-                {isPending ? (
-                  <>
-                    <div className="px-2 py-1">
-                      <ShimmeringLoader className="py-2" />
-                    </div>
-                    <div className="px-2 py-1 w-4/5">
-                      <ShimmeringLoader className="py-2" />
-                    </div>
-                  </>
-                ) : isError ? (
-                  <div className="flex items-center py-3 justify-center">
-                    <p className="text-xs text-foreground-lighter">Failed to retrieve functions</p>
+          <div className="w-full flex gap-1">
+            <p className="text-foreground-lighter">
+              {isCountsPending
+                ? 'Loading functions...'
+                : totalCount === 0
+                  ? 'No functions available'
+                  : `${grantsCount} of ${totalCount} functions exposed${
+                      pendingCount > 0
+                        ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
+                        : ''
+                    }`}
+            </p>
+          </div>
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_
+        className="p-0 min-w-[200px] pointer-events-auto"
+        side="bottom"
+        align="start"
+        sameWidthAsTrigger
+      >
+        <Command_Shadcn_ shouldFilter={false}>
+          <CommandInput_Shadcn_
+            className="text-xs"
+            placeholder="Find function..."
+            value={search}
+            onValueChange={setSearch}
+          />
+          <CommandList_Shadcn_>
+            <CommandGroup_Shadcn_>
+              {isPending ? (
+                <>
+                  <div className="px-2 py-1">
+                    <ShimmeringLoader className="py-2" />
                   </div>
-                ) : (
-                  <>
-                    {functions.length === 0 && (
-                      <p className="text-xs text-center text-foreground-lighter py-3">
-                        {search.length > 0 ? 'No functions found' : 'No functions available'}
-                      </p>
-                    )}
-                    <ScrollArea
-                      ref={scrollRootRef}
-                      className={functions.length > 7 ? 'h-[210px]' : ''}
-                    >
-                      {functions.map((fn) => {
-                        const key = `${fn.schema}.${fn.name}`
-                        const isSchemaExposed = selectedSchemas.includes(fn.schema)
-                        const hasPendingAdd = pendingAddSet.has(key)
-                        const hasPendingRemove = pendingRemoveSet.has(key)
+                  <div className="px-2 py-1 w-4/5">
+                    <ShimmeringLoader className="py-2" />
+                  </div>
+                </>
+              ) : isError ? (
+                <div className="flex items-center py-3 justify-center">
+                  <p className="text-xs text-foreground-lighter">Failed to retrieve functions</p>
+                </div>
+              ) : (
+                <>
+                  {functions.length === 0 && (
+                    <p className="text-xs text-center text-foreground-lighter py-3">
+                      {search.length > 0 ? 'No functions found' : 'No functions available'}
+                    </p>
+                  )}
+                  <ScrollArea
+                    ref={scrollRootRef}
+                    className={functions.length > 7 ? 'h-[210px]' : ''}
+                  >
+                    {functions.map((fn) => {
+                      const key = `${fn.schema}.${fn.name}`
+                      const isSchemaExposed = selectedSchemas.includes(fn.schema)
+                      const hasPendingAdd = pendingAddSet.has(key)
+                      const hasPendingRemove = pendingRemoveSet.has(key)
 
-                        const isCustom = fn.status === 'custom'
-                        const isGranted = fn.status === 'granted'
+                      const isCustom = fn.status === 'custom'
+                      const isGranted = fn.status === 'granted'
 
-                        const isCustomNeutral = isCustom && !hasPendingAdd && !hasPendingRemove
-                        const isExposed =
-                          isSchemaExposed &&
-                          (isCustom ? hasPendingAdd : isGranted ? !hasPendingRemove : hasPendingAdd)
+                      const isCustomNeutral = isCustom && !hasPendingAdd && !hasPendingRemove
+                      const isExposed =
+                        isSchemaExposed &&
+                        (isCustom ? hasPendingAdd : isGranted ? !hasPendingRemove : hasPendingAdd)
 
-                        const customGrantsTooltip = getCustomGrantsTooltip({
-                          hasPendingAdd,
-                          hasPendingRemove,
-                        })
+                      const customGrantsTooltip = getCustomGrantsTooltip({
+                        hasPendingAdd,
+                        hasPendingRemove,
+                      })
 
-                        return (
-                          <CommandItem_Shadcn_
-                            key={key}
-                            value={key}
-                            className={cn(
-                              'w-full',
-                              isSchemaExposed ? 'cursor-pointer' : 'opacity-50 !cursor-not-allowed'
-                            )}
-                            onSelect={() => {
-                              if (!isSchemaExposed) return
+                      return (
+                        <CommandItem_Shadcn_
+                          key={key}
+                          value={key}
+                          className={cn(
+                            'w-full',
+                            isSchemaExposed ? 'cursor-pointer' : 'opacity-50 !cursor-not-allowed'
+                          )}
+                          onSelect={() => {
+                            if (!isSchemaExposed) return
 
-                              if (isCustom) {
-                                if (hasPendingAdd) {
-                                  onTogglePendingAdd(key)
-                                  onTogglePendingRemove(key)
-                                } else if (hasPendingRemove) {
-                                  onTogglePendingRemove(key)
-                                  onTogglePendingAdd(key)
-                                } else {
-                                  onTogglePendingAdd(key)
-                                }
-                                return
-                              }
-
-                              if (isGranted) {
+                            if (isCustom) {
+                              if (hasPendingAdd) {
+                                onTogglePendingAdd(key)
                                 onTogglePendingRemove(key)
+                              } else if (hasPendingRemove) {
+                                onTogglePendingRemove(key)
+                                onTogglePendingAdd(key)
                               } else {
                                 onTogglePendingAdd(key)
                               }
-                            }}
-                          >
-                            <div className="w-full flex items-center gap-x-2">
-                              <div className="w-4 shrink-0 flex items-center justify-center">
-                                {isExposed && <Check size={16} className="text-brand shrink-0" />}
-                              </div>
-                              <span
-                                className={cn(
-                                  'truncate',
-                                  (!isSchemaExposed || isCustomNeutral) && 'text-foreground-muted',
-                                  isCustomNeutral && isSchemaExposed && 'text-warning'
-                                )}
-                              >
-                                {key}
-                              </span>
+                              return
+                            }
 
-                              <div className="ml-auto flex items-center gap-x-2">
-                                {isCustom && (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div
-                                        className={cn(
-                                          'shrink-0 flex items-center justify-center hover:text-foreground-light',
-                                          isCustomNeutral && isSchemaExposed
-                                            ? 'text-warning'
-                                            : 'text-foreground-muted'
-                                        )}
-                                      >
-                                        <CircleAlert size={14} />
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent
-                                      side="right"
-                                      className="max-w-[320px] text-xs pointer-events-none"
-                                    >
-                                      {customGrantsTooltip}
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                                {!isSchemaExposed && (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <button
-                                        type="button"
-                                        tabIndex={-1}
-                                        aria-label="Schema not exposed"
-                                        className="inline-flex items-center text-foreground-muted hover:text-foreground-light"
-                                      >
-                                        <Info size={14} />
-                                      </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="right" className="max-w-[320px] text-xs">
-                                      {`The schema "${fn.schema}" must be exposed before enabling this function.`}
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </div>
+                            if (isGranted) {
+                              onTogglePendingRemove(key)
+                            } else {
+                              onTogglePendingAdd(key)
+                            }
+                          }}
+                        >
+                          <div className="w-full flex items-center gap-x-2">
+                            <div className="w-4 shrink-0 flex items-center justify-center">
+                              {isExposed && <Check size={16} className="text-brand shrink-0" />}
                             </div>
-                          </CommandItem_Shadcn_>
-                        )
-                      })}
-                      <div ref={sentinelRef} className="h-1 -mt-1" />
-                      {hasNextPage && (
-                        <div className="px-2 py-1">
-                          <ShimmeringLoader className="py-2" />
-                        </div>
-                      )}
-                    </ScrollArea>
-                  </>
-                )}
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-    </div>
+                            <span
+                              className={cn(
+                                'truncate',
+                                (!isSchemaExposed || isCustomNeutral) && 'text-foreground-muted',
+                                isCustomNeutral && isSchemaExposed && 'text-warning'
+                              )}
+                            >
+                              {key}
+                            </span>
+
+                            <div className="ml-auto flex items-center gap-x-2">
+                              {isCustom && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div
+                                      className={cn(
+                                        'shrink-0 flex items-center justify-center hover:text-foreground-light',
+                                        isCustomNeutral && isSchemaExposed
+                                          ? 'text-warning'
+                                          : 'text-foreground-muted'
+                                      )}
+                                    >
+                                      <CircleAlert size={14} />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent
+                                    side="right"
+                                    className="max-w-[320px] text-xs pointer-events-none"
+                                  >
+                                    {customGrantsTooltip}
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                              {!isSchemaExposed && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      type="button"
+                                      tabIndex={-1}
+                                      aria-label="Schema not exposed"
+                                      className="inline-flex items-center text-foreground-muted hover:text-foreground-light"
+                                    >
+                                      <Info size={14} />
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-[320px] text-xs">
+                                    The schema "{fn.schema}" must be exposed before enabling this
+                                    function.
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                            </div>
+                          </div>
+                        </CommandItem_Shadcn_>
+                      )
+                    })}
+                    <div ref={sentinelRef} className="h-1 -mt-1" />
+                    {hasNextPage && (
+                      <div className="px-2 py-1">
+                        <ShimmeringLoader className="py-2" />
+                      </div>
+                    )}
+                  </ScrollArea>
+                </>
+              )}
+            </CommandGroup_Shadcn_>
+          </CommandList_Shadcn_>
+        </Command_Shadcn_>
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 
