@@ -116,8 +116,9 @@ export async function GET(request: NextRequest) {
       files: [...dynamicFiles, ...(baseRegistry.files || [])],
       envVars: {
         NEXT_PUBLIC_SUPABASE_URL: `https://${ref}.supabase.co`,
-        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY: anonKey,
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: anonKey,
       },
+      docs: '',
     }
 
     return NextResponse.json(registryResponse)

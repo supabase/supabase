@@ -6,9 +6,9 @@
   "description": "TanStack Query integration with Supabase collections for type-safe database operations",
   "registryDependencies": ["button", "input", "label", "sheet"],
   "dependencies": [
-    "@tanstack/react-query@latest",
     "supa-tdb-collection@latest",
     "zod@latest",
+    "@tanstack/db@latest",
     "@tanstack/react-db@latest"
   ],
   "files": [],

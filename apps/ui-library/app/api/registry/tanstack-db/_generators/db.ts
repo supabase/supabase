@@ -6,9 +6,8 @@ export function generateDbContent(definitions: Record<string, OpenAPIDefinition>
   const tableNames = Object.keys(definitions).filter((name) => !name.startsWith('_'))
 
   const lines: string[] = [
-    "import { supabaseCollectionOptions} from 'supabase-collection'",
+    "import { supabaseCollectionOptions } from 'supa-tdb-collection'",
     "import { createClient } from '@/lib/supabase/client'",
-    "import { getQueryClient } from '@/lib/query-client'",
     'import {',
     ...tableNames.map((name) => `  ${toCamelCase(name)}Schema,`),
     "} from './schemas'",
@@ -56,7 +55,6 @@ export function generateDbContent(definitions: Record<string, OpenAPIDefinition>
     lines.push(`  where: ${whereFn},`)
     lines.push(`  schema: ${schemaName},`)
     lines.push(`  realtime: true,`)
-    lines.push('  queryClient: getQueryClient(),')
     lines.push('  supabase: supabase,')
     lines.push('}))')
     lines.push('')

@@ -21,6 +21,7 @@ export function ProjectPicker({ onProjectResolved }: ProjectPickerProps) {
 
   const [selectedOrg, setSelectedOrg] = useState<Org | null>(null)
   const [selectedProject, setSelectedProject] = useState<ProjectInfoInfinite | null>(null)
+  const [missingAnonKey, setMissingAnonKey] = useState(false)
 
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
@@ -132,13 +133,13 @@ export function ProjectPicker({ onProjectResolved }: ProjectPickerProps) {
       return
     }
 
-    const key =
-      apiKeysData.find((k) => k.type === 'publishable')?.api_key ??
-      apiKeysData.find((k) => k.type === 'legacy' && k.id === 'anon')?.api_key
+    const anonKey = apiKeysData.find((k) => k.type === 'legacy' && k.id === 'anon')?.api_key
 
-    if (key) {
-      onProjectResolved({ projectRef: selectedProject.ref, anonKey: key })
+    if (anonKey) {
+      setMissingAnonKey(false)
+      onProjectResolved({ projectRef: selectedProject.ref, anonKey })
     } else {
+      setMissingAnonKey(true)
       onProjectResolved(null)
     }
   }, [selectedProject?.ref, apiKeysData, isApiKeysPending, isApiKeysError, onProjectResolved])
@@ -174,6 +175,11 @@ export function ProjectPicker({ onProjectResolved }: ProjectPickerProps) {
       )}
       {isApiKeysError && selectedProject && (
         <p className="text-xs text-destructive">Failed to load API keys for this project.</p>
+      )}
+      {missingAnonKey && selectedProject && (
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+          This project does not have an anon key. Please enable the anon key in your project's API settings to use this block.
+        </div>
       )}
     </div>
   )
