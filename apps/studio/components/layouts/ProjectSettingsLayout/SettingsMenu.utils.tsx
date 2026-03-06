@@ -17,6 +17,7 @@ export const generateSettingsMenu = (
     legacyJwtKeys?: boolean
     logDrains?: boolean
     billing?: boolean
+    platformWebhooks?: boolean
   }
 ): ProductMenuGroup[] => {
   if (!IS_PLATFORM) {
@@ -39,6 +40,7 @@ export const generateSettingsMenu = (
 
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
   const billingEnabled = features?.billing ?? true
+  const platformWebhooksEnabled = features?.platformWebhooks ?? false
 
   return [
     {
@@ -72,6 +74,17 @@ export const generateSettingsMenu = (
           items: [],
           disabled: !isProjectActive,
         },
+        ...(platformWebhooksEnabled
+          ? [
+              {
+                name: 'Webhooks',
+                key: 'webhooks',
+                url: `/project/${ref}/settings/webhooks`,
+                items: [],
+                disabled: !isProjectActive,
+              },
+            ]
+          : []),
 
         {
           name: 'API Keys',
