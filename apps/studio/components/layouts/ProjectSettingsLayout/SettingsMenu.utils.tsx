@@ -41,6 +41,8 @@ export const generateSettingsMenu = (
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
   const billingEnabled = features?.billing ?? true
   const platformWebhooksEnabled = features?.platformWebhooks ?? false
+  const isFreeOrProPlan = organization?.plan?.id === 'free' || organization?.plan?.id === 'pro'
+  const canManageMembers = isFreeOrProPlan && Boolean(organization?.slug)
 
   return [
     {
@@ -52,6 +54,17 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
+        ...(canManageMembers
+          ? [
+              {
+                name: 'Members',
+                key: 'members',
+                url: `/org/${organization?.slug}/team`,
+                items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+              },
+            ]
+          : []),
         {
           name: 'Compute and Disk',
           key: 'compute-and-disk',
