@@ -11,17 +11,19 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+export interface OrganizationSelectionListProps {
+  organizations: Array<{ slug: string; name: string }>
+  isLoading: boolean
+  selectedSlug?: string
+  onSelect: (slug: string) => void
+}
+
 export function OrganizationSelectionList({
   organizations,
   isLoading,
   selectedSlug,
   onSelect,
-}: {
-  organizations: Array<{ slug: string; name: string }>
-  isLoading: boolean
-  selectedSlug?: string
-  onSelect: (slug: string) => void
-}) {
+}: OrganizationSelectionListProps) {
   const [search, setSearch] = useState('')
   const normalizedSearch = search.trim().toLowerCase()
 

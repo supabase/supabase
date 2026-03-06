@@ -12,6 +12,16 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+export interface BranchSelectionListProps {
+  branches: Branch[]
+  selectedBranch?: Branch
+  isBranchingEnabled: boolean
+  isBranchesLoaded: boolean
+  onSelect: (branch: Branch) => void
+  onCreateBranch: () => void
+  onManageBranches: () => void
+}
+
 export function BranchSelectionList({
   branches,
   selectedBranch,
@@ -20,15 +30,7 @@ export function BranchSelectionList({
   onSelect,
   onCreateBranch,
   onManageBranches,
-}: {
-  branches: Branch[]
-  selectedBranch?: Branch
-  isBranchingEnabled: boolean
-  isBranchesLoaded: boolean
-  onSelect: (branch: Branch) => void
-  onCreateBranch: () => void
-  onManageBranches: () => void
-}) {
+}: BranchSelectionListProps) {
   const [search, setSearch] = useState('')
   const lowerSearch = search.toLowerCase()
 

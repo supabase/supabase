@@ -1,27 +1,129 @@
 import { useParams } from 'common'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
-import { ProjectRowLink } from './ProjectRowLink'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
-import { Box, Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Box, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Badge, Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import type { ComponentProps } from 'react'
+import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
+import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
 import { sanitizeRoute } from './ProjectDropdown.utils'
+import { ProjectRowLink } from './ProjectRowLink'
+import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+
+// --- Sub-components ---
+
+interface ProjectDropdownNewProjectActionsProps {
+  organizationSlug: string | undefined
+  embedded: boolean
+  onClose: () => void
+  onNavigate: (href: string) => void
+}
+
+function ProjectDropdownNewProjectActions({
+  organizationSlug,
+  embedded,
+  onClose,
+  onNavigate,
+}: ProjectDropdownNewProjectActionsProps) {
+  const href = `/new/${organizationSlug}`
+
+  if (embedded) {
+    return (
+      <Button
+        type="default"
+        block
+        size="small"
+        asChild
+        icon={<Plus size={14} strokeWidth={1.5} />}
+      >
+        <Link
+          href={href}
+          onClick={onClose}
+          className="text-xs text-foreground-light hover:text-foreground"
+        >
+          New project
+        </Link>
+      </Button>
+    )
+  }
+
+  return (
+    <CommandGroup_Shadcn_>
+      <CommandItem_Shadcn_
+        className="cursor-pointer w-full"
+        onSelect={() => {
+          onClose()
+          onNavigate(href)
+        }}
+        onClick={onClose}
+      >
+        <Link href={href} onClick={onClose} className="w-full flex items-center gap-2">
+          <Plus size={14} strokeWidth={1.5} />
+          <p>New project</p>
+        </Link>
+      </CommandItem_Shadcn_>
+    </CommandGroup_Shadcn_>
+  )
+}
+
+function ProjectDropdownNonPlatformView({ projectName }: { projectName: string }) {
+  return (
+    <Button type="text">
+      <span className="text-sm">{projectName}</span>
+    </Button>
+  )
+}
+
+interface ProjectDropdownPlatformViewProps {
+  projectRef: string | undefined
+  projectName: string
+  selectorProps: Omit<
+    ComponentProps<typeof OrganizationProjectSelector>,
+    'renderTrigger' | 'embedded'
+  >
+}
+
+function ProjectDropdownPlatformView({
+  projectRef,
+  projectName,
+  selectorProps,
+}: ProjectDropdownPlatformViewProps) {
+  return (
+    <>
+      <Link
+        href={`/project/${projectRef}`}
+        className="flex items-center gap-2 flex-shrink-0 text-sm"
+      >
+        <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+        <span
+          title={projectName}
+          className="text-foreground max-w-32 lg:max-w-64 truncate"
+        >
+          {projectName}
+        </span>
+      </Link>
+
+      <OrganizationProjectSelector
+        {...selectorProps}
+        renderTrigger={() => <AppLayoutDropdownTriggerButton />}
+      />
+    </>
+  )
+}
+
+// --- Main component ---
 
 interface ProjectDropdownProps {
-  /** When true, render only the project list (no link/trigger). For use inside sheet or popover. */
   embedded?: boolean
-  /** Applied to the root when embedded. Use e.g. "bg-transparent" to inherit sheet background. */
   className?: string
-  /** When embedded, called when selection should close the parent (e.g. sheet). */
   onClose?: () => void
 }
 
@@ -48,12 +150,10 @@ export const ProjectDropdown = ({
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
-    if (!embedded) return <ShimmeringLoader className="w-[90px]" />
+    if (!embedded) return <GenericSkeletonLoader className="p-2 w-[90px]" />
   }
 
-  const handleSetOpen = embedded
-    ? (_value: boolean) => onClose?.()
-    : setOpen
+  const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen
 
   const selectorProps = {
     open,
@@ -75,43 +175,12 @@ export const ProjectDropdown = ({
     ),
     renderActions: (_setOpen: (value: boolean) => void, options?: { embedded?: boolean }) =>
       projectCreationEnabled ? (
-        options?.embedded ? (
-          <Button
-            type="default"
-            block
-            size="small"
-            asChild
-            icon={<Plus size={14} strokeWidth={1.5} />}
-          >
-            <Link
-              href={`/new/${selectedOrganization?.slug}`}
-              onClick={() => close()}
-              className="text-xs text-foreground-light hover:text-foreground"
-            >
-              New project
-            </Link>
-          </Button>
-        ) : (
-          <CommandGroup_Shadcn_>
-            <CommandItem_Shadcn_
-              className="cursor-pointer w-full"
-              onSelect={() => {
-                close()
-                router.push(`/new/${selectedOrganization?.slug}`)
-              }}
-              onClick={() => close()}
-            >
-              <Link
-                href={`/new/${selectedOrganization?.slug}`}
-                onClick={() => close()}
-                className="w-full flex items-center gap-2"
-              >
-                <Plus size={14} strokeWidth={1.5} />
-                <p>New project</p>
-              </Link>
-            </CommandItem_Shadcn_>
-          </CommandGroup_Shadcn_>
-        )
+        <ProjectDropdownNewProjectActions
+          organizationSlug={selectedOrganization?.slug}
+          embedded={options?.embedded ?? false}
+          onClose={close}
+          onNavigate={(href) => router.push(href)}
+        />
       ) : null,
   }
 
@@ -122,35 +191,12 @@ export const ProjectDropdown = ({
   }
 
   return IS_PLATFORM ? (
-    <>
-      <Link
-        href={`/project/${project?.ref}`}
-        className="flex items-center gap-2 flex-shrink-0 text-sm"
-      >
-        <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span
-          title={selectedProject?.name ?? ''}
-          className="text-foreground max-w-32 lg:max-w-64 truncate"
-        >
-          {selectedProject?.name ?? ''}
-        </span>
-      </Link>
-
-      <OrganizationProjectSelector
-        {...selectorProps}
-        renderTrigger={() => (
-          <Button
-            type="text"
-            size="tiny"
-            className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-          />
-        )}
-      />
-    </>
+    <ProjectDropdownPlatformView
+      projectRef={project?.ref}
+      projectName={selectedProject?.name ?? ''}
+      selectorProps={selectorProps}
+    />
   ) : (
-    <Button type="text">
-      <span className="text-sm">{selectedProject?.name}</span>
-    </Button>
+    <ProjectDropdownNonPlatformView projectName={selectedProject?.name ?? ''} />
   )
 }

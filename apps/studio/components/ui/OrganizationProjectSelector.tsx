@@ -21,6 +21,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { EmbeddedProjectList } from './OrganizationProjectSelector/EmbeddedProjectList'
 import { ProjectCommandItem } from './OrganizationProjectSelector/ProjectCommandItem'
 
 interface OrganizationProjectSelectorSelectorProps {
@@ -175,26 +176,17 @@ export const OrganizationProjectSelector = ({
     }
     if (embedded) {
       return (
-        <div className="min-h-0 p-1">
-          {projects?.map((project) => (
-            <ProjectCommandItem
-              key={project.ref}
-              project={project}
-              selectedRef={selectedRef ?? undefined}
-              onSelect={onSelect}
-              onClose={() => setOpen(false)}
-              renderRow={renderRow}
-              checkPosition={checkPosition}
-              isOptionDisabled={isOptionDisabled}
-            />
-          ))}
-          <div ref={sentinelRef} className="h-1 -mt-1" />
-          {hasNextPage && (
-            <div className="px-2 py-1">
-              <ShimmeringLoader className="py-2" />
-            </div>
-          )}
-        </div>
+        <EmbeddedProjectList
+          projects={projects}
+          selectedRef={selectedRef ?? undefined}
+          onSelect={onSelect}
+          onClose={() => setOpen(false)}
+          renderRow={renderRow}
+          checkPosition={checkPosition}
+          isOptionDisabled={isOptionDisabled}
+          sentinelRef={sentinelRef}
+          hasNextPage={!!hasNextPage}
+        />
       )
     }
     return (

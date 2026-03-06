@@ -1,23 +1,15 @@
 import { useParams } from 'common'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import type { Branch } from 'data/branches/branches-query'
-import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { AlertCircle, ChevronsUpDown } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  Badge,
-  Button,
-  cn,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
+import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
+import { BranchBadge } from './BranchBadge'
 import { BranchDropdownCommandContent } from './BranchDropdownCommandContent'
+import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 
 interface BranchDropdownProps {
   embedded?: boolean
@@ -84,16 +76,11 @@ export const BranchDropdown = ({
   )
 
   if (isLoading) {
-    return <ShimmeringLoader className="w-[90px]" />
+    return <GenericSkeletonLoader className="p-2 w-[90px]" />
   }
 
   if (isError) {
-    return (
-      <div className="flex items-center space-x-2 text-amber-900">
-        <AlertCircle size={16} strokeWidth={1.5} />
-        <p className="text-sm">Failed to load branches</p>
-      </div>
-    )
+    return <AppLayoutDropdownError message="Failed to load branches" />
   }
 
   if (!isSuccess) return null
@@ -103,48 +90,23 @@ export const BranchDropdown = ({
   }
 
   return (
-    <>
-      <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0">
-        <span
-          title={isBranchingEnabled ? selectedBranch?.name : 'main'}
-          className="text-sm text-foreground max-w-32 lg:max-w-64 truncate"
-        >
-          {isBranchingEnabled ? selectedBranch?.name : 'main'}
-        </span>
-        {isBranchingEnabled ? (
-          selectedBranch?.is_default ? (
-            <Badge variant="warning" className="mt-[1px]">
-              Production
-            </Badge>
-          ) : selectedBranch?.persistent ? (
-            <Badge variant="success" className="mt-[1px]">
-              Persistent
-            </Badge>
-          ) : (
-            <Badge variant="success" className="mt-[1px]">
-              Preview
-            </Badge>
-          )
-        ) : (
-          <Badge variant="warning" className="mt-[1px]">
-            Production
-          </Badge>
-        )}
-      </Link>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            type="text"
-            block
-            size="tiny"
-            className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-          />
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-          {commandContent}
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-    </>
+    <AppLayoutDropdownWithPopover
+      linkHref={`/project/${ref}`}
+      linkContent={
+        <>
+          <span
+            title={isBranchingEnabled ? selectedBranch?.name : 'main'}
+            className="text-sm text-foreground max-w-32 lg:max-w-64 truncate"
+          >
+            {isBranchingEnabled ? selectedBranch?.name : 'main'}
+          </span>
+          <BranchBadge branch={selectedBranch} isBranchingEnabled={isBranchingEnabled} />
+        </>
+      }
+      linkClassName="flex items-center gap-2 flex-shrink-0"
+      commandContent={commandContent}
+      open={open}
+      onOpenChange={setOpen}
+    />
   )
 }
