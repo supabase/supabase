@@ -12,6 +12,7 @@ export function useSelectedProjectQuery({ enabled = true } = {}) {
       select: (data) => {
         return {
           ...data,
+          status: 'RESTORING',
           parentRef: data.parent_project_ref ?? data.ref,
         }
       },

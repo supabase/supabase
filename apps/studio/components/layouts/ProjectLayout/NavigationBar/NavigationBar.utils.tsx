@@ -7,7 +7,7 @@ import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEdito
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
-export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
+export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
