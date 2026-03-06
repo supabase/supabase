@@ -18,6 +18,7 @@ export const projectKeys = {
   status: (projectRef: string | undefined) => ['project', projectRef, 'status'] as const,
   types: (projectRef: string | undefined) => ['project', projectRef, 'types'] as const,
   detail: (projectRef: string | undefined) => ['project', projectRef, 'detail'] as const,
+  members: (projectRef: string | undefined) => ['project', projectRef, 'members'] as const,
   serviceVersions: (projectRef: string | undefined) =>
     ['project', projectRef, 'service-versions'] as const,
   readonlyStatus: (projectRef: string | undefined) =>
