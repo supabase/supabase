@@ -72,7 +72,6 @@ export const LayoutHeader = ({
   const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
 
   const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
@@ -111,20 +110,6 @@ export const LayoutHeader = ({
             >
               <ChevronLeft strokeWidth={1.5} size={16} />
             </Link>
-          </div>
-        )}
-        {(showProductMenu || isAccountPage) && (
-          <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
-            <button
-              title="Menu dropdown button"
-              className={cn(
-                'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
-              )}
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-              <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-            </button>
           </div>
         )}
         <div

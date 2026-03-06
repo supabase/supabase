@@ -26,3 +26,18 @@ export interface ProductMenuGroupItem {
   childItems?: ProductMenuGroupItem[]
   pages?: string[]
 }
+
+/**
+ * Generic section format for SubMenu. Compatible with SidebarSection from AccountLayout.
+ */
+export interface SubMenuSection {
+  key: string
+  heading?: string
+  links: Array<{ key: string; label: string; href?: string }>
+}
+
+export interface SubMenuProps {
+  sections: SubMenuSection[]
+  page?: string
+  onItemClick?: () => void
+}

@@ -1,12 +1,12 @@
-import Link from 'next/link'
-
 import { IS_PLATFORM, useParams } from 'common'
 import {
   useIsAnalyticsBucketsEnabled,
   useIsVectorBucketsEnabled,
 } from 'data/config/project-storage-config-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import Link from 'next/link'
 import { Badge, Menu } from 'ui'
+
 import { BUCKET_TYPES } from './Storage.constants'
 import { useStorageV2Page } from './Storage.utils'
 
@@ -29,9 +29,9 @@ export const StorageMenuV2 = () => {
   })
 
   return (
-    <Menu type="pills" className="my-6 flex flex-grow flex-col">
-      <div className="space-y-6">
-        <div className="mx-3">
+    <Menu type="pills" className="my-2 md:my-4 flex flex-grow flex-col">
+      <div className="space-y-4">
+        <div className="md:mx-3">
           <Menu.Group title={<span className="uppercase font-mono">Manage</span>} />
 
           {bucketTypes.map(([type, config]) => {
@@ -55,8 +55,8 @@ export const StorageMenuV2 = () => {
 
         {IS_PLATFORM && (
           <>
-            <div className="h-px w-full bg-border" />
-            <div className="mx-3">
+            <div className="h-px w-[calc(100%-1.5rem)] mx-auto md:w-full bg-border" />
+            <div className="md:mx-3">
               <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
 
               <Link href={`/project/${ref}/storage/s3`}>

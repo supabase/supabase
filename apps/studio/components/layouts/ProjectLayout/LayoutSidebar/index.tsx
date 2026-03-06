@@ -2,7 +2,6 @@ import { useBreakpoint } from 'common'
 import { useEffect } from 'react'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn, ResizableHandle, ResizablePanel } from 'ui'
-import { MobileSheetNav } from 'ui-patterns'
 
 import { useMobileSheet } from '../NavigationBar/MobileSheetContext'
 
@@ -19,13 +18,17 @@ export const LayoutSidebar = ({
   maxSize = '50',
   defaultSize = '30',
 }: LayoutSidebarProps) => {
-  const { activeSidebar, closeActive } = useSidebarManagerSnapshot()
+  const { activeSidebar } = useSidebarManagerSnapshot()
   const isMobile = useBreakpoint('md')
-  const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSheet()
+  const { setContent: setMobileSheetContent } = useMobileSheet()
 
-  // On mobile the sidebar content is rendered in MobileSheetNav
+  // On mobile, sidebar content is shown in the sheet. Sync sheet content with active sidebar; clear when none or when switching to desktop.
   useEffect(() => {
-    if (isMobile && activeSidebar?.component) {
+    if (!isMobile) {
+      setMobileSheetContent(null)
+      return
+    }
+    if (activeSidebar?.component) {
       setMobileSheetContent(activeSidebar.id)
     } else {
       setMobileSheetContent(null)
@@ -33,23 +36,7 @@ export const LayoutSidebar = ({
   }, [isMobile, activeSidebar, setMobileSheetContent])
 
   if (!activeSidebar?.component) return null
-
-  if (isMobile)
-    return (
-      <MobileSheetNav
-        shouldCloseOnRouteChange={false}
-        shouldCloseOnViewportResize={false}
-        open={mobileSheetContent !== null}
-        onOpenChange={(open: boolean) => {
-          if (!open) {
-            setMobileSheetContent(null)
-            closeActive()
-          }
-        }}
-      >
-        {activeSidebar?.component?.()}
-      </MobileSheetNav>
-    )
+  if (isMobile) return null
 
   return (
     <>
