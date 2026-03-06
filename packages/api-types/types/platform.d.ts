@@ -4320,6 +4320,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/stripe/fabric/provisioning/account_requests/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get account request details */
+    get: operations['AccountRequestsController_getAccountRequest']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/fabric/provisioning/account_requests/{id}/confirm': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Confirm account request (from Studio) */
+    post: operations['AccountRequestsController_confirmAccountRequest']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/stripe/invoices/overdue': {
     parameters: {
       query?: never
@@ -4609,6 +4643,22 @@ export interface components {
       scope?: 'V0'
       token_alias: string
     }
+    AccountRequestDetailsDto: {
+      email: string
+      expires_at: string
+      id: string
+      name?: string
+      orchestrator: {
+        stripe?: {
+          account: string
+          organization?: string
+        }
+        type: string
+      }
+      scopes?: string[]
+      /** @enum {string} */
+      status: 'pending' | 'complete' | 'expired'
+    }
     AddAwsAccountToPrivateLinkBody: {
       account_name?: string
       aws_account_id: string
@@ -4789,6 +4839,10 @@ export interface components {
       name: string
       payment_intent_id: string
       size?: string
+    }
+    ConfirmResponseDto: {
+      organization_slug: string
+      success: boolean
     }
     ConfirmSubscriptionChangeBody: {
       payment_intent_id: string
@@ -5148,7 +5202,12 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
+          billing_partner:
+            | 'fly'
+            | 'aws_marketplace'
+            | 'vercel_marketplace'
+            | 'stripe_product'
+            | null
           id: number
           is_owner: boolean
           name: string
@@ -5200,8 +5259,6 @@ export interface components {
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
-        | 'pico'
-        | 'nano'
         | 'micro'
         | 'small'
         | 'medium'
@@ -5226,7 +5283,7 @@ export interface components {
        * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
        */
-      postgres_engine?: '13' | '14' | '15' | '17' | '17-oriole'
+      postgres_engine?: '15' | '17' | '17-oriole'
       /** @description Provider region selection. Only one of db_region or region_selection can be specified. */
       region_selection?:
         | {
@@ -5297,15 +5354,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -5373,15 +5430,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -5452,6 +5509,12 @@ export interface components {
            */
           max_fill_ms?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
@@ -5479,6 +5542,12 @@ export interface components {
            */
           max_fill_ms?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
@@ -6487,7 +6556,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -6691,6 +6760,8 @@ export interface components {
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
       AUDIT_LOG_DISABLE_POSTGRES: boolean | null
+      CUSTOM_OAUTH_ENABLED: boolean
+      CUSTOM_OAUTH_MAX_PROVIDERS: number
       DB_MAX_POOL_SIZE: number | null
       /** @enum {string|null} */
       DB_MAX_POOL_SIZE_UNIT: 'connections' | 'percent' | null
@@ -7102,6 +7173,7 @@ export interface components {
             | 'instances.read_replicas'
             | 'instances.disk_modifications'
             | 'instances.high_availability'
+            | 'instances.orioledb'
             | 'replication.etl'
             | 'storage.max_file_size'
             | 'storage.max_file_size.configurable'
@@ -7131,7 +7203,9 @@ export interface components {
             | 'auth.user_sessions'
             | 'auth.leaked_password_protection'
             | 'auth.advanced_auth_settings'
+            | 'auth.performance_settings'
             | 'backup.retention_days'
+            | 'backup.restore_to_new_project'
             | 'function.max_count'
             | 'function.size_limit_mb'
             | 'realtime.max_concurrent_users'
@@ -7145,7 +7219,10 @@ export interface components {
             | 'security.member_roles'
             | 'project_pausing'
             | 'project_cloning'
+            | 'project_restore_after_expiry'
             | 'assistant.advance_model'
+            | 'integrations.github_connections'
+            | 'dedicated_pooler'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -7493,7 +7570,7 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
       id: number
       is_owner: boolean
       name: string
@@ -7556,7 +7633,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -8462,15 +8539,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -8550,15 +8627,15 @@ export interface components {
           | {
               big_query: {
                 /**
+                 * @description Number of concurrent BigQuery Storage Write API connections.
+                 * @example 8
+                 */
+                connection_pool_size?: number
+                /**
                  * @description BigQuery dataset id
                  * @example analytics
                  */
                 dataset_id: string
-                /**
-                 * @description Maximum number of concurrent write streams
-                 * @example 8
-                 */
-                max_concurrent_streams?: number
                 /**
                  * @description Maximum data staleness in minutes
                  * @example 5
@@ -8761,6 +8838,12 @@ export interface components {
            */
           max_fill_ms?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
@@ -8820,6 +8903,12 @@ export interface components {
              */
             max_fill_ms?: number
           }
+          /**
+           * @description Behavior when the replication slot is invalidated
+           * @example error
+           * @enum {string}
+           */
+          invalidated_slot_behavior?: 'error' | 'recreate'
           /** @description Maximum number of copy connections per table */
           max_copy_connections_per_table?: number
           /** @description Maximum number of table sync workers */
@@ -9794,6 +9883,7 @@ export interface components {
     UpdateGoTrueConfigBody: {
       API_MAX_REQUEST_DURATION?: number | null
       AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
+      CUSTOM_OAUTH_ENABLED?: boolean
       DB_MAX_POOL_SIZE?: number | null
       /** @enum {string|null} */
       DB_MAX_POOL_SIZE_UNIT?: 'connections' | 'percent' | null
@@ -10199,15 +10289,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -10275,15 +10365,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -10354,6 +10444,12 @@ export interface components {
            */
           max_fill_ms?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
@@ -10381,6 +10477,12 @@ export interface components {
            */
           max_fill_ms?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
@@ -10713,15 +10815,15 @@ export interface components {
         | {
             big_query: {
               /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number
+              /**
                * @description BigQuery dataset id
                * @example analytics
                */
               dataset_id: string
-              /**
-               * @description Maximum number of concurrent write streams
-               * @example 8
-               */
-              max_concurrent_streams?: number
               /**
                * @description Maximum data staleness in minutes
                * @example 5
@@ -10789,6 +10891,12 @@ export interface components {
            */
           max_fill_ms?: number
         }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number
         /** @description Maximum number of table sync workers */
@@ -17102,6 +17210,7 @@ export interface operations {
           | 'instances.read_replicas'
           | 'instances.disk_modifications'
           | 'instances.high_availability'
+          | 'instances.orioledb'
           | 'replication.etl'
           | 'storage.max_file_size'
           | 'storage.max_file_size.configurable'
@@ -17131,7 +17240,9 @@ export interface operations {
           | 'auth.user_sessions'
           | 'auth.leaked_password_protection'
           | 'auth.advanced_auth_settings'
+          | 'auth.performance_settings'
           | 'backup.retention_days'
+          | 'backup.restore_to_new_project'
           | 'function.max_count'
           | 'function.size_limit_mb'
           | 'realtime.max_concurrent_users'
@@ -17145,7 +17256,10 @@ export interface operations {
           | 'security.member_roles'
           | 'project_pausing'
           | 'project_cloning'
+          | 'project_restore_after_expiry'
           | 'assistant.advance_model'
+          | 'integrations.github_connections'
+          | 'dedicated_pooler'
       }
       header?: never
       path?: never
@@ -22693,8 +22807,6 @@ export interface operations {
       query: {
         cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
         desired_instance_size?:
-          | 'pico'
-          | 'nano'
           | 'micro'
           | 'small'
           | 'medium'
@@ -26297,6 +26409,48 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  AccountRequestsController_getAccountRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AccountRequestDetailsDto']
+        }
+      }
+    }
+  }
+  AccountRequestsController_confirmAccountRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ConfirmResponseDto']
+        }
       }
     }
   }

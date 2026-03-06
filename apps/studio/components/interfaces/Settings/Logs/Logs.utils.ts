@@ -6,6 +6,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
+
 import logConstants from 'shared-data/logConstants'
 
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
@@ -280,21 +281,6 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
 
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
- */
-export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?: PlanId) => {
-  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
-
-  return (
-    (day > 1 && planId === 'free') ||
-    (day > 7 && planId === 'pro') ||
-    (day > 28 && planId === 'team') ||
-    (day > 90 && planId === 'enterprise')
-  )
-}
-
-/**
- * Determine if we should show the user an upgrade prompt while browsing logs
- * This method should replace maybeShowUpgradePrompt once we have migrated all usage to the Entitlements API.
  */
 export const maybeShowUpgradePromptIfNotEntitled = (
   from: string | null | undefined,

@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { template } from 'lodash'
-import { Download, Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -16,6 +11,10 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { template } from 'lodash'
+import { Download, Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Alert,
   AlertDialog,
@@ -44,7 +43,7 @@ import {
 } from 'ui-patterns'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-const SSLConfiguration = () => {
+export const SSLConfiguration = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isEnforced, setIsEnforced] = useState(false)
@@ -114,7 +113,7 @@ const SSLConfiguration = () => {
     <PageSection id="ssl-configuration">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>SSL Configuration</PageSectionTitle>
+          <PageSectionTitle>SSL configuration</PageSectionTitle>
         </PageSectionSummary>
         <DocsButton href={`${DOCS_URL}/guides/platform/ssl-enforcement`} />
       </PageSectionMeta>
@@ -231,5 +230,3 @@ const SSLConfiguration = () => {
     </PageSection>
   )
 }
-
-export default SSLConfiguration

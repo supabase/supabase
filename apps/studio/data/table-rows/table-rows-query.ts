@@ -16,6 +16,7 @@ import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { handleError } from '../fetchers'
+import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
@@ -390,10 +391,17 @@ async function getTableRows(
 }
 
 export const useTableRowsQuery = <TData = TableRowsData>(
-  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>,
+  {
+    projectRef,
+    connectionString: connectionStringOverride,
+    tableId,
+    ...args
+  }: Omit<TableRowsVariables, 'queryClient'>,
   { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
+  const { connectionString: connectionStringReadOps } = useConnectionStringForReadOps()
+  const connectionString = connectionStringOverride || connectionStringReadOps
 
   // [Joshen] Exclude preflightCheck from query key
   const { preflightCheck, ...othersArgs } = args
@@ -401,11 +409,16 @@ export const useTableRowsQuery = <TData = TableRowsData>(
   return useQuery<TableRowsData, TableRowsError, TData>({
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
+      connectionString,
       ...othersArgs,
     }),
     queryFn: ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof tableId !== 'undefined' &&
+      (!IS_PLATFORM || typeof connectionString !== 'undefined'),
     ...options,
   })
 }
@@ -417,6 +430,7 @@ export function prefetchTableRows(
   return client.fetchQuery({
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
+      connectionString,
       ...args,
     }),
     queryFn: ({ signal }) =>

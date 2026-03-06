@@ -4,12 +4,12 @@ import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
   createContext,
-  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
+  type PropsWithChildren,
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
@@ -82,8 +82,9 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
+  const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -93,19 +94,29 @@ export const useUnifiedLogsPreview = () => {
 
 export const useIsBranching2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const gitlessBranchingEnabled = useFlag('gitlessBranching')
-  return gitlessBranchingEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+}
+
+export const useIsPgDeltaDiffEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
+  return pgDeltaDiffEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
 }
 
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const advisorRulesEnabled = useFlag('advisorRules')
-  return advisorRulesEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
 export const useIsQueueOperationsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
+}
+
+export const useIsPlatformWebhooksEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const platformWebhooksEnabled = useFlag('platformWebhooks')
+  return platformWebhooksEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]
 }
 
 export const useIsTableFilterBarEnabled = () => {

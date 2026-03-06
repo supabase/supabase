@@ -6,16 +6,16 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.97.1-canary.3
-  '@supabase/postgrest-js': 2.97.1-canary.3
-  '@supabase/realtime-js': 2.97.1-canary.3
-  '@supabase/supabase-js': 2.97.1-canary.3
+  '@supabase/auth-js': 2.98.1-canary.0
+  '@supabase/postgrest-js': 2.98.1-canary.0
+  '@supabase/realtime-js': 2.98.1-canary.0
+  '@supabase/supabase-js': 2.98.1-canary.0
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
-  next: ^15.5.10
-  lodash-es: ^4.17.23
   lodash: ^4.17.23
+  lodash-es: ^4.17.23
+  next: ^15.5.10
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -44,7 +44,7 @@ minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
-  - 'next'
+  - next
   - '@next/*'
   - ai
   - js-yaml
@@ -59,19 +59,27 @@ minimumReleaseAgeExclude:
   - lodash
   - next-mdx-remote
   - react-resizable-panels
+  - swiper@12.1.2
 
 onlyBuiltDependencies:
   - node-pty
   - supabase
 
 overrides:
+  '@aws-sdk/core>fast-xml-parser': ^5.3.5
+  '@mapbox/node-pre-gyp>tar': ^7.5.8
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
+  cacache>tar: ^7.5.8
   esbuild: ^0.25.2
-  nodemailer: ^7.0.11
-  lodash-es: 'catalog:'
   lodash: 'catalog:'
+  lodash-es: 'catalog:'
+  node-gyp>tar: ^7.5.8
+  nodemailer: ^7.0.11
+  openapi-sampler>fast-xml-parser: ^5.3.5
   payload>undici: ^7.18.2
   refractor>prismjs: ^1.30.0
-  tar: ^7.5.7
   tmp: ^0.2.4
+
+patchedDependencies:
+  react-data-grid: patches/react-data-grid.patch
