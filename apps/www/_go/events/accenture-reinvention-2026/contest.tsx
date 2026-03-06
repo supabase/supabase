@@ -6,18 +6,19 @@ const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'accenture-reinvention-2026/contest',
   metadata: {
-    title: 'Win an iPhone Pro Max | Supabase at Accenture AI & Data Conference (ReinventionX) 2026',
+    title:
+      'Win an iPhone 17 Pro Max | Supabase at Accenture AI & Data Conference (ReinventionX) 2026',
     description:
-      'Create a Supabase account and load data for a chance to win an iPhone Pro Max. Accenture AI & Data Conference (ReinventionX) 2026.',
+      'Create a Supabase account and load data for a chance to win an iPhone 17 Pro Max. Accenture AI & Data Conference (ReinventionX) 2026.',
   },
   hero: {
-    title: 'Win an iPhone Pro Max',
+    title: 'Win an iPhone 17 Pro Max',
     subtitle: 'Supabase at Accenture AI & Data Conference 2026',
     description:
-      'Your team is already building with AI tools. Supabase is the production backend that turns those prototypes into secure, scalable applications. Try it out -- create an account, load some data, and you could win an iPhone Pro Max.',
+      'Your team is already building with AI tools. Supabase is the production backend that turns those prototypes into secure, scalable applications. Try it out -- create an account, load some data, and you could win an iPhone 17 Pro Max.',
     image: {
       src: '/images/landing-pages/stripe-sessions/iphone17-pro-max.png',
-      alt: 'iPhone Pro Max',
+      alt: 'Orange iPhone 17 Pro Max',
       width: 400,
       height: 500,
     },
