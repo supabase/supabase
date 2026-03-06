@@ -306,7 +306,7 @@ export const Addons = () => {
                         subject: 'Project too old old for PITR',
                       }}
                     >
-                      <a>Contact support</a>
+                      Contact support
                     </SupportLink>
                   </Button>
                 </AlertDescription_Shadcn_>
