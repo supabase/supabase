@@ -3,7 +3,7 @@ import path from 'path'
 import { expect, Page } from '@playwright/test'
 
 import { env } from '../env.config.js'
-import { dropTable } from '../utils/db/index.js'
+import { dropTable, query } from '../utils/db/index.js'
 import { createTable, createTableWithRLS } from '../utils/db/queries.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test, withSetupCleanup } from '../utils/test.js'
@@ -33,10 +33,10 @@ const deleteTable = async (page: Page, ref: string, tableName: string) => {
 }
 
 const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
-  // Wait for the types page to fully load by checking for a known enum that always exists
-  await expect(page.getByRole('cell', { name: 'feedback_vote', exact: true })).toBeVisible({
-    timeout: 30_000,
-  })
+  const loadTypesPromise = waitForApiResponse(page, 'pg-meta', ref, `types`)
+  await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
+  await loadTypesPromise
+  expect(page.getByText('public').first()).toBeVisible()
 
   // if enum (test) exists, delete it.
   const exists = (await page.getByRole('cell', { name: enumName, exact: true }).count()) > 0
@@ -176,10 +176,18 @@ testRunner('table editor', () => {
     const columnNameEnum = 'pw_column_enum'
     const enum_name = 'pw_enum'
 
+    let shouldCleanup = true
+    await using _ = await withSetupCleanup(
+      async () => {
+        await query(`drop table if exists ${tableNameEnum};`);
+        await query(`drop type if exists ${enum_name};`);
+      },
+      async () => {
+        await query(`drop table if exists ${tableNameEnum};`);
+        await query(`drop type if exists ${enum_name};`);
+      }
+    )
     await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
-
-    // delete enum if it exists
-    await deleteEnumIfExist(page, ref, enum_name)
 
     // create a new enum
     await page.getByRole('button', { name: 'Create type' }).click()
@@ -187,9 +195,7 @@ testRunner('table editor', () => {
     await page.locator('input[name="values.0.value"]').fill('value1')
     await page.getByRole('button', { name: 'Add value' }).click()
     await page.locator('input[name="values.1.value"]').fill('value2')
-    const createTypePromise = waitForApiResponse(page, 'pg-meta', ref, 'types')
     await page.getByRole('button', { name: 'Create type' }).click()
-    await createTypePromise
 
     // verify enum is created
     await expect(page.getByRole('cell', { name: enum_name, exact: true })).toBeVisible()
@@ -247,6 +253,7 @@ testRunner('table editor', () => {
 
     // clear local storage, as it might result in some flakiness
     await resetLocalStorage(page, ref)
+    shouldCleanup = false
   })
 
   test('Grid editor exporting works as expected', async ({ page, ref }) => {
