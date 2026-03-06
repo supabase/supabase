@@ -722,13 +722,6 @@ export const TAX_IDS: TaxId[] = [
     countryIso2: 'MK',
   },
   {
-    name: 'nz_gst',
-    type: 'nz_gst',
-    country: 'New Zealand',
-    placeholder: '123456789',
-    countryIso2: 'NZ',
-  },
-  {
     name: 'NO VAT',
     type: 'no_vat',
     country: 'Norway',
