@@ -5,7 +5,6 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { isGreaterThanOrEqual } from 'lib/semver'
@@ -33,7 +32,6 @@ export const CronjobsTab = () => {
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
-  const [isDirty, setIsDirty] = useState(false)
   const [search, setSearch] = useState(searchQuery)
 
   const handleSearchSubmit = () => {
@@ -141,13 +139,6 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(false)
     cleanPointerEventsNoneOnBody(500)
   }
-  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
-    onClose: () => {
-      setIsDirty(false)
-      onClose()
-    },
-  })
 
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
@@ -195,11 +186,8 @@ export const CronjobsTab = () => {
         open={!!createCronJobSheetShown || !!cronJobForEditing}
         selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
         supportsSeconds={supportsSeconds}
-        onDirty={setIsDirty}
         onClose={onClose}
-        onCloseWithConfirmation={confirmOnClose}
       />
-      {/* <DiscardChangesConfirmationDialog {...modalProps} /> */}
     </>
   )
 }

@@ -3,7 +3,6 @@ import { toString as CronToString } from 'cronstrue'
 import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Edit3, List } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -60,16 +59,6 @@ export const CronJobPage = () => {
     cronJobValues.type === 'edge_function' ? cronJobValues.edgeFunctionName : undefined
   const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()
   const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
-
-  const [isDirty, setIsDirty] = useState(false)
-
-  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
-    onClose: () => {
-      setIsDirty(false)
-      setIsEditSheetOpen(false)
-    },
-  })
 
   const pageTitle = childLabel || childId || 'Cron Job'
 
@@ -200,12 +189,9 @@ export const CronJobPage = () => {
             command: job.command,
           }}
           supportsSeconds={true}
-          onDirty={setIsDirty}
           onClose={() => setIsEditSheetOpen(false)}
-          onCloseWithConfirmation={confirmOnClose}
         />
       )}
-      {/* <DiscardChangesConfirmationDialog {...modalProps} /> */}
     </>
   )
 }

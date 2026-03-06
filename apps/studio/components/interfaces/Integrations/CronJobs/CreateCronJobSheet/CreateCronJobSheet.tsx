@@ -57,9 +57,7 @@ interface CreateCronJobSheetProps {
   open: boolean
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
   supportsSeconds: boolean
-  onDirty: (isDirty: boolean) => void
   onClose: () => void
-  onCloseWithConfirmation: () => void
 }
 
 const FORM_ID = 'create-cron-job-sidepanel'
@@ -92,9 +90,7 @@ export const CreateCronJobSheet = ({
   open,
   selectedCronJob,
   supportsSeconds,
-  onDirty,
   onClose,
-  // onCloseWithConfirmation: confirmOnClose,
 }: CreateCronJobSheetProps) => {
   const { childId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -244,15 +240,6 @@ export const CreateCronJobSheet = ({
     )
     setIsLoadingGetCronJob(false)
   }
-
-  useEffect(() => {
-    const subscription = form.watch(() => {
-      const isDirty = form.formState.isDirty
-      onDirty(isDirty)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [form, onDirty])
 
   // update the snippet field when the user changes the any values in the form
   useEffect(() => {
