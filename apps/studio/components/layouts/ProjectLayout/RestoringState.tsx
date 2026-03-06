@@ -15,7 +15,6 @@ import {
   Button,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -26,7 +25,7 @@ import {
 
 import { useProjectLastRestoreInitiatedQuery } from '@/data/projects/project-restore-status-query'
 
-const RestoringState = () => {
+export const RestoringState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -190,5 +189,3 @@ const RestoringState = () => {
     </div>
   )
 }
-
-export default RestoringState
