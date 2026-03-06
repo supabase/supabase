@@ -4,7 +4,7 @@ import { Badge, Card, CardContent, Loading, Tooltip, TooltipContent, TooltipTrig
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import { ButtonTooltip } from '../../ui/ButtonTooltip'
-import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
+import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
 
 type ServiceConfig = {

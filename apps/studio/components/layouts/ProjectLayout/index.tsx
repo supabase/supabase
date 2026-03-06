@@ -35,7 +35,6 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { usePHFlag } from '@/hooks/ui/useFlag'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
@@ -267,8 +266,6 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const isHomeNew = usePHFlag('homeNew') === 'new-home'
-
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
   const isHomePage = router.pathname === '/project/[ref]'
 
@@ -288,13 +285,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
-  // handle redirect to home for building state
-  const shouldRedirectToHomeForBuilding =
-    isProjectBuilding && requiresDbConnection && isHomeNew && !isHomePage
+  const shouldRedirectToHomeForBuilding = isProjectBuilding && requiresDbConnection && !isHomePage
 
-  // We won't be showing the building state with the new home page
-  const shouldShowBuildingState =
-    isProjectBuilding && requiresDbConnection && !(isHomeNew && isHomePage)
+  // Don't show building state on the home page — it handles building state inline
+  const shouldShowBuildingState = isProjectBuilding && requiresDbConnection && !isHomePage
 
   useEffect(() => {
     if (shouldRedirectToHomeForBuilding && ref) {

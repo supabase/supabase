@@ -88,6 +88,11 @@ const nextConfig = {
               destination: '/sign-in',
               permanent: false,
             },
+            {
+              source: '/project/:ref/building',
+              destination: '/project/:ref',
+              permanent: false,
+            },
           ]
         : [
             {
@@ -118,6 +123,11 @@ const nextConfig = {
             {
               source: '/log-in',
               destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/project/:ref/building',
+              destination: '/project/:ref',
               permanent: false,
             },
           ]),

@@ -1,27 +1,27 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import dayjs from 'dayjs'
-import { useEffect, useRef } from 'react'
-
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { ProjectUsageSection as ProjectUsageSectionV1 } from 'components/interfaces/Home/ProjectUsageSection'
-import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
-import { TopSection } from 'components/interfaces/HomeNew/TopSection'
+import { SortableSection } from 'components/interfaces/ProjectHome/SortableSection'
+import { TopSection } from 'components/interfaces/ProjectHome/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import dayjs from 'dayjs'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { useEffect, useRef } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
+
 import { AdvisorSection } from './AdvisorSection'
 import { CustomReportSection } from './CustomReportSection'
 import { type GettingStartedState } from './GettingStarted/GettingStarted.types'
 import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
 import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
 
-export const HomeV2 = () => {
+export const ProjectHome = () => {
   const { enableBranching } = useParams()
   const snap = useAppStateSnapshot()
   const { data: project } = useSelectedProjectQuery()

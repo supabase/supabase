@@ -329,7 +329,6 @@
       "components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet.tsx": 1,
       "components/interfaces/Functions/EdgeFunctionsListItem.tsx": 2,
       "components/interfaces/Functions/FunctionsNav.tsx": 1,
-      "components/interfaces/Home/Home.tsx": 6,
       "components/interfaces/Home/ProjectList/ProjectList.tsx": 1,
       "components/interfaces/Home/ProjectUsage.tsx": 1,
       "components/interfaces/Home/ServiceStatus.tsx": 1,

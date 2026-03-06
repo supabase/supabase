@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle, cn, Loading } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
-import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
+import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
 
 const colorClassMap: Record<string, string> = {

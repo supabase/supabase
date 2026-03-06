@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 
-import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
+import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import {
   computeSuccessAndNonSuccessRates,
   sumErrors,
   sumTotal,
   sumWarnings,
-} from '../HomeNew/ProjectUsage.metrics'
+} from '../ProjectHome/ProjectUsage.metrics'
 
 /**
  * Calculates the date range for fetching service health metrics

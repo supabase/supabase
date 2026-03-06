@@ -1,5 +1,5 @@
-import { ActivityStats } from 'components/interfaces/HomeNew/ActivityStats'
-import { ProjectConnectionHoverCard } from 'components/interfaces/HomeNew/ProjectConnectionHoverCard'
+import { ActivityStats } from 'components/interfaces/ProjectHome/ActivityStats'
+import { ProjectConnectionHoverCard } from 'components/interfaces/ProjectHome/ProjectConnectionHoverCard'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
