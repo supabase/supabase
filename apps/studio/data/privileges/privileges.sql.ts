@@ -215,8 +215,9 @@ export function getExposedFunctionCountsSql({ selectedSchemas }: { selectedSchem
   return /* SQL */ `
     with ${getFunctionGrantsCTEs()}
     select
-      (select count(*)::int from function_grants) as total_count,
-      (select count(*)::int from function_grants where status = 'granted' and schema_name in (${schemasList})) as grants_count;
+      count(*)::int as total_count,
+      (count(*) filter (where status = 'granted' and schema_name in (${schemasList})))::int as grants_count
+    from function_grants
   `
 }
 
