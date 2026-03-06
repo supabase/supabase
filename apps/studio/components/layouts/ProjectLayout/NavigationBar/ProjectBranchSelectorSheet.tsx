@@ -4,6 +4,8 @@ import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import type { Branch } from 'data/branches/branches-query'
 import type { ProjectDetail } from 'data/projects/project-detail-query'
 import { Box, Boxes, GitBranch } from 'lucide-react'
+
+import { ProjectBranchSelectorSheetTabTrigger } from './ProjectBranchSelectorSheetTabTrigger'
 import type { Organization } from 'types'
 import {
   cn,
@@ -16,7 +18,7 @@ import {
 } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
-const embeddedClassName =
+const EMBEDDED_CLASSNAME =
   'bg-transparent border-0 shadow-none min-h-0 flex-1 flex flex-col overflow-hidden rounded-none'
 
 export interface ProjectBranchSelectorSheetProps {
@@ -103,49 +105,16 @@ export function ProjectBranchSelectorSheet({
               tabs.length === 3 && 'grid-cols-3'
             )}
           >
-            {tabs.map(({ value, label, icon: Icon }, index) => {
-              const isBranch = value === 'branch'
-              const isProductionBranch = isBranch && isMainBranch
-              const isLast = index === tabs.length - 1
-
-              return (
-                <TabsTrigger_Shadcn_
-                  key={value}
-                  value={value}
-                  className={cn(
-                    'group relative text-xs flex flex-col items-center gap-1.5 px-4 py-3 data-[state=active]:bg-surface-200 data-[state=active]:border-foreground-light border-b duration-0',
-                    isProductionBranch &&
-                      'text-warning data-[state=active]:text-warning hover:text-warning hover:opacity-70'
-                  )}
-                >
-                  <Icon className="shrink-0" size={16} strokeWidth={1.5} />
-                  <span className="truncate max-w-full text-xs leading-tight" title={label}>
-                    {label}
-                  </span>
-
-                  {!isLast && (
-                    <svg
-                      aria-hidden="true"
-                      width="100%"
-                      height="100%"
-                      viewBox="0 0 6 63"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="absolute duration-0 bottom-0 top-0 -right-2 w-3 h-full z-10"
-                    >
-                      <path
-                        d="M5.49365 31L0.493652 0V62L5.49365 31Z"
-                        className="fill-[hsl(var(--background-dash-sidebar))] group-data-[state=active]:fill-[hsl(var(--background-surface-200))]"
-                      />
-                      <path
-                        d="M0.493652 0L5.49365 31L0.493652 62"
-                        stroke="hsl(var(--border-default))"
-                      />
-                    </svg>
-                  )}
-                </TabsTrigger_Shadcn_>
-              )
-            })}
+            {tabs.map(({ value, label, icon }, index) => (
+              <ProjectBranchSelectorSheetTabTrigger
+                key={value}
+                value={value}
+                label={label}
+                icon={icon}
+                isMainBranch={value === 'branch' ? isMainBranch : undefined}
+                isLast={index === tabs.length - 1}
+              />
+            ))}
           </TabsList_Shadcn_>
         </SheetHeader>
         {tabs.some((t) => t.value === 'organization') && (
@@ -153,7 +122,7 @@ export function ProjectBranchSelectorSheet({
             value="organization"
             className="flex-1 min-h-0 overflow-hidden flex flex-col mt-0 p-0 data-[state=inactive]:hidden"
           >
-            <OrganizationDropdown embedded className={embeddedClassName} onClose={onClose} />
+            <OrganizationDropdown embedded className={EMBEDDED_CLASSNAME} onClose={onClose} />
           </TabsContent_Shadcn_>
         )}
         {tabs.some((t) => t.value === 'project') && (
@@ -161,7 +130,7 @@ export function ProjectBranchSelectorSheet({
             value="project"
             className="flex-1 min-h-0 overflow-hidden flex flex-col mt-0 py-0 data-[state=inactive]:hidden"
           >
-            <ProjectDropdown embedded className={embeddedClassName} onClose={onClose} />
+            <ProjectDropdown embedded className={EMBEDDED_CLASSNAME} onClose={onClose} />
           </TabsContent_Shadcn_>
         )}
         {tabs.some((t) => t.value === 'branch') && (
@@ -169,7 +138,7 @@ export function ProjectBranchSelectorSheet({
             value="branch"
             className="flex-1 min-h-0 overflow-hidden flex flex-col mt-0 p-0 data-[state=inactive]:hidden"
           >
-            <BranchDropdown embedded className={embeddedClassName} onClose={onClose} />
+            <BranchDropdown embedded className={EMBEDDED_CLASSNAME} onClose={onClose} />
           </TabsContent_Shadcn_>
         )}
       </Tabs_Shadcn_>

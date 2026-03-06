@@ -1,6 +1,7 @@
-import { ParsedUrlQuery } from 'querystring'
 import { useParams } from 'common'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { ProjectRowLink } from './ProjectRowLink'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -13,23 +14,7 @@ import { useState } from 'react'
 import { Badge, Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
-  const queryArray = Object.entries(routerQueries)
-
-  if (queryArray.length > 1) {
-    // [Joshen] Ideally we shouldn't use hard coded numbers, but temp workaround
-    // for storage bucket route since its longer
-    const isStorageBucketRoute = 'bucketId' in routerQueries
-    const isSecurityAdvisorRoute = 'preset' in routerQueries
-
-    return route
-      .split('/')
-      .slice(0, isStorageBucketRoute || isSecurityAdvisorRoute ? 5 : 4)
-      .join('/')
-  } else {
-    return route
-  }
-}
+import { sanitizeRoute } from './ProjectDropdown.utils'
 
 interface ProjectDropdownProps {
   /** When true, render only the project list (no link/trigger). For use inside sheet or popover. */
@@ -60,15 +45,19 @@ export const ProjectDropdown = ({
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const [open, setOpen] = useState(false)
-  const close = embedded ? onClose ?? (() => {}) : () => setOpen(false)
+  const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
     if (!embedded) return <ShimmeringLoader className="w-[90px]" />
   }
 
+  const handleSetOpen = embedded
+    ? (_value: boolean) => onClose?.()
+    : setOpen
+
   const selectorProps = {
     open,
-    setOpen: embedded ? onClose ?? (() => {}) : setOpen,
+    setOpen: handleSetOpen,
     selectedRef: ref,
     onSelect: (project: { ref: string }) => {
       const sanitizedRoute = sanitizeRoute(router.route, router.query)
@@ -76,25 +65,14 @@ export const ProjectDropdown = ({
       close()
       router.push(href)
     },
-    renderRow: (project: { ref: string; name: string; status?: string }) => {
-      const sanitizedRoute = sanitizeRoute(router.route, router.query)
-      const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-      const isSelected = project.ref === ref
-      const isPaused = project.status === 'INACTIVE'
-
-      return (
-        <Link
-          href={href}
-          className="w-full flex items-center justify-between p-0.5 md:p-0 text-sm md:text-xs"
-        >
-          <span className={cn('truncate', isSelected ? 'md:max-w-60' : 'md:max-w-64')}>
-            {project.name}
-            {isPaused && <Badge className="ml-2">Paused</Badge>}
-          </span>
-          {isSelected && <Check size={16} />}
-        </Link>
-      )
-    },
+    renderRow: (project: { ref: string; name: string; status?: string }) => (
+      <ProjectRowLink
+        project={project}
+        selectedRef={ref}
+        route={router.route}
+        routerQueries={router.query}
+      />
+    ),
     renderActions: (_setOpen: (value: boolean) => void, options?: { embedded?: boolean }) =>
       projectCreationEnabled ? (
         options?.embedded ? (

@@ -16,6 +16,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { getProjectBranchSelectorState } from './ProjectBranchSelector.utils'
 import { ProjectBranchSelectorPopover } from './ProjectBranchSelectorPopover'
 import { ProjectBranchSelectorSheet } from './ProjectBranchSelectorSheet'
 import { ProjectBranchSelectorTrigger } from './ProjectBranchSelectorTrigger'
@@ -43,13 +44,13 @@ export function ProjectBranchSelector() {
   )
 
   const selectedBranch = branches?.find((b) => b.project_ref === ref)
-  /** When branching is disabled we're always on main; when enabled, main is the branch with is_default. */
-  const isMainBranch = !isBranchingEnabled || selectedBranch?.is_default === true
-  const branchDisplayName = isBranchingEnabled ? selectedBranch?.name ?? 'main' : 'main'
-  const selectedOrgInitial = selectedOrganization?.name?.trim().charAt(0).toUpperCase() || 'O'
-  const organizationHref = selectedOrganization?.slug
-    ? `/org/${selectedOrganization.slug}`
-    : '/organizations'
+  const { isMainBranch, branchDisplayName, selectedOrgInitial, organizationHref } =
+    getProjectBranchSelectorState({
+      selectedBranch,
+      isBranchingEnabled,
+      selectedOrganization: selectedOrganization ?? undefined,
+    })
+
   const goToOrganization = () => {
     setOpen(false)
     router.push(organizationHref)

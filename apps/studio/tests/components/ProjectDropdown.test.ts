@@ -1,4 +1,4 @@
-import { sanitizeRoute } from 'components/layouts/AppLayout/ProjectDropdown'
+import { sanitizeRoute } from 'components/layouts/AppLayout/ProjectDropdown.utils'
 import { test, expect } from 'vitest'
 
 test('Should sanitize project routes correctly when switching projects by removing project specific parameters', () => {

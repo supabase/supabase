@@ -2,7 +2,7 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -10,7 +10,6 @@ import {
   Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -21,6 +20,8 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { ProjectCommandItem } from './OrganizationProjectSelector/ProjectCommandItem'
 
 interface OrganizationProjectSelectorSelectorProps {
   slug?: string
@@ -176,33 +177,16 @@ export const OrganizationProjectSelector = ({
       return (
         <div className="min-h-0 p-1">
           {projects?.map((project) => (
-            <CommandItem_Shadcn_
+            <ProjectCommandItem
               key={project.ref}
-              value={`${project.name.replaceAll('"', '')}-${project.ref}`}
-              className="cursor-pointer w-full"
-              onSelect={() => {
-                onSelect?.(project)
-                setOpen(false)
-              }}
-              onClick={() => setOpen(false)}
-              disabled={!!isOptionDisabled ? isOptionDisabled(project) : false}
-            >
-              {!!renderRow ? (
-                renderRow(project)
-              ) : (
-                <div
-                  className={cn(
-                    'w-full flex items-center',
-                    checkPosition === 'left' ? 'gap-x-2' : 'justify-between',
-                    project.ref !== selectedRef && checkPosition === 'left' && 'ml-6'
-                  )}
-                >
-                  {checkPosition === 'left' && project.ref === selectedRef && <Check size={16} />}
-                  {project.name}
-                  {checkPosition === 'right' && project.ref === selectedRef && <Check size={16} />}
-                </div>
-              )}
-            </CommandItem_Shadcn_>
+              project={project}
+              selectedRef={selectedRef ?? undefined}
+              onSelect={onSelect}
+              onClose={() => setOpen(false)}
+              renderRow={renderRow}
+              checkPosition={checkPosition}
+              isOptionDisabled={isOptionDisabled}
+            />
           ))}
           <div ref={sentinelRef} className="h-1 -mt-1" />
           {hasNextPage && (
@@ -216,33 +200,16 @@ export const OrganizationProjectSelector = ({
     return (
       <ScrollArea className={(projects || []).length > 7 ? 'h-full md:h-[210px]' : ''}>
         {projects?.map((project) => (
-          <CommandItem_Shadcn_
+          <ProjectCommandItem
             key={project.ref}
-            value={`${project.name.replaceAll('"', '')}-${project.ref}`}
-            className="cursor-pointer w-full"
-            onSelect={() => {
-              onSelect?.(project)
-              setOpen(false)
-            }}
-            onClick={() => setOpen(false)}
-            disabled={!!isOptionDisabled ? isOptionDisabled(project) : false}
-          >
-            {!!renderRow ? (
-              renderRow(project)
-            ) : (
-              <div
-                className={cn(
-                  'w-full flex items-center',
-                  checkPosition === 'left' ? 'gap-x-2' : 'justify-between',
-                  project.ref !== selectedRef && checkPosition === 'left' && 'ml-6'
-                )}
-              >
-                {checkPosition === 'left' && project.ref === selectedRef && <Check size={16} />}
-                {project.name}
-                {checkPosition === 'right' && project.ref === selectedRef && <Check size={16} />}
-              </div>
-            )}
-          </CommandItem_Shadcn_>
+            project={project}
+            selectedRef={selectedRef ?? undefined}
+            onSelect={onSelect}
+            onClose={() => setOpen(false)}
+            renderRow={renderRow}
+            checkPosition={checkPosition}
+            isOptionDisabled={isOptionDisabled}
+          />
         ))}
         <div ref={sentinelRef} className="h-1 -mt-1" />
         {hasNextPage && (

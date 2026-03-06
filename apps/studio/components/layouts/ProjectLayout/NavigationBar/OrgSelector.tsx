@@ -1,10 +1,9 @@
 import { useBreakpoint, useParams } from 'common'
-import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Boxes, Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Boxes, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -25,6 +24,8 @@ import {
   SidebarMenuItem,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { OrgCommandItem } from 'components/layouts/AppLayout/OrgCommandItem'
 
 import { OrgSelectorSheet } from './OrgSelectorSheet'
 
@@ -117,32 +118,16 @@ export function OrgSelector() {
                   <ScrollArea
                     className={(organizations || []).length > 7 ? 'h-full md:h-[210px]' : ''}
                   >
-                    {organizations?.map((org) => {
-                      const href = routeSlug
-                        ? router.pathname.replace('[slug]', org.slug)
-                        : `/org/${org.slug}`
-
-                      return (
-                        <CommandItem_Shadcn_
-                          key={org.slug}
-                          value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
-                          className="cursor-pointer w-full"
-                          onSelect={() => {
-                            setOpen(false)
-                            router.push(href)
-                          }}
-                          onClick={() => setOpen(false)}
-                        >
-                          <Link href={href} className="w-full flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span>{org.name}</span>
-                              <PartnerIcon organization={org} />
-                            </div>
-                            {org.slug === slug && <Check size={16} />}
-                          </Link>
-                        </CommandItem_Shadcn_>
-                      )
-                    })}
+                    {organizations?.map((org) => (
+                      <OrgCommandItem
+                        key={org.slug}
+                        org={org}
+                        selectedSlug={slug}
+                        routePathname={router.pathname}
+                        hasRouteSlug={!!routeSlug}
+                        onClose={() => setOpen(false)}
+                      />
+                    ))}
                   </ScrollArea>
                 </CommandGroup_Shadcn_>
                 <CommandSeparator_Shadcn_ />
