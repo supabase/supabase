@@ -38,7 +38,7 @@ export function UpdateBillingAddressModal() {
   const [dismissed, setDismissed] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const showMissingAddressModal = useFlag('missingBillingAddressModal')
+  const showMissingAddressModal = useFlag('enableBillingAddressModal')
   const { data: org } = useSelectedOrganizationQuery()
   const slug = org?.slug
 
@@ -47,27 +47,12 @@ export function UpdateBillingAddressModal() {
     'stripe.customer'
   )
 
-  // TODO: remove DEV_FORCE_SHOW before merging
-  const DEV_FORCE_SHOW = process.env.NODE_ENV === 'development'
-
-  if (DEV_FORCE_SHOW) {
-    console.log('[MissingBillingAddressModal]', {
-      IS_PLATFORM,
-      showMissingAddressModal,
-      org: org?.slug,
-      organization_missing_address: org?.organization_missing_address,
-      billing_partner: org?.billing_partner,
-      permissionsLoaded,
-      canBillingWrite,
-    })
-  }
-
   const shouldShow =
-    (IS_PLATFORM || DEV_FORCE_SHOW) &&
-    (!!showMissingAddressModal || DEV_FORCE_SHOW) &&
+    IS_PLATFORM &&
+    !!showMissingAddressModal &&
     !!org &&
     org.plan.id !== 'free' &&
-    (!!org.organization_missing_address || DEV_FORCE_SHOW) &&
+    !!org.organization_missing_address &&
     !org.billing_partner &&
     permissionsLoaded &&
     canBillingWrite
@@ -79,15 +64,19 @@ export function UpdateBillingAddressModal() {
     setDismissed(false)
   }, [router.asPath])
 
-  const { data: customerProfile, isSuccess: profileLoaded } = useOrganizationCustomerProfileQuery(
-    { slug },
-    { enabled: open && !!slug }
-  )
+  const {
+    data: customerProfile,
+    isSuccess: profileLoaded,
+    isError: profileError,
+    refetch: refetchProfile,
+  } = useOrganizationCustomerProfileQuery({ slug }, { enabled: open && !!slug })
 
-  const { data: taxId, isSuccess: taxIdLoaded } = useOrganizationTaxIdQuery(
-    { slug },
-    { enabled: open && !!slug }
-  )
+  const {
+    data: taxId,
+    isSuccess: taxIdLoaded,
+    isError: taxIdError,
+    refetch: refetchTaxId,
+  } = useOrganizationTaxIdQuery({ slug }, { enabled: open && !!slug })
 
   const initialCustomerData = useMemo<Partial<BillingCustomerDataFormValues>>(
     () => ({
@@ -159,7 +148,24 @@ export function UpdateBillingAddressModal() {
           </DialogDescription>
         </DialogHeader>
 
-        {!profileLoaded || !taxIdLoaded ? (
+        {profileError || taxIdError ? (
+          <DialogSection>
+            <div className="flex flex-col items-center gap-3 py-4 text-center">
+              <p className="text-sm text-foreground-light">
+                Failed to load billing data. Please try again.
+              </p>
+              <Button
+                type="default"
+                onClick={() => {
+                  if (profileError) refetchProfile()
+                  if (taxIdError) refetchTaxId()
+                }}
+              >
+                Retry
+              </Button>
+            </div>
+          </DialogSection>
+        ) : !profileLoaded || !taxIdLoaded ? (
           <DialogSection>
             <div className="space-y-2">
               <ShimmeringLoader />
