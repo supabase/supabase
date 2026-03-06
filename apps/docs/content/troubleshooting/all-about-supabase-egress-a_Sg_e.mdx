@@ -23,7 +23,7 @@ You can review the [Billing Dashboard](/dashboard/org/_/usage#egress) for egress
 
 While pointing out the exact cause for egress may not be straightforward, there are various steps you can take to determine the source of these issues:
 
-- Review your egress usage at the project and org level in the [Billing Dashboard](https://supabase.com/dashboard/org/_/usage#egress)
+- Review your egress usage at the project and org level in the [Billing Dashboard](/dashboard/org/_/usage#egress)
 - Picking the "Top Paths" from the [log explorer](https://app.supabase.com/project/_/logs/explorer/templates) will help you identify heavily queried paths
 - By finding the most requested queries from Query performance report: https://app.supabase.com/project/_/advisors/query-performance
 - Supavisor Egress is independent of client. There is no direct relation between a single query and Supavisor egress, it is harder to debug and identify. But you can make use of frequent queries from the link in above step that also displays average number of rows which will help to identify queries with a large number of rows returned. While this does not display Supavisor queries specifically, it will give an overview of queries with lots of rows that can help.
