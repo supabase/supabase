@@ -150,7 +150,16 @@ export type PageHeaderTitleProps = React.ComponentProps<'h1'>
  */
 const PageHeaderTitle = ({ className, children, ...props }: PageHeaderTitleProps) => {
   return (
-    <h1 data-slot="page-header-title" className={cn('heading-title', className)} {...props}>
+    <h1
+      data-slot="page-header-title"
+      className={cn('heading-title', className)}
+      style={
+        {
+          textBoxTrim: 'trim-end',
+        } as React.CSSProperties
+      }
+      {...props}
+    >
       {children}
     </h1>
   )
@@ -171,6 +180,11 @@ const PageHeaderDescription = ({ className, children, ...props }: PageHeaderDesc
     <div
       data-slot="page-header-description"
       className={cn('heading-subSection text-foreground-light', className)}
+      style={
+        {
+          textBoxTrim: 'trim-end',
+        } as React.CSSProperties
+      }
       {...props}
     >
       {children}
@@ -192,16 +206,24 @@ export type PageHeaderMetaProps = React.ComponentProps<'div'>
  */
 const PageHeaderMeta = ({ className, children, ...props }: PageHeaderMetaProps) => {
   const { size } = usePageHeaderContext()
+
   return (
     <PageContainer size={size}>
       <div
         data-slot="page-header-meta"
         className={cn(
-          'flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4',
+          'flex flex-col @xl:flex-row @xl:justify-between @xl:items-end gap-4',
+          // If we can use has selector, change above to @xl:items-center
+          // '@xl:[&:has([data-slot="page-header-description"])]:items-end',
           '[&>[data-slot="page-header-icon"]]:shrink-0',
           '[&>[data-slot="page-header-summary"]]:flex-1',
           className
         )}
+        style={
+          {
+            textBoxTrim: 'trim-end',
+          } as React.CSSProperties
+        }
         {...props}
       >
         {children}
