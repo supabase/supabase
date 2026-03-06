@@ -1401,6 +1401,157 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react",
+        "y-monaco",
+        "yjs",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-react",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react",
+        "y-monaco",
+        "yjs",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-react-router",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react",
+        "y-monaco",
+        "yjs",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react",
+        "y-monaco",
+        "yjs",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "infinite-query-hook",
       "type": "registry:block",
       "title": "Infinite Query Hook",

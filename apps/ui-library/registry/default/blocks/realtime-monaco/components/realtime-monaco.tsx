@@ -1,0 +1,40 @@
+'use client'
+
+import { Editor } from '@monaco-editor/react'
+import { Awareness } from 'y-protocols/awareness.js'
+
+import { useConnectOnMount } from '../hooks/use-connect-on-mount'
+
+type RealtimeMonacoProps = {
+  channel: string
+  language?: string
+  height?: string | number
+  className?: string
+  awareness?: boolean | Awareness
+  theme?: 'light' | 'dark'
+}
+
+const DEFAULT_HEIGHT = 550
+
+const RealtimeMonaco = ({
+  channel,
+  language = 'javascript',
+  height = DEFAULT_HEIGHT,
+  awareness = true,
+  theme,
+  ...rest
+}: RealtimeMonacoProps) => {
+  const { connectOnMount } = useConnectOnMount({ channel, awareness })
+
+  return (
+    <Editor
+      height={height}
+      language={language}
+      theme={theme === 'dark' ? 'vs-dark' : 'light'}
+      onMount={connectOnMount}
+      {...rest}
+    />
+  )
+}
+
+export { RealtimeMonaco }

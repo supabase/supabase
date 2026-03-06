@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "realtime-monaco",
+  "type": "registry:component",
+  "title": "Realtime Monaco",
+  "description": "Real-time Monaco editor for collaborative applications.",
+  "registryDependencies": [],
+  "dependencies": ["@monaco-editor/react", "y-monaco", "yjs"],
+  "files": [
+    {
+      "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+      "type": "registry:component"
+    }
+  ]
+}
