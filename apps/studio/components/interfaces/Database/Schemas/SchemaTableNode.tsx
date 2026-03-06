@@ -1,9 +1,8 @@
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
-import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
+import { DiamondIcon, ExternalLink, Fingerprint, Hash, InfoIcon, Key, Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
-
-import { Button, cn } from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
 export const TABLE_NODE_WIDTH = 320
@@ -15,6 +14,7 @@ export type TableNodeData = {
   name: string
   ref?: string
   isForeign: boolean
+  description: string
   columns: {
     id: string
     isPrimary: boolean
@@ -67,19 +67,30 @@ export const TableNode = ({
               <Table2 strokeWidth={1} size={12} className="text-light" />
               {data.name}
             </div>
-            {!placeholder && (
-              <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link
-                  href={buildTableEditorUrl({
-                    projectRef: data.ref,
-                    tableId: data.id,
-                    schema: data.schema,
-                  })}
-                >
-                  <ExternalLink size={10} className="text-foreground-light" />
-                </Link>
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {data.description && (
+                <Tooltip>
+                  <TooltipTrigger asChild className="cursor-default ">
+                    <InfoIcon size={10} className="text-light" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{data.description}</TooltipContent>
+                </Tooltip>
+              )}
+
+              {!placeholder && (
+                <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
+                  <Link
+                    href={buildTableEditorUrl({
+                      projectRef: data.ref,
+                      tableId: data.id,
+                      schema: data.schema,
+                    })}
+                  >
+                    <ExternalLink size={10} className="text-foreground-light" />
+                  </Link>
+                </Button>
+              )}
+            </div>
           </header>
 
           {data.columns.map((column) => (
