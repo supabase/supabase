@@ -10,22 +10,7 @@ import {
   waitForDatabaseToLoad,
 } from '../utils/wait-for-response.js'
 
-const databaseTableNameNew = 'pw_database_table_new'
-const databaseTableNameUpdated = 'pw_database_table_updated'
-const databaseTableNameDuplicate = 'pw_database_table_duplicate'
 const databaseColumnName = 'pw_database_column'
-const databaseColumnName2 = 'pw_database_column_2'
-const databaseColumnName3 = 'pw_database_column_3'
-const databaseIndexName = 'pw_database_index'
-const databaseEnumName = 'pw_database_enum'
-const databaseEnumValue1Name = 'pw_database_value1'
-const databaseEnumValue2Name = 'pw_database_value2'
-const databaseEnumValue3Name = 'pw_database_value3'
-const databaseTriggerName = 'pw_database_trigger'
-const databaseTriggerNameUpdated = 'pw_database_trigger_updated'
-const databaseFunctionName = 'pw_database_function'
-const databaseFunctionNameUpdated = 'pw_database_function_updated'
-const databaseRoleName = 'pw_database_role'
 
 test.describe('Database', () => {
   test.describe('Schema Visualizer', () => {
@@ -140,12 +125,17 @@ test.describe('Database', () => {
 
     test('CRUD operations and copy works as expected', async ({ page, ref }) => {
       const databaseTableName = 'pw_database_tablecrud_table'
+      const databaseTableNameNew = 'pw_database_table_new'
+      const databaseTableNameUpdated = 'pw_database_table_updated'
+      const databaseTableNameDuplicate = 'pw_database_table_duplicate'
+
       await using _ = await withSetupCleanup(
         async () => {
           await createTable(databaseTableName, databaseColumnName)
         },
         async () => {
           // Cleanup the table in case the test failed at some point
+          await dropTable(databaseTableName)
           await dropTable(databaseTableNameNew)
           await dropTable(databaseTableNameUpdated)
           await dropTable(databaseTableNameDuplicate)
@@ -248,6 +238,9 @@ test.describe('Database', () => {
   test.describe('Tables columns', () => {
     test('can view, create, update, delete, and filter table columns', async ({ page, ref }) => {
       const databaseTableName = 'pw_database_columns_table'
+      const databaseColumnName2 = 'pw_database_column_2'
+      const databaseColumnName3 = 'pw_database_column_3'
+
       await using _ = await withSetupCleanup(
         async () => {
           await createTable(databaseTableName, databaseColumnName)
@@ -382,6 +375,9 @@ test.describe('Database', () => {
 
     test('CRUD operations works as expected', async ({ page, ref }) => {
       const databaseTableName = 'pw_database_trigger_table'
+      const databaseTriggerName = 'pw_database_trigger'
+      const databaseTriggerNameUpdated = 'pw_database_trigger_updated'
+
       await using _ = await withSetupCleanup(
         async () => {
           await createTable(databaseTableName, databaseColumnName)
@@ -517,6 +513,8 @@ test.describe('Database', () => {
 
     test('CRUD operations works as expected', async ({ page, ref }) => {
       const databaseTableName = 'pw_database_indexes_table'
+      const databaseIndexName = 'pw_database_index'
+
       await using _ = await withSetupCleanup(
         async () => {
           await createTable(databaseTableName, databaseColumnName)
@@ -589,6 +587,7 @@ test.describe('Database', () => {
     })
 
     test('CRUD operations works as expected', async ({ page, ref }) => {
+      const databaseRoleName = 'pw_database_role'
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/roles`))
 
       // Wait for database roles to be populated
@@ -660,6 +659,11 @@ test.describe('Database Enumerated Types', () => {
   })
 
   test('CRUD operations works as expected', async ({ page, ref }) => {
+    const databaseEnumName = 'pw_database_enum'
+    const databaseEnumValue1Name = 'pw_database_value1'
+    const databaseEnumValue2Name = 'pw_database_value2'
+    const databaseEnumValue3Name = 'pw_database_value3'
+
     const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=schemas')
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
@@ -744,36 +748,31 @@ test.describe('Database Functions', () => {
   })
 
   test('CRUD operations works as expected', async ({ page, ref }) => {
+    const databaseFunctionName = 'pw_database_function'
+    const databaseFunctionNameUpdated = 'pw_database_function_updated'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await query(`drop function if exists ${databaseFunctionName}`);
+        await query(`drop function if exists ${databaseFunctionNameUpdated}`);
+      }
+    )
+
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/functions?schema=public`))
 
     // Wait for database functions to be populated
     await page.waitForLoadState('networkidle')
 
-    // delete function if exists
-    if ((await page.getByRole('button', { name: databaseFunctionName }).count()) > 0) {
-      const functionRow = await page.getByRole('row', { name: databaseFunctionName })
-      await functionRow.getByRole('button', { name: 'More options' }).click()
-      await page.getByRole('menuitem', { name: 'Delete function' }).click()
-      await page
-        .getByRole('textbox', { name: `Type ${databaseFunctionName} to confirm.` })
-        .fill(databaseFunctionName)
-      await page.getByRole('button', { name: `Delete function ${databaseFunctionName}` }).click()
-      await expect(
-        page.getByText(`Successfully removed function ${databaseFunctionName}`),
-        'Delete confirmation toast should be visible'
-      ).toBeVisible({
-        timeout: 50000,
-      })
-    }
-
     // create new function
     await page.getByRole('button', { name: 'Create a new function' }).click()
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionName)
-    const editor = await page.getByRole('presentation')
+    const editor = page.getByRole('presentation')
     await editor.click()
-    await page.keyboard.type(`BEGIN
-END;`)
-    expect(await page.getByRole('presentation').textContent()).toBe(`BEGINEND;`)
+    await page.keyboard.type(`BEGIN\nEND;`)
+    await expect(page.getByRole('presentation')).toHaveText(`BEGINEND;`)
     const functionCreateWait = createApiResponseWaiter(
       page,
       'pg-meta',
