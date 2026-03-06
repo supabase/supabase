@@ -412,7 +412,7 @@ const JitDbAccessConfiguration = () => {
       <PageSection id="jit-db-access-configuration">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Just-in-Time (JIT) access</PageSectionTitle>
+            <PageSectionTitle>Just-in-time (JIT) access</PageSectionTitle>
           </PageSectionSummary>
           <DocsButton href={`${DOCS_URL}/guides/platform/just-in-time-database-access`} />
         </PageSectionMeta>
