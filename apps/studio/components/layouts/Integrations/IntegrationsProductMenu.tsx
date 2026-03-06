@@ -18,6 +18,7 @@ export function IntegrationsProductMenu() {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { integrationsWrappers: showWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+  const resolvedProjectRef = projectRef ?? project?.ref
 
   const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
   const page = getIntegrationsPageFromPathname(pathname)
@@ -62,6 +63,7 @@ export function IntegrationsProductMenu() {
           />
         )}
         {isSuccess &&
+          resolvedProjectRef &&
           integrations.map((integration) => (
             <ProductMenuItem
               key={`integrations/${integration.id}`}
@@ -70,7 +72,7 @@ export function IntegrationsProductMenu() {
                 name: integration.name,
                 label: integration.status,
                 key: `integrations/${integration.id}`,
-                url: `/project/${project?.ref}/integrations/${integration.id}/overview`,
+                url: `/project/${resolvedProjectRef}/integrations/${integration.id}/overview`,
                 icon: (
                   <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
                     {integration.icon({ className: 'p-1' })}

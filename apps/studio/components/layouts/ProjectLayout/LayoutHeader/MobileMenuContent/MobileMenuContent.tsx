@@ -16,12 +16,12 @@ import type { Route } from 'components/ui/ui.types'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
+import { getPathnameWithoutQuery, getPathSegment } from 'lib/pathname.utils'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import { Button, cn, Separator, SidebarGroup, SidebarMenu } from 'ui'
-
-import { getPathSegment, getPathnameWithoutQuery } from 'lib/pathname.utils'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
 import { resolveSectionDisplay } from './MobileMenuContent.utils'
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
@@ -172,9 +172,7 @@ export function MobileMenuContent({
               </SidebarGroup>
               <Separator className="mx-2 w-auto bg-sidebar-border" />
               <SidebarGroup className="gap-0.5">
-                {productRoutes.map((route) =>
-                  renderRoute(route, activeRoute === route.key)
-                )}
+                {productRoutes.map((route) => renderRoute(route, activeRoute === route.key))}
               </SidebarGroup>
               <Separator className="mx-2 w-auto bg-sidebar-border" />
               <SidebarGroup className="gap-0.5">
@@ -182,9 +180,7 @@ export function MobileMenuContent({
               </SidebarGroup>
               <Separator className="mx-2 w-auto bg-sidebar-border" />
               <SidebarGroup className="gap-0.5">
-                {settingsRoutes.map((route) =>
-                  renderRoute(route, activeRoute === route.key)
-                )}
+                {settingsRoutes.map((route) => renderRoute(route, activeRoute === route.key))}
               </SidebarGroup>
             </SidebarMenu>
           </nav>
@@ -194,9 +190,7 @@ export function MobileMenuContent({
             {sectionKeyToShow === currentSectionKey && currentProductMenu ? (
               currentProductMenu
             ) : SectionMenuContent ? (
-              <React.Suspense
-                fallback={<div className="py-4 text-sm text-foreground-muted">Loading...</div>}
-              >
+              <React.Suspense fallback={<GenericSkeletonLoader className="p-4" />}>
                 {sectionKeyToShow === 'advisors' ? (
                   <SectionMenuContent
                     {...({ page: pageSegment } as React.ComponentProps<typeof SectionMenuContent>)}

@@ -12,7 +12,7 @@ export function getPathnameWithoutQuery(
   fallbackPathname: string
 ): string {
   if (asPath === undefined || asPath === null) return fallbackPathname
-  const withoutQuery = asPath.split('?')[0]
+  const withoutQuery = asPath.split(/[?#]/)[0]
   return withoutQuery ?? fallbackPathname
 }
 

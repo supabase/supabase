@@ -25,9 +25,7 @@ const ORG_SETTINGS_ROUTES = ['general', 'apps', 'audit', 'documents', 'security'
  * Returns the org section key that has a submenu and matches the current route.
  * e.g. /org/my-org/general → 'settings', /org/my-org/team → null
  */
-export function getOrgSectionKeyFromPathname(
-  activeRoute: string | undefined
-): string | null {
+export function getOrgSectionKeyFromPathname(activeRoute: string | undefined): string | null {
   if (activeRoute && ORG_SETTINGS_ROUTES.includes(activeRoute as any)) {
     return 'settings'
   }
@@ -49,7 +47,10 @@ export function isOrgMenuActive(
     return activeRoute === undefined
   }
   if (item.key === 'settings') {
-    return ORG_SETTINGS_ROUTES.some((route) => pathname.includes(`/${route}`))
+    return (
+      activeRoute !== undefined &&
+      ORG_SETTINGS_ROUTES.includes(activeRoute as (typeof ORG_SETTINGS_ROUTES)[number])
+    )
   }
   return activeRoute === item.key
 }

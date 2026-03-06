@@ -10,6 +10,7 @@ import { Blocks, Boxes, ChartArea, ChevronLeft, Receipt, Settings, Users } from 
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import { Button, cn, SidebarGroup, SidebarMenu } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
 import { getOrgMenuComponent } from './mobileOrgMenuRegistry'
 import type { OrgNavItem } from './OrgMenuContent.utils'
@@ -131,9 +132,7 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
           </Button>
         </div>
         <div className="flex-1 overflow-y-auto text-sidebar-foreground px-2">
-          <React.Suspense
-            fallback={<div className="py-4 text-sm text-foreground-muted">Loading...</div>}
-          >
+          <React.Suspense fallback={<GenericSkeletonLoader className="p-4" />}>
             <SectionMenuContent onCloseSheet={onCloseSheet} />
           </React.Suspense>
         </div>
