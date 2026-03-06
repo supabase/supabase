@@ -185,7 +185,6 @@ export const CronjobsTab = () => {
       <CreateCronJobSheet
         open={!!createCronJobSheetShown || !!cronJobForEditing}
         selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
-        supportsSeconds={supportsSeconds}
         onClose={onClose}
       />
     </>

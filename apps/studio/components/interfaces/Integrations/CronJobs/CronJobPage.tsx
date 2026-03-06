@@ -182,13 +182,7 @@ export const CronJobPage = () => {
       {job && (
         <CreateCronJobSheet
           open={isEditSheetOpen}
-          selectedCronJob={{
-            jobname: job.jobname,
-            schedule: job.schedule,
-            active: job.active,
-            command: job.command,
-          }}
-          supportsSeconds={true}
+          selectedCronJob={job}
           onClose={() => setIsEditSheetOpen(false)}
         />
       )}

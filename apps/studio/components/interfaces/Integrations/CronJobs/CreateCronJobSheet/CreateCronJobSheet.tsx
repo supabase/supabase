@@ -52,11 +52,11 @@ import {
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { isGreaterThanOrEqual } from '@/lib/semver'
 
 interface CreateCronJobSheetProps {
   open: boolean
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
-  supportsSeconds: boolean
   onClose: () => void
 }
 
@@ -86,12 +86,7 @@ const buildCommand = (values: CronJobType) => {
   return command
 }
 
-export const CreateCronJobSheet = ({
-  open,
-  selectedCronJob,
-  supportsSeconds,
-  onClose,
-}: CreateCronJobSheetProps) => {
+export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCronJobSheetProps) => {
   const { childId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -102,12 +97,17 @@ export const CreateCronJobSheet = ({
   const isEditing = !!selectedCronJob?.jobname
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
 
-  const { data } = useDatabaseExtensionsQuery({
+  const { data = [] } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const pgNetExtension = (data ?? []).find((ext) => ext.name === 'pg_net')
+  const pgNetExtension = data.find((ext) => ext.name === 'pg_net')
   const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
+
+  const pgCronExtension = data.find((ext) => ext.name === 'pg_cron')
+  const supportsSeconds = pgCronExtension?.installed_version
+    ? isGreaterThanOrEqual(pgCronExtension.installed_version, '1.5')
+    : false
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertCronJob, isPending: isUpserting } = useDatabaseCronJobCreateMutation()
