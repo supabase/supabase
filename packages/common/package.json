@@ -12,7 +12,6 @@
     "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
-    "@sentry/nextjs": "catalog:",
     "@types/dat.gui": "^0.7.12",
     "@usercentrics/cmp-browser-sdk": "^4.42.0",
     "api-types": "workspace:*",

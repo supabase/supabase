@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation'
 import Script from 'next/script'
 import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
-import * as Sentry from '@sentry/nextjs'
 
 import { useUser } from './auth'
 import { hasConsented, useConsentState } from './consent-state'
@@ -26,14 +25,6 @@ import {
 } from './telemetry-utils'
 
 export { posthogClient, type ClientTelemetryEvent }
-
-function captureTelemetryError(error: unknown, context: string) {
-  Sentry.withScope((scope) => {
-    scope.setTag('team', 'growth-eng')
-    scope.setTag('context', context)
-    Sentry.captureException(error instanceof Error ? error : new Error(String(error)))
-  })
-}
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
@@ -303,7 +294,7 @@ export const PageTelemetry = ({
       slug,
       ref,
     }).catch((e) => {
-      captureTelemetryError(e, 'telemetry-page-view')
+      console.error('Problem sending telemetry page:', e)
     })
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
@@ -319,7 +310,7 @@ export const PageTelemetry = ({
       slug,
       ref
     ).catch((e) => {
-      captureTelemetryError(e, 'telemetry-page-leave')
+      console.error('Problem sending telemetry page-leave:', e)
     })
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
@@ -367,7 +358,7 @@ export const PageTelemetry = ({
             ref,
             telemetryDataOverride: telemetryData,
             firstReferrerData,
-          }).catch((e) => captureTelemetryError(e, 'telemetry-page-view'))
+          })
         } catch (error) {
           if (!IS_PROD) {
             console.warn('Invalid telemetry cookie data:', error)
@@ -379,7 +370,7 @@ export const PageTelemetry = ({
             slug,
             ref,
             firstReferrerData,
-          }).catch((e) => captureTelemetryError(e, 'telemetry-page-view'))
+          })
         } finally {
           clearTelemetryDataCookie()
         }
@@ -391,7 +382,7 @@ export const PageTelemetry = ({
           slug,
           ref,
           firstReferrerData,
-        }).catch((e) => captureTelemetryError(e, 'telemetry-page-view'))
+        })
       }
 
       hasSentInitialPageTelemetryRef.current = true
