@@ -93,7 +93,8 @@ export const useUnifiedLogsPreview = () => {
 
 export const useIsBranching2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+  const gitlessBranchingEnabled = useFlag('gitlessBranching')
+  return gitlessBranchingEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
@@ -104,12 +105,19 @@ export const useIsPgDeltaDiffEnabled = () => {
 
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+  const advisorRulesEnabled = useFlag('advisorRules')
+  return advisorRulesEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
 export const useIsQueueOperationsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
+}
+
+export const useIsJitDbAccessEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const jitDbAccessEnabled = useFlag('jitDbAccess')
+  return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
 export const useIsPlatformWebhooksEnabled = () => {
