@@ -3,8 +3,13 @@
 import { File as FileIcon, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
+import { syncItemAssetsAction } from '@/app/protected/actions'
 import { Dropzone, DropzoneContent, DropzoneEmptyState } from '@/components/dropzone'
 import { useSupabaseUpload } from '@/hooks/use-supabase-upload'
+import {
+  getItemFilesStoragePath,
+  MARKETPLACE_DRAFT_STORAGE_BUCKET,
+} from '@/lib/marketplace/item-storage'
 import { createClient } from '@/lib/supabase/client'
 
 type ItemFile = {
@@ -62,11 +67,11 @@ export function ItemFilesUploader({
 
   const storagePath = useMemo(() => {
     if (!itemId) return undefined
-    return `${partnerId}/items/${itemId}/files`
+    return getItemFilesStoragePath(partnerId, itemId)
   }, [itemId, partnerId])
 
   const upload = useSupabaseUpload({
-    bucketName: 'item_files',
+    bucketName: MARKETPLACE_DRAFT_STORAGE_BUCKET,
     path: storagePath,
     maxFiles: 10,
     maxFileSize: 25_000_000,
@@ -112,6 +117,18 @@ export function ItemFilesUploader({
     const inserted = (data ?? []) as ItemFile[]
     setItemFiles((prev) => [...prev, ...inserted])
     setPersistedSuccesses((prev) => Array.from(new Set([...prev, ...pending])))
+
+    try {
+      const syncFormData = new FormData()
+      syncFormData.set('itemId', String(itemId))
+      await syncItemAssetsAction(syncFormData)
+    } catch (syncError) {
+      const message = syncError instanceof Error ? syncError.message : 'Unable to sync public item assets'
+      setMetadataError(message)
+      setSavingMetadata(false)
+      return [...responses, { name: 'sync', message }]
+    }
+
     setSavingMetadata(false)
 
     return responses
@@ -164,7 +181,7 @@ export function ItemFilesUploader({
 
     let isCancelled = false
     const loadPreviews = async () => {
-      const { data, error } = await supabase.storage.from('item_files').createSignedUrls(
+      const { data, error } = await supabase.storage.from(MARKETPLACE_DRAFT_STORAGE_BUCKET).createSignedUrls(
         imageFiles.map((file) => file.file_path),
         60 * 60
       )

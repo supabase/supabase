@@ -103,7 +103,7 @@ export function ItemEditorSplitView(props: ItemEditorSplitViewProps) {
 
   return (
     <div className="flex h-full min-h-full min-w-0">
-      <section className="w-4xl min-w-2xl min-h-0 border-r flex flex-col">
+      <section className="max-w-xl w-full min-w-lg min-h-0 border-r flex flex-col">
         <div className="min-h-0 flex-1">
           {props.mode === 'edit' ? (
             <ItemForm

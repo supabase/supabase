@@ -38,9 +38,16 @@ export function parseNumberList(formData: FormData, key: string) {
   )
 }
 
+function isFileLikeFormDataEntry(value: FormDataEntryValue | null): value is File {
+  if (!value || typeof value === 'string') return false
+
+  const maybeFile = value as Partial<File>
+  return typeof maybeFile.arrayBuffer === 'function' && typeof maybeFile.size === 'number'
+}
+
 export function parseTemplateZip(formData: FormData) {
   const raw = formData.get('templateZip')
-  if (!(raw instanceof File) || raw.size === 0) {
+  if (!isFileLikeFormDataEntry(raw) || raw.size === 0) {
     return null
   }
   return raw

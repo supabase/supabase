@@ -106,4 +106,18 @@ describe('item-draft utils', () => {
     expect(parseTemplateZip(formData)).toBe(zip)
     expect(parseTemplateZip(new FormData())).toBeNull()
   })
+
+  it('accepts file-like template uploads from server actions', () => {
+    const zipLike = {
+      name: 'template.zip',
+      type: 'application/zip',
+      size: 3,
+      arrayBuffer: async () => new ArrayBuffer(3),
+    }
+    const formData = {
+      get: (key: string) => (key === 'templateZip' ? zipLike : null),
+    } as unknown as FormData
+
+    expect(parseTemplateZip(formData)).toBe(zipLike)
+  })
 })

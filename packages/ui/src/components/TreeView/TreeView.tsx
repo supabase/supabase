@@ -170,11 +170,6 @@ const TreeViewItem = forwardRef<
       }
     }
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault()
-      onEditSubmit?.(localValueState)
-    }
-
     // [Joshen] These properties were causing console errors as they were getting passed as props to the parent div
     const {
       isDisabled,
@@ -271,7 +266,7 @@ const TreeViewItem = forwardRef<
 
         {!isEditing && actions}
 
-        <form onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
+        <div className={cn(!isEditing && 'hidden')}>
           <Input
             autoFocus
             ref={inputRef}
@@ -294,7 +289,7 @@ const TreeViewItem = forwardRef<
             className="block w-full text-sm px-2 py-1 h-7"
             value={localValueState}
           />
-        </form>
+        </div>
       </div>
     )
   }

@@ -23,6 +23,10 @@ import { z } from 'zod'
 
 import { createItemDraftAction, updateItemDraftAction } from '@/app/protected/actions'
 import { ItemFilesUploader, type ItemPreviewFile } from '@/components/item-files-uploader'
+import {
+  getItemTemplateStoragePath,
+  MARKETPLACE_DRAFT_STORAGE_BUCKET,
+} from '@/lib/marketplace/item-storage'
 import { normalizeTemplatePath, shouldIgnoreTemplatePath } from '@/lib/marketplace/template-package'
 import { createClient } from '@/lib/supabase/client'
 
@@ -252,15 +256,17 @@ export function ItemForm(props: ItemFormProps) {
     }
 
     let isCancelled = false
-    const basePath = `${props.partner.id}/items/${itemId}/template`
+    const basePath = getItemTemplateStoragePath(props.partner.id, itemId)
 
     const loadTemplateFiles = async () => {
       const listRecursive = async (prefix = ''): Promise<string[]> => {
         const targetPath = prefix ? `${basePath}/${prefix}` : basePath
-        const { data, error } = await supabase.storage.from('item_files').list(targetPath, {
-          limit: 1000,
-          sortBy: { column: 'name', order: 'asc' },
-        })
+        const { data, error } = await supabase.storage
+          .from(MARKETPLACE_DRAFT_STORAGE_BUCKET)
+          .list(targetPath, {
+            limit: 1000,
+            sortBy: { column: 'name', order: 'asc' },
+          })
 
         if (error || !data) return []
 
@@ -713,7 +719,7 @@ export function ItemForm(props: ItemFormProps) {
                       'Template package (.zip)'
                     )
                   }
-                  description="Upload a zip containing template.json, functions/, and schemas/."
+                  description="Upload a zip containing template.json and functions/, plus migrations/, schemas/, config.toml, or any combination of those."
                 >
                   <Input
                     id="item-template-zip"

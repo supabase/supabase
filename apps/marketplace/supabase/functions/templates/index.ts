@@ -1,6 +1,8 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { corsHeaders } from 'jsr:@supabase/supabase-js@2/cors'
 
+import { resolveTemplateJsonRelativePaths } from './template-json.ts'
+
 type ItemRow = {
   slug: string
   type: 'oauth' | 'template'
@@ -98,7 +100,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const data = await upstream.json()
-    return jsonResponse(data, 200)
+    return jsonResponse(resolveTemplateJsonRelativePaths(data, upstream.url), 200)
   } catch {
     return jsonResponse({ error: 'Template URL did not return valid JSON' }, 502)
   }

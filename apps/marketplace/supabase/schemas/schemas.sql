@@ -521,6 +521,7 @@ create policy "item_files_select"
   for select
   using (
     public.is_admin_member()
+    or public.is_review_manager_member()
     or exists (
       select 1
       from public.items i
@@ -652,6 +653,15 @@ revoke all on function public.storage_object_item_id(text) from public;
 grant execute on function public.storage_object_partner_id(text) to authenticated;
 grant execute on function public.storage_object_item_id(text) to authenticated;
 
+insert into storage.buckets (id, name, public)
+values
+  ('item_files', 'item_files', false),
+  ('public_item_files', 'public_item_files', true)
+on conflict (id) do update
+set
+  name = excluded.name,
+  public = excluded.public;
+
 -- Storage policies for marketplace item files.
 create policy "item_files_storage_select"
   on storage.objects
@@ -667,7 +677,10 @@ create policy "item_files_storage_select"
       from public.items i
       where i.id = public.storage_object_item_id(name)
         and i.partner_id = public.storage_object_partner_id(name)
-        and public.is_partner_member(i.partner_id)
+        and (
+          public.is_review_manager_member()
+          or public.is_partner_member(i.partner_id)
+        )
     )
   );
 
@@ -717,6 +730,111 @@ create policy "item_files_storage_update"
       where i.id = public.storage_object_item_id(name)
         and i.partner_id = public.storage_object_partner_id(name)
         and public.is_partner_member(i.partner_id)
+    )
+  );
+
+create policy "public_item_files_storage_select"
+  on storage.objects
+  for select
+  to authenticated
+  using (
+    bucket_id = 'public_item_files'
+    and split_part(name, '/', 2) = 'items'
+    and public.storage_object_partner_id(name) is not null
+    and public.storage_object_item_id(name) is not null
+    and exists (
+      select 1
+      from public.items i
+      where i.id = public.storage_object_item_id(name)
+        and i.partner_id = public.storage_object_partner_id(name)
+        and (
+          public.is_admin_member()
+          or public.is_review_manager_member()
+          or public.is_partner_member(i.partner_id)
+        )
+    )
+  );
+
+create policy "public_item_files_storage_insert"
+  on storage.objects
+  for insert
+  to authenticated
+  with check (
+    bucket_id = 'public_item_files'
+    and split_part(name, '/', 2) = 'items'
+    and public.storage_object_partner_id(name) is not null
+    and public.storage_object_item_id(name) is not null
+    and exists (
+      select 1
+      from public.items i
+      where i.id = public.storage_object_item_id(name)
+        and i.partner_id = public.storage_object_partner_id(name)
+        and (
+          public.is_admin_member()
+          or public.is_review_manager_member()
+          or public.is_partner_member(i.partner_id)
+        )
+    )
+  );
+
+create policy "public_item_files_storage_update"
+  on storage.objects
+  for update
+  to authenticated
+  using (
+    bucket_id = 'public_item_files'
+    and split_part(name, '/', 2) = 'items'
+    and public.storage_object_partner_id(name) is not null
+    and public.storage_object_item_id(name) is not null
+    and exists (
+      select 1
+      from public.items i
+      where i.id = public.storage_object_item_id(name)
+        and i.partner_id = public.storage_object_partner_id(name)
+        and (
+          public.is_admin_member()
+          or public.is_review_manager_member()
+          or public.is_partner_member(i.partner_id)
+        )
+    )
+  )
+  with check (
+    bucket_id = 'public_item_files'
+    and split_part(name, '/', 2) = 'items'
+    and public.storage_object_partner_id(name) is not null
+    and public.storage_object_item_id(name) is not null
+    and exists (
+      select 1
+      from public.items i
+      where i.id = public.storage_object_item_id(name)
+        and i.partner_id = public.storage_object_partner_id(name)
+        and (
+          public.is_admin_member()
+          or public.is_review_manager_member()
+          or public.is_partner_member(i.partner_id)
+        )
+    )
+  );
+
+create policy "public_item_files_storage_delete"
+  on storage.objects
+  for delete
+  to authenticated
+  using (
+    bucket_id = 'public_item_files'
+    and split_part(name, '/', 2) = 'items'
+    and public.storage_object_partner_id(name) is not null
+    and public.storage_object_item_id(name) is not null
+    and exists (
+      select 1
+      from public.items i
+      where i.id = public.storage_object_item_id(name)
+        and i.partner_id = public.storage_object_partner_id(name)
+        and (
+          public.is_admin_member()
+          or public.is_review_manager_member()
+          or public.is_partner_member(i.partner_id)
+        )
     )
   );
 

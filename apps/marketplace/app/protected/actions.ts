@@ -13,6 +13,13 @@ import {
   parseTemplateZip,
   slugify,
 } from '@/lib/marketplace/item-draft'
+import {
+  getItemFilesStoragePath,
+  getItemTemplateRegistryFilePath,
+  getItemTemplateStoragePath,
+  MARKETPLACE_DRAFT_STORAGE_BUCKET,
+  MARKETPLACE_PUBLIC_STORAGE_BUCKET,
+} from '@/lib/marketplace/item-storage'
 import { isReviewStatus, shouldRequestReview } from '@/lib/marketplace/review-state'
 import {
   hasRequiredTemplateEntries,
@@ -22,6 +29,153 @@ import {
 } from '@/lib/marketplace/template-package'
 import { createClient } from '@/lib/supabase/server'
 
+type MarketplaceSupabaseClient = Awaited<ReturnType<typeof createClient>>
+
+async function listStorageFilesRecursively(
+  supabase: MarketplaceSupabaseClient,
+  bucket: string,
+  basePath: string,
+  prefix = ''
+): Promise<string[]> {
+  const targetPath = prefix ? `${basePath}/${prefix}` : basePath
+  const { data, error } = await supabase.storage.from(bucket).list(targetPath, {
+    limit: 1000,
+    sortBy: { column: 'name', order: 'asc' },
+  })
+
+  if (error || !data) return []
+
+  const nested = await Promise.all(
+    data.map(async (entry) => {
+      const isDirectory = entry.metadata == null
+      const nextPrefix = prefix ? `${prefix}/${entry.name}` : entry.name
+      if (isDirectory) {
+        return listStorageFilesRecursively(supabase, bucket, basePath, nextPrefix)
+      }
+      return [`${basePath}/${nextPrefix}`]
+    })
+  )
+
+  return nested.flat()
+}
+
+async function removeStoragePrefix(
+  supabase: MarketplaceSupabaseClient,
+  bucket: string,
+  basePath: string
+) {
+  const existingPaths = await listStorageFilesRecursively(supabase, bucket, basePath)
+  if (existingPaths.length === 0) return
+
+  const { error } = await supabase.storage.from(bucket).remove(existingPaths)
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
+async function syncStoragePrefixToPublicBucket(
+  supabase: MarketplaceSupabaseClient,
+  basePath: string
+) {
+  const [draftPaths, publicPaths] = await Promise.all([
+    listStorageFilesRecursively(supabase, MARKETPLACE_DRAFT_STORAGE_BUCKET, basePath),
+    listStorageFilesRecursively(supabase, MARKETPLACE_PUBLIC_STORAGE_BUCKET, basePath),
+  ])
+
+  const draftPathSet = new Set(draftPaths)
+  const stalePublicPaths = publicPaths.filter((path) => !draftPathSet.has(path))
+  if (stalePublicPaths.length > 0) {
+    const { error } = await supabase.storage
+      .from(MARKETPLACE_PUBLIC_STORAGE_BUCKET)
+      .remove(stalePublicPaths)
+    if (error) {
+      throw new Error(error.message)
+    }
+  }
+
+  for (const draftPath of draftPaths) {
+    const { data, error: downloadError } = await supabase.storage
+      .from(MARKETPLACE_DRAFT_STORAGE_BUCKET)
+      .download(draftPath)
+
+    if (downloadError) {
+      throw new Error(downloadError.message)
+    }
+
+    const { error: uploadError } = await supabase.storage
+      .from(MARKETPLACE_PUBLIC_STORAGE_BUCKET)
+      .upload(draftPath, data, {
+        upsert: true,
+        contentType: data.type || undefined,
+      })
+
+    if (uploadError) {
+      throw new Error(uploadError.message)
+    }
+  }
+}
+
+function getTemplateRegistryPublicUrl(
+  supabase: MarketplaceSupabaseClient,
+  partnerId: number,
+  itemId: number
+) {
+  const {
+    data: { publicUrl },
+  } = supabase.storage
+    .from(MARKETPLACE_PUBLIC_STORAGE_BUCKET)
+    .getPublicUrl(getItemTemplateRegistryFilePath(partnerId, itemId))
+
+  return publicUrl
+}
+
+async function syncPublicItemAssets(supabase: MarketplaceSupabaseClient, itemId: number) {
+  const { data: item, error: itemError } = await supabase
+    .from('items')
+    .select('id, partner_id, published, type, registry_item_url')
+    .eq('id', itemId)
+    .single<{
+      id: number
+      partner_id: number
+      published: boolean
+      type: 'oauth' | 'template'
+      registry_item_url: string | null
+    }>()
+
+  if (itemError || !item) {
+    throw new Error(itemError?.message ?? 'Unable to load item')
+  }
+
+  const { data: review, error: reviewError } = await supabase
+    .from('item_reviews')
+    .select('status')
+    .eq('item_id', itemId)
+    .maybeSingle<{ status: string | null }>()
+
+  if (reviewError) {
+    throw new Error(reviewError.message)
+  }
+
+  const itemFilesBasePath = getItemFilesStoragePath(item.partner_id, item.id)
+  const itemTemplateBasePath = getItemTemplateStoragePath(item.partner_id, item.id)
+  const shouldExposePublicAssets = item.published && review?.status === 'approved'
+
+  if (!shouldExposePublicAssets) {
+    await Promise.all([
+      removeStoragePrefix(supabase, MARKETPLACE_PUBLIC_STORAGE_BUCKET, itemFilesBasePath),
+      removeStoragePrefix(supabase, MARKETPLACE_PUBLIC_STORAGE_BUCKET, itemTemplateBasePath),
+    ])
+    return
+  }
+
+  await syncStoragePrefixToPublicBucket(supabase, itemFilesBasePath)
+  if (item.type === 'template' && item.registry_item_url) {
+    await syncStoragePrefixToPublicBucket(supabase, itemTemplateBasePath)
+  } else {
+    await removeStoragePrefix(supabase, MARKETPLACE_PUBLIC_STORAGE_BUCKET, itemTemplateBasePath)
+  }
+}
+
 async function uploadTemplatePackage({
   zipFile,
   supabase,
@@ -29,7 +183,7 @@ async function uploadTemplatePackage({
   itemId,
 }: {
   zipFile: File
-  supabase: Awaited<ReturnType<typeof createClient>>
+  supabase: MarketplaceSupabaseClient
   partnerId: number
   itemId: number
 }) {
@@ -55,64 +209,30 @@ async function uploadTemplatePackage({
 
   if (!hasRequiredTemplateEntries(entryPaths)) {
     throw new Error(
-      'Template package must include template.json plus files in functions/ and schemas/'
+      'Template package must include template.json and functions/, plus at least one of migrations/, schemas/, or config.toml'
     )
   }
 
-  const basePath = `${partnerId}/items/${itemId}/template`
+  const basePath = getItemTemplateStoragePath(partnerId, itemId)
 
-  const listStorageFilesRecursively = async (prefix = ''): Promise<string[]> => {
-    const targetPath = prefix ? `${basePath}/${prefix}` : basePath
-    const { data, error } = await supabase.storage.from('item_files').list(targetPath, {
-      limit: 1000,
-      sortBy: { column: 'name', order: 'asc' },
-    })
-
-    if (error || !data) return []
-
-    const nested = await Promise.all(
-      data.map(async (entry) => {
-        const isDirectory = entry.metadata == null
-        const nextPrefix = prefix ? `${prefix}/${entry.name}` : entry.name
-        if (isDirectory) {
-          return listStorageFilesRecursively(nextPrefix)
-        }
-        return [`${basePath}/${nextPrefix}`]
-      })
-    )
-
-    return nested.flat()
-  }
-
-  const existingTemplatePaths = await listStorageFilesRecursively()
-  if (existingTemplatePaths.length > 0) {
-    const { error: removeError } = await supabase.storage
-      .from('item_files')
-      .remove(existingTemplatePaths)
-    if (removeError) {
-      throw new Error(removeError.message)
-    }
-  }
+  await removeStoragePrefix(supabase, MARKETPLACE_DRAFT_STORAGE_BUCKET, basePath)
 
   for (const normalizedEntry of normalizedEntries) {
     const blob = await normalizedEntry.entry.async('blob')
     const objectPath = `${basePath}/${normalizedEntry.relativePath}`
-    const { error } = await supabase.storage.from('item_files').upload(objectPath, blob, {
-      upsert: true,
-      contentType: blob.type || undefined,
-    })
+    const { error } = await supabase.storage
+      .from(MARKETPLACE_DRAFT_STORAGE_BUCKET)
+      .upload(objectPath, blob, {
+        upsert: true,
+        contentType: blob.type || undefined,
+      })
 
     if (error) {
       throw new Error(error.message)
     }
   }
 
-  const registryFilePath = `${basePath}/template.json`
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from('item_files').getPublicUrl(registryFilePath)
-
-  return publicUrl
+  return getTemplateRegistryPublicUrl(supabase, partnerId, itemId)
 }
 
 export async function createPartnerAction(formData: FormData) {
@@ -432,6 +552,21 @@ export async function updateItemAction(formData: FormData) {
   redirect(`/protected/${updated.partnerSlug}/items/${updated.itemSlug}`)
 }
 
+export async function syncItemAssetsAction(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const itemId = Number(parseRequiredString(formData, 'itemId'))
+  await syncPublicItemAssets(supabase, itemId)
+  return { itemId }
+}
+
 export async function updateItemDraftAction(formData: FormData) {
   const supabase = await createClient()
   const {
@@ -474,14 +609,18 @@ export async function updateItemDraftAction(formData: FormData) {
   })
 
   const templateRegistryUrl =
-    type === 'template' && templateZip
-      ? await uploadTemplatePackage({
-          zipFile: templateZip,
-          supabase,
-          partnerId,
-          itemId,
-        })
-      : existingRegistryItemUrl
+    type === 'template'
+      ? templateZip
+        ? await uploadTemplatePackage({
+            zipFile: templateZip,
+            supabase,
+            partnerId,
+            itemId,
+          })
+        : existingRegistryItemUrl
+          ? getTemplateRegistryPublicUrl(supabase, partnerId, itemId)
+          : null
+      : null
 
   const { data: item, error } = await supabase
     .from('items')
@@ -520,7 +659,7 @@ export async function updateItemDraftAction(formData: FormData) {
       const idsToDelete = filesToDelete.map((file: { id: number }) => file.id)
 
       const { error: storageDeleteError } = await supabase.storage
-        .from('item_files')
+        .from(MARKETPLACE_DRAFT_STORAGE_BUCKET)
         .remove(pathsToDelete)
 
       if (storageDeleteError) {
@@ -538,6 +677,8 @@ export async function updateItemDraftAction(formData: FormData) {
       }
     }
   }
+
+  await syncPublicItemAssets(supabase, itemId)
 
   revalidatePath(`/protected/${partnerSlug}`)
   return {
@@ -698,6 +839,8 @@ export async function saveItemReviewAction(formData: FormData) {
       throw new Error(insertCategoryItemsError.message)
     }
   }
+
+  await syncPublicItemAssets(supabase, itemId)
 
   revalidatePath(`/protected/${partnerSlug}/reviews`)
   revalidatePath(`/protected/${partnerSlug}/reviews/${itemId}`)

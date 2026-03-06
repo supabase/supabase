@@ -24,25 +24,31 @@ describe('template-package utils', () => {
   })
 
   it('infers top-level root prefix only when all entries share one', () => {
-    expect(inferTemplateRootPrefix(['pkg/functions/a.ts', 'pkg/schemas/a.sql'])).toBe('pkg')
-    expect(inferTemplateRootPrefix(['a/functions/a.ts', 'b/schemas/a.sql'])).toBeNull()
+    expect(inferTemplateRootPrefix(['pkg/functions/a.ts', 'pkg/migrations/a.sql'])).toBe('pkg')
+    expect(inferTemplateRootPrefix(['a/functions/a.ts', 'b/migrations/a.sql'])).toBeNull()
   })
 
   it('normalizes and filters template paths', () => {
     expect(
       normalizeTemplatePaths([
         'pkg/functions/index.ts',
-        'pkg/schemas/001.sql',
+        'pkg/migrations/001.sql',
         'pkg/template.json',
         '__MACOSX/skip',
       ])
-    ).toEqual(['functions/index.ts', 'schemas/001.sql', 'template.json'])
+    ).toEqual(['functions/index.ts', 'migrations/001.sql', 'template.json'])
   })
 
   it('validates required template package entries', () => {
     expect(
+      hasRequiredTemplateEntries(['pkg/functions/a.ts', 'pkg/migrations/a.sql', 'pkg/template.json'])
+    ).toBe(true)
+    expect(
       hasRequiredTemplateEntries(['pkg/functions/a.ts', 'pkg/schemas/a.sql', 'pkg/template.json'])
     ).toBe(true)
-    expect(hasRequiredTemplateEntries(['pkg/functions/a.ts', 'pkg/schemas/a.sql'])).toBe(false)
+    expect(hasRequiredTemplateEntries(['pkg/functions/a.ts', 'pkg/config.toml', 'pkg/template.json'])).toBe(
+      true
+    )
+    expect(hasRequiredTemplateEntries(['pkg/functions/a.ts', 'pkg/template.json'])).toBe(false)
   })
 })

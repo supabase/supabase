@@ -38,5 +38,7 @@ export function hasRequiredTemplateEntries(paths: string[]) {
   const hasRegistry = normalized.some((path) => path === 'template.json')
   const hasFunctions = normalized.some((path) => path.startsWith('functions/'))
   const hasSchemas = normalized.some((path) => path.startsWith('schemas/'))
-  return hasRegistry && hasFunctions && hasSchemas
+  const hasMigrations = normalized.some((path) => path.startsWith('migrations/'))
+  const hasConfig = normalized.some((path) => path === 'config.toml')
+  return hasRegistry && hasFunctions && (hasSchemas || hasMigrations || hasConfig)
 }

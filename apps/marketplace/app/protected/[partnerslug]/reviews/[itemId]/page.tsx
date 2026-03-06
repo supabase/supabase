@@ -145,7 +145,7 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
       </PageHeader>
 
       <div className="flex min-h-0 flex-1 min-w-0">
-        <section className="min-w-2xl w-4xl overflow-y-auto border-r">
+        <section className="max-w-xl w-full min-w-lg overflow-y-auto border-r">
           <ReviewDecisionForm
             partnerSlug={partnerslug}
             itemId={item.id}

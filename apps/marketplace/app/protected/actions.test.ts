@@ -55,10 +55,18 @@ function createSupabaseMock({
   user: null | { id: string }
   fromHandler: (table: string, state: Record<string, unknown>) => Result
   storage?: {
-    list?: (path: string) => Promise<Result<unknown[]>>
-    remove?: (paths: string[]) => Promise<{ error: null | { message: string } }>
-    upload?: (path: string) => Promise<{ error: null | { message: string } }>
-    getPublicUrl?: (path: string) => { data: { publicUrl: string } }
+    list?: (bucket: string, path: string) => Promise<Result<unknown[]>>
+    remove?: (bucket: string, paths: string[]) => Promise<{ error: null | { message: string } }>
+    upload?: (
+      bucket: string,
+      path: string,
+      file?: Blob
+    ) => Promise<{ error: null | { message: string } }>
+    download?: (
+      bucket: string,
+      path: string
+    ) => Promise<{ data: Blob | null; error: null | { message: string } }>
+    getPublicUrl?: (bucket: string, path: string) => { data: { publicUrl: string } }
   }
   rpc?: (
     name: string,
@@ -73,28 +81,36 @@ function createSupabaseMock({
       .fn()
       .mockImplementation((name, args) => rpc?.(name, args) ?? Promise.resolve({ error: null })),
     storage: {
-      from: vi.fn().mockReturnValue({
+      from: vi.fn().mockImplementation((bucket: string) => ({
         list: vi
           .fn()
           .mockImplementation(
-            (path: string) => storage?.list?.(path) ?? Promise.resolve(success([]))
+            (path: string) => storage?.list?.(bucket, path) ?? Promise.resolve(success([]))
           ),
         remove: vi
           .fn()
           .mockImplementation(
-            (paths: string[]) => storage?.remove?.(paths) ?? Promise.resolve({ error: null })
+            (paths: string[]) => storage?.remove?.(bucket, paths) ?? Promise.resolve({ error: null })
           ),
         upload: vi
           .fn()
           .mockImplementation(
-            (path: string) => storage?.upload?.(path) ?? Promise.resolve({ error: null })
+            (path: string, file?: Blob) =>
+              storage?.upload?.(bucket, path, file) ?? Promise.resolve({ error: null })
+          ),
+        download: vi
+          .fn()
+          .mockImplementation(
+            (path: string) =>
+              storage?.download?.(bucket, path) ??
+              Promise.resolve({ data: new Blob(['{}']), error: null })
           ),
         getPublicUrl: vi
           .fn()
           .mockImplementation(
-            (path: string) => storage?.getPublicUrl?.(path) ?? { data: { publicUrl: path } }
+            (path: string) => storage?.getPublicUrl?.(bucket, path) ?? { data: { publicUrl: path } }
           ),
-      }),
+      })),
     },
     from: vi.fn().mockImplementation((table: string) => {
       const state: Record<string, unknown> = { table }
@@ -300,9 +316,9 @@ describe('protected actions', () => {
           name: 'pkg/functions/main.ts',
           async: vi.fn().mockResolvedValue(new Blob(['export {}'], { type: 'text/plain' })),
         },
-        'pkg/schemas/001.sql': {
+        'pkg/migrations/001.sql': {
           dir: false,
-          name: 'pkg/schemas/001.sql',
+          name: 'pkg/migrations/001.sql',
           async: vi.fn().mockResolvedValue(new Blob(['select 1;'], { type: 'text/plain' })),
         },
       },
@@ -473,8 +489,20 @@ describe('protected actions', () => {
           if (table === 'items' && state.op === 'update') {
             return success({ slug: 'updated-item' })
           }
+          if (table === 'items' && state.op === 'select') {
+            return success({
+              id: 2,
+              partner_id: 1,
+              published: false,
+              type: 'oauth',
+              registry_item_url: null,
+            })
+          }
           if (table === 'item_files' && state.op === 'select') {
             return success([{ id: 99, file_path: '1/items/2/files/a.png' }])
+          }
+          if (table === 'item_reviews' && state.op === 'select') {
+            return success(null)
           }
           if (table === 'item_files' && state.op === 'delete') {
             return success(null)
@@ -498,7 +526,7 @@ describe('protected actions', () => {
 
     const result = await updateItemDraftAction(formData)
     expect(result).toEqual({ itemId: 2, itemSlug: 'updated-item', partnerSlug: 'acme' })
-    expect(storageRemoveSpy).toHaveBeenCalledWith(['1/items/2/files/a.png'])
+    expect(storageRemoveSpy).toHaveBeenCalledWith('item_files', ['1/items/2/files/a.png'])
   })
 
   it('throws when storage file deletion fails during item update', async () => {
@@ -573,6 +601,18 @@ describe('protected actions', () => {
         fromHandler: (table, state) => {
           if (table === 'items' && state.op === 'update') {
             return success({ slug: 'updated-item' })
+          }
+          if (table === 'items' && state.op === 'select') {
+            return success({
+              id: 2,
+              partner_id: 1,
+              published: false,
+              type: 'oauth',
+              registry_item_url: null,
+            })
+          }
+          if (table === 'item_reviews' && state.op === 'select') {
+            return success(null)
           }
           return success(null)
         },
@@ -691,7 +731,21 @@ describe('protected actions', () => {
     createClientMock.mockResolvedValue(
       createSupabaseMock({
         user: { id: 'reviewer' },
-        fromHandler: () => success(null),
+        fromHandler: (table, state) => {
+          if (table === 'items' && state.op === 'select') {
+            return success({
+              id: 9,
+              partner_id: 1,
+              published: false,
+              type: 'oauth',
+              registry_item_url: null,
+            })
+          }
+          if (table === 'item_reviews' && state.op === 'select') {
+            return success({ status: 'approved' })
+          }
+          return success(null)
+        },
       })
     )
 

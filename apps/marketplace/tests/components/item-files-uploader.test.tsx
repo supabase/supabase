@@ -3,6 +3,10 @@ import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+vi.mock('@/app/protected/actions', () => ({
+  syncItemAssetsAction: vi.fn().mockResolvedValue({ itemId: 2 }),
+}))
+
 vi.mock('@/hooks/use-supabase-upload', () => ({
   useSupabaseUpload: () => ({
     files: [],
