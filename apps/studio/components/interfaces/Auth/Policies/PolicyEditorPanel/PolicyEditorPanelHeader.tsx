@@ -119,6 +119,7 @@ export const PolicyEditorPanelHeader = ({
             ) : (
               <PanelRightClose size={19} strokeWidth={1} />
             )}
+            <span className='sr-only'>{showTools ? 'Hide' : 'Show'} tools</span>
           </button>
         </TooltipTrigger>
         <TooltipContent side="left">{showTools ? 'Hide' : 'Show'} tools</TooltipContent>

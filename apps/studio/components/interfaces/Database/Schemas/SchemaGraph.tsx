@@ -226,7 +226,7 @@ export const SchemaGraph = () => {
               <div className="flex items-center gap-x-2">
                 <ButtonTooltip
                   type="outline"
-                  icon={copied ? <Check /> : <Copy />}
+                  icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
                   onClick={() => {
                     if (tables) {
                       copyToClipboard(tablesToSQL(tables))

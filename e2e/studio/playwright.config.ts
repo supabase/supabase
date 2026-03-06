@@ -111,6 +111,9 @@ export default defineConfig({
         '--enable-features=NetworkService,NetworkServiceInProcess', // Uses modern network service in-process for better performance
       ],
     },
+    contextOptions: {
+      reducedMotion: 'reduce',
+    },
   },
   projects: [
     {

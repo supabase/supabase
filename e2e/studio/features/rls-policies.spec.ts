@@ -1,65 +1,9 @@
 import { expect, Page } from '@playwright/test'
-import { test } from '../utils/test.js'
+
+import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
-
-const policyTableName = 'pw_rls_policy_test_table'
-const policySelectName = 'pw_test_select_policy'
-const policyInsertName = 'pw_test_insert_policy'
-const policyUpdateName = 'pw_test_update_policy'
-const policyDeleteName = 'pw_test_delete_policy'
-
-/**
- * Helper function to create a test table for RLS policies
- */
-const createTestTable = async (page: Page, ref: string) => {
-  await page.goto(toUrl(`/project/${ref}/editor`))
-  await page.waitForTimeout(1000)
-
-  // Check if table already exists
-  const tableExists =
-    (await page.getByRole('button', { name: `View ${policyTableName}` }).count()) > 0
-
-  if (!tableExists) {
-    await page.getByRole('button', { name: 'New table', exact: true }).click()
-    await page.getByTestId('table-name-input').fill(policyTableName)
-    await page.getByRole('button', { name: 'Save' }).click()
-
-    await expect(
-      page.getByText(`Table ${policyTableName} is good to go!`),
-      'Table creation confirmation should be visible'
-    ).toBeVisible({ timeout: 50000 })
-  }
-}
-
-/**
- * Helper function to delete the test table
- */
-const deleteTestTable = async (page: Page, ref: string) => {
-  await page.goto(toUrl(`/project/${ref}/editor`))
-  await page.waitForTimeout(1000)
-
-  const tableExists =
-    (await page.getByRole('button', { name: `View ${policyTableName}` }).count()) > 0
-
-  if (tableExists) {
-    await page.getByLabel(`View ${policyTableName}`).nth(0).click()
-    // Open the row actions menu (three dots) using the same selector pattern as table-editor.spec.ts.
-    // This avoids brittle index-based selection and ignores the Unrestricted badge button.
-    await page
-      .getByLabel(`View ${policyTableName}`)
-      .locator('button[aria-haspopup="menu"]')
-      .click({ force: true })
-    await page.getByText('Delete table').click()
-    await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).click()
-    await page.getByRole('button', { name: 'Delete' }).click()
-
-    await expect(
-      page.getByText(`Successfully deleted table "${policyTableName}"`),
-      'Table deletion confirmation should be visible'
-    ).toBeVisible({ timeout: 50000 })
-  }
-}
+import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
 
 /**
  * Helper function to navigate to policies page and wait for it to load
@@ -104,27 +48,18 @@ const deletePolicyIfExists = async (page: Page, ref: string, policyNameToDelete:
   }
 }
 
-test.describe.serial('RLS Policies', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser, ref }) => {
-    page = await browser.newPage()
-
-    // Create test table
-    await createTestTable(page, ref)
-
-    // Navigate to policies page
-    await navigateToPoliciesPage(page, ref)
-  })
-
-  test.afterAll(async ({ ref }) => {
-    // Clean up: delete test table
-    await deleteTestTable(page, ref)
-    await page.close()
-  })
-
+test.describe('RLS Policies', () => {
   test.describe('Policies Page', () => {
-    test('should display policies page correctly', async ({ ref }) => {
+    test('should display policies page correctly', async ({ page, ref }) => {
+      const policyTableName = 'pw_rls_policy_test_table'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTableWithRLS(policyTableName, 'test')
+        },
+        async () => {
+          await dropTable(policyTableName)
+        }
+      )
       await navigateToPoliciesPage(page, ref)
 
       // Check page elements
@@ -143,7 +78,16 @@ test.describe.serial('RLS Policies', () => {
       await expect(page.getByText(policyTableName)).toBeVisible()
     })
 
-    test('should filter tables and policies by search', async ({ ref }) => {
+    test('should filter tables and policies by search', async ({ page, ref }) => {
+      const policyTableName = 'pw_rls_policy_filter_table'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTableWithRLS(policyTableName, 'test')
+        },
+        async () => {
+          await dropTable(policyTableName)
+        }
+      )
       await navigateToPoliciesPage(page, ref)
 
       const searchInput = page.getByPlaceholder('Filter tables and policies')
@@ -160,7 +104,7 @@ test.describe.serial('RLS Policies', () => {
       await page.waitForTimeout(500)
     })
 
-    test('should switch between schemas', async ({ ref }) => {
+    test('should switch between schemas', async ({ page, ref }) => {
       await navigateToPoliciesPage(page, ref)
 
       // Click schema selector
@@ -181,7 +125,19 @@ test.describe.serial('RLS Policies', () => {
   })
 
   test.describe('Table editor RLS badge', () => {
-    test('shows Unrestricted badge when RLS is disabled for public table', async ({ ref }) => {
+    test('shows Unrestricted badge when RLS is disabled for public table', async ({
+      page,
+      ref,
+    }) => {
+      const policyTableName = 'pw_rls_policy_unrestricted_table'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTableWithRLS(policyTableName, 'test')
+        },
+        async () => {
+          await dropTable(policyTableName)
+        }
+      )
       // First, ensure RLS is disabled for the test table via the Policies page
       await navigateToPoliciesPage(page, ref)
 
@@ -241,11 +197,18 @@ test.describe.serial('RLS Policies', () => {
   })
 
   test.describe('Create RLS Policy', () => {
-    test('should create a SELECT policy successfully', async ({ ref }) => {
+    test('should create a SELECT policy successfully', async ({ page, ref }) => {
+      const policyTableName = 'pw_rls_policy_select_table'
+      const policySelectName = 'pw_test_select_policy'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTableWithRLS(policyTableName, 'test')
+        },
+        async () => {
+          await dropTable(policyTableName)
+        }
+      )
       await navigateToPoliciesPage(page, ref)
-
-      // Delete policy if it exists from previous run
-      await deletePolicyIfExists(page, ref, policySelectName)
 
       // Find the test table and click "Create policy"
       await page.getByTestId(`${policyTableName}-create-policy`).click()
@@ -255,6 +218,9 @@ test.describe.serial('RLS Policies', () => {
         page.getByRole('heading', { name: 'Create a new Row Level Security policy' }),
         'Policy creation dialog should open'
       ).toBeVisible()
+
+      // Hide the sidebar tools
+      await page.getByText('Hide tools').click()
 
       // Fill in policy name
       await page.getByRole('textbox', { name: 'Policy Name' }).fill(policySelectName)
@@ -287,11 +253,18 @@ test.describe.serial('RLS Policies', () => {
       await expect(policyRow.locator('code').filter({ hasText: /^public$/ })).toBeVisible()
     })
 
-    test('should create an INSERT policy with authenticated role', async ({ ref }) => {
+    test('should create an INSERT policy with authenticated role', async ({ page, ref }) => {
+      const policyTableName = 'pw_rls_policy_insert_table'
+      const policyInsertName = 'pw_test_insert_policy'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTableWithRLS(policyTableName, 'test')
+        },
+        async () => {
+          await dropTable(policyTableName)
+        }
+      )
       await navigateToPoliciesPage(page, ref)
-
-      // Delete policy if it exists
-      await deletePolicyIfExists(page, ref, policyInsertName)
 
       // Open create policy dialog
       await page.getByTestId(`${policyTableName}-create-policy`).click()
@@ -299,6 +272,9 @@ test.describe.serial('RLS Policies', () => {
       await expect(
         page.getByRole('heading', { name: 'Create a new Row Level Security policy' })
       ).toBeVisible()
+
+      // Hide the sidebar tools
+      await page.getByText('Hide tools').click()
 
       // Fill in policy name
       await page.getByRole('textbox', { name: 'Policy Name' }).fill(policyInsertName)
@@ -332,11 +308,18 @@ test.describe.serial('RLS Policies', () => {
       await expect(policyRow.locator('code').filter({ hasText: /^authenticated$/ })).toBeVisible()
     })
 
-    test('should create an UPDATE policy with custom condition', async ({ ref }) => {
+    test('should create an UPDATE policy with custom condition', async ({ page, ref }) => {
+      const policyTableName = 'pw_rls_policy_update_table'
+      const policyUpdateName = 'pw_test_update_policy'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTableWithRLS(policyTableName, 'test')
+        },
+        async () => {
+          await dropTable(policyTableName)
+        }
+      )
       await navigateToPoliciesPage(page, ref)
-
-      // Delete policy if it exists
-      await deletePolicyIfExists(page, ref, policyUpdateName)
 
       // Open create policy dialog
       await page.getByTestId(`${policyTableName}-create-policy`).click()
@@ -344,6 +327,9 @@ test.describe.serial('RLS Policies', () => {
       await expect(
         page.getByRole('heading', { name: 'Create a new Row Level Security policy' })
       ).toBeVisible()
+
+      // Hide the sidebar tools
+      await page.getByText('Hide tools').click()
 
       // Fill in policy name
       await page.getByRole('textbox', { name: 'Policy Name' }).fill(policyUpdateName)
@@ -374,11 +360,18 @@ test.describe.serial('RLS Policies', () => {
       await expect(policyRow.locator('code').filter({ hasText: /^UPDATE$/ })).toBeVisible()
     })
 
-    test('should create a DELETE policy', async ({ ref }) => {
+    test('should create a DELETE policy', async ({ page, ref }) => {
+      const policyTableName = 'pw_rls_policy_delete_table'
+      const policyDeleteName = 'pw_test_delete_policy'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTableWithRLS(policyTableName, 'test')
+        },
+        async () => {
+          await dropTable(policyTableName)
+        }
+      )
       await navigateToPoliciesPage(page, ref)
-
-      // Delete policy if it exists
-      await deletePolicyIfExists(page, ref, policyDeleteName)
 
       // Open create policy dialog
       await page.getByTestId(`${policyTableName}-create-policy`).click()
@@ -386,6 +379,9 @@ test.describe.serial('RLS Policies', () => {
       await expect(
         page.getByRole('heading', { name: 'Create a new Row Level Security policy' })
       ).toBeVisible()
+
+      // Hide the sidebar tools
+      await page.getByText('Hide tools').click()
 
       // Fill in policy name
       await page.getByRole('textbox', { name: 'Policy Name' }).fill(policyDeleteName)
@@ -416,7 +412,16 @@ test.describe.serial('RLS Policies', () => {
       await expect(policyRow.locator('code').filter({ hasText: /^DELETE$/ })).toBeVisible()
     })
 
-    test('should cancel policy creation', async ({ ref }) => {
+    test('should cancel policy creation', async ({ page, ref }) => {
+      const policyTableName = 'pw_rls_policy_cancel_table'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTableWithRLS(policyTableName, 'test')
+        },
+        async () => {
+          await dropTable(policyTableName)
+        }
+      )
       await navigateToPoliciesPage(page, ref)
 
       // Open create policy dialog
@@ -430,7 +435,7 @@ test.describe.serial('RLS Policies', () => {
       await page.getByRole('textbox', { name: 'Policy Name' }).fill('policy_to_cancel')
 
       // Click cancel
-      await page.getByRole('button', { name: 'Cancel' }).click()
+      await page.getByRole('button', { name: 'Cancel', exact: true }).click()
 
       // Dialog should close
       await expect(
