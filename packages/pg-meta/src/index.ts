@@ -17,8 +17,6 @@ import types from './pg-meta-types'
 import version from './pg-meta-version'
 import views from './pg-meta-views'
 import * as query from './query/index'
-import { getIndexStatusesSQL, USER_SEARCH_INDEXES } from './sql/studio/get-index-statuses'
-import { getIndexWorkerStatusSQL } from './sql/studio/get-index-worker-status'
 
 export default {
   roles,
@@ -40,7 +38,4 @@ export default {
   indexes,
   columnPrivileges,
   query,
-  getIndexWorkerStatusSQL,
-  getIndexStatusesSQL,
-  USER_SEARCH_INDEXES,
 }

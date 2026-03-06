@@ -1,11 +1,10 @@
 import { Query } from '@supabase/pg-meta/src/query'
-import {
-  COUNT_ESTIMATE_SQL,
-  THRESHOLD_COUNT,
-} from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 
 import { GetTableRowsCountArgs } from './table-rows-count-query'
+import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from './table-rows-constants'
 import { formatFilterValue } from './utils'
+
+export { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT }
 
 /**
  * [Joshen] Initially check reltuples from pg_class for an estimate of row count on the table

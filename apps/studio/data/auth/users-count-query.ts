@@ -1,9 +1,8 @@
-import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
-import { getUsersCountSQL } from '@supabase/pg-meta/src/sql/studio/get-users-count'
 import { useQuery } from '@tanstack/react-query'
-
 import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from 'types'
+
+import { getUsersCountSQL, type OptimizedSearchColumns } from './auth.sql'
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
 

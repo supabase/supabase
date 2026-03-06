@@ -1,5 +1,3 @@
-import pgMeta from '@supabase/pg-meta'
-import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
@@ -75,6 +73,7 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { USER_SEARCH_INDEXES, type OptimizedSearchColumns } from '@/data/auth/auth.sql'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
@@ -215,7 +214,7 @@ export const UsersV2 = () => {
   const isImprovedUserSearchFlagEnabled = useFlag('improvedUserSearch')
   const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
   const {
-    data: userSearchIndexes,
+    data: userSearchIndexes = [],
     isError: isUserSearchIndexesError,
     isLoading: isUserSearchIndexesLoading,
   } = useUserIndexStatusesQuery({ projectRef, connectionString: project?.connectionString })
@@ -246,7 +245,7 @@ export const UsersV2 = () => {
   const userSearchIndexesAreValidAndReady =
     !isUserSearchIndexesError &&
     !isUserSearchIndexesLoading &&
-    userSearchIndexes?.length === pgMeta.USER_SEARCH_INDEXES.length &&
+    userSearchIndexes?.length === USER_SEARCH_INDEXES.length &&
     userSearchIndexes?.every((index) => index.is_valid && index.is_ready)
 
   /**

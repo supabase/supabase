@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
+import { getUsersCountSQL } from '@studio-data/auth/auth.sql'
 import { afterAll, expect, test } from 'vitest'
 
-import { getUsersCountSQL } from '../../../src/sql/studio/get-users-count'
 import { cleanupRoot, createDatabaseWithAuthSchema, createTestDatabase } from '../../db/utils'
 
 afterAll(async () => {
@@ -61,7 +61,7 @@ withTestDatabase('filters verified users correctly', async ({ executeQuery }) =>
   // 2 verified users (email confirmed)
   await executeQuery(`
     INSERT INTO auth.users (id, email, instance_id, email_confirmed_at, created_at)
-    VALUES 
+    VALUES
       ('${randomUUID()}', 'verified1@supabase.io', '00000000-0000-0000-0000-000000000000', '${now}', NOW()),
       ('${randomUUID()}', 'verified2@supabase.io', '00000000-0000-0000-0000-000000000000', '${now}', NOW())
   `)
@@ -75,7 +75,7 @@ withTestDatabase('filters verified users correctly', async ({ executeQuery }) =>
   // 2 unverified users
   await executeQuery(`
     INSERT INTO auth.users (id, email, instance_id, created_at)
-    VALUES 
+    VALUES
       ('${randomUUID()}', 'unverified1@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
       ('${randomUUID()}', 'unverified2@supabase.io', '00000000-0000-0000-0000-000000000000', NOW())
   `)
@@ -95,7 +95,7 @@ withTestDatabase('filters anonymous users correctly', async ({ executeQuery }) =
   // 2 anonymous users
   await executeQuery(`
     INSERT INTO auth.users (id, email, instance_id, is_anonymous, created_at)
-    VALUES 
+    VALUES
       ('${randomUUID()}', 'anon1@supabase.io', '00000000-0000-0000-0000-000000000000', true, NOW()),
       ('${randomUUID()}', 'anon2@supabase.io', '00000000-0000-0000-0000-000000000000', true, NOW())
   `)
@@ -103,7 +103,7 @@ withTestDatabase('filters anonymous users correctly', async ({ executeQuery }) =
   // 3 regular users
   await executeQuery(`
     INSERT INTO auth.users (id, email, instance_id, is_anonymous, created_at)
-    VALUES 
+    VALUES
       ('${randomUUID()}', 'regular1@supabase.io', '00000000-0000-0000-0000-000000000000', false, NOW()),
       ('${randomUUID()}', 'regular2@supabase.io', '00000000-0000-0000-0000-000000000000', false, NOW()),
       ('${randomUUID()}', 'regular3@supabase.io', '00000000-0000-0000-0000-000000000000', false, NOW())
@@ -119,7 +119,7 @@ withTestDatabase('searches by keywords across multiple fields', async ({ execute
 
   await executeQuery(`
     INSERT INTO auth.users (id, email, phone, instance_id, created_at)
-    VALUES 
+    VALUES
       ('${searchUserId}', 'john.doe@supabase.io', NULL, '00000000-0000-0000-0000-000000000000', NOW()),
       ('${randomUUID()}', 'jane.smith@supabase.io', '+1234567890', '00000000-0000-0000-0000-000000000000', NOW()),
       ('${randomUUID()}', 'bob.jones@supabase.io', '+9876543210', '00000000-0000-0000-0000-000000000000', NOW())
@@ -145,7 +145,7 @@ withTestDatabase('searches by keywords across multiple fields', async ({ execute
 withTestDatabase('filters by provider correctly', async ({ executeQuery }) => {
   await executeQuery(`
     INSERT INTO auth.users (id, email, instance_id, raw_app_meta_data, created_at)
-    VALUES 
+    VALUES
       ('${randomUUID()}', 'google1@supabase.io', '00000000-0000-0000-0000-000000000000', '{"providers": ["google"]}', NOW()),
       ('${randomUUID()}', 'google2@supabase.io', '00000000-0000-0000-0000-000000000000', '{"providers": ["google"]}', NOW()),
       ('${randomUUID()}', 'github@supabase.io', '00000000-0000-0000-0000-000000000000', '{"providers": ["github"]}', NOW()),
@@ -171,7 +171,7 @@ withTestDatabase('combines multiple filters correctly', async ({ executeQuery })
 
   await executeQuery(`
     INSERT INTO auth.users (id, email, instance_id, email_confirmed_at, raw_app_meta_data, created_at)
-    VALUES 
+    VALUES
       ('${randomUUID()}', 'verified.google@supabase.io', '00000000-0000-0000-0000-000000000000', '${now}', '{"providers": ["google"]}', NOW()),
       ('${randomUUID()}', 'verified.github@supabase.io', '00000000-0000-0000-0000-000000000000', '${now}', '{"providers": ["github"]}', NOW()),
       ('${randomUUID()}', 'unverified.google@supabase.io', '00000000-0000-0000-0000-000000000000', NULL, '{"providers": ["google"]}', NOW())
@@ -191,7 +191,7 @@ withTestDatabase('combines multiple filters correctly', async ({ executeQuery })
 withTestDatabase('optimized email search works correctly', async ({ executeQuery }) => {
   await executeQuery(`
     INSERT INTO auth.users (id, email, instance_id, created_at)
-    VALUES 
+    VALUES
       ('${randomUUID()}', 'alice@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
       ('${randomUUID()}', 'bob@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
       ('${randomUUID()}', 'alicia@supabase.io', '00000000-0000-0000-0000-000000000000', NOW())
@@ -206,7 +206,7 @@ withTestDatabase('optimized email search works correctly', async ({ executeQuery
 withTestDatabase('optimized phone search works correctly', async ({ executeQuery }) => {
   await executeQuery(`
     INSERT INTO auth.users (id, phone, instance_id, created_at)
-    VALUES 
+    VALUES
       ('${randomUUID()}', '+1234567890', '00000000-0000-0000-0000-000000000000', NOW()),
       ('${randomUUID()}', '+1234999999', '00000000-0000-0000-0000-000000000000', NOW()),
       ('${randomUUID()}', '+9876543210', '00000000-0000-0000-0000-000000000000', NOW())
@@ -225,7 +225,7 @@ withTestDatabase('optimized id search works correctly', async ({ executeQuery })
 
   await executeQuery(`
     INSERT INTO auth.users (id, email, instance_id, created_at)
-    VALUES 
+    VALUES
       ('${userId1}', 'user1@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
       ('${userId2}', 'user2@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
       ('${userId3}', 'user3@supabase.io', '00000000-0000-0000-0000-000000000000', NOW())
@@ -245,7 +245,7 @@ withTestDatabase('optimized id search works correctly', async ({ executeQuery })
 withTestDatabase('handles SAML provider filtering', async ({ executeQuery }) => {
   await executeQuery(`
     INSERT INTO auth.users (id, email, instance_id, raw_app_meta_data, created_at)
-    VALUES 
+    VALUES
       ('${randomUUID()}', 'sso1@supabase.io', '00000000-0000-0000-0000-000000000000', '{"providers": ["sso:provider-id-1"]}', NOW()),
       ('${randomUUID()}', 'sso2@supabase.io', '00000000-0000-0000-0000-000000000000', '{"providers": ["sso:provider-id-2"]}', NOW()),
       ('${randomUUID()}', 'google@supabase.io', '00000000-0000-0000-0000-000000000000', '{"providers": ["google"]}', NOW())
