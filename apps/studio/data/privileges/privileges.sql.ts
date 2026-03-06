@@ -121,10 +121,10 @@ export function getExposedTableCountsSql({ selectedSchemas }: { selectedSchemas:
 
   return /* SQL */ `
     with ${getTableGrantsCTEs()}
- select
+    select
       count(*)::int as total_count,
       (count(*) filter (where status = 'granted' and schema_name in (${schemasList})))::int as grants_count
-  from table_grants
+    from table_grants
   `
 }
 

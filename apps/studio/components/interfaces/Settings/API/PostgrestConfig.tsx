@@ -19,6 +19,7 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Skeleton,
+  useWatch_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
@@ -235,11 +236,20 @@ export const PostgrestConfig = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady])
 
-  const watchedDbSchema = form.watch('dbSchema')
-  const watchedTableIdsToAdd = form.watch('tableIdsToAdd')
-  const watchedTableIdsToRemove = form.watch('tableIdsToRemove')
-  const watchedFunctionNamesToAdd = form.watch('functionNamesToAdd')
-  const watchedFunctionNamesToRemove = form.watch('functionNamesToRemove')
+  const watchedDbSchema = useWatch_Shadcn_({ control: form.control, name: 'dbSchema' })
+  const watchedTableIdsToAdd = useWatch_Shadcn_({ control: form.control, name: 'tableIdsToAdd' })
+  const watchedTableIdsToRemove = useWatch_Shadcn_({
+    control: form.control,
+    name: 'tableIdsToRemove',
+  })
+  const watchedFunctionNamesToAdd = useWatch_Shadcn_({
+    control: form.control,
+    name: 'functionNamesToAdd',
+  })
+  const watchedFunctionNamesToRemove = useWatch_Shadcn_({
+    control: form.control,
+    name: 'functionNamesToRemove',
+  })
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
