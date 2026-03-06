@@ -45,8 +45,12 @@ export const useMfaUnenrollMutation = ({
       ])
 
       await Promise.all([
-        ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.mfaFactors())] : []),
-        ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.aaLevel())] : []),
+        ...(refreshFactors
+          ? [queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors() })]
+          : []),
+        ...(refreshFactors
+          ? [queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() })]
+          : []),
       ])
 
       await onSuccess?.(data, variables, context)

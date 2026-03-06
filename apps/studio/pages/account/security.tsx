@@ -1,6 +1,4 @@
-import dynamic from 'next/dynamic'
-import { AlertCircle, ChevronRightIcon, Fingerprint, Smartphone } from 'lucide-react'
-
+import { useFlag } from 'common'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -8,6 +6,10 @@ import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { AlertCircle, ChevronRightIcon, Fingerprint, Smartphone } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useState } from 'react'
+import type { NextPageWithLayout } from 'types'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -26,10 +28,6 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-
-import type { NextPageWithLayout } from 'types'
-import { useState } from 'react'
-import { useFlag } from 'common'
 
 const TOTPFactors = dynamic(() =>
   import('components/interfaces/Account/TOTPFactors').then((mod) => mod.TOTPFactors)
@@ -77,7 +75,7 @@ const Security: NextPageWithLayout = () => {
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
-        <div className="space-y-4">
+        <div className="space-y-4 mt-8">
           {verifiedFactors?.length === 1 && (
             <Alert_Shadcn_ variant="default" className="mb-2">
               <AlertCircle className="h-4 w-4" />
@@ -108,7 +106,7 @@ const Security: NextPageWithLayout = () => {
 
                 <div className="flex flex-row gap-3 items-center">
                   {data ? (
-                    <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
+                    <Badge variant={data.totp.length === 0 ? 'default' : 'success'}>
                       {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
                     </Badge>
                   ) : null}
@@ -152,7 +150,7 @@ const Security: NextPageWithLayout = () => {
                     {data ? (
                       <Badge
                         variant={
-                          !!data.webauthn && data.webauthn?.length !== 0 ? 'brand' : 'default'
+                          !!data.webauthn && data.webauthn?.length !== 0 ? 'success' : 'default'
                         }
                       >
                         {data.webauthn?.length ?? '0'} key{data.webauthn?.length === 1 ? '' : 's'}{' '}

@@ -27,7 +27,7 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
 
   const {
     mutate: register,
-    isLoading: isVerifying,
+    isPending: isVerifying,
     isSuccess,
     reset,
   } = useMfaWebAuthnRegisterMutation({
@@ -36,7 +36,7 @@ export const AddNewWebAuthnModal = ({ visible, onClose }: AddNewWebAuthnModalPro
     },
     onSuccess: async () => {
       if (lastVisitedOrganization) {
-        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+        await queryClient.invalidateQueries({ queryKey: organizationKeys.members(lastVisitedOrganization) })
       }
       toast.success(`Successfully added a second factor authentication`)
       onClose()

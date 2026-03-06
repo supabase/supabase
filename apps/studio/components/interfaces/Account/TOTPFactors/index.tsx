@@ -1,14 +1,13 @@
-import dayjs from 'dayjs'
-import { useState } from 'react'
-
+import type { AuthMFAListFactorsResponse } from '@supabase/auth-js'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import dayjs from 'dayjs'
 import { DATETIME_FORMAT } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, CardContent, CardFooter } from 'ui'
+import { useState } from 'react'
+import { Button, CardContent, CardFooter } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
-import type { AuthMFAListFactorsResponse } from '@supabase/auth-js'
 
 export const TOTPFactors = ({
   data,
@@ -27,7 +26,6 @@ export const TOTPFactors = ({
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
 
   const totpFactors = data?.totp ?? []
-  const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
 
   return (
     <>

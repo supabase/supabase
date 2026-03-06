@@ -43,32 +43,31 @@ export const useMfaWebAuthnRegisterMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation(
-    (vars) => {
+  return useMutation({
+    mutationFn: (vars: MFAVerifyWebauthnParams) => {
       return mfaWebAuthnRegister(vars)
     },
-    {
-      async onSuccess(data, variables, context) {
-        // when a MFA is added, the aaLevel is bumped up
-        const refreshFactors = variables.refreshFactors ?? true
+    async onSuccess(data, variables, context) {
+      const refreshFactors = variables.refreshFactors ?? true
 
-        await Promise.all([
-          ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.mfaFactors())] : []),
-          queryClient.invalidateQueries(profileKeys.aaLevel()),
-        ])
+      await Promise.all([
+        ...(refreshFactors
+          ? [queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors() })]
+          : []),
+        queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() }),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to sign in: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to sign in: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
 
-        Sentry.captureMessage('Failed to sign in via WebAuthn MFA: ' + data.message)
-      },
-      ...options,
-    }
-  )
+      Sentry.captureMessage('Failed to sign in via WebAuthn MFA: ' + data.message)
+    },
+    ...options,
+  })
 }

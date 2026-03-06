@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DATETIME_FORMAT } from 'lib/constants'
 import { Badge, Button, CardContent, CardFooter } from 'ui'
 import { AddNewWebAuthnModal } from './AddNewWebAuthnModal'
@@ -32,7 +32,7 @@ export const WebAuthnFactors = ({
 
   const {
     mutate: mfaWebAuthnChallengeAndVerify,
-    isLoading: isWebAuthnVerifying,
+    isPending: isWebAuthnVerifying,
     isSuccess: isWebAuthnSuccess,
   } = useMfaWebAuthnChallengeAndVerifyMutation({
     onSuccess: () => {

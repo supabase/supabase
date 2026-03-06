@@ -26,10 +26,10 @@ const DeleteWebAuthnModal = ({
     ''
   )
 
-  const { mutate: unenroll, isLoading } = useMfaUnenrollMutation({
+  const { mutate: unenroll, isPending: isLoading } = useMfaUnenrollMutation({
     onSuccess: async () => {
       if (lastVisitedOrganization) {
-        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+        await queryClient.invalidateQueries({ queryKey: organizationKeys.members(lastVisitedOrganization) })
       }
       toast.success(`Successfully deleted security key`)
       onClose()

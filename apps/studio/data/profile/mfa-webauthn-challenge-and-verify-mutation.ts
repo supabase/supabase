@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
 import type { AuthMFAVerifyResponse, MFAChallengeWebauthnParams } from '@supabase/auth-js'
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, type UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { auth } from 'lib/gotrue'
 import { toast } from 'sonner'
 
-import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
 
 const WHITELIST_ERRORS = ['Invalid TOTP code entered']
@@ -54,34 +54,33 @@ export const useMfaWebAuthnChallengeAndVerifyMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation(
-    (vars) => {
-      const { refreshFactors, ...params } = vars
+  return useMutation({
+    mutationFn: (vars: MFAWebAuthnChallengeAndVerifyVariables) => {
+      const { refreshFactors: _, ...params } = vars
       return mfaWebAuthnChallengeAndVerify(params)
     },
-    {
-      async onSuccess(data, variables, context) {
-        // when a MFA is added, the aaLevel is bumped up
-        const refreshFactors = variables.refreshFactors ?? true
+    async onSuccess(data, variables, context) {
+      const refreshFactors = variables.refreshFactors ?? true
 
-        await Promise.all([
-          ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.mfaFactors())] : []),
-          queryClient.invalidateQueries(profileKeys.aaLevel()),
-        ])
+      await Promise.all([
+        ...(refreshFactors
+          ? [queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors() })]
+          : []),
+        queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() }),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to sign in: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-          Sentry.captureMessage('[CRITICAL] Failed to sign in via MFA: ' + data.message)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to sign in: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+      if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+        Sentry.captureMessage('[CRITICAL] Failed to sign in via MFA: ' + data.message)
+      }
+    },
+    ...options,
+  })
 }

@@ -27,9 +27,12 @@ export const useMfaAuthenticateWebAuthnMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation(mfaAuthenticateWebAuthn, {
+  return useMutation({
+    mutationFn: mfaAuthenticateWebAuthn,
     async onSuccess(data, variables, context) {
-      await Promise.all([queryClient.invalidateQueries(profileKeys.aaLevel())])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

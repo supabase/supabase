@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 
-import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useAuthError } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
@@ -29,7 +28,6 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Alert, AlertDescription, AlertTitle } from 'ui/src/components/shadcn/ui/alert'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import z from 'zod'
 
 import { SupportLink } from '../Support/SupportLink'
 
@@ -78,15 +76,14 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,
-    isLoading: isTotpVerifying,
+    isPending: isTotpVerifying,
     isSuccess: isTotpSuccess,
-    isPending: isVerifying,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: handleSuccess,
   })
   const {
     mutate: mfaAuthenticateWebAuthn,
-    isLoading: isWebAuthnVerifying,
+    isPending: isWebAuthnVerifying,
     isSuccess: isWebAuthnSuccess,
   } = useMfaAuthenticateWebAuthnMutation({
     onSuccess: handleSuccess,
