@@ -1,4 +1,4 @@
-import { type SafeParseReturnType, z } from 'zod'
+import { z, type SafeParseReturnType } from 'zod'
 
 /**
  * Wraps bare URLs containing <placeholder> patterns in backticks so they render in code font,

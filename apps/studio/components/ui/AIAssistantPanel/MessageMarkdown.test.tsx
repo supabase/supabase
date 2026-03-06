@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
+
 import { wrapPlaceholderUrls } from './Message.utils'
 import { OrderedList } from './MessageMarkdown'
 
@@ -23,7 +24,9 @@ describe('wrapPlaceholderUrls', () => {
 
   test('wraps bare URL but preserves surrounding text', () => {
     expect(
-      wrapPlaceholderUrls('Authorization endpoint: https://<project-ref>.supabase.co/auth/v1/oauth/authorize')
+      wrapPlaceholderUrls(
+        'Authorization endpoint: https://<project-ref>.supabase.co/auth/v1/oauth/authorize'
+      )
     ).toBe('Authorization endpoint: `https://<project-ref>.supabase.co/auth/v1/oauth/authorize`')
   })
 })

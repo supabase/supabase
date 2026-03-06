@@ -1,3 +1,4 @@
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import {
@@ -10,14 +11,11 @@ import {
   type ReactElement,
 } from 'react'
 import type { StreamdownProps } from 'streamdown'
-
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import {
   Button,
   cn,
   CodeBlock,
   CodeBlockLang,
-  markdownComponents,
   Dialog,
   DialogClose,
   DialogContent,
@@ -26,7 +24,9 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
+  markdownComponents,
 } from 'ui'
+
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
