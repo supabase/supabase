@@ -43,14 +43,32 @@
   font-display: swap;
 }
 
+:root {
+  --heading-font: var(--font-ktf-prima);
+  --body-font: var(--font-ktf-prima);
+  --heading-tracking: -0.02em;
+  --body-tracking: -0.01em;
+  --heading-leading: 1.1;
+  --body-leading: 1.6;
+}
+
 html {
   scroll-behavior: smooth !important;
 }
 
 body {
   @apply bg text-foreground;
+  font-family: var(--body-font), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: var(--body-tracking);
+  line-height: var(--body-leading);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading-font), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: var(--heading-tracking);
+  line-height: var(--heading-leading);
 }
 
 /* h1,
