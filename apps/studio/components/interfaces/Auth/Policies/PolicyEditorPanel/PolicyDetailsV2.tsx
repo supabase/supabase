@@ -271,7 +271,7 @@ export const PolicyDetailsV2 = ({
                       form.setValue('command', value)
                       onUpdateCommand(value)
                     }}
-                    className={`grid grid-cols-10 gap-3 ${isEditing ? 'opacity-50' : ''}`}
+                    className={`!flex !flex-wrap gap-3 ${isEditing ? 'opacity-50' : ''}`}
                   >
                     {[
                       'select',
@@ -283,7 +283,7 @@ export const PolicyDetailsV2 = ({
                         value={x}
                         disabled={isEditing}
                         label={x.toLocaleUpperCase()}
-                        className={`col-span-2 w-auto ${isEditing ? 'cursor-not-allowed' : ''}`}
+                        className={`!w-auto min-w-[3rem] ${isEditing ? 'cursor-not-allowed' : ''}`}
                       />
                     ))}
                   </RadioGroup_Shadcn_>
