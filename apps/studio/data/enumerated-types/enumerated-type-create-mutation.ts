@@ -15,6 +15,11 @@ export type EnumeratedTypeCreateVariables = {
   values: string[]
 }
 
+// Escape single quotes in SQL string literals by doubling them
+function escapeSqlString(str: string): string {
+  return str.replace(/'/g, "''")
+}
+
 export async function createEnumeratedType({
   projectRef,
   connectionString,
@@ -23,11 +28,13 @@ export async function createEnumeratedType({
   description,
   values,
 }: EnumeratedTypeCreateVariables) {
-  const createSql = `create type "${schema}"."${name}" as enum (${values
-    .map((x) => `'${x}'`)
-    .join(', ')});`
+  const escapedValues = values.map((x) => `'${escapeSqlString(x)}'`).join(', ')
+  const createSql = `create type "${schema}"."${name}" as enum (${escapedValues});`
+  const escapedDescription = description !== undefined ? escapeSqlString(description) : undefined
   const commentSql =
-    description !== undefined ? `comment on type "${schema}"."${name}" is '${description}';` : ''
+    escapedDescription !== undefined
+      ? `comment on type "${schema}"."${name}" is '${escapedDescription}';`
+      : ''
   const sql = wrapWithTransaction(`${createSql} ${commentSql}`)
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result

@@ -94,7 +94,7 @@ const CreateEnumeratedTypeSidePanel = ({
       connectionString: project.connectionString,
       schema,
       name: data.name,
-      description: data.description?.replaceAll("'", "''"),
+      description: data.description,
       values: data.values.filter((x) => x.value.length > 0).map((x) => x.value.trim()),
     })
   }
