@@ -64,7 +64,7 @@ const aiBuilderStories = [
       'We store embeddings in a PostgreSQL database, hosted by Supabase, to perform a similarity search to identify',
     slug: 'lovable',
     gradient:
-      'linear-gradient(160deg, #c4b5fd 0%, #a78bfa 20%, #ec4899 50%, #fb7185 75%, #ef4444 100%)',
+      'linear-gradient(to bottom, #c4b5fd 0%, #a78bfa 20%, #ec4899 50%, #fb7185 75%, #ef4444 100%)',
   },
 ]
 
@@ -106,7 +106,7 @@ export function CustomerStoriesSection() {
                   <img
                     src={story.logo}
                     alt={story.name}
-                    className="size-16 rounded object-contain shrink-0"
+                    className="size-16 rounded object-contain shrink-0 dark:invert"
                   />
 
                   <AnimatePresence mode="popLayout">

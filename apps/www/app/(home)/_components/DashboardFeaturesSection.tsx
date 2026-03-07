@@ -17,7 +17,7 @@ const dashboardStories = [
     slug: 'mozilla-mdn',
   },
   {
-    logo: '/images/customers/logos/chatbase.svg',
+    logo: '/images/customers/logos/chatbase.png',
     name: 'Chatbase',
     quote:
       'The SQL Editor in Supabase is my favorite feature — it lets us run complex queries, debug issues, and iterate on our schema without ever leaving the browser.',
@@ -25,7 +25,7 @@ const dashboardStories = [
     slug: 'chatbase',
   },
   {
-    logo: '/images/customers/logos/markprompt.svg',
+    logo: '/images/customers/logos/markprompt.png',
     name: 'Markprompt',
     quote:
       'Row Level Security in Supabase allows us to set granular access policies directly in Postgres, so our multi-tenant architecture stays secure by default.',
@@ -118,7 +118,7 @@ export function DashboardFeaturesSection({
               <img
                 src={story.logo}
                 alt={story.name}
-                className="h-8 w-8 shrink-0 object-contain grayscale opacity-80"
+                className="h-8 w-8 shrink-0 object-contain grayscale opacity-80 dark:invert"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-foreground-lighter text-sm">

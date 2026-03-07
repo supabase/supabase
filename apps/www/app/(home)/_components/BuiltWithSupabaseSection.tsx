@@ -1,20 +1,33 @@
 'use client'
 
+import { ComponentProps } from 'react'
 import Examples from 'data/Examples'
 import Link from 'next/link'
 import { Button, IconGitHubSolid } from 'ui'
+import {
+  NextjsLogo,
+  ReactLogo,
+  SvelteLogo,
+  FlutterLogo,
+  ExpoLogo,
+  NestjsLogo,
+  StripeLogo,
+  VercelLogo,
+  OpenaiLogo,
+  LangchainLogo,
+} from './logos/FrameworkLogos'
 
-const FRAMEWORK_TAGS: Record<string, string> = {
-  'Next.js': '/images/logos/frameworks/nextjs.svg',
-  React: '/images/logos/frameworks/react.svg',
-  Svelte: '/images/logos/frameworks/svelte.svg',
-  Flutter: '/images/logos/frameworks/flutter.svg',
-  Expo: '/images/logos/frameworks/expo.svg',
-  NestJs: '/images/logos/frameworks/nestjs.svg',
-  Stripe: '/images/logos/frameworks/stripe.svg',
-  Vercel: '/images/logos/frameworks/vercel.svg',
-  OpenAI: '/images/logos/frameworks/openai.svg',
-  LangChain: '/images/logos/frameworks/langchain.svg',
+const FRAMEWORK_TAGS: Record<string, (props: ComponentProps<'svg'>) => React.JSX.Element> = {
+  'Next.js': NextjsLogo,
+  React: ReactLogo,
+  Svelte: SvelteLogo,
+  Flutter: FlutterLogo,
+  Expo: ExpoLogo,
+  NestJs: NestjsLogo,
+  Stripe: StripeLogo,
+  Vercel: VercelLogo,
+  OpenAI: OpenaiLogo,
+  LangChain: LangchainLogo,
 }
 
 export function BuiltWithSupabaseSection() {
@@ -57,15 +70,13 @@ export function BuiltWithSupabaseSection() {
             target="_blank"
             className="group rounded-lg border border-border bg-surface-75 overflow-hidden hover:border-foreground-muted transition-colors"
           >
-            <div className="aspect-[16/9] bg-surface-200 flex items-center justify-center gap-6 overflow-hidden">
+            <div className="aspect-[16/9] bg-surface-200 flex items-center justify-center gap-6 overflow-hidden text-foreground-lighter">
               {example.tags.map((tag) => {
-                const icon = FRAMEWORK_TAGS[tag]
-                return icon ? (
-                  <img
+                const Logo = FRAMEWORK_TAGS[tag]
+                return Logo ? (
+                  <Logo
                     key={tag}
-                    src={icon}
-                    alt={tag}
-                    className="h-8 w-auto opacity-40 grayscale group-hover:opacity-60 transition-opacity"
+                    className="h-8 w-auto opacity-40 group-hover:opacity-60 transition-opacity"
                   />
                 ) : (
                   <span key={tag} className="text-foreground-lighter text-sm font-medium">
@@ -99,11 +110,11 @@ export function BuiltWithSupabaseSection() {
                 {example.description}
               </p>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2 text-foreground-lighter">
               {example.tags.map((tag) => {
-                const icon = FRAMEWORK_TAGS[tag]
-                return icon ? (
-                  <img key={tag} src={icon} alt={tag} className="h-4 w-auto opacity-40 grayscale" />
+                const Logo = FRAMEWORK_TAGS[tag]
+                return Logo ? (
+                  <Logo key={tag} className="h-4 w-auto opacity-40" />
                 ) : (
                   <span
                     key={tag}

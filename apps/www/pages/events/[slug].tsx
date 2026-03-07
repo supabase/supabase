@@ -28,8 +28,8 @@ import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.svg'
+import supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.svg'
 
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import type Author from '~/types/author'
