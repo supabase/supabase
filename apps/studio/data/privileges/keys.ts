@@ -13,4 +13,14 @@ export const privilegeKeys = {
     ] as const,
   exposedTableCounts: (projectRef: string | undefined, selectedSchemas: string[]) =>
     ['projects', projectRef, 'privileges', 'exposed-table-counts', ...selectedSchemas] as const,
+  exposedFunctionsInfinite: (projectRef: string | undefined, search?: string) =>
+    [
+      'projects',
+      projectRef,
+      'privileges',
+      'exposed-functions-infinite',
+      ...(search ? ([{ search }] as const) : []),
+    ] as const,
+  exposedFunctionCounts: (projectRef: string | undefined, selectedSchemas: string[]) =>
+    ['projects', projectRef, 'privileges', 'exposed-function-counts', ...selectedSchemas] as const,
 }
