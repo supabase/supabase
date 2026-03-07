@@ -248,6 +248,7 @@ allow_list = [
     "LlamaIndex",
     "Llamafile",
     "Logflare",
+    "LogQL",
     "Lovable",
     "Lovable Cloud",
     "Lua",
