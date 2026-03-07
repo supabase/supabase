@@ -5,8 +5,8 @@ This example will set you up for a very common situation: users can sign up or s
 This demonstrates how to use:
 
 - User signups using Supabase [Auth](https://supabase.com/auth).
-  - Supabase [Auth Helpers for Next.js](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
-  - Supabase [pre-built Auth UI for React](https://supabase.com/docs/guides/auth/auth-helpers/auth-ui).
+  - Supabase [SSR Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs).
+  - Supabase [pre-built Auth UI for React](https://supabase.com/docs/guides/auth/auth-ui).
 - User avatar images using Supabase [Storage](https://supabase.com/storage)
 - Public profiles restricted with [Policies](https://supabase.com/docs/guides/auth#policies).
 - Frontend using [Next.js](<[nextjs.org/](https://nextjs.org/)>).
@@ -16,8 +16,8 @@ This demonstrates how to use:
 - Frontend:
   - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
   - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
-  - Supabase [Auth Helpers for Next.js](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
-  - Supabase [pre-built Auth UI for React](https://supabase.com/docs/guides/auth/auth-helpers/auth-ui).
+  - Supabase [`@supabase/ssr`](https://supabase.com/docs/guides/auth/server-side/nextjs) for SSR auth.
+  - Supabase [pre-built Auth UI for React](https://supabase.com/docs/guides/auth/auth-ui).
 - Backend:
   - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
 
