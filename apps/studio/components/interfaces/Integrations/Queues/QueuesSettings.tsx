@@ -323,7 +323,7 @@ export const QueuesSettings = () => {
               </FormPanelContent>
 
               <FormPanelFooter className="flex px-8 py-4 flex items-center justify-between">
-                <DocsButton href="https://github.com/tembo-io/pgmq?tab=readme-ov-file#sql-examples" />
+                <DocsButton href="https://github.com/pgmq/pgmq?tab=readme-ov-file#sql-examples" />
                 <div className="flex items-center gap-x-2">
                   <Button
                     type="default"
