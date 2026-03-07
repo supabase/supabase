@@ -40,7 +40,8 @@ export interface ReportConfig<FiltersType = any> {
   hideChartType: boolean
   defaultChartStyle: string
   titleTooltip: string
-  availableIn: string[]
+  /** Entitlement key required to view this chart. If undefined, chart is available to all plans. */
+  entitlement?: string
   format?: (value: unknown) => string
   YAxisProps?: YAxisProps
   xAxisKey?: string

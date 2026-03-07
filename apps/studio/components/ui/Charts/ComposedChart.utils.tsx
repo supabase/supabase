@@ -14,7 +14,7 @@ export interface ReportAttributes {
   attributes?: (MultiAttribute | false)[]
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
-  availableIn?: string[]
+  entitlement?: string
   hideChartType?: boolean
   format?: string
   className?: string
