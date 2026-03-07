@@ -32,6 +32,7 @@ import {
   PlusIcon,
   X,
 } from 'lucide-react'
+import type { editor as MonacoEditor } from 'monaco-editor'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { editorPanelState, useEditorPanelStateSnapshot } from 'state/editor-panel-state'
@@ -89,6 +90,8 @@ export const EditorPanel = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [titleInput, setTitleInput] = useState('')
   const titleInputRef = useRef<HTMLInputElement>(null)
+  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null)
+  const shouldRefocusAfterRunRef = useRef(false)
   const [monaco, setMonaco] = useState<Monaco | null>(null)
 
   useAddDefinitions('', monaco)
@@ -126,6 +129,23 @@ export const EditorPanel = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const originalSnippetRef = useRef<{ sql: string; name: string } | null>(null)
+
+  const refocusEditor = () => {
+    requestAnimationFrame(() => {
+      setTimeout(() => editorRef.current?.focus(), 0)
+    })
+  }
+
+  const clearPendingRunRefocus = () => {
+    shouldRefocusAfterRunRef.current = false
+  }
+
+  const refocusEditorAfterRunIfNeeded = () => {
+    if (!shouldRefocusAfterRunRef.current) return
+
+    shouldRefocusAfterRunRef.current = false
+    refocusEditor()
+  }
 
   const showSaveSuccess = () => {
     setSaveStatus('success')
@@ -184,10 +204,12 @@ export const EditorPanel = () => {
     onSuccess: async (res) => {
       setResults(res.result)
       setError(undefined)
+      refocusEditorAfterRunIfNeeded()
     },
     onError: (mutationError) => {
       setError(mutationError)
       setResults([])
+      refocusEditorAfterRunIfNeeded()
     },
   })
 
@@ -196,7 +218,10 @@ export const EditorPanel = () => {
     setShowWarning(undefined)
     setResults(undefined)
 
-    if (currentValue.length === 0) return
+    if (currentValue.length === 0) {
+      clearPendingRunRefocus()
+      return
+    }
 
     if (!skipValidation) {
       const isReadOnlySelectSQL = isReadOnlySelect(currentValue)
@@ -232,7 +257,14 @@ export const EditorPanel = () => {
     setIsTemplatesOpen(false)
   }
 
+  const onExecuteSqlFromButton = () => {
+    shouldRefocusAfterRunRef.current = true
+    onExecuteSql()
+    refocusEditor()
+  }
+
   const handleClosePanel = () => {
+    clearPendingRunRefocus()
     closeSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     setTemplates([])
     setError(undefined)
@@ -458,7 +490,10 @@ export const EditorPanel = () => {
             language="pgsql"
             value={currentValue}
             onChange={handleChange}
-            onMount={(_, m) => setMonaco(m)}
+            onMount={(editor, m) => {
+              editorRef.current = editor
+              setMonaco(m)
+            }}
             aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
             aiMetadata={{
               projectRef: project?.ref,
@@ -510,10 +545,16 @@ export const EditorPanel = () => {
           <SqlWarningAdmonition
             className="border-t"
             warningType={showWarning}
-            onCancel={() => setShowWarning(undefined)}
+            onCancel={() => {
+              clearPendingRunRefocus()
+              setShowWarning(undefined)
+              refocusEditor()
+            }}
             onConfirm={() => {
+              shouldRefocusAfterRunRef.current = true
               setShowWarning(undefined)
               onExecuteSql(true)
+              refocusEditor()
             }}
           />
         )}
@@ -615,7 +656,11 @@ export const EditorPanel = () => {
           >
             {activeSnippet ? 'Update snippet' : 'Save as snippet'}
           </Button>
-          <SqlRunButton isDisabled={isExecuting} isExecuting={isExecuting} onClick={onExecuteSql} />
+          <SqlRunButton
+            isDisabled={isExecuting}
+            isExecuting={isExecuting}
+            onClick={onExecuteSqlFromButton}
+          />
         </div>
       </div>
       <SaveSnippetDialog
