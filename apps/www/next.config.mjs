@@ -36,7 +36,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const isPreview = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'preview'
 const scriptSrc = [
-  "'unsafe-inline'",
+  "'unsafe-inline' 'unsafe-eval'",
   "https://frontend-assets.supabase.com",
   "https://ph.supabase.green",
   "https://ph.supabase.com",
