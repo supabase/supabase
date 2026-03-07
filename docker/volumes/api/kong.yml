@@ -180,7 +180,7 @@ services:
             - admin
             - anon
   - name: realtime-v1-rest
-    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+    _comment: 'Realtime: /realtime/v1/api/* -> http://realtime:4000/api/*'
     url: http://realtime-dev.supabase-realtime:4000/api
     protocol: http
     routes:
@@ -218,6 +218,14 @@ services:
           - /storage/v1/
     plugins:
       - name: cors
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - "Authorization:$LUA_AUTH_EXPR"
+          replace:
+            headers:
+              - "Authorization:$LUA_AUTH_EXPR"
 
   ## Edge Functions routes
   - name: functions-v1

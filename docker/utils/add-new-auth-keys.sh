@@ -1,18 +1,21 @@
 #!/bin/sh
 #
-# Generate asymmetric keys for self-hosted Supabase.
+# Add asymmetric keys and opaque API keys to a self-hosted Supabase installation.
 #
-# This script adds ES256 asymmetric JWT support on top of an existing
-# self-hosted installation. It reads JWT_SECRET from .env and generates:
-#
+# Reads JWT_SECRET from .env and generates ES256 asymmetric JWT support:
 #   - EC P-256 key pair (JWKS_KEYPAIR, JWKS_PUBLIC)
 #   - Opaque API keys (SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY)
 #   - ES256 JWT API keys (ANON_KEY_ASYMMETRIC, SERVICE_ROLE_KEY_ASYMMETRIC)
 #
+# Usage:
+#   sh add-new-auth-keys.sh              # Interactive: prints keys, prompts to update .env
+#   sh add-new-auth-keys.sh --update-env # Prints keys and writes them to .env
+#   sh add-new-auth-keys.sh | tee keys   # Non-interactive: prints keys only
+#
 # Prerequisites:
 #   - .env file with JWT_SECRET set (run generate-keys.sh first)
-#   - openssl (for EC key generation)
-#   - node >= 16 (for JWK export and ES256 JWT signing)
+#   - openssl
+#   - node >= 16
 #
 
 set -e
@@ -129,40 +132,42 @@ console.log("JWKS_PUBLIC=" + JSON.stringify(jwksPublic));
 ' "$tmpdir/ec_private.pem" "$jwt_secret" > "$tmpdir/output"
 
 # Read generated values
-supabase_publishable_key=$(grep '^SUPABASE_PUBLISHABLE_KEY=' "$tmpdir/output" | cut -d= -f2-)
-supabase_secret_key=$(grep '^SUPABASE_SECRET_KEY=' "$tmpdir/output" | cut -d= -f2-)
-anon_key_asymmetric=$(grep '^ANON_KEY_ASYMMETRIC=' "$tmpdir/output" | cut -d= -f2-)
-service_role_key_asymmetric=$(grep '^SERVICE_ROLE_KEY_ASYMMETRIC=' "$tmpdir/output" | cut -d= -f2-)
-jwks_keypair=$(grep '^JWKS_KEYPAIR=' "$tmpdir/output" | cut -d= -f2-)
-jwks_public=$(grep '^JWKS_PUBLIC=' "$tmpdir/output" | cut -d= -f2-)
+SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' "$tmpdir/output" | cut -d= -f2-)
+SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' "$tmpdir/output" | cut -d= -f2-)
+ANON_KEY_ASYMMETRIC=$(grep '^ANON_KEY_ASYMMETRIC=' "$tmpdir/output" | cut -d= -f2-)
+SERVICE_ROLE_KEY_ASYMMETRIC=$(grep '^SERVICE_ROLE_KEY_ASYMMETRIC=' "$tmpdir/output" | cut -d= -f2-)
+JWKS_KEYPAIR=$(grep '^JWKS_KEYPAIR=' "$tmpdir/output" | cut -d= -f2-)
+JWKS_PUBLIC=$(grep '^JWKS_PUBLIC=' "$tmpdir/output" | cut -d= -f2-)
 
 echo ""
-echo "SUPABASE_PUBLISHABLE_KEY=${supabase_publishable_key}"
-echo "SUPABASE_SECRET_KEY=${supabase_secret_key}"
+echo "SUPABASE_PUBLISHABLE_KEY=${SUPABASE_PUBLISHABLE_KEY}"
+echo "SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY}"
 echo ""
-echo "ANON_KEY_ASYMMETRIC=${anon_key_asymmetric}"
-echo "SERVICE_ROLE_KEY_ASYMMETRIC=${service_role_key_asymmetric}"
+echo "ANON_KEY_ASYMMETRIC=${ANON_KEY_ASYMMETRIC}"
+echo "SERVICE_ROLE_KEY_ASYMMETRIC=${SERVICE_ROLE_KEY_ASYMMETRIC}"
 echo ""
-echo "JWKS_KEYPAIR=${jwks_keypair}"
+echo "JWKS_KEYPAIR=${JWKS_KEYPAIR}"
 echo ""
-echo "JWKS_PUBLIC=${jwks_public}"
+echo "JWKS_PUBLIC=${JWKS_PUBLIC}"
 echo ""
 
-if ! test -t 0; then
-    echo "Running non-interactively. Skipping .env update."
-    exit 0
+if [ "$1" = "--update-env" ]; then
+    update_env=true
+elif test -t 0; then
+    printf "Update .env file? (y/N) "
+    read -r REPLY
+    case "$REPLY" in
+        [Yy]) update_env=true ;;
+        *) update_env=false ;;
+    esac
+else
+    echo "Running non-interactively. Pass --update-env to write to .env."
+    update_env=false
 fi
 
-printf "Update .env file? (y/N) "
-read -r REPLY
-case "$REPLY" in
-    [Yy])
-        ;;
-    *)
-        echo "Not updating .env"
-        exit 0
-        ;;
-esac
+if [ "$update_env" != "true" ]; then
+    exit 0
+fi
 
 echo "Updating .env..."
 
