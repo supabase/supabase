@@ -73,6 +73,10 @@ const ColumnType = ({
   const listboxId = useId()
   const availableTypes = POSTGRES_DATA_TYPES.concat(
     enumTypes.map((type) => type.format.replaceAll('"', ''))
+  ).concat(
+    enumTypes.map((option) =>
+      option.schema === 'public' ? option.name : `"${option.schema}"."${option.name}"`
+    )
   )
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
@@ -85,7 +89,16 @@ const ColumnType = ({
     if (pgOption) return pgOption
 
     // handle custom enums
-    const enumType = enumTypes.find((type) => type.format === name)
+    const enumType = enumTypes.find((option) => {
+      const typeString =
+        option.schema === 'public' ? option.name : `"${option.schema}"."${option.name}"`
+      return (
+        typeString === name ||
+        option.format === name ||
+        option.name === name ||
+        option.format.replaceAll('"', '') === name
+      )
+    })
     return enumType ? { ...enumType, type: 'enum' } : undefined
   }
 
@@ -232,46 +245,52 @@ const ColumnType = ({
                   <>
                     <CommandSeparator_Shadcn_ />
                     <CommandGroup_Shadcn_ heading="Other types">
-                      {enumTypes.map((option) => (
-                        <CommandItem_Shadcn_
-                          key={option.id}
-                          value={option.format}
-                          className={cn(
-                            'relative',
-                            option.format === value ? 'bg-surface-200' : ''
-                          )}
-                          onSelect={(value: string) => {
-                            // [Joshen] For camel case types specifically, format property includes escaped double quotes
-                            // which will cause the POST columns call to error out. So we strip it specifically in this context
-                            onOptionSelect(
-                              option.schema === 'public' ? value.replaceAll('"', '') : value
-                            )
-                            setOpen(false)
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div>
-                              <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
+                      {enumTypes.map((option) => {
+                        const typeString =
+                          option.schema === 'public'
+                            ? option.name
+                            : `"${option.schema}"."${option.name}"`
+                        const isSelected =
+                          option.format === value ||
+                          typeString === value ||
+                          option.format.replaceAll('"', '') === value
+
+                        return (
+                          <CommandItem_Shadcn_
+                            key={option.id}
+                            value={typeString}
+                            className={cn('relative', isSelected ? 'bg-surface-200' : '')}
+                            onSelect={() => {
+                              onOptionSelect(typeString)
+                              setOpen(false)
+                            }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div>
+                                <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
+                              </div>
+                              <span className="text-foreground">
+                                {option.schema === 'public'
+                                  ? option.name
+                                  : `${option.schema}.${option.name}`}
+                              </span>
+                              {option.comment !== undefined && (
+                                <span
+                                  title={option.comment ?? ''}
+                                  className="text-foreground-lighter"
+                                >
+                                  {option.comment}
+                                </span>
+                              )}
+                              {isSelected && (
+                                <span className="absolute right-3 top-2">
+                                  <Check className="text-brand" size={14} />
+                                </span>
+                              )}
                             </div>
-                            <span className="text-foreground">
-                              {option.format.replaceAll('"', '')}
-                            </span>
-                            {option.comment !== undefined && (
-                              <span
-                                title={option.comment ?? ''}
-                                className="text-foreground-lighter"
-                              >
-                                {option.comment}
-                              </span>
-                            )}
-                            {option.format === value && (
-                              <span className="absolute right-3 top-2">
-                                <Check className="text-brand" size={14} />
-                              </span>
-                            )}
-                          </div>
-                        </CommandItem_Shadcn_>
-                      ))}
+                          </CommandItem_Shadcn_>
+                        )
+                      })}
                     </CommandGroup_Shadcn_>
                   </>
                 )}

@@ -178,13 +178,12 @@ COMMIT;`
   return { sql }
 }
 
-// TODO: make this more robust - use type_id or type_schema + type_name instead of just type.
 const typeIdent = (type: string) => {
-  return type.endsWith('[]')
-    ? `${ident(type.slice(0, -2))}[]`
-    : type.includes('.')
-      ? type
-      : ident(type)
+  if (type.endsWith('[]')) {
+    const baseType = type.slice(0, -2)
+    return baseType.includes('.') ? `${baseType}[]` : `${ident(baseType)}[]`
+  }
+  return type.includes('.') ? type : ident(type)
 }
 
 function update(
