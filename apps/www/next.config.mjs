@@ -38,12 +38,13 @@ const isPreview = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.
 const scriptSrc = [
   "'unsafe-inline'",
   "https://frontend-assets.supabase.com",
+  "https://ph.supabase.green",
+  "https://ph.supabase.com",
   isPreview ? "https://*.vercel.app/" : "",
 ].filter(Boolean).join(" ")
 
 const cspString = [
   `script-src ${scriptSrc}`,
-  "script-src-elem 'unsafe-inline' https://ph.supabase.green https://ph.supabase.com",
   "object-src 'none'",
   "base-uri 'none'",
 ].join("; ")
