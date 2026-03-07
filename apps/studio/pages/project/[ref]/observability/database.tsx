@@ -31,7 +31,7 @@ import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import dayjs from 'dayjs'
-import { useHasEntitlementAccess } from 'hooks/misc/useCheckEntitlements'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -123,9 +123,19 @@ const DatabaseUsage = () => {
     }
   )
 
-  const hasEntitlementAccess = useHasEntitlementAccess()
-  const hasDbAdvancedMetrics = hasEntitlementAccess('observability.db_advanced_metrics')
-  const hasDiskThroughputMetrics = hasEntitlementAccess('observability.disk_throughput_metrics')
+  const {
+    hasAccess: hasDbAdvancedMetrics,
+    isLoading: isLoadingDbEntitlement,
+  } = useCheckEntitlements('observability.db_advanced_metrics')
+  const {
+    hasAccess: hasDiskThroughputMetrics,
+    isLoading: isLoadingDiskEntitlement,
+  } = useCheckEntitlements('observability.disk_throughput_metrics')
+  const isEntitlementLoading = isLoadingDbEntitlement || isLoadingDiskEntitlement
+  const entitlementAccess: Record<string, boolean> = {
+    'observability.db_advanced_metrics': hasDbAdvancedMetrics,
+    'observability.disk_throughput_metrics': hasDiskThroughputMetrics,
+  }
 
   const isSpendCapEnabled =
     hasDbAdvancedMetrics && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
@@ -254,7 +264,10 @@ const DatabaseUsage = () => {
       >
         {selectedDateRange &&
           REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => {
-            const chartAvailable = !chart.entitlement || hasEntitlementAccess(chart.entitlement)
+            const chartAvailable =
+              !chart.entitlement ||
+              isEntitlementLoading ||
+              entitlementAccess[chart.entitlement]
             return chartAvailable ? (
               <LazyComposedChartHandler
                 key={chart.id}
