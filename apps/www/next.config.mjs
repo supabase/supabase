@@ -36,11 +36,12 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const isPreview = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'preview'
 const scriptSrc = [
-  "'unsafe-inline'",
+  "'self' 'unsafe-inline' 'unsafe-eval'",
   "https://frontend-assets.supabase.com",
-  "https://ph.supabase.green",
-  "https://ph.supabase.com",
-  isPreview ? "https://*.vercel.app/" : "",
+  "https://ss.supabase.com",
+  isPreview ? "https://ph.supabase.green": "https://ph.supabase.com",
+  isPreview ? "https://*.vercel.app/" : "", // preview domain
+  isPreview ? "https://vercel.live" : "", // debugger
 ].filter(Boolean).join(" ")
 
 const cspString = [
@@ -191,7 +192,7 @@ const nextConfig = {
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'no-sniff',
+            value: 'nosniff',
           },
           {
             key: 'Referrer-Policy',
