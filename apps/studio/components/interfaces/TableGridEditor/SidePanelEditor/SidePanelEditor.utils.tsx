@@ -23,10 +23,10 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { executeWithRetry } from 'data/table-rows/table-rows-query'
 import { tableKeys } from 'data/tables/keys'
 import {
-  RetrieveTableResult,
-  RetrievedTableColumn,
   getTable,
   getTableQuery,
+  RetrievedTableColumn,
+  RetrieveTableResult,
 } from 'data/tables/table-retrieve-query'
 import {
   UpdateTableBody,
@@ -554,7 +554,10 @@ export const createTable = async ({
   const sqlStatements: string[] = []
 
   // 1. Create table SQL
-  const { sql: createTableSql } = pgMeta.tables.create(payload)
+  const { sql: createTableSql } = pgMeta.tables.create({
+    ...payload,
+    noTransaction: true,
+  })
   sqlStatements.push(createTableSql)
 
   // 2. Enable RLS if configured
@@ -582,6 +585,7 @@ export const createTable = async ({
       is_unique: columnPayload.isUnique,
       comment: columnPayload.comment,
       check: columnPayload.check,
+      noTransaction: true,
     })
     sqlStatements.push(columnSQL)
   }
@@ -615,7 +619,7 @@ export const createTable = async ({
   await executeSql({
     projectRef,
     connectionString,
-    sql: sqlStatements.join(';\n'),
+    sql: `BEGIN;\n${sqlStatements.join(';\n')};\nCOMMIT;`,
     queryKey: ['table', 'create-with-columns'],
   })
 
