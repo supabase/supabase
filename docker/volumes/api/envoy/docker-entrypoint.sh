@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
 
-# Generate base64 encoded basic auth credentials for dashboard
-# Format: username:password -> base64
-DASHBOARD_BASIC_AUTH=$(printf '%s' "${DASHBOARD_USERNAME}:${DASHBOARD_PASSWORD}" | base64 | tr -d '\n')
+# Generate SHA1 base64 hash for Envoy basic auth user list
+PASSWORD_HASH=$(printf '%s' "${DASHBOARD_PASSWORD}" | openssl sha1 -binary | openssl base64)
+DASHBOARD_BASIC_AUTH="${DASHBOARD_USERNAME}:{SHA}${PASSWORD_HASH}"
 
 echo "Generating Envoy configuration..."
 
@@ -12,7 +12,7 @@ echo "Generating Envoy configuration..."
 sed -e "s|\${ANON_KEY}|${ANON_KEY}|g" \
     -e "s|\${SERVICE_ROLE_KEY}|${SERVICE_ROLE_KEY}|g" \
     -e "s|\${DASHBOARD_BASIC_AUTH}|${DASHBOARD_BASIC_AUTH}|g" \
-    /etc/envoy/lds.yaml.template > /etc/envoy/lds.yaml
+    /etc/envoy/lds.template.yaml > /etc/envoy/lds.yaml
 
 echo "Envoy configuration generated successfully"
 echo "Starting Envoy..."

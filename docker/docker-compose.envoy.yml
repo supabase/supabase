@@ -19,7 +19,7 @@ services:
     volumes:
       - ./volumes/api/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
       - ./volumes/api/envoy/cds.yaml:/etc/envoy/cds.yaml:ro
-      - ./volumes/api/envoy/lds.yaml.template:/etc/envoy/lds.yaml.template:ro
+      - ./volumes/api/envoy/lds.template.yaml:/etc/envoy/lds.template.yaml:ro
       - ./volumes/api/envoy/docker-entrypoint.sh:/docker-entrypoint.sh:ro
     depends_on:
       analytics:

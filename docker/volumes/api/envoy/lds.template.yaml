@@ -1,0 +1,352 @@
+resources:
+  - '@type': type.googleapis.com/envoy.config.listener.v3.Listener
+    name: supabase
+    
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 8000
+        
+    filter_chains:
+      - filters:
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              '@type': >-
+                type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+              stat_prefix: ingress_http
+              upgrade_configs:
+                - upgrade_type: websocket
+                
+              route_config:
+                name: supabase_route
+                virtual_hosts:
+                  - name: supabase_host
+                    domains:
+                      - '*'
+                    routes:
+                      - match:
+                          prefix: /auth/v1/verify
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /verify
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+                                      
+                      - match:
+                          prefix: /auth/v1/callback
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /callback
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+                                      
+                      - match:
+                          prefix: /auth/v1/authorize
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /authorize
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+                                      
+                      - match:
+                          prefix: /functions/v1/
+                        route:
+                          cluster: functions
+                          prefix_rewrite: /
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+                                      
+                      - match:
+                          prefix: /storage/v1/
+                        route:
+                          cluster: storage
+                          prefix_rewrite: /
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+                                      
+                      - match:
+                          prefix: /auth/v1/
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                            
+                      - match:
+                          prefix: /rest/v1/
+                        route:
+                          cluster: rest
+                          prefix_rewrite: /
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                            
+                      - match:
+                          prefix: /graphql/v1/
+                        route:
+                          cluster: rest
+                          prefix_rewrite: /rpc/graphql
+                          timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: Content-Profile
+                              value: graphql_public
+                            append: false
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                            
+                      - match:
+                          prefix: /realtime/v1/api/
+                        route:
+                          cluster: realtime
+                          prefix_rewrite: /api/
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                            
+                      - match:
+                          prefix: /realtime/v1/
+                        route:
+                          cluster: realtime
+                          prefix_rewrite: /socket/
+                          timeout: 30s
+                          host_rewrite_literal: realtime-dev.supabase-realtime
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                            
+                      - match:
+                          prefix: /pg/
+                        route:
+                          cluster: meta
+                          prefix_rewrite: /
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                            
+                      - match:
+                          prefix: /api/mcp
+                        route:
+                          cluster: studio
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                            
+                      - match:
+                          prefix: /mcp
+                        route:
+                          cluster: studio
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                            
+                      - match:
+                          prefix: /
+                        route:
+                          cluster: studio
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+
+              http_filters:
+                - name: envoy.filters.http.cors
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+                      
+                - name: envoy.filters.http.basic_auth
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.basic_auth.v3.BasicAuth
+                    users:
+                      inline_string: '${DASHBOARD_BASIC_AUTH}'
+                      
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      function envoy_on_request(request_handle)
+                        local headers = request_handle:headers()
+                        if headers:get("apikey") ~= nil then
+                          return
+                        end
+
+                        local path = headers:get(":path")
+                        local query_start = string.find(path, "?", 1, true)
+                        if query_start == nil then
+                          return
+                        end
+
+                        local query = string.sub(path, query_start + 1)
+                        for key, value in string.gmatch(query, "([^&]+)=([^&]*)") do
+                          if key == "apikey" and value ~= "" then
+                            headers:add("apikey", value)
+                            return
+                          end
+                        end
+                      end
+                      
+                - name: envoy.filters.http.rbac
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBAC
+                    rules:
+                      action: ALLOW
+                      policies:
+                        admin:
+                          permissions:
+                            - url_path:
+                                path:
+                                  prefix: /pg/
+                          principals:
+                            - header:
+                                name: apikey
+                                string_match:
+                                  exact: '${SERVICE_ROLE_KEY}'
+                        apikey:
+                          permissions:
+                            - url_path:
+                                path:
+                                  prefix: /auth/v1/
+                            - url_path:
+                                path:
+                                  prefix: /rest/v1/
+                            - url_path:
+                                path:
+                                  prefix: /realtime/v1/api/
+                            - url_path:
+                                path:
+                                  prefix: /realtime/v1/
+                            - url_path:
+                                path:
+                                  prefix: /graphql/v1/
+                          principals:
+                            - header:
+                                name: apikey
+                                string_match:
+                                  exact: '${SERVICE_ROLE_KEY}'
+                            - header:
+                                name: apikey
+                                string_match:
+                                  exact: '${ANON_KEY}'
+                                  
+                - name: envoy.filters.http.router
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.router.v3.Router

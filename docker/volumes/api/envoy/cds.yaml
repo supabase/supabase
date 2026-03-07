@@ -100,26 +100,6 @@ resources:
           max_requests: 10000
 
   - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
-    name: analytics
-    type: STRICT_DNS
-    lb_policy: ROUND_ROBIN
-    load_assignment:
-      cluster_name: analytics
-      endpoints:
-        - lb_endpoints:
-            - endpoint:
-                address:
-                  socket_address:
-                    address: analytics
-                    port_value: 4000
-    circuit_breakers:
-      thresholds:
-        - priority: DEFAULT
-          max_connections: 10000
-          max_pending_requests: 10000
-          max_requests: 10000
-
-  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
     name: meta
     type: STRICT_DNS
     lb_policy: ROUND_ROBIN
