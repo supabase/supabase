@@ -280,6 +280,7 @@ export const realtimeReports = ({
     titleTooltip:
       'Median time between database commit and broadcast when using broadcast from database.',
     entitlement: 'observability.realtime_advanced_metrics',
+    requiredPlan: 'Pro',
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -320,6 +321,7 @@ export const realtimeReports = ({
     titleTooltip:
       'Execution median time of RLS (Row Level Security) to subscribe to a private channel',
     entitlement: 'observability.realtime_advanced_metrics',
+    requiredPlan: 'Pro',
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -360,6 +362,7 @@ export const realtimeReports = ({
     titleTooltip:
       'Execution median time of RLS (Row Level Security) to publish to a private channel',
     entitlement: 'observability.realtime_advanced_metrics',
+    requiredPlan: 'Pro',
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,

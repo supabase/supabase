@@ -277,7 +277,7 @@ const DatabaseUsage = () => {
             ) : (
               <ReportChartUpsell
                 key={chart.id}
-                report={{ label: chart.label }}
+                report={{ label: chart.label, requiredPlan: chart.requiredPlan }}
                 orgSlug={org?.slug ?? ''}
               />
             )

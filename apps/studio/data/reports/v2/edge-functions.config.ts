@@ -337,6 +337,7 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations by region.',
     entitlement: 'observability.edge_functions_advanced_metrics',
+    requiredPlan: 'Pro',
     dataProvider: async () => {
       const sql = METRIC_SQL.InvocationsByRegion(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)

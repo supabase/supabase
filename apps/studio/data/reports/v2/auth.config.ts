@@ -810,6 +810,7 @@ export const createLatencyReportConfig = ({
       titleTooltip:
         'Percentile processing time metrics for sign in operations within the auth server (excludes network latency).',
       entitlement: 'observability.auth_advanced_metrics',
+      requiredPlan: 'Pro',
       dataProvider: async () => {
         const attributes = [
           {
@@ -891,6 +892,7 @@ export const createLatencyReportConfig = ({
       titleTooltip:
         'Percentile processing time metrics for sign up operations within the auth server (excludes network latency).',
       entitlement: 'observability.auth_advanced_metrics',
+      requiredPlan: 'Pro',
       dataProvider: async () => {
         const attributes = [
           {

@@ -42,6 +42,7 @@ export interface ReportConfig<FiltersType = any> {
   titleTooltip: string
   /** Entitlement key required to view this chart. If undefined, chart is available to all plans. */
   entitlement?: string
+  requiredPlan?: string
   format?: (value: unknown) => string
   YAxisProps?: YAxisProps
   xAxisKey?: string
