@@ -179,11 +179,24 @@ COMMIT;`
 }
 
 const typeIdent = (type: string) => {
-  if (type.endsWith('[]')) {
-    const baseType = type.slice(0, -2)
-    return baseType.includes('.') ? `${baseType}[]` : `${ident(baseType)}[]`
+  const isArray = type.endsWith('[]')
+  const baseType = isArray ? type.slice(0, -2) : type
+  const suffix = isArray ? '[]' : ''
+
+  const quotedQualified = /^"([^"]+)"\."([^"]+)"$/.exec(baseType)
+  if (quotedQualified) {
+    return `${ident(quotedQualified[1])}.${ident(quotedQualified[2])}${suffix}`
   }
-  return type.includes('.') ? type : ident(type)
+
+  if (baseType.includes('.')) {
+    const parts = baseType.split('.')
+    if (parts.length !== 2 || parts.some((part) => part.length === 0)) {
+      throw new Error(`Invalid type identifier: ${type}`)
+    }
+    return `${ident(parts[0])}.${ident(parts[1])}${suffix}`
+  }
+
+  return `${ident(baseType)}${suffix}`
 }
 
 function update(
@@ -221,15 +234,15 @@ function update(
     name === undefined || name === old.name
       ? ''
       : `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} RENAME COLUMN ${ident(
-          old.name
-        )} TO ${ident(name)};`
+        old.name
+      )} TO ${ident(name)};`
   // We use USING to allow implicit conversion of incompatible types (e.g. int4 -> text).
   const typeSql =
     type === undefined
       ? ''
       : `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
-          old.name
-        )} SET DATA TYPE ${typeIdent(type)} USING ${ident(old.name)}::${typeIdent(type)};`
+        old.name
+      )} SET DATA TYPE ${typeIdent(type)} USING ${ident(old.name)}::${typeIdent(type)};`
 
   let defaultValueSql: string
   if (drop_default) {
@@ -275,11 +288,11 @@ function update(
   } else {
     isNullableSql = is_nullable
       ? `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
-          old.name
-        )} DROP NOT NULL;`
+        old.name
+      )} DROP NOT NULL;`
       : `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
-          old.name
-        )} SET NOT NULL;`
+        old.name
+      )} SET NOT NULL;`
   }
   let isUniqueSql = ''
   if (old.is_unique === true && is_unique === false) {
@@ -311,8 +324,8 @@ $$;
     comment === undefined
       ? ''
       : `COMMENT ON COLUMN ${ident(old.schema)}.${ident(old.table)}.${ident(
-          old.name
-        )} IS ${literal(comment)};`
+        old.name
+      )} IS ${literal(comment)};`
 
   const checkSql =
     check === undefined
@@ -333,29 +346,28 @@ BEGIN
 
   IF v_conname IS NOT NULL THEN
     EXECUTE format('ALTER TABLE ${ident(old.schema)}.${ident(
-      old.table
-    )} DROP CONSTRAINT %I', v_conname);
+        old.table
+      )} DROP CONSTRAINT %I', v_conname);
   END IF;
 
-  ${
-    check !== null
-      ? `
+  ${check !== null
+        ? `
   ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD CONSTRAINT ${ident(
-    `${old.table}_${old.name}_check`
-  )} CHECK (${check});
+          `${old.table}_${old.name}_check`
+        )} CHECK (${check});
 
   SELECT conkey into v_conkey FROM pg_constraint WHERE conname = ${literal(
-    `${old.table}_${old.name}_check`
-  )};
+          `${old.table}_${old.name}_check`
+        )};
 
   ASSERT v_conkey IS NOT NULL, 'error creating column constraint: check condition must refer to this column';
   ASSERT cardinality(v_conkey) = 1, 'error creating column constraint: check condition cannot refer to multiple columns';
   ASSERT v_conkey[1] = ${literal(
-    old.ordinal_position
-  )}, 'error creating column constraint: check condition cannot refer to other columns';
+          old.ordinal_position
+        )}, 'error creating column constraint: check condition cannot refer to other columns';
 `
-      : ''
-  }
+        : ''
+      }
 END
 $$;
 `
