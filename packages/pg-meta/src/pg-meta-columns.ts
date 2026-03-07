@@ -178,13 +178,25 @@ COMMIT;`
   return { sql }
 }
 
-// TODO: make this more robust - use type_id or type_schema + type_name instead of just type.
 const typeIdent = (type: string) => {
-  return type.endsWith('[]')
-    ? `${ident(type.slice(0, -2))}[]`
-    : type.includes('.')
-      ? type
-      : ident(type)
+  const isArray = type.endsWith('[]')
+  const baseType = isArray ? type.slice(0, -2) : type
+  const suffix = isArray ? '[]' : ''
+
+  const quotedQualified = /^"([^"]+)"\."([^"]+)"$/.exec(baseType)
+  if (quotedQualified) {
+    return `${ident(quotedQualified[1])}.${ident(quotedQualified[2])}${suffix}`
+  }
+
+  if (baseType.includes('.')) {
+    const parts = baseType.split('.')
+    if (parts.length !== 2 || parts.some((part) => part.length === 0)) {
+      throw new Error(`Invalid type identifier: ${type}`)
+    }
+    return `${ident(parts[0])}.${ident(parts[1])}${suffix}`
+  }
+
+  return `${ident(baseType)}${suffix}`
 }
 
 function update(
