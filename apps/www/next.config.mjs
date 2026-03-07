@@ -34,6 +34,21 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
+const isPreview = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'preview'
+const scriptSrc = [
+  "'unsafe-inline' 'unsafe-eval'",
+  "https://frontend-assets.supabase.com",
+  "https://ph.supabase.green",
+  "https://ph.supabase.com",
+  isPreview ? "https://*.vercel.app/" : "",
+].filter(Boolean).join(" ")
+
+const cspString = [
+  `script-src ${scriptSrc}`,
+  "object-src 'none'",
+  "base-uri 'none'",
+].join("; ")
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -94,6 +109,22 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'no-sniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: cspString,
+          },
           {
             key: 'Strict-Transport-Security',
             value:
