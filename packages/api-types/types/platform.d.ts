@@ -4645,6 +4645,7 @@ export interface components {
     }
     AccountRequestDetailsDto: {
       email: string
+      email_matches: boolean
       expires_at: string
       id: string
       name?: string
@@ -7204,6 +7205,7 @@ export interface components {
             | 'auth.leaked_password_protection'
             | 'auth.advanced_auth_settings'
             | 'auth.performance_settings'
+            | 'auth.password_hibp'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
             | 'function.max_count'
@@ -7223,6 +7225,11 @@ export interface components {
             | 'assistant.advance_model'
             | 'integrations.github_connections'
             | 'dedicated_pooler'
+            | 'observability.db_advanced_metrics'
+            | 'observability.disk_throughput_metrics'
+            | 'observability.auth_advanced_metrics'
+            | 'observability.realtime_advanced_metrics'
+            | 'observability.edge_functions_advanced_metrics'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -17241,6 +17248,7 @@ export interface operations {
           | 'auth.leaked_password_protection'
           | 'auth.advanced_auth_settings'
           | 'auth.performance_settings'
+          | 'auth.password_hibp'
           | 'backup.retention_days'
           | 'backup.restore_to_new_project'
           | 'function.max_count'
@@ -17260,6 +17268,11 @@ export interface operations {
           | 'assistant.advance_model'
           | 'integrations.github_connections'
           | 'dedicated_pooler'
+          | 'observability.db_advanced_metrics'
+          | 'observability.disk_throughput_metrics'
+          | 'observability.auth_advanced_metrics'
+          | 'observability.realtime_advanced_metrics'
+          | 'observability.edge_functions_advanced_metrics'
       }
       header?: never
       path?: never
@@ -26517,13 +26530,6 @@ export interface operations {
     }
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to send analytics server event */
-      500: {
         headers: {
           [name: string]: unknown
         }

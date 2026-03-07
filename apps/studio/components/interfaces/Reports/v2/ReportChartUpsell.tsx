@@ -7,7 +7,7 @@ import { Button, Card, cn } from 'ui'
 interface ReportsChartUpsellProps {
   report: {
     label: string
-    availableIn: string[]
+    requiredPlan?: string
   }
   orgSlug: string
 }
@@ -42,13 +42,9 @@ export const ReportChartUpsell = ({ report, orgSlug }: ReportsChartUpsellProps) 
       <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-surface-100/70 backdrop-blur-md">
         <h2 className="text-sm">{report.label}</h2>
         <p className="text-sm text-foreground-light">
-          This chart is available from{' '}
-          <span className="capitalize">
-            {Array.isArray(report.availableIn) && report.availableIn.length > 0
-              ? report.availableIn[0]
-              : 'Pro'}
-          </span>{' '}
-          plan and above
+          {report.requiredPlan
+            ? `Available on the ${report.requiredPlan} Plan and above`
+            : `Your plan does not include access to ${report.label}`}
         </p>
         <Button
           asChild
@@ -58,12 +54,7 @@ export const ReportChartUpsell = ({ report, orgSlug }: ReportsChartUpsellProps) 
           className="mt-4"
         >
           <Link href={`/org/${orgSlug || '_'}/billing?panel=subscriptionPlan&source=reports`}>
-            Upgrade to{' '}
-            <span className="capitalize">
-              {Array.isArray(report.availableIn) && report.availableIn.length > 0
-                ? report.availableIn[0]
-                : 'Pro'}
-            </span>
+            {report.requiredPlan ? `Upgrade to ${report.requiredPlan}` : 'Upgrade'}
           </Link>
         </Button>
       </div>
