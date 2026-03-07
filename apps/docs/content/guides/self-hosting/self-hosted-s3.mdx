@@ -134,6 +134,39 @@ storage:
 - Open Studio and upload a file to a bucket. List the file using the AWS CLI or `rclone` to confirm the S3 endpoint works.
 - If using an S3 backend: confirm the file appears in your S3 provider's console.
 
+## Session token
+
+You can authenticate to Supabase S3 with a user JWT token to provide limited access via RLS to all S3 operations. This is useful when you want initialize the S3 client on the server scoped to a specific user, or use the S3 client directly from the client side.
+
+All S3 operations performed with the Session Token are scoped to the authenticated user. RLS policies on the Storage Schema are respected.
+
+To authenticate with S3 using a Session Token, use the following credentials:
+
+- access_key_id: `STORAGE_TENANT_ID` environment variable in `.env` file
+- secret_access_key: `ANON_KEY` environment variable in `.env` file
+- session_token: `valid jwt token`
+
+For example, using the `aws-sdk` library:
+
+```javascript
+import { S3Client } from '@aws-sdk/client-s3'
+
+const {
+  data: { session },
+} = await supabase.auth.getSession()
+
+const client = new S3Client({
+  forcePathStyle: true,
+  region: 'REGION',
+  endpoint: 'http://supabase.example.com:8000/storage/v1/s3',
+  credentials: {
+    accessKeyId: 'STORAGE_TENANT_ID',
+    secretAccessKey: 'ANON_KEY',
+    sessionToken: session.access_token,
+  },
+})
+```
+
 ## Troubleshooting
 
 ### Signature mismatch errors
