@@ -54,7 +54,8 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
   const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
   const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [schemaSearchTerm, setSchemaSearchTerm] = useState('')
+  const [tableSearchTerm, setTableSearchTerm] = useState('')
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -63,7 +64,15 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',
-    search: searchTerm,
+    search: tableSearchTerm,
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  // Fetch all entities (without search filter) to determine if schema has any tables
+  const { data: allEntities } = useEntityTypesQuery({
+    schemas: [selectedSchema],
+    sort: 'alphabetical',
+    search: '',
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -90,8 +99,17 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
     [entities?.pages]
   )
 
-  function handleSearchChange(value: string) {
-    setSearchTerm(value)
+  const allEntityTypes = useMemo(
+    () => allEntities?.pages.flatMap((page) => page.data.entities) || [],
+    [allEntities?.pages]
+  )
+
+  function handleSchemaSearchChange(value: string) {
+    setSchemaSearchTerm(value)
+  }
+
+  function handleTableSearchChange(value: string) {
+    setTableSearchTerm(value)
   }
 
   const columns = tableColumns?.[0]?.columns ?? []
@@ -132,6 +150,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
       setSelectedEntity('')
       setSelectedColumns([])
       setSelectedIndexType(INDEX_TYPES[0].value)
+      setSchemaSearchTerm('')
+      setTableSearchTerm('')
     }
   }, [visible])
 
@@ -139,6 +159,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     setSelectedEntity('')
     setSelectedColumns([])
     setSelectedIndexType(INDEX_TYPES[0].value)
+    setTableSearchTerm('')
   }, [selectedSchema])
 
   useEffect(() => {
@@ -146,7 +167,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     setSelectedIndexType(INDEX_TYPES[0].value)
   }, [selectedEntity])
 
-  const isSelectEntityDisabled = entityTypes.length === 0
+  // Only disable if the schema truly has no entities (not just filtered by search)
+  const isSelectEntityDisabled = allEntityTypes.length === 0
 
   return (
     <SidePanel
@@ -188,9 +210,9 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               >
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_
-                    placeholder="Find table..."
-                    value={searchTerm}
-                    onValueChange={handleSearchChange}
+                    placeholder="Find schema..."
+                    value={schemaSearchTerm}
+                    onValueChange={handleSchemaSearchChange}
                   />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
@@ -271,8 +293,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 <Command_Shadcn_ shouldFilter={false}>
                   <CommandInput_Shadcn_
                     placeholder="Find table..."
-                    value={searchTerm}
-                    onValueChange={handleSearchChange}
+                    value={tableSearchTerm}
+                    onValueChange={handleTableSearchChange}
                   />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>
