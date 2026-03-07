@@ -43,6 +43,7 @@ const scriptSrc = [
 
 const cspString = [
   `script-src ${scriptSrc}`,
+  "script-src-elem 'unsafe-inline' https://ph.supabase.green https://ph.supabase.com",
   "object-src 'none'",
   "base-uri 'none'",
 ].join("; ")
