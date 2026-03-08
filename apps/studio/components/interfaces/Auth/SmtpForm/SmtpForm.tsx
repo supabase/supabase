@@ -61,18 +61,18 @@ export const SmtpForm = () => {
   )
 
   const smtpSchema = yup.object({
-    SMTP_ADMIN_EMAIL: yup.string().when('ENABLE_SMTP', {
+    SMTP_ADMIN_EMAIL: yup.string().trim().when('ENABLE_SMTP', {
       is: true,
       then: (schema) =>
         schema.email('Must be a valid email').required('Sender email address is required'),
       otherwise: (schema) => schema,
     }),
-    SMTP_SENDER_NAME: yup.string().when('ENABLE_SMTP', {
+    SMTP_SENDER_NAME: yup.string().trim().when('ENABLE_SMTP', {
       is: true,
       then: (schema) => schema.required('Sender name is required'),
       otherwise: (schema) => schema,
     }),
-    SMTP_HOST: yup.string().when('ENABLE_SMTP', {
+    SMTP_HOST: yup.string().trim().when('ENABLE_SMTP', {
       is: true,
       then: (schema) =>
         schema
@@ -98,12 +98,12 @@ export const SmtpForm = () => {
           .max(32767, 'Must not be more than 32,767 an hour'),
       otherwise: (schema) => schema,
     }),
-    SMTP_USER: yup.string().when('ENABLE_SMTP', {
+    SMTP_USER: yup.string().trim().when('ENABLE_SMTP', {
       is: true,
       then: (schema) => schema.required('SMTP Username is required'),
       otherwise: (schema) => schema,
     }),
-    SMTP_PASS: yup.string(),
+    SMTP_PASS: yup.string().trim(),
     ENABLE_SMTP: yup.boolean().required(),
   })
 
