@@ -66,13 +66,13 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
   }, [sortStorage, isSuccessSortStorage, setSort, slug])
 
   return (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-2 w-full">
+      <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1 basis-full md:basis-auto">
         <Input
           placeholder="Search for a project"
           icon={<Search />}
           size="tiny"
-          className="w-32 md:w-64"
+          className="min-w-[7rem] w-32 md:w-64"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           actions={[
@@ -114,7 +114,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
         {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-shrink-0">
         {viewMode && setViewMode && (
           <ToggleGroup
             type="single"
