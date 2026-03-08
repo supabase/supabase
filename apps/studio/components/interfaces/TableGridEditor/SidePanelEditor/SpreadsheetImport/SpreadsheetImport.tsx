@@ -195,10 +195,7 @@ export const SpreadsheetImport = ({
       header={
         selectedTable !== undefined ? (
           <>
-            Add data to{' '}
-            <code className="text-sm">
-              {selectedTable.schema}.{selectedTable.name}
-            </code>
+            Add data to <code className="text-sm">{selectedTable.name}</code>
           </>
         ) : (
           'Add content to new table'
