@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { type RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { Query } from '@supabase/pg-meta/src/query'
 import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
@@ -532,6 +532,7 @@ export const createTable = async ({
   organizationSlug,
   generatedPolicies = [],
   onCreatePoliciesSuccess,
+  roleImpersonationState,
 }: {
   projectRef: string
   connectionString?: string | null
