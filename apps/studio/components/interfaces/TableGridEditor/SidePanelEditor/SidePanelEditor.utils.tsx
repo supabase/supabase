@@ -548,6 +548,7 @@ export const createTable = async ({
   organizationSlug?: string
   generatedPolicies?: GeneratedPolicy[]
   onCreatePoliciesSuccess?: () => void
+  roleImpersonationState?: RoleImpersonationState
 }) => {
   const queryClient = getQueryClient()
 
@@ -727,7 +728,8 @@ export const createTable = async ({
             </div>,
             { id: toastId }
           )
-        }
+        },
+        roleImpersonationState
       )
 
       if (error !== undefined) {
@@ -759,7 +761,8 @@ export const createTable = async ({
             </div>,
             { id: toastId }
           )
-        }
+        },
+        roleImpersonationState
       )
     }
 
