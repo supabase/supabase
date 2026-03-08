@@ -871,7 +871,8 @@ export const SidePanelEditor = ({
             />,
             { id: toastId }
           )
-        }
+        },
+        getImpersonatedRoleState()
       )
       if (res.error) {
         toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
@@ -895,7 +896,8 @@ export const SidePanelEditor = ({
             />,
             { id: toastId }
           )
-        }
+        },
+        getImpersonatedRoleState()
       )
       if (res.error) {
         toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
