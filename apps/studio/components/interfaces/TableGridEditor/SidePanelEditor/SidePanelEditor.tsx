@@ -255,10 +255,10 @@ export const SidePanelEditor = ({
   })
   const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
   const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
-    onError: () => { },
+    onError: () => {},
   })
   const { mutateAsync: updateApiPrivileges } = useTableApiAccessPrivilegesMutation({
-    onError: () => { }, // Errors handled inline
+    onError: () => {}, // Errors handled inline
   })
 
   const isDuplicating = snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'
@@ -407,7 +407,7 @@ export const SidePanelEditor = ({
 
     if (payload !== undefined && configuration !== undefined) {
       try {
-        await saveRow(payload, isNewRecord, configuration, () => { })
+        await saveRow(payload, isNewRecord, configuration, () => {})
       } catch (error) {
         // [Joshen] No error handler required as error is handled within saveRow
       } finally {
@@ -432,8 +432,8 @@ export const SidePanelEditor = ({
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      saveRow(value, isNewRecord, configuration, () => { })
-    } catch (error) { }
+      saveRow(value, isNewRecord, configuration, () => {})
+    } catch (error) {}
   }
 
   const saveColumn = async (
@@ -457,23 +457,23 @@ export const SidePanelEditor = ({
 
     const response = isNewRecord
       ? await createColumn({
-        projectRef: project?.ref!,
-        connectionString: project?.connectionString,
-        payload: payload as CreateColumnPayload,
-        selectedTable,
-        primaryKey,
-        foreignKeyRelations,
-      })
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          payload: payload as CreateColumnPayload,
+          selectedTable,
+          primaryKey,
+          foreignKeyRelations,
+        })
       : await updateColumn({
-        projectRef: project?.ref!,
-        connectionString: project?.connectionString,
-        originalColumn: selectedColumnToEdit as PostgresColumn,
-        payload: payload as UpdateColumnPayload,
-        selectedTable,
-        primaryKey,
-        foreignKeyRelations,
-        existingForeignKeyRelations,
-      })
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          originalColumn: selectedColumnToEdit as PostgresColumn,
+          payload: payload as UpdateColumnPayload,
+          selectedTable,
+          primaryKey,
+          foreignKeyRelations,
+          existingForeignKeyRelations,
+        })
 
     if (response?.error) {
       toast.error(response.error.message)
@@ -597,14 +597,14 @@ export const SidePanelEditor = ({
       const realtimeTables =
         isAlreadyEnabled && !enabled
           ? // Toggle realtime off
-          realtimePublication.tables
-            .filter((t) => t.id !== table.id)
-            .map((t) => `${t.schema}.${t.name}`)
+            realtimePublication.tables
+              .filter((t) => t.id !== table.id)
+              .map((t) => `${t.schema}.${t.name}`)
           : !isAlreadyEnabled && enabled
             ? // Toggle realtime on
-            realtimePublication.tables
-              .map((t) => `${t.schema}.${t.name}`)
-              .concat([`${table.schema}.${table.name}`])
+              realtimePublication.tables
+                .map((t) => `${t.schema}.${t.name}`)
+                .concat([`${table.schema}.${table.name}`])
             : null
       if (realtimeTables === null) return
       await updatePublication({
@@ -891,8 +891,9 @@ export const SidePanelEditor = ({
           toast.loading(
             <SonnerProgress
               progress={progress}
-              message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${selectedTable.name
-                }`}
+              message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${
+                selectedTable.name
+              }`}
             />,
             { id: toastId }
           )
@@ -947,7 +948,7 @@ export const SidePanelEditor = ({
       <TableEditor
         table={
           snap.sidePanel?.type === 'table' &&
-            (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
+          (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
             ? selectedTable
             : undefined
         }
@@ -955,11 +956,11 @@ export const SidePanelEditor = ({
         templateData={
           snap.sidePanel?.type === 'table' && snap.sidePanel.templateData
             ? {
-              ...snap.sidePanel.templateData,
-              columns: snap.sidePanel.templateData.columns
-                ? [...snap.sidePanel.templateData.columns]
-                : undefined,
-            }
+                ...snap.sidePanel.templateData,
+                columns: snap.sidePanel.templateData.columns
+                  ? [...snap.sidePanel.templateData.columns]
+                  : undefined,
+              }
             : undefined
         }
         visible={snap.sidePanel?.type === 'table'}
