@@ -195,7 +195,7 @@ export const SpreadsheetImport = ({
       header={
         selectedTable !== undefined ? (
           <>
-            Add data to <code className="text-sm">{selectedTable.name}</code>
+            Add data to <code className="text-sm ml-1">{selectedTable.name}</code>
           </>
         ) : (
           'Add content to new table'
