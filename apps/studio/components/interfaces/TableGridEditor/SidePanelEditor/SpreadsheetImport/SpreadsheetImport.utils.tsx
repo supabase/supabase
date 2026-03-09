@@ -72,12 +72,21 @@ export const parseSpreadsheet = (
       worker: true,
       quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
       chunkSize: CHUNK_SIZE,
-      transform: treatEmptyAsNull ? (value: string) => (value === '' ? null : value) : undefined,
       chunk: (results) => {
         headers = results.meta.fields as string[]
 
+        // transform option is silently ignored when worker: true, so we apply
+        // the empty→null conversion manually here instead
+        const data: any[] = treatEmptyAsNull
+          ? (results.data as any[]).map((row) =>
+              Object.fromEntries(
+                Object.entries(row as object).map(([k, v]) => [k, v === '' ? null : v])
+              )
+            )
+          : (results.data as any[])
+
         headers.forEach((header) => {
-          const type = inferColumnType(header, results.data as any[])
+          const type = inferColumnType(header, data)
           if (!has(columnTypeMap, header)) {
             columnTypeMap[header] = type
           } else if (columnTypeMap[header] !== type) {
@@ -85,8 +94,8 @@ export const parseSpreadsheet = (
           }
         })
 
-        rowCount += results.data.length
-        previewRows = results.data.slice(0, 20)
+        rowCount += data.length
+        previewRows = data.slice(0, 20)
         if (results.errors.length > 0) {
           const formattedErrors = results.errors.map((error) => {
             if (error) return { ...error, data: results.data[error.row] }
