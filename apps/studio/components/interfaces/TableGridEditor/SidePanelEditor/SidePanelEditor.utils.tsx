@@ -678,7 +678,8 @@ export const createTable = async ({
                 </div>,
                 { id: toastId }
               )
-            }
+            },
+            importContent.treatEmptyAsNull
           )
 
           if (error !== undefined) {
@@ -711,7 +712,8 @@ export const createTable = async ({
                 </div>,
                 { id: toastId }
               )
-            }
+            },
+            importContent.treatEmptyAsNull
           )
         }
 
@@ -966,10 +968,12 @@ export const formatRowsForInsert = ({
   rows,
   headers,
   columns = [],
+  treatEmptyAsNull = true,
 }: {
   rows: any[]
   headers: string[]
   columns?: RetrieveTableResult['columns']
+  treatEmptyAsNull?: boolean
 }) => {
   return rows.map((row: any) => {
     const formattedRow: any = {}
@@ -991,7 +995,7 @@ export const formatRowsForInsert = ({
           formattedRow[header] = tryParseJson(originalValue)
         }
       } else if (originalValue === '') {
-        formattedRow[header] = column?.is_nullable ? null : ''
+        formattedRow[header] = treatEmptyAsNull && column?.is_nullable ? null : ''
       } else {
         formattedRow[header] = originalValue
       }
@@ -1006,7 +1010,8 @@ export const insertRowsViaSpreadsheet = async (
   file: any,
   table: RetrieveTableResult,
   selectedHeaders: string[],
-  onProgressUpdate: (progress: number) => void
+  onProgressUpdate: (progress: number) => void,
+  treatEmptyAsNull = true
 ) => {
   let chunkNumber = 0
   let insertError: any = undefined
@@ -1026,6 +1031,7 @@ export const insertRowsViaSpreadsheet = async (
           rows: results.data,
           headers: selectedHeaders,
           columns: table.columns,
+          treatEmptyAsNull,
         })
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
@@ -1060,7 +1066,8 @@ export const insertTableRows = async (
   table: RetrieveTableResult,
   rows: any,
   selectedHeaders: string[],
-  onProgressUpdate: (progress: number) => void
+  onProgressUpdate: (progress: number) => void,
+  treatEmptyAsNull = true
 ) => {
   let insertError = undefined
   let insertProgress = 0
@@ -1069,6 +1076,7 @@ export const insertTableRows = async (
     rows,
     headers: selectedHeaders,
     columns: table.columns,
+    treatEmptyAsNull,
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)

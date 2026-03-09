@@ -18,5 +18,6 @@ export interface ImportContent {
   rows: object[]
   columnTypeMap: Dictionary<any>
   selectedHeaders: string[]
+  treatEmptyAsNull: boolean
   resolve: () => void
 }

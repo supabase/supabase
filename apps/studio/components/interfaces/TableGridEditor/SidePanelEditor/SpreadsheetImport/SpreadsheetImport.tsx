@@ -170,7 +170,7 @@ export const SpreadsheetImport = ({
       )
       resolve()
     } else {
-      saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
+      saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, treatEmptyAsNull, resolve })
       sendEvent({
         action: 'import_data_added',
         groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
