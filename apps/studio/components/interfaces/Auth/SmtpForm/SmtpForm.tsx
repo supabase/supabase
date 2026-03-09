@@ -151,20 +151,15 @@ export const SmtpForm = () => {
     const { ENABLE_SMTP, ...rest } = values
 
     // Trim whitespace from string fields to prevent DNS lookup failures
-    if (rest.SMTP_HOST) {
-      rest.SMTP_HOST = rest.SMTP_HOST.trim()
-    }
-    if (rest.SMTP_USER) {
-      rest.SMTP_USER = rest.SMTP_USER.trim()
-    }
-    if (rest.SMTP_ADMIN_EMAIL) {
-      rest.SMTP_ADMIN_EMAIL = rest.SMTP_ADMIN_EMAIL.trim()
-    }
-    if (rest.SMTP_SENDER_NAME) {
-      rest.SMTP_SENDER_NAME = rest.SMTP_SENDER_NAME.trim()
+    const normalizedRest = {
+      ...rest,
+      ...(rest.SMTP_HOST && { SMTP_HOST: rest.SMTP_HOST.trim() }),
+      ...(rest.SMTP_USER && { SMTP_USER: rest.SMTP_USER.trim() }),
+      ...(rest.SMTP_ADMIN_EMAIL && { SMTP_ADMIN_EMAIL: rest.SMTP_ADMIN_EMAIL.trim() }),
+      ...(rest.SMTP_SENDER_NAME && { SMTP_SENDER_NAME: rest.SMTP_SENDER_NAME.trim() }),
     }
 
-    const basePayload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
+    const basePayload = ENABLE_SMTP ? normalizedRest : defaultDisabledSmtpFormValues
 
     // When enabling SMTP, set RATE_LIMIT_EMAIL_SENT to 30
     // When disabling, backend will handle resetting to default
