@@ -61,9 +61,6 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const isLoading = IS_PLATFORM
     ? !flagsLoaded || (isMarketplaceEnabled && isPendingCategories)
     : false
-  const isSuccess = IS_PLATFORM
-    ? flagsLoaded && (isSuccessCategories || !isMarketplaceEnabled)
-    : true
 
   const allCategories = [
     {
@@ -100,9 +97,9 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   return (
     <div className="px-4 py-6 md:px-6">
       <Menu.Group title={<span className="uppercase font-mono">Explore</span>} />
-      {isLoading && <GenericSkeletonLoader />}
-
-      {isSuccess && (
+      {isLoading ? (
+        <GenericSkeletonLoader />
+      ) : (
         <div>
           {allCategories.map((item) => (
             <ProductMenuItem key={item.key} isActive={pageKey === item.key} item={item} />

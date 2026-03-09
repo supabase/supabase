@@ -6,11 +6,23 @@ import { useAvailableIntegrations } from '../../Landing/useAvailableIntegrations
 import { FilesViewer } from './FilesViewer'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 
-const getSiteUrlLabel = (url: string) => {
+const getSiteUrlLabel = (url: string | undefined | null) => {
+  if (!url) return undefined
+
   try {
     return new URL(url).origin
   } catch (error) {
     return undefined
+  }
+}
+
+const isGithubHost = (url: string | undefined | null) => {
+  if (!url) return false
+  try {
+    const hostname = new URL(url).hostname.toLowerCase()
+    return hostname === 'github.com' || hostname.endsWith('.github.com')
+  } catch (error) {
+    return false
   }
 }
 
@@ -31,10 +43,10 @@ export const IntegrationOverviewTabV2 = () => {
 
   const docsUrlLabel = docsUrl?.includes('supabase.com/docs')
     ? 'Supabase Docs'
-    : docsUrl?.includes('github.com')
+    : isGithubHost(docsUrl)
       ? 'GitHub Docs'
       : 'Documentation'
-  const siteUrlLabel = !!siteUrl ? getSiteUrlLabel(siteUrl) : undefined
+  const siteUrlLabel = getSiteUrlLabel(siteUrl)
 
   return (
     <div className="grid grid-cols-3 gap-x-8 px-10 py-8">
