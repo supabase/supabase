@@ -8,6 +8,7 @@ import * as tus from 'tus-js-client'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 
+import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import {
   STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
@@ -230,10 +231,6 @@ function createStorageExplorerState({
       state.columns = state.columns.map((col, idx) => {
         return idx === index ? { ...col, isLoadingMoreItems } : col
       })
-    },
-
-    openBucket: async (bucket: Bucket) => {
-      state.setSelectedBucket(bucket)
     },
 
     // ======== Folders CRUD ========

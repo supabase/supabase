@@ -1,14 +1,13 @@
-import { compact, get, isEmpty, uniqBy } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
-
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
 import { useLatest } from 'hooks/misc/useLatest'
 import { IS_PLATFORM } from 'lib/constants'
+import { compact, get, isEmpty, uniqBy } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
@@ -18,6 +17,7 @@ import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 export const StorageExplorer = () => {
   const { ref, bucketId } = useParams()
@@ -30,7 +30,6 @@ export const StorageExplorer = () => {
     openedFolders,
     selectedItemsToMove,
     selectedBucket,
-    openBucket,
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
@@ -40,6 +39,7 @@ export const StorageExplorer = () => {
     popOpenedFoldersAtIndex,
     setSelectedItems,
     clearSelectedItems,
+    setSelectedBucket,
     setSelectedFilePreview,
     setSelectedItemsToMove,
   } = useStorageExplorerStateSnapshot()
@@ -91,14 +91,15 @@ export const StorageExplorer = () => {
       }
     }
   })
+
   useEffect(() => {
     if (bucket && projectRef) fetchContents(bucket)
   }, [bucket, projectRef, debouncedSearchString, fetchContents])
 
-  const openBucketRef = useLatest(openBucket)
+  const setSelectedBucketRef = useLatest(setSelectedBucket)
   useEffect(() => {
-    if (bucket && !!projectRef) openBucketRef.current(bucket)
-  }, [bucket, projectRef, openBucketRef])
+    if (bucket && !!projectRef) setSelectedBucketRef.current(bucket)
+  }, [bucket, projectRef, setSelectedBucketRef])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */
