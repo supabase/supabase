@@ -1,9 +1,9 @@
 import { AiPromptCopiedEvent } from 'common/telemetry-constants'
-import { useTrack } from 'lib/telemetry/track'
 import { BASE_PATH } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { Check, ChevronDown, Copy } from 'lucide-react'
-import Image from 'next/image'
 import { useTheme } from 'next-themes'
+import Image from 'next/image'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import {
   AiIconAnimation,
@@ -23,8 +23,8 @@ import {
 type TelemetrySource = AiPromptCopiedEvent['properties']['source']
 
 const EXTERNAL_AI_TOOLS = [
-  { label: 'Open in Claude.ai', url: 'https://claude.ai/new', promptParam: 'q' },
   { label: 'Open in ChatGPT', url: 'https://chatgpt.com/', promptParam: 'q' },
+  { label: 'Open in Claude.ai', url: 'https://claude.ai/new', promptParam: 'q' },
 ]
 
 export interface AiAssistantDropdownItem {
