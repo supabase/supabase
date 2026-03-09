@@ -5,6 +5,7 @@ import { z, type SafeParseReturnType } from 'zod'
  * regardless of whether the LLM remembered to wrap them. Skips URLs already inside code spans.
  */
 export function wrapPlaceholderUrls(markdown: string): string {
+  if (!markdown.includes('<')) return markdown
   const segments = markdown.split(/(```[\s\S]*?```|`[^`]*`)/g)
   return segments
     .map((segment, i) => {

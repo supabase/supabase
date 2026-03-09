@@ -154,13 +154,15 @@ export function MessageMarkdown({
   children: ReactNode
 }) {
   const markdownSource = useMemo(() => {
-    const raw =
-      typeof children === 'string'
-        ? children
-        : Array.isArray(children)
-          ? children.filter((child): child is string => typeof child === 'string').join('')
-          : ''
-    return wrapPlaceholderUrls(raw)
+    if (typeof children === 'string') {
+      return wrapPlaceholderUrls(children)
+    }
+    if (Array.isArray(children)) {
+      return wrapPlaceholderUrls(
+        children.filter((child): child is string => typeof child === 'string').join('')
+      )
+    }
+    return ''
   }, [children])
 
   const allMarkdownComponents = useMemo(
