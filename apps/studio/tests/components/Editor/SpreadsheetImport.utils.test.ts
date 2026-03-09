@@ -4,7 +4,7 @@ import {
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
 import { describe, test, expect } from 'vitest'
 
-describe('SpreadsheedImport.utils: inferColumnType', () => {
+describe('SpreadsheetImport.utils: inferColumnType', () => {
   test('should default column type to text if no rows to infer from', () => {
     const mockData: any[] = []
     const type = inferColumnType('id', mockData)
