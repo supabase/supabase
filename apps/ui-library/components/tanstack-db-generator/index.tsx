@@ -50,7 +50,7 @@ export function TanstackDBGenerator() {
 
   const baseUrl = getBaseUrl()
   const apiUrl = resolvedProject
-    ? `${baseUrl}${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/api/registry/tanstack-db?ref=${encodeURIComponent(resolvedProject.projectRef)}&anonKey=${encodeURIComponent(resolvedProject.anonKey)}`
+    ? `${baseUrl}/api/registry/tanstack-db?ref=${encodeURIComponent(resolvedProject.projectRef)}&anonKey=${encodeURIComponent(resolvedProject.anonKey)}`
     : ''
 
   const commands: Record<PackageManager, string> = {
