@@ -1,4 +1,4 @@
-import { ident, literal } from '../../pg-format'
+import { ident, literal } from '../../../pg-format'
 import { prefixToUUID, stringRange } from './get-users-common'
 import { OptimizedSearchColumns } from './get-users-types'
 
