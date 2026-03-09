@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
-  MAP_CHART_THEME,
   buildCountsByIso2,
   computeMarkerRadius,
   extractIso2FromFeatureProps,
@@ -10,10 +9,11 @@ import {
   isKnownCountryCode,
   isMicroCountry,
   iso2ToCountryName,
+  MAP_CHART_THEME,
 } from 'components/interfaces/Reports/utils/geo'
 import {
-  TextFormatter,
   jsonSyntaxHighlight,
+  TextFormatter,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -24,24 +24,24 @@ import { BASE_PATH } from 'lib/constants'
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import type { ResponseError } from 'types'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Collapsible,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   WarningIcon,
 } from 'ui'
 import * as z from 'zod'
 
-import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 import { queryParamsToObject } from '../Reports.utils'
+import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -410,7 +410,6 @@ export const RequestsByCountryMapRenderer = (
 ) => {
   const WORLD_TOPO_URL = `${BASE_PATH}/json/worldmap.json`
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
   const [hoverInfo, setHoverInfo] = useState<{
     x: number
     y: number
@@ -424,33 +423,6 @@ export const RequestsByCountryMapRenderer = (
   const { resolvedTheme } = useTheme()
   const theme = resolvedTheme === 'dark' ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
 
-  // Lazy load the map when it becomes visible
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true)
-            // Once visible, we can stop observing
-            observer.disconnect()
-          }
-        })
-      },
-      {
-        rootMargin: '100px', // Start loading 100px before the map comes into view
-        threshold: 0,
-      }
-    )
-
-    observer.observe(containerRef.current)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [])
-
   if (!!props.error) {
     const AlertErrorSchema = z.object({ message: z.string() })
     const parsed =
@@ -463,172 +435,111 @@ export const RequestsByCountryMapRenderer = (
 
   return (
     <div ref={containerRef} className="w-full h-[420px] relative border-t">
-      {!isVisible ? (
-        <div className="w-full h-full flex items-center justify-center text-foreground-lighter">
-          <div className="text-sm">Loading map...</div>
-        </div>
-      ) : (
-        <ComposableMap
-        projection="geoMercator"
-        projectionConfig={{ scale: 155 }}
-        className="w-full h-full"
-        style={{ backgroundColor: theme.oceanFill }}
-      >
-        <ZoomableGroup minZoom={1} maxZoom={5} zoom={1.3}>
-          <Geographies geography={WORLD_TOPO_URL}>
-            {({ geographies }) => (
-              <>
-                {geographies.map((geo) => {
-                  const title =
-                    (geo.properties?.name as string) ||
-                    (geo.properties?.NAME as string) ||
-                    'Unknown'
-                  const iso2 = extractIso2FromFeatureProps(
-                    (geo.properties || undefined) as Record<string, unknown> | undefined
-                  )
-                  // Skip Antarctica entirely (causes hover issues)
-                  if ((title || '').toLowerCase() === 'antarctica') {
-                    return null
-                  }
-                  const value = iso2 ? countsByIso2[iso2] || 0 : 0
-                  const baseOpacity = getFillOpacity(value, max, theme)
-                  const tooltipTitle = title
-                  const tooltipSubtitle = `${value.toLocaleString()} requests`
-                  return (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      onMouseMove={(e) => {
-                        const rect = containerRef.current?.getBoundingClientRect()
-                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
-                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
-                        setHoverInfo({
-                          x,
-                          y,
-                          title: tooltipTitle,
-                          subtitle: tooltipSubtitle,
-                          visible: true,
-                        })
-                      }}
-                      onMouseEnter={(e) => {
-                        const rect = containerRef.current?.getBoundingClientRect()
-                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
-                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
-                        setHoverInfo({
-                          x,
-                          y,
-                          title: tooltipTitle,
-                          subtitle: tooltipSubtitle,
-                          visible: true,
-                        })
-                      }}
-                      onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
-                      style={{
-                        default: {
-                          fill: getFillColor(value, max, theme),
-                          stroke: theme.boundaryStroke,
-                          strokeWidth: 0.4,
-                          opacity: baseOpacity,
-                          outline: 'none',
-                          cursor: 'default',
-                        },
-                        hover: {
-                          fill: getFillColor(value, max, theme),
-                          stroke: 'transparent',
-                          strokeWidth: 0,
-                          opacity: Math.max(0, baseOpacity * 0.8),
-                          outline: 'none',
-                          cursor: 'default',
-                        },
-                        pressed: {
-                          fill: getFillColor(value, max, theme),
-                          stroke: 'transparent',
-                          strokeWidth: 0,
-                          opacity: Math.max(0, baseOpacity * 0.8),
-                          outline: 'none',
-                          cursor: 'default',
-                        },
-                      }}
-                      aria-label={`${tooltipTitle} — ${tooltipSubtitle}`}
-                    />
-                  )
-                })}
-
-                {geographies.map((geo) => {
-                  const title =
-                    (geo.properties?.name as string) ||
-                    (geo.properties?.NAME as string) ||
-                    'Unknown'
-                  if (!isMicroCountry(title)) return null
-                  const iso2 = extractIso2FromFeatureProps(
-                    (geo.properties || undefined) as Record<string, unknown> | undefined
-                  )
-                  const value = iso2 ? countsByIso2[iso2] || 0 : 0
-                  if (value <= 0) return null
-                  const [lon, lat] = geoCentroid(geo)
-                  const r = computeMarkerRadius(value, max)
-                  const tooltipTitle = title
-                  const tooltipSubtitle = `${value.toLocaleString()} requests`
-                  return (
-                    <Marker
-                      key={`marker-${geo.rsmKey}`}
-                      coordinates={[lon, lat]}
-                      onMouseMove={(e) => {
-                        const rect = containerRef.current?.getBoundingClientRect()
-                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
-                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
-                        setHoverInfo({
-                          x,
-                          y,
-                          title: tooltipTitle,
-                          subtitle: tooltipSubtitle,
-                          visible: true,
-                        })
-                      }}
-                      onMouseEnter={(e) => {
-                        const rect = containerRef.current?.getBoundingClientRect()
-                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
-                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
-                        setHoverInfo({
-                          x,
-                          y,
-                          title: tooltipTitle,
-                          subtitle: tooltipSubtitle,
-                          visible: true,
-                        })
-                      }}
-                      onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
-                    >
-                      <circle r={r} fill={theme.markerFill} />
-                    </Marker>
-                  )
-                })}
-
-                {(() => {
-                  const present = new Set<string>()
-                  for (const g of geographies) {
-                    const code = extractIso2FromFeatureProps(
-                      (g.properties || undefined) as Record<string, unknown> | undefined
+      <ComposableMap
+          projection="geoMercator"
+          projectionConfig={{ scale: 155 }}
+          className="w-full h-full"
+          style={{ backgroundColor: theme.oceanFill }}
+        >
+          <ZoomableGroup minZoom={1} maxZoom={5} zoom={1.3}>
+            <Geographies geography={WORLD_TOPO_URL}>
+              {({ geographies }) => (
+                <>
+                  {geographies.map((geo) => {
+                    const title =
+                      (geo.properties?.name as string) ||
+                      (geo.properties?.NAME as string) ||
+                      'Unknown'
+                    const iso2 = extractIso2FromFeatureProps(
+                      (geo.properties || undefined) as Record<string, unknown> | undefined
                     )
-                    if (code) present.add(code)
-                  }
+                    // Skip Antarctica entirely (causes hover issues)
+                    if ((title || '').toLowerCase() === 'antarctica') {
+                      return null
+                    }
+                    const value = iso2 ? countsByIso2[iso2] || 0 : 0
+                    const baseOpacity = getFillOpacity(value, max, theme)
+                    const tooltipTitle = title
+                    const tooltipSubtitle = `${value.toLocaleString()} requests`
+                    return (
+                      <Geography
+                        key={geo.rsmKey}
+                        geography={geo}
+                        onMouseMove={(e) => {
+                          const rect = containerRef.current?.getBoundingClientRect()
+                          const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                          const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                          setHoverInfo({
+                            x,
+                            y,
+                            title: tooltipTitle,
+                            subtitle: tooltipSubtitle,
+                            visible: true,
+                          })
+                        }}
+                        onMouseEnter={(e) => {
+                          const rect = containerRef.current?.getBoundingClientRect()
+                          const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                          const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                          setHoverInfo({
+                            x,
+                            y,
+                            title: tooltipTitle,
+                            subtitle: tooltipSubtitle,
+                            visible: true,
+                          })
+                        }}
+                        onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
+                        style={{
+                          default: {
+                            fill: getFillColor(value, max, theme),
+                            stroke: theme.boundaryStroke,
+                            strokeWidth: 0.4,
+                            opacity: baseOpacity,
+                            outline: 'none',
+                            cursor: 'default',
+                          },
+                          hover: {
+                            fill: getFillColor(value, max, theme),
+                            stroke: 'transparent',
+                            strokeWidth: 0,
+                            opacity: Math.max(0, baseOpacity * 0.8),
+                            outline: 'none',
+                            cursor: 'default',
+                          },
+                          pressed: {
+                            fill: getFillColor(value, max, theme),
+                            stroke: 'transparent',
+                            strokeWidth: 0,
+                            opacity: Math.max(0, baseOpacity * 0.8),
+                            outline: 'none',
+                            cursor: 'default',
+                          },
+                        }}
+                        aria-label={`${tooltipTitle} — ${tooltipSubtitle}`}
+                      />
+                    )
+                  })}
 
-                  const markers: JSX.Element[] = []
-                  for (const iso2 in countsByIso2) {
-                    const count = countsByIso2[iso2]
-                    if (count <= 0) continue
-                    // Do not render Antarctica
-                    if (iso2.toUpperCase() === 'AQ') continue
-                    if (present.has(iso2)) continue
-                    if (!isKnownCountryCode(iso2)) continue
-                    const ll = COUNTRY_LAT_LON[iso2]
-                    const r = computeMarkerRadius(count, max)
-                    const tooltipTitle = iso2ToCountryName(iso2)
-                    const tooltipSubtitle = `${count.toLocaleString()} requests`
-                    markers.push(
+                  {geographies.map((geo) => {
+                    const title =
+                      (geo.properties?.name as string) ||
+                      (geo.properties?.NAME as string) ||
+                      'Unknown'
+                    if (!isMicroCountry(title)) return null
+                    const iso2 = extractIso2FromFeatureProps(
+                      (geo.properties || undefined) as Record<string, unknown> | undefined
+                    )
+                    const value = iso2 ? countsByIso2[iso2] || 0 : 0
+                    if (value <= 0) return null
+                    const [lon, lat] = geoCentroid(geo)
+                    const r = computeMarkerRadius(value, max)
+                    const tooltipTitle = title
+                    const tooltipSubtitle = `${value.toLocaleString()} requests`
+                    return (
                       <Marker
-                        key={`fallback-${iso2}`}
-                        coordinates={[ll.lon, ll.lat]}
+                        key={`marker-${geo.rsmKey}`}
+                        coordinates={[lon, lat]}
                         onMouseMove={(e) => {
                           const rect = containerRef.current?.getBoundingClientRect()
                           const x = (rect ? e.clientX - rect.left : e.clientX) + 12
@@ -658,17 +569,72 @@ export const RequestsByCountryMapRenderer = (
                         <circle r={r} fill={theme.markerFill} />
                       </Marker>
                     )
-                  }
+                  })}
 
-                  return markers
-                })()}
-              </>
-            )}
-          </Geographies>
-        </ZoomableGroup>
-      </ComposableMap>
-      )}
-      {isVisible && hoverInfo.visible && (
+                  {(() => {
+                    const present = new Set<string>()
+                    for (const g of geographies) {
+                      const code = extractIso2FromFeatureProps(
+                        (g.properties || undefined) as Record<string, unknown> | undefined
+                      )
+                      if (code) present.add(code)
+                    }
+
+                    const markers: JSX.Element[] = []
+                    for (const iso2 in countsByIso2) {
+                      const count = countsByIso2[iso2]
+                      if (count <= 0) continue
+                      // Do not render Antarctica
+                      if (iso2.toUpperCase() === 'AQ') continue
+                      if (present.has(iso2)) continue
+                      if (!isKnownCountryCode(iso2)) continue
+                      const ll = COUNTRY_LAT_LON[iso2]
+                      const r = computeMarkerRadius(count, max)
+                      const tooltipTitle = iso2ToCountryName(iso2)
+                      const tooltipSubtitle = `${count.toLocaleString()} requests`
+                      markers.push(
+                        <Marker
+                          key={`fallback-${iso2}`}
+                          coordinates={[ll.lon, ll.lat]}
+                          onMouseMove={(e) => {
+                            const rect = containerRef.current?.getBoundingClientRect()
+                            const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                            const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                            setHoverInfo({
+                              x,
+                              y,
+                              title: tooltipTitle,
+                              subtitle: tooltipSubtitle,
+                              visible: true,
+                            })
+                          }}
+                          onMouseEnter={(e) => {
+                            const rect = containerRef.current?.getBoundingClientRect()
+                            const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                            const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                            setHoverInfo({
+                              x,
+                              y,
+                              title: tooltipTitle,
+                              subtitle: tooltipSubtitle,
+                              visible: true,
+                            })
+                          }}
+                          onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
+                        >
+                          <circle r={r} fill={theme.markerFill} />
+                        </Marker>
+                      )
+                    }
+
+                    return markers
+                  })()}
+                </>
+              )}
+            </Geographies>
+          </ZoomableGroup>
+        </ComposableMap>
+      {hoverInfo.visible && (
         <div
           className="pointer-events-none absolute z-10 rounded bg-surface-100 p-1.5 border border-surface-200 text-sm"
           style={{ left: hoverInfo.x, top: hoverInfo.y }}
