@@ -45,6 +45,7 @@ import {
 import { Route } from '../ui/ui.types'
 import {
   useIsAPIDocsSidePanelEnabled,
+  useIsPlatformWebhooksEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
 
@@ -225,6 +226,7 @@ const ProjectLinks = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
@@ -256,7 +258,9 @@ const ProjectLinks = () => {
     showReports,
     apiDocsSidePanel: isNewAPIDocsEnabled,
   })
-  const settingsRoutes = generateSettingsRoutes(ref, project)
+  const settingsRoutes = generateSettingsRoutes(ref, project, {
+    platformWebhooks: platformWebhooksEnabled,
+  })
 
   return (
     <SidebarMenu>
