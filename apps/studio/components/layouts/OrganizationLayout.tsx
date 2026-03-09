@@ -1,17 +1,58 @@
+import Head from 'next/head'
 import { ExternalLink } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { type PropsWithChildren } from 'react'
 
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
 import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { buildStudioPageTitle } from 'lib/page-title'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
+type OrganizationRouteTitleParts = {
+  section?: string
+  surface?: string
+}
+
+const ORGANIZATION_ROUTE_TITLES: Record<string, OrganizationRouteTitleParts> = {
+  '/org': { section: 'Organizations' },
+  '/org/index': { section: 'Organizations' },
+  // Omit the generic "Organization" segment on top-level org pages; the org name already carries that context.
+  '/org/[slug]': { section: 'Projects' },
+  '/org/[slug]/billing': { section: 'Billing' },
+  '/org/[slug]/team': { section: 'Team' },
+  '/org/[slug]/usage': { section: 'Usage' },
+  '/org/[slug]/integrations': { section: 'Integrations' },
+  // Keep "Organization Settings" for settings routes because it disambiguates them from billing/team/etc.
+  '/org/[slug]/general': { section: 'General', surface: 'Organization Settings' },
+  '/org/[slug]/security': { section: 'Security', surface: 'Organization Settings' },
+  '/org/[slug]/apps': { section: 'OAuth Apps', surface: 'Organization Settings' },
+  '/org/[slug]/sso': { section: 'SSO', surface: 'Organization Settings' },
+  '/org/[slug]/audit': { section: 'Audit Logs', surface: 'Organization Settings' },
+  '/org/[slug]/documents': { section: 'Legal Documents', surface: 'Organization Settings' },
+}
+
 const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
+  const router = useRouter()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { appTitle } = useCustomContent(['app:title'])
+
+  const routeTitle = ORGANIZATION_ROUTE_TITLES[router.pathname]
+  const shouldRenderTitle = router.pathname.startsWith('/org')
+  const pageTitle =
+    shouldRenderTitle && routeTitle
+      ? buildStudioPageTitle({
+          section: routeTitle.section,
+          surface: routeTitle.surface,
+          org: selectedOrganization?.name,
+          brand: appTitle || 'Supabase',
+        })
+      : undefined
 
   const vercelQuery = useVercelRedirectQuery(
     {
@@ -37,6 +78,12 @@ const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
 
   return (
     <div className={cn('h-full w-full flex flex-col overflow-hidden')}>
+      {pageTitle && (
+        <Head>
+          <title>{pageTitle}</title>
+          <meta name="description" content="Supabase Studio" />
+        </Head>
+      )}
       {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
         <Alert_Shadcn_
           variant="default"
