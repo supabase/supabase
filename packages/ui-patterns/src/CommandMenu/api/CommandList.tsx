@@ -33,7 +33,6 @@ const CommandList = forwardRef<
     >
       <CommandEmpty listRef={innerRef}>No results found.</CommandEmpty>
       {(() => {
-        let runningIndex = 0
         return commandSections.map((section) => {
           if (section.commands.every((command) => command.defaultHidden) && !query) return null
 
@@ -41,10 +40,9 @@ const CommandList = forwardRef<
             (command) => !command.defaultHidden || query
           )
 
-          const group = (
+          return (
             <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
-              {visibleCommands.map((command) => {
-                const index = runningIndex++
+              {visibleCommands.map((command, index) => {
                 return (
                   <CommandItem key={command.id} command={command} commandIndex={index}>
                     <TextHighlighter>{command.name}</TextHighlighter>
@@ -53,8 +51,6 @@ const CommandList = forwardRef<
               })}
             </CommandGroup>
           )
-
-          return group
         })
       })()}
     </CommandList_Shadcn_>
