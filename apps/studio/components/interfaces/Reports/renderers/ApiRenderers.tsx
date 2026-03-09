@@ -453,10 +453,6 @@ export const RequestsByCountryMapRenderer = (
                     const iso2 = extractIso2FromFeatureProps(
                       (geo.properties || undefined) as Record<string, unknown> | undefined
                     )
-                    // Skip Antarctica entirely (causes hover issues)
-                    if ((title || '').toLowerCase() === 'antarctica') {
-                      return null
-                    }
                     const value = iso2 ? countsByIso2[iso2] || 0 : 0
                     const baseOpacity = getFillOpacity(value, max, theme)
                     const tooltipTitle = title
