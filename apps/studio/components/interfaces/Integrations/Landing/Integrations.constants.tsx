@@ -48,7 +48,10 @@ export type IntegrationDefinition = {
     pageId: string | undefined,
     childId: string | undefined
   ) => ComponentType<{}> | null
-} & ({ type: 'wrapper'; meta: WrapperMeta } | { type: string })
+} & (
+  | { type: 'wrapper'; meta: WrapperMeta }
+  | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
+)
 
 const authorSupabase = {
   name: 'Supabase',

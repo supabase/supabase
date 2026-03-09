@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFeatureFlags, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { ProjectLayout } from 'components/layouts/ProjectLayout'
 import AlertError from 'components/ui/AlertError'
@@ -58,8 +58,12 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
     isSuccess: isSuccessCategories,
   } = useQuery(marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled }))
 
-  const isLoading = !flagsLoaded || (isMarketplaceEnabled && isPendingCategories)
-  const isSuccess = flagsLoaded && (isSuccessCategories || !isMarketplaceEnabled)
+  const isLoading = IS_PLATFORM
+    ? !flagsLoaded || (isMarketplaceEnabled && isPendingCategories)
+    : false
+  const isSuccess = IS_PLATFORM
+    ? flagsLoaded && (isSuccessCategories || !isMarketplaceEnabled)
+    : true
 
   const allCategories = [
     {
