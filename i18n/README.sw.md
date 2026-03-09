@@ -30,11 +30,11 @@ Fuatilia "matoleo" ya hifadhi (repo) hii ili kupata taarifa za masasisho makuu.
 
 Kwa nyaraka kamili, tembelea [supabase.com/docs](https://supabase.com/docs)
 
-Ili kuona jinsi ya kuchangia, tembelea [Kuanza](./DEVELOPERS.md)
+Ili kuona jinsi ya kuchangia, tembelea [Kuanza](../DEVELOPERS.md)
 
 ## Jamii & Msaada 
 
-* [Jukwaa la jamii](https://github.com/supabase/supabase/discussions). Bora kwa: msaada wa kujenga miradi na majadiliano kuhusu mbinu bora za kutumia database.
+* [Jukwaa la jamii](https://github.com/supabase/supabase/discussions). Bora kwa: msaada wa kujenga miradi na majadiliano kuhusu mbinu bora za kutumia hifadhidata.
 * [GitHub Issues](https://github.com/supabase/supabase/issues). Bora kwa: kuripoti hitilafu na makosa unayokutana nayo ukitumia Supabase.
 * [Msaada wa Barua pepe](https://supabase.com/docs/support#business-support). Bora kwa: matatizo yanayohusiana na hifadhidata au miundombinu yako.
 * [Discord](https://discord.supabase.com). Bora kwa: kushiriki programu zako na kujumuika na jamii.
