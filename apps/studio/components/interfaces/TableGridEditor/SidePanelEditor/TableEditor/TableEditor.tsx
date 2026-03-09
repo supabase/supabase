@@ -377,85 +377,85 @@ export const TableEditor = ({
       <SidePanel.Separator />
 
       <SidePanel.Content className="space-y-10 py-6">
-            <Checkbox
-              id="enable-rls"
-              // @ts-ignore
-              label={
-                <div className="flex items-center space-x-2">
-                  <span>Enable Row Level Security (RLS)</span>
-                  <Badge>Recommended</Badge>
-                </div>
-              }
-              description="Restrict access to your table by enabling RLS and writing Postgres policies."
-              checked={tableFields.isRLSEnabled}
-              onChange={() => {
-                // if isEnabled, show confirm modal to turn off
-                // if not enabled, allow turning on without modal confirmation
-                tableFields.isRLSEnabled
-                  ? setRlsConfirmVisible(true)
-                  : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-              }}
-              size="medium"
+        <Checkbox
+          id="enable-rls"
+          // @ts-ignore
+          label={
+            <div className="flex items-center space-x-2">
+              <span>Enable Row Level Security (RLS)</span>
+              <Badge>Recommended</Badge>
+            </div>
+          }
+          description="Restrict access to your table by enabling RLS and writing Postgres policies."
+          checked={tableFields.isRLSEnabled}
+          onChange={() => {
+            // if isEnabled, show confirm modal to turn off
+            // if not enabled, allow turning on without modal confirmation
+            tableFields.isRLSEnabled
+              ? setRlsConfirmVisible(true)
+              : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+          }}
+          size="medium"
+        />
+
+        {tableFields.isRLSEnabled ? (
+          <Admonition
+            type="default"
+            className="!mt-3"
+            title="Policies are required to query data"
+            description={
+              <>
+                You need to create an access policy before you can query data from this table.
+                Without a policy, querying this table will return an{' '}
+                <u className="text-foreground">empty array</u> of results.{' '}
+                {isNewRecord ? 'You can create policies after saving this table.' : ''}
+              </>
+            }
+          >
+            <DocsButton
+              abbrev={false}
+              className="mt-2"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
+          </Admonition>
+        ) : (
+          <Admonition
+            type="warning"
+            className="!mt-3"
+            title="You are allowing anonymous access to your table"
+            description={
+              <>
+                {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be publicly
+                writable and readable
+              </>
+            }
+          >
+            <DocsButton
+              abbrev={false}
+              className="mt-2"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
+            />
+          </Admonition>
+        )}
 
-            {tableFields.isRLSEnabled ? (
-              <Admonition
-                type="default"
-                className="!mt-3"
-                title="Policies are required to query data"
-                description={
-                  <>
-                    You need to create an access policy before you can query data from this table.
-                    Without a policy, querying this table will return an{' '}
-                    <u className="text-foreground">empty array</u> of results.{' '}
-                    {isNewRecord ? 'You can create policies after saving this table.' : ''}
-                  </>
-                }
-              >
-                <DocsButton
-                  abbrev={false}
-                  className="mt-2"
-                  href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
-                />
-              </Admonition>
-            ) : (
-              <Admonition
-                type="warning"
-                className="!mt-3"
-                title="You are allowing anonymous access to your table"
-                description={
-                  <>
-                    {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be
-                    publicly writable and readable
-                  </>
-                }
-              >
-                <DocsButton
-                  abbrev={false}
-                  className="mt-2"
-                  href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
-                />
-              </Admonition>
-            )}
-
-            {realtimeEnabled && (
-              <Checkbox
-                id="enable-realtime"
-                label="Enable Realtime"
-                description="Broadcast changes on this table to authorized subscribers"
-                checked={tableFields.isRealtimeEnabled}
-                onChange={() => {
-                  track('realtime_toggle_table_clicked', {
-                    newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                    origin: 'tableSidePanel',
-                  })
-                  onUpdateField({
-                    isRealtimeEnabled: !tableFields.isRealtimeEnabled,
-                  })
-                }}
-                size="medium"
-              />
-            )}
+        {realtimeEnabled && (
+          <Checkbox
+            id="enable-realtime"
+            label="Enable Realtime"
+            description="Broadcast changes on this table to authorized subscribers"
+            checked={tableFields.isRealtimeEnabled}
+            onChange={() => {
+              track('realtime_toggle_table_clicked', {
+                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                origin: 'tableSidePanel',
+              })
+              onUpdateField({
+                isRealtimeEnabled: !tableFields.isRealtimeEnabled,
+              })
+            }}
+            size="medium"
+          />
+        )}
       </SidePanel.Content>
 
       <SidePanel.Separator />
