@@ -47,7 +47,9 @@ export function generateDbContent(definitions: Record<string, OpenAPIDefinition>
     if (primaryKeys.length === 1) {
       whereFn = `(query, item) => query.eq(${JSON.stringify(primaryKeys[0])}, ${propAccess('item', primaryKeys[0])})`
     } else {
-      const whereParts = primaryKeys.map((k) => `.eq(${JSON.stringify(k)}, ${propAccess('item', k)})`).join('')
+      const whereParts = primaryKeys
+        .map((k) => `.eq(${JSON.stringify(k)}, ${propAccess('item', k)})`)
+        .join('')
       whereFn = `(query, item) => query${whereParts}`
     }
 
