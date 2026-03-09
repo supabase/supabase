@@ -73,7 +73,11 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
   const handleOpenExternalAI = async (tool: (typeof EXTERNAL_AI_TOOLS)[number]) => {
     const prompt = buildPrompt()
     if (tool.promptParam) {
-      window.open(`${tool.url}?${tool.promptParam}=${encodeURIComponent(prompt)}`, '_blank', 'noreferrer')
+      window.open(
+        `${tool.url}?${tool.promptParam}=${encodeURIComponent(prompt)}`,
+        '_blank',
+        'noreferrer'
+      )
     } else {
       await copyToClipboard(prompt)
       window.open(tool.url, '_blank', 'noreferrer')
