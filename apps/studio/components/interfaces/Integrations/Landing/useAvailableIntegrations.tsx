@@ -7,6 +7,7 @@ import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
 import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
+import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 /**
@@ -18,6 +19,9 @@ export const useAvailableIntegrations = () => {
   const { hasLoaded } = useContext(FeatureFlagContext)
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+
+  const { data: cliData } = useCLIReleaseVersionQuery()
+  const isCLI = !!cliData?.current
 
   const { data, error } = useQuery({
     ...marketplaceIntegrationsQueryOptions(),
@@ -104,12 +108,18 @@ export const useAvailableIntegrations = () => {
       ) {
         return false
       }
-      if (!IS_PLATFORM && integration.id === 'data_api') {
+
+      if (integration.id === 'stripe_sync_engine' && isCLI) {
         return false
       }
+
+      if (integration.id === 'data_api' && !IS_PLATFORM) {
+        return false
+      }
+
       return true
     })
-  }, [integrationsWrappers])
+  }, [integrationsWrappers, isCLI])
 
   const availableIntegrations = useMemo(
     () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
