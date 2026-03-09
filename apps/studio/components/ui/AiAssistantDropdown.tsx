@@ -59,7 +59,7 @@ export interface AiAssistantDropdownProps {
   className?: string
   tooltip?: string
   copyLabel?: string
-  disableExternalAI?: boolean
+  showExternalAI?: boolean
   extraDropdownItems?: ReactNode
   additionalDropdownItems?: AiAssistantDropdownItem[]
 }
@@ -77,7 +77,7 @@ export function AiAssistantDropdown({
   className,
   tooltip,
   copyLabel = 'Copy prompt',
-  disableExternalAI = false,
+  showExternalAI = false,
   extraDropdownItems,
   additionalDropdownItems,
 }: AiAssistantDropdownProps) {
@@ -147,7 +147,7 @@ export function AiAssistantDropdown({
             {showCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
             {showCopied ? 'Copied!' : copyLabel}
           </DropdownMenuItem>
-          {!disableExternalAI && (
+          {showExternalAI && (
             <>
               <DropdownMenuSeparator />
               {EXTERNAL_AI_TOOLS.map((tool) => (

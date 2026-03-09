@@ -182,7 +182,6 @@ export const AdvisorWidget = () => {
                         telemetrySource="advisor_widget"
                         type="text"
                         className="px-1 w-7"
-                        disableExternalAI
                       />
                     </div>
                   </div>

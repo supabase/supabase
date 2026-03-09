@@ -121,6 +121,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
               buildPrompt={buildPrompt}
               onOpenAssistant={handleOpenAssistant}
               copyLabel="Copy Markdown"
+              showExternalAI
               extraDropdownItems={
                 docsUrl ? (
                   <>

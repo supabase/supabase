@@ -164,7 +164,6 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                   telemetrySource="sql_debug"
                   disabled={!!isDisabled || isDebugging}
                   loading={isDebugging}
-                  disableExternalAI
                 />
               )}
             </div>
