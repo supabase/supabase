@@ -36,7 +36,7 @@ import {
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
-import ProjectIntegrationsLayout from '@/components/layouts/ProjectIntegrationsLayout'
+import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
 
 type NavigationItem = { label: string; href: string; active?: boolean }
 

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { ProjectLayout } from 'components/layouts/ProjectLayout'
 import AlertError from 'components/ui/AlertError'
@@ -17,7 +17,7 @@ import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integratio
  * Layout component for the Integrations section
  * Provides sidebar navigation for integrations
  */
-const ProjectIntegrationsLayout = ({ children }: PropsWithChildren) => {
+export const ProjectIntegrationsLayout = withAuth(({ children }: PropsWithChildren) => {
   const router = useRouter()
   const segments = router.asPath.split('/')
   // construct the page url to be used to determine the active state for the sidebar
@@ -39,14 +39,13 @@ const ProjectIntegrationsLayout = ({ children }: PropsWithChildren) => {
       {children}
     </ProjectLayout>
   )
-}
-
-// Wrap component with authentication HOC before exporting
-export default withAuth(ProjectIntegrationsLayout)
+})
 
 const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const router = useRouter()
   const { ref } = useParams()
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
   const urlParams = new URLSearchParams(router.asPath.split('?')[1] || '')
   const categoryParam = urlParams.get('category')
@@ -55,9 +54,12 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const { integrationsWrappers: showWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
   const {
     data: categories = [],
-    isPending,
-    isSuccess,
-  } = useQuery(marketplaceCategoriesQueryOptions())
+    isPending: isPendingCategories,
+    isSuccess: isSuccessCategories,
+  } = useQuery(marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled }))
+
+  const isLoading = !flagsLoaded || (isMarketplaceEnabled && isPendingCategories)
+  const isSuccess = flagsLoaded && (isSuccessCategories || !isMarketplaceEnabled)
 
   const allCategories = [
     {
@@ -97,7 +99,8 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   return (
     <div className="px-4 py-6 md:px-6">
       <Menu.Group title={<span className="uppercase font-mono">Explore</span>} />
-      {isPending && <GenericSkeletonLoader />}
+      {isLoading && <GenericSkeletonLoader />}
+
       {isSuccess && (
         <div>
           {allCategories.map((item) => (

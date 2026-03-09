@@ -25,7 +25,7 @@ import {
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
 
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
-import ProjectIntegrationsLayout from '@/components/layouts/ProjectIntegrationsLayout'
+import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
 
 const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_sync_engine']
 

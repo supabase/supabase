@@ -18,7 +18,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
-import ProjectIntegrationsLayout from '@/components/layouts/ProjectIntegrationsLayout'
+import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
