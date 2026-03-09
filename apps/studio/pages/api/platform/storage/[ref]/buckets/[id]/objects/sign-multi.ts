@@ -20,11 +20,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query
-  const { paths, expiresIn = 60 * 60 * 24 } = req.body
+  const { path, expiresIn = 60 * 60 * 24 } = req.body
 
   const { data, error } = await supabase.storage
     .from(id as string)
-    .createSignedUrls(paths, expiresIn)
+    .createSignedUrls(path, expiresIn)
 
   if (error) {
     return res.status(400).json({ error: { message: error.message } })
