@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
@@ -17,6 +18,12 @@ import {
 } from 'ui'
 
 type TelemetrySource = AiPromptCopiedEvent['properties']['source']
+
+export interface AiAssistantDropdownItem {
+  label: string
+  icon?: ReactNode
+  onClick: () => void
+}
 
 export interface AiAssistantDropdownProps {
   buildPrompt: () => string
@@ -32,6 +39,7 @@ export interface AiAssistantDropdownProps {
   tooltip?: string
   copyLabel?: string
   extraDropdownItems?: ReactNode
+  additionalDropdownItems?: AiAssistantDropdownItem[]
 }
 
 export function AiAssistantDropdown({
@@ -48,6 +56,7 @@ export function AiAssistantDropdown({
   tooltip,
   copyLabel = 'Copy prompt',
   extraDropdownItems,
+  additionalDropdownItems,
 }: AiAssistantDropdownProps) {
   const track = useTrack()
   const [showCopied, setShowCopied] = useState(false)
@@ -105,6 +114,17 @@ export function AiAssistantDropdown({
             {showCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
             {showCopied ? 'Copied!' : copyLabel}
           </DropdownMenuItem>
+          {additionalDropdownItems && additionalDropdownItems.length > 0 && (
+            <>
+              <DropdownMenuSeparator />
+              {additionalDropdownItems.map((item, i) => (
+                <DropdownMenuItem key={i} onClick={item.onClick} className="gap-2">
+                  {item.icon}
+                  {item.label}
+                </DropdownMenuItem>
+              ))}
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

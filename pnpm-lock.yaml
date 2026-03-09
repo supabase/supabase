@@ -80,6 +80,11 @@ overrides:
   '@aws-sdk/core>fast-xml-parser': ^5.3.5
   openapi-sampler>fast-xml-parser: ^5.3.5
 
+patchedDependencies:
+  react-data-grid:
+    hash: 803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488
+    path: patches/react-data-grid.patch
+
 importers:
 
   .:
@@ -176,7 +181,7 @@ importers:
         version: 18.3.1
       react-data-grid:
         specifier: 7.0.0-beta.47
-        version: 7.0.0-beta.47(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.0.0-beta.47(patch_hash=803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-day-picker:
         specifier: ^9.11.1
         version: 9.11.1(react@18.3.1)
@@ -1007,7 +1012,7 @@ importers:
         version: 5.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-data-grid:
         specifier: 7.0.0-beta.47
-        version: 7.0.0-beta.47(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.0.0-beta.47(patch_hash=803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-day-picker:
         specifier: ^9.11.1
         version: 9.11.1(react@18.3.1)
@@ -34849,7 +34854,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  react-data-grid@7.0.0-beta.47(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-data-grid@7.0.0-beta.47(patch_hash=803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       clsx: 2.1.1
       react: 18.3.1
