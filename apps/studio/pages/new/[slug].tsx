@@ -11,8 +11,8 @@ import { DisabledWarningDueToIncident } from 'components/interfaces/ProjectCreat
 import { FreeProjectLimitWarning } from 'components/interfaces/ProjectCreation/FreeProjectLimitWarning'
 import { OrganizationSelector } from 'components/interfaces/ProjectCreation/OrganizationSelector'
 import {
-  PostgresVersionSelector,
   extractPostgresVersionDetails,
+  PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { sizes } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { FormSchema } from 'components/interfaces/ProjectCreation/ProjectCreation.schema'
@@ -44,7 +44,6 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useTrackExperimentExposure } from 'hooks/misc/useTrackExperimentExposure'
 import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
@@ -57,9 +56,9 @@ import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
-import { Button, FormField_Shadcn_, Form_Shadcn_, useWatch_Shadcn_ } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
@@ -72,10 +71,6 @@ const Wizard: NextPageWithLayout = () => {
   const { profile } = useProfile()
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
-  const rlsExperimentVariant = usePHFlag<'control' | 'test' | false | undefined>(
-    'projectCreationEnableRlsEventTrigger'
-  )
-  const shouldShowEnableRlsEventTrigger = rlsExperimentVariant === 'test'
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
@@ -250,9 +245,6 @@ const Wizard: NextPageWithLayout = () => {
         {
           instanceSize: form.getValues('instanceSize'),
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
-          ...((rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test') && {
-            rlsOptionVariant: rlsExperimentVariant,
-          }),
           dataApiEnabled: form.getValues('dataApi'),
           useOrioleDb: form.getValues('useOrioleDb'),
         },
@@ -388,15 +380,6 @@ const Wizard: NextPageWithLayout = () => {
       })
     }
   }, [instanceSize, watchedInstanceSize, form])
-
-  // Track exposure to RLS option experiment (only when explicitly assigned to a variant)
-  const shouldTrackRlsExposure =
-    !!currentOrg?.slug && (rlsExperimentVariant === 'control' || rlsExperimentVariant === 'test')
-
-  useTrackExperimentExposure(
-    'project_creation_rls_option',
-    shouldTrackRlsExposure ? rlsExperimentVariant : undefined
-  )
 
   return (
     <Form_Shadcn_ {...form}>
