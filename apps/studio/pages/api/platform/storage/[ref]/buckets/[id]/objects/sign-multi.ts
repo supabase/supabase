@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -42,3 +42,5 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
 
   return res.status(201).json(remapped)
 }
+
+export default wrappedHandler
