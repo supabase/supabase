@@ -60,9 +60,29 @@ A good default is to use `Lax` which sends cookies when users are navigating to 
 
 ### Can I use server-side rendering with a CDN or cache?
 
-Yes, but you need to be careful to include at least the refresh token cookie value in the cache key. Otherwise you may be accidentally serving pages with data belonging to different users!
+Yes, but there is one thing to be aware of when deploying behind a CDN or reverse proxy.
 
-Also be sure you set proper cache control headers. We recommend invalidating cache keys every hour or less.
+When `@supabase/ssr` refreshes a session token server-side, it writes the updated JWT to the HTTP response via a `Set-Cookie` header. If your CDN (e.g. CloudFront, Vercel Edge, Cloudflare) caches that response and serves it to a different user, that user's browser will store the cached token and be signed in as the wrong person.
+
+To prevent this, set `Cache-Control: private, no-store` on responses from any route that handles authentication, typically your middleware. Most CDNs will not cache responses with this header.
+
+**Next.js middleware:**
+
+```ts
+const response = NextResponse.next()
+// ... supabase client setup and getUser() call
+response.headers.set('Cache-Control', 'private, no-store')
+return response
+```
+
+**Nuxt server middleware:**
+
+```ts
+// ... supabase client setup and getUser() call
+setHeader(event, 'Cache-Control', 'private, no-store')
+```
+
+If you need to cache SSR pages for performance, apply caching only to downstream routes that do not write `Set-Cookie` headers, and always include the refresh token cookie value in the cache key for any routes that serve user-specific content.
 
 ### Which authentication flows have PKCE support?
 
