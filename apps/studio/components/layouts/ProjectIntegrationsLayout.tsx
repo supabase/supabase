@@ -79,7 +79,6 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
             name: 'Wrappers',
             key: 'wrappers',
             url: `/project/${ref}/integrations?category=wrappers`,
-            pages: ['integrations?category=wrapper'],
             items: [],
           },
         ]
@@ -88,14 +87,12 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
       name: 'Postgres Modules',
       key: 'postgres_extension',
       url: `/project/${ref}/integrations?category=postgres_extension`,
-      pages: ['integrations?category=postgres_extension'],
       items: [],
     },
     ...categories.map((category) => ({
       name: category.title,
       key: category.slug,
       url: `/project/${ref}/integrations?category=${category.slug}`,
-      pages: [`integrations?category=${category.slug}`],
       items: [],
     })),
   ]

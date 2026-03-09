@@ -6,6 +6,14 @@ import { useAvailableIntegrations } from '../../Landing/useAvailableIntegrations
 import { FilesViewer } from './FilesViewer'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 
+const getSiteUrlLabel = (url: string) => {
+  try {
+    return new URL(url).origin
+  } catch (error) {
+    return undefined
+  }
+}
+
 /**
  * [Joshen] This will serve as the overview tab for remotely fetched integrations
  */
@@ -26,7 +34,7 @@ export const IntegrationOverviewTabV2 = () => {
     : docsUrl?.includes('github.com')
       ? 'GitHub Docs'
       : 'Documentation'
-  const siteUrlLabel = !!siteUrl ? new URL(siteUrl).origin : undefined
+  const siteUrlLabel = !!siteUrl ? getSiteUrlLabel(siteUrl) : undefined
 
   return (
     <div className="grid grid-cols-3 gap-x-8 px-10 py-8">

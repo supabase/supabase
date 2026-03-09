@@ -47,10 +47,18 @@ const IntegrationsPage: NextPageWithLayout = () => {
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
 
-  const { data: availableIntegrations } = useAvailableIntegrations()
-  const { installedIntegrations, error, isError, isLoading, isSuccess } = useInstalledIntegrations()
+  const {
+    data: availableIntegrations,
+    error,
+    isPending: isLoadingAvailableIntegrations,
+    isError,
+    isSuccess,
+  } = useAvailableIntegrations()
 
+  const { installedIntegrations, isLoading: isLoadingInstalledIntegrations } =
+    useInstalledIntegrations()
   const installedIds = installedIntegrations.map((i) => i.id)
+  const isLoading = isLoadingAvailableIntegrations || isLoadingInstalledIntegrations
 
   // Dynamic page content based on selected category
   const pageContent = useMemo(() => {

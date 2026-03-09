@@ -23,9 +23,9 @@ export const useAvailableIntegrations = () => {
     ...marketplaceIntegrationsQueryOptions(),
     enabled: isMarketplaceEnabled,
   })
-  const isPending = !hasLoaded ? true : isMarketplaceEnabled ? !data && !error : false
-  const isSuccess = isMarketplaceEnabled ? !!data && !error : true
-  const isError = isMarketplaceEnabled ? !!error : false
+  const isPending = IS_PLATFORM && (!hasLoaded || (isMarketplaceEnabled && !data && !error))
+  const isSuccess = IS_PLATFORM || !isMarketplaceEnabled || (!!data && !error)
+  const isError = !IS_PLATFORM && isMarketplaceEnabled && !!error
 
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
