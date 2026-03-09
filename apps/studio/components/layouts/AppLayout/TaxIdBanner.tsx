@@ -41,8 +41,8 @@ export const TaxIdBanner = () => {
       description={
         <>
           If you are a registered business, please{' '}
-          <InlineLink href={`/org/${slug}/billing#address`}>add a Tax ID</InlineLink> to your billing
-          settings. Not applicable for individual users.
+          <InlineLink href={`/org/${slug}/billing#address`}>add a Tax ID</InlineLink> to your
+          billing settings. Not applicable for individual users.
         </>
       }
       onDismiss={() => setIsDismissed(true)}
