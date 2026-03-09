@@ -5,7 +5,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) ni jukwaa la maendeleo linalotumia Postgres. Tunajenga vipengele vinavyofanana na Firebase kwa kutumia zana za wazi za kiwango cha juu cha biashara.
+[Supabase](https://supabase.com) ni jukwaa la maendeleo linalotumia Postgres. Tunajenga vipengele vinavyofanana na Firebase kwa kutumia zana za chanzo wazi za kiwango cha kibiashara.
 
 - [x] Hifadhidata ya Postgres iliyohifadhiwa. [Docs](https://supabase.com/docs/guides/database)
 - [x] Uthibitishaji na Uidhinishaji. [Docs](https://supabase.com/docs/guides/auth)
@@ -15,10 +15,10 @@
   - [x] Usajili wa muda halisi. [Docs](https://supabase.com/docs/guides/realtime)
 - [x] Kazi (Functions).
   - [x] Kazi za hifadhidata (Database Functions). [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Kazi za makali (Edge Functions). [Docs](https://supabase.com/docs/guides/functions)
+  - [x] Kazi za mipakani mwa mtandao (Edge Functions). [Docs](https://supabase.com/docs/guides/functions)
 - [x] Hifadhi ya Faili. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Akili mnemba + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
-- [x] Dashboard
+- [x] Dashibodi
 
 ![Dashibodi ya Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
@@ -48,7 +48,7 @@ Supabase ni mchanganyiko wa zana za open source. Tunajenga vipengele vya Firebas
 Supabase ni [jukwaa lililohifadhiwa mtandaoni](https://supabase.com/dashboard). Unaweza kujiandikisha na kuanza kutumia Supabase bila kusakinisha chochote.
 Pia unaweza [kuji-host mwenyewe](https://supabase.com/docs/guides/hosting/overview) na [kuendeleza mfumo wako ndani ya mazingira ya ndani](https://supabase.com/docs/guides/local-development).
 
-![Usanifu](apps/docs/public/img/supabase-architecture.svg)
+![Usanifu](../apps/docs/public/img/supabase-architecture.svg)
 
 - [Postgres](https://www.postgresql.org/) ni mfumo wa hifadhidata wa object-relational wenye zaidi ya miaka 30 ya uendelezaji amilifu ambao umejipatia sifa kubwa ya kuaminika, vipengele thabiti, na utendaji wa hali ya juu.
 - [Realtime](https://github.com/supabase/realtime) ni seva ya Elixir inayokuruhusu kusikiliza mabadiliko ya PostgreSQL (inserts, updates, na deletes) kwa kutumia websockets. Realtime huchunguza uwezo wa Postgres wa replication uliojengwa ndani kwa ajili ya mabadiliko ya hifadhidata, inabadilisha mabadiliko hayo kuwa JSON, kisha inasambaza JSON hiyo kupitia websockets kwa wateja walioidhinishwa.
@@ -203,7 +203,7 @@ Mbinu yetu kwa maktaba za wateja ni ya modular. Kila maktaba ndogo (sub-library)
 
 ## Beji
 
-![Imetengenezwa kwa kutumia Supabase](./apps/www/public/badge-made-with-supabase.svg)
+![Imetengenezwa kwa kutumia Supabase](../apps/www/public/badge-made-with-supabase.svg)
 
 ```md
 [![Imetengenezwa kwa kutumia Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
@@ -220,7 +220,7 @@ Mbinu yetu kwa maktaba za wateja ni ya modular. Kila maktaba ndogo (sub-library)
 </a>
 ```
 
-![Imetengenezwa kwa kutumia Supabase (giza)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![Imetengenezwa kwa kutumia Supabase (giza)](../apps/www/public/badge-made-with-supabase-dark.svg)
 
 ```md
 [![Imetengenezwa kwa kutumia Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
