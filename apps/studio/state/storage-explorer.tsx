@@ -1,13 +1,14 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 
+import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import {
   STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
@@ -50,7 +51,6 @@ import { tryParseJson } from '@/lib/helpers'
 import { lookupMime } from '@/lib/mime'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import { ResponseError } from '@/types'
-import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 
 type UploadProgress = {
   percentage: number
@@ -81,15 +81,15 @@ if (typeof window !== 'undefined') {
 function createStorageExplorerState({
   projectRef,
   connectionString,
+  bucket,
   resumableUploadUrl,
   clientEndpoint,
-  bucketId,
 }: {
   projectRef: string
   connectionString: string
+  bucket?: Bucket
   resumableUploadUrl: string
   clientEndpoint: string
-  bucketId?: string
 }) {
   const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
   const { view, sortBy, sortByOrder, sortBucket } =
@@ -98,10 +98,10 @@ function createStorageExplorerState({
 
   const state = proxy({
     projectRef,
-    bucketId,
     connectionString,
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
+    selectedBucket: bucket as Bucket,
 
     abortApiCalls: () => {
       if (abortController) {
@@ -160,14 +160,6 @@ function createStorageExplorerState({
     selectedItemsToMove: [] as StorageItemWithColumn[],
     setSelectedItemsToMove: (items: StorageItemWithColumn[]) => {
       state.selectedItemsToMove = items
-    },
-
-    selectedBucket: {} as Bucket,
-    setSelectedBucket: (bucket: Bucket) => {
-      state.selectedBucket = bucket
-      state.setSelectedFilePreview(undefined)
-      state.clearOpenedFolders()
-      state.clearSelectedItems()
     },
 
     setSelectedItemToRename: (file: { name: string; columnIndex: number }) => {
@@ -234,10 +226,6 @@ function createStorageExplorerState({
       state.columns = state.columns.map((col, idx) => {
         return idx === index ? { ...col, isLoadingMoreItems } : col
       })
-    },
-
-    openBucket: async (bucket: Bucket) => {
-      state.setSelectedBucket(bucket)
     },
 
     // ======== Folders CRUD ========
@@ -1860,6 +1848,7 @@ const DEFAULT_STATE_CONFIG = {
   connectionString: '',
   resumableUploadUrl: '',
   clientEndpoint: '',
+  bucket: {} as Bucket,
 }
 
 const StorageExplorerStateContext = createContext<StorageExplorerState>(
@@ -1869,12 +1858,10 @@ const StorageExplorerStateContext = createContext<StorageExplorerState>(
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: bucket } = useSelectedBucket()
-
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
-  const bucketRef = useRef(bucket?.id)
 
   const {
     storageEndpoint,
@@ -1888,38 +1875,32 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   // So the useEffect here is to make sure that the project ref is loaded into the state properly
   // Although I'd be keen to re-investigate this to see if we can remove this
   useEffect(() => {
-    const hasDataReady = !!project?.ref
+    const hasDataReady = !!project && !!bucket
     const storeAlreadyLoaded = state.projectRef === project?.ref
-    const hasBucketChanged = bucket?.id !== bucketRef.current
 
-    if (
-      !isPaused &&
-      hasDataReady &&
-      isSuccessSettings &&
-      (!storeAlreadyLoaded || hasBucketChanged)
-    ) {
+    if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
       const clientEndpoint = storageEndpoint ?? hostEndpoint ?? ''
       const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
+
       setState(
         createStorageExplorerState({
-          projectRef: project?.ref ?? '',
-          bucketId: bucket?.id,
+          projectRef: project.ref,
           connectionString: project.connectionString ?? '',
+          bucket,
           resumableUploadUrl,
           clientEndpoint,
         })
       )
     }
   }, [
-    bucket?.id,
     state.projectRef,
-    project?.ref,
-    project?.connectionString,
+    project,
     stateRef,
     isPaused,
     hostEndpoint,
     storageEndpoint,
     isSuccessSettings,
+    bucket,
   ])
 
   return (
