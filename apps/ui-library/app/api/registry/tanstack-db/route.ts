@@ -11,7 +11,7 @@ import {
   generateSheetContent,
 } from './_generators'
 import { OpenAPISchema, RegistryFile } from './types'
-import { toSingular } from './utils'
+import { safeFileSegment, toSingular, validateDefinitionNames } from './utils'
 
 // Read the base registry JSON
 async function readBaseRegistry(): Promise<RegistryItem> {
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Validate Supabase project ref to prevent SSRF via crafted hostnames
-  // Typical Supabase refs are lowercase alphanumeric; adjust if needed.
+  // Typical Supabase refs are lowercase alphabetic; adjust if needed.
   const refPattern = /^[a-z]{1,64}$/
   if (!refPattern.test(ref)) {
     return NextResponse.json({ error: 'Invalid project ref format.' }, { status: 400 })
@@ -60,6 +60,18 @@ export async function GET(request: NextRequest) {
     if (!openApiSpec.definitions) {
       return NextResponse.json(
         { error: 'No table definitions found in OpenAPI spec' },
+        { status: 400 }
+      )
+    }
+
+    // Validate all table/column names before generating any code
+    try {
+      validateDefinitionNames(openApiSpec.definitions)
+    } catch (validationError) {
+      return NextResponse.json(
+        {
+          error: `Invalid table or column name: ${validationError instanceof Error ? validationError.message : String(validationError)}`,
+        },
         { status: 400 }
       )
     }
@@ -94,25 +106,27 @@ export async function GET(request: NextRequest) {
     // Add example CRUD pages for the first table
     if (firstTableName && firstTableDefinition) {
       const singularTableName = toSingular(firstTableName)
+      const safeTable = safeFileSegment(firstTableName)
+      const safeSingular = safeFileSegment(singularTableName)
 
       dynamicFiles.push(
         {
-          path: `app/${firstTableName}/page.tsx`,
+          path: `app/${safeTable}/page.tsx`,
           content: generatePageContent(firstTableName),
           type: 'registry:page',
-          target: `app/${firstTableName}/page.tsx`,
+          target: `app/${safeTable}/page.tsx`,
         },
         {
-          path: `app/${firstTableName}/${singularTableName}-sheet.tsx`,
+          path: `app/${safeTable}/${safeSingular}-sheet.tsx`,
           content: generateSheetContent(firstTableName, firstTableDefinition),
           type: 'registry:component',
-          target: `app/${firstTableName}/${singularTableName}-sheet.tsx`,
+          target: `app/${safeTable}/${safeSingular}-sheet.tsx`,
         },
         {
-          path: `app/${firstTableName}/${firstTableName}-list.tsx`,
+          path: `app/${safeTable}/${safeTable}-list.tsx`,
           content: generateListContent(firstTableName, firstTableDefinition),
           type: 'registry:component',
-          target: `app/${firstTableName}/${firstTableName}-list.tsx`,
+          target: `app/${safeTable}/${safeTable}-list.tsx`,
         }
       )
     }

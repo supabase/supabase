@@ -1,12 +1,21 @@
 import { OpenAPIDefinition } from '../types'
-import { findPrimaryKeys, toCamelCase, toLabel, toPascalCase, toSingular } from '../utils'
+import {
+  findPrimaryKeys,
+  propAccess,
+  sanitizeIdentifier,
+  toCamelCase,
+  toLabel,
+  toPascalCase,
+  toSingular,
+} from '../utils'
 
 // Generate sheet component content
 export function generateSheetContent(tableName: string, definition: OpenAPIDefinition): string {
-  const pascalName = toPascalCase(tableName)
-  const singularName = toSingular(tableName)
+  const safeTableId = sanitizeIdentifier(tableName)
+  const pascalName = toPascalCase(safeTableId)
+  const singularName = toSingular(safeTableId)
   const singularPascal = toPascalCase(singularName)
-  const camelName = toCamelCase(tableName)
+  const camelName = toCamelCase(safeTableId)
   const collectionName = `${camelName}Collection`
   const sheetComponentName = `${singularPascal}Sheet`
   const properties = definition.properties || {}
@@ -30,37 +39,41 @@ export function generateSheetContent(tableName: string, definition: OpenAPIDefin
   // Generate state declarations
   const stateDeclarations = editableFields
     .map(([name, prop]) => {
-      const stateName = toCamelCase(name)
+      const safeName = sanitizeIdentifier(name)
+      const stateName = toCamelCase(safeName)
       if (prop.type === 'boolean') {
-        return `  const [${stateName}, set${toPascalCase(name)}] = useState(false)`
+        return `  const [${stateName}, set${toPascalCase(safeName)}] = useState(false)`
       }
       if (prop.type === 'integer' || prop.type === 'number') {
-        return `  const [${stateName}, set${toPascalCase(name)}] = useState<number | ''>(0)`
+        return `  const [${stateName}, set${toPascalCase(safeName)}] = useState<number | ''>(0)`
       }
-      return `  const [${stateName}, set${toPascalCase(name)}] = useState('')`
+      return `  const [${stateName}, set${toPascalCase(safeName)}] = useState('')`
     })
     .join('\n')
 
   // Generate useEffect reset
   const useEffectReset = editableFields
     .map(([name, prop]) => {
-      const stateName = toCamelCase(name)
-      const setterName = `set${toPascalCase(name)}`
+      const safeName = sanitizeIdentifier(name)
+      const stateName = toCamelCase(safeName)
+      const setterName = `set${toPascalCase(safeName)}`
+      const access = propAccess('item?', name)
       if (prop.type === 'boolean') {
-        return `      ${setterName}(item?.${name} ?? false)`
+        return `      ${setterName}(${access} ?? false)`
       }
       if (prop.type === 'integer' || prop.type === 'number') {
-        return `      ${setterName}(item?.${name} ?? 0)`
+        return `      ${setterName}(${access} ?? 0)`
       }
-      return `      ${setterName}(item?.${name} ?? '')`
+      return `      ${setterName}(${access} ?? '')`
     })
     .join('\n')
 
   // Generate form fields for editable fields
   const editableFormFields = editableFields
     .map(([name, prop]) => {
-      const stateName = toCamelCase(name)
-      const setterName = `set${toPascalCase(name)}`
+      const safeName = sanitizeIdentifier(name)
+      const stateName = toCamelCase(safeName)
+      const setterName = `set${toPascalCase(safeName)}`
       const label = toLabel(name)
       const isRequired = required.includes(name)
 
@@ -135,7 +148,8 @@ ${options}
     .map(([name]) => {
       const label = toLabel(name)
       const isTimestamp = name.endsWith('_at')
-      const displayValue = isTimestamp ? `new Date(item.${name}).toLocaleString()` : `item.${name}`
+      const itemAccess = propAccess('item', name)
+      const displayValue = isTimestamp ? `new Date(${itemAccess}).toLocaleString()` : itemAccess
 
       return `            {/* ${label} - Read Only */}
             <div className="flex flex-col gap-2">
@@ -154,41 +168,46 @@ ${options}
 
   // Generate insert data
   const insertData = [
-    `        ${primaryKey}: crypto.randomUUID(),`,
+    `        ${JSON.stringify(primaryKey)}: crypto.randomUUID(),`,
     ...editableFields.map(([name, prop]) => {
-      const stateName = toCamelCase(name)
+      const safeName = sanitizeIdentifier(name)
+      const stateName = toCamelCase(safeName)
+      const key = JSON.stringify(name)
       if (prop.type === 'boolean') {
-        return `        ${name}: ${stateName},`
+        return `        ${key}: ${stateName},`
       }
       if (prop.type === 'integer' || prop.type === 'number') {
-        return `        ${name}: ${stateName} || 0,`
+        return `        ${key}: ${stateName} || 0,`
       }
-      return `        ${name}: ${stateName},`
+      return `        ${key}: ${stateName},`
     }),
     // Add timestamps if they exist
     ...readOnlyFields
       .filter(([name]) => name === 'created_at')
-      .map(() => `        created_at: new Date().toISOString(),`),
+      .map(() => `        "created_at": new Date().toISOString(),`),
   ].join('\n')
 
   // Generate update data (direct mutations on draft)
   const updateData = editableFields
     .map(([name, prop]) => {
-      const stateName = toCamelCase(name)
+      const safeName = sanitizeIdentifier(name)
+      const stateName = toCamelCase(safeName)
+      const draftAccess = propAccess('draft', name)
       if (prop.type === 'boolean') {
-        return `        draft.${name} = ${stateName}`
+        return `        ${draftAccess} = ${stateName}`
       }
       if (prop.type === 'integer' || prop.type === 'number') {
-        return `        draft.${name} = ${stateName} || 0`
+        return `        ${draftAccess} = ${stateName} || 0`
       }
-      return `        draft.${name} = ${stateName}`
+      return `        ${draftAccess} = ${stateName}`
     })
     .join('\n')
 
   // Generate reset states
   const resetStates = editableFields
     .map(([name, prop]) => {
-      const setterName = `set${toPascalCase(name)}`
+      const safeName = sanitizeIdentifier(name)
+      const setterName = `set${toPascalCase(safeName)}`
       if (prop.type === 'boolean') {
         return `    ${setterName}(false)`
       }
@@ -205,7 +224,8 @@ ${options}
     requiredEditableFields.length > 0
       ? requiredEditableFields
           .map(([name, prop]) => {
-            const stateName = toCamelCase(name)
+            const safeName = sanitizeIdentifier(name)
+            const stateName = toCamelCase(safeName)
             if (prop.type === 'boolean') return null
             if (prop.type === 'integer' || prop.type === 'number') {
               return `${stateName} === ''`
@@ -259,7 +279,7 @@ ${validationCheck ? `    if (${validationCheck}) return\n` : ''}
 ${insertData}
       })
     } else if (item) {
-      ${collectionName}.update(item.${primaryKey}, (draft) => {
+      ${collectionName}.update(${propAccess('item', primaryKey)}, (draft) => {
 ${updateData}
       })
     }

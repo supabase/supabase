@@ -1,5 +1,5 @@
 import { OpenAPIDefinition } from '../types'
-import { openApiTypeToZod, toCamelCase, toPascalCase } from '../utils'
+import { openApiTypeToZod, sanitizeIdentifier, toCamelCase, toPascalCase } from '../utils'
 
 // Generate schemas.ts content from OpenAPI definitions
 export function generateSchemasContent(definitions: Record<string, OpenAPIDefinition>): string {
@@ -9,8 +9,9 @@ export function generateSchemasContent(definitions: Record<string, OpenAPIDefini
     // Skip internal PostgREST tables
     if (tableName.startsWith('_')) continue
 
-    const typeName = toPascalCase(tableName)
-    const schemaName = `${toCamelCase(tableName)}Schema`
+    const safeTableId = sanitizeIdentifier(tableName)
+    const typeName = toPascalCase(safeTableId)
+    const schemaName = `${toCamelCase(safeTableId)}Schema`
     const properties = definition.properties || {}
     const required = definition.required || []
 
@@ -20,7 +21,7 @@ export function generateSchemasContent(definitions: Record<string, OpenAPIDefini
     for (const [propName, prop] of Object.entries(properties)) {
       const isRequired = required.includes(propName)
       const zodType = openApiTypeToZod(prop, isRequired)
-      lines.push(`  ${propName}: ${zodType},`)
+      lines.push(`  ${JSON.stringify(propName)}: ${zodType},`)
     }
 
     lines.push('})')

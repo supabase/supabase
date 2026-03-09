@@ -3,7 +3,7 @@
   "name": "tanstack-db-nextjs",
   "type": "registry:block",
   "title": "TanStack DB for Next.js and Supabase",
-  "description": "TanStack Query integration with Supabase collections for type-safe database operations",
+  "description": "TanStack DB integration with Supabase collections for type-safe database operations",
   "dependencies": [
     "supa-tdb-collection@latest",
     "zod@latest",

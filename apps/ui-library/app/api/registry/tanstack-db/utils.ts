@@ -1,5 +1,94 @@
 import { OpenAPIProperty } from './types'
 
+// Valid JS identifier pattern: starts with letter or underscore, contains only alphanumeric and underscores
+const VALID_IDENTIFIER_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/
+
+/**
+ * Validate that a name is safe for use as a JS/TS identifier.
+ * Throws if the name contains characters that cannot produce a valid identifier.
+ */
+export function sanitizeIdentifier(name: string): string {
+  // Replace common non-identifier characters with underscores
+  let sanitized = name.replace(/[^a-zA-Z0-9_]/g, '_')
+  // Ensure it doesn't start with a digit
+  if (/^[0-9]/.test(sanitized)) {
+    sanitized = `_${sanitized}`
+  }
+  // Collapse multiple underscores
+  sanitized = sanitized.replace(/_+/g, '_').replace(/^_+|_+$/g, '') || '_'
+
+  if (!VALID_IDENTIFIER_RE.test(sanitized)) {
+    throw new Error(
+      `Cannot safely map name "${name}" to a valid identifier. Names must contain only letters, digits, and underscores.`
+    )
+  }
+
+  return sanitized
+}
+
+/**
+ * Validate that a name is safe for use as a file path segment.
+ * Rejects traversal sequences, slashes, and other dangerous characters.
+ */
+export function safeFileSegment(name: string): string {
+  if (
+    name.includes('/') ||
+    name.includes('\\') ||
+    name.includes('..') ||
+    name.includes('\0') ||
+    name.startsWith('.')
+  ) {
+    throw new Error(
+      `Unsafe file segment: "${name}". Names must not contain path separators, traversal sequences, or start with a dot.`
+    )
+  }
+
+  // Only allow alphanumeric, underscores, and hyphens in file segments
+  const sanitized = name.replace(/[^a-zA-Z0-9_-]/g, '_')
+  if (!sanitized) {
+    throw new Error(`Cannot safely map name "${name}" to a file path segment.`)
+  }
+
+  return sanitized
+}
+
+/**
+ * Emit safe property access for generated code.
+ * Uses dot notation for identifier-safe names, bracket notation otherwise.
+ */
+export function propAccess(obj: string, name: string): string {
+  if (VALID_IDENTIFIER_RE.test(name)) {
+    return `${obj}.${name}`
+  }
+  return `${obj}[${JSON.stringify(name)}]`
+}
+
+/**
+ * Validate all table and column names from OpenAPI definitions upfront.
+ * Throws a descriptive error if any name cannot be safely used.
+ */
+export function validateDefinitionNames(
+  definitions: Record<string, { properties?: Record<string, unknown> }>
+): void {
+  for (const [tableName, def] of Object.entries(definitions)) {
+    if (tableName.startsWith('_')) continue
+    // Validate table name can be used as identifier and file segment
+    sanitizeIdentifier(tableName)
+    safeFileSegment(tableName)
+
+    if (def.properties) {
+      for (const colName of Object.keys(def.properties)) {
+        // Validate column names can at minimum be used as quoted properties
+        if (colName.includes('\0') || colName.includes('\\')) {
+          throw new Error(
+            `Unsafe column name "${colName}" in table "${tableName}". Column names must not contain null bytes or backslashes.`
+          )
+        }
+      }
+    }
+  }
+}
+
 // Convert OpenAPI type to Zod type
 export function openApiTypeToZod(prop: OpenAPIProperty, isRequired: boolean): string {
   let zodType: string
@@ -11,7 +100,7 @@ export function openApiTypeToZod(prop: OpenAPIProperty, isRequired: boolean): st
       } else if (prop.format === 'date-time' || prop.format === 'timestamp with time zone') {
         zodType = 'z.string()'
       } else if (prop.enum && prop.enum.length > 0) {
-        const enumValues = prop.enum.map((e) => `'${e}'`).join(', ')
+        const enumValues = prop.enum.map((e) => `'${e.replace(/'/g, "\\'")}'`).join(', ')
         zodType = `z.enum([${enumValues}])`
       } else {
         zodType = 'z.string()'

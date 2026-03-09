@@ -47,8 +47,10 @@ export function ProjectPicker({ onProjectResolved }: ProjectPickerProps) {
       { enabled: isLoggedIn }
     )
   )
-  const projects =
-    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
+  const projects = useMemo(
+    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
+    [projectsData?.pages]
+  )
 
   const anyIsPending = organizationsIsPending || projectsIsPending
   const anyIsError = organizationsIsError || projectsIsError
@@ -134,7 +136,7 @@ export function ProjectPicker({ onProjectResolved }: ProjectPickerProps) {
       return
     }
 
-    const anonKey = apiKeysData.find((k) => k.type === 'legacy' && k.id === 'anon')?.api_key
+    const anonKey = apiKeysData.find((k) => k.type === 'legacy' && k.name === 'anon')?.api_key
 
     if (anonKey) {
       setMissingAnonKey(false)

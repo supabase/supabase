@@ -1,15 +1,13 @@
-import { toCamelCase, toPascalCase } from '../utils'
+import { safeFileSegment, sanitizeIdentifier, toPascalCase } from '../utils'
 
 // Generate page.tsx content
 export function generatePageContent(tableName: string): string {
-  const pascalName = toPascalCase(tableName)
-  const camelName = toCamelCase(tableName)
-  const collectionName = `${camelName}Collection`
+  const safeTableId = sanitizeIdentifier(tableName)
+  const pascalName = toPascalCase(safeTableId)
   const listComponentName = `${pascalName}List`
+  const safeTable = safeFileSegment(tableName)
 
-  return `import { ${collectionName} } from '@/lib/db'
-
-import { ${listComponentName} } from './${tableName}-list'
+  return `import { ${listComponentName} } from './${safeTable}-list'
 
 export default async function ${pascalName}Page() {
 

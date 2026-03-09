@@ -18,8 +18,8 @@ export function store(storageType: StorageType, key: LocalStorageKey, value: str
   }
 }
 
-export function retrieve(storageType: StorageType, key: LocalStorageKey) {
-  if (typeof window === 'undefined') return
+export function retrieve(storageType: StorageType, key: LocalStorageKey): string | null {
+  if (typeof window === 'undefined') return null
   const storage = getStorage(storageType)
   return storage.getItem(key as string)
 }

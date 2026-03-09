@@ -1,12 +1,20 @@
 import { OpenAPIDefinition } from '../types'
-import { findPrimaryKeys, toCamelCase, toPascalCase, toSingular } from '../utils'
+import {
+  findPrimaryKeys,
+  propAccess,
+  sanitizeIdentifier,
+  toCamelCase,
+  toPascalCase,
+  toSingular,
+} from '../utils'
 
 // Generate list component content
 export function generateListContent(tableName: string, definition: OpenAPIDefinition): string {
-  const pascalName = toPascalCase(tableName)
-  const singularName = toSingular(tableName)
+  const safeTableId = sanitizeIdentifier(tableName)
+  const pascalName = toPascalCase(safeTableId)
+  const singularName = toSingular(safeTableId)
   const singularPascal = toPascalCase(singularName)
-  const camelName = toCamelCase(tableName)
+  const camelName = toCamelCase(safeTableId)
   const collectionName = `${camelName}Collection`
   const listComponentName = `${pascalName}List`
   const sheetComponentName = `${singularPascal}Sheet`
@@ -25,17 +33,24 @@ export function generateListContent(tableName: string, definition: OpenAPIDefini
 
   // Get all fields for select
   const allFieldNames = Object.keys(properties)
-  const selectFields = allFieldNames.map((name) => `          ${name}: item.${name},`).join('\n')
+  const selectFields = allFieldNames
+    .map((name) => `          ${JSON.stringify(name)}: ${propAccess('item', name)},`)
+    .join('\n')
 
   // Determine if we have created_at for display
   const hasCreatedAt = properties['created_at'] !== undefined
 
+  // Pre-compute safe property access expressions for the template
+  const displayAccess = propAccess('item', displayField)
+  const primaryKeyAccess = propAccess('item', primaryKey)
+
   // Generate secondary info display
   let secondaryInfo = ''
   if (secondaryField) {
+    const secondaryAccess = propAccess('item', secondaryField)
     secondaryInfo = `
-                    {item.${secondaryField} && (
-                      <span className="truncate">{item.${secondaryField}}</span>
+                    {${secondaryAccess} && (
+                      <span className="truncate">{${secondaryAccess}}</span>
                     )}
                     ${hasCreatedAt ? `<span>•</span>` : ''}`
   }
@@ -56,11 +71,11 @@ export function ${listComponentName}() {
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<${pascalName} | null>(null)
 
-  const { data: items } = useLiveQuery(
+  const { data: items = [] } = useLiveQuery(
     (q) =>
       q
         .from({ item: ${collectionName} })
-        .orderBy(({ item }) => item.${displayField}, 'asc')
+        .orderBy(({ item }) => ${displayAccess}, 'asc')
         .select(({ item }) => ({
 ${selectFields}
         })),
@@ -105,7 +120,7 @@ ${selectFields}
                   'border border-border/50 bg-card shadow-sm',
                   'transition-all duration-150 hover:shadow-md hover:border-border'
                 )}
-                key={item.${primaryKey}}
+                key={${primaryKeyAccess}}
               >
                 <div className="flex items-center gap-4 flex-1 min-w-0">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-chart-1/20 to-chart-2/20 shrink-0">
@@ -113,7 +128,7 @@ ${selectFields}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">
-                      {item.${displayField} || 'Untitled'}
+                      {${displayAccess} || 'Untitled'}
                     </p>
                     <div className="flex items-center gap-3 text-muted-foreground text-xs">${secondaryInfo}${
                       hasCreatedAt
@@ -122,8 +137,8 @@ ${selectFields}
                         Created {new Date(item.created_at).toLocaleDateString()}
                       </span>`
                         : `
-                      <span className="font-mono truncate max-w-[120px]" title={item.${primaryKey}}>
-                        {item.${primaryKey}.slice(0, 8)}...
+                      <span className="font-mono truncate max-w-[120px]" title={${primaryKeyAccess}}>
+                        {${primaryKeyAccess}.slice(0, 8)}...
                       </span>`
                     }
                     </div>
@@ -141,7 +156,7 @@ ${selectFields}
                   </Button>
                   <Button
                     className="text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(item.${primaryKey})}
+                    onClick={() => handleDelete(${primaryKeyAccess})}
                     size="sm"
                     variant="ghost"
                   >
