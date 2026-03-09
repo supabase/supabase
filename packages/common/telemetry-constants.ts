@@ -2304,6 +2304,14 @@ export interface CommandMenuCommandClickedEvent {
      */
     search_query?: string
     /**
+     * Zero-based index of the clicked item across all visible results
+     */
+    result_index?: number
+    /**
+     * The path or URL the clicked item leads to (only present for route commands)
+     */
+    result_path?: string
+    /**
      * In which app the command input was typed
      */
     app: 'studio' | 'docs' | 'www'

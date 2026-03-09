@@ -47,12 +47,13 @@ data-[disabled=true]:opacity-50
 
 interface CommandItemProps extends React.ComponentPropsWithoutRef<typeof CommandItem_Shadcn_> {
   command: ICommand
+  commandIndex?: number
 }
 
 const CommandItem = forwardRef<
   React.ElementRef<typeof CommandItem_Shadcn_>,
   PropsWithChildren<CommandItemProps>
->(({ children, className, command: _command, ...props }, ref) => {
+>(({ children, className, command: _command, commandIndex, ...props }, ref) => {
   const router = useCrossCompatRouter()
   const setIsOpen = useSetCommandMenuOpen()
   const resetCommandMenu = useResetCommandMenu()
@@ -71,6 +72,8 @@ const CommandItem = forwardRef<
           command_value: command.value,
           command_type: isActionCommand(command) ? ('action' as const) : ('route' as const),
           search_query: query || undefined,
+          result_index: commandIndex,
+          result_path: isRouteCommand(command) ? command.route : undefined,
           app: telemetryContext.app,
         },
         groups: {},

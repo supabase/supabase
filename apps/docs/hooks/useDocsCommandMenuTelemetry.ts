@@ -18,10 +18,10 @@ export function useDocsCommandMenuTelemetry() {
   const onTelemetry = useCallback(
     (
       event:
-      | CommandMenuOpenedEvent
-      | CommandMenuClosedEvent
-      | CommandMenuCommandClickedEvent
-      | CommandMenuSearchSubmittedEvent
+        | CommandMenuOpenedEvent
+        | CommandMenuClosedEvent
+        | CommandMenuCommandClickedEvent
+        | CommandMenuSearchSubmittedEvent
     ) => {
       console.log('--- hasAcceptedConsent ---', hasAcceptedConsent)
       console.log('EVENT', event)
