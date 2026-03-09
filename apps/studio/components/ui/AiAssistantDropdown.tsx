@@ -23,8 +23,18 @@ import {
 type TelemetrySource = AiPromptCopiedEvent['properties']['source']
 
 const EXTERNAL_AI_TOOLS = [
-  { label: 'Open in ChatGPT', url: 'https://chatgpt.com/', promptParam: 'q' },
-  { label: 'Open in Claude.ai', url: 'https://claude.ai/new', promptParam: 'q' },
+  {
+    label: 'Open in ChatGPT',
+    url: 'https://chatgpt.com/',
+    promptParam: 'q',
+    icon: { light: '/img/mcp-clients/openai-icon.svg', dark: '/img/mcp-clients/openai-icon-dark.svg' },
+  },
+  {
+    label: 'Open in Claude.ai',
+    url: 'https://claude.ai/new',
+    promptParam: 'q',
+    icon: { light: '/img/mcp-clients/claude-icon.svg', dark: '/img/mcp-clients/claude-icon.svg' },
+  },
 ]
 
 export interface AiAssistantDropdownItem {
@@ -137,34 +147,21 @@ export function AiAssistantDropdown({
           {!disableExternalAI && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="gap-2"
-                onClick={() => handleOpenExternalAI(EXTERNAL_AI_TOOLS[0])}
-              >
-                <Image
-                  src={`${BASE_PATH}/img/mcp-clients/claude-icon.svg`}
-                  alt="Claude.ai"
-                  width={14}
-                  height={14}
-                />
-                {EXTERNAL_AI_TOOLS[0].label}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="gap-2"
-                onClick={() => handleOpenExternalAI(EXTERNAL_AI_TOOLS[1])}
-              >
-                <Image
-                  src={
-                    resolvedTheme?.includes('dark')
-                      ? `${BASE_PATH}/img/mcp-clients/openai-icon-dark.svg`
-                      : `${BASE_PATH}/img/mcp-clients/openai-icon.svg`
-                  }
-                  alt="ChatGPT"
-                  width={14}
-                  height={14}
-                />
-                {EXTERNAL_AI_TOOLS[1].label}
-              </DropdownMenuItem>
+              {EXTERNAL_AI_TOOLS.map((tool) => (
+                <DropdownMenuItem
+                  key={tool.url}
+                  className="gap-2"
+                  onClick={() => handleOpenExternalAI(tool)}
+                >
+                  <Image
+                    src={`${BASE_PATH}${resolvedTheme?.includes('dark') ? tool.icon.dark : tool.icon.light}`}
+                    alt={tool.label}
+                    width={14}
+                    height={14}
+                  />
+                  {tool.label}
+                </DropdownMenuItem>
+              ))}
             </>
           )}
           {additionalDropdownItems && additionalDropdownItems.length > 0 && (

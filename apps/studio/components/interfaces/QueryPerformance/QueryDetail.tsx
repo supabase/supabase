@@ -89,6 +89,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
             telemetrySource="query_performance"
             size="tiny"
             type="default"
+            disableExternalAI
           />
         </div>
         <div

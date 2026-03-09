@@ -68,6 +68,7 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
           buildPrompt={buildPromptForCopy}
           onOpenAssistant={handleAskAssistant}
           telemetrySource="lint_detail"
+          disableExternalAI
         />
         <LintCTA title={lint.name} projectRef={projectRef} metadata={lint.metadata} />
         <Button asChild type="text">

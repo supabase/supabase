@@ -82,6 +82,7 @@ export function MultiSelectActionBar({
           label="Explain with AI"
           buildPrompt={() => buildLogsPrompt(selectedRowsData, queryType, sqlQuery)}
           onOpenAssistant={handleOpenAiAssistant}
+          disableExternalAI
         />
 
         <Button

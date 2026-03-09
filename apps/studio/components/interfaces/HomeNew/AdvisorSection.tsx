@@ -141,6 +141,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                         telemetrySource="advisor_section"
                         type="text"
                         className="w-7 h-7"
+                        disableExternalAI
                       />
                     </div>
                   </CardHeader>

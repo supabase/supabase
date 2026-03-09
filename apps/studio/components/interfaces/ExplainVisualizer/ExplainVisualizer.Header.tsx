@@ -130,6 +130,7 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
               telemetrySource="explain_visualizer"
               size="tiny"
               type="default"
+              disableExternalAI
             />
           )}
           <Button
