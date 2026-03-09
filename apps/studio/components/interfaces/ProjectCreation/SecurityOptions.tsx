@@ -77,8 +77,8 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
                     Enable automatic RLS
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    Create an event trigger that automatically enables Row Level Security on all
-                    new tables in the public schema.
+                    Create an event trigger that automatically enables Row Level Security on all new
+                    tables in the public schema.
                   </FormDescription_Shadcn_>
                 </div>
               </FormItem_Shadcn_>
