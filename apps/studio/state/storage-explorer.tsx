@@ -81,11 +81,13 @@ if (typeof window !== 'undefined') {
 function createStorageExplorerState({
   projectRef,
   connectionString,
+  bucket,
   resumableUploadUrl,
   clientEndpoint,
 }: {
   projectRef: string
   connectionString: string
+  bucket?: Bucket
   resumableUploadUrl: string
   clientEndpoint: string
 }) {
@@ -99,6 +101,7 @@ function createStorageExplorerState({
     connectionString,
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
+    selectedBucket: bucket as Bucket,
 
     abortApiCalls: () => {
       if (abortController) {
@@ -157,14 +160,6 @@ function createStorageExplorerState({
     selectedItemsToMove: [] as StorageItemWithColumn[],
     setSelectedItemsToMove: (items: StorageItemWithColumn[]) => {
       state.selectedItemsToMove = items
-    },
-
-    selectedBucket: {} as Bucket,
-    setSelectedBucket: (bucket: Bucket) => {
-      state.selectedBucket = bucket
-      state.setSelectedFilePreview(undefined)
-      state.clearOpenedFolders()
-      state.clearSelectedItems()
     },
 
     setSelectedItemToRename: (file: { name: string; columnIndex: number }) => {
@@ -1853,6 +1848,7 @@ const DEFAULT_STATE_CONFIG = {
   connectionString: '',
   resumableUploadUrl: '',
   clientEndpoint: '',
+  bucket: {} as Bucket,
 }
 
 const StorageExplorerStateContext = createContext<StorageExplorerState>(
@@ -1861,6 +1857,7 @@ const StorageExplorerStateContext = createContext<StorageExplorerState>(
 
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
+  const { data: bucket } = useSelectedBucket()
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
@@ -1878,16 +1875,18 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   // So the useEffect here is to make sure that the project ref is loaded into the state properly
   // Although I'd be keen to re-investigate this to see if we can remove this
   useEffect(() => {
-    const hasDataReady = !!project?.ref
+    const hasDataReady = !!project && !!bucket
     const storeAlreadyLoaded = state.projectRef === project?.ref
 
     if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
       const clientEndpoint = storageEndpoint ?? hostEndpoint ?? ''
       const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
+
       setState(
         createStorageExplorerState({
-          projectRef: project?.ref ?? '',
+          projectRef: project.ref,
           connectionString: project.connectionString ?? '',
+          bucket,
           resumableUploadUrl,
           clientEndpoint,
         })
@@ -1895,13 +1894,13 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     }
   }, [
     state.projectRef,
-    project?.ref,
-    project?.connectionString,
+    project,
     stateRef,
     isPaused,
     hostEndpoint,
     storageEndpoint,
     isSuccessSettings,
+    bucket,
   ])
 
   return (
