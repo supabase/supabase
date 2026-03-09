@@ -1,6 +1,7 @@
 'use client'
 
 import type {
+  CommandMenuClosedEvent,
   CommandMenuCommandClickedEvent,
   CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
@@ -11,7 +12,11 @@ import { useCommandMenuTelemetryContext } from './useCommandMenuTelemetryContext
 import { useCommandMenuOpen } from './viewHooks'
 
 export type CommandMenuTelemetryCallback = (
-  event: CommandMenuOpenedEvent | CommandMenuCommandClickedEvent | CommandMenuSearchSubmittedEvent
+  event:
+    | CommandMenuOpenedEvent
+    | CommandMenuClosedEvent
+    | CommandMenuCommandClickedEvent
+    | CommandMenuSearchSubmittedEvent
 ) => void
 
 export interface UseCommandMenuTelemetryOptions {

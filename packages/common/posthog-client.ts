@@ -304,6 +304,25 @@ class PostHogClient {
     }
   }
 
+  capture(event: string, properties?: Record<string, any>, hasConsent: boolean = true) {
+    if (!hasConsent) return
+
+    if (!this.initialized) {
+      if (this.pendingEvents.length >= this.maxPendingEvents) {
+        this.pendingEvents.shift()
+      }
+      this.pendingEvents.push({ event, properties: properties ?? {} })
+      return
+    }
+
+    try {
+      posthog.capture(event, properties)
+      this.emitToDevListeners('capture', event, properties)
+    } catch (error) {
+      console.error('PostHog capture failed:', error)
+    }
+  }
+
   subscribeToEvents(listener: ClientTelemetryListener): () => void {
     this.devListeners.add(listener)
     return () => this.devListeners.delete(listener)

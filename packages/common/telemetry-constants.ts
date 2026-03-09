@@ -2300,7 +2300,29 @@ export interface CommandMenuCommandClickedEvent {
     command_value?: string
     command_type: 'action' | 'route'
     /**
+     * The search query that was active when the command was clicked
+     */
+    search_query?: string
+    /**
      * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User closed the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuClosedEvent {
+  action: 'command_menu_closed'
+  properties: {
+    /**
+     * In which app the command menu was closed
      */
     app: 'studio' | 'docs' | 'www'
   }
@@ -2823,6 +2845,7 @@ export type TelemetryEvent =
   | TableCreateGeneratePoliciesExperimentConvertedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
+  | CommandMenuClosedEvent
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent
