@@ -60,7 +60,7 @@ const StripeFabricLoginPage = () => {
   }, [router.isReady, ar_id, router])
 
   const handleApprove = async (organizationId?: number) => {
-    if (!ar_id) return
+    if (!ar_id || isConfirming) return
     confirmAccountRequest({ arId: ar_id, organizationId })
   }
 
@@ -137,7 +137,7 @@ const StripeFabricLoginPage = () => {
                   Stripe account. Approve to continue.
                 </p>
                 <div className="py-6">
-                  <Button size="large" type="primary" onClick={() => handleApprove()}>
+                  <Button size="large" type="primary" disabled={isConfirming} onClick={() => handleApprove()}>
                     Approve
                   </Button>
                 </div>
@@ -149,7 +149,7 @@ const StripeFabricLoginPage = () => {
                   A new Supabase organization will be created and linked to your Stripe account.
                 </p>
                 <div className="py-6">
-                  <Button size="large" type="primary" onClick={() => handleApprove()}>
+                  <Button size="large" type="primary" disabled={isConfirming} onClick={() => handleApprove()}>
                     Approve
                   </Button>
                 </div>
@@ -165,6 +165,7 @@ const StripeFabricLoginPage = () => {
                   <Button
                     size="large"
                     type="primary"
+                    disabled={isConfirming}
                     onClick={() => handleApprove(userOrgs[0].id)}
                   >
                     Approve
@@ -205,7 +206,7 @@ const StripeFabricLoginPage = () => {
                   Link <strong>{selectedOrg!.name}</strong> to your Stripe account?
                 </p>
                 <div className="py-6 flex flex-col items-center gap-3">
-                  <Button size="large" type="primary" onClick={() => handleApprove(selectedOrg!.id)}>
+                  <Button size="large" type="primary" disabled={isConfirming} onClick={() => handleApprove(selectedOrg!.id)}>
                     Approve
                   </Button>
                   <button
