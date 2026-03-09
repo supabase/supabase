@@ -27,7 +27,10 @@ const EXTERNAL_AI_TOOLS = [
     label: 'Open in ChatGPT',
     url: 'https://chatgpt.com/',
     promptParam: 'q',
-    icon: { light: '/img/mcp-clients/openai-icon.svg', dark: '/img/mcp-clients/openai-icon-dark.svg' },
+    icon: {
+      light: '/img/mcp-clients/openai-icon.svg',
+      dark: '/img/mcp-clients/openai-icon-dark.svg',
+    },
   },
   {
     label: 'Open in Claude.ai',
