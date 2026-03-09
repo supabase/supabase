@@ -7,6 +7,7 @@ import { ResourceItem } from 'components/ui/Resource/ResourceItem'
 import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useHasEntitlementAccess } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { Check } from 'lucide-react'
@@ -67,7 +68,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     )
   }
 
-  const isFreePlan = organization?.plan.id === 'free'
+  const hasEntitlementAccess = useHasEntitlementAccess()
 
   const INITIAL_VALUES = (() => {
     const initialValues: { [x: string]: string | boolean } = {}
@@ -201,18 +202,17 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                           )
                         }
 
+                        const { entitlementKey } = provider.properties[x]
+                        const hasAccess =
+                          entitlementKey == null || hasEntitlementAccess(entitlementKey)
                         const properties = {
                           ...provider.properties[x],
-                          description:
-                            provider.properties[x].isPaid && isFreePlan
-                              ? `${description} Only available on [Pro plan](/org/${organization.slug}/billing?panel=subscriptionPlan) and above.`
-                              : description,
+                          description: hasAccess
+                            ? description
+                            : `${description} Only available on [Pro plan](/org/${organization?.slug}/billing?panel=subscriptionPlan) and above.`,
                         }
-                        const isDisabledDueToPlan = properties.isPaid && isFreePlan
                         const shouldDisable =
-                          properties.type === 'boolean'
-                            ? isDisabledDueToPlan && !values[x]
-                            : isDisabledDueToPlan
+                          properties.type === 'boolean' ? !hasAccess && !values[x] : !hasAccess
 
                         return (
                           <FormField

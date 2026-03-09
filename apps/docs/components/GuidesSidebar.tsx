@@ -63,7 +63,7 @@ function AiTools({ className }: { className?: string }) {
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >
-          <Chatgpt size={14} strokeWidth={0} />
+          <Chatgpt size={14} />
           Ask ChatGPT
         </a>
         <a
@@ -72,7 +72,7 @@ function AiTools({ className }: { className?: string }) {
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >
-          <Claude size={14} strokeWidth={0} />
+          <Claude size={14} />
           Ask Claude
         </a>
       </div>
