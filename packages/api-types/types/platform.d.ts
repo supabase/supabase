@@ -4645,8 +4645,14 @@ export interface components {
     }
     AccountRequestDetailsDto: {
       email: string
+      email_matches: boolean
       expires_at: string
       id: string
+      linked_organization?: {
+        id: number
+        name: string
+        slug: string
+      }
       name?: string
       orchestrator: {
         stripe?: {
@@ -4658,6 +4664,11 @@ export interface components {
       scopes?: string[]
       /** @enum {string} */
       status: 'pending' | 'complete' | 'expired'
+      user_organizations?: {
+        id: number
+        name: string
+        slug: string
+      }[]
     }
     AddAwsAccountToPrivateLinkBody: {
       account_name?: string
@@ -4839,6 +4850,9 @@ export interface components {
       name: string
       payment_intent_id: string
       size?: string
+    }
+    ConfirmRequestDto: {
+      organization_id?: number
     }
     ConfirmResponseDto: {
       organization_slug: string
@@ -7204,6 +7218,7 @@ export interface components {
             | 'auth.leaked_password_protection'
             | 'auth.advanced_auth_settings'
             | 'auth.performance_settings'
+            | 'auth.password_hibp'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
             | 'function.max_count'
@@ -17241,6 +17256,7 @@ export interface operations {
           | 'auth.leaked_password_protection'
           | 'auth.advanced_auth_settings'
           | 'auth.performance_settings'
+          | 'auth.password_hibp'
           | 'backup.retention_days'
           | 'backup.restore_to_new_project'
           | 'function.max_count'
@@ -26442,7 +26458,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ConfirmRequestDto']
+      }
+    }
     responses: {
       200: {
         headers: {
@@ -26517,13 +26537,6 @@ export interface operations {
     }
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to send analytics server event */
-      500: {
         headers: {
           [name: string]: unknown
         }
