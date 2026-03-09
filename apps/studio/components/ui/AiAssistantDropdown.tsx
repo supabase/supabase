@@ -1,6 +1,9 @@
 import { AiPromptCopiedEvent } from 'common/telemetry-constants'
 import { useTrack } from 'lib/telemetry/track'
+import { BASE_PATH } from 'lib/constants'
 import { Check, ChevronDown, Copy } from 'lucide-react'
+import Image from 'next/image'
+import { useTheme } from 'next-themes'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import {
   AiIconAnimation,
@@ -18,6 +21,11 @@ import {
 } from 'ui'
 
 type TelemetrySource = AiPromptCopiedEvent['properties']['source']
+
+const EXTERNAL_AI_TOOLS = [
+  { label: 'Open in Claude.ai', url: 'https://claude.ai/new', promptParam: 'q' },
+  { label: 'Open in ChatGPT', url: 'https://chatgpt.com/', promptParam: 'q' },
+]
 
 export interface AiAssistantDropdownItem {
   label: string
@@ -38,6 +46,7 @@ export interface AiAssistantDropdownProps {
   className?: string
   tooltip?: string
   copyLabel?: string
+  disableExternalAI?: boolean
   extraDropdownItems?: ReactNode
   additionalDropdownItems?: AiAssistantDropdownItem[]
 }
@@ -55,10 +64,12 @@ export function AiAssistantDropdown({
   className,
   tooltip,
   copyLabel = 'Copy prompt',
+  disableExternalAI = false,
   extraDropdownItems,
   additionalDropdownItems,
 }: AiAssistantDropdownProps) {
   const track = useTrack()
+  const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -77,6 +88,15 @@ export function AiAssistantDropdown({
     if (telemetrySource) {
       track('ai_prompt_copied', { source: telemetrySource })
     }
+  }
+
+  const handleOpenExternalAI = (tool: (typeof EXTERNAL_AI_TOOLS)[number]) => {
+    const prompt = buildPrompt()
+    window.open(
+      `${tool.url}?${tool.promptParam}=${encodeURIComponent(prompt)}`,
+      '_blank',
+      'noreferrer'
+    )
   }
 
   const handleOpenAssistant = () => {
@@ -114,6 +134,39 @@ export function AiAssistantDropdown({
             {showCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
             {showCopied ? 'Copied!' : copyLabel}
           </DropdownMenuItem>
+          {!disableExternalAI && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="gap-2"
+                onClick={() => handleOpenExternalAI(EXTERNAL_AI_TOOLS[0])}
+              >
+                <Image
+                  src={`${BASE_PATH}/img/mcp-clients/claude-icon.svg`}
+                  alt="Claude.ai"
+                  width={14}
+                  height={14}
+                />
+                {EXTERNAL_AI_TOOLS[0].label}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="gap-2"
+                onClick={() => handleOpenExternalAI(EXTERNAL_AI_TOOLS[1])}
+              >
+                <Image
+                  src={
+                    resolvedTheme?.includes('dark')
+                      ? `${BASE_PATH}/img/mcp-clients/openai-icon-dark.svg`
+                      : `${BASE_PATH}/img/mcp-clients/openai-icon.svg`
+                  }
+                  alt="ChatGPT"
+                  width={14}
+                  height={14}
+                />
+                {EXTERNAL_AI_TOOLS[1].label}
+              </DropdownMenuItem>
+            </>
+          )}
           {additionalDropdownItems && additionalDropdownItems.length > 0 && (
             <>
               <DropdownMenuSeparator />
