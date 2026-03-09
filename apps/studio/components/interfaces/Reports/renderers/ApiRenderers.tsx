@@ -24,7 +24,7 @@ import { BASE_PATH } from 'lib/constants'
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import type { ResponseError } from 'types'
 import {
@@ -410,6 +410,7 @@ export const RequestsByCountryMapRenderer = (
 ) => {
   const WORLD_TOPO_URL = `${BASE_PATH}/json/worldmap.json`
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const [isVisible, setIsVisible] = useState(false)
   const [hoverInfo, setHoverInfo] = useState<{
     x: number
     y: number
@@ -423,6 +424,33 @@ export const RequestsByCountryMapRenderer = (
   const { resolvedTheme } = useTheme()
   const theme = resolvedTheme === 'dark' ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
 
+  // Lazy load the map when it becomes visible
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true)
+            // Once visible, we can stop observing
+            observer.disconnect()
+          }
+        })
+      },
+      {
+        rootMargin: '100px', // Start loading 100px before the map comes into view
+        threshold: 0,
+      }
+    )
+
+    observer.observe(containerRef.current)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
+
   if (!!props.error) {
     const AlertErrorSchema = z.object({ message: z.string() })
     const parsed =
@@ -435,7 +463,12 @@ export const RequestsByCountryMapRenderer = (
 
   return (
     <div ref={containerRef} className="w-full h-[420px] relative border-t">
-      <ComposableMap
+      {!isVisible ? (
+        <div className="w-full h-full flex items-center justify-center text-foreground-lighter">
+          <div className="text-sm">Loading map...</div>
+        </div>
+      ) : (
+        <ComposableMap
         projection="geoMercator"
         projectionConfig={{ scale: 155 }}
         className="w-full h-full"
@@ -634,7 +667,8 @@ export const RequestsByCountryMapRenderer = (
           </Geographies>
         </ZoomableGroup>
       </ComposableMap>
-      {hoverInfo.visible && (
+      )}
+      {isVisible && hoverInfo.visible && (
         <div
           className="pointer-events-none absolute z-10 rounded bg-surface-100 p-1.5 border border-surface-200 text-sm"
           style={{ left: hoverInfo.x, top: hoverInfo.y }}
