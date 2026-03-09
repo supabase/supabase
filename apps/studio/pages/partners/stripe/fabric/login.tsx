@@ -81,7 +81,11 @@ const StripeFabricLoginPage = () => {
     : isLinking
       ? 'Linking your organization...'
       : 'Setting up your organization...'
-  const successTitle = isReauth ? 'Authorization Complete' : isLinking ? 'Organization Linked' : 'Organization Created'
+  const successTitle = isReauth
+    ? 'Authorization Complete'
+    : isLinking
+      ? 'Organization Linked'
+      : 'Organization Created'
   const successDescription = isReauth
     ? `Your Stripe account is connected to ${linkedOrg?.name}.`
     : isLinking
@@ -137,7 +141,12 @@ const StripeFabricLoginPage = () => {
                   Stripe account. Approve to continue.
                 </p>
                 <div className="py-6">
-                  <Button size="large" type="primary" disabled={isConfirming} onClick={() => handleApprove()}>
+                  <Button
+                    size="large"
+                    type="primary"
+                    disabled={isConfirming}
+                    onClick={() => handleApprove()}
+                  >
                     Approve
                   </Button>
                 </div>
@@ -149,7 +158,12 @@ const StripeFabricLoginPage = () => {
                   A new Supabase organization will be created and linked to your Stripe account.
                 </p>
                 <div className="py-6">
-                  <Button size="large" type="primary" disabled={isConfirming} onClick={() => handleApprove()}>
+                  <Button
+                    size="large"
+                    type="primary"
+                    disabled={isConfirming}
+                    onClick={() => handleApprove()}
+                  >
                     Approve
                   </Button>
                 </div>
@@ -206,7 +220,12 @@ const StripeFabricLoginPage = () => {
                   Link <strong>{selectedOrg!.name}</strong> to your Stripe account?
                 </p>
                 <div className="py-6 flex flex-col items-center gap-3">
-                  <Button size="large" type="primary" disabled={isConfirming} onClick={() => handleApprove(selectedOrg!.id)}>
+                  <Button
+                    size="large"
+                    type="primary"
+                    disabled={isConfirming}
+                    onClick={() => handleApprove(selectedOrg!.id)}
+                  >
                     Approve
                   </Button>
                   <button
