@@ -93,47 +93,6 @@ export type Database = {
           },
         ]
       }
-      item_files: {
-        Row: {
-          alt_text: string | null
-          created_at: string
-          featured: boolean
-          file_path: string
-          id: number
-          item_id: number
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          alt_text?: string | null
-          created_at?: string
-          featured?: boolean
-          file_path: string
-          id?: never
-          item_id: number
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          alt_text?: string | null
-          created_at?: string
-          featured?: boolean
-          file_path?: string
-          id?: never
-          item_id?: number
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'item_files_item_id_fkey'
-            columns: ['item_id']
-            isOneToOne: false
-            referencedRelation: 'items'
-            referencedColumns: ['id']
-          },
-        ]
-      }
       item_reviews: {
         Row: {
           created_at: string
@@ -183,6 +142,7 @@ export type Database = {
           content: string | null
           created_at: string
           documentation_url: string | null
+          files: string[]
           id: number
           partner_id: number
           published: boolean
@@ -199,6 +159,7 @@ export type Database = {
           content?: string | null
           created_at?: string
           documentation_url?: string | null
+          files?: string[]
           id?: never
           partner_id: number
           published?: boolean
@@ -215,6 +176,7 @@ export type Database = {
           content?: string | null
           created_at?: string
           documentation_url?: string | null
+          files?: string[]
           id?: never
           partner_id?: number
           published?: boolean
@@ -329,6 +291,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      before_user_created_hook: { Args: { event: Json }; Returns: Json }
       is_admin_member: { Args: never; Returns: boolean }
       is_partner_admin: {
         Args: { target_partner_id: number }

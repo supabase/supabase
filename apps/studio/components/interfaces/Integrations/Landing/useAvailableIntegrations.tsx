@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
 import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -5,7 +6,7 @@ import { useContext, useMemo } from 'react'
 import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
-import { useMarketplaceIntegrationsQuery } from '@/data/marketplace/integrations-query'
+import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 /**
@@ -18,7 +19,10 @@ export const useAvailableIntegrations = () => {
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
-  const { data, error } = useMarketplaceIntegrationsQuery({ enabled: isMarketplaceEnabled })
+  const { data, error } = useQuery({
+    ...marketplaceIntegrationsQueryOptions(),
+    enabled: isMarketplaceEnabled,
+  })
   const isPending = !hasLoaded ? true : isMarketplaceEnabled ? !data && !error : false
   const isSuccess = isMarketplaceEnabled ? !!data && !error : true
   const isError = isMarketplaceEnabled ? !!error : false
@@ -29,11 +33,13 @@ export const useAvailableIntegrations = () => {
     const {
       id,
       type,
+      categories,
       title: name,
       summary: description,
       documentation_url: docsUrl,
       url: siteUrl,
       content,
+      files,
     } = integration
 
     const status = undefined
@@ -41,10 +47,12 @@ export const useAvailableIntegrations = () => {
 
     return {
       id: id.toString(),
-      type,
       name,
       status,
+      type,
+      categories: categories.map((x) => x.slug),
       content,
+      files,
       description,
       docsUrl,
       siteUrl,
@@ -65,7 +73,7 @@ export const useAvailableIntegrations = () => {
             return dynamic(
               () =>
                 import(
-                  'components/interfaces/Integrations/Integration/IntegrationOverviewTabV2'
+                  'components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index'
                 ).then((mod) => mod.IntegrationOverviewTabV2),
               {
                 loading: Loading,

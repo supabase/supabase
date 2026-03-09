@@ -28,9 +28,11 @@ export type IntegrationDefinition = {
   id: string
   name: string
   status?: 'alpha' | 'beta'
+  categories?: string[]
   icon: (props?: { className?: string; style?: Record<string, any> }) => ReactNode
   description: string | null
   content?: string | null
+  files?: string[]
   docsUrl: string | null
   siteUrl?: string | null
   author: {
@@ -46,13 +48,7 @@ export type IntegrationDefinition = {
     pageId: string | undefined,
     childId: string | undefined
   ) => ComponentType<{}> | null
-} & (
-  | { type: 'wrapper'; meta: WrapperMeta }
-  | { type: 'postgres_extension' }
-  | { type: 'custom' }
-  | { type: 'oauth' }
-  | { type: 'template' }
-)
+} & ({ type: 'wrapper'; meta: WrapperMeta } | { type: string })
 
 const authorSupabase = {
   name: 'Supabase',

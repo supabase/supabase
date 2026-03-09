@@ -4,22 +4,20 @@ import { handleError } from 'data/fetchers'
 import { marketplaceIntegrationsKeys } from './keys'
 import { createMarketplaceClient } from './marketplace-client'
 
-async function getMarketplaceIntegrations() {
+async function getMarketplaceCategories() {
   const client = createMarketplaceClient()
-  const { data, error } = await client
-    .from('items')
-    .select('*, categories:category_items(...categories(slug, title))')
+  const { data, error } = await client.from('categories').select('*')
 
   if (error) handleError(error)
   return data ?? []
 }
 
-export const marketplaceIntegrationsQueryOptions = ({
+export const marketplaceCategoriesQueryOptions = ({
   enabled = true,
 }: { enabled?: boolean } = {}) => {
   return queryOptions({
-    queryKey: marketplaceIntegrationsKeys.list(),
-    queryFn: () => getMarketplaceIntegrations(),
+    queryKey: marketplaceIntegrationsKeys.categories(),
+    queryFn: () => getMarketplaceCategories(),
     enabled,
   })
 }

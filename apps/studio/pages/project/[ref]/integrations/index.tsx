@@ -82,7 +82,9 @@ const IntegrationsPage: NextPageWithLayout = () => {
     let filtered = availableIntegrations ?? []
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter((i) => i.type === selectedCategory)
+      filtered = filtered.filter(
+        (i) => i.type === selectedCategory || i.categories?.includes(selectedCategory)
+      )
     }
 
     if (search.length > 0) {

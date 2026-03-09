@@ -1,7 +1,9 @@
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
+import { cn } from 'ui'
 
-import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
+import { useAvailableIntegrations } from '../../Landing/useAvailableIntegrations'
+import { FilesViewer } from './FilesViewer'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 
 /**
@@ -17,7 +19,7 @@ export const IntegrationOverviewTabV2 = () => {
     return <div>Unsupported integration type</div>
   }
 
-  const { type, content, docsUrl, siteUrl } = integration
+  const { type, content, docsUrl, siteUrl, files = [] } = integration
 
   const docsUrlLabel = docsUrl?.includes('supabase.com/docs')
     ? 'Supabase Docs'
@@ -28,8 +30,9 @@ export const IntegrationOverviewTabV2 = () => {
 
   return (
     <div className="grid grid-cols-3 gap-x-8 px-10 py-8">
-      <div className="col-span-2 flex-grow">
-        <Markdown className="flex flex-col gap-y-2">{content}</Markdown>
+      <div className="col-span-2 flex-grow flex flex-col gap-y-8">
+        {files.length > 0 && <FilesViewer files={files} />}
+        <Markdown className="flex flex-col gap-y-4 text-foreground-light">{content}</Markdown>
       </div>
 
       <div className="text-sm col-span-1 flex flex-col gap-y-8">
@@ -43,7 +46,9 @@ export const IntegrationOverviewTabV2 = () => {
 
           <div className="flex flex-col gap-y-1">
             <p className="font-mono uppercase text-foreground-light">Built by</p>
-            <p>{integration.author.name || 'Unknown Author'}</p>
+            <p className={cn(!integration.author.name && 'text-foreground-lighter')}>
+              {integration.author.name || 'Unknown Author'}
+            </p>
           </div>
 
           {docsUrl && (
