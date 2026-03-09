@@ -17,6 +17,29 @@ interface ObservabilityLayoutProps {
   title?: string
 }
 
+const OBSERVABILITY_SECTION_TITLE_BY_ROUTE: Record<string, string> = {
+  'api-overview': 'API Gateway',
+  auth: 'Auth',
+  database: 'Database',
+  'edge-functions': 'Edge Functions',
+  postgrest: 'PostgREST',
+  'query-performance': 'Query Performance',
+  realtime: 'Realtime',
+  storage: 'Storage',
+}
+
+const getObservabilitySectionTitle = (pathname: string | null, title?: string) => {
+  if (title !== undefined) return title
+  if (!pathname) return undefined
+
+  const segments = pathname.split('/').filter(Boolean)
+  const page = segments[3]
+
+  if (page === undefined) return 'Overview'
+
+  return OBSERVABILITY_SECTION_TITLE_BY_ROUTE[page] ?? 'Report'
+}
+
 const ObservabilityLayoutContent = ({
   title,
   children,
@@ -81,11 +104,12 @@ const ObservabilityLayoutContent = ({
   ])
 
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
+  const resolvedTitle = getObservabilitySectionTitle(pathname, title)
 
   if (reportsAll) {
     return (
       <ProjectLayout
-        title={title}
+        title={resolvedTitle}
         product="Observability"
         productMenu={<ObservabilityMenu />}
         isBlocking={false}
