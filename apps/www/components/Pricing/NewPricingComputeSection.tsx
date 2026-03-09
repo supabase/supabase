@@ -107,8 +107,7 @@ const NewPricingComputeSection = () => {
             2. Configure compute for your projects
           </h3>
           <p className="text-foreground-lighter text-xs mb-6">
-            Paid plans can have unlimited projects. Pay only for compute usage (from{' '}
-            <span translate="no">$10</span>/month for Micro).
+            Add projects and adjust compute to estimate your monthly cost.
           </p>
 
           <NewComputePricingCalculator activePlan={activePlan} />
