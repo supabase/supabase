@@ -11,7 +11,9 @@ export const ERROR_CODE_DOCS_URLS: Record<ErrorCodeService, string> = {
   realtime: 'https://supabase.com/docs/guides/realtime/reports',
 }
 
-export const HTTP_ERROR_CODES: Partial<Record<ErrorCodeService, Record<number, { description: string }>>> = {
+export const HTTP_ERROR_CODES: Partial<
+  Record<ErrorCodeService, Record<number, { description: string }>>
+> = {
   auth: {
     403: {
       description:
@@ -89,8 +91,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
       description: 'Email address already exists in the system.',
     },
     email_not_confirmed: {
-      description:
-        'Signing in is not allowed for this user as the email address is not confirmed.',
+      description: 'Signing in is not allowed for this user as the email address is not confirmed.',
     },
     email_provider_disabled: {
       description: 'Signups are disabled for email and password.',
@@ -160,15 +161,13 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
       description: 'Enrollment of MFA Phone factors is disabled.',
     },
     mfa_phone_verify_not_enabled: {
-      description:
-        'Login via Phone factors and verification of new Phone factors is disabled.',
+      description: 'Login via Phone factors and verification of new Phone factors is disabled.',
     },
     mfa_totp_enroll_not_enabled: {
       description: 'Enrollment of MFA TOTP factors is disabled.',
     },
     mfa_totp_verify_not_enabled: {
-      description:
-        'Login via TOTP factors and verification of new TOTP factors is disabled.',
+      description: 'Login via TOTP factors and verification of new TOTP factors is disabled.',
     },
     mfa_verification_failed: {
       description: 'MFA challenge could not be verified -- wrong TOTP code.',
@@ -195,8 +194,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
         'Login via WebAuthn factors and verification of new WebAuthn factors is disabled.',
     },
     no_authorization: {
-      description:
-        'This HTTP request requires an Authorization header, which is not provided.',
+      description: 'This HTTP request requires an Authorization header, which is not provided.',
     },
     not_admin: {
       description:
@@ -207,11 +205,10 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
     },
     otp_disabled: {
       description:
-        'Sign in with OTPs (magic link, email OTP) is disabled. Check your server\'s configuration.',
+        "Sign in with OTPs (magic link, email OTP) is disabled. Check your server's configuration.",
     },
     otp_expired: {
-      description:
-        'OTP code for this sign-in has expired. Ask the user to sign in again.',
+      description: 'OTP code for this sign-in has expired. Ask the user to sign in again.',
     },
     over_email_send_rate_limit: {
       description:
@@ -235,15 +232,13 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
       description: 'Phone number already exists in the system.',
     },
     phone_not_confirmed: {
-      description:
-        'Signing in is not allowed for this user as the phone number is not confirmed.',
+      description: 'Signing in is not allowed for this user as the phone number is not confirmed.',
     },
     phone_provider_disabled: {
       description: 'Signups are disabled for phone and password.',
     },
     provider_disabled: {
-      description:
-        "OAuth provider is disabled for use. Check your server's configuration.",
+      description: "OAuth provider is disabled for use. Check your server's configuration.",
     },
     provider_email_needs_verification: {
       description:
@@ -301,8 +296,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
         '(Admin API.) Adding or updating a SAML provider failed as its metadata could not be fetched from the provided URL.',
     },
     saml_provider_disabled: {
-      description:
-        'Using Enterprise SSO with SAML 2.0 is not enabled on the Auth server.',
+      description: 'Using Enterprise SSO with SAML 2.0 is not enabled on the Auth server.',
       references: [
         {
           href: 'https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml',
@@ -340,16 +334,13 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
         "Every user must have at least one identity attached to it, so deleting (unlinking) an identity is not allowed if it's the only one for the user.",
     },
     sms_send_failed: {
-      description:
-        'Sending an SMS message failed. Check your SMS provider configuration.',
+      description: 'Sending an SMS message failed. Check your SMS provider configuration.',
     },
     sso_domain_already_exists: {
-      description:
-        '(Admin API.) Only one SSO domain can be registered per SSO identity provider.',
+      description: '(Admin API.) Only one SSO domain can be registered per SSO identity provider.',
     },
     sso_provider_not_found: {
-      description:
-        'SSO provider not found. Check the arguments in supabase.auth.signInWithSSO().',
+      description: 'SSO provider not found. Check the arguments in supabase.auth.signInWithSSO().',
     },
     too_many_enrolled_mfa_factors: {
       description: 'A user can only have a fixed number of enrolled MFA factors.',
@@ -359,8 +350,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
         "(Deprecated feature not available via Supabase client libraries.) The request's X-JWT-AUD claim does not match the JWT's audience.",
     },
     unexpected_failure: {
-      description:
-        'Auth service is degraded or a bug is present, without a specific reason.',
+      description: 'Auth service is degraded or a bug is present, without a specific reason.',
     },
     user_already_exists: {
       description:
@@ -435,8 +425,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
       description: 'The number of connected clients has reached its limit.',
     },
     ClientJoinRateLimitReached: {
-      description:
-        'The rate of joins per second from your clients has reached the channel limits.',
+      description: 'The rate of joins per second from your clients has reached the channel limits.',
     },
     RealtimeDisabledForTenant: {
       description: 'Realtime has been disabled for the tenant.',
@@ -514,31 +503,25 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
       description: 'Error when trying to delete a subscription for postgres changes.',
     },
     UnableToDeletePhantomSubscriptions: {
-      description:
-        'Error when trying to delete subscriptions that are no longer being used.',
+      description: 'Error when trying to delete subscriptions that are no longer being used.',
     },
     UnableToCheckProcessesOnRemoteNode: {
       description: 'Error when trying to check the processes on a remote node.',
     },
     UnableToCreateCounter: {
-      description:
-        'Error when trying to create a counter to track rate limits for a tenant.',
+      description: 'Error when trying to create a counter to track rate limits for a tenant.',
     },
     UnableToIncrementCounter: {
-      description:
-        'Error when trying to increment a counter to track rate limits for a tenant.',
+      description: 'Error when trying to increment a counter to track rate limits for a tenant.',
     },
     UnableToDecrementCounter: {
-      description:
-        'Error when trying to decrement a counter to track rate limits for a tenant.',
+      description: 'Error when trying to decrement a counter to track rate limits for a tenant.',
     },
     UnableToUpdateCounter: {
-      description:
-        'Error when trying to update a counter to track rate limits for a tenant.',
+      description: 'Error when trying to update a counter to track rate limits for a tenant.',
     },
     UnableToFindCounter: {
-      description:
-        'Error when trying to find a counter to track rate limits for a tenant.',
+      description: 'Error when trying to find a counter to track rate limits for a tenant.',
     },
     UnhandledProcessMessage: {
       description: 'Unhandled message received by a Realtime process.',
@@ -560,8 +543,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
       description: 'Database is initializing connection.',
     },
     DatabaseConnectionIssue: {
-      description:
-        'Database had connection issues and connection was not able to be established.',
+      description: 'Database had connection issues and connection was not able to be established.',
     },
     UnableToConnectToProject: {
       description: 'Unable to connect to Project database.',
@@ -582,7 +564,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
       description: 'Realtime is currently restarting.',
     },
     UnableToProcessListenPayload: {
-      description: 'Payload sent in NOTIFY operation was JSON parsable.',
+      description: 'Payload sent in NOTIFY operation was "NOT" JSON parsable.',
     },
     UnableToListenToTenantDatabase: {
       description: 'Unable to LISTEN for notifications against the Tenant Database.',
@@ -615,8 +597,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
         'An error were we are not handling correctly the response to be sent to the end user.',
     },
     UnknownErrorOnController: {
-      description:
-        'An error we are not handling correctly was triggered on a controller.',
+      description: 'An error we are not handling correctly was triggered on a controller.',
     },
     UnknownErrorOnChannel: {
       description: 'An error we are not handling correctly was triggered on a channel.',
