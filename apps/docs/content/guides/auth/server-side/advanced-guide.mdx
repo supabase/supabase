@@ -90,7 +90,11 @@ return response
 setHeader(event, 'Cache-Control', 'private, no-store')
 ```
 
-Note: On some managed CDN platforms (for example AWS Amplify), cache policies are configured at the platform level and may not fully respect `Cache-Control` headers set in your application. In those cases, you may need to configure cache rules directly in the platform settings, or disable CDN caching entirely for authenticated routes.
+<Admonition type="note>
+
+On some managed CDN platforms (for example, AWS Amplify), cache policies are configured at the platform level and may not fully respect `Cache-Control` headers set in your application. In those cases, you may need to configure cache rules directly in the platform settings or disable CDN caching entirely for authenticated routes.
+
+</Admonition>
 
 If you need to cache SSR pages for performance, apply caching only to routes that do not write `Set-Cookie` headers, and always include the refresh token cookie value in the cache key for any routes that serve user-specific content.
 
