@@ -245,7 +245,12 @@ function createSchemaProvisioner(config) {
         serviceKey = await keyManager.signServiceKey(validated.name);
         await updateRegistryKeys(client, project.id, anonKey, serviceKey);
         await updateRegistryStatus(client, project.id, "active");
-        return { ...project, status: "active", anon_key: anonKey, service_key: serviceKey };
+        return {
+          ...project,
+          status: "active",
+          anon_key: anonKey,
+          service_key: serviceKey
+        };
       } catch (ddlError) {
         await client.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`).catch(() => {
         });
@@ -314,7 +319,12 @@ function createSchemaProvisioner(config) {
         serviceKey = await keyManager.signServiceKey(project.name);
         await updateRegistryKeys(client, project.id, anonKey, serviceKey);
         await updateRegistryStatus(client, project.id, "active");
-        return { ...project, status: "active", anon_key: anonKey, service_key: serviceKey };
+        return {
+          ...project,
+          status: "active",
+          anon_key: anonKey,
+          service_key: serviceKey
+        };
       } catch (ddlError) {
         await client.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`).catch(() => {
         });
@@ -357,6 +367,33 @@ function createSchemaProvisioner(config) {
       client.release();
     }
   }
+  async function listProjects() {
+    const client = await pool.connect();
+    try {
+      const result = await client.query(
+        `SELECT id, name, schema_name, anon_key, service_key, status, created_at::text
+         FROM _admin.projects ORDER BY created_at ASC`
+      );
+      return result.rows.map((row) => projectSchema.parse(row));
+    } finally {
+      client.release();
+    }
+  }
+  async function rotateKeys(name) {
+    const client = await pool.connect();
+    try {
+      const project = await findProjectByName(client, name);
+      if (!project) {
+        throw new Error(`Project "${name}" not found`);
+      }
+      const anonKey = await keyManager.signAnonKey(name);
+      const serviceKey = await keyManager.signServiceKey(name);
+      await updateRegistryKeys(client, project.id, anonKey, serviceKey);
+      return { ...project, anon_key: anonKey, service_key: serviceKey };
+    } finally {
+      client.release();
+    }
+  }
   async function end() {
     await pool.end();
   }
@@ -366,6 +403,8 @@ function createSchemaProvisioner(config) {
     dropProject,
     retryProject,
     forceDeleteProject,
+    listProjects,
+    rotateKeys,
     end
   };
 }

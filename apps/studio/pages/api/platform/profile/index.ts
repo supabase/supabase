@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
-import { DEFAULT_PROJECT } from 'lib/constants/api'
+import { getProvisioner } from 'lib/api/self-hosted/provisioner'
+import { toStudioProject } from 'lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -17,8 +18,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
+const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
+  // CRITICAL: This route is the Docker healthcheck — it MUST always return 200.
+  // If the provisioner is unavailable, we fall back to an empty projects array.
+  let projects: ReturnType<typeof toStudioProject>[] = []
+  try {
+    const provisionerProjects = await getProvisioner().listProjects()
+    projects = provisionerProjects.map(toStudioProject)
+  } catch {
+    // Provisioner unavailable — healthcheck must still succeed
+    projects = []
+  }
+
   const response = {
     id: 1,
     primary_email: 'johndoe@supabase.io',
@@ -31,7 +42,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
         slug: 'default-org-slug',
         billing_email: 'billing@supabase.co',
-        projects: [{ ...DEFAULT_PROJECT, connectionString: '' }],
+        projects,
       },
     ],
   }

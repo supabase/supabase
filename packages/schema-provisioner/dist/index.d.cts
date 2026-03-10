@@ -45,6 +45,10 @@ interface SchemaProvisioner {
     retryProject(name: string): Promise<Project>;
     /** Delete a project in 'error' state without confirmation. */
     forceDeleteProject(name: string): Promise<void>;
+    /** List all projects ordered by created_at ASC. */
+    listProjects(): Promise<Project[]>;
+    /** Rotate anon and service keys for a project. Returns updated Project. */
+    rotateKeys(name: string): Promise<Project>;
     /** Release pool connections. Call on shutdown. */
     end(): Promise<void>;
 }
