@@ -27,9 +27,9 @@ import {
 import dayjs from 'dayjs'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useTrack } from 'lib/telemetry/track'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { useTrack } from 'lib/telemetry/track'
 import { Plus, RefreshCw } from 'lucide-react'
 import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -210,7 +210,10 @@ export function CustomReportSection() {
       setEditableReport(updated)
       persistReport(updated)
 
-      track('home_custom_report_block_added', { block_id: snippet.id, position: current.length - 1 })
+      track('home_custom_report_block_added', {
+        block_id: snippet.id,
+        position: current.length - 1,
+      })
     },
     [
       editableReport,
