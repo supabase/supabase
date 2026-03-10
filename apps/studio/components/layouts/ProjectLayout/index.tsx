@@ -68,6 +68,7 @@ const routesToIgnorePostgrestConnection = [
 ]
 
 export interface ProjectLayoutProps {
+  /** @deprecated Use browserTitle.section instead. */
   title?: string
   isLoading?: boolean
   isBlocking?: boolean
