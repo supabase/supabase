@@ -138,7 +138,11 @@ export function useCommandHandling({
           const path = activeInput.path
           const filtersWithOperator = updateNestedOperator(activeFilters, path, item.value)
           onFilterChange(updateNestedValue(filtersWithOperator, path, item.defaultValue ?? ''))
-          setActiveInput({ type: 'value', path })
+
+          // Added minor delay to ensure the filter is updated before navigating to the group
+          setTimeout(() => {
+            setActiveInput({ type: 'group', path: path.slice(0, -1) })
+          }, 0)
         } else {
           handleOperatorCommand(selectedValue)
         }

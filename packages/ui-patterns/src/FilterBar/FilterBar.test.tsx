@@ -218,6 +218,10 @@ describe('FilterBar', () => {
         conditions: [{ propertyName: 'name', operator: '=', value: 'abc' }],
       })
     })
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Add more filters...')).toHaveFocus()
+    })
   })
 
   it('renders and applies custom value component inside popover', async () => {
