@@ -72,15 +72,6 @@ export const CustomDomainsConfigureHostname = () => {
 
   const domain = form.watch('domain')
   const trimmedDomain = domain.trim()
-  const subdomainLabel = (() => {
-    if (trimmedDomain.length === 0) return undefined
-
-    const labels = trimmedDomain.split('.').filter(Boolean)
-    if (labels.length === 0) return undefined
-    if (labels.length <= 2) return labels[0]
-
-    return labels.slice(0, -2).join('.')
-  })()
   const isSubmitting = isCheckingRecord || isCreating
 
   return (
@@ -138,17 +129,18 @@ export const CustomDomainsConfigureHostname = () => {
               with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
               disable the proxy option.
               <br />
-              Some DNS providers expect only the subdomain label{' '}
-              {subdomainLabel !== undefined && (
+              {trimmedDomain.includes('.') ? (
                 <>
-                  <code className="text-code-inline">{subdomainLabel}</code>{' '}
+                  Some DNS providers expect only the subdomain label{' '}
+                  <code className="text-code-inline">
+                    {trimmedDomain.split('.')[0]}
+                  </code>
+                  , while others accept the full hostname{' '}
+                  <code className="text-code-inline">{trimmedDomain}</code>.
                 </>
+              ) : (
+                'Some DNS providers expect only the subdomain label, while others accept the full hostname.'
               )}
-              while others accept the full hostname{' '}
-              {trimmedDomain.length > 0 && (
-                <code className="text-code-inline">{trimmedDomain}</code>
-              )}
-              .
             </p>
           </CardContent>
 
