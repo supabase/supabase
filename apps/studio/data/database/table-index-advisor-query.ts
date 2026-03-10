@@ -36,6 +36,10 @@ export function getTableIndexAdvisorSql(schema: string, table: string): string {
   const escapedSchema = schema.replace(/'/g, "''")
   const escapedTable = table.replace(/'/g, "''")
 
+  // Escape regex metacharacters so schema/table names are matched literally
+  const regexSchema = escapedSchema.toLowerCase().replace(/[.+*?^${}()|[\]\\]/g, '\\$&')
+  const regexTable = escapedTable.toLowerCase().replace(/[.+*?^${}()|[\]\\]/g, '\\$&')
+
   return /* SQL */ `
 -- Get top 5 SELECT queries involving this table and run through index_advisor
 set search_path to public, extensions;
@@ -48,14 +52,15 @@ with top_queries as (
     statements.mean_exec_time + statements.mean_plan_time as mean_time
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  where 
+  where
     -- Filter for SELECT queries only (index_advisor only works with SELECT)
     (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
-    -- Filter for queries involving our table (handles schema.table and just table references)
+    -- Filter for queries involving our table. Use regex word boundaries so that e.g.
+    -- looking for table "orders" does not match queries on "orders_items".
     and (
-      lower(statements.query) like '%${escapedSchema.toLowerCase()}.${escapedTable.toLowerCase()}%'
-      or lower(statements.query) like '%from ${escapedTable.toLowerCase()}%'
-      or lower(statements.query) like '%join ${escapedTable.toLowerCase()}%'
+      lower(statements.query) ~ '(^|[^a-z0-9_$])${regexSchema}[.]${regexTable}($|[^a-z0-9_$])'
+      or lower(statements.query) ~ '(^|[^a-z0-9_$])from[[:space:]]+${regexTable}($|[^a-z0-9_$])'
+      or lower(statements.query) ~ '(^|[^a-z0-9_$])join[[:space:]]+${regexTable}($|[^a-z0-9_$])'
     )
     -- Exclude system queries
     and statements.query not like '%pg_catalog%'
