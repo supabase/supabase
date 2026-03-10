@@ -9,6 +9,7 @@ import { Card, CardContent, cn } from 'ui'
 
 import type { ConnectMode } from '../ConnectSheet/Connect.types'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 type ConnectAction = {
   mode: ConnectMode
@@ -56,6 +57,22 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
 
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
+  const {
+    projectConnectionShowAppFrameworks: showAppFrameworks,
+    projectConnectionShowMobileFrameworks: showMobileFrameworks,
+    projectConnectionShowOrms: showOrms,
+  } = useIsFeatureEnabled([
+    'project_connection:show_app_frameworks',
+    'project_connection:show_mobile_frameworks',
+    'project_connection:show_orms',
+  ])
+
+  const availableActions = CONNECT_ACTIONS.filter((action) => {
+    if (action.mode === 'framework') return showAppFrameworks || showMobileFrameworks
+    if (action.mode === 'orm') return showOrms
+    return true
+  })
+
   const hasTrackedExposure = useRef(false)
 
   useEffect(() => {
@@ -81,12 +98,12 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
         <div className="absolute -inset-16 z-0 opacity-50">
           <img
             src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
-            alt="Supabase Grafana"
+            alt=""
             className="w-full h-full object-cover object-right hidden dark:block"
           />
           <img
             src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
-            alt="Supabase Grafana"
+            alt=""
             className="w-full h-full object-cover object-right dark:hidden"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
@@ -94,7 +111,7 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
 
         <CardContent className="relative z-10 p-0">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 divide-y md:divide-y-0 md:divide-x border-muted">
-            {CONNECT_ACTIONS.map((action) => (
+            {availableActions.map((action) => (
               <button
                 key={action.mode}
                 type="button"
