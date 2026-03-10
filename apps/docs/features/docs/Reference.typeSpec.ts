@@ -261,11 +261,14 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
     const exampleTags = original.blockTags.filter((t) => t.tag === '@example')
     // Helper: companion tags (e.g. @exampleDescription) may have no TypeDoc
     // `name` field; the example name is then the first line of content.
-    function tagNameAndBody(t: CommentBlockTag): [name: string, body: string] {
+    function deconstructTag(t: CommentBlockTag): [name: string, body: string] {
       if (t.name) {
         return [t.name, t.content.map((p) => p.text).join('')]
       }
       const first = t.content[0]
+      // TypeDoc may produce a tag with an empty content array (e.g. a tag with
+      // no body text). Guard here so the rest of the parsing can safely assume
+      // a non-empty first element.
       if (!first) return ['', '']
       const newline = first.text.indexOf('\n')
       const name = (newline >= 0 ? first.text.slice(0, newline) : first.text).trim()
@@ -275,13 +278,15 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
     }
 
     const descByName = Object.fromEntries(
-      original.blockTags.filter((t) => t.tag === '@exampleDescription').map(tagNameAndBody)
+      original.blockTags
+        .filter((t) => t.tag === '@exampleDescription')
+        .map((t) => deconstructTag(t))
     )
     const sqlByName = Object.fromEntries(
-      original.blockTags.filter((t) => t.tag === '@exampleSql').map(tagNameAndBody)
+      original.blockTags.filter((t) => t.tag === '@exampleSql').map((t) => deconstructTag(t))
     )
     const respByName = Object.fromEntries(
-      original.blockTags.filter((t) => t.tag === '@exampleResponse').map(tagNameAndBody)
+      original.blockTags.filter((t) => t.tag === '@exampleResponse').map((t) => deconstructTag(t))
     )
 
     if (exampleTags.length > 0) {
