@@ -1,5 +1,4 @@
-import { Switch } from 'ui'
-import { Label_Shadcn_ } from 'ui'
+import { Label_Shadcn_, Switch } from 'ui'
 
 export default function SwitchDemo() {
   return (

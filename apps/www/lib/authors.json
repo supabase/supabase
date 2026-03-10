@@ -760,8 +760,8 @@
     "author_id": "fady",
     "author": "Fady Abdelmalik",
     "position": "Engineering",
-    "author_url": "https://github.com/issuedat",
-    "author_image_url": "https://github.com/issuedat.png"
+    "author_url": "https://github.com/fadymak",
+    "author_image_url": "https://github.com/fadymak.png"
   },
   {
     "author_id": "danny",
@@ -785,6 +785,15 @@
     "position": "Engineering",
     "author_url": "https://github.com/edgurgel",
     "author_image_url": "https://github.com/edgurgel.png"
+  },
+  {
+    "author_id": "eric_simons",
+    "author": "Eric Simons",
+    "username": "ericsimons",
+    "position": "CEO",
+    "company": "Bolt.new",
+    "author_url": "https://github.com/ericsimons",
+    "author_image_url": "https://github.com/ericsimons.png"
   },
   {
     "author_id": "steven_eubank",

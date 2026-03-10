@@ -21,7 +21,7 @@ import {
  * Reckon we ensure that the dashboard just caps query costs at "heavy", so that it doesn't impact the DB for other queries
  * (e.g from the user's application)
  */
-const COST_THRESHOLD = 100_000
+const COST_THRESHOLD = 200_000
 export const COST_THRESHOLD_ERROR = 'Query cost exceeds threshold'
 
 export type ExecuteSqlVariables = {
@@ -112,6 +112,11 @@ export async function executeSql<T = any>(
         body: {
           query: `explain ${sql}`,
           disable_statement_timeout: isStatementTimeoutDisabled,
+        },
+        params: {
+          ...options.params,
+          // @ts-expect-error: This is just a client side thing to identify queries better
+          query: { key: 'preflight-check' },
         },
       })
       const parsedTree = !!costCheck ? createNodeTree(costCheck) : undefined

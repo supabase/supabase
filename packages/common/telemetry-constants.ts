@@ -2320,7 +2320,7 @@ export interface SidebarOpenedEvent {
     /**
      * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
      */
-    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
+    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel' | 'help-panel'
   }
   groups: TelemetryGroups
 }
@@ -2367,6 +2367,8 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'sentry'
       | 's3'
       | 'axiom'
+      | 'last9'
+      | 'otlp'
   }
   groups: TelemetryGroups
 }
@@ -2395,6 +2397,8 @@ export interface LogDrainConfirmButtonSubmittedEvent {
       | 'sentry'
       | 's3'
       | 'axiom'
+      | 'last9'
+      | 'otlp'
   }
   groups: TelemetryGroups
 }
@@ -2481,6 +2485,31 @@ export interface AdvisorAssistantButtonClickedEvent {
  */
 export interface QueryPerformanceAIExplanationButtonClickedEvent {
   action: 'query_performance_explain_with_ai_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User copied an AI prompt to clipboard instead of using the built-in assistant.
+ * This allows users to paste the prompt into external AI tools (Cursor, Claude, etc.)
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiPromptCopiedEvent {
+  action: 'ai_prompt_copied'
+  properties: {
+    /**
+     * Source/location where the prompt was copied from
+     */
+    source:
+      | 'explain_visualizer'
+      | 'query_performance'
+      | 'sql_debug'
+      | 'lint_detail'
+      | 'advisor_section'
+      | 'advisor_widget'
+      | 'branch_review'
+  }
   groups: TelemetryGroups
 }
 
@@ -2647,6 +2676,45 @@ export interface RlsEventTriggerBannerCreateButtonClickedEvent {
 }
 
 /**
+ * User was exposed to the pricing calculator experiment on the /pricing page.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingCalculatorExperimentExposedEvent {
+  action: 'pricing_calculator_experiment_exposed'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'pricingCalculatorExperiment'
+    /**
+     * Experiment variant: 'control' (existing compute section) or 'test' (new compute section)
+     */
+    variant: 'control' | 'test'
+  }
+}
+
+/**
+ * User clicked the Run button in the log explorer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/logs/explorer
+ */
+export interface LogExplorerQueryRunButtonClickedEvent {
+  action: 'log_explorer_query_run_button_clicked'
+  properties: {
+    /**
+     * Whether the user is editing a saved query
+     */
+    is_saved_query: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2716,6 +2784,7 @@ export type TelemetryEvent =
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
+  | LogExplorerQueryRunButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
@@ -2784,6 +2853,7 @@ export type TelemetryEvent =
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
+  | AiPromptCopiedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
@@ -2793,3 +2863,4 @@ export type TelemetryEvent =
   | IntegrationInstallFailedEvent
   | IntegrationUninstallCompletedEvent
   | RlsEventTriggerBannerCreateButtonClickedEvent
+  | PricingCalculatorExperimentExposedEvent

@@ -1,9 +1,4 @@
-import { Box, Check, ChevronsUpDown, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
@@ -11,7 +6,11 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
-import { Badge, Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, cn } from 'ui'
+import { Box, Check, ChevronsUpDown, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Badge, Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
@@ -60,8 +59,11 @@ export const ProjectDropdown = () => {
         className="flex items-center gap-2 flex-shrink-0 text-sm"
       >
         <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span className="text-foreground max-w-32 lg:max-w-none truncate">
-          {selectedProject?.name}
+        <span
+          title={selectedProject.name}
+          className="text-foreground max-w-32 lg:max-w-64 truncate"
+        >
+          {selectedProject.name}
         </span>
       </Link>
 

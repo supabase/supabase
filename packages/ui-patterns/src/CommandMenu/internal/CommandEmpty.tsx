@@ -1,7 +1,6 @@
 'use client'
 
-import { type PropsWithChildren, type RefObject, useEffect, useState } from 'react'
-
+import { useEffect, useState, type PropsWithChildren, type RefObject } from 'react'
 import { cn } from 'ui'
 
 import { useQuery } from '../api/hooks/queryHooks'

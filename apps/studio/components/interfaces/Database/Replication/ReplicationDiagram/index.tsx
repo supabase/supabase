@@ -14,6 +14,8 @@ import { ReplicationPipelineStatusResponse } from '@/data/replication/pipeline-s
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { timeout } from '@/lib/helpers'
 
+import 'reactflow/dist/style.css'
+
 export const ReplicationDiagram = () => {
   return (
     <ReactFlowProvider>
@@ -116,7 +118,7 @@ const ReplicationDiagramContent = () => {
 
     // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
     await timeout(1)
-    reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
+    reactFlow.fitView({ minZoom: 0.8, maxZoom: 0.9 })
   }
 
   useEffect(() => {
@@ -127,7 +129,7 @@ const ReplicationDiagramContent = () => {
     <div className="nowheel relative min-h-[350px]">
       <ReactFlow
         fitView
-        fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
+        fitViewOptions={{ minZoom: 0.8, maxZoom: 0.9 }}
         className="bg"
         zoomOnPinch={false}
         zoomOnScroll={false}

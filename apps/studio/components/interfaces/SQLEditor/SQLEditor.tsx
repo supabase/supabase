@@ -1,11 +1,5 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronUp, Loader2 } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   isExplainQuery,
@@ -32,6 +26,11 @@ import { formatSql } from 'lib/formatSql'
 import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { ChevronUp, Loader2 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -56,6 +55,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
@@ -118,6 +118,7 @@ export const SQLEditor = () => {
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const scrollTopRef = useRef<number>(0)
+  const shouldRefocusAfterRunRef = useRef(false)
 
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
@@ -127,6 +128,23 @@ export const SQLEditor = () => {
   const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
   const [showWidget, setShowWidget] = useState(false)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
+
+  const refocusEditor = useCallback(() => {
+    requestAnimationFrame(() => {
+      setTimeout(() => editorRef.current?.focus(), 0)
+    })
+  }, [])
+
+  const clearPendingRunRefocus = useCallback(() => {
+    shouldRefocusAfterRunRef.current = false
+  }, [])
+
+  const refocusEditorAfterRunIfNeeded = useCallback(() => {
+    if (!shouldRefocusAfterRunRef.current) return
+
+    shouldRefocusAfterRunRef.current = false
+    refocusEditor()
+  }, [refocusEditor])
 
   // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
@@ -173,6 +191,7 @@ export const SQLEditor = () => {
 
       // revalidate lint query
       queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
+      refocusEditorAfterRunIfNeeded()
     },
     onError(error: any, vars) {
       if (id) {
@@ -209,6 +228,8 @@ export const SQLEditor = () => {
 
         snapV2.addResultError(id, error, vars.autoLimit)
       }
+
+      refocusEditorAfterRunIfNeeded()
     },
   })
 
@@ -273,87 +294,95 @@ export const SQLEditor = () => {
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
-      if (isDiffOpen) return
+      if (isDiffOpen) {
+        clearPendingRunRefocus()
+        return
+      }
 
       // use the latest state
       const state = getSqlEditorV2StateSnapshot()
       const snippet = state.snippets[id]
 
-      if (editorRef.current !== null && !isExecuting && project !== undefined) {
-        const editor = editorRef.current
-        const selection = editor.getSelection()
-        const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
-
-        const sql = snippet
-          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
-          : selectedValue || editorRef.current?.getValue()
-
-        let queryHasIssues = false
-
-        const destructiveOperations = checkDestructiveQuery(sql)
-        if (!force && destructiveOperations) {
-          setShowPotentialIssuesModal(true)
-          setQueryHasDestructiveOperations(true)
-          queryHasIssues = true
-        }
-
-        const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
-        if (!force && updateWithoutWhereClause) {
-          setShowPotentialIssuesModal(true)
-          setQueryHasUpdateWithoutWhere(true)
-          queryHasIssues = true
-        }
-
-        if (queryHasIssues) {
-          return
-        }
-
-        if (
-          !isHipaaProjectDisallowed &&
-          snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
-          IS_PLATFORM
-        ) {
-          // Intentionally don't await title gen (lazy)
-          setAiTitle(id, sql)
-        }
-
-        if (lineHighlights.length > 0) {
-          editor?.deltaDecorations(lineHighlights, [])
-          setLineHighlights([])
-        }
-
-        const impersonatedRoleState = getImpersonatedRoleState()
-        const connectionString = databases?.find(
-          (db) => db.identifier === databaseSelectorState.selectedDatabaseId
-        )?.connectionString
-        if (!isValidConnString(connectionString)) {
-          return toast.error('Unable to run query: Connection string is missing')
-        }
-
-        const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-        const formattedSql = suffixWithLimit(sql, limit)
-
-        execute({
-          projectRef: project.ref,
-          connectionString: connectionString,
-          sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
-          autoLimit: appendAutoLimit ? limit : undefined,
-          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
-          isStatementTimeoutDisabled: true,
-          contextualInvalidation: true,
-          handleError: (error) => {
-            throw error
-          },
-        })
-
-        sendEvent({
-          action: 'sql_editor_query_run_button_clicked',
-          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-        })
+      if (editorRef.current === null || isExecuting || project === undefined) {
+        clearPendingRunRefocus()
+        return
       }
+
+      const editor = editorRef.current
+      const selection = editor.getSelection()
+      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+
+      const sql = snippet
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        : selectedValue || editorRef.current?.getValue()
+
+      let queryHasIssues = false
+
+      const destructiveOperations = checkDestructiveQuery(sql)
+      if (!force && destructiveOperations) {
+        setShowPotentialIssuesModal(true)
+        setQueryHasDestructiveOperations(true)
+        queryHasIssues = true
+      }
+
+      const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
+      if (!force && updateWithoutWhereClause) {
+        setShowPotentialIssuesModal(true)
+        setQueryHasUpdateWithoutWhere(true)
+        queryHasIssues = true
+      }
+
+      if (queryHasIssues) {
+        return
+      }
+
+      if (
+        !isHipaaProjectDisallowed &&
+        snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
+        IS_PLATFORM
+      ) {
+        // Intentionally don't await title gen (lazy)
+        setAiTitle(id, sql)
+      }
+
+      if (lineHighlights.length > 0) {
+        editor?.deltaDecorations(lineHighlights, [])
+        setLineHighlights([])
+      }
+
+      const impersonatedRoleState = getImpersonatedRoleState()
+      const connectionString = databases?.find(
+        (db) => db.identifier === databaseSelectorState.selectedDatabaseId
+      )?.connectionString
+      if (!isValidConnString(connectionString)) {
+        clearPendingRunRefocus()
+        return toast.error('Unable to run query: Connection string is missing')
+      }
+
+      const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+      const formattedSql = suffixWithLimit(sql, limit)
+
+      execute({
+        projectRef: project.ref,
+        connectionString: connectionString,
+        sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
+        autoLimit: appendAutoLimit ? limit : undefined,
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+        isStatementTimeoutDisabled: true,
+        contextualInvalidation: true,
+        handleError: (error) => {
+          throw error
+        },
+      })
+
+      sendEvent({
+        action: 'sql_editor_query_run_button_clicked',
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
+      clearPendingRunRefocus,
       isDiffOpen,
       id,
       isExecuting,
@@ -367,6 +396,12 @@ export const SQLEditor = () => {
       limit,
     ]
   )
+
+  const executeQueryFromButton = useCallback(() => {
+    shouldRefocusAfterRunRef.current = true
+    refocusEditor()
+    void executeQuery()
+  }, [executeQuery, refocusEditor])
 
   const executeExplainQuery = useCallback(async () => {
     if (isDiffOpen) return
@@ -476,6 +511,16 @@ export const SQLEditor = () => {
     }, 20)
     editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
   }
+
+  const buildDebugPrompt = useCallback(() => {
+    const snippet = snapV2.snippets[id]
+    const result = snapV2.results[id]?.[0]
+    const sql = (snippet?.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim()
+    const errorMessage = result?.error?.message ?? 'Unknown error'
+    const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
+
+    return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
+  }, [id, snapV2.results, snapV2.snippets])
 
   const onDebug = useCallback(async () => {
     try {
@@ -760,24 +805,29 @@ export const SQLEditor = () => {
         hasDestructiveOperations={queryHasDestructiveOperations}
         hasUpdateWithoutWhere={queryHasUpdateWithoutWhere}
         onCancel={() => {
+          clearPendingRunRefocus()
           setShowPotentialIssuesModal(false)
           setQueryHasDestructiveOperations(false)
           setQueryHasUpdateWithoutWhere(false)
-          setTimeout(() => editorRef.current?.focus(), 100)
+          refocusEditor()
         }}
         onConfirm={() => {
+          shouldRefocusAfterRunRef.current = true
           setShowPotentialIssuesModal(false)
-          executeQuery(true)
+          setQueryHasDestructiveOperations(false)
+          setQueryHasUpdateWithoutWhere(false)
+          refocusEditor()
+          void executeQuery(true)
         }}
       />
 
       <div className="flex h-full">
         <ResizablePanelGroup
           className="relative"
-          direction="vertical"
+          orientation="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
@@ -888,7 +938,7 @@ export const SQLEditor = () => {
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="animate-spin text-brand" />
@@ -901,9 +951,10 @@ export const SQLEditor = () => {
                 isDisabled={isDiffOpen}
                 hasSelection={hasSelection}
                 prettifyQuery={prettifyQuery}
-                executeQuery={executeQuery}
+                executeQuery={executeQueryFromButton}
                 executeExplainQuery={executeExplainQuery}
                 onDebug={onDebug}
+                buildDebugPrompt={buildDebugPrompt}
                 activeTab={activeUtilityTab}
                 onActiveTabChange={setActiveUtilityTab}
               />

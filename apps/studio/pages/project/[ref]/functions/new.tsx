@@ -1,14 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { isEqual } from 'lodash'
-import { AlertCircle, Book, Check } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
-import { useLatest } from '@/hooks/misc/useLatest'
 import { useParams } from 'common'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
@@ -22,6 +12,12 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { isEqual } from 'lodash'
+import { AlertCircle, Book, Check } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useId, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
@@ -47,6 +43,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import * as z from 'zod'
+
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { useLatest } from '@/hooks/misc/useLatest'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -123,6 +123,7 @@ const NewFunctionPage = () => {
   const [files, setFiles] = useState<FileData[]>(INITIAL_FILES)
   const [selectedFileId, setSelectedFileId] = useState<number>(INITIAL_FILES[0].id)
   const [open, setOpen] = useState(false)
+  const templatesListboxId = useId()
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
 
@@ -311,12 +312,13 @@ const NewFunctionPage = () => {
                 type="default"
                 role="combobox"
                 aria-expanded={open}
+                aria-controls={templatesListboxId}
                 icon={<Book size={14} />}
               >
                 Templates
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[300px] p-0" align="end">
+            <PopoverContent_Shadcn_ id={templatesListboxId} className="w-[300px] p-0" align="end">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Search templates..." />
                 <CommandList_Shadcn_>

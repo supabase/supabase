@@ -5,7 +5,6 @@ import { DatabaseConnectionString } from 'components/interfaces/Connect/Database
 import { McpTabContent } from 'components/interfaces/Connect/McpTabContent'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
@@ -16,25 +15,26 @@ import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
+  cn,
+  Dialog,
   DIALOG_PADDING_X,
   DIALOG_PADDING_Y,
-  Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogSectionSeparator,
   DialogTitle,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
 } from 'ui'
 
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 export const Connect = () => {
   const router = useRouter()
@@ -82,9 +82,9 @@ export const Connect = () => {
   const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
   const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
   const [queryWith, setQueryWith] = useQueryState('with', parseAsString)
-  const [_, setQueryType] = useQueryState('type', parseAsString)
-  const [__, setQuerySource] = useQueryState('source', parseAsString)
-  const [___, setQueryMethod] = useQueryState('method', parseAsString)
+  const [, setQueryType] = useQueryState('type', parseAsString)
+  const [, setQuerySource] = useQueryState('source', parseAsString)
+  const [, setQueryMethod] = useQueryState('method', parseAsString)
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -97,7 +97,8 @@ export const Connect = () => {
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: open })
+  const { data: resolvedEndpoint } = useProjectApiUrl({ projectRef })
+
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
@@ -216,22 +217,12 @@ export const Connect = () => {
     : { anonKey: null, publishableKey: null }
 
   const projectKeys = useMemo(() => {
-    const protocol = settings?.app_config?.protocol ?? 'https'
-    const endpoint = settings?.app_config?.endpoint ?? ''
-    const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
-
     return {
-      apiUrl: apiHost ?? null,
+      apiUrl: resolvedEndpoint ?? null,
       anonKey: anonKey?.api_key ?? null,
       publishableKey: publishableKey?.api_key ?? null,
     }
-  }, [
-    settings?.app_config?.protocol,
-    settings?.app_config?.endpoint,
-    canReadAPIKeys,
-    anonKey?.api_key,
-    publishableKey?.api_key,
-  ])
+  }, [resolvedEndpoint, anonKey?.api_key, publishableKey?.api_key])
 
   const filePath = getContentFilePath({
     connectionObject,

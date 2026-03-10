@@ -12,8 +12,8 @@ export function useConnectCommands() {
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const [_, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
-  const [__, setConnectTab] = useQueryState('connectTab', parseAsString)
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setConnectTab] = useQueryState('connectTab', parseAsString)
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.ACTIONS,

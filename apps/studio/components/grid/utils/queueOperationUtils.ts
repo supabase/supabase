@@ -1,10 +1,10 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { type Entity, isTableLike } from 'data/table-editor/table-editor-types'
+import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import type { Dictionary } from 'types'
 
-import { PendingAddRow, PendingDeleteRow, SupaRow, isPendingAddRow } from '../types'
+import { isPendingAddRow, PendingAddRow, PendingDeleteRow, SupaRow } from '../types'
 import {
   EditCellContentOperation,
   NewQueuedOperation,

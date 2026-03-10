@@ -1,4 +1,5 @@
 import { CodeBlock } from 'ui/src/components/CodeBlock'
+
 import type {
   ClaudeCodeMcpConfig,
   CodexMcpConfig,
@@ -60,6 +61,7 @@ export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group
   ['docs', 'database', 'development', 'debugging'].includes(group.id)
 )
 
+/** Only set hasDistinctDarkIcon: true when the client has a separate -icon-dark.svg that looks different. Otherwise the same -icon.svg is used for both themes. */
 export const MCP_CLIENTS: McpClient[] = [
   {
     key: 'cursor',
@@ -159,6 +161,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'codex',
     label: 'Codex',
     icon: 'openai',
+    hasDistinctDarkIcon: true,
     configFile: '~/.codex/config.toml',
     externalDocsUrl: 'https://developers.openai.com/codex/mcp/',
     transformConfig: (config): CodexMcpConfig => {
@@ -227,19 +230,56 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    primaryInstructions: (config, onCopy) => {
+    primaryInstructions: (config, onCopy, options) => {
       const mcpUrl = getMcpUrl(config)
-      const command = `gemini mcp add -t http supabase ${mcpUrl}`
+      const mcpCommand = `gemini mcp add -t http supabase ${mcpUrl}`
       return (
         <div className="space-y-2">
           <p className="text-xs text-warning">
             Ensure you are running Gemini CLI version <code>0.20.2</code> or higher.
           </p>
-          <p className="text-xs text-foreground-light">
-            Add the Supabase MCP server to Gemini CLI:
-          </p>
+          {options?.isPlatform && (
+            <>
+              <p className="text-xs text-foreground-light">
+                Install the Supabase{' '}
+                <a
+                  href="https://github.com/supabase-community/gemini-extension"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-link hover:underline"
+                >
+                  extension
+                </a>{' '}
+                for Gemini CLI. This bundles the Supabase MCP server connection,{' '}
+                <a
+                  href="https://github.com/supabase/agent-skills"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-link hover:underline"
+                >
+                  agent skills
+                </a>
+                , and other context.
+              </p>
+              <CodeBlock
+                value="gemini extensions install https://github.com/supabase-community/gemini-extension"
+                language="bash"
+                focusable={false}
+                className="block"
+                onCopyCallback={() => onCopy('command')}
+              />
+              <p className="text-xs text-foreground-light">
+                Or add just the MCP server to Gemini CLI:
+              </p>
+            </>
+          )}
+          {!options?.isPlatform && (
+            <p className="text-xs text-foreground-light">
+              Add the Supabase MCP server to Gemini CLI:
+            </p>
+          )}
           <CodeBlock
-            value={command}
+            value={mcpCommand}
             language="bash"
             focusable={false}
             className="block"
@@ -270,6 +310,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'windsurf',
     label: 'Windsurf',
     icon: 'windsurf',
+    hasDistinctDarkIcon: true,
     configFile: '~/.codeium/windsurf/mcp_config.json',
     externalDocsUrl: '',
     transformConfig: (config): WindsurfMcpConfig => {
@@ -298,6 +339,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'goose',
     label: 'Goose',
     icon: 'goose',
+    hasDistinctDarkIcon: true,
     configFile: '~/.config/goose/config.yaml',
     externalDocsUrl: 'https://block.github.io/goose/docs/category/getting-started',
     transformConfig: (config): GooseMcpConfig => {
@@ -364,6 +406,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'factory',
     label: 'Factory',
     icon: 'factory',
+    hasDistinctDarkIcon: true,
     configFile: '~/.factory/mcp.json',
     externalDocsUrl: 'https://docs.factory.ai/cli/configuration/mcp.md',
     transformConfig: (config): FactoryMcpConfig => {
@@ -405,6 +448,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'opencode',
     label: 'OpenCode',
     icon: 'opencode',
+    hasDistinctDarkIcon: true,
     configFile: '~/.config/opencode/opencode.json',
     externalDocsUrl: 'https://opencode.ai/docs/mcp-servers/',
     transformConfig: (config): OpenCodeMcpConfig => {
@@ -455,7 +499,7 @@ export const MCP_CLIENTS: McpClient[] = [
           href="https://kiro.dev/docs/powers/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-brand hover:underline"
+          className="text-brand-link hover:underline"
         >
           power
         </a>{' '}

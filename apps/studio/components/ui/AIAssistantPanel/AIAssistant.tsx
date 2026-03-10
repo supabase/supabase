@@ -42,6 +42,7 @@ import {
 import { Message } from './Message'
 import AlertError from '../AlertError'
 import { ASSISTANT_ERRORS } from './AiAssistant.constants'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
@@ -65,18 +66,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const state = useAiAssistantState()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
-  const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
+  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('assistant.advance_model')
 
   const selectedModel = useMemo<AssistantModel>(() => {
-    const defaultModel: AssistantModel = isPaidPlan ? 'gpt-5' : 'gpt-5-mini'
+    // While entitlements are loading, use the stored model without enforcing access
+    if (isLoadingEntitlements) {
+      return snap.model ?? 'gpt-5-mini'
+    }
+
+    const defaultModel: AssistantModel = hasAccessToAdvanceModel ? 'gpt-5' : 'gpt-5-mini'
     const model = snap.model ?? defaultModel
 
-    if (!isPaidPlan && model === 'gpt-5') {
+    if (!hasAccessToAdvanceModel && model === 'gpt-5') {
       return 'gpt-5-mini'
     }
 
     return model
-  }, [isPaidPlan, snap.model])
+  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -224,6 +231,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           projectRef: project.ref,
           orgSlug: selectedOrganization.slug,
           reason,
+          spanId: state.messageSpanIds[messageId],
         })
 
         sendEvent({
@@ -247,7 +255,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent]
+    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent, state]
   )
 
   const isContextExceededError =

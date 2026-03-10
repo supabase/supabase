@@ -9,7 +9,7 @@ import {
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   ApiOperationRequestBodyDetails,
@@ -460,7 +460,7 @@ async function FunctionSection({
   const fn = fns?.find((fn) => fn.id === section.id)
   if (!fn) return null
 
-  let types: MethodTypes | undefined
+  let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
     types = await getTypeSpec(fn['$ref'] as string)
   }
@@ -479,7 +479,7 @@ async function FunctionSection({
       <StickyHeader {...section} className="col-[1_/_-1]" />
 
       {/* Display method signature below title */}
-      {types && formatMethodSignature(types) && (
+      {types && 'params' in types && formatMethodSignature(types) && (
         <div className="col-[1_/_-1] -mt-2 mb-4">
           <code className="text-sm text-foreground-muted font-mono">
             {formatMethodSignature(types)}
@@ -500,12 +500,18 @@ async function FunctionSection({
                 }))
               : 'params' in fn
                 ? (fn.params as Array<object>).map((param) => ({ ...param, __overwritten: true }))
-                : types?.params
+                : types && 'params' in types
+                  ? types.params
+                  : undefined
           }
-          altParameters={types?.altSignatures?.map(({ params }) => params)}
+          altParameters={
+            types && 'altSignatures' in types
+              ? types.altSignatures?.map(({ params }) => params)
+              : undefined
+          }
           className="max-w-[80ch]"
         />
-        {!!types?.ret && <ReturnTypeDetails returnType={types.ret} />}
+        {types && 'ret' in types && !!types.ret && <ReturnTypeDetails returnType={types.ret} />}
       </div>
       <div className="overflow-auto">
         {(() => {

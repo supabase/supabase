@@ -35,7 +35,7 @@ export async function getIndexAdvisorResult({
   const { result: results } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from index_advisor('${escapedQuery}');`,
+    sql: `set search_path to public, extensions; select * from index_advisor('${escapedQuery}');`,
   })
 
   if (!results || results.length === 0) {

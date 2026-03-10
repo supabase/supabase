@@ -1,8 +1,6 @@
 import { useCallback } from 'react'
 
-import { ActiveInput } from './hooks'
-import { MenuItem } from './menuItems'
-import { FilterGroup, FilterProperty } from './types'
+import { ActiveInputState, FilterGroup, FilterProperty, MenuItem } from './types'
 import { addFilterToGroup, addGroupToGroup, findGroupByPath, isCustomOptionObject } from './utils'
 
 export function useCommandHandling({
@@ -18,8 +16,8 @@ export function useCommandHandling({
   newPathRef,
   setIsCommandMenuVisible,
 }: {
-  activeInput: ActiveInput
-  setActiveInput: (input: ActiveInput) => void
+  activeInput: ActiveInputState
+  setActiveInput: (input: ActiveInputState) => void
   activeFilters: FilterGroup
   onFilterChange: (filters: FilterGroup) => void
   filterProperties: FilterProperty[]
