@@ -13,7 +13,7 @@ import { useConnectState } from './useConnectState'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
-const CONNECT_MODES = ['framework', 'direct', 'orm', 'mcp'] as const
+const CONNECT_MODES: readonly ConnectMode[] = ['framework', 'direct', 'orm', 'mcp'] as const
 
 function isConnectMode(value: string): value is ConnectMode {
   return CONNECT_MODES.some((mode) => mode === value)
