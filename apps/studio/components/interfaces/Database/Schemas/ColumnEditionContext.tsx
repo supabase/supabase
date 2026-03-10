@@ -1,5 +1,4 @@
-import { createContext, useContext } from 'react'
-import { ReactNode } from 'react-markdown/lib/react-markdown'
+import { createContext, useContext, type ReactNode } from 'react'
 
 export type ColumnEditionContextType = {
   onEditColumn: (tableId: number, columnId: string) => void
