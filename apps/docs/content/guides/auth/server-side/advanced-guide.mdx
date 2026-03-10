@@ -62,7 +62,7 @@ A good default is to use `Lax` which sends cookies when users are navigating to 
 
 Yes, but there are two specific scenarios that can cause users to receive another user's session. Both are related to caching of HTTP responses that contain `Set-Cookie` headers.
 
-**ISR (Incremental Static Regeneration)**
+#### ISR (Incremental Static Regeneration)
 
 If you use ISR on pages that trigger a Supabase session refresh, the cached response will include the `Set-Cookie` header containing the refreshed JWT. When that cached response is served to a subsequent user, their browser stores the token and they are signed in as the wrong person.
 
