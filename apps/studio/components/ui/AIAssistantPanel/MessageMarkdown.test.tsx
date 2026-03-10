@@ -35,6 +35,12 @@ describe('wrapPlaceholderUrls', () => {
     expect(wrapPlaceholderUrls(input)).toBe(input)
   })
 
+  test('wraps placeholder URL used as markdown link text', () => {
+    expect(
+      wrapPlaceholderUrls('[https://<project-ref>.supabase.co](https://supabase.com/dashboard)')
+    ).toBe('[`https://<project-ref>.supabase.co`](https://supabase.com/dashboard)')
+  })
+
   test('wraps bare URL but skips linked URL when both appear in the same string', () => {
     expect(
       wrapPlaceholderUrls(
