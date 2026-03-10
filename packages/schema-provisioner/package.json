@@ -1,0 +1,20 @@
+{
+  "name": "@hosted-supabase/schema-provisioner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "dependencies": {
+    "jose": "^6.2.1",
+    "pg": "8.20.0",
+    "zod": "^3.0.0"
+  }
+}
