@@ -435,7 +435,7 @@ const NewFunctionPage = () => {
 NewFunctionPage.getLayout = (page: React.ReactNode) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
+      <EdgeFunctionsLayout title="New">{page}</EdgeFunctionsLayout>
     </DefaultLayout>
   )
 }

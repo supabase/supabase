@@ -8,26 +8,6 @@ import { PropsWithChildren } from 'react'
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateAuthMenu } from './AuthLayout.utils'
 
-const AUTH_SECTION_TITLE_BY_PAGE: Record<string, string> = {
-  overview: 'Overview',
-  users: 'Users',
-  'oauth-apps': 'OAuth Apps',
-  policies: 'Policies',
-  providers: 'Sign In / Providers',
-  'third-party': 'Sign In / Providers',
-  'oauth-server': 'OAuth Server',
-  sessions: 'Sessions',
-  'rate-limits': 'Rate Limits',
-  mfa: 'Multi-Factor',
-  'url-configuration': 'URL Configuration',
-  protection: 'Attack Protection',
-  hooks: 'Auth Hooks',
-  'audit-logs': 'Audit Logs',
-  performance: 'Performance',
-  templates: 'Email',
-  smtp: 'Email',
-}
-
 const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
@@ -39,14 +19,10 @@ const AuthProductMenu = () => {
   return <ProductMenu page={page} menu={menu} />
 }
 
-const AuthLayout = ({ children }: PropsWithChildren<{}>) => {
-  const router = useRouter()
-  const page = router.pathname.split('/')[4]
-  const sectionTitle = page !== undefined ? AUTH_SECTION_TITLE_BY_PAGE[page] : undefined
-
+const AuthLayout = ({ title, children }: PropsWithChildren<{ title: string }>) => {
   return (
     <ProjectLayout
-      title={sectionTitle}
+      title={title}
       product="Authentication"
       productMenu={<AuthProductMenu />}
       isBlocking={false}

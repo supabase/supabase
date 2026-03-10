@@ -1,9 +1,9 @@
-import { useRouter } from 'next/router'
-import { ComponentProps, PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useRouter } from 'next/router'
+import { ComponentProps, PropsWithChildren } from 'react'
+
 import { ProjectLayout } from '../ProjectLayout'
 
 const EdgeFunctionsProductMenu = () => {
@@ -36,13 +36,13 @@ const EdgeFunctionsProductMenu = () => {
 }
 
 interface EdgeFunctionsLayoutProps {
-  title?: string
+  title: string
   browserTitle?: ComponentProps<typeof ProjectLayout>['browserTitle']
 }
 
 const EdgeFunctionsLayout = ({
   children,
-  title = 'Edge Functions',
+  title,
   browserTitle,
 }: PropsWithChildren<EdgeFunctionsLayoutProps>) => {
   return (

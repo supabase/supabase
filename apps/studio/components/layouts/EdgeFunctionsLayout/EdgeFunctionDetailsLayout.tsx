@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download, FileArchive, Send } from 'lucide-react'
-import { useRouter } from 'next/router'
-import React, { useEffect, useState, type PropsWithChildren } from 'react'
-import { toast } from 'sonner'
-
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -18,7 +13,11 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { DOCS_URL } from 'lib/constants'
+import { Download, FileArchive, Send } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState, type PropsWithChildren } from 'react'
+import { toast } from 'sonner'
 import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
@@ -42,19 +41,12 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 
 interface EdgeFunctionDetailsLayoutProps {
-  title?: string
-}
-
-const getEdgeFunctionDetailsSectionTitle = (pathname: string) => {
-  if (pathname.endsWith('/invocations')) return 'Invocations'
-  if (pathname.endsWith('/logs')) return 'Logs'
-  if (pathname.endsWith('/details')) return 'Details'
-  if (pathname.endsWith('/code')) return 'Code'
-  return 'Overview'
+  title: string
 }
 
 const EdgeFunctionDetailsLayout = ({
@@ -101,7 +93,7 @@ const EdgeFunctionDetailsLayout = ({
   const name = selectedFunction?.name || ''
   const browserTitle = {
     entity: functionSlug ? name || functionSlug : undefined,
-    section: title || getEdgeFunctionDetailsSectionTitle(router.pathname),
+    section: title,
   }
 
   const breadcrumbItems = [
@@ -238,7 +230,7 @@ const EdgeFunctionDetailsLayout = ({
   }
 
   return (
-    <EdgeFunctionsLayout browserTitle={browserTitle}>
+    <EdgeFunctionsLayout title={title} browserTitle={browserTitle}>
       <div className="w-full min-h-full flex flex-col items-stretch">
         <PageHeader size="full" className="sticky top-0 z-10 bg-background">
           {breadcrumbItems.length > 0 && (
