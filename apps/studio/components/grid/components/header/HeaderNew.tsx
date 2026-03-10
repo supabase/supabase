@@ -71,11 +71,11 @@ export const HeaderNew = ({
         ) : snap.selectedRows.size > 0 ? (
           <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
         ) : (
-          <div className="flex-1 min-w-[600px] flex items-center gap-2">
+          <div className="flex-1 min-w-[300px] flex items-center gap-2">
             <FilterPopoverNew isRefetching={isRefetching} />
           </div>
         )}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 overflow-x-auto">
           {!customHeader && snap.selectedRows.size === 0 && (
             <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
           )}
