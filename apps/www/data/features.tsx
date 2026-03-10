@@ -605,14 +605,14 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 
 ## Key benefits
 1. Real-time replication: Near real-time data synchronization using Postgres logical replication.
-2. Analytics Buckets support: Replicate to Iceberg format for large-scale analytics.
-3. BigQuery integration: Direct replication to Google's data warehouse.
+2. BigQuery integration: Direct replication to Google's data warehouse.
+3. More destinations planned: Additional replication targets are planned for the future.
 4. Complete change history: Captures INSERT, UPDATE, DELETE, and TRUNCATE operations.
 5. Optimized for analytics: Faster queries and lower storage costs through compression.
 6. Production isolation: Complete separation of analytics and production workloads.
 
 ## How it works
-ETL uses Postgres logical replication to capture changes. Each replicated table includes a \`cdc_operation\` column tracking the type of change. For Analytics Buckets, data is stored in append-only changelog format using Parquet files. For BigQuery, a view is created for each table backed by versioned tables.
+ETL uses Postgres logical replication to capture changes. Each replicated table includes a \`cdc_operation\` column tracking the type of change. Right now, BigQuery is the only supported managed destination. In BigQuery, a view is created for each table backed by versioned tables.
 
 ## Supabase ETL is valuable for:
 - Data warehousing and business intelligence
@@ -1554,43 +1554,6 @@ Supabase Storage simplifies adding robust file management to your applications, 
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
-    },
-  },
-  {
-    title: 'Analytics Buckets (with Iceberg)',
-    subtitle: 'Large-scale analytics using Apache Iceberg format.',
-    description: `Analytics Buckets provide specialized storage optimized for large-scale analytics using Apache Iceberg open table format. Built on Amazon S3 Tables, Analytics Buckets enable petabyte-scale analytics with automatic compaction and snapshot management.
-
-## Key benefits
-1. Apache Iceberg format: Open standard with Parquet files for broad tool compatibility.
-2. Automatic compaction: S3 Tables merges small files automatically for optimal performance.
-3. Built-in time travel: Query historical data using snapshots.
-4. Schema evolution: Evolve schema over time without breaking queries.
-5. Integrated with ETL: Real-time replication from Postgres via Supabase ETL.
-6. Query from Postgres: Use Iceberg Foreign Data Wrapper to join with operational data.
-
-## Query tools supported
-PyIceberg, Apache Spark, DuckDB, Amazon Athena, and any tool supporting Iceberg REST Catalog API.
-
-## Analytics Buckets are valuable for:
-- Data tiering: Archive cold data from Postgres to Analytics Buckets.
-- Historical analysis: Query complete change history.
-- Cost optimization: S3 pricing for large datasets.
-- Separation of workloads: Analytics queries don't impact production.
-- Bottomless storage: Virtually unlimited capacity.
-
-## Security
-TLS 1.2+ in transit. SSE-S3 or SSE-KMS encryption at rest.
-
-Analytics Buckets provide the scalable, cost-effective storage layer required for modern analytics workflows.`,
-    icon: BarChart,
-    products: [PRODUCT_SHORTNAMES.STORAGE],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/storage/analytics/introduction',
-    slug: 'analytics-buckets-with-iceberg',
-    status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
-      availableOnSelfHosted: false,
     },
   },
   {
@@ -2792,17 +2755,17 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
   {
     title: 'Replication',
     subtitle: 'Replicate database changes to external destinations.',
-    description: `Replication uses Postgres logical replication to replicate database changes to external destinations like Analytics Buckets and BigQuery. Changes are captured from the Write Ahead Log and delivered in near real-time to analytical systems.
+    description: `Replication uses Postgres logical replication to replicate database changes to external destinations. Changes are captured from the Write Ahead Log and delivered in near real-time to analytical systems.
 
 ## Key benefits
 1. Near real-time sync: Changes replicated as they occur using WAL reading.
-2. Analytics Buckets support: Append-only changelog format in Iceberg.
-3. BigQuery integration: Direct replication to Google's data warehouse.
+2. BigQuery integration: Direct replication to Google's data warehouse.
+3. More destinations planned: Additional replication targets are planned for the future.
 4. Complete change capture: INSERT, UPDATE, DELETE, and TRUNCATE operations.
 5. Managed pipeline: Monitor status, lag, and errors in dashboard.
 
 ## Destinations
-Analytics Buckets create append-only changelog with \`cdc_operation\` column, preserving complete change history in Iceberg format. BigQuery creates views backed by versioned tables for efficient querying.
+Right now, BigQuery is the only supported managed destination. It creates views backed by versioned tables for efficient querying. More destinations are planned in the future.
 
 ## Setup
 Create Postgres publication for tables to replicate. Add destination in Replication section of dashboard. Configure destination-specific settings. Monitor pipeline in dashboard.

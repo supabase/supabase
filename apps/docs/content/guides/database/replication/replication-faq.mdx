@@ -14,9 +14,9 @@ Replication is currently in private alpha. Access is limited and features may ch
 
 ## What destinations are supported?
 
-Replication currently supports Analytics Buckets (Iceberg format) and BigQuery. See the destination tabs in the [Setup guide](/docs/guides/database/replication/replication-setup#step-3-add-a-destination) for configuration details.
+Replication currently supports **BigQuery** as the only managed destination. See the [Setup guide](/docs/guides/database/replication/replication-setup#step-3-add-a-destination) for configuration details.
 
-Availability varies based on the planned roll-out strategy. The destinations you can access depend on your project and access level.
+We are working on adding more destinations in the future. Availability may continue to vary based on the planned roll-out strategy.
 
 ## Why is a table not being replicated?
 
@@ -66,7 +66,7 @@ Note: Stopping replication will cause changes to queue up in the WAL.
 
 ## What happens if a table is deleted at the destination?
 
-If a table is deleted downstream at the destination (e.g., in your Analytics Bucket or BigQuery dataset), the replication pipeline will automatically recreate it.
+If a table is deleted downstream at the destination (for example, in your BigQuery dataset), the replication pipeline will automatically recreate it.
 
 This behavior is by design to prevent the pipeline from breaking if tables are accidentally deleted. The pipeline ensures that all tables in your publication are always present at the destination.
 

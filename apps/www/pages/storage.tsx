@@ -197,13 +197,13 @@ function StoragePage() {
           <div className="mb-12">
             <h2 className="h3">Bucket types for every application</h2>
             <p className="p text-lg">
-              Store, serve, or analyze data the way your app needs. Supabase Storage supports three
+              Store and serve data the way your app needs. Supabase Storage supports two
               purpose-built bucket types so you can pick the right tools for the job without adding
               extra systems.
             </p>
           </div>
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 lg:col-span-4">
+            <div className="col-span-12 lg:col-span-6">
               <h4 className="h4">Files buckets</h4>
               <p className="p">
                 Ideal for everyday assets and user content. Store images, videos, documents, PDFs,
@@ -214,23 +214,7 @@ function StoragePage() {
                 <Link href="/docs/guides/storage">Read the docs</Link>
               </Button>
             </div>
-            <div className="col-span-12 lg:col-span-4">
-              <h4 className="h4">Analytics buckets</h4>
-              <p className="p">
-                Built for large-scale analytical workloads on open table formats such as Apache
-                Iceberg. Keep historical or time-series data, logs, or ETL outputs in a format that
-                is efficient to query, partition, and transform, and optionally expose via Postgres.
-              </p>
-              <div className="mt-4 flex gap-2">
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/docs/guides/storage/analytics-buckets">Read the docs</Link>
-                </Button>
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/blog/analytics-buckets">Read the blog post</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="col-span-12 lg:col-span-4">
+            <div className="col-span-12 lg:col-span-6">
               <h4 className="h4">Vector buckets</h4>
               <p className="p">
                 Designed for AI and ML use cases that rely on semantic search or similarity

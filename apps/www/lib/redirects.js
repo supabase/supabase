@@ -2648,6 +2648,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/analytics-buckets',
+    destination: '/docs/guides/storage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/analytics/:path*',
+    destination: '/docs/guides/storage',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
     destination: '/docs/guides/auth/server-side/advanced-guide',
   },

@@ -2032,56 +2032,6 @@ export const storage: NavMenuConstant = {
       ],
     },
     {
-      name: 'Analytics Buckets',
-      items: [
-        { name: 'Introduction', url: '/guides/storage/analytics/introduction' },
-        {
-          name: 'Creating Buckets',
-          url: '/guides/storage/analytics/creating-analytics-buckets' as `/${string}`,
-        },
-        {
-          name: 'Iceberg Catalog',
-          url: '/guides/storage/analytics/connecting-to-analytics-bucket' as `/${string}`,
-        },
-        {
-          name: 'Realtime Data-Sync',
-          url: '/guides/storage/analytics/replication' as `/${string}`,
-        },
-        {
-          name: 'Query with Postgres',
-          url: '/guides/storage/analytics/query-with-postgres' as `/${string}`,
-        },
-        {
-          name: 'Examples',
-          url: '/guides/storage/analytics/examples' as `/${string}`,
-          items: [
-            {
-              name: 'Using DuckDB',
-              url: '/guides/storage/analytics/examples/duckdb',
-            },
-            {
-              name: 'Using PyIceberg',
-              url: '/guides/storage/analytics/examples/pyiceberg',
-            },
-            {
-              name: 'Using Apache Spark',
-              url: '/guides/storage/analytics/examples/apache-spark',
-            },
-          ],
-        },
-        {
-          name: 'Limits',
-          url: '/guides/storage/analytics/limits' as `/${string}`,
-          enabled: billingEnabled,
-        },
-        {
-          name: 'Pricing',
-          url: '/guides/storage/analytics/pricing' as `/${string}`,
-          enabled: billingEnabled,
-        },
-      ],
-    },
-    {
       name: 'Vector Buckets',
       url: '/guides/storage/vector',
       items: [
