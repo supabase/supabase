@@ -7,6 +7,7 @@ import {
 } from 'components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -28,9 +29,7 @@ import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { getTables } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { isValidExperimentVariant } from 'hooks/misc/useTableCreateGeneratePolicies'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
-import { usePHFlag } from 'hooks/ui/useFlag'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useTrack } from 'lib/telemetry/track'
 import { isEmpty, isUndefined, noop } from 'lodash'
@@ -41,7 +40,6 @@ import { useTableEditorStateSnapshot, type TableEditorState } from 'state/table-
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { ColumnEditor } from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -206,7 +204,6 @@ export const SidePanelEditor = ({
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
-  const generatePoliciesFlag = usePHFlag<string>('tableCreateGeneratePolicies')
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
@@ -229,7 +226,7 @@ export const SidePanelEditor = ({
     }
   )
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isEdited,
     onClose: () => {
       setIsEdited(false)
@@ -739,17 +736,6 @@ export const SidePanelEditor = ({
           toast.success(`Table ${table.name} is good to go!`, { id: toastId })
         }
 
-        // Track experiment conversion if user is in the experiment
-        if (isValidExperimentVariant(generatePoliciesFlag)) {
-          track('table_create_generate_policies_experiment_converted', {
-            experiment_id: 'tableCreateGeneratePolicies',
-            variant: generatePoliciesFlag,
-            has_rls_enabled: isRLSEnabled,
-            has_rls_policies: generatedPolicies.length > 0,
-            has_generated_policies: generatedPolicies.length > 0,
-          })
-        }
-
         onTableCreated(table)
       } else if (action === 'duplicate' && !!selectedTable) {
         const tableToDuplicate = selectedTable
@@ -1011,22 +997,7 @@ export const SidePanelEditor = ({
         visible={snap.sidePanel?.type === 'operation-queue'}
         closePanel={snap.closeSidePanel}
       />
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

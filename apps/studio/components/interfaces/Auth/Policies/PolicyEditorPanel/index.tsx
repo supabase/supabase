@@ -12,12 +12,13 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -33,7 +34,6 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
 import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { checkIfPolicyHasChanged, generateCreatePolicyQuery } from './PolicyEditorPanel.utils'
@@ -165,7 +165,7 @@ export const PolicyEditorPanel = memo(function ({
     return policyCreateUnsaved || policyUpdateUnsaved
   }, [command, name, roles, selectedPolicy])
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: hasUnsavedChanges,
     onClose: onSelectCancel,
   })
@@ -292,7 +292,7 @@ export const PolicyEditorPanel = memo(function ({
     <>
       <Form_Shadcn_ {...form}>
         <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-          <Sheet open={visible} onOpenChange={confirmOnClose}>
+          <Sheet open={visible} onOpenChange={handleOpenChange}>
             <SheetContent
               showClose={false}
               size={showTools ? 'lg' : 'default'}
@@ -573,24 +573,12 @@ export const PolicyEditorPanel = memo(function ({
         </form>
       </Form_Shadcn_>
 
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog
+        {...modalProps}
+        description="Are you sure you want to close the editor? Any unsaved changes on your policy and conversations with the Assistant will be lost."
+      />
     </>
   )
 })
 
 PolicyEditorPanel.displayName = 'PolicyEditorPanel'
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      Are you sure you want to close the editor? Any unsaved changes on your policy and
-      conversations with the Assistant will be lost.
-    </p>
-  </ConfirmationModal>
-)

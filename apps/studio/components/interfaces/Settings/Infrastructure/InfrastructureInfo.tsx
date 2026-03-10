@@ -25,8 +25,15 @@ export const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
-    useIsFeatureEnabled(['project_auth:all', 'project_settings:database_upgrades'])
+  const {
+    projectAuthAll: authEnabled,
+    projectSettingsDatabaseUpgrades: showDatabaseUpgrades,
+    databaseReplication: showReplication,
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_settings:database_upgrades',
+    'database:replication',
+  ])
 
   const {
     data,
@@ -71,7 +78,7 @@ export const InfrastructureInfo = () => {
     <>
       <ScaffoldDivider />
 
-      {project?.cloud_provider !== 'FLY' && (
+      {project?.cloud_provider !== 'FLY' && showReplication && (
         <ScaffoldContainer>
           <ScaffoldSection isFullWidth>
             <NoticeBar
