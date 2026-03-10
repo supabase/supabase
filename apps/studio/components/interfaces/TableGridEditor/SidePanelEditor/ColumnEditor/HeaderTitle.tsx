@@ -10,7 +10,8 @@ const HeaderTitle: React.FC<Props> = ({ table, column }) => {
   if (!column) {
     return (
       <>
-        Add new column to <code>{table.name}</code>
+        <span>Add new column to</span>
+        <code className="ml-1">{table.name}</code>
       </>
     )
   }
