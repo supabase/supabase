@@ -5,6 +5,7 @@ import { QueryIndexes } from 'components/interfaces/QueryPerformance/QueryIndexe
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { databaseKeys } from 'data/database/keys'
 import {
+  cleanIndexColumnName,
   useTableIndexAdvisorQuery,
   TableIndexAdvisorData,
   IndexAdvisorSuggestion,
@@ -80,7 +81,7 @@ export function TableIndexAdvisorProvider({
         suggestion.index_statements.some((stmt) => {
           const match = stmt.match(/USING\s+\w+\s*\(([^)]+)\)/i)
           if (match) {
-            const columns = match[1].split(',').map((c) => c.trim().replace(/^"(.+)"$/, '$1'))
+            const columns = match[1].split(',').map((c) => cleanIndexColumnName(c))
             return columns.includes(columnName)
           }
           return false

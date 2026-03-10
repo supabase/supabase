@@ -85,6 +85,17 @@ left join lateral (
 `.trim()
 }
 
+// Strips ordering modifiers and outer quotes from a raw column token from an index statement.
+// e.g. '"created_at" DESC NULLS LAST' -> 'created_at'
+export function cleanIndexColumnName(raw: string): string {
+  return raw
+    .trim()
+    .replace(/\s+(asc|desc)(\s+nulls\s+(first|last))?$/i, '')
+    .replace(/\s+nulls\s+(first|last)$/i, '')
+    .trim()
+    .replace(/^"(.+)"$/, '$1')
+}
+
 //Extracts column names from index statements
 //e.g. "CREATE INDEX ON public.users USING btree (email)" -> "email"
 function extractColumnsFromIndexStatements(indexStatements: string[]): string[] {
@@ -97,8 +108,9 @@ function extractColumnsFromIndexStatements(indexStatements: string[]): string[] 
       const columnPart = match[1]
       // Split by comma and clean up each column name
       columnPart.split(',').forEach((col) => {
-        const cleanedCol = col.trim().replace(/^"(.+)"$/, '$1') // Remove quotes if present
-        if (cleanedCol) {
+        const cleanedCol = cleanIndexColumnName(col)
+        // Only add simple identifiers — skip expressions like lower(col)
+        if (cleanedCol && /^[a-z_][a-z0-9_$]*$/i.test(cleanedCol)) {
           columns.add(cleanedCol)
         }
       })
