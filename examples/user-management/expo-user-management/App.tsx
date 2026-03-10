@@ -10,18 +10,18 @@ export default function App() {
   const [email, setEmail] = useState<string | undefined>(undefined)
 
   useEffect(() => {
-    supabase.auth.getClaims().then((decoded) => {
-      if (decoded?.claims) {
-        setUserId(decoded.claims.sub)
-        setEmail(decoded.claims.email)
+    supabase.auth.getClaims().then(({ data: { claims } }) => {
+      if (claims) {
+        setUserId(claims.sub)
+        setEmail(claims.email)
       }
     })
 
     supabase.auth.onAuthStateChange(async (_event, _session) => {
-      const decoded = await supabase.auth.getClaims()
-      if (decoded?.claims) {
-        setUserId(decoded.claims.sub)
-        setEmail(decoded.claims.email)
+      const { data: { claims } } = await supabase.auth.getClaims()
+      if (claims) {
+        setUserId(claims.sub)
+        setEmail(claims.email)
       } else {
         setUserId(null)
         setEmail(undefined)

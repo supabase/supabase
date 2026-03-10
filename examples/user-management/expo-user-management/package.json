@@ -23,7 +23,7 @@
     "react-native": "0.83.2",
     "react-native-safe-area-context": "~5.6.2",
     "react-native-url-polyfill": "^3.0.0",
-    "react-native-web": "~0.19.13"
+    "react-native-web": "~0.21.2"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
