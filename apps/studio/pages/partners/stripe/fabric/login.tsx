@@ -8,15 +8,12 @@ import {
   AlertTitle_Shadcn_,
   Button,
   LogoLoader,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
   WarningIcon,
 } from 'ui'
 
 import APIAuthorizationLayout from '@/components/layouts/APIAuthorizationLayout'
+import { OrganizationSelector } from '@/components/ui/org-selector'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-fabric-confirm-mutation'
 import {
   accountRequestQueryOptions,
@@ -43,6 +40,7 @@ const StripeFabricLoginPage = () => {
     isError,
     error,
   } = useQuery(accountRequestQueryOptions({ arId: ar_id }))
+  const { data: organizations = [] } = useOrganizationsQuery()
 
   const {
     mutateAsync: confirmAccountRequest,
@@ -67,7 +65,7 @@ const StripeFabricLoginPage = () => {
   // linked_organization is set when an org is already linked to this Stripe account+org pair
   // user_organizations is the list of user's orgs to pick from (only when no linked org)
   const linkedOrg = accountRequest?.linked_organization
-  const userOrgs = accountRequest?.user_organizations ?? []
+  const userOrgs = organizations ?? []
   const emailMatches = accountRequest?.email_matches ?? false
 
   const orgCount = userOrgs.length
@@ -94,7 +92,7 @@ const StripeFabricLoginPage = () => {
 
   return (
     <APIAuthorizationLayout>
-      <div className="flex flex-col items-center justify-center h-full">
+      <div className="flex flex-col items-center min-h-[500px]">
         {isConfirming ? (
           <>
             <LogoLoader />
@@ -192,25 +190,18 @@ const StripeFabricLoginPage = () => {
                 <p className="mt-4 text-sm text-foreground-light text-center">
                   Select the organization you'd like to link to your Stripe account.
                 </p>
-                <div className="mt-4 w-64">
-                  <Select_Shadcn_
-                    onValueChange={(slug) => {
+                <div className="mt-4 w-96">
+                  <OrganizationSelector
+                    onSelect={(slug) => {
                       const org = userOrgs.find((o) => o.slug === slug) ?? null
                       setSelectedOrg(org)
-                      if (org) setOrgConfirmed(true)
+                      if (org) {
+                        setOrgConfirmed(true)
+                      }
                     }}
-                  >
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="Choose an organization" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      {userOrgs.map((org) => (
-                        <SelectItem_Shadcn_ key={org.slug} value={org.slug}>
-                          {org.name}
-                        </SelectItem_Shadcn_>
-                      ))}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    maxOrgsToShow={3}
+                    canCreateNewOrg={false}
+                  />
                 </div>
               </>
             ) : (
