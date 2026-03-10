@@ -4664,11 +4664,6 @@ export interface components {
       scopes?: string[]
       /** @enum {string} */
       status: 'pending' | 'complete' | 'expired'
-      user_organizations?: {
-        id: number
-        name: string
-        slug: string
-      }[]
     }
     AddAwsAccountToPrivateLinkBody: {
       account_name?: string
@@ -5216,12 +5211,7 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner:
-            | 'fly'
-            | 'aws_marketplace'
-            | 'vercel_marketplace'
-            | 'stripe_product'
-            | null
+          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric' | null
           id: number
           is_owner: boolean
           name: string
@@ -6570,7 +6560,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -7585,7 +7575,7 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric' | null
       id: number
       is_owner: boolean
       name: string
@@ -7648,7 +7638,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric' | null
       has_oriole_project: boolean
       id: number
       name: string
