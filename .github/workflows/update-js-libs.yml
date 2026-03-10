@@ -42,16 +42,16 @@ jobs:
           VERSION: ${{ github.event.inputs.version }}
         run: |
           # Update @supabase/supabase-js
-          sed -i "s|'@supabase/supabase-js': .*|'@supabase/supabase-js': '${VERSION}'|" pnpm-workspace.yaml
+          sed -i "s|'@supabase/supabase-js': .*|'@supabase/supabase-js': ${VERSION}|" pnpm-workspace.yaml
 
           # Update @supabase/auth-js
-          sed -i "s|'@supabase/auth-js': .*|'@supabase/auth-js': '${VERSION}'|" pnpm-workspace.yaml
+          sed -i "s|'@supabase/auth-js': .*|'@supabase/auth-js': ${VERSION}|" pnpm-workspace.yaml
 
           # Update @supabase/realtime-js
-          sed -i "s|'@supabase/realtime-js': .*|'@supabase/realtime-js': '${VERSION}'|" pnpm-workspace.yaml
+          sed -i "s|'@supabase/realtime-js': .*|'@supabase/realtime-js': ${VERSION}|" pnpm-workspace.yaml
 
           # Update @supabase/postgrest-js
-          sed -i "s|'@supabase/postgrest-js': .*|'@supabase/postgrest-js': '${VERSION}'|" pnpm-workspace.yaml
+          sed -i "s|'@supabase/postgrest-js': .*|'@supabase/postgrest-js': ${VERSION}|" pnpm-workspace.yaml
 
           echo "Updated pnpm-workspace.yaml:"
           cat pnpm-workspace.yaml
