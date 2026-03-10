@@ -3,6 +3,7 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import {
   Children,
+  isValidElement,
   useMemo,
   useState,
   type KeyboardEvent,
@@ -58,7 +59,14 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   refs,
   children: _children,
 }) => {
-  const children = Children.toArray(_children) as PanelPropsProps[]
+  // Children.toArray clones elements (to assign keys) and accesses element.ref
+  // internally, which triggers a React 19 warning. Children.forEach iterates
+  // without cloning, so it never touches .ref.
+  const childrenArr: PanelPropsProps[] = []
+  Children.forEach(_children, (child) => {
+    if (isValidElement(child)) childrenArr.push(child as unknown as PanelPropsProps)
+  })
+  const children = childrenArr
 
   const [activeTab, setActiveTab] = useState(
     activeId ??
