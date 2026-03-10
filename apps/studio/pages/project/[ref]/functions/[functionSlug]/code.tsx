@@ -20,9 +20,8 @@ import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
 import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
-import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
-import { useLatest } from '@/hooks/misc/useLatest'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
@@ -150,11 +149,7 @@ const CodePage = () => {
   const hasUnsavedChanges = useMemo(() => {
     const normalizeFiles = (list: FileData[]) =>
       list.map(({ id, name, content }) => ({ id, name, content }))
-    const hasUnsavedChanges = !isEqual(
-      normalizeFiles(initialFiles),
-      normalizeFiles(files)
-    )
-    return hasUnsavedChanges
+    return !isEqual(normalizeFiles(initialFiles), normalizeFiles(files))
   }, [initialFiles, files])
 
   return (
