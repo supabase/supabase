@@ -1,7 +1,14 @@
 import { useCallback } from 'react'
 
 import { ActiveInputState, FilterGroup, FilterProperty, MenuItem } from './types'
-import { addFilterToGroup, addGroupToGroup, findGroupByPath, isCustomOptionObject } from './utils'
+import {
+  addFilterToGroup,
+  addGroupToGroup,
+  findGroupByPath,
+  isCustomOptionObject,
+  updateNestedOperator,
+  updateNestedValue,
+} from './utils'
 
 export function useCommandHandling({
   activeInput,
@@ -136,7 +143,14 @@ export function useCommandHandling({
       if (activeInput?.type === 'value') {
         handleValueCommand(item)
       } else if (activeInput?.type === 'operator') {
-        handleOperatorCommand(selectedValue)
+        if (item.isDefaultOperator) {
+          const path = activeInput.path
+          const filtersWithOperator = updateNestedOperator(activeFilters, path, item.value)
+          onFilterChange(updateNestedValue(filtersWithOperator, path, item.defaultValue ?? ''))
+          setActiveInput({ type: 'value', path })
+        } else {
+          handleOperatorCommand(selectedValue)
+        }
       } else if (activeInput?.type === 'group') {
         handleGroupPropertyCommand(selectedValue)
       }
@@ -150,6 +164,7 @@ export function useCommandHandling({
       handleValueCommand,
       handleOperatorCommand,
       handleGroupPropertyCommand,
+      onFilterChange,
       setIsCommandMenuVisible,
     ]
   )

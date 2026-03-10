@@ -97,6 +97,8 @@ export type MenuItem = {
   actionInputValue?: string
   group?: FilterOperatorGroup
   operatorSymbol?: string
+  isDefaultOperator?: boolean
+  defaultValue?: string
 }
 
 export type GroupedMenuItem = {
