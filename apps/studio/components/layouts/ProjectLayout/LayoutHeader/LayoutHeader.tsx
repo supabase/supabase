@@ -47,6 +47,7 @@ const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanEl
       strokeLinejoin="round"
       fill="none"
       shapeRendering="geometricPrecision"
+      aria-hidden={true}
     >
       <path d="M16 3.549L7.12 20.600" />
     </svg>
@@ -116,6 +117,7 @@ export const LayoutHeader = ({
         {(showProductMenu || isAccountPage) && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <button
+              type="button"
               title="Menu dropdown button"
               className={cn(
                 'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'

@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { ConnectButton } from 'components/interfaces/ConnectButton/ConnectButton'
 import { SidebarContent } from 'components/interfaces/Sidebar'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { Menu, Search } from 'lucide-react'
 import { useState } from 'react'
@@ -14,8 +15,10 @@ import { ProjectBranchSelector } from './ProjectBranchSelector'
 
 const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, slug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const isProjectScope = !!projectRef
+  const showOrgSelection = slug || (selectedOrganization && projectRef)
 
   return (
     <div className="w-full flex flex-row md:hidden">
@@ -34,9 +37,11 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
               <ProjectBranchSelector />
               <ConnectButton className="[&_span]:hidden h-8 w-8" />
             </>
-          ) : IS_PLATFORM ? (
+          ) : IS_PLATFORM && showOrgSelection ? (
             <OrgSelector />
-          ) : null}
+          ) : (
+            <HomeIcon className="ml-1" />
+          )}
         </div>
         <div className="flex flex-shrink-0 gap-2">
           <CommandMenuTrigger>
