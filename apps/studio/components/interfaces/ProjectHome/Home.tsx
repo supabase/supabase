@@ -5,11 +5,10 @@ import { ProjectUsageSection as ProjectUsageSectionV1 } from 'components/interfa
 import { SortableSection } from 'components/interfaces/ProjectHome/SortableSection'
 import { TopSection } from 'components/interfaces/ProjectHome/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import dayjs from 'dayjs'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useTrack } from 'lib/telemetry/track'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useEffect, useRef } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -25,8 +24,7 @@ export const ProjectHome = () => {
   const { enableBranching } = useParams()
   const snap = useAppStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const showHomepageUsageV2 = useFlag('newHomepageUsageV2')
 
@@ -58,20 +56,11 @@ export const ProjectHome = () => {
       const newIndex = items.indexOf(String(over.id))
       if (oldIndex === -1 || newIndex === -1) return items
 
-      if (project?.ref && organization?.slug) {
-        sendEvent({
-          action: 'home_section_rows_moved',
-          properties: {
-            section_moved: String(active.id),
-            old_position: oldIndex,
-            new_position: newIndex,
-          },
-          groups: {
-            project: project.ref,
-            organization: organization.slug,
-          },
-        })
-      }
+      track('home_section_rows_moved', {
+        section_moved: String(active.id),
+        old_position: oldIndex,
+        new_position: newIndex,
+      })
 
       return arrayMove(items, oldIndex, newIndex)
     })

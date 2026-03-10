@@ -24,11 +24,10 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import dayjs from 'dayjs'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useTrack } from 'lib/telemetry/track'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Plus, RefreshCw } from 'lucide-react'
@@ -47,8 +46,7 @@ export function CustomReportSection() {
   const { ref } = useParams()
   const { profile } = useProfile()
   const state = useDatabaseSelectorStateSnapshot()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { invalidateInfraMonitoringQuery } = useInvalidateAnalyticsQuery()
   const { data: project } = useSelectedProjectQuery()
 
@@ -202,19 +200,7 @@ export function CustomReportSection() {
           },
         })
 
-        if (ref && organization?.slug) {
-          sendEvent({
-            action: 'home_custom_report_block_added',
-            properties: {
-              block_id: snippet.id,
-              position: 0,
-            },
-            groups: {
-              project: ref,
-              organization: organization.slug,
-            },
-          })
-        }
+        track('home_custom_report_block_added', { block_id: snippet.id, position: 0 })
         return
       }
       const current = [...editableReport.layout]
@@ -224,19 +210,7 @@ export function CustomReportSection() {
       setEditableReport(updated)
       persistReport(updated)
 
-      if (ref && organization?.slug) {
-        sendEvent({
-          action: 'home_custom_report_block_added',
-          properties: {
-            block_id: snippet.id,
-            position: current.length - 1,
-          },
-          groups: {
-            project: ref,
-            organization: organization.slug,
-          },
-        })
-      }
+      track('home_custom_report_block_added', { block_id: snippet.id, position: current.length - 1 })
     },
     [
       editableReport,
@@ -244,8 +218,7 @@ export function CustomReportSection() {
       ref,
       profile,
       upsertContent,
-      organization,
-      sendEvent,
+      track,
       findNextPlacement,
       createSnippetChartBlock,
       persistReport,
@@ -264,17 +237,8 @@ export function CustomReportSection() {
     setEditableReport(updated)
     persistReport(updated)
 
-    if (ref && organization?.slug && removedChart) {
-      sendEvent({
-        action: 'home_custom_report_block_removed',
-        properties: {
-          block_id: String(removedChart.id),
-        },
-        groups: {
-          project: ref,
-          organization: organization.slug,
-        },
-      })
+    if (removedChart) {
+      track('home_custom_report_block_removed', { block_id: String(removedChart.id) })
     }
   }
 
@@ -324,12 +288,9 @@ export function CustomReportSection() {
       // Handle success optimistically
       toast.success(`Successfully created new query: ${label}`, { id: toastId })
       addSnippetToReport({ id: payload.id, name: label })
-      sendEvent({
-        action: 'custom_report_assistant_sql_block_added',
-        groups: { project: ref, organization: organization?.slug ?? 'Unknown' },
-      })
+      track('custom_report_assistant_sql_block_added')
     },
-    [ref, profile, project, upsertContent, addSnippetToReport, sendEvent, organization]
+    [ref, profile, project, upsertContent, addSnippetToReport, track]
   )
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
