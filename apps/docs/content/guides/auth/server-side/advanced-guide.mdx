@@ -68,7 +68,7 @@ If you use ISR on pages that trigger a Supabase session refresh, the cached resp
 
 Do not enable ISR on any route where authentication is handled or where a session refresh can occur. In Nuxt, avoid setting `isr` on authenticated routes. In Next.js, use `export const dynamic = 'force-dynamic'` on pages that require authentication.
 
-**CDN and reverse proxy caching**
+#### CDN and reverse proxy caching
 
 When `@supabase/ssr` refreshes a session token server-side, it writes the updated JWT to the HTTP response via a `Set-Cookie` header. If your CDN (e.g. CloudFront, Vercel Edge, Cloudflare) caches that response and serves it to a different user, that user's browser will store the cached token and be signed in as the wrong person.
 
