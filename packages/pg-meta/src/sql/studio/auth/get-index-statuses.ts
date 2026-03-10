@@ -1,4 +1,4 @@
-import { literal } from '../../pg-format'
+import { literal } from '../../../pg-format'
 
 export const USER_SEARCH_INDEXES = [
   'idx_users_email',

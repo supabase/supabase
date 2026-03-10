@@ -1,8 +1,8 @@
-import { expect, Page } from '@playwright/test'
+import { expect } from '@playwright/test'
 
 import { env } from '../env.config.js'
-import { dropTable, query } from '../utils/db/index.js'
-import { test } from '../utils/test.js'
+import { createTable, dropTable, query } from '../utils/db/index.js'
+import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import {
   createApiResponseWaiter,
@@ -10,52 +10,21 @@ import {
   waitForDatabaseToLoad,
 } from '../utils/wait-for-response.js'
 
-const databaseTableName = 'pw_database_table'
-const databaseTableNameNew = 'pw_database_table_new'
-const databaseTableNameUpdated = 'pw_database_table_updated'
-const databaseTableNameDuplicate = 'pw_database_table_duplicate'
 const databaseColumnName = 'pw_database_column'
-const databaseColumnName2 = 'pw_database_column_2'
-const databaseColumnName3 = 'pw_database_column_3'
-const databaseIndexName = 'pw_database_index'
-const databaseEnumName = 'pw_database_enum'
-const databaseEnumValue1Name = 'pw_database_value1'
-const databaseEnumValue2Name = 'pw_database_value2'
-const databaseEnumValue3Name = 'pw_database_value3'
-const databaseTriggerName = 'pw_database_trigger'
-const databaseTriggerNameUpdated = 'pw_database_trigger_updated'
-const databaseFunctionName = 'pw_database_function'
-const databaseFunctionNameUpdated = 'pw_database_function_updated'
-const databaseRoleName = 'pw_database_role'
 
-test.describe.serial('Database', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser, ref }) => {
-    // Create the shared test table via API
-    await dropTable(databaseTableName) // Clean up if exists
-    await query(`
-      CREATE TABLE IF NOT EXISTS ${databaseTableName} (
-        id bigint generated always as identity not null primary key,
-        created_at timestamptz default now(),
-        ${databaseColumnName} text
-      )
-    `)
-
-    page = await browser.newPage()
-    const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
-    await page.goto(toUrl(`/project/${ref}/editor`))
-    await wait
-  })
-
-  test.afterAll(async () => {
-    // Clean up via API
-    await dropTable(databaseTableName)
-    await page.close()
-  })
-
+test.describe('Database', () => {
   test.describe('Schema Visualizer', () => {
     test('actions works as expected', async ({ page, ref }) => {
+      const databaseTableName = 'pw_database_schema_table'
+      const databaseColumnName = 'pw_database_schema_column'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTable(databaseTableName, databaseColumnName)
+        },
+        async () => {
+          await dropTable(databaseTableName)
+        }
+      )
       const wait = createApiResponseWaiter(
         page,
         'pg-meta',
@@ -66,19 +35,18 @@ test.describe.serial('Database', () => {
       await wait
 
       // validates table and column exists
-      await page.waitForTimeout(500)
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
       await expect(page.getByText(databaseColumnName)).toBeVisible()
 
       // copies schema definition to clipboard
       await page.getByRole('button', { name: 'Copy as SQL' }).click()
-      await page.waitForTimeout(500)
+      await expect(page.getByTestId('copy-sql-ready')).toBeVisible()
       const clipboardText = await page.evaluate(() => navigator.clipboard.readText())
-      expect(clipboardText).toContain(`CREATE TABLE public.pw_database_table (
+      expect(clipboardText).toContain(`CREATE TABLE public.${databaseTableName} (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
-  pw_database_column text,
-  CONSTRAINT pw_database_table_pkey PRIMARY KEY (id)
+  ${databaseColumnName} text,
+  CONSTRAINT ${databaseTableName}_pkey PRIMARY KEY (id)
 );`)
 
       // downloads schema diagram when export is triggered
@@ -86,7 +54,7 @@ test.describe.serial('Database', () => {
       await page.getByRole('button', { name: 'Download Schema' }).click()
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
-      await expect(download.suggestedFilename()).toContain('.png')
+      expect(download.suggestedFilename()).toContain('.png')
 
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
@@ -104,8 +72,17 @@ test.describe.serial('Database', () => {
     })
   })
 
-  test.describe.serial('Tables', () => {
+  test.describe('Tables', () => {
     test('actions works as expected', async ({ page, ref }) => {
+      const databaseTableName = 'pw_database_actions_table'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTable(databaseTableName, databaseColumnName)
+        },
+        async () => {
+          await dropTable(databaseTableName)
+        }
+      )
       const wait = createApiResponseWaiter(
         page,
         'pg-meta',
@@ -119,7 +96,7 @@ test.describe.serial('Database', () => {
       await expect(page.getByRole('button', { name: 'New table' })).toBeVisible()
 
       // validates database name is present and has accurate number of columns
-      const tableRow = await page.getByRole('row', {
+      const tableRow = page.getByRole('row', {
         name: `${databaseTableName} No description`,
       })
       await expect(tableRow).toContainText(databaseTableName)
@@ -142,71 +119,31 @@ test.describe.serial('Database', () => {
 
       // filter by querying
       await page.getByRole('textbox', { name: 'Search for a table' }).fill('mfa')
-      await page.waitForTimeout(500)
       await expect(page.getByText('sso_providers')).not.toBeVisible()
       await expect(page.getByText('mfa_factors')).toBeVisible()
     })
 
     test('CRUD operations and copy works as expected', async ({ page, ref }) => {
-      await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
+      const databaseTableName = 'pw_database_tablecrud_table'
+      const databaseTableNameNew = 'pw_database_table_new'
+      const databaseTableNameUpdated = 'pw_database_table_updated'
+      const databaseTableNameDuplicate = 'pw_database_table_duplicate'
 
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTable(databaseTableName, databaseColumnName)
+        },
+        async () => {
+          // Cleanup the table in case the test failed at some point
+          await dropTable(databaseTableName)
+          await dropTable(databaseTableNameNew)
+          await dropTable(databaseTableNameUpdated)
+          await dropTable(databaseTableNameDuplicate)
+        }
+      )
+      await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
       // Wait for database tables to be populated
       await waitForDatabaseToLoad(page, ref)
-
-      // drop database tables if exists
-      if ((await page.getByText(databaseTableNameNew, { exact: true }).count()) > 0) {
-        await page
-          .getByRole('row', { name: databaseTableNameNew })
-          .getByRole('button')
-          .last()
-          .click()
-        await page.getByRole('menuitem', { name: 'Delete table' }).click()
-        await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
-        const cleanupNewWait = createApiResponseWaiter(
-          page,
-          'pg-meta',
-          ref,
-          'query?key=table-delete'
-        )
-        await page.getByRole('button', { name: 'Delete' }).click()
-        await cleanupNewWait
-      }
-
-      if ((await page.getByText(databaseTableNameUpdated, { exact: true }).count()) > 0) {
-        await page
-          .getByRole('row', { name: databaseTableNameUpdated })
-          .getByRole('button')
-          .last()
-          .click()
-        await page.getByRole('menuitem', { name: 'Delete table' }).click()
-        await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
-        const cleanupUpdatedWait = createApiResponseWaiter(
-          page,
-          'pg-meta',
-          ref,
-          'query?key=table-delete'
-        )
-        await page.getByRole('button', { name: 'Delete' }).click()
-        await cleanupUpdatedWait
-      }
-
-      if ((await page.getByText(databaseTableNameDuplicate, { exact: true }).count()) > 0) {
-        await page
-          .getByRole('row', { name: databaseTableNameDuplicate })
-          .getByRole('button')
-          .last()
-          .click()
-        await page.getByRole('menuitem', { name: 'Delete table' }).click()
-        await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
-        const cleanupDuplicateWait = createApiResponseWaiter(
-          page,
-          'pg-meta',
-          ref,
-          'query?key=table-delete'
-        )
-        await page.getByRole('button', { name: 'Delete' }).click()
-        await cleanupDuplicateWait
-      }
 
       // create a new table
       await page.getByRole('button', { name: 'New table' }).click()
@@ -294,13 +231,25 @@ test.describe.serial('Database', () => {
       // validate navigating to table editor from database table page
       await page.getByRole('row', { name: databaseTableName }).getByRole('button').last().click()
       await page.getByRole('menuitem', { name: 'View in Table Editor' }).click()
-      await page.waitForTimeout(1000) // wait for the table editor to be loaded
-      expect(page.url().includes('editor')).toBe(true)
+      await page.waitForURL(/.*\/editor\/\d+/)
     })
   })
 
   test.describe('Tables columns', () => {
     test('can view, create, update, delete, and filter table columns', async ({ page, ref }) => {
+      const databaseTableName = 'pw_database_columns_table'
+      const databaseColumnName2 = 'pw_database_column_2'
+      const databaseColumnName3 = 'pw_database_column_3'
+
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTable(databaseTableName, databaseColumnName)
+        },
+        async () => {
+          await dropTable(databaseTableName)
+        }
+      )
+
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
@@ -400,7 +349,7 @@ test.describe.serial('Database', () => {
     })
   })
 
-  test.describe.serial('Triggers', () => {
+  test.describe('Triggers', () => {
     test('actions works as expected', async ({ page, ref }) => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
@@ -421,28 +370,31 @@ test.describe.serial('Database', () => {
 
       // filter by querying
       await page.getByRole('textbox', { name: 'Search for a trigger' }).fill('abc')
-      await page.waitForTimeout(500) // wait for enum types to be loaded
       await expect(page.getByText('tr_check_filters')).not.toBeVisible()
     })
 
     test('CRUD operations works as expected', async ({ page, ref }) => {
+      const databaseTableName = 'pw_database_trigger_table'
+      const databaseTriggerName = 'pw_database_trigger'
+      const databaseTriggerNameUpdated = 'pw_database_trigger_updated'
+
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTable(databaseTableName, databaseColumnName)
+        },
+        async () => {
+          await query(`drop trigger if exists ${databaseTriggerName} on ${databaseTableName};`)
+          await query(
+            `drop trigger if exists ${databaseTriggerNameUpdated} on ${databaseTableName};`
+          )
+          await dropTable(databaseTableName)
+        }
+      )
+
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
       // Wait for database triggers to be populated
       await waitForApiResponse(page, 'pg-meta', ref, 'triggers')
-
-      // delete trigger if exists
-      if ((await page.getByRole('button', { name: databaseTriggerName }).count()) > 0) {
-        const triggerRow = await page.getByRole('row', { name: databaseTriggerName })
-        await triggerRow.getByRole('button', { name: 'More options' }).click()
-        await page.getByRole('menuitem', { name: 'Delete trigger' }).click()
-        await page.getByPlaceholder('Type in name of trigger').fill(databaseTriggerName)
-        await page.getByRole('button', { name: `Delete trigger ${databaseTriggerName}` }).click()
-        await expect(
-          page.getByText(`Successfully removed ${databaseTriggerName}`),
-          'Delete confirmation toast should be visible'
-        ).toBeVisible({ timeout: 50000 })
-      }
 
       // create new trigger
       await page.getByRole('button', { name: 'New trigger' }).first().click()
@@ -470,9 +422,9 @@ test.describe.serial('Database', () => {
       ).toBeVisible({
         timeout: 50000,
       })
-      const triggerRow = await page.getByRole('row', { name: databaseTriggerName })
-      expect(triggerRow).toContainText('subscription_check_filters')
-      expect(triggerRow).toContainText(databaseTriggerName)
+      const triggerRow = page.getByRole('row', { name: databaseTriggerName })
+      await expect(triggerRow).toContainText('subscription_check_filters')
+      await expect(triggerRow).toContainText(databaseTriggerName)
 
       // update trigger
       await triggerRow.getByRole('button', { name: 'More options' }).click()
@@ -534,17 +486,17 @@ test.describe.serial('Database', () => {
       const confirmationTokenIdxRow = page.getByRole('row', { name: 'confirmation_token_idx' })
       const createIndexButton = page.getByRole('button', { name: 'Create index' }).first()
 
-      expect(ssoProvidersPkeyRow).toBeVisible()
-      expect(confirmationTokenIdxRow).toBeVisible()
+      await expect(ssoProvidersPkeyRow).toBeVisible()
+      await expect(confirmationTokenIdxRow).toBeVisible()
       // create new index button does not exist in other schemas
-      expect(createIndexButton).not.toBeVisible()
+      await expect(createIndexButton).not.toBeVisible()
 
       // filter by querying
       await page.getByRole('textbox', { name: 'Search for an index' }).fill('users')
       await page.waitForTimeout(2000)
 
-      expect(page.getByText('sso_providers_pkey')).not.toBeVisible()
-      expect(page.getByText('confirmation_token_idx')).toBeVisible()
+      await expect(page.getByText('sso_providers_pkey')).not.toBeVisible()
+      await expect(page.getByText('confirmation_token_idx')).toBeVisible()
 
       // check index definition
       await page
@@ -552,30 +504,30 @@ test.describe.serial('Database', () => {
         .getByRole('button')
         .last()
         .click()
-      await page.getByText('Index:confirmation_token_idx')
-      await page.waitForTimeout(2000) // wait for text content to be visible
-      expect(await page.getByRole('presentation').textContent()).toBe(
-        `CREATE UNIQUE INDEX confirmation_token_idx ON auth.users USING btree (confirmation_token) WHERE ((confirmation_token)::text !~ '^[0-9 ]*$'::text)`
-      )
+      await expect(
+        page.getByText(
+          `CREATE UNIQUE INDEX confirmation_token_idx ON auth.users USING btree (confirmation_token) WHERE ((confirmation_token)::text !~ '^[0-9 ]*$'::text)`
+        )
+      ).toBeVisible()
     })
 
     test('CRUD operations works as expected', async ({ page, ref }) => {
+      const databaseTableName = 'pw_database_indexes_table'
+      const databaseIndexName = 'pw_database_index'
+
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTable(databaseTableName, databaseColumnName)
+        },
+        async () => {
+          await query(`drop index if exists ${databaseIndexName};`)
+          await dropTable(databaseTableName)
+        }
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/indexes?schema=public`))
 
       // Wait for database indexes to be populated
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
-
-      // delete index if exist
-      const exists = (await page.getByRole('button', { name: databaseIndexName }).count()) > 0
-      if (exists) {
-        await page.getByRole('button', { name: databaseIndexName }).getByRole('button').click()
-        await page.getByRole('menuitem', { name: 'Delete' }).click()
-        await page.getByRole('button', { name: 'Confirm' }).click()
-        await expect(
-          page.getByText(`Successfully deleted role: ${databaseIndexName}`),
-          'Delete confirmation toast should be visible'
-        ).toBeVisible({ timeout: 50000 })
-      }
 
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
@@ -593,14 +545,15 @@ test.describe.serial('Database', () => {
       ).toBeVisible()
 
       // check index definition
-      const newIndexRow = await page.getByRole('row', {
+      const newIndexRow = page.getByRole('row', {
         name: `${databaseTableName}_${databaseColumnName}_idx`,
       })
       await newIndexRow.getByRole('button', { name: 'View definition' }).click()
-      await page.waitForTimeout(500) // wait for text content to be visible
-      expect(await page.getByRole('presentation').textContent()).toBe(
-        `CREATE INDEX ${databaseTableName}_${databaseColumnName}_idx ON public.${databaseTableName} USING btree (${databaseColumnName})`
-      )
+      await expect(
+        page.getByText(
+          `CREATE INDEX ${databaseTableName}_${databaseColumnName}_idx ON public.${databaseTableName} USING btree (${databaseColumnName})`
+        )
+      ).toBeVisible()
       await page.getByRole('button', { name: 'Cancel' }).click()
 
       // delete the index
@@ -634,6 +587,7 @@ test.describe.serial('Database', () => {
     })
 
     test('CRUD operations works as expected', async ({ page, ref }) => {
+      const databaseRoleName = 'pw_database_role'
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/roles`))
 
       // Wait for database roles to be populated
@@ -677,7 +631,7 @@ test.describe.serial('Database', () => {
   })
 })
 
-test.describe.serial('Database Enumerated Types', () => {
+test.describe('Database Enumerated Types', () => {
   test('actions works as expected', async ({ page, ref }) => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
@@ -700,21 +654,23 @@ test.describe.serial('Database Enumerated Types', () => {
 
     // filter by querying
     await page.getByRole('textbox', { name: 'Search for a type' }).fill('code')
-    await page.waitForTimeout(1000) // wait for enum types to be loaded
     await expect(page.getByText('factor_type')).not.toBeVisible()
     await expect(page.getByText('code_challenge_method')).toBeVisible()
   })
 
   test('CRUD operations works as expected', async ({ page, ref }) => {
+    const databaseEnumName = 'pw_database_enum'
+    const databaseEnumValue1Name = 'pw_database_value1'
+    const databaseEnumValue2Name = 'pw_database_value2'
+    const databaseEnumValue3Name = 'pw_database_value3'
+
     const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=schemas')
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
     // Wait for database roles list to be populated
     await wait
-    // await page.waitForLoadState('networkidle')
 
     // if enum exists, delete it.
-    await page.waitForTimeout(500)
     if ((await page.getByRole('cell', { name: databaseEnumName, exact: true }).count()) > 0) {
       await page
         .getByRole('row', { name: `public ${databaseEnumName}` })
@@ -764,13 +720,12 @@ test.describe.serial('Database Enumerated Types', () => {
   })
 })
 
-test.describe.serial('Database Functions', () => {
+test.describe('Database Functions', () => {
   test('actions works as expected', async ({ page, ref }) => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/functions?schema=public`))
 
     // Wait for database functions to be populated
     await page.waitForLoadState('networkidle')
-    // await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
 
     // create a new function button exists in public schema
     await expect(page.getByRole('button', { name: 'Create a new function' })).toBeVisible()
@@ -786,44 +741,36 @@ test.describe.serial('Database Functions', () => {
 
     // filter by querying
     await page.getByRole('textbox', { name: 'Search for a function' }).fill('email')
-    await page.waitForTimeout(500) // wait for enum types to be loaded
     await expect(page.getByText('email')).toBeVisible()
     await expect(page.getByText('jwt')).not.toBeVisible()
   })
 
   test('CRUD operations works as expected', async ({ page, ref }) => {
+    const databaseFunctionName = 'pw_database_function'
+    const databaseFunctionNameUpdated = 'pw_database_function_updated'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await query(`drop function if exists ${databaseFunctionName}`);
+        await query(`drop function if exists ${databaseFunctionNameUpdated}`);
+      }
+    )
+
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/functions?schema=public`))
 
     // Wait for database functions to be populated
-    // await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
     await page.waitForLoadState('networkidle')
-
-    // delete function if exists
-    if ((await page.getByRole('button', { name: databaseFunctionName }).count()) > 0) {
-      const functionRow = await page.getByRole('row', { name: databaseFunctionName })
-      await functionRow.getByRole('button', { name: 'More options' }).click()
-      await page.getByRole('menuitem', { name: 'Delete function' }).click()
-      await page
-        .getByRole('textbox', { name: `Type ${databaseFunctionName} to confirm.` })
-        .fill(databaseFunctionName)
-      await page.getByRole('button', { name: `Delete function ${databaseFunctionName}` }).click()
-      await expect(
-        page.getByText(`Successfully removed function ${databaseFunctionName}`),
-        'Delete confirmation toast should be visible'
-      ).toBeVisible({
-        timeout: 50000,
-      })
-    }
 
     // create new function
     await page.getByRole('button', { name: 'Create a new function' }).click()
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionName)
-    const editor = await page.getByRole('presentation')
+    const editor = page.getByRole('presentation')
     await editor.click()
-    await page.keyboard.type(`BEGIN
-END;`)
-    await page.waitForTimeout(500) // wait for text content to be visible
-    expect(await page.getByRole('presentation').textContent()).toBe(`BEGINEND;`)
+    await page.keyboard.type(`BEGIN\nEND;`)
+    await expect(page.getByRole('presentation')).toHaveText(`BEGINEND;`)
     const functionCreateWait = createApiResponseWaiter(
       page,
       'pg-meta',
@@ -847,8 +794,8 @@ END;`)
     ).toBeVisible({
       timeout: 50000,
     })
-    const functionRow = await page.getByRole('row', { name: databaseFunctionName })
-    expect(functionRow).toContainText(databaseFunctionName)
+    const functionRow = page.getByRole('row', { name: databaseFunctionName })
+    await expect(functionRow).toContainText(databaseFunctionName)
 
     // update function
     await functionRow.getByRole('button', { name: 'More options' }).click()

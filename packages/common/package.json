@@ -21,7 +21,7 @@
     "flags": "^4.0.0",
     "lodash": "catalog:",
     "next-themes": "^0.3.0",
-    "posthog-js": "^1.257.2",
+    "posthog-js": "^1.333.0",
     "react-use": "^17.4.0",
     "valtio": "catalog:"
   },
