@@ -42,9 +42,9 @@ const CommandList = forwardRef<
 
           return (
             <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
-              {visibleCommands.map((command, index) => {
+              {visibleCommands.map((command) => {
                 return (
-                  <CommandItem key={command.id} command={command} commandIndex={index}>
+                  <CommandItem key={command.id} command={command}>
                     <TextHighlighter>{command.name}</TextHighlighter>
                   </CommandItem>
                 )

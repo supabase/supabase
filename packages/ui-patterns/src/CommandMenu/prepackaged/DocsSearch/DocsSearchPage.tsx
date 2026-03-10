@@ -82,14 +82,13 @@ const DocsSearchPage = () => {
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useCrossCompatRouter()
 
-  function trackResultClicked(name: string, path: string, index: number) {
+  function trackResultClicked(name: string, path: string) {
     telemetryContext?.onTelemetry?.({
-      action: 'command_menu_command_clicked',
+      action: 'command_menu_item_clicked',
       properties: {
         command_name: name,
         command_type: 'route',
         search_query: query || undefined,
-        result_index: index,
         result_path: path,
         app: telemetryContext.app,
       },
@@ -200,7 +199,7 @@ const DocsSearchPage = () => {
                   key={`${page.path}-item`}
                   value={`${escapeAttributeSelector(page.title)}-item-index-${i}`}
                   onSelect={() => {
-                    trackResultClicked(page.title, page.path, i)
+                    trackResultClicked(page.title, page.path)
                     openLink(page.type, page.path)
                   }}
                   forceMount={true}
@@ -232,8 +231,7 @@ const DocsSearchPage = () => {
                         onSelect={() => {
                           trackResultClicked(
                             section.heading ?? page.title,
-                            formatSectionUrl(page, section),
-                            i
+                            formatSectionUrl(page, section)
                           )
                           openLink(page.type, formatSectionUrl(page, section))
                         }}

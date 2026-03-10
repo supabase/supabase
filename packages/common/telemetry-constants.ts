@@ -2291,7 +2291,7 @@ export interface CommandMenuSearchSubmittedEvent {
  * @page any
  */
 export interface CommandMenuCommandClickedEvent {
-  action: 'command_menu_command_clicked'
+  action: 'command_menu_item_clicked'
   properties: {
     /**
      * The clicked command
@@ -2303,10 +2303,6 @@ export interface CommandMenuCommandClickedEvent {
      * The search query that was active when the command was clicked
      */
     search_query?: string
-    /**
-     * Zero-based index of the clicked item across all visible results
-     */
-    result_index?: number
     /**
      * The path or URL the clicked item leads to (only present for route commands)
      */
