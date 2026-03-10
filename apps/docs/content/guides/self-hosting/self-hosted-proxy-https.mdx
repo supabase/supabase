@@ -38,9 +38,9 @@ Comment out Kong's host port mappings in `docker-compose.yml` so that it's not e
 ```yaml
 kong:
   # ...
-  ports:
-    # - ${KONG_HTTP_PORT}:8000/tcp
-    # - ${KONG_HTTPS_PORT}:8443/tcp
+  # ports:
+  #   - ${KONG_HTTP_PORT}:8000/tcp
+  #   - ${KONG_HTTPS_PORT}:8443/tcp
 ```
 
 Kong remains accessible to other containers on the internal Docker network.
