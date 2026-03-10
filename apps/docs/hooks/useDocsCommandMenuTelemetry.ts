@@ -23,8 +23,6 @@ export function useDocsCommandMenuTelemetry() {
         | CommandMenuCommandClickedEvent
         | CommandMenuSearchSubmittedEvent
     ) => {
-      console.log('--- hasAcceptedConsent ---', hasAcceptedConsent)
-      console.log('EVENT', event)
       sendTelemetryEvent(event)
       posthogClient.capture(event.action, event.properties, hasAcceptedConsent)
     },

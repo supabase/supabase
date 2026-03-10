@@ -69,7 +69,7 @@ export const useCommandMenuOpenedTelemetry: (
         action: 'command_menu_opened' as const,
         properties: {
           trigger_type: trigger,
-          location: 'user_dropdown_menu',
+          trigger_location: 'user_dropdown_menu',
           app: telemetryContext.app,
         },
         groups: {},
