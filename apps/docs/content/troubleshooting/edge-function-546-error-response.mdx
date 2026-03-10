@@ -146,7 +146,6 @@ There are a few other queries that may be useful for identifying patterns around
 
         You can check error frequency by version with the below query:
 
-
 ```sql
 select
   COUNT(id) as total_responses,
@@ -194,7 +193,8 @@ WHERE pathname = '/functions/v1/FUNCTION_NAME'--<--OPTIONAL FILTER: add specific
 group by hour
 ORDER by hour DESC
 LIMIT 24;
-```
+
+````
 
     The output may look like:
     ![image](/docs/img/troubleshooting/546_errors_by_hour.png)
@@ -238,7 +238,7 @@ method <> 'OPTIONS' --ignore OPTION requests
 AND
 pathname = '/functions/v1/FUNCTION_NAME' --<-- add your function name to inspect specific endpoints
 GROUP BY metadata.execution_id
-```
+````
 
     </AccordionItem>
 
