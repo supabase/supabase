@@ -158,7 +158,7 @@ export const TableNode = ({
                 <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[85px]">
                   {column.name}
                 </span>
-                <span className="pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem]">
+                <span className="pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem] group-hover:hidden">
                   {column.format}
                 </span>
               </div>
