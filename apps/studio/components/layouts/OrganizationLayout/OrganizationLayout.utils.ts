@@ -7,8 +7,8 @@
  * Extracts pathname without query string. Safely handles undefined inputs.
  */
 export function getPathnameWithoutQuery(
-  asPath: string | undefined,
-  fallback: string | undefined
+  asPath?: string
+  fallback?: string
 ): string {
   const path = asPath ?? fallback ?? ''
   if (typeof path !== 'string' || path.length === 0) return ''
