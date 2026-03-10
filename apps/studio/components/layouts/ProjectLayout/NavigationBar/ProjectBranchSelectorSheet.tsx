@@ -23,14 +23,11 @@ const EMBEDDED_CLASSNAME =
 export interface ProjectBranchSelectorSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** When set (user is inside a project), default tab is "project". Otherwise "organization". */
   selectedRef: string | undefined
   onClose: () => void
-  /** Actual selected entities; used for tab labels and for accessing details inside the sheet. */
   selectedOrganization?: Organization | null
   displayProject?: ProjectDetail | null
   selectedBranch?: Branch | null
-  /** Optional overrides for tab labels when you don't pass the full objects. */
   selectedOrganizationName?: string | null
   selectedProjectName?: string | null
   selectedBranchName?: string | null

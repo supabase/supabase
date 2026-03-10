@@ -9,10 +9,6 @@ export interface ProjectBranchSelectorState {
   organizationHref: string
 }
 
-/**
- * Derives display state for the project/branch selector.
- * Pure function for testability.
- */
 export function getProjectBranchSelectorState(params: {
   selectedBranch: Branch | undefined
   isBranchingEnabled: boolean
