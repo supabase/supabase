@@ -12,14 +12,17 @@ export const TaxIdBanner = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const slug = org?.slug
 
-  const { data: taxId, isSuccess: isTaxIdLoaded } = useOrganizationTaxIdQuery(
-    { slug },
-    { enabled: !!slug && org?.plan?.id !== 'free', staleTime: 1000 * 60 * 30 }
-  )
-
   const [isDismissed, setIsDismissed, { isSuccess: isDismissLoaded }] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.TAX_ID_BANNER_DISMISSED(slug ?? ''),
     false
+  )
+
+  const { data: taxId, isSuccess: isTaxIdLoaded } = useOrganizationTaxIdQuery(
+    { slug },
+    {
+      enabled: !!slug && org?.plan?.id !== 'free' && !isDismissed,
+      staleTime: 1000 * 60 * 30,
+    }
   )
 
   if (
