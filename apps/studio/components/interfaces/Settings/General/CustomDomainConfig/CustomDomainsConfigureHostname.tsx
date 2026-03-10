@@ -76,7 +76,8 @@ export const CustomDomainsConfigureHostname = () => {
     if (trimmedDomain.length === 0) return undefined
 
     const labels = trimmedDomain.split('.').filter(Boolean)
-    if (labels.length <= 2) return labels[0] ?? 'api'
+    if (labels.length === 0) return undefined
+    if (labels.length <= 2) return labels[0]
 
     return labels.slice(0, -2).join('.')
   })()
@@ -124,13 +125,20 @@ export const CustomDomainsConfigureHostname = () => {
               {endpoint ? (
                 <span className="inline-flex items-center gap-x-1">
                   <code className="text-code-inline">{endpoint}</code>
-                  <CopyButton iconOnly type="default" className="px-1" text={endpoint} />
+                  <CopyButton
+                    iconOnly
+                    type="text"
+                    className="h-5 w-5 min-w-0 p-0 [&_svg]:h-3 [&_svg]:w-3"
+                    text={endpoint}
+                  />
                 </span>
               ) : (
                 "your project's API URL"
               )}{' '}
               with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-              disable the proxy option. Some DNS providers expect only the subdomain label{' '}
+              disable the proxy option.
+              <br />
+              Some DNS providers expect only the subdomain label{' '}
               {subdomainLabel !== undefined && (
                 <>
                   <code className="text-code-inline">{subdomainLabel}</code>{' '}
