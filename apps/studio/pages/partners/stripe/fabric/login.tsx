@@ -63,7 +63,7 @@ const StripeFabricLoginPage = () => {
   }
 
   // linked_organization is set when an org is already linked to this Stripe account+org pair
-  // user_organizations is the list of user's orgs to pick from (only when no linked org)
+  // userOrgs is the list of user's orgs to pick from (only when no linked org)
   const linkedOrg = accountRequest?.linked_organization
   const userOrgs = organizations ?? []
   const emailMatches = accountRequest?.email_matches ?? false
