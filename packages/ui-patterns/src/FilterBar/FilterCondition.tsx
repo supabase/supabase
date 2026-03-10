@@ -40,7 +40,6 @@ export function FilterCondition({
     isLoading,
     propertyOptionsCache,
     loadingOptions,
-    handleOperatorChange,
     handleInputChange,
     handleOperatorFocus,
     handleInputFocus,

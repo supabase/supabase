@@ -5,7 +5,6 @@ import {
   addFilterToGroup,
   addGroupToGroup,
   findGroupByPath,
-  isCustomOptionObject,
   updateNestedOperator,
   updateNestedValue,
 } from './utils'
@@ -102,15 +101,7 @@ export function useCommandHandling({
       const group = findGroupByPath(activeFilters, currentPath)
       if (!group) return
 
-      if (
-        selectedProperty.options &&
-        !Array.isArray(selectedProperty.options) &&
-        isCustomOptionObject(selectedProperty.options)
-      ) {
-        handlePropertySelection(selectedProperty, currentPath, group)
-      } else {
-        handlePropertySelection(selectedProperty, currentPath, group)
-      }
+      handlePropertySelection(selectedProperty, currentPath, group)
       onFreeformTextChange('')
     },
     [activeInput, filterProperties, activeFilters, onFreeformTextChange, handlePropertySelection]
