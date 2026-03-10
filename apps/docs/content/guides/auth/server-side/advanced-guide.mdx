@@ -74,7 +74,7 @@ When `@supabase/ssr` refreshes a session token server-side, it writes the update
 
 To prevent this, set `Cache-Control: private, no-store` on responses from any route that handles authentication, typically your middleware. Most CDNs will not cache responses with this header.
 
-**Next.js middleware:**
+#### Next.js middleware
 
 ```ts
 const response = NextResponse.next()
