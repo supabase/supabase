@@ -217,8 +217,10 @@ export const SchemaGraph = () => {
       onEditColumn: (tableId, columnId) => {
         const table = tables.find((table) => table.id === tableId)
         if (!table || table.columns == null) return
+
         const column = table.columns.find((column) => column.id === columnId)
         if (!column) return
+
         setSelectedTable(table)
         snap.onEditColumn(column)
       },
