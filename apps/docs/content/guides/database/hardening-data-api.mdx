@@ -58,10 +58,10 @@ Any data, views, or functions that should be exposed need to be deliberately put
     create schema if not exists api;
     ```
 
-1.  Grant the `anon` and `authenticated` roles usage on this schema.
+1.  Grant the `anon` and `authenticated` roles usage on this schema. If you also need server-side access using the `service_role` key, include `service_role` in the grant as well.
 
     ```sql
-    grant usage on schema api to anon, authenticated;
+    grant usage on schema api to anon, authenticated, service_role;
     ```
 
 1.  Go to [API Settings](/dashboard/project/_/settings/api) in the Supabase Dashboard.
