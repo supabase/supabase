@@ -36,15 +36,17 @@ const STATUS_MAP: Record<string, string> = {
 }
 
 /** Translate provisioner status enum to Studio's uppercase status string. */
-export function mapProvisionerStatus(status: ProvisionerStatus | string): string {
-  return STATUS_MAP[status] ?? 'UNKNOWN'
+export function mapProvisionerStatus(status: unknown): string {
+  return STATUS_MAP[String(status)] ?? 'UNKNOWN'
 }
 
 type ProvisionerProject = {
   id: string
   name: string
   schema_name: string
-  status: ProvisionerStatus | string
+  // Accept optional unknown here to handle zod v3/v4 dist type mismatch in the submodule;
+  // the status value is always a string at runtime.
+  status?: unknown
   created_at: string
 }
 

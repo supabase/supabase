@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { fetchGet } from 'data/fetchers'
 import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PG_META_URL } from 'lib/constants'
+import { IS_PLATFORM, PG_META_URL } from 'lib/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -21,9 +21,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 /**
- * Construct the pgMeta redirection url passing along the filtering query params
- * @param req
- * @param endpoint
+ * Construct the pgMeta redirection url passing along the filtering query params.
+ * In self-hosted mode, injects included_schemas=co_{ref} for schema isolation
+ * so the Table Editor only shows tables belonging to the selected project.
  */
 export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
   const query = Object.entries(req.query).reduce((query, entry) => {
@@ -42,6 +42,15 @@ export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
   if (Object.keys(req.query).length > 0) {
     url += `?${query}`
   }
+
+  // Self-hosted schema isolation: inject included_schemas so pg-meta only returns
+  // tables from the project's co_{ref} schema (locked CONTEXT.md decision).
+  if (!IS_PLATFORM) {
+    const ref = req.query.ref as string
+    const sep = url.includes('?') ? '&' : '?'
+    url = `${url}${sep}included_schemas=co_${ref}`
+  }
+
   return url
 }
 

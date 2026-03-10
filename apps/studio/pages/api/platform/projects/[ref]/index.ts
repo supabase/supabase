@@ -6,7 +6,7 @@ import { toStudioProject } from 'lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const { method } = req
 
   switch (method) {
@@ -20,7 +20,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGet = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   const ref = req.query.ref as string
   const projects = await getProvisioner().listProjects()
   const project = projects.find((p) => p.name === ref)
@@ -32,7 +32,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   return res.status(200).json(toStudioProject(project))
 }
 
-const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleDelete = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   const ref = req.query.ref as string
   const { confirm } = req.body ?? {}
 
@@ -47,5 +47,5 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   await getProvisioner().dropProject(ref, { confirm })
-  return res.status(204).end()
+  res.status(204).end()
 }
