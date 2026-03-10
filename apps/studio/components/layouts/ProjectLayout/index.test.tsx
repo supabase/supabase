@@ -51,17 +51,28 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    create: (Component: any) => Component,
   },
 }))
 
 vi.mock('ui', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
+  CommandInput_Shadcn_: { displayName: 'CommandInput' },
+  CommandItem_Shadcn_: { displayName: 'CommandItem' },
   LogoLoader: () => <div data-testid="logo-loader" />,
   ResizableHandle: (props: any) => <div {...props} />,
   ResizablePanel: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   ResizablePanelGroup: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  Sidebar: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarContent: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarFooter: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarGroup: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarMenu: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarMenuButton: (props: any) => <div {...props} />,
+  SidebarMenuItem: (props: any) => <div {...props} />,
   useIsMobile: () => false,
   usePanelRef: () => undefined,
+  useSidebar: () => ({ setOpen: vi.fn() }),
 }))
 
 vi.mock('ui-patterns/MobileSheetNav/MobileSheetNav', () => ({
