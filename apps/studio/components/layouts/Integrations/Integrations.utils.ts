@@ -1,9 +1,4 @@
 /**
- * Integrations layout path and URL parsing utilities.
- * Defensive helpers to avoid undefined access when parsing route segments.
- */
-
-/**
  * Builds the integrations page key from pathname segments.
  * e.g. /project/ref/integrations → 'integrations'
  *      /project/ref/integrations/abc-123 → 'integrations/abc-123'

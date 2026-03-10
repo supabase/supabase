@@ -40,5 +40,5 @@ export function generateIntegrationsMenu({
         },
       ],
     },
-  ].filter(Boolean)
+  ]
 }
