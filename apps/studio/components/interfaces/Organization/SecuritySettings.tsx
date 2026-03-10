@@ -15,8 +15,8 @@ import { useOrganizationMembersQuery } from 'data/organizations/organization-mem
 import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -41,7 +41,6 @@ const schema = z.object({
 export const SecuritySettings = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
 
   const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -54,7 +53,8 @@ export const SecuritySettings = () => {
   )
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const isPaidPlan = selectedOrganization?.plan.id !== 'free'
+  const { hasAccess: hasAccessToEnforceMfa, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('security.enforce_mfa')
 
   const {
     data: mfaConfig,
@@ -62,7 +62,7 @@ export const SecuritySettings = () => {
     isPending: isLoadingMfa,
     isError: isErrorMfa,
     isSuccess: isSuccessMfa,
-  } = useOrganizationMfaQuery({ slug }, { enabled: isPaidPlan && canReadMfaConfig })
+  } = useOrganizationMfaQuery({ slug }, { enabled: hasAccessToEnforceMfa && canReadMfaConfig })
 
   const { mutate: toggleMfa, isPending: isUpdatingMfa } = useOrganizationMfaToggleMutation({
     onError: (error) => {
@@ -100,14 +100,14 @@ export const SecuritySettings = () => {
     members?.find((member) => member.primary_email == profile?.primary_email)?.mfa_enabled || false
 
   const onSubmit = (values: { enforceMfa: boolean }) => {
-    if (!slug || !isPaidPlan) return
+    if (!slug || !hasAccessToEnforceMfa) return
     toggleMfa({ slug, setEnforced: values.enforceMfa })
   }
 
   return (
-    <ScaffoldContainer>
+    <ScaffoldContainer size="small" className="px-6 xl:px-10">
       <ScaffoldSection isFullWidth>
-        {!isPaidPlan ? (
+        {!hasAccessToEnforceMfa && !isLoadingEntitlement ? (
           <UpgradeToPro
             source="organizationMfa"
             primaryText="Organization MFA enforcement is not available on Free Plan"
@@ -116,7 +116,7 @@ export const SecuritySettings = () => {
           />
         ) : (
           <>
-            {isLoadingMfa || isLoadingPermissions ? (
+            {isLoadingMfa || isLoadingPermissions || isLoadingEntitlement ? (
               <Card>
                 <CardContent>
                   <GenericSkeletonLoader />
@@ -126,11 +126,11 @@ export const SecuritySettings = () => {
               <NoPermission resourceText="view organization security settings" />
             ) : null}
 
-            {(isErrorMfa || mfaError) && isPaidPlan && (
+            {(isErrorMfa || mfaError) && hasAccessToEnforceMfa && (
               <AlertError error={mfaError} subject="Failed to retrieve MFA enforcement status" />
             )}
 
-            {isSuccessMfa && isPaidPlan && (
+            {isSuccessMfa && hasAccessToEnforceMfa && (
               <Form_Shadcn_ {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
@@ -151,7 +151,7 @@ export const SecuritySettings = () => {
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                     disabled={
-                                      !isPaidPlan ||
+                                      !hasAccessToEnforceMfa ||
                                       !canUpdateMfaConfig ||
                                       !hasMFAEnabled ||
                                       isUpdatingMfa
@@ -181,7 +181,9 @@ export const SecuritySettings = () => {
                         <Button
                           type="default"
                           disabled={isLoadingMfa || isUpdatingMfa}
-                          onClick={() => form.reset({ enforceMfa: isPaidPlan ? mfaConfig : false })}
+                          onClick={() =>
+                            form.reset({ enforceMfa: hasAccessToEnforceMfa ? mfaConfig : false })
+                          }
                         >
                           Cancel
                         </Button>
@@ -190,7 +192,7 @@ export const SecuritySettings = () => {
                         type="primary"
                         htmlType="submit"
                         disabled={
-                          !isPaidPlan ||
+                          !hasAccessToEnforceMfa ||
                           !canUpdateMfaConfig ||
                           isUpdatingMfa ||
                           isLoadingMfa ||

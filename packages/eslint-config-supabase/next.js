@@ -64,11 +64,29 @@ module.exports = defineConfig([
     rules: {
       '@next/next/no-html-link-for-pages': 'off',
       'react/jsx-key': 'off',
+      'no-restricted-imports': [
+        'warn',
+        {
+          name: 'react-data-grid',
+          message: 'Please use @tanstack/react-table instead.',
+        },
+        {
+          name: 'react-contexify',
+          message: 'Please use ContextMenu from the ui package instead.',
+        },
+      ],
     },
   },
   {
     // check for default exports in all files except app and pages folders.
-    ignores: ['pages/**/*.ts', 'app/**/*.ts', 'pages/**/*.tsx', 'app/**/*.tsx'],
+    ignores: [
+      'pages/**/*.ts',
+      'app/**/*.ts',
+      'pages/**/*.tsx',
+      'app/**/*.tsx',
+      'components/interfaces/**/content/**/content.tsx',
+      'vitest.config.ts',
+    ],
     rules: {
       'no-restricted-exports': [
         'warn',

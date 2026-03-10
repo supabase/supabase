@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { IncidentInfo } from 'lib/api/incident-status'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, IS_TEST_ENV } from 'lib/constants'
 import { partition } from 'lodash'
 import { UseCustomQueryOptions } from 'types'
 
@@ -42,5 +42,6 @@ export const useIncidentStatusQuery = <TData = IncidentStatusData>(
     queryFn: ({ signal }) => getIncidentStatus(signal),
     staleTime: 1000 * 60 * 5, // 5 minutes to match API cache
     ...options,
-    enabled: IS_PLATFORM && (options.enabled ?? true),
+    // Enable in platform mode, or in test environment for E2E testing
+    enabled: (IS_PLATFORM || IS_TEST_ENV) && (options.enabled ?? true),
   })

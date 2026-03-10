@@ -1,6 +1,5 @@
-import { proxy, snapshot, useSnapshot } from 'valtio'
-
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import { proxy, snapshot, useSnapshot } from 'valtio'
 
 const getInitialState = () => {
   return {

@@ -1,13 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isEqual } from 'lodash'
-import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
-import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
-import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
-import { useLatest } from '@/hooks/misc/useLatest'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
@@ -21,7 +13,15 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { isEqual } from 'lodash'
+import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
+
+import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
@@ -146,27 +146,11 @@ const CodePage = () => {
     setFiles(initialFiles)
   }, [initialFiles])
 
-  // [Joshen] Probably a candidate for useStaticEffectEvent
-  const filesRef = useLatest(files)
-  const initialFilesRef = useLatest(initialFiles)
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      const normalizeFiles = (list: FileData[]) =>
-        list.map(({ id, name, content }) => ({ id, name, content }))
-      const hasUnsavedChanges = !isEqual(
-        normalizeFiles(initialFilesRef.current),
-        normalizeFiles(filesRef.current)
-      )
-
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const hasUnsavedChanges = useMemo(() => {
+    const normalizeFiles = (list: FileData[]) =>
+      list.map(({ id, name, content }) => ({ id, name, content }))
+    return !isEqual(normalizeFiles(initialFiles), normalizeFiles(files))
+  }, [initialFiles, files])
 
   return (
     <div className="flex flex-col h-full">
@@ -214,33 +198,35 @@ const CodePage = () => {
               orgSlug: org?.slug,
             }}
           />
-          <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
-            <ButtonTooltip
-              loading={isDeploying}
-              size="medium"
-              disabled={!canDeployFunction || files.length === 0 || isLoadingFiles}
-              onClick={handleDeployClick}
-              iconRight={
-                isDeploying ? (
-                  <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-                ) : (
-                  <div className="flex items-center space-x-1">
-                    <CornerDownLeft size={10} strokeWidth={1.5} />
-                  </div>
-                )
-              }
-              tooltip={{
-                content: {
-                  side: 'top',
-                  text: !canDeployFunction
-                    ? 'You need additional permissions to update edge functions'
-                    : undefined,
-                },
-              }}
-            >
-              Deploy updates
-            </ButtonTooltip>
-          </div>
+          {IS_PLATFORM && (
+            <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
+              <ButtonTooltip
+                loading={isDeploying}
+                size="medium"
+                disabled={!canDeployFunction || files.length === 0 || isLoadingFiles}
+                onClick={handleDeployClick}
+                iconRight={
+                  isDeploying ? (
+                    <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+                  ) : (
+                    <div className="flex items-center space-x-1">
+                      <CornerDownLeft size={10} strokeWidth={1.5} />
+                    </div>
+                  )
+                }
+                tooltip={{
+                  content: {
+                    side: 'top',
+                    text: !canDeployFunction
+                      ? 'You need additional permissions to update edge functions'
+                      : undefined,
+                  },
+                }}
+              >
+                Deploy updates
+              </ButtonTooltip>
+            </div>
+          )}
         </>
       )}
 
@@ -250,6 +236,7 @@ const CodePage = () => {
         onConfirm={handleDeployConfirm}
         isDeploying={isDeploying}
       />
+      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges} />
     </div>
   )
 }

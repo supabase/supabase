@@ -8,43 +8,44 @@ import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configur
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
+import { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
+  cn,
   CodeBlock,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   DIALOG_PADDING_X,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Separator,
-  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   CONNECTION_PARAMETERS,
-  type ConnectionStringMethod,
+  connectionStringMethodOptions,
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
   IPV4_ADDON_TEXT,
   PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT,
-  connectionStringMethodOptions,
+  type ConnectionStringMethod,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
-import examples, { Example } from './DirectConnectionExamples'
+import { examples, type Example } from './DirectConnectionExamples'
 
 const StepLabel = ({
   number,
@@ -67,6 +68,12 @@ export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
+  const {
+    hasAccess: hasDedicatedPooler,
+    isLoading: isLoadingEntitlement,
+    isSuccess: isSuccessEntitlement,
+  } = useCheckEntitlements('dedicated_pooler')
+  const sharedPoolerPreferred = !hasDedicatedPooler
 
   // URL state management
   const [queryType, setQueryType] = useQueryState('type', parseAsString.withDefault('uri'))
@@ -75,10 +82,6 @@ export const DatabaseConnectionString = () => {
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
   const [selectedMethod, setSelectedMethod] = useState<ConnectionStringMethod>('direct')
-
-  const sharedPoolerPreferred = useMemo(() => {
-    return org?.plan?.id === 'free'
-  }, [org])
 
   // Sync URL state with component state on mount and when URL changes
   useEffect(() => {
@@ -177,9 +180,9 @@ export const DatabaseConnectionString = () => {
       : isSuccessSupavisorConfig
 
   const error = poolerError || readReplicasError
-  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
+  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas || isLoadingEntitlement
   const isError = isErrorPoolerConfig || isErrorReadReplicas
-  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
+  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas && isSuccessEntitlement
 
   const sharedPoolerConfig = supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
   const poolingConfiguration = sharedPoolerPreferred ? sharedPoolerConfig : pgbouncerConfig

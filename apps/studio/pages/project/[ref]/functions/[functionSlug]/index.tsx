@@ -1,13 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import dayjs, { Dayjs } from 'dayjs'
-import maxBy from 'lodash/maxBy'
-import meanBy from 'lodash/meanBy'
-import sumBy from 'lodash/sumBy'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-
-import { useFlag } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
+import { EdgeFunctionRecentInvocations } from 'components/interfaces/Functions/EdgeFunctionRecentInvocations'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
@@ -19,13 +12,19 @@ import {
   useFunctionsCombinedStatsQuery,
 } from 'data/analytics/functions-combined-stats-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import dayjs, { Dayjs } from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import maxBy from 'lodash/maxBy'
+import meanBy from 'lodash/meanBy'
+import sumBy from 'lodash/sumBy'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
@@ -66,7 +65,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
-  const newChartsEnabled = useFlag('newEdgeFunctionOverviewCharts')
+
   const [interval, setInterval] = useState<string>('15min')
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const { data: selectedFunction } = useEdgeFunctionQuery({
@@ -81,7 +80,9 @@ const PageLayout: NextPageWithLayout = () => {
   })
 
   const combinedStatsData = useMemo(() => {
-    const result = combinedStatsResults.data?.result
+    const result = combinedStatsResults.data?.result as
+      | Record<string, string | number>[]
+      | undefined
     return result || []
   }, [combinedStatsResults.data])
 
@@ -98,10 +99,10 @@ const PageLayout: NextPageWithLayout = () => {
     data: combinedStatsChartData,
     error: combinedStatsError,
     isError: isErrorCombinedStats,
-  } = useFillTimeseriesSorted(
-    combinedStatsData,
-    'timestamp',
-    [
+  } = useFillTimeseriesSorted({
+    data: combinedStatsData,
+    timestampKey: 'timestamp',
+    valueKey: [
       'requests_count',
       'log_count',
       'log_info_count',
@@ -119,10 +120,10 @@ const PageLayout: NextPageWithLayout = () => {
       'avg_external_memory_used',
       'max_cpu_time_used',
     ],
-    0,
-    startDate.toISOString(),
-    endDate.toISOString()
-  )
+    defaultValue: 0,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+  })
 
   const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
@@ -136,6 +137,14 @@ const PageLayout: NextPageWithLayout = () => {
     <PageContainer size="full">
       <PageSection>
         <PageSectionContent>
+          {IS_PLATFORM && id && (
+            <div className="mb-8">
+              <EdgeFunctionRecentInvocations
+                functionId={id}
+                functionSlug={functionSlug as string}
+              />
+            </div>
+          )}
           <div className="flex flex-row items-center gap-2 mb-4">
             <div className="flex items-center">
               {CHART_INTERVALS.map((item, i) => {
@@ -179,7 +188,7 @@ const PageLayout: NextPageWithLayout = () => {
                       <WarningIcon />
                       <AlertTitle_Shadcn_>Failed to reterieve execution time</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {combinedStatsError.message}
+                        {combinedStatsError?.message ?? 'Unknown error'}
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (
@@ -194,20 +203,18 @@ const PageLayout: NextPageWithLayout = () => {
                         format="ms"
                         highlightedValue={meanBy(props.data, 'avg_execution_time')}
                       />
-                      {newChartsEnabled && (
-                        <AreaChart
-                          title="Max execution time"
-                          className="w-full"
-                          xAxisKey="timestamp"
-                          customDateFormat={selectedInterval.format}
-                          yAxisKey="max_execution_time"
-                          data={props.data}
-                          format="ms"
-                          highlightedValue={
-                            maxBy(props.data, 'max_execution_time')?.max_execution_time
-                          }
-                        />
-                      )}
+                      <AreaChart
+                        title="Max execution time"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        customDateFormat={selectedInterval.format}
+                        yAxisKey="max_execution_time"
+                        data={props.data}
+                        format="ms"
+                        highlightedValue={
+                          maxBy(props.data, 'max_execution_time')?.max_execution_time
+                        }
+                      />
                     </div>
                   )
                 }}
@@ -224,7 +231,7 @@ const PageLayout: NextPageWithLayout = () => {
                         <WarningIcon />
                         <AlertTitle_Shadcn_>Failed to reterieve invocations</AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
-                          {combinedStatsError.message}
+                          {combinedStatsError?.message ?? 'Unknown error'}
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )
@@ -292,24 +299,22 @@ const PageLayout: NextPageWithLayout = () => {
                             )
                           }}
                         />
-                        {newChartsEnabled && (
-                          <StackedBarChart
-                            title="Worker Logs"
-                            className="w-full"
-                            xAxisKey="timestamp"
-                            yAxisKey="count"
-                            stackKey="status"
-                            data={logsData}
-                            highlightedValue={sumBy(logsData, 'count')}
-                            customDateFormat={selectedInterval.format}
-                            stackColors={['red', 'brand', 'yellow']}
-                            onBarClick={() => {
-                              router.push(
-                                `/project/${projectRef}/functions/${functionSlug}/logs?its=${startDate.toISOString()}`
-                              )
-                            }}
-                          />
-                        )}
+                        <StackedBarChart
+                          title="Worker Logs"
+                          className="w-full"
+                          xAxisKey="timestamp"
+                          yAxisKey="count"
+                          stackKey="status"
+                          data={logsData}
+                          highlightedValue={sumBy(logsData, 'count')}
+                          customDateFormat={selectedInterval.format}
+                          stackColors={['red', 'brand', 'yellow']}
+                          onBarClick={() => {
+                            router.push(
+                              `/project/${projectRef}/functions/${functionSlug}/logs?its=${startDate.toISOString()}`
+                            )
+                          }}
+                        />
                       </div>
                     )
                   }
@@ -326,7 +331,7 @@ const PageLayout: NextPageWithLayout = () => {
                       <WarningIcon />
                       <AlertTitle_Shadcn_>Failed to retrieve CPU time</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {combinedStatsError.message}
+                        {combinedStatsError?.message ?? 'Unknown error'}
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (
@@ -341,20 +346,16 @@ const PageLayout: NextPageWithLayout = () => {
                         format="ms"
                         highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
                       />
-                      {newChartsEnabled && (
-                        <AreaChart
-                          title="Max CPU Time"
-                          className="w-full"
-                          xAxisKey="timestamp"
-                          customDateFormat={selectedInterval.format}
-                          yAxisKey="max_cpu_time_used"
-                          data={props.data}
-                          format="ms"
-                          highlightedValue={
-                            maxBy(props.data, 'max_cpu_time_used')?.max_cpu_time_used
-                          }
-                        />
-                      )}
+                      <AreaChart
+                        title="Max CPU Time"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        customDateFormat={selectedInterval.format}
+                        yAxisKey="max_cpu_time_used"
+                        data={props.data}
+                        format="ms"
+                        highlightedValue={maxBy(props.data, 'max_cpu_time_used')?.max_cpu_time_used}
+                      />
                     </div>
                   )
                 }}
@@ -371,7 +372,7 @@ const PageLayout: NextPageWithLayout = () => {
                         <WarningIcon />
                         <AlertTitle_Shadcn_>Failed to retrieve memory usage</AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
-                          {combinedStatsError.message}
+                          {combinedStatsError?.message ?? 'Unknown error'}
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )
@@ -404,20 +405,18 @@ const PageLayout: NextPageWithLayout = () => {
                         format="MB"
                         highlightedValue={meanBy(props.data, 'avg_memory_used')}
                       />
-                      {newChartsEnabled && (
-                        <StackedBarChart
-                          title="Average Memory Usage by Type"
-                          className="w-full"
-                          xAxisKey="timestamp"
-                          yAxisKey="count"
-                          stackKey="type"
-                          format="MB"
-                          data={memoryData}
-                          highlightedValue={sumBy(memoryData, 'count')}
-                          customDateFormat={selectedInterval.format}
-                          stackColors={['blue', 'brand']}
-                        />
-                      )}
+                      <StackedBarChart
+                        title="Average Memory Usage by Type"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        yAxisKey="count"
+                        stackKey="type"
+                        format="MB"
+                        data={memoryData}
+                        highlightedValue={sumBy(memoryData, 'count')}
+                        customDateFormat={selectedInterval.format}
+                        stackColors={['blue', 'brand']}
+                      />
                     </div>
                   )
                 }}

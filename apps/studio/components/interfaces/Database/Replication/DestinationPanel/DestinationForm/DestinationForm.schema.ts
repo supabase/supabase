@@ -7,16 +7,22 @@ export const DestinationPanelFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   publicationName: z.string().min(1, 'Publication is required'),
   maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
-  maxSize: z.number().min(1, 'Max batch size should be greater than 0').int().optional(),
   maxTableSyncWorkers: z
     .number()
     .min(1, 'Max table sync workers should be greater than 0')
     .int()
     .optional(),
+  maxCopyConnectionsPerTable: z
+    .number()
+    .int()
+    .min(1, 'Max copy connections per table should be greater than 0')
+    .optional(),
+  invalidatedSlotBehavior: z.enum(['error', 'recreate']).optional(),
   // BigQuery fields
   projectId: z.string().optional(),
   datasetId: z.string().optional(),
   serviceAccountKey: z.string().optional(),
+  connectionPoolSize: z.number().int().min(1).optional(),
   maxStalenessMins: z.number().nonnegative().optional(),
   // Analytics Bucket fields, only warehouse name and namespace are visible + editable fields
   warehouseName: z.string().optional(),

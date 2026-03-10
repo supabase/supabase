@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { paths } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { UseCustomQueryOptions } from 'types'
+
 import type { AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
 
@@ -14,7 +14,7 @@ export type InfraMonitoringSeriesMetadata = {
   yAxisLimit: number
   format: string
   total: number
-  totalAverage: number
+  totalAverage: number | string
 }
 
 // TODO(raulb): Remove InfraMonitoringSingleResponse once API always returns multi-attribute format.
