@@ -137,10 +137,13 @@ export const PostgrestConfig = () => {
     [allSchemas]
   )
 
-  const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation()
-
-  const { mutateAsync: updateExposedEntities } = useUpdateExposedEntitiesMutation()
-  const { mutateAsync: updateDefaultPrivileges } = useUpdateDefaultPrivilegesMutation()
+  const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation({
+    onError: noop,
+  })
+  const { mutateAsync: updateExposedEntities } = useUpdateExposedEntitiesMutation({ onError: noop })
+  const { mutateAsync: updateDefaultPrivileges } = useUpdateDefaultPrivilegesMutation({
+    onError: noop,
+  })
 
   const [isUpdating, setIsUpdating] = useState(false)
 
