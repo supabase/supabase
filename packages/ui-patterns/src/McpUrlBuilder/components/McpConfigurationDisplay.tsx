@@ -86,7 +86,7 @@ export function McpConfigurationDisplay({
             >
               <Image
                 src={mcpButtonData.imageSrc}
-                alt=""
+                alt={`${selectedClient.label} icon`}
                 width={16}
                 height={16}
                 className="shrink-0"

@@ -9,6 +9,8 @@ import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
 import { Feedback } from '~/components/Feedback'
 import { useTocAnchors } from '../features/docs/GuidesMdx.state'
+import { Chatgpt } from 'icons'
+import { Claude } from 'icons'
 
 interface TOCHeader {
   id?: string
@@ -61,7 +63,7 @@ function AiTools({ className }: { className?: string }) {
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >
-          <ExternalLink size={14} strokeWidth={1.5} />
+          <Chatgpt size={14} />
           Ask ChatGPT
         </a>
         <a
@@ -70,7 +72,7 @@ function AiTools({ className }: { className?: string }) {
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >
-          <ExternalLink size={14} strokeWidth={1.5} />
+          <Claude size={14} />
           Ask Claude
         </a>
       </div>

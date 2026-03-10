@@ -1,10 +1,25 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  generateOrganizationSettingsMenuItems,
   generateOrganizationSettingsSections,
   getOrganizationSettingsDocumentTitle,
   normalizeOrganizationSettingsPath,
 } from './OrganizationSettingsLayout'
+
+describe('generateOrganizationSettingsMenuItems', () => {
+  it('includes webhooks entry for organization settings nav', () => {
+    const items = generateOrganizationSettingsMenuItems({
+      slug: 'my-org',
+      showSecuritySettings: true,
+      showSsoSettings: true,
+      showLegalDocuments: true,
+    })
+
+    expect(items.some((item) => item.label === 'Webhooks')).toBe(true)
+    expect(items.some((item) => item.href === '/org/my-org/webhooks')).toBe(true)
+  })
+})
 
 describe('OrganizationSettingsLayout helpers', () => {
   it('returns expected organization settings sections and links', () => {
@@ -26,6 +41,7 @@ describe('OrganizationSettingsLayout helpers', () => {
       'Security',
       'SSO',
       'OAuth Apps',
+      'Webhooks',
       'Audit Logs',
       'Legal Documents',
     ])
@@ -52,6 +68,7 @@ describe('OrganizationSettingsLayout helpers', () => {
     expect(sections.flatMap((section) => section.links.map((item) => item.label))).toEqual([
       'General',
       'OAuth Apps',
+      'Webhooks',
       'Audit Logs',
     ])
   })
@@ -68,6 +85,21 @@ describe('OrganizationSettingsLayout helpers', () => {
 
     expect(
       sections.flatMap((section) => section.links).find((item) => item.label === 'Security')
+        ?.isActive
+    ).toBe(true)
+  })
+
+  it('keeps webhooks nav item active for nested endpoint routes', () => {
+    const sections = generateOrganizationSettingsSections({
+      slug: 'my-org',
+      currentPath: '/org/my-org/webhooks/org-endpoint-1',
+      showSecuritySettings: true,
+      showSsoSettings: true,
+      showLegalDocuments: true,
+    })
+
+    expect(
+      sections.flatMap((section) => section.links).find((item) => item.label === 'Webhooks')
         ?.isActive
     ).toBe(true)
   })

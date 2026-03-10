@@ -47,6 +47,13 @@ interface MiddlewareResponse {
 
 export const FIRST_REFERRER_COOKIE_NAME = '_sb_first_referrer'
 
+/**
+ * Short-lived (60s) diagnostic cookie written by www middleware on /dashboard and /docs paths.
+ * Encodes: hit=1&would_stamp={0|1}&has_cookie={0|1}
+ * Read by Studio telemetry to report middleware reach and attribution signals to PostHog.
+ */
+export const MW_DIAG_COOKIE_NAME = '_sb_mw_diag'
+
 /** 365 days in seconds */
 export const FIRST_REFERRER_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
 
@@ -260,6 +267,44 @@ export function stampFirstReferrerCookie(
       : {}),
     maxAge: FIRST_REFERRER_COOKIE_MAX_AGE,
   })
+}
+
+// ---------------------------------------------------------------------------
+// Middleware diagnostic cookie — parse (client-side)
+// ---------------------------------------------------------------------------
+
+export interface MwDiagData {
+  hit: boolean
+  would_stamp: boolean
+  has_existing_cookie: boolean
+}
+
+/**
+ * Parse the short-lived middleware diagnostic cookie written by www middleware
+ * on /dashboard and /docs paths. Returns null if the cookie is absent or malformed.
+ */
+export function parseMwDiagCookie(cookieHeader: string): MwDiagData | null {
+  try {
+    const cookies = cookieHeader.split(';')
+    const match = cookies
+      .map((c) => c.trim())
+      .find((c) => c.startsWith(`${MW_DIAG_COOKIE_NAME}=`))
+
+    if (!match) return null
+
+    const value = match.slice(`${MW_DIAG_COOKIE_NAME}=`.length)
+    const params = new URLSearchParams(value)
+
+    if (params.get('hit') !== '1') return null
+
+    return {
+      hit: true,
+      would_stamp: params.get('would_stamp') === '1',
+      has_existing_cookie: params.get('has_cookie') === '1',
+    }
+  } catch {
+    return null
+  }
 }
 
 // ---------------------------------------------------------------------------

@@ -47,7 +47,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
 
   const isActive = activeInput?.type === 'group' && pathsEqual(path, activeInput.path)
 
-  // Reset local value when group freeform value is cleared
   useEffect(() => {
     if (freeformText === '') {
       setLocalFreeformValue('')
@@ -82,6 +81,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
   const isOperatorActive = (conditionPath: number[]) => {
     if (!activeInput) return false
     return activeInput.type === 'operator' && pathsEqual(conditionPath, activeInput.path)
+  }
+
+  const isPropertyActiveForCondition = (conditionPath: number[]) => {
+    if (!activeInput) return false
+    return activeInput.type === 'property' && pathsEqual(conditionPath, activeInput.path)
   }
 
   const isConditionHighlighted = (conditionPath: number[]) => {
@@ -171,6 +175,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   path={currentPath}
                   isActive={isConditionActive(currentPath)}
                   isOperatorActive={isOperatorActive(currentPath)}
+                  isPropertyActive={isPropertyActiveForCondition(currentPath)}
                   isHighlighted={isConditionHighlighted(currentPath)}
                 />
               )}

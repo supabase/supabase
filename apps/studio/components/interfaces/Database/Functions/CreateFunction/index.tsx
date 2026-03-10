@@ -13,7 +13,7 @@ import { useDatabaseFunctionCreateMutation } from 'data/database-functions/datab
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import type { FormSchema } from 'types'
 import {
@@ -41,7 +41,7 @@ import {
   Toggle,
   cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
@@ -87,7 +87,7 @@ export const CreateFunction = ({
   })
   const language = form.watch('language')
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
   })
@@ -158,7 +158,7 @@ export const CreateFunction = ({
   const { data: protectedSchemas } = useProtectedSchemas()
 
   return (
-    <Sheet open={visible} onOpenChange={confirmOnClose}>
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent
         showClose={false}
         size={'default'}
@@ -402,26 +402,11 @@ export const CreateFunction = ({
             </Button>
           </SheetFooter>
         </div>
-        <CloseConfirmationModal {...closeConfirmationModalProps} />
+        <DiscardChangesConfirmationDialog {...modalProps} />
       </SheetContent>
     </Sheet>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)
 
 interface FormFieldConfigParamsProps {
   readonly?: boolean
