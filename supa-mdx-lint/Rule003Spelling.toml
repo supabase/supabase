@@ -258,6 +258,7 @@ allow_list = [
     "Mansueli",
     "Metabase",
     "[Mm]in[Ii][Oo]",
+    "[Mm]itigations",
     "Mixpeek",
     "Multiplatform",
     "MySQL",
