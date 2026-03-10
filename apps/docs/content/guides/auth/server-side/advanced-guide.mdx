@@ -70,9 +70,9 @@ Do not enable ISR on any route where authentication is handled or where a sessio
 
 #### CDN and reverse proxy caching
 
-When `@supabase/ssr` refreshes a session token server-side, it writes the updated JWT to the HTTP response via a `Set-Cookie` header. If your CDN (e.g. CloudFront, Vercel Edge, Cloudflare) caches that response and serves it to a different user, that user's browser will store the cached token and be signed in as the wrong person.
+When `@supabase/ssr` refreshes a session token server-side, it writes the updated JWT to the HTTP response via a `Set-Cookie` header. If your CDN (e.g. Vercel Edge, Cloudflare) caches that response and serves it to a different user, that user's browser will store the cached token and be signed in as the wrong person.
 
-To prevent this, set `Cache-Control: private, no-store` on responses from any route that handles authentication, typically your middleware. Most CDNs will not cache responses with this header.
+To prevent this, set `Cache-Control: private, no-store` on responses from any route that handles authentication, typically your middleware. Most CDNs respect this header and will not cache the response.
 
 #### Next.js middleware
 
@@ -90,11 +90,25 @@ return response
 setHeader(event, 'Cache-Control', 'private, no-store')
 ```
 
+<<<<<<< Updated upstream
 <Admonition type="note>
 
 On some managed CDN platforms (for example, AWS Amplify), cache policies are configured at the platform level and may not fully respect `Cache-Control` headers set in your application. In those cases, you may need to configure cache rules directly in the platform settings or disable CDN caching entirely for authenticated routes.
 
 </Admonition>
+=======
+**CloudFront**
+
+CloudFront's behavior depends on its cache policy configuration and is not solely controlled by the `Cache-Control` response header. Even with `Cache-Control: private, no-store`, CloudFront can still cache the response and the `Set-Cookie` header if its cache policy has a Minimum TTL greater than 0, or if cookies and the `Set-Cookie` header are not forwarded to the origin.
+
+To protect against session leakage on CloudFront, use one or more of the following mitigations:
+
+- **Set Minimum TTL to 0** in your CloudFront cache policy. This allows `Cache-Control: no-store` to take effect as intended.
+- **Use `Cache-Control: no-cache="Set-Cookie"`** to instruct CloudFront not to cache the `Set-Cookie` header specifically, while still allowing other parts of the response to be cached.
+- **Disable caching entirely** for authenticated routes (e.g. your middleware path) by associating a cache policy with TTL set to 0, or by using the managed `CachingDisabled` policy for those behaviors.
+
+Note: On other managed CDN platforms (for example AWS Amplify), cache policies are configured at the platform level and may similarly not fully respect `Cache-Control` headers set in your application. Always verify your CDN's caching behavior for routes that set cookies.
+>>>>>>> Stashed changes
 
 If you need to cache SSR pages for performance, apply caching only to routes that do not write `Set-Cookie` headers, and always include the refresh token cookie value in the cache key for any routes that serve user-specific content.
 
