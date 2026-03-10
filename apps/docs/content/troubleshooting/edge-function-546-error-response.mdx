@@ -318,7 +318,7 @@ Performing edits against images or other large files can be both CPU and Memory 
 
 AI models process data into embeddings (large arrays), that they can more understand. Edge Functions are capable of managing [some small models directly](/blog/ai-inference-now-available-in-supabase-edge-functions); however, some require more processing power than what the edge function can support direclty. In these cases, the solution is to manage the embeddings via an external source, such as OpenAI, Anthropic, etc. and to just use the edge function for light processing and coordination.
 
-### Webscraping 
+### Web scraping 
 
 Webscraping often requires a headless browser operator, such as [puppeteer](https://pptr.dev/) or [playwright](https://playwright.dev/) for rendering webpages. In this case, it is better to use an external API to manage the headless browser for you and then parse the results it returns with the edge function. There's an example in the function docs: [Taking Screenshots with Puppeteer](/docs/guides/functions/examples/screenshots)
 
