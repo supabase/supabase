@@ -64,7 +64,7 @@ export async function getTables(
     return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
   }
 
-  return data as Omit<PostgresTable, 'columns'>[]
+  return data
 }
 
 export type TablesData = Awaited<ReturnType<typeof getTables>>
