@@ -27,6 +27,7 @@ export function getMcpButtonData({
       icon: client.icon!,
       useDarkVariant: theme === 'light',
       hasDistinctDarkIcon: client.hasDistinctDarkIcon,
+      iconExtension: client.iconExtension,
     })
 
     return {

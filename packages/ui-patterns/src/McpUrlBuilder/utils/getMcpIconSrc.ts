@@ -9,13 +9,15 @@ export function getMcpClientIconSrc({
   icon,
   useDarkVariant,
   hasDistinctDarkIcon,
+  iconExtension = 'svg',
 }: {
   basePath: string
   iconFolder: string
   icon: string
   useDarkVariant: boolean
   hasDistinctDarkIcon?: boolean
+  iconExtension?: string
 }): string {
   const suffix = useDarkVariant && hasDistinctDarkIcon ? '-dark' : ''
-  return `${basePath}/img/${iconFolder}/${icon.toLowerCase()}-icon${suffix}.svg`
+  return `${basePath}/img/${iconFolder}/${icon.toLowerCase()}-icon${suffix}.${iconExtension}`
 }
