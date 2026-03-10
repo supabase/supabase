@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import CopyButton from 'components/ui/CopyButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
@@ -70,6 +71,15 @@ export const CustomDomainsConfigureHostname = () => {
   }
 
   const domain = form.watch('domain')
+  const trimmedDomain = domain.trim()
+  const subdomainLabel = (() => {
+    if (trimmedDomain.length === 0) return undefined
+
+    const labels = trimmedDomain.split('.').filter(Boolean)
+    if (labels.length <= 2) return labels[0] ?? 'api'
+
+    return labels.slice(0, -2).join('.')
+  })()
   const isSubmitting = isCheckingRecord || isCreating
 
   return (
@@ -112,12 +122,25 @@ export const CustomDomainsConfigureHostname = () => {
               {domain ? <code className="text-code-inline">{domain}</code> : 'your custom domain'}{' '}
               resolving to{' '}
               {endpoint ? (
-                <code className="text-code-inline">{endpoint}</code>
+                <span className="inline-flex items-center gap-x-1">
+                  <code className="text-code-inline">{endpoint}</code>
+                  <CopyButton iconOnly type="default" className="px-1" text={endpoint} />
+                </span>
               ) : (
                 "your project's API URL"
               )}{' '}
               with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-              disable the proxy option.
+              disable the proxy option. Some DNS providers expect only the subdomain label{' '}
+              {subdomainLabel !== undefined && (
+                <>
+                  <code className="text-code-inline">{subdomainLabel}</code>{' '}
+                </>
+              )}
+              while others accept the full hostname{' '}
+              {trimmedDomain.length > 0 && (
+                <code className="text-code-inline">{trimmedDomain}</code>
+              )}
+              .
             </p>
           </CardContent>
 
