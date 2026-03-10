@@ -60,7 +60,15 @@ A good default is to use `Lax` which sends cookies when users are navigating to 
 
 ### Can I use server-side rendering with a CDN or cache?
 
-Yes, but there is one thing to be aware of when deploying behind a CDN or reverse proxy.
+Yes, but there are two specific scenarios that can cause users to receive another user's session. Both are related to caching of HTTP responses that contain `Set-Cookie` headers.
+
+**ISR (Incremental Static Regeneration)**
+
+If you use ISR on pages that trigger a Supabase session refresh, the cached response will include the `Set-Cookie` header containing the refreshed JWT. When that cached response is served to a subsequent user, their browser stores the token and they are signed in as the wrong person.
+
+Do not enable ISR on any route where authentication is handled or where a session refresh can occur. In Nuxt, avoid setting `isr` on authenticated routes. In Next.js, use `export const dynamic = 'force-dynamic'` on pages that require authentication.
+
+**CDN and reverse proxy caching**
 
 When `@supabase/ssr` refreshes a session token server-side, it writes the updated JWT to the HTTP response via a `Set-Cookie` header. If your CDN (e.g. CloudFront, Vercel Edge, Cloudflare) caches that response and serves it to a different user, that user's browser will store the cached token and be signed in as the wrong person.
 
@@ -82,7 +90,9 @@ return response
 setHeader(event, 'Cache-Control', 'private, no-store')
 ```
 
-If you need to cache SSR pages for performance, apply caching only to downstream routes that do not write `Set-Cookie` headers, and always include the refresh token cookie value in the cache key for any routes that serve user-specific content.
+Note: On some managed CDN platforms (for example AWS Amplify), cache policies are configured at the platform level and may not fully respect `Cache-Control` headers set in your application. In those cases, you may need to configure cache rules directly in the platform settings, or disable CDN caching entirely for authenticated routes.
+
+If you need to cache SSR pages for performance, apply caching only to routes that do not write `Set-Cookie` headers, and always include the refresh token cookie value in the cache key for any routes that serve user-specific content.
 
 ### Which authentication flows have PKCE support?
 

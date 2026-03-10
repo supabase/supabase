@@ -744,11 +744,11 @@ language="typescript"
 </TabPanel>
 </Tabs>
 
-## CDN and reverse proxy caching
+## Caching considerations
 
-If your app is deployed behind a CDN or reverse proxy, set `Cache-Control: private, no-store` on responses from any route that handles authentication. When a session is refreshed, the new token is written to the response via `Set-Cookie`. If a CDN caches that response and serves it to a different user, that user will be signed in as the wrong person.
+If your app uses ISR or is deployed behind a CDN, caching of HTTP responses can cause users to receive another user's session. When a session is refreshed, the new token is written to the response via `Set-Cookie`. If that response is cached and served to a different user, that user will be signed in as the wrong person.
 
-See the [advanced guide](/docs/guides/auth/server-side/advanced-guide#can-i-use-server-side-rendering-with-a-cdn-or-cache) for more detail and framework-specific examples.
+See the [advanced guide](/docs/guides/auth/server-side/advanced-guide#can-i-use-server-side-rendering-with-a-cdn-or-cache) for details and framework-specific examples.
 
 ## Next steps
 
