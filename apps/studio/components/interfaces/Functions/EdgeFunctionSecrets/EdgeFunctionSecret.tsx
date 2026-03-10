@@ -1,10 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit2, Eye, EyeOff, MoreVertical, Trash } from 'lucide-react'
-import { useState } from 'react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { ProjectSecret } from 'data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Edit2, MoreVertical, Trash } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -25,15 +23,9 @@ interface EdgeFunctionSecretProps {
 
 const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFunctionSecretProps) => {
   const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
-  const [isValueVisible, setIsValueVisible] = useState(false)
-
   // [Joshen] Following API's validation:
   // https://github.com/supabase/platform/blob/develop/api/src/routes/v1/projects/ref/secrets/secrets.controller.ts#L106
   const isReservedSecret = !!secret.name.match(/^(SUPABASE_).*/)
-
-  const displayValue = isValueVisible
-    ? secret.value
-    : '•'.repeat(Math.min(secret.value.length, 20))
 
   return (
     <TableRow>
@@ -41,23 +33,12 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
         <p className="truncate py-2">{secret.name}</p>
       </TableCell>
       <TableCell>
-        <div className="flex items-center gap-2">
-          <p
-            className="font-mono text-sm max-w-96 truncate text-foreground-light"
-            title={isValueVisible ? secret.value : 'Hidden'}
-          >
-            {displayValue}
-          </p>
-          <Button
-            type="default"
-            size="tiny"
-            title={isValueVisible ? 'Hide secret value' : 'Show secret value'}
-            aria-label={isValueVisible ? 'Hide secret value' : 'Show secret value'}
-            className="px-1.5"
-            icon={isValueVisible ? <EyeOff size={14} /> : <Eye size={14} />}
-            onClick={() => setIsValueVisible((prev) => !prev)}
-          />
-        </div>
+        <p
+          className="font-mono text-sm max-w-96 truncate text-foreground-light"
+          title={secret.value}
+        >
+          {secret.value}
+        </p>
       </TableCell>
       <TableCell>
         {!!secret.updated_at ? (

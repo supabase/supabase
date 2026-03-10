@@ -1,29 +1,29 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { motion } from 'framer-motion'
+import { BASE_PATH } from 'lib/constants'
+import { buildPathWithParams } from 'lib/gotrue'
 import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { BASE_PATH } from 'lib/constants'
-import { buildPathWithParams } from 'lib/gotrue'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
 const schema = z.object({
