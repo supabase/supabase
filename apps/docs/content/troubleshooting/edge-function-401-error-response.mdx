@@ -55,6 +55,7 @@ When an edge function fails due to a platform 401 error, it returns the error:
 ### Inspecting the logs
 
 Your code may return a 401 error due to its own logic
+
 ```js
 return new Response(JSON.stringify(data), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
