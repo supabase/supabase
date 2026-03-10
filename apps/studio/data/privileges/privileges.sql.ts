@@ -221,6 +221,57 @@ export function getExposedFunctionCountsSql({ selectedSchemas }: { selectedSchem
   `
 }
 
+export function getDefaultPrivilegesStateSql() {
+  return /* SQL */ `
+    select
+      count(*)::int as revoke_count
+    from pg_default_acl d
+    join pg_namespace n on n.oid = d.defaclnamespace
+    join pg_roles r on r.oid = d.defaclrole
+    where n.nspname = 'public'
+      and r.rolname in ('postgres', 'supabase_admin')
+      and d.defaclobjtype in ('r', 'f', 'S')
+      and d.defaclacl = '{}'
+  `
+}
+
+export function buildDefaultPrivilegesSql(action: 'grant' | 'revoke') {
+  const roles = ['anon', 'authenticated', 'service_role']
+  const statements: string[] = []
+
+  for (const grantor of ['postgres', 'supabase_admin']) {
+    for (const role of roles) {
+      if (action === 'grant') {
+        statements.push(
+          `alter default privileges for role ${grantor} in schema public grant select, insert, update, delete on tables to ${role}`,
+          `alter default privileges for role ${grantor} in schema public grant execute on functions to ${role}`,
+          `alter default privileges for role ${grantor} in schema public grant usage, select on sequences to ${role}`
+        )
+      } else {
+        statements.push(
+          `alter default privileges for role ${grantor} in schema public revoke select, insert, update, delete on tables from ${role}`,
+          `alter default privileges for role ${grantor} in schema public revoke execute on functions from ${role}`,
+          `alter default privileges for role ${grantor} in schema public revoke usage, select on sequences from ${role}`
+        )
+      }
+    }
+  }
+
+  if (action === 'revoke') {
+    statements.push(
+      `alter default privileges for role postgres in schema public revoke execute on functions from public`,
+      `alter default privileges for role supabase_admin in schema public revoke execute on functions from public`
+    )
+  } else {
+    statements.push(
+      `alter default privileges for role postgres in schema public grant execute on functions to public`,
+      `alter default privileges for role supabase_admin in schema public grant execute on functions to public`
+    )
+  }
+
+  return statements.join(';\n') + ';'
+}
+
 export const buildTablePrivilegesSql = (oids: number[], action: 'grant' | 'revoke') => {
   if (oids.length === 0) return ''
 

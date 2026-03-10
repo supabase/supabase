@@ -23,4 +23,6 @@ export const privilegeKeys = {
     ] as const,
   exposedFunctionCounts: (projectRef: string | undefined, selectedSchemas: string[]) =>
     ['projects', projectRef, 'privileges', 'exposed-function-counts', ...selectedSchemas] as const,
+  defaultPrivileges: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'privileges', 'default-privileges'] as const,
 }

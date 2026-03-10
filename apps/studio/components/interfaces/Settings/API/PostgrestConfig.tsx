@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
@@ -19,6 +19,7 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Skeleton,
+  Switch,
   useWatch_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
@@ -42,7 +43,9 @@ import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { privilegeKeys } from '@/data/privileges/keys'
+import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
 import { useUpdateExposedEntitiesMutation } from '@/data/privileges/update-exposed-entities-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
@@ -63,6 +66,9 @@ const formSchema = z.object({
     .max(1000, "Can't be more than 1000")
     .optional()
     .nullable(),
+
+  // Default privileges toggle
+  defaultPrivilegesGranted: z.boolean(),
 
   // Fields for expose toggles
   tableIdsToAdd: z.array(z.number()),
@@ -98,12 +104,23 @@ export const PostgrestConfig = () => {
     connectionString: project?.connectionString,
   })
 
+  const {
+    data: defaultPrivilegesGranted,
+    isPending: isLoadingDefaultPrivileges,
+    isSuccess: isSuccessDefaultPrivileges,
+  } = useQuery(
+    defaultPrivilegesQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    })
+  )
+
   const configDbSchemas = useMemo(
     () => (config?.db_schema ? config.db_schema.split(',').map((x) => x.trim()) : []),
     [config?.db_schema]
   )
 
-  const isLoading = isLoadingConfig || isLoadingSchemas
+  const isLoading = isLoadingConfig || isLoadingSchemas || isLoadingDefaultPrivileges
 
   const schemas = useMemo(
     () =>
@@ -123,6 +140,7 @@ export const PostgrestConfig = () => {
   const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation()
 
   const { mutateAsync: updateExposedEntities } = useUpdateExposedEntitiesMutation()
+  const { mutateAsync: updateDefaultPrivileges } = useUpdateDefaultPrivilegesMutation()
 
   const [isUpdating, setIsUpdating] = useState(false)
 
@@ -144,12 +162,13 @@ export const PostgrestConfig = () => {
         .map((x) => x.trim())
         .filter(Boolean),
       dbPool: config?.db_pool,
+      defaultPrivilegesGranted: defaultPrivilegesGranted ?? true,
       tableIdsToAdd: [] as number[],
       tableIdsToRemove: [] as number[],
       functionNamesToAdd: [] as string[],
       functionNamesToRemove: [] as string[],
     }
-  }, [config, configDbSchemas])
+  }, [config, configDbSchemas, defaultPrivilegesGranted])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -178,6 +197,14 @@ export const PostgrestConfig = () => {
           functionNamesToAdd: values.functionNamesToAdd,
           functionNamesToRemove: values.functionNamesToRemove,
         })
+
+        if (values.defaultPrivilegesGranted !== defaultPrivilegesGranted) {
+          await updateDefaultPrivileges({
+            projectRef,
+            connectionString: project?.connectionString,
+            granted: values.defaultPrivilegesGranted,
+          })
+        }
       }
 
       await updatePostgrestConfig(
@@ -204,6 +231,9 @@ export const PostgrestConfig = () => {
         queryClient.invalidateQueries({
           queryKey: privilegeKeys.exposedFunctionCounts(projectRef, watchedDbSchema),
         }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.defaultPrivileges(projectRef),
+        }),
       ])
 
       toast.success('Successfully saved settings')
@@ -215,6 +245,7 @@ export const PostgrestConfig = () => {
         maxRows: values.maxRows,
         dbExtraSearchPath: values.dbExtraSearchPath,
         dbPool: values.dbPool,
+        defaultPrivilegesGranted: values.defaultPrivilegesGranted,
         tableIdsToAdd: [],
         tableIdsToRemove: [],
         functionNamesToAdd: [],
@@ -228,7 +259,7 @@ export const PostgrestConfig = () => {
   }
 
   const resetFormRef = useLatest(resetForm)
-  const isReady = isSuccessConfig && isSuccessSchemas
+  const isReady = isSuccessConfig && isSuccessSchemas && isSuccessDefaultPrivileges
   useEffect(() => {
     if (isReady) {
       resetFormRef.current()
@@ -249,6 +280,10 @@ export const PostgrestConfig = () => {
   const watchedFunctionNamesToRemove = useWatch_Shadcn_({
     control: form.control,
     name: 'functionNamesToRemove',
+  })
+  const watchedDefaultPrivilegesGranted = useWatch_Shadcn_({
+    control: form.control,
+    name: 'defaultPrivilegesGranted',
   })
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
@@ -375,6 +410,28 @@ export const PostgrestConfig = () => {
                           }}
                         />
                       </FormItemLayout>
+
+                      {watchedDbSchema.includes('public') && (
+                        <FormItemLayout
+                          isReactForm={false}
+                          layout="flex-row-reverse"
+                          label="Default privileges for new entities"
+                          description="When enabled, new tables and functions in the public schema are automatically accessible via the Data API. We recommend disabling this and manually granting access to each new entity."
+                        >
+                          <div>
+                            <Switch
+                              size="large"
+                              disabled={!canUpdatePostgrestConfig}
+                              checked={watchedDefaultPrivilegesGranted}
+                              onCheckedChange={(checked) => {
+                                form.setValue('defaultPrivilegesGranted', checked, {
+                                  shouldDirty: true,
+                                })
+                              }}
+                            />
+                          </div>
+                        </FormItemLayout>
+                      )}
 
                       {watchedDbSchema.length === 0 && (
                         <Admonition
