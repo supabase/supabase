@@ -7,8 +7,7 @@ const CODE_SEGMENT_REGEX = /(```[\s\S]*?```|`[^`]*`)/g
 // Matches bare placeholder URLs like https://xxx/<project-ref>/... outside markdown link
 // syntax. Stops at whitespace, ), or ] to avoid consuming link delimiters. Trailing prose
 // punctuation is stripped in the replacement callback below.
-const PLACEHOLDER_URL_REGEX =
-  /(?<!\()https?:\/\/[^\s)\]]*<[a-z][a-z0-9]*(?:-[a-z0-9]+)*>[^\s)\]]*/g
+const PLACEHOLDER_URL_REGEX = /(?<!\()https?:\/\/[^\s)\]]*<[a-z][a-z0-9]*(?:-[a-z0-9]+)*>[^\s)\]]*/g
 
 /**
  * Wraps bare URLs containing <placeholder> patterns in backticks so they render in
