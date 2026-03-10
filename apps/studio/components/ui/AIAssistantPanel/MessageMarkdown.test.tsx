@@ -29,6 +29,38 @@ describe('wrapPlaceholderUrls', () => {
       )
     ).toBe('Authorization endpoint: `https://<project-ref>.supabase.co/auth/v1/oauth/authorize`')
   })
+
+  test('skips URLs inside markdown link destinations', () => {
+    const input = '[OAuth docs](https://<project-ref>.supabase.co/auth/v1/oauth/authorize)'
+    expect(wrapPlaceholderUrls(input)).toBe(input)
+  })
+
+  test('wraps bare URL but skips linked URL when both appear in the same string', () => {
+    expect(
+      wrapPlaceholderUrls(
+        'Use [link](https://<project-ref>.supabase.co) or https://<project-ref>.supabase.co/raw'
+      )
+    ).toBe(
+      'Use [link](https://<project-ref>.supabase.co) or `https://<project-ref>.supabase.co/raw`'
+    )
+  })
+
+  test('leaves placeholder URLs inside fenced code blocks unchanged', () => {
+    const input = '```\nhttps://<project-ref>.supabase.co\n```'
+    expect(wrapPlaceholderUrls(input)).toBe(input)
+  })
+
+  test('strips trailing prose punctuation before wrapping', () => {
+    expect(wrapPlaceholderUrls('See https://<project-ref>.supabase.co/auth, then proceed.')).toBe(
+      'See `https://<project-ref>.supabase.co/auth`, then proceed.'
+    )
+  })
+
+  test('wraps URLs whose angle-bracket segment has no hyphen', () => {
+    expect(wrapPlaceholderUrls('https://example.com/path?id=<ref>')).toBe(
+      '`https://example.com/path?id=<ref>`'
+    )
+  })
 })
 
 describe('OrderedList', () => {
