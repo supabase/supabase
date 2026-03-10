@@ -24,7 +24,7 @@ type TelemetrySource = AiPromptCopiedEvent['properties']['source']
 
 const EXTERNAL_AI_TOOLS = [
   {
-    label: 'Open in ChatGPT',
+    label: 'Ask ChatGPT',
     url: 'https://chatgpt.com/',
     promptParam: 'q',
     icon: {
@@ -33,7 +33,7 @@ const EXTERNAL_AI_TOOLS = [
     },
   },
   {
-    label: 'Open in Claude.ai',
+    label: 'Ask Claude',
     url: 'https://claude.ai/new',
     promptParam: 'q',
     icon: { light: '/img/mcp-clients/claude-icon.svg', dark: '/img/mcp-clients/claude-icon.svg' },
