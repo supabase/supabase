@@ -20,7 +20,7 @@ export const TaxIdBanner = () => {
   const { data: taxId, isSuccess: isTaxIdLoaded } = useOrganizationTaxIdQuery(
     { slug },
     {
-      enabled: !!slug && org?.plan?.id !== 'free' && !isDismissed,
+      enabled: !!slug && org?.plan?.id !== 'free' && isDismissLoaded && !isDismissed,
       staleTime: 1000 * 60 * 30,
     }
   )
