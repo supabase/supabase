@@ -5,18 +5,13 @@ import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSe
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
 import pageData from '~/data/surveys/state-of-startups-2025'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { useFlag } from 'common'
 import { motion } from 'framer-motion'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
 
 function StateOfStartupsPage() {
-  const router = useRouter()
-  const isPageEnabled = useFlag('stateOfStartups')
-
   const meta_title = pageData.metaTitle || 'State of Startups 2025 | Supabase'
   const meta_description =
     pageData.metaDescription ||
@@ -28,10 +23,6 @@ function StateOfStartupsPage() {
   const tocRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
   const ctaBannerRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    if (isPageEnabled !== undefined && !isPageEnabled) router.push('/')
-  }, [isPageEnabled, router])
 
   // Scroll detection to show floating ToC
   useEffect(() => {
@@ -177,8 +168,6 @@ function StateOfStartupsPage() {
       </div>
     )
   }
-
-  if (!isPageEnabled) return null
 
   return (
     <>

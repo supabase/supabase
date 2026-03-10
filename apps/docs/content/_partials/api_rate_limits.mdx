@@ -21,11 +21,11 @@ This means you can make 120 requests to Project A and 120 requests to Project B 
 
 ### Rate limit response headers
 
-Every API response includes rate limit information in the following headers:
+Every API response includes rate limit information following official [HTTP specification headers](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-ratelimit-headers):
 
 - `X-RateLimit-Limit` - The maximum number of requests allowed in the current time window
 - `X-RateLimit-Remaining` - The number of requests remaining before you hit the rate limit
-- `X-RateLimit-Reset` - The number of milliseconds remaining until your rate limit resets
+- `X-RateLimit-Reset` - The number of seconds remaining until your rate limit resets
 
 You can use these headers to monitor your usage and implement proactive rate limit handling before receiving a 429 response.
 
@@ -60,6 +60,6 @@ Some endpoints have stricter rate limits than the standard 120 requests per minu
 ### Best practices
 
 - **Monitor rate limit headers** - Check the `X-RateLimit-Remaining` header to see how many requests you have left. When it approaches 0, slow down your requests to avoid hitting the limit.
-- **Implement exponential backoff** - When you receive a 429 response, wait before retrying. You can use the `X-RateLimit-Reset` header (milliseconds) to determine exactly how long to wait.
+- **Implement exponential backoff** - When you receive a 429 response, wait before retrying. You can use the `X-RateLimit-Reset` header (seconds) to determine exactly how long to wait.
 - **Batch operations** - Where possible, combine multiple operations into fewer API calls to reduce your request count.
 - **Be mindful of expensive endpoints** - Analytics, database context, and domain endpoints have stricter limits, so use them judiciously.
