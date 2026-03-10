@@ -6,8 +6,10 @@ import { SortableSection } from 'components/interfaces/ProjectHome/SortableSecti
 import { TopSection } from 'components/interfaces/ProjectHome/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import dayjs from 'dayjs'
+import { useTrackExperimentExposure } from 'hooks/misc/useTrackExperimentExposure'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { useEffect, useRef } from 'react'
@@ -15,10 +17,13 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 
 import { AdvisorSection } from './AdvisorSection'
+import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
 import { type GettingStartedState } from './GettingStarted/GettingStarted.types'
 import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
 import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
+
+const DEFAULT_SECTION_ORDER = ['connect', 'getting-started', 'usage', 'advisor', 'custom-report']
 
 export const ProjectHome = () => {
   const { enableBranching } = useParams()
@@ -27,6 +32,9 @@ export const ProjectHome = () => {
   const track = useTrack()
 
   const showHomepageUsageV2 = useFlag('newHomepageUsageV2')
+  const connectSectionVariant = usePHFlag<string | false>('connectSection')
+  const isConnectSectionFlagResolved = connectSectionVariant !== undefined
+  const isConnectSectionEnabled = connectSectionVariant === 'connect'
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
@@ -36,7 +44,7 @@ export const ProjectHome = () => {
 
   const [sectionOrder, setSectionOrder] = useLocalStorage<string[]>(
     `home-section-order-${project?.ref || 'default'}`,
-    ['getting-started', 'usage', 'advisor', 'custom-report']
+    DEFAULT_SECTION_ORDER
   )
 
   const [gettingStartedState, setGettingStartedState] = useLocalStorage<GettingStartedState>(
@@ -73,6 +81,51 @@ export const ProjectHome = () => {
     }
   }, [enableBranching, snap])
 
+  // PostHog experiment exposure (both variants). ConnectSection also fires
+  // home_connect_section_exposed as a custom analytics event for the connect variant.
+  useTrackExperimentExposure(
+    'connectSection',
+    typeof connectSectionVariant === 'string' && !isMatureProject && !!project
+      ? connectSectionVariant
+      : undefined
+  )
+
+  useEffect(() => {
+    setSectionOrder((items) => {
+      const knownItems = items.filter((id) => DEFAULT_SECTION_ORDER.includes(id))
+      const missingItems = DEFAULT_SECTION_ORDER.filter((id) => !knownItems.includes(id))
+
+      if (missingItems.length === 0 && knownItems.length === items.length) return items
+
+      const merged = [...knownItems]
+      missingItems.forEach((id) => {
+        const defaultIndex = DEFAULT_SECTION_ORDER.indexOf(id)
+        const nextKnownId = DEFAULT_SECTION_ORDER.slice(defaultIndex + 1).find((candidate) =>
+          merged.includes(candidate)
+        )
+        if (!nextKnownId) {
+          merged.push(id)
+          return
+        }
+        merged.splice(merged.indexOf(nextKnownId), 0, id)
+      })
+      return merged
+    })
+  }, [setSectionOrder])
+
+  const shouldShowConnectSection =
+    isConnectSectionFlagResolved &&
+    isConnectSectionEnabled &&
+    !isMatureProject &&
+    !!project
+
+  const shouldShowGettingStarted =
+    isConnectSectionFlagResolved &&
+    !isConnectSectionEnabled &&
+    !isMatureProject &&
+    !!project &&
+    gettingStartedState !== 'hidden'
+
   return (
     <div className="w-full h-full">
       <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
@@ -88,9 +141,11 @@ export const ProjectHome = () => {
           <ScaffoldSection isFullWidth className="gap-16 pb-32">
             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
               <SortableContext
-                items={sectionOrder.filter(
-                  (id) => id !== 'getting-started' || gettingStartedState !== 'hidden'
-                )}
+                items={sectionOrder.filter((id) => {
+                  if (id === 'connect') return shouldShowConnectSection
+                  if (id === 'getting-started') return shouldShowGettingStarted
+                  return true
+                })}
                 strategy={verticalListSortingStrategy}
               >
                 {sectionOrder.map((id) => {
@@ -103,12 +158,14 @@ export const ProjectHome = () => {
                       </div>
                     )
                   }
-                  if (
-                    id === 'getting-started' &&
-                    !isMatureProject &&
-                    project &&
-                    gettingStartedState !== 'hidden'
-                  ) {
+                  if (id === 'connect' && shouldShowConnectSection) {
+                    return (
+                      <SortableSection key={id} id={id}>
+                        <ConnectSection variant={connectSectionVariant} />
+                      </SortableSection>
+                    )
+                  }
+                  if (id === 'getting-started' && shouldShowGettingStarted) {
                     return (
                       <SortableSection key={id} id={id}>
                         <GettingStartedSection
