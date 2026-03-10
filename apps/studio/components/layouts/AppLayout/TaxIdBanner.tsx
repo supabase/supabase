@@ -1,11 +1,14 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 
+import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+
+const SUPPORTED_TAX_ID_COUNTRIES = new Set(TAX_IDS.map((t) => t.countryIso2))
 
 export const TaxIdBanner = () => {
   const router = useRouter()
@@ -17,22 +20,25 @@ export const TaxIdBanner = () => {
     false
   )
 
-  const { data: taxId, isSuccess: isTaxIdLoaded } = useOrganizationTaxIdQuery(
+  const shouldFetch =
+    !!slug && org?.plan?.id !== 'free' && isDismissLoaded && !isDismissed && !!org?.organization_missing_tax_id
+
+  const { data: customerProfile } = useOrganizationCustomerProfileQuery(
     { slug },
-    {
-      enabled: !!slug && org?.plan?.id !== 'free' && isDismissLoaded && !isDismissed,
-      staleTime: 1000 * 60 * 30,
-    }
+    { enabled: shouldFetch, staleTime: 1000 * 60 * 30 }
   )
+
+  const billingCountry = customerProfile?.address?.country
+  const hasSupportedTaxId = !!billingCountry && SUPPORTED_TAX_ID_COUNTRIES.has(billingCountry)
 
   if (
     router.pathname.includes('sign-in') ||
     !org ||
     org.plan?.id === 'free' ||
-    !isTaxIdLoaded ||
     !isDismissLoaded ||
-    taxId ||
-    isDismissed
+    isDismissed ||
+    !org.organization_missing_tax_id ||
+    !hasSupportedTaxId
   ) {
     return null
   }
