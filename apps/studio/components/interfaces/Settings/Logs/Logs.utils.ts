@@ -6,8 +6,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
-
-import logConstants from 'shared-data/logConstants'
+import logConstants from 'shared-data/log-constants'
 
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams } from './Logs.types'

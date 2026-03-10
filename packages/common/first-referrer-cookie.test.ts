@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest'
 import {
   buildFirstReferrerData,
   FIRST_REFERRER_COOKIE_NAME,
+  MW_DIAG_COOKIE_NAME,
   hasPaidSignals,
   isExternalReferrer,
   parseFirstReferrerCookie,
+  parseMwDiagCookie,
   serializeFirstReferrerCookie,
   shouldRefreshCookie,
 } from './first-referrer-cookie'
@@ -164,6 +166,71 @@ describe('first-referrer-cookie', () => {
       expect(hasPaidSignals(new URL('https://supabase.com/?utm_source=google'))).toBe(false)
       expect(hasPaidSignals(new URL('https://supabase.com/?utm_medium=email'))).toBe(false)
       expect(hasPaidSignals(new URL('https://supabase.com/?utm_medium=organic'))).toBe(false)
+    })
+  })
+
+  describe('parseMwDiagCookie', () => {
+    it('parses well-formed value with would_stamp=1 and has_cookie=0', () => {
+      const header = `${MW_DIAG_COOKIE_NAME}=hit=1&would_stamp=1&has_cookie=0`
+      expect(parseMwDiagCookie(header)).toEqual({
+        hit: true,
+        would_stamp: true,
+        has_existing_cookie: false,
+      })
+    })
+
+    it('parses well-formed value with would_stamp=0 and has_cookie=1', () => {
+      const header = `${MW_DIAG_COOKIE_NAME}=hit=1&would_stamp=0&has_cookie=1`
+      expect(parseMwDiagCookie(header)).toEqual({
+        hit: true,
+        would_stamp: false,
+        has_existing_cookie: true,
+      })
+    })
+
+    it('returns null when hit=0', () => {
+      const header = `${MW_DIAG_COOKIE_NAME}=hit=0&would_stamp=1&has_cookie=1`
+      expect(parseMwDiagCookie(header)).toBeNull()
+    })
+
+    it('returns object with would_stamp: false when would_stamp key is missing', () => {
+      const header = `${MW_DIAG_COOKIE_NAME}=hit=1&has_cookie=1`
+      expect(parseMwDiagCookie(header)).toEqual({
+        hit: true,
+        would_stamp: false,
+        has_existing_cookie: true,
+      })
+    })
+
+    it('returns object with has_existing_cookie: false when has_cookie key is missing', () => {
+      const header = `${MW_DIAG_COOKIE_NAME}=hit=1&would_stamp=1`
+      expect(parseMwDiagCookie(header)).toEqual({
+        hit: true,
+        would_stamp: true,
+        has_existing_cookie: false,
+      })
+    })
+
+    it('returns null for empty string input', () => {
+      expect(parseMwDiagCookie('')).toBeNull()
+    })
+
+    it('returns null when cookie is not present in header', () => {
+      expect(parseMwDiagCookie('session=abc123; theme=dark')).toBeNull()
+    })
+
+    it('returns null for garbage value', () => {
+      const header = `${MW_DIAG_COOKIE_NAME}=not-a-valid-query-string`
+      expect(parseMwDiagCookie(header)).toBeNull()
+    })
+
+    it('parses correct cookie from header with multiple cookies', () => {
+      const header = `session=abc123; ${MW_DIAG_COOKIE_NAME}=hit=1&would_stamp=1&has_cookie=0; theme=dark`
+      expect(parseMwDiagCookie(header)).toEqual({
+        hit: true,
+        would_stamp: true,
+        has_existing_cookie: false,
+      })
     })
   })
 

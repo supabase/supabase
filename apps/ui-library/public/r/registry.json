@@ -1419,6 +1419,46 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "tanstack-db-nextjs",
+      "type": "registry:block",
+      "title": "TanStack DB for Next.js and Supabase",
+      "description": "TanStack DB integration with Supabase collections for type-safe database operations",
+      "registryDependencies": [
+        "button",
+        "input",
+        "label",
+        "sheet"
+      ],
+      "dependencies": [
+        "supa-tdb-collection@latest",
+        "zod@latest",
+        "@tanstack/db@latest",
+        "@tanstack/react-db@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "supabase-client-nextjs",
       "type": "registry:lib",
       "title": "Supabase Client for Next.js",
