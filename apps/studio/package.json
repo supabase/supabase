@@ -27,6 +27,7 @@
     "evals:upload": "braintrust eval evals/assistant.eval.ts"
   },
   "dependencies": {
+    "@hosted-supabase/schema-provisioner": "workspace:*",
     "@ai-sdk/amazon-bedrock": "^3.0.0",
     "@ai-sdk/openai": "2.0.32",
     "@ai-sdk/provider": "^2.0.0",

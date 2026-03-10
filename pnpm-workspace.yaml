@@ -42,6 +42,10 @@ ignoredBuiltDependencies:
 minimumReleaseAge: 10080
 
 minimumReleaseAgeExclude:
+  - pg
+  - 'pg-*'
+  - pgpass
+  - jose
   - '@ai-sdk/*'
   - '@supabase/*'
   - 'next'
