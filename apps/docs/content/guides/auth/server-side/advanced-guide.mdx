@@ -94,7 +94,7 @@ setHeader(event, 'Cache-Control', 'private, no-store')
 
 CloudFront's behavior depends on its cache policy configuration and is not solely controlled by the `Cache-Control` response header. Even with `Cache-Control: private, no-store`, CloudFront can still cache the response and the `Set-Cookie` header if its cache policy has a Minimum TTL greater than 0, or if cookies and the `Set-Cookie` header are not forwarded to the origin.
 
-To protect against session leakage on CloudFront, use one or more of the following mitigations:
+To protect against session leakage on CloudFront, use one or more of the following steps:
 
 - **Set Minimum TTL to 0** in your CloudFront cache policy. This allows `Cache-Control: no-store` to take effect as intended.
 - **Use `Cache-Control: no-cache="Set-Cookie"`** to instruct CloudFront not to cache the `Set-Cookie` header specifically, while still allowing other parts of the response to be cached.
