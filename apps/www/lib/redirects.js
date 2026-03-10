@@ -2648,13 +2648,13 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/storage/analytics-buckets',
-    destination: '/docs/guides/storage',
+    source: '/docs/guides/storage/analytics/etl',
+    destination: '/docs/guides/database/replication/replication-setup',
   },
   {
     permanent: true,
-    source: '/docs/guides/storage/analytics/:path*',
-    destination: '/docs/guides/storage',
+    source: '/docs/guides/storage/analytics/replication',
+    destination: '/docs/guides/database/replication/replication-setup',
   },
   {
     permanent: true,
