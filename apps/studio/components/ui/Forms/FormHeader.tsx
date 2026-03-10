@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { cn } from 'ui'
+
 import { DocsButton } from '../DocsButton'
 
 export const FormHeader = ({
@@ -18,7 +19,7 @@ export const FormHeader = ({
   return (
     <div
       className={cn(
-        `w-full mb-6 flex flex-col sm:flex-row md:items-center justify-between gap-4 ${className}`
+        `w-full mb-6 flex flex-col sm:flex-row md:items-center justify-between gap-4 md:h-[var(--header-height)] ${className}`
       )}
     >
       <div className="space-y-1">

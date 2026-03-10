@@ -5,7 +5,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL
 const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
   ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
   : ''
-const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
+const SUPABASE_PROJECTS_URL = 'https://*.supabase.co https://*.storage.supabase.co'
 const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
 
 // construct the URL for the Websocket Local URLs
@@ -37,7 +37,7 @@ const NIMBUS_STAGING_PROJECTS_URL_WS = 'wss://*.nmb-proj.com'
 const NIMBUS_PROD_PROJECTS_URL = process.env.NIMBUS_PROD_PROJECTS_URL || ''
 const NIMBUS_PROD_PROJECTS_URL_WS = process.env.NIMBUS_PROD_PROJECTS_URL_WS || ''
 
-const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
+const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red https://*.storage.supabase.red'
 const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
 const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'

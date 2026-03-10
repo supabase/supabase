@@ -6,10 +6,10 @@
   "description": "",
   "registryDependencies": [],
   "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
-  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
   "envVars": {
     "NUXT_PUBLIC_SUPABASE_URL": "",
-    "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+    "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
   },
   "files": [
     {

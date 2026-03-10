@@ -2,13 +2,23 @@ import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
 import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
-import { parse } from 'libpg-query'
+import { extractUrls } from 'lib/helpers'
 
-const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
+const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2' // NOTE: `gpt-5.2-2025-12-11` snapshot not yet working with online scorers
 
-type Input = string
+export type AssistantEvalInput = {
+  prompt: string
+  mockTables?: Record<
+    string,
+    Array<{
+      name: string
+      rls_enabled: boolean
+      columns: Array<{ name: string; data_type: string }>
+    }>
+  >
+}
 
-type Output = {
+export type AssistantEvalOutput = {
   finishReason: FinishReason
   steps: Array<{ text: string; toolCalls: Array<{ toolName: string; input: unknown }> }>
   toolNames: string[]
@@ -34,14 +44,15 @@ export type AssistantEvalCaseCategory =
 
 export type AssistantEvalCaseMetadata = {
   category?: AssistantEvalCaseCategory[]
+  description?: string
 }
 
-export type AssistantEvalCase = EvalCase<Input, Expected, AssistantEvalCaseMetadata>
+export type AssistantEvalCase = EvalCase<AssistantEvalInput, Expected, AssistantEvalCaseMetadata>
 
 /**
  * Serialize steps into a string representation including text and tool calls
  */
-function serializeSteps(steps: Output['steps']): string {
+function serializeSteps(steps: AssistantEvalOutput['steps']): string {
   return steps
     .map((step) => {
       const toolCalls = step.toolCalls
@@ -55,17 +66,18 @@ function serializeSteps(steps: Output['steps']): string {
 /**
  * Extract only the text content from steps, filtering out empty text
  */
-function extractTextOnly(steps: Output['steps']): string {
+function extractTextOnly(steps: AssistantEvalOutput['steps']): string {
   return steps
     .map((step) => step.text)
     .filter((text) => text && text.trim().length > 0)
     .join('\n')
 }
 
-export const toolUsageScorer: EvalScorer<Input, Output, Expected> = async ({
-  output,
-  expected,
-}) => {
+export const toolUsageScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ output, expected }) => {
   if (!expected.requiredTools) return null
 
   const presentCount = expected.requiredTools.filter((tool) =>
@@ -77,31 +89,6 @@ export const toolUsageScorer: EvalScorer<Input, Output, Expected> = async ({
   return {
     name: 'Tool Usage',
     score: ratio,
-  }
-}
-
-export const sqlSyntaxScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
-  if (output.sqlQueries === undefined || output.sqlQueries.length === 0) {
-    return null
-  }
-
-  const errors: string[] = []
-  let validQueries = 0
-
-  for (const sql of output.sqlQueries) {
-    try {
-      await parse(sql)
-      validQueries++
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      errors.push(`SQL syntax error: ${errorMessage}`)
-    }
-  }
-
-  return {
-    name: 'SQL Validity',
-    score: validQueries / output.sqlQueries.length,
-    metadata: errors.length > 0 ? { errors } : undefined,
   }
 }
 
@@ -123,9 +110,13 @@ const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const concisenessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
+export const concisenessScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ input, output }) => {
   return await concisenessEvaluator({
-    input,
+    input: input.prompt,
     output: serializeSteps(output.steps),
   })
 }
@@ -147,12 +138,13 @@ const completenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
-  input,
-  output,
-}) => {
+export const completenessScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ input, output }) => {
   return await completenessEvaluator({
-    input,
+    input: input.prompt,
     output: serializeSteps(output.steps),
   })
 }
@@ -175,12 +167,13 @@ const goalCompletionEvaluator = LLMClassifierFromTemplate<{ input: string }>({
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const goalCompletionScorer: EvalScorer<Input, Output, Expected> = async ({
-  input,
-  output,
-}) => {
+export const goalCompletionScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ input, output }) => {
   return await goalCompletionEvaluator({
-    input,
+    input: input.prompt,
     output: serializeSteps(output.steps),
   })
 }
@@ -206,7 +199,11 @@ const docsFaithfulnessEvaluator = LLMClassifierFromTemplate<{ docs: string }>({
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const docsFaithfulnessScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
+export const docsFaithfulnessScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ output }) => {
   // Skip scoring if no docs were retrieved
   if (!output.docs || output.docs.length === 0) {
     return null
@@ -247,19 +244,70 @@ const correctnessEvaluator = LLMClassifierFromTemplate<{ input: string; expected
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
-  input,
-  output,
-  expected,
-}) => {
+export const correctnessScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ input, output, expected }) => {
   // Skip scoring if no ground truth is provided
   if (!expected.correctAnswer) {
     return null
   }
 
   return await correctnessEvaluator({
-    input,
+    input: input.prompt,
     expected: expected.correctAnswer,
     output: extractTextOnly(output.steps),
   })
+}
+
+export const urlValidityScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ output }) => {
+  const responseText = extractTextOnly(output.steps)
+  const allUrls = extractUrls(responseText, { excludeCodeBlocks: true, excludeTemplates: true })
+  const urls = allUrls.filter((url) => {
+    try {
+      const { hostname } = new URL(url)
+      return hostname === 'supabase.com' || hostname.endsWith('.supabase.com')
+    } catch {
+      return false
+    }
+  })
+
+  // Skip if no URLs found
+  if (urls.length === 0) {
+    return null
+  }
+
+  const results = await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+        if (response.ok) {
+          return { valid: true }
+        }
+        return { valid: false, error: `${url} returned ${response.status}` }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        return { valid: false, error: `${url} failed: ${errorMessage}` }
+      }
+    })
+  )
+
+  const errors = results.flatMap((r) => (r.error ? [r.error] : []))
+  const validUrls = results.filter((r) => r.valid).length
+
+  const metadata = {
+    urls,
+    errors: errors.length > 0 ? errors : undefined,
+  }
+
+  return {
+    name: 'URL Validity',
+    score: validUrls / urls.length,
+    metadata,
+  }
 }

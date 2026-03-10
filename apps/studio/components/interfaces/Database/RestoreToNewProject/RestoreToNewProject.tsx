@@ -18,6 +18,7 @@ import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -35,7 +36,8 @@ import { PreviousRestoreItem } from './PreviousRestoreItem'
 export const RestoreToNewProject = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const isFreePlan = organization?.plan?.id === 'free'
+  const { hasAccess: hasAccessToRestoreToNewProject, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('backup.restore_to_new_project')
   const isOrioleDb = useIsOrioleDb()
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
@@ -50,7 +52,10 @@ export const RestoreToNewProject = () => {
     error,
     isPending: cloneBackupsLoading,
     isError,
-  } = useCloneBackupsQuery({ projectRef: project?.ref }, { enabled: !isFreePlan })
+  } = useCloneBackupsQuery(
+    { projectRef: project?.ref },
+    { enabled: hasAccessToRestoreToNewProject }
+  )
 
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -102,7 +107,11 @@ export const RestoreToNewProject = () => {
   const isRestoring = previousClones?.some((c) => c.status === 'IN_PROGRESS')
   const restoringClone = previousClones?.find((c) => c.status === 'IN_PROGRESS')
 
-  if (isFreePlan) {
+  if (isLoadingEntitlement) {
+    return <GenericSkeletonLoader />
+  }
+
+  if (!hasAccessToRestoreToNewProject) {
     return (
       <UpgradeToPro
         buttonText="Upgrade"
@@ -256,6 +265,7 @@ export const RestoreToNewProject = () => {
         selectedBackupId={selectedBackupId}
         recoveryTimeTarget={recoveryTimeTarget}
         additionalMonthlySpend={additionalMonthlySpend}
+        hasAccess={hasAccessToRestoreToNewProject}
         onOpenChange={setShowNewProjectDialog}
         onCloneSuccess={() => {
           refetchCloneStatus()
@@ -307,6 +317,7 @@ export const RestoreToNewProject = () => {
       ) : (
         <BackupsList
           disabled={isRestoring}
+          hasAccess={hasAccessToRestoreToNewProject}
           onSelectRestore={(id) => {
             setSelectedBackupId(id)
             setShowConfirmationDialog(true)

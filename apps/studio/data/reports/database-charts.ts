@@ -1,8 +1,9 @@
-import { numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { compactNumberFormatter, numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import type { Organization } from 'types'
+
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
 import { Project } from '../projects/project-detail-query'
@@ -76,7 +77,11 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 45,
-        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+        tickFormatter: (value: any) => {
+          // avoid displaying 100.00%
+          if (value === 100) return '100%'
+          return `${numberFormatter(value, 2)}%`
+        },
       },
       hideChartType: false,
       defaultChartStyle: 'bar',
@@ -144,8 +149,8 @@ export const getReportAttributesV2: (
       showGrid: true,
       showMaxValue: true,
       YAxisProps: {
-        width: 35,
-        tickFormatter: (value: any) => numberFormatter(value, 0),
+        width: 55,
+        tickFormatter: (value: any) => compactNumberFormatter(value),
       },
       defaultChartStyle: 'bar',
       attributes: [

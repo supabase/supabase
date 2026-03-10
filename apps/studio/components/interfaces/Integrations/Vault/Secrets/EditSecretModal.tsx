@@ -1,13 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
-import { useState } from 'react'
-import { type SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Eye, EyeOff } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+import { toast } from 'sonner'
 import type { VaultSecret } from 'types'
 import {
   Button,
@@ -25,12 +24,9 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { z } from 'zod'
 
-interface EditSecretModalProps {
-  visible: boolean
-  secret: VaultSecret
-  onClose: () => void
-}
+import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 
 const SecretSchema = z.object({
   name: z.string().min(1, 'Please provide a name for your secret'),
@@ -40,22 +36,33 @@ const SecretSchema = z.object({
 
 const formId = 'edit-vault-secret-form'
 
-const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => {
-  const [showSecretValue, setShowSecretValue] = useState(false)
+export const EditSecretModal = () => {
   const { data: project } = useSelectedProjectQuery()
+
+  const { data: secrets = [], isSuccess } = useVaultSecretsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const [secretIdToEdit, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
+  const secret = secrets.find((secret) => secret.id === secretIdToEdit)
+
+  const [showSecretValue, setShowSecretValue] = useState(false)
+
   const { data, isPending: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
     {
       projectRef: project?.ref,
-      id: secret.id,
+      id: secret?.id,
       connectionString: project?.connectionString,
     },
     { enabled: !!project?.ref }
   )
+
   const values = {
-    name: secret.name ?? '',
-    description: secret.description ?? '',
-    secret: secret.decryptedSecret ?? data ?? '',
+    name: secret?.name ?? '',
+    description: secret?.description ?? '',
+    secret: secret?.decryptedSecret ?? data ?? '',
   }
+
   const form = useForm<z.infer<typeof SecretSchema>>({
     resolver: zodResolver(SecretSchema),
     defaultValues: values,
@@ -66,6 +73,7 @@ const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => 
 
   const onSubmit: SubmitHandler<z.infer<typeof SecretSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
+    if (!secret) return console.error('Secret is required')
 
     const payload: Partial<VaultSecret> = {
       secret: values.secret,
@@ -84,7 +92,7 @@ const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => 
         {
           onSuccess: () => {
             toast.success('Successfully updated secret')
-            onClose()
+            setSelectedSecretToEdit(null)
           },
           onError: (error) => {
             toast.error(`Failed to update secret: ${error.message}`)
@@ -94,13 +102,20 @@ const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => 
     }
   }
 
+  useEffect(() => {
+    if (isSuccess && !!secretIdToEdit && !secret) {
+      toast('Secret not found')
+      setSelectedSecretToEdit(null)
+    }
+  }, [isSuccess, secretIdToEdit, secret, setSelectedSecretToEdit])
+
   return (
     <Dialog
-      open={visible}
+      open={!!secret}
       onOpenChange={(open) => {
         if (!open) {
           form.reset()
-          onClose()
+          setSelectedSecretToEdit(null)
         }
       }}
     >
@@ -189,7 +204,7 @@ const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => 
                 disabled={isSubmitting}
                 onClick={() => {
                   form.reset()
-                  onClose()
+                  setSelectedSecretToEdit(null)
                 }}
               >
                 Cancel
@@ -204,5 +219,3 @@ const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => 
     </Dialog>
   )
 }
-
-export default EditSecretModal

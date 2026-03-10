@@ -1,6 +1,3 @@
-import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
@@ -8,6 +5,9 @@ import { Pipeline } from 'data/replication/pipelines-query'
 import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import { parseAsInteger, useQueryState } from 'nuqs'
+import { toast } from 'sonner'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -22,39 +22,45 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
+  getStatusName,
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
   PIPELINE_ERROR_MESSAGES,
-  getStatusName,
 } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 
 interface RowMenuProps {
+  destinationId: number
   pipeline: Pipeline | undefined
   pipelineStatus?: ReplicationPipelineStatusData['status']
   error: ResponseError | null
   isLoading: boolean
   isError: boolean
-  onEditClick: () => void
-  onDeleteClick: () => void
   hasUpdate?: boolean
+  onDeleteClick: () => void
   onUpdateClick?: () => void
 }
 
 export const RowMenu = ({
+  destinationId,
   pipeline,
   pipelineStatus,
   error,
   isLoading,
   isError,
-  onEditClick,
-  onDeleteClick,
   hasUpdate = false,
+  onDeleteClick,
   onUpdateClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
   const statusName = getStatusName(pipelineStatus)
+
+  const [, setEdit] = useQueryState(
+    'edit',
+    parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
@@ -176,7 +182,7 @@ export const RowMenu = ({
             </>
           )}
 
-          <DropdownMenuItem className="space-x-2" onClick={onEditClick}>
+          <DropdownMenuItem className="space-x-2" onClick={() => setEdit(destinationId)}>
             <Edit size={14} />
             <p>Edit destination</p>
           </DropdownMenuItem>

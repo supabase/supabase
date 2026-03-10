@@ -1,6 +1,6 @@
 import { EdgeFunctionSecrets } from 'components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
 import { FunctionsSecretsEmptyStateLocal } from 'components/interfaces/Functions/FunctionsEmptyState'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
@@ -18,7 +18,7 @@ const SecretsPage: NextPageWithLayout = () => {
   return (
     <PageContainer size="large">
       <PageSection>
-        <PageSectionContent>
+        <PageSectionContent className="space-y-4 md:space-y-8">
           {IS_PLATFORM ? <EdgeFunctionSecrets /> : <FunctionsSecretsEmptyStateLocal />}
         </PageSectionContent>
       </PageSection>
