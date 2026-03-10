@@ -50,7 +50,7 @@ export const IntegrationOverviewTabV2 = () => {
 
   return (
     <div className="grid grid-cols-3 gap-x-8 px-10 py-8">
-      <div className="col-span-2 flex-grow flex flex-col gap-y-8">
+      <div className="col-span-2 flex flex-col gap-y-8">
         {files.length > 0 && <FilesViewer files={files} />}
         <Markdown className="flex flex-col gap-y-4 text-foreground-light">{content}</Markdown>
       </div>

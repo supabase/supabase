@@ -52,11 +52,9 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const pageKey = categoryParam || page
 
   const { integrationsWrappers: showWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const {
-    data: categories = [],
-    isPending: isPendingCategories,
-    isSuccess: isSuccessCategories,
-  } = useQuery(marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled }))
+  const { data: categories = [], isPending: isPendingCategories } = useQuery(
+    marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled })
+  )
 
   const isLoading = IS_PLATFORM
     ? !flagsLoaded || (isMarketplaceEnabled && isPendingCategories)
@@ -74,8 +72,8 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
       ? [
           {
             name: 'Wrappers',
-            key: 'wrappers',
-            url: `/project/${ref}/integrations?category=wrappers`,
+            key: 'wrapper',
+            url: `/project/${ref}/integrations?category=wrapper`,
             items: [],
           },
         ]
