@@ -545,7 +545,7 @@ const PageLayout = withAuth(({ children }: PropsWithChildren) => {
 })
 
 Wizard.getLayout = (page) => (
-  <DefaultLayout headerTitle="New project">
+  <DefaultLayout hideMobileMenu headerTitle="New project">
     <PageLayout>{page}</PageLayout>
   </DefaultLayout>
 )

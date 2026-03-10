@@ -14,10 +14,17 @@ export function getOrgActiveRoute(pathname: string): string | undefined {
   return segments[orgIndex + 2]
 }
 
-const ORG_SETTINGS_ROUTES = ['general', 'apps', 'audit', 'documents', 'security', 'sso'] as const
+const ORG_SETTINGS_ROUTES: string[] = [
+  'general',
+  'apps',
+  'audit',
+  'documents',
+  'security',
+  'sso',
+] as const
 
 export function getOrgSectionKeyFromPathname(activeRoute: string | undefined): string | null {
-  if (activeRoute && ORG_SETTINGS_ROUTES.includes(activeRoute as string)) {
+  if (activeRoute && ORG_SETTINGS_ROUTES.includes(activeRoute)) {
     return 'settings'
   }
   return null

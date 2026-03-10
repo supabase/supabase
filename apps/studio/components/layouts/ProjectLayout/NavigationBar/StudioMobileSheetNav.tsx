@@ -45,4 +45,4 @@ const StudioMobileSheetNav = () => {
   )
 }
 
-export default StudioMobileSheetNav
+export { StudioMobileSheetNav }

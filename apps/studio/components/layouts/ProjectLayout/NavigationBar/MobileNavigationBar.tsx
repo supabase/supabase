@@ -39,6 +39,7 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
         <div className="flex gap-2">
           <CommandMenuTrigger>
             <button
+              type="button"
               className={cn(
                 'group',
                 'flex-grow h-[30px] rounded-md',
@@ -50,9 +51,7 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
                 'transition'
               )}
             >
-              <div className="flex items-center space-x-2">
-                <Search size={18} strokeWidth={2} />
-              </div>
+              <Search size={18} strokeWidth={2} />
             </button>
           </CommandMenuTrigger>
           {!hideMobileMenu && (
