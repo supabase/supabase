@@ -58,7 +58,10 @@ vi.mock('framer-motion', () => ({
 vi.mock('ui', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   CommandInput_Shadcn_: { displayName: 'CommandInput' },
+  Command_Shadcn_: { displayName: 'Command' },
+  CommandGroup_Shadcn_: { displayName: 'CommandGroup' },
   CommandItem_Shadcn_: { displayName: 'CommandItem' },
+  CommandList_Shadcn_: { displayName: 'CommandList' },
   LogoLoader: () => <div data-testid="logo-loader" />,
   ResizableHandle: (props: any) => <div {...props} />,
   ResizablePanel: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -155,6 +158,7 @@ vi.mock('@/state/database-selector', () => ({
   }),
 }))
 
+import { MobileSheetProvider } from './NavigationBar/MobileSheetContext'
 import { ProjectLayout } from './index'
 
 describe('ProjectLayout title', () => {
@@ -171,9 +175,11 @@ describe('ProjectLayout title', () => {
 
   it('sets a composed document title and deduplicates identical section/surface labels', async () => {
     render(
-      <ProjectLayout title="Settings" product="Settings" isBlocking={false}>
-        <div>Page Content</div>
-      </ProjectLayout>
+      <MobileSheetProvider>
+        <ProjectLayout title="Settings" product="Settings" isBlocking={false}>
+          <div>Page Content</div>
+        </ProjectLayout>
+      </MobileSheetProvider>
     )
 
     await waitFor(() => {
@@ -185,14 +191,16 @@ describe('ProjectLayout title', () => {
 
   it('prefers entity-first browserTitle metadata when provided', async () => {
     render(
-      <ProjectLayout
-        title="Database"
-        product="Database"
-        browserTitle={{ entity: 'users', section: 'Tables' }}
-        isBlocking={false}
-      >
-        <div>Page Content</div>
-      </ProjectLayout>
+      <MobileSheetProvider>
+        <ProjectLayout
+          title="Database"
+          product="Database"
+          browserTitle={{ entity: 'users', section: 'Tables' }}
+          isBlocking={false}
+        >
+          <div>Page Content</div>
+        </ProjectLayout>
+      </MobileSheetProvider>
     )
 
     await waitFor(() => {
