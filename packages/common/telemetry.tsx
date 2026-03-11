@@ -13,7 +13,11 @@ import { IS_PLATFORM, IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import type { FirstReferrerData, MwDiagData } from './first-referrer-cookie'
-import { isExternalReferrer, parseFirstReferrerCookie, parseMwDiagCookie } from './first-referrer-cookie'
+import {
+  isExternalReferrer,
+  parseFirstReferrerCookie,
+  parseMwDiagCookie,
+} from './first-referrer-cookie'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useParams, useTelemetryCookie } from './hooks'
 import { posthogClient, type ClientTelemetryEvent } from './posthog-client'

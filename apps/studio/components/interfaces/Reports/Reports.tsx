@@ -37,6 +37,7 @@ import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 
 const DEFAULT_CHART_COLUMN_COUNT = 1
 const DEFAULT_CHART_ROW_COUNT = 1
@@ -56,9 +57,6 @@ const Reports = () => {
   const [endDate, setEndDate] = useState<string>()
   const [hasEdits, setHasEdits] = useState<boolean>(false)
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
-
-  const [navigateUrl, setNavigateUrl] = useState<string>()
-  const [confirmNavigate, setConfirmNavigate] = useState(false)
 
   const {
     data: userContents,
@@ -364,31 +362,6 @@ const Reports = () => {
     checkEditState()
   }, [config])
 
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasEdits) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-
-    const handleBrowseAway = (url: string) => {
-      if (hasEdits && !confirmNavigate) {
-        setNavigateUrl(url)
-        throw 'Route change declined' // Just to prevent the route change
-      } else {
-        setNavigateUrl(undefined)
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    router.events.on('routeChangeStart', handleBrowseAway)
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      router.events.off('routeChangeStart', handleBrowseAway)
-    }
-  }, [hasEdits, confirmNavigate, router])
-
   if (isLoading || isLoadingPermissions) {
     return <LogoLoader />
   }
@@ -528,27 +501,7 @@ const Reports = () => {
           </div>
         )}
       </div>
-      <ConfirmationModal
-        visible={!!navigateUrl}
-        variant="warning"
-        title="You have unsaved changes in your report"
-        confirmLabel="Confirm"
-        onConfirm={() => {
-          setConfirmNavigate(true)
-          let urlToNavigate = navigateUrl ?? '/'
-          if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
-            urlToNavigate = urlToNavigate.slice(BASE_PATH.length) || '/'
-          }
-          if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
-          setNavigateUrl(undefined)
-          router.push(urlToNavigate)
-        }}
-        onCancel={() => setNavigateUrl(undefined)}
-      >
-        <p className="text-sm">
-          Unsaved changes will be lost, are you sure you want to navigate away?
-        </p>
-      </ConfirmationModal>
+      <PreventNavigationOnUnsavedChanges hasChanges={hasEdits} />
     </>
   )
 }

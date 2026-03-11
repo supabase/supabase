@@ -20,8 +20,8 @@ import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
 import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
-import { useLatest } from '@/hooks/misc/useLatest'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
@@ -146,27 +146,11 @@ const CodePage = () => {
     setFiles(initialFiles)
   }, [initialFiles])
 
-  // [Joshen] Probably a candidate for useStaticEffectEvent
-  const filesRef = useLatest(files)
-  const initialFilesRef = useLatest(initialFiles)
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      const normalizeFiles = (list: FileData[]) =>
-        list.map(({ id, name, content }) => ({ id, name, content }))
-      const hasUnsavedChanges = !isEqual(
-        normalizeFiles(initialFilesRef.current),
-        normalizeFiles(filesRef.current)
-      )
-
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const hasUnsavedChanges = useMemo(() => {
+    const normalizeFiles = (list: FileData[]) =>
+      list.map(({ id, name, content }) => ({ id, name, content }))
+    return !isEqual(normalizeFiles(initialFiles), normalizeFiles(files))
+  }, [initialFiles, files])
 
   return (
     <div className="flex flex-col h-full">
@@ -252,6 +236,7 @@ const CodePage = () => {
         onConfirm={handleDeployConfirm}
         isDeploying={isDeploying}
       />
+      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges} />
     </div>
   )
 }
