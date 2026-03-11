@@ -113,7 +113,6 @@ export const Grid = memo(
 
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
-        connectionString: project?.connectionString,
         schema: table?.schema ?? undefined,
       })
 
@@ -203,7 +202,7 @@ export const Grid = memo(
       // Compute rowClass function to style pending add/delete rows
       const computedRowClass = useMemo(() => {
         return (row: SupaRow) => {
-          const classes: string[] = []
+          const classes: string[] = ['[&>.rdg-cell]:flex', '[&>.rdg-cell]:items-center']
 
           // Call the original rowClass if provided
           if (rowClass) {

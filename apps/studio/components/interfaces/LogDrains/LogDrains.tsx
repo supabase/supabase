@@ -58,6 +58,7 @@ export function LogDrains({
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
   const axiomEnabled = useFlag('axiomLogDrain')
+  const otlpEnabled = useFlag('otlpLogDrain')
   const last9Enabled = useFlag('Last9LogDrain')
   const hasLogDrains = !!logDrains?.length
 
@@ -92,11 +93,12 @@ export function LogDrains({
   if (!isLoading && !hasLogDrains) {
     return (
       <>
-        <div className="grid lg:grid-cols-2 gap-4">
+        <div className="grid lg:grid-cols-3 gap-4">
           {LOG_DRAIN_TYPES.filter((t) => {
             if (t.value === 'sentry') return sentryEnabled
             if (t.value === 's3') return s3Enabled
             if (t.value === 'axiom') return axiomEnabled
+            if (t.value === 'otlp') return otlpEnabled
             if (t.value === 'last9') return last9Enabled
             return true
           }).map((src) => (

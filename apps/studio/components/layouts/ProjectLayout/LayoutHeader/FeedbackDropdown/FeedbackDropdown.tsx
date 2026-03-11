@@ -15,9 +15,9 @@ import {
   PopoverTrigger_Shadcn_,
 } from 'ui'
 
-import { ASSISTANT_SUGGESTIONS } from '../HelpDropdown/HelpDropdown.constants'
-import { getSupportLinkQueryParams } from '../HelpDropdown/HelpDropdown.utils'
-import { HelpSection } from '../HelpDropdown/HelpSection'
+import { ASSISTANT_SUGGESTIONS } from '../HelpPanel/HelpPanel.constants'
+import { getSupportLinkQueryParams } from '../HelpPanel/HelpPanel.utils'
+import { HelpSection } from '../HelpPanel/HelpSection'
 import { FeedbackWidget } from './FeedbackWidget'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {

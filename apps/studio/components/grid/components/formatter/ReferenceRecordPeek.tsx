@@ -39,7 +39,6 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
   } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: table.id,
       filters: [{ column, operator: '=', value }],
       page: 1,

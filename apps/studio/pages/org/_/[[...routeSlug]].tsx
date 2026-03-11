@@ -3,6 +3,7 @@ import {
   LoadingCardView,
   NoOrganizationsState,
 } from 'components/interfaces/Home/ProjectList/EmptyStates'
+import { buildOrgUrl } from 'components/interfaces/Organization/Organization.utils'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -22,17 +23,6 @@ const GenericOrganizationPage: NextPage = () => {
       : ''
 
   const { data: organizations, isPending: isLoading } = useOrganizationsQuery()
-
-  const urlRewriterFactory = (slug: string | string[] | undefined) => {
-    return (orgSlug: string) => {
-      if (!Array.isArray(slug)) {
-        return `/org/${orgSlug}/general${!!queryString ? `?${queryString}` : ''}`
-      } else {
-        const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-        return `/org/${orgSlug}/${slugPath}${!!queryString ? `?${queryString}` : ''}`
-      }
-    }
-  }
 
   return (
     <>
@@ -60,7 +50,7 @@ const GenericOrganizationPage: NextPage = () => {
                       <OrganizationCard
                         key={org.id}
                         organization={org}
-                        href={urlRewriterFactory(routeSlug)(org.slug)}
+                        href={buildOrgUrl({ slug: routeSlug, orgSlug: org.slug, queryString })}
                       />
                     ))}
                   </ul>

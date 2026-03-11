@@ -88,6 +88,11 @@ const nextConfig = {
               destination: '/sign-in',
               permanent: false,
             },
+            {
+              source: '/project/:ref/building',
+              destination: '/project/:ref',
+              permanent: false,
+            },
           ]
         : [
             {
@@ -118,6 +123,11 @@ const nextConfig = {
             {
               source: '/log-in',
               destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/project/:ref/building',
+              destination: '/project/:ref',
               permanent: false,
             },
           ]),
@@ -627,5 +637,11 @@ module.exports =
         // https://docs.sentry.io/product/crons/
         // https://vercel.com/docs/cron-jobs
         automaticVercelMonitors: true,
+
+        // Annotate bundles at build time so thirdPartyErrorFilterIntegration can
+        // distinguish our code from browser extensions / injected scripts at runtime.
+        unstable_sentryWebpackPluginOptions: {
+          applicationKey: 'supabase-studio',
+        },
       })
     : nextConfig
