@@ -16,14 +16,14 @@ The function rejected the request for lacking the appropriate authorization head
 
 By default, edge functions are configured to check requests for a valid [legacy key](/docs/guides/api/api-keys#overview).
 
-#### How the check Causes 401 errors
+#### How the check causes 401 errors
 
 The check will fail and return a 401 permission error if:
 
 - The request includes an invalid legacy key, or
 - The request uses the newer asymmetric keys instead of a legacy key.
 
-#### What this Check Actually Does
+#### What this check actually Does
 
 This validation provides limited security value. It only confirms that the request includes a legacy token associated with your project, such as the anon key.
 
