@@ -284,10 +284,7 @@ export const PostgrestConfig = () => {
     control: form.control,
     name: 'functionNamesToRemove',
   })
-  const watchedDefaultPrivilegesGranted = useWatch_Shadcn_({
-    control: form.control,
-    name: 'defaultPrivilegesGranted',
-  })
+
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
@@ -415,25 +412,37 @@ export const PostgrestConfig = () => {
                       </FormItemLayout>
 
                       {watchedDbSchema.includes('public') && (
-                        <FormItemLayout
-                          isReactForm={false}
-                          layout="flex-row-reverse"
-                          label="Default privileges for new entities"
-                          description="When enabled, new tables and functions in the public schema are automatically accessible via the Data API. We recommend disabling this and manually granting access to each new entity."
-                        >
-                          <div>
-                            <Switch
-                              size="large"
-                              disabled={!canUpdatePostgrestConfig}
-                              checked={watchedDefaultPrivilegesGranted}
-                              onCheckedChange={(checked) => {
-                                form.setValue('defaultPrivilegesGranted', checked, {
-                                  shouldDirty: true,
-                                })
-                              }}
-                            />
-                          </div>
-                        </FormItemLayout>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="defaultPrivilegesGranted"
+                          render={({ field }) => (
+                            <FormItem_Shadcn_>
+                              <FormItemLayout
+                                layout="flex-row-reverse"
+                                label="Default privileges for new entities"
+                                description={
+                                  <>
+                                    When enabled, new tables and functions in the{' '}
+                                    <code>public</code> schema are automatically accessible via the
+                                    Data API. We recommend disabling this and manually granting
+                                    access to each new entity.
+                                  </>
+                                }
+                              >
+                                <FormControl_Shadcn_>
+                                  <div>
+                                    <Switch
+                                      size="large"
+                                      disabled={!canUpdatePostgrestConfig}
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                    />
+                                  </div>
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            </FormItem_Shadcn_>
+                          )}
+                        />
                       )}
 
                       {watchedDbSchema.length === 0 && (
