@@ -19,13 +19,13 @@
     },
     {
       "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserName.ts",
-      "content": "import { ref, onMounted } from 'vue'\n// @ts-ignore\nimport { createClient } from \"@/lib/supabase/client\"\n\nexport function useCurrentUserName() {\n  const name = ref<string | null>(null)\n\n  const fetchProfileName = async () => {\n    const { data, error } = await createClient().auth.getSession()\n\n    if (error) {\n      console.error(error)\n      return\n    }\n\n    name.value = data.session?.user.user_metadata.full_name ?? '?'\n  }\n\n  onMounted(() => {\n    fetchProfileName()\n  })\n\n  return {\n    name,\n  }\n}\n",
+      "content": "import { ref, onMounted } from 'vue'\n// @ts-ignore\nimport { createClient } from '@/lib/supabase/client'\n\nexport function useCurrentUserName() {\n  const name = ref<string | null>(null)\n\n  const fetchProfileName = async () => {\n    const { data, error } = await createClient().auth.getSession()\n\n    if (error) {\n      console.error(error)\n      return\n    }\n\n    name.value = data.session?.user.user_metadata.full_name ?? '?'\n  }\n\n  onMounted(() => {\n    fetchProfileName()\n  })\n\n  return {\n    name,\n  }\n}\n",
       "type": "registry:component",
       "target": "composables/useCurrentUserName.ts"
     },
     {
       "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserImage.ts",
-      "content": "import { ref, onMounted } from 'vue'\n// @ts-ignore\nimport { createClient } from \"@/lib/supabase/client\"\n\nexport function useCurrentUserImage() {\n  const image = ref<string | null>(null)\n\n  const fetchUserImage = async () => {\n    const { data, error } = await createClient().auth.getSession()\n\n    if (error) {\n      console.error(error)\n      return\n    }\n\n    image.value = data.session?.user.user_metadata.avatar_url ?? null\n  }\n\n  onMounted(() => {\n    fetchUserImage()\n  })\n\n  return {\n    image,\n  }\n}\n",
+      "content": "import { ref, onMounted } from 'vue'\n// @ts-ignore\nimport { createClient } from '@/lib/supabase/client'\n\nexport function useCurrentUserImage() {\n  const image = ref<string | null>(null)\n\n  const fetchUserImage = async () => {\n    const { data, error } = await createClient().auth.getSession()\n\n    if (error) {\n      console.error(error)\n      return\n    }\n\n    image.value = data.session?.user.user_metadata.avatar_url ?? null\n  }\n\n  onMounted(() => {\n    fetchUserImage()\n  })\n\n  return {\n    image,\n  }\n}\n",
       "type": "registry:component",
       "target": "composables/useCurrentUserImage.ts"
     }
