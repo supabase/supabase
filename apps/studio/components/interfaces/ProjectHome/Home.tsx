@@ -35,9 +35,6 @@ export const ProjectHome = () => {
   const isConnectSectionFlagResolved = connectSectionVariant !== undefined
   const isConnectSectionEnabled = connectSectionVariant === 'connect'
 
-  const connectSheetVariant = usePHFlag<string | boolean>('connectSheet')
-  const isConnectSheetEnabled = connectSheetVariant === true || connectSheetVariant === 'variation'
-
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
   const hasShownEnableBranchingModalRef = useRef(false)
@@ -107,11 +104,7 @@ export const ProjectHome = () => {
   }, [setSectionOrder])
 
   const shouldShowConnectSection =
-    isConnectSectionFlagResolved &&
-    isConnectSectionEnabled &&
-    isConnectSheetEnabled &&
-    !isMatureProject &&
-    !!project
+    isConnectSectionFlagResolved && isConnectSectionEnabled && !isMatureProject && !!project
 
   const shouldShowGettingStarted =
     isConnectSectionFlagResolved &&
