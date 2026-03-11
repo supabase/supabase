@@ -1,4 +1,4 @@
-const config = require('config/tailwind.config');
+const config = require('config/tailwind.config')
 
 module.exports = config({
   content: [
@@ -8,7 +8,7 @@ module.exports = config({
     './../../packages/ui/src/**/*.{tsx,ts,js}',
     './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
   ],
-  plugins: [ require('@tailwindcss/container-queries'), require('./tailwind-plugins/hit-area') ],
+  plugins: [require('@tailwindcss/container-queries'), require('./tailwind-plugins/hit-area')],
   theme: {
     extend: {
       fontSize: {
@@ -102,4 +102,4 @@ module.exports = config({
       },
     },
   },
-});
+})
