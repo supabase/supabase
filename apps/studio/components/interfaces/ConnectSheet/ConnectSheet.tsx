@@ -35,13 +35,30 @@ export const ConnectSheet = () => {
   const track = useTrack()
   const prevShowConnect = useRef(false)
 
+  const { state, activeFields, resolvedSteps, schema, getFieldOptions, setMode, updateField } =
+    useConnectState()
+
   useEffect(() => {
-    if (showConnect && !prevShowConnect.current) {
-      track('connect_sheet_opened', { source: connectSheetSource })
-      setConnectSheetSource('header_button')
-    }
+    const justOpened = showConnect && !prevShowConnect.current
     prevShowConnect.current = showConnect
-  }, [showConnect, connectSheetSource, track, setConnectSheetSource])
+
+    if (!justOpened) return
+
+    track('connect_sheet_opened', { source: connectSheetSource })
+    setConnectSheetSource('header_button')
+
+    if (connectTab && isConnectMode(connectTab) && availableModeIds.includes(connectTab)) {
+      setMode(connectTab)
+    }
+  }, [
+    showConnect,
+    connectSheetSource,
+    connectTab,
+    availableModeIds,
+    track,
+    setConnectSheetSource,
+    setMode,
+  ])
 
   const handleOpenChange = (sheetOpen: boolean) => {
     if (!sheetOpen) {
@@ -49,9 +66,6 @@ export const ConnectSheet = () => {
     }
     setShowConnect(sheetOpen)
   }
-
-  const { state, activeFields, resolvedSteps, schema, getFieldOptions, setMode, updateField } =
-    useConnectState()
 
   const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })
 
@@ -76,12 +90,6 @@ export const ConnectSheet = () => {
     () => schema.modes.filter((m) => availableModeIds.includes(m.id)),
     [schema.modes, availableModeIds]
   )
-
-  useEffect(() => {
-    if (!showConnect || !connectTab || !isConnectMode(connectTab)) return
-    if (!availableModeIds.includes(connectTab) || state.mode === connectTab) return
-    setMode(connectTab)
-  }, [showConnect, connectTab, availableModeIds, state.mode, setMode])
 
   const handleModeChange = (mode: ConnectMode) => {
     setMode(mode)

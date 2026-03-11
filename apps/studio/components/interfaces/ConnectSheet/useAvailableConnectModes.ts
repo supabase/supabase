@@ -14,11 +14,12 @@ export function useAvailableConnectModes(): ConnectMode[] {
   ])
 
   return useMemo(() => {
-    const modes: ConnectMode[] = []
-    if (showAppFrameworks || showMobileFrameworks) modes.push('framework')
-    modes.push('direct')
-    if (showOrms) modes.push('orm')
-    modes.push('mcp')
-    return modes
+    const allModes: { id: ConnectMode; enabled: boolean }[] = [
+      { id: 'framework', enabled: showAppFrameworks || showMobileFrameworks },
+      { id: 'direct', enabled: true },
+      { id: 'orm', enabled: showOrms },
+      { id: 'mcp', enabled: true },
+    ]
+    return allModes.filter((m) => m.enabled).map((m) => m.id)
   }, [showAppFrameworks, showMobileFrameworks, showOrms])
 }

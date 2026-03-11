@@ -17,12 +17,12 @@ import { cn } from 'ui'
 
 import { AdvisorSection } from './AdvisorSection'
 import { ConnectSection } from './ConnectSection'
+import type { ConnectSectionVariant } from './ConnectSection.config'
 import { CustomReportSection } from './CustomReportSection'
 import { type GettingStartedState } from './GettingStarted/GettingStarted.types'
 import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
+import { DEFAULT_SECTION_ORDER, mergeSectionOrder, getSectionVisibility } from './Home.utils'
 import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
-
-const DEFAULT_SECTION_ORDER = ['connect', 'getting-started', 'usage', 'advisor', 'custom-report']
 
 export const ProjectHome = () => {
   const { enableBranching } = useParams()
@@ -31,9 +31,7 @@ export const ProjectHome = () => {
   const track = useTrack()
 
   const showHomepageUsageV2 = useFlag('newHomepageUsageV2')
-  const connectSectionVariant = usePHFlag<string | false>('connectSection')
-  const isConnectSectionFlagResolved = connectSectionVariant !== undefined
-  const isConnectSectionEnabled = connectSectionVariant === 'connect'
+  const connectSectionVariant = usePHFlag<ConnectSectionVariant | false>('connectSection')
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
@@ -81,37 +79,15 @@ export const ProjectHome = () => {
   }, [enableBranching, snap])
 
   useEffect(() => {
-    setSectionOrder((items) => {
-      const knownItems = items.filter((id) => DEFAULT_SECTION_ORDER.includes(id))
-      const missingItems = DEFAULT_SECTION_ORDER.filter((id) => !knownItems.includes(id))
-
-      if (missingItems.length === 0 && knownItems.length === items.length) return items
-
-      const merged = [...knownItems]
-      missingItems.forEach((id) => {
-        const defaultIndex = DEFAULT_SECTION_ORDER.indexOf(id)
-        const nextKnownId = DEFAULT_SECTION_ORDER.slice(defaultIndex + 1).find((candidate) =>
-          merged.includes(candidate)
-        )
-        if (!nextKnownId) {
-          merged.push(id)
-          return
-        }
-        merged.splice(merged.indexOf(nextKnownId), 0, id)
-      })
-      return merged
-    })
+    setSectionOrder(mergeSectionOrder)
   }, [setSectionOrder])
 
-  const shouldShowConnectSection =
-    isConnectSectionFlagResolved && isConnectSectionEnabled && !isMatureProject && !!project
-
-  const shouldShowGettingStarted =
-    isConnectSectionFlagResolved &&
-    !isConnectSectionEnabled &&
-    !isMatureProject &&
-    !!project &&
-    gettingStartedState !== 'hidden'
+  const { showConnectSection, showGettingStarted } = getSectionVisibility({
+    connectSectionVariant,
+    isMatureProject,
+    hasProject: !!project,
+    gettingStartedState,
+  })
 
   return (
     <div className="w-full h-full">
@@ -129,8 +105,8 @@ export const ProjectHome = () => {
             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
               <SortableContext
                 items={sectionOrder.filter((id) => {
-                  if (id === 'connect') return shouldShowConnectSection
-                  if (id === 'getting-started') return shouldShowGettingStarted
+                  if (id === 'connect') return showConnectSection
+                  if (id === 'getting-started') return showGettingStarted
                   return true
                 })}
                 strategy={verticalListSortingStrategy}
@@ -145,14 +121,14 @@ export const ProjectHome = () => {
                       </div>
                     )
                   }
-                  if (id === 'connect' && shouldShowConnectSection) {
+                  if (id === 'connect' && showConnectSection) {
                     return (
                       <SortableSection key={id} id={id}>
-                        <ConnectSection variant={connectSectionVariant as string} />
+                        <ConnectSection variant={connectSectionVariant as ConnectSectionVariant} />
                       </SortableSection>
                     )
                   }
-                  if (id === 'getting-started' && shouldShowGettingStarted) {
+                  if (id === 'getting-started' && showGettingStarted) {
                     return (
                       <SortableSection key={id} id={id}>
                         <GettingStartedSection

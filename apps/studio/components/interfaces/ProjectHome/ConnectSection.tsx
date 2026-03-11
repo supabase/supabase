@@ -1,53 +1,18 @@
 import { IS_PLATFORM } from 'common'
-import { Box, Cable, Database, Sparkles } from 'lucide-react'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import type { ReactNode } from 'react'
 import { useEffect, useRef } from 'react'
 import { Card, CardContent, cn } from 'ui'
 
 import type { ConnectMode } from '../ConnectSheet/Connect.types'
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
 import { useAppStateSnapshot } from '@/state/app-state'
-
-type ConnectAction = {
-  mode: ConnectMode
-  heading: string
-  subheading: string
-  icon: ReactNode
-}
-
-const CONNECT_ACTIONS: ConnectAction[] = [
-  {
-    mode: 'framework',
-    heading: 'Framework',
-    subheading: 'Use a client library',
-    icon: <Box size={16} strokeWidth={1.5} />,
-  },
-  {
-    mode: 'direct',
-    heading: 'Direct',
-    subheading: 'Connection string',
-    icon: <Database size={16} strokeWidth={1.5} />,
-  },
-  {
-    mode: 'orm',
-    heading: 'ORM',
-    subheading: 'Third-party library',
-    icon: <Cable size={16} strokeWidth={1.5} />,
-  },
-  {
-    mode: 'mcp',
-    heading: 'MCP',
-    subheading: 'Connect your agent',
-    icon: <Sparkles size={16} strokeWidth={1.5} />,
-  },
-]
+import { CONNECT_ACTIONS, type ConnectSectionVariant } from './ConnectSection.config'
 
 interface ConnectSectionProps {
-  variant: string
+  variant: ConnectSectionVariant
 }
 
 export const ConnectSection = ({ variant }: ConnectSectionProps) => {
