@@ -94,6 +94,7 @@ allow_list = [
     "microtasks",
     "[Mm]iddlewares?",
     "[Mm]iscapitalization",
+    "[Mm]isreport",
     "[Mm]onorepos?",
     "[Mm]ultimodal",
     "[Mm]ultipart",
