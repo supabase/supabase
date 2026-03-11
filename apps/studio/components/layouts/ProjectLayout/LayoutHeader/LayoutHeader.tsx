@@ -75,9 +75,9 @@ export const LayoutHeader = ({
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
 
-  const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
-  const isFlagResolved = connectSheetFlag !== undefined
-  const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
+  const connectSectionVariant = usePHFlag<string | false>('connectSection')
+  const isFlagResolved = connectSectionVariant !== undefined
+  const isConnectSheetEnabled = connectSectionVariant === 'connect'
 
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 

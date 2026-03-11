@@ -1,7 +1,7 @@
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Plug } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { ComponentProps } from 'react'
 import { Button } from 'ui'
 
@@ -16,6 +16,7 @@ export const ConnectButton = ({ buttonType = 'default' }: ConnectButtonProps) =>
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setConnectSource] = useQueryState('connectSource', parseAsString)
 
   return (
     <ButtonTooltip
@@ -23,7 +24,10 @@ export const ConnectButton = ({ buttonType = 'default' }: ConnectButtonProps) =>
       disabled={!isActiveHealthy}
       className="rounded-full"
       icon={<Plug className="rotate-90" />}
-      onClick={() => setShowConnect(true)}
+      onClick={() => {
+        setConnectSource('header_button')
+        setShowConnect(true)
+      }}
       tooltip={{
         content: {
           side: 'bottom',

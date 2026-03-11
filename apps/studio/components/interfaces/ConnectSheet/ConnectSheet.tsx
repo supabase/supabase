@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
 
 import type { ConnectMode, ProjectKeys } from './Connect.types'
@@ -12,6 +12,7 @@ import { ConnectStepsSection } from './ConnectStepsSection'
 import { useConnectState } from './useConnectState'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useTrack } from 'lib/telemetry/track'
 
 const CONNECT_MODES: readonly ConnectMode[] = ['framework', 'direct', 'orm', 'mcp'] as const
 
@@ -29,10 +30,24 @@ export const ConnectSheet = () => {
     parseAsBoolean.withDefault(false)
   )
   const [connectTab, setConnectTab] = useQueryState('connectTab', parseAsString)
+  const [connectSource, setConnectSource] = useQueryState('connectSource', parseAsString)
+  const track = useTrack()
+  const prevShowConnect = useRef(false)
+
+  useEffect(() => {
+    if (showConnect && !prevShowConnect.current) {
+      track('connect_sheet_opened', {
+        source: (connectSource as 'header_button' | 'connect_section') ?? 'header_button',
+      })
+      setConnectSource(null)
+    }
+    prevShowConnect.current = showConnect
+  }, [showConnect, connectSource, track, setConnectSource])
 
   const handleOpenChange = (sheetOpen: boolean) => {
     if (!sheetOpen) {
       setConnectTab(null)
+      setConnectSource(null)
     }
     setShowConnect(sheetOpen)
   }

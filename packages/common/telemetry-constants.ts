@@ -1937,6 +1937,24 @@ export interface HomeConnectActionClickedEvent {
 }
 
 /**
+ * User opened the ConnectSheet panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface ConnectSheetOpenedEvent {
+  action: 'connect_sheet_opened'
+  properties: {
+    /**
+     * Where the sheet was opened from
+     */
+    source: 'header_button' | 'connect_section'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User reordered sections in HomeV2 using drag and drop.
  *
  * @group Events
@@ -2863,6 +2881,7 @@ export type TelemetryEvent =
   | HomeNewExperimentExposedEvent
   | HomeConnectSectionExposedEvent
   | HomeConnectActionClickedEvent
+  | ConnectSheetOpenedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
   | HomeProjectUsageServiceClickedEvent
