@@ -7,6 +7,12 @@ Once your data flows into an analytics bucket through your own ingestion pipelin
 
 This is made possible by the [Iceberg Foreign Data Wrapper](/docs/guides/database/extensions/wrappers/iceberg), which creates a bridge between your Postgres database and Iceberg tables.
 
+<Admonition type="note" title="About ingestion">
+
+Managed replication into Analytics Buckets through Supabase ETL is no longer supported. This guide assumes your Analytics Bucket is being populated by your own ingestion pipeline.
+
+</Admonition>
+
 ## Setup overview
 
 You have two options to enable querying:
