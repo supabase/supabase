@@ -39,8 +39,10 @@ const OrgDocuments: NextPageWithLayout = () => {
 
 OrgDocuments.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout pageTitle="Legal Documents">{page}</OrganizationSettingsLayout>
+    <OrganizationLayout
+      browserTitle={{ section: 'Legal Documents', surface: 'Organization Settings' }}
+    >
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>
 )

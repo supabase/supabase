@@ -41,8 +41,8 @@ const OrgSSO: NextPageWithLayout = () => {
 
 OrgSSO.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout pageTitle="SSO">{page}</OrganizationSettingsLayout>
+    <OrganizationLayout browserTitle={{ section: 'SSO', surface: 'Organization Settings' }}>
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>
 )

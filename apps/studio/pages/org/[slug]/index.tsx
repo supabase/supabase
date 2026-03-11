@@ -50,7 +50,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
 ProjectsPage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
+    <OrganizationLayout browserTitle={{ section: 'Projects' }}>
       <PageLayout title="Projects">{page}</PageLayout>
     </OrganizationLayout>
   </DefaultLayout>

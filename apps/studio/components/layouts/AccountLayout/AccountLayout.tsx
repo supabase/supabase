@@ -17,14 +17,6 @@ export interface AccountLayoutProps {
   title: string
 }
 
-const ACCOUNT_ROUTE_TITLES: Record<string, string> = {
-  '/account/me': 'Preferences',
-  '/account/tokens': 'Access Tokens',
-  '/account/tokens/scoped': 'Scoped Access Tokens',
-  '/account/security': 'Security',
-  '/account/audit': 'Audit Logs',
-}
-
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
@@ -47,9 +39,8 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         : '/organizations'
 
   const currentPath = router.pathname
-  const sectionTitle = ACCOUNT_ROUTE_TITLES[currentPath] ?? title
   const pageTitle = buildStudioPageTitle({
-    section: sectionTitle,
+    section: title,
     surface: 'Account',
     brand: brandTitle,
   })

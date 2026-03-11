@@ -33,7 +33,7 @@ User.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout title="Account Settings">{page}</AccountLayout>
+        <AccountLayout title="Preferences">{page}</AccountLayout>
       </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>

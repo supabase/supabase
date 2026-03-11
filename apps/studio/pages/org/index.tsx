@@ -38,7 +38,7 @@ const OrgIndexPage: NextPageWithLayout = () => {
 
 OrgIndexPage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>{page}</OrganizationLayout>
+    <OrganizationLayout browserTitle={{ section: 'Organizations' }}>{page}</OrganizationLayout>
   </DefaultLayout>
 )
 

@@ -1,6 +1,5 @@
 import Head from 'next/head'
 import { ExternalLink } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { type PropsWithChildren } from 'react'
 
 import PartnerIcon from 'components/ui/PartnerIcon'
@@ -14,41 +13,26 @@ import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { buildStudioPageTitle } from 'lib/page-title'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
-type OrganizationRouteTitleParts = {
-  section?: string
-  surface?: string
+interface OrganizationLayoutProps {
+  browserTitle?: {
+    section?: string
+    surface?: string
+  }
 }
 
-const ORGANIZATION_ROUTE_TITLES: Record<string, OrganizationRouteTitleParts> = {
-  '/org': { section: 'Organizations' },
-  '/org/index': { section: 'Organizations' },
-  // Omit the generic "Organization" segment on top-level org pages; the org name already carries that context.
-  '/org/[slug]': { section: 'Projects' },
-  '/org/[slug]/billing': { section: 'Billing' },
-  '/org/[slug]/team': { section: 'Team' },
-  '/org/[slug]/usage': { section: 'Usage' },
-  '/org/[slug]/integrations': { section: 'Integrations' },
-  // Keep "Organization Settings" for settings routes because it disambiguates them from billing/team/etc.
-  '/org/[slug]/general': { section: 'General', surface: 'Organization Settings' },
-  '/org/[slug]/security': { section: 'Security', surface: 'Organization Settings' },
-  '/org/[slug]/apps': { section: 'OAuth Apps', surface: 'Organization Settings' },
-  '/org/[slug]/sso': { section: 'SSO', surface: 'Organization Settings' },
-  '/org/[slug]/audit': { section: 'Audit Logs', surface: 'Organization Settings' },
-  '/org/[slug]/documents': { section: 'Legal Documents', surface: 'Organization Settings' },
-}
-
-const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
-  const router = useRouter()
+const OrganizationLayoutContent = ({
+  children,
+  browserTitle,
+}: PropsWithChildren<OrganizationLayoutProps>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { appTitle } = useCustomContent(['app:title'])
 
-  const routeTitle = ORGANIZATION_ROUTE_TITLES[router.pathname]
-  const shouldRenderTitle = router.pathname.startsWith('/org')
+  // Keep title intent close to each page (getLayout) to avoid route-to-title drift in this layout.
   const pageTitle =
-    shouldRenderTitle && routeTitle
+    browserTitle !== undefined
       ? buildStudioPageTitle({
-          section: routeTitle.section,
-          surface: routeTitle.surface,
+          section: browserTitle.section,
+          surface: browserTitle.surface,
           org: selectedOrganization?.name,
           brand: appTitle || 'Supabase',
         })
@@ -105,8 +89,13 @@ const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
   )
 }
 
-const OrganizationLayout = ({ children }: PropsWithChildren) => {
-  return <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
+const OrganizationLayout = ({
+  children,
+  browserTitle,
+}: PropsWithChildren<OrganizationLayoutProps>) => {
+  return (
+    <OrganizationLayoutContent browserTitle={browserTitle}>{children}</OrganizationLayoutContent>
+  )
 }
 
 export default withAuth(OrganizationLayout)
