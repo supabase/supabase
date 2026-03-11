@@ -56,7 +56,7 @@ async function insertRegistryRow(client, options, status) {
   const result = await client.query(
     `INSERT INTO _admin.projects (name, schema_name, status)
      VALUES ($1, $2, $3)
-     RETURNING id, name, schema_name, anon_key, service_key, status, created_at::text`,
+     RETURNING id, name, schema_name, anon_key, service_key, status, to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS created_at`,
     [options.name, schemaName, status]
   );
   return projectSchema.parse(result.rows[0]);
@@ -72,7 +72,7 @@ async function deleteRegistryRow(client, id) {
 }
 async function findProjectByName(client, name) {
   const result = await client.query(
-    `SELECT id, name, schema_name, anon_key, service_key, status, created_at::text
+    `SELECT id, name, schema_name, anon_key, service_key, status, to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS created_at
      FROM _admin.projects WHERE name = $1`,
     [name]
   );
@@ -334,7 +334,7 @@ function createSchemaProvisioner(config) {
     const client = await pool.connect();
     try {
       const result = await client.query(
-        `SELECT id, name, schema_name, anon_key, service_key, status, created_at::text
+        `SELECT id, name, schema_name, anon_key, service_key, status, to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS created_at
          FROM _admin.projects ORDER BY created_at ASC`
       );
       return result.rows.map((row) => projectSchema.parse(row));

@@ -41,7 +41,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
 
   useEffect(() => {
     if (!IS_PLATFORM) {
-      router.push('/project/default')
+      router.push('/projects')
     }
   }, [router])
 

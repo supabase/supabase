@@ -92,32 +92,32 @@ const nextConfig = {
         : [
             {
               source: '/',
-              destination: '/project/default',
+              destination: '/projects',
               permanent: false,
             },
             {
               source: '/register',
-              destination: '/project/default',
+              destination: '/projects',
               permanent: false,
             },
             {
               source: '/signup',
-              destination: '/project/default',
+              destination: '/projects',
               permanent: false,
             },
             {
               source: '/signin',
-              destination: '/project/default',
+              destination: '/projects',
               permanent: false,
             },
             {
               source: '/login',
-              destination: '/project/default',
+              destination: '/projects',
               permanent: false,
             },
             {
               source: '/log-in',
-              destination: '/project/default',
+              destination: '/projects',
               permanent: false,
             },
           ]),
@@ -429,11 +429,16 @@ const nextConfig = {
         destination: '/org/:slug/billing#invoices',
         permanent: true,
       },
-      {
-        source: '/projects',
-        destination: '/organizations',
-        permanent: false,
-      },
+      // In self-hosted mode, /projects is our landing page (not a redirect)
+      ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+        ? [
+            {
+              source: '/projects',
+              destination: '/organizations',
+              permanent: false,
+            },
+          ]
+        : []),
       {
         source: '/project/:ref/settings/auth',
         destination: '/project/:ref/auth/providers',
