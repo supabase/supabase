@@ -1,5 +1,7 @@
 import { IS_PLATFORM } from 'common'
 import { Box, Cable, Database, Sparkles } from 'lucide-react'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -9,7 +11,6 @@ import { Card, CardContent, cn } from 'ui'
 
 import type { ConnectMode } from '../ConnectSheet/Connect.types'
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 type ConnectAction = {
   mode: ConnectMode
@@ -49,11 +50,22 @@ interface ConnectSectionProps {
   variant: string
 }
 
+// The old Connect dialog uses different tab keys than the new ConnectSheet
+const LEGACY_TAB_MAP: Record<ConnectMode, string> = {
+  framework: 'frameworks',
+  direct: 'direct',
+  orm: 'orms',
+  mcp: 'mcp',
+}
+
 export const ConnectSection = ({ variant }: ConnectSectionProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
   const track = useTrack()
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
   const [, setConnectTab] = useQueryState('connectTab', parseAsString)
+
+  const connectSheetVariant = usePHFlag<string | boolean>('connectSheet')
+  const isConnectSheetEnabled = connectSheetVariant === true || connectSheetVariant === 'variation'
 
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -73,7 +85,7 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
 
   const handleConnectClick = (mode: ConnectMode) => {
     track('home_connect_action_clicked', { mode })
-    setConnectTab(mode)
+    setConnectTab(isConnectSheetEnabled ? mode : LEGACY_TAB_MAP[mode])
     setShowConnect(true)
   }
 
