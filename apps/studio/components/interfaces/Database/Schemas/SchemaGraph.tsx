@@ -1,10 +1,10 @@
-import type { PostgresSchema } from '@supabase/postgres-meta'
+import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toPng, toSvg } from 'html-to-image'
 import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 
 import 'reactflow/dist/style.css'
@@ -22,6 +22,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { tablesToSQL } from 'lib/helpers'
 import { toast } from 'sonner'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   copyToClipboard,
@@ -32,6 +33,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { ColumnEditionContextProvider, ColumnEditionContextType } from './ColumnEditionContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
@@ -43,6 +46,8 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const [selectedTable, setSelectedTable] = useState<PostgresTable | null>(null)
+  const snap = useTableEditorStateSnapshot()
 
   const [copied, setCopied] = useState(false)
   useEffect(() => {
@@ -191,16 +196,37 @@ export const SchemaGraph = () => {
     }
   }
 
+  const isFirstLoad = useRef(true)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
       getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
-        setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+        // Prevent resetting a view after first load to avoid layout changes after editing a column
+        if (isFirstLoad.current) {
+          isFirstLoad.current = false
+          setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+        }
       })
     }
   }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme])
+
+  const columnEditionContext = useMemo<ColumnEditionContextType>(
+    () => ({
+      onEditColumn: (tableId, columnId) => {
+        const table = tables.find((table) => table.id === tableId)
+        if (!table || table.columns == null) return
+
+        const column = table.columns.find((column) => column.id === columnId)
+        if (!column) return
+
+        setSelectedTable(table)
+        snap.onEditColumn(column)
+      },
+    }),
+    [tables, snap]
+  )
 
   return (
     <>
@@ -323,41 +349,44 @@ export const SchemaGraph = () => {
               </Admonition>
             </div>
           ) : (
-            <div className="w-full h-full">
-              <ReactFlow
-                defaultNodes={[]}
-                defaultEdges={[]}
-                defaultEdgeOptions={{
-                  type: 'smoothstep',
-                  animated: true,
-                  deletable: false,
-                }}
-                nodeTypes={nodeTypes}
-                fitView
-                minZoom={0.8}
-                maxZoom={1.8}
-                proOptions={{ hideAttribution: true }}
-                onNodeDragStop={() => saveNodePositions()}
-              >
-                <Background
-                  gap={16}
-                  className="[&>*]:stroke-foreground-muted opacity-[25%]"
-                  variant={BackgroundVariant.Dots}
-                  color={'inherit'}
-                />
-                <MiniMap
-                  pannable
-                  zoomable
-                  nodeColor={miniMapNodeColor}
-                  maskColor={miniMapMaskColor}
-                  className="border rounded-md shadow-sm"
-                />
-                <SchemaGraphLegend />
-              </ReactFlow>
-            </div>
+            <ColumnEditionContextProvider value={columnEditionContext}>
+              <div className="w-full h-full">
+                <ReactFlow
+                  defaultNodes={[]}
+                  defaultEdges={[]}
+                  defaultEdgeOptions={{
+                    type: 'smoothstep',
+                    animated: true,
+                    deletable: false,
+                  }}
+                  nodeTypes={nodeTypes}
+                  fitView
+                  minZoom={0.8}
+                  maxZoom={1.8}
+                  proOptions={{ hideAttribution: true }}
+                  onNodeDragStop={() => saveNodePositions()}
+                >
+                  <Background
+                    gap={16}
+                    className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                    variant={BackgroundVariant.Dots}
+                    color={'inherit'}
+                  />
+                  <MiniMap
+                    pannable
+                    zoomable
+                    nodeColor={miniMapNodeColor}
+                    maskColor={miniMapMaskColor}
+                    className="border rounded-md shadow-sm"
+                  />
+                  <SchemaGraphLegend />
+                </ReactFlow>
+              </div>
+            </ColumnEditionContextProvider>
           )}
         </>
       )}
+      <SidePanelEditor selectedTable={selectedTable ?? undefined} includeColumns />
     </>
   )
 }

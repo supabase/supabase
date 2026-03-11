@@ -495,6 +495,9 @@ export const SidePanelEditor = ({
           queryKey: databaseKeys.tableDefinition(project?.ref, selectedTable?.id),
         }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.list(project?.ref, selectedTable?.schema, includeColumns),
+        }),
       ])
 
       // We need to invalidate tableRowsAndCount after tableEditor

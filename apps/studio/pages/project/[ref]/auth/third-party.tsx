@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
 import { ThirdPartyAuthForm } from 'components/interfaces/Auth/ThirdPartyAuthForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
@@ -23,7 +22,7 @@ const ThirdPartyPage: NextPageWithLayout = () => {
 
   if (!showThirdPartyAuth) {
     return (
-      <AuthLayout>
+      <AuthLayout title="Sign In / Providers">
         <UnknownInterface urlBack={`/project/${ref}/auth/providers`} />
       </AuthLayout>
     )
