@@ -1,3 +1,4 @@
+import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import dayjs from 'dayjs'
 import { ComponentProps, useMemo, useState } from 'react'
 import {
@@ -10,9 +11,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
+
 import { ChartHeader } from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
@@ -24,7 +24,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   xAxisKey: string
   customDateFormat?: string
   displayDateInUtc?: boolean
-  onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
+  onBarClick?: (datum: D, tooltipData?: CategoricalChartState) => void
   emptyStateMessage?: string
   showLegend?: boolean
   xAxisIsDate?: boolean
@@ -34,7 +34,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   syncId?: string
 }
 
-const BarChart = ({
+function BarChart<D extends Datum = Datum>({
   data,
   yAxisKey,
   xAxisKey,
@@ -56,7 +56,7 @@ const BarChart = ({
   YAxisProps,
   showGrid = false,
   syncId,
-}: BarChartProps) => {
+}: BarChartProps<D>) {
   const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } =
     useChartHoverState('default')
   const { Container } = useChartSize(size)
@@ -191,7 +191,7 @@ const BarChart = ({
             animationDuration={300}
             maxBarSize={48}
           >
-            {data?.map((_entry: Datum, index: any) => (
+            {data?.map((_entry: D, index: number) => (
               <Cell
                 key={`cell-${index}`}
                 className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
@@ -207,7 +207,7 @@ const BarChart = ({
         </RechartBarChart>
       </Container>
       {data && (
-        <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
+        <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
           <span>
             {xAxisIsDate ? day(data[0][xAxisKey]).format(customDateFormat) : data[0][xAxisKey]}
           </span>

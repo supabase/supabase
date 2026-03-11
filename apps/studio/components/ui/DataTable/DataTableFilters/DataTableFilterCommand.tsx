@@ -382,11 +382,13 @@ function CommandItemSuggestions<TData>({ field }: { field: DataTableFilterField<
     case 'checkbox': {
       return (
         <span className={cn(className)}>
-          {getFacetedUniqueValues
-            ? Array.from(getFacetedUniqueValues(table, value)?.keys() || [])
-                .map((value) => `[${value}]`)
-                .join(' ')
-            : field.options?.map(({ value }) => `[${value}]`).join(' ')}
+          {field.options && field.options.length > 0
+            ? field.options.map(({ value }) => `[${value}]`).join(' ')
+            : getFacetedUniqueValues
+              ? Array.from(getFacetedUniqueValues(table, value)?.keys() || [])
+                  .map((value) => `[${value}]`)
+                  .join(' ')
+              : null}
         </span>
       )
     }

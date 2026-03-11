@@ -1,11 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Eye, EyeOff } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as yup from 'yup'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -13,21 +7,27 @@ import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Eye, EyeOff } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   PrePostTab,
   Switch,
-  cn,
 } from 'ui'
 import { Admonition, PageSection, PageSectionContent } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as yup from 'yup'
+
 import { urlRegex } from '../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
@@ -61,25 +61,34 @@ export const SmtpForm = () => {
   )
 
   const smtpSchema = yup.object({
-    SMTP_ADMIN_EMAIL: yup.string().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) =>
-        schema.email('Must be a valid email').required('Sender email address is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_SENDER_NAME: yup.string().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) => schema.required('Sender name is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_HOST: yup.string().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) =>
-        schema
-          .matches(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address')
-          .required('Host URL is required.'),
-      otherwise: (schema) => schema,
-    }),
+    SMTP_ADMIN_EMAIL: yup
+      .string()
+      .trim()
+      .when('ENABLE_SMTP', {
+        is: true,
+        then: (schema) =>
+          schema.email('Must be a valid email').required('Sender email address is required'),
+        otherwise: (schema) => schema,
+      }),
+    SMTP_SENDER_NAME: yup
+      .string()
+      .trim()
+      .when('ENABLE_SMTP', {
+        is: true,
+        then: (schema) => schema.required('Sender name is required'),
+        otherwise: (schema) => schema,
+      }),
+    SMTP_HOST: yup
+      .string()
+      .trim()
+      .when('ENABLE_SMTP', {
+        is: true,
+        then: (schema) =>
+          schema
+            .matches(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address')
+            .required('Host URL is required.'),
+        otherwise: (schema) => schema,
+      }),
     SMTP_PORT: yup.number().when('ENABLE_SMTP', {
       is: true,
       then: (schema) =>
@@ -98,12 +107,15 @@ export const SmtpForm = () => {
           .max(32767, 'Must not be more than 32,767 an hour'),
       otherwise: (schema) => schema,
     }),
-    SMTP_USER: yup.string().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) => schema.required('SMTP Username is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_PASS: yup.string(),
+    SMTP_USER: yup
+      .string()
+      .trim()
+      .when('ENABLE_SMTP', {
+        is: true,
+        then: (schema) => schema.required('SMTP Username is required'),
+        otherwise: (schema) => schema,
+      }),
+    SMTP_PASS: yup.string().trim(),
     ENABLE_SMTP: yup.boolean().required(),
   })
 

@@ -1,7 +1,7 @@
 import { Badge, Menu } from 'ui'
 
 import type { ProductMenuGroup } from './ProductMenu.types'
-import ProductMenuItem from './ProductMenuItem'
+import { ProductMenuItem } from './ProductMenuItem'
 
 interface ProductMenuProps {
   page?: string
@@ -35,14 +35,9 @@ export const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                     return (
                       <ProductMenuItem
                         key={item.key}
-                        url={item.url}
-                        name={item.name}
-                        icon={item.icon}
-                        rightIcon={item.rightIcon}
+                        item={item}
                         isActive={isActive}
-                        isExternal={item.isExternal}
                         target={item.isExternal ? '_blank' : '_self'}
-                        label={item.label}
                       />
                     )
                   })}

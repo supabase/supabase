@@ -1,18 +1,30 @@
 import { screen, waitFor } from '@testing-library/react'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import userEvent from '@testing-library/user-event'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import {
-  LogsPreviewer,
   calculateBarClickTimeRange,
+  LogsPreviewer,
 } from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { customRender, customRenderHook } from 'tests/lib/custom-render'
-import userEvent from '@testing-library/user-event'
-
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
-import { LOGS_API_MOCKS } from './logs.mocks'
+import { customRender, customRenderHook } from 'tests/lib/custom-render'
 import { addAPIMock } from 'tests/lib/msw'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+
+import { LOGS_API_MOCKS } from './logs.mocks'
+
+vi.mock('components/interfaces/Settings/Logs/LogTable', () => ({
+  LogTable: ({ data }: { data: any[] }) => (
+    <div data-testid="log-table-mock">
+      {data.map((row) => (
+        <div key={row.id} data-testid="log-row">
+          {row.event_message}
+        </div>
+      ))}
+    </div>
+  ),
+}))
 
 dayjs.extend(utc)
 
@@ -80,14 +92,10 @@ test('useLogsPreview returns data from MSW', async () => {
   expect(result.current.logData).toEqual(LOGS_API_MOCKS.result)
 })
 
-test('LogsPreviewer renders the expected data from the API', async () => {
+test('LogsPreviewer passes API data to LogTable', async () => {
   customRender(
     <LogsPreviewer queryType="api" projectRef="default" tableName={LogsTableName.EDGE} />
   )
-
-  await waitFor(() => {
-    expect(screen.getByRole('table')).toBeInTheDocument()
-  })
 
   const firstLogEventMessage = LOGS_API_MOCKS.result[0].event_message
 

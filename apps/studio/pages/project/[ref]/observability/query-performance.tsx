@@ -3,6 +3,7 @@ import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFi
 
 import { useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { useSupamonitorStatus } from 'components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import {
@@ -27,6 +28,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const { isSupamonitorEnabled } = useSupamonitorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
 
   const {
@@ -76,8 +78,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     filterIndexAdvisor: indexAdvisor === 'true',
   })
 
-  const isPgStatMonitorEnabled = project?.dbVersion === '17.4.1.076-psml-1'
-
   if (!isLoadingProject && !project) {
     return (
       <div className="h-full flex flex-col p-6">
@@ -99,7 +99,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
             href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
           />
           <DatabaseSelector />
-          {isPgStatMonitorEnabled && (
+          {isSupamonitorEnabled && (
             <LogsDatePicker
               value={datePickerValue}
               helpers={datePickerHelpers.filter(
@@ -117,7 +117,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         queryHitRate={queryHitRate}
         queryPerformanceQuery={queryPerformanceQuery}
         queryMetrics={queryMetrics}
-        isPgStatMonitorEnabled={isPgStatMonitorEnabled}
+        isSupamonitorEnabled={isSupamonitorEnabled}
         dateRange={selectedDateRange}
         onDateRangeChange={updateDateRange}
       />

@@ -1,8 +1,7 @@
-import { ArrowUpRight } from 'lucide-react'
-
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { ArrowUpRight } from 'lucide-react'
 import type { Organization } from 'types'
 
 export const generateSettingsMenu = (
@@ -18,12 +17,13 @@ export const generateSettingsMenu = (
     legacyJwtKeys?: boolean
     logDrains?: boolean
     billing?: boolean
+    platformWebhooks?: boolean
   }
 ): ProductMenuGroup[] => {
   if (!IS_PLATFORM) {
     return [
       {
-        title: 'Project Settings',
+        title: 'Configuration',
         items: [
           {
             name: `Log Drains`,
@@ -35,19 +35,16 @@ export const generateSettingsMenu = (
       },
     ]
   }
-  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}`
 
-  const authEnabled = features?.auth ?? true
-  const authProvidersEnabled = features?.authProviders ?? true
-  const edgeFunctionsEnabled = features?.edgeFunctions ?? true
-  const storageEnabled = features?.storage ?? true
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
   const billingEnabled = features?.billing ?? true
+  const platformWebhooksEnabled = features?.platformWebhooks ?? false
 
   return [
     {
-      title: 'Project Settings',
+      title: 'Configuration',
       items: [
         {
           name: 'General',
@@ -60,12 +57,14 @@ export const generateSettingsMenu = (
           key: 'compute-and-disk',
           url: `/project/${ref}/settings/compute-and-disk`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'Infrastructure',
           key: 'infrastructure',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
+          url: `/project/${ref}/settings/infrastructure`,
           items: [],
+          disabled: !isProjectActive,
         },
 
         {
@@ -73,19 +72,26 @@ export const generateSettingsMenu = (
           key: 'integrations',
           url: `/project/${ref}/settings/integrations`,
           items: [],
+          disabled: !isProjectActive,
         },
+        ...(platformWebhooksEnabled
+          ? [
+              {
+                name: 'Webhooks',
+                key: 'webhooks',
+                url: `/project/${ref}/settings/webhooks`,
+                items: [],
+                disabled: !isProjectActive,
+              },
+            ]
+          : []),
 
-        {
-          name: 'Data API',
-          key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
         {
           name: 'API Keys',
           key: 'api-keys',
           url: `/project/${ref}/settings/api-keys/new`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'JWT Keys',
@@ -94,6 +100,7 @@ export const generateSettingsMenu = (
             ? `/project/${ref}/settings/jwt`
             : `/project/${ref}/settings/jwt/signing-keys`,
           items: [],
+          disabled: !isProjectActive,
         },
 
         {
@@ -101,6 +108,7 @@ export const generateSettingsMenu = (
           key: `log-drains`,
           url: `/project/${ref}/settings/log-drains`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'Add Ons',
@@ -108,13 +116,27 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/addons`,
           items: [],
         },
+      ],
+    },
+    {
+      title: 'Integrations',
+      items: [
+        {
+          name: 'Data API',
+          key: 'api',
+          url: `/project/${ref}/integrations/data_api/overview`,
+          items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          disabled: !isProjectActive,
+        },
         {
           name: 'Vault',
           key: 'vault',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
+          url: `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           label: 'Beta',
+          disabled: !isProjectActive,
         },
       ],
     },

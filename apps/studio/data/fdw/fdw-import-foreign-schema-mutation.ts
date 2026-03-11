@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { foreignTableKeys } from 'data/foreign-tables/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { fdwKeys } from './keys'
 
 export type FDWImportForeignSchemaVariables = {

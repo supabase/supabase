@@ -38,8 +38,19 @@ const Streamdown = dynamic<StreamdownProps>(
   { ssr: false }
 )
 
-export const OrderedList = memo(({ children }: { children?: ReactNode }) => (
-  <ol className="flex flex-col gap-y-4">{children}</ol>
+// Streamdown splits ordered lists with complex content (e.g. code blocks) into
+// separate <ol> elements. The `start` attribute preserves semantics for screen
+// readers, while `counterReset` is what actually fixes the visible numbering —
+// the prose config (tailwind.config.js) uses a custom CSS counter named "item"
+// with `listStyleType: 'none'`, so the `start` attribute alone has no visual effect.
+export const OrderedList = memo(({ children, start }: { children?: ReactNode; start?: number }) => (
+  <ol
+    className="flex flex-col gap-y-4"
+    start={start}
+    style={start !== undefined ? { counterReset: `item ${start - 1}` } : undefined}
+  >
+    {children}
+  </ol>
 ))
 OrderedList.displayName = 'OrderedList'
 

@@ -1,5 +1,6 @@
-import type { getSortedPosts } from 'lib/posts'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+
+import type { getSortedPosts } from '@/lib/posts'
 
 export interface PostTypes {
   type: 'casestudy' | 'blog' | 'event'
@@ -15,8 +16,10 @@ export interface PostTypes {
     url: string
   }
   content?: string
-  thumb: string
-  image?: string
+  imgThumb?: string // Used by blog posts and case studies
+  imgSocial?: string // Used by blog posts
+  thumb?: string // Used by events
+  thumb_light?: string // Used by events (light mode variant)
   readingTime?: string
   description: string
   url: string
@@ -38,8 +41,7 @@ export interface PostTypes {
     href: string
     target?: '_blank' | '_self'
     label?: string
-  } // used on event previews to link to a custom event page
-  isCMS?: boolean
+  }
 }
 
 export type Event = {
@@ -72,18 +74,6 @@ export type StaticAuthor = {
   position: string
 }
 
-export type CMSAuthor = {
-  author: string
-  author_image_url:
-    | {
-        url: string
-      }
-    | string
-    | null
-  author_url: string
-  position: string
-}
-
 export type Blog = {
   slug: string
   title: string
@@ -91,7 +81,7 @@ export type Blog = {
   content: MDXRemoteSerializeResult
   toc: string | { content: string }
   author?: string
-  authors?: (CMSAuthor | StaticAuthor)[]
+  authors?: StaticAuthor[]
   date: string
   categories?: string[]
   tags?:
@@ -110,14 +100,13 @@ export type Blog = {
   blog_url?: string
   url?: string
   source: string
-  image?: string
-  thumb?: string
+  imgSocial?: string
+  imgThumb?: string
   youtubeHero?: string
   launchweek?: number | string
   meta_title?: string
   meta_description?: string
   meta_image?: string
-  isCMS?: boolean
 }
 
 export type BlogData = {
@@ -127,7 +116,7 @@ export type BlogData = {
   content: MDXRemoteSerializeResult
   toc: string | { content: string }
   author?: string
-  authors?: (CMSAuthor | StaticAuthor)[]
+  authors?: StaticAuthor[]
   date: string
   categories?: string[]
   tags?:
@@ -145,15 +134,14 @@ export type BlogData = {
   blog_url?: string
   url?: string
   source: string
-  image?: string
-  thumb?: string
+  imgSocial?: string
+  imgThumb?: string
   youtubeHero?: string
   launchweek?: number | string
   meta_title?: string
   meta_description?: string
   meta_image?: string
   video?: string
-  isCMS?: boolean
 }
 
 export type Tag =
@@ -204,21 +192,6 @@ export interface EventData {
   meta_title?: string
   meta_description?: string
   video?: string
-  isCMS?: boolean
-}
-
-export interface CMSPostTypes extends PostTypes {
-  isCMS?: boolean
-  authors?: Array<{
-    author: string
-    author_id: string
-    position: string
-    author_url: string
-    author_image_url: {
-      url: string
-    }
-    username: string
-  }>
 }
 
 export type PostReturnType = ReturnType<typeof getSortedPosts>[number]

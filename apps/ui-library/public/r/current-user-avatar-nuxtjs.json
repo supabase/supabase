@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "current-user-avatar-nuxtjs",
+  "type": "registry:block",
+  "title": "Current User Avatar",
+  "description": "Component which renders the current user's avatar.",
+  "dependencies": [
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [
+    "avatar"
+  ],
+  "files": [
+    {
+      "path": "registry/default/current-user-avatar/nuxtjs/app/components/current-user-avatar.vue",
+      "content": "<script setup lang=\"ts\">\nimport { computed } from 'vue'\n// @ts-ignore\nimport { useCurrentUserImage } from '@/composables/useCurrentUserImage'\n// @ts-ignore\nimport { useCurrentUserName } from '@/composables/useCurrentUserName'\n\nimport Avatar from '@/components/ui/avatar/Avatar.vue'\nimport AvatarFallback from '@/components/ui/avatar/AvatarFallback.vue'\nimport AvatarImage from '@/components/ui/avatar/AvatarImage.vue'\n\nconst { image: profileImage } = useCurrentUserImage()\nconst { name } = useCurrentUserName()\n\nconst initials = computed(() => {\n  if (!name.value) return ''\n  return name.value\n    .split(' ')\n    .map(word => word[0])\n    .join('')\n    .toUpperCase()\n})\n</script>\n\n<template>\n  <Avatar>\n    <AvatarImage\n      v-if=\"profileImage\"\n      :src=\"profileImage\"\n      :alt=\"initials\"\n    />\n    <AvatarFallback>\n      {{ initials }}\n    </AvatarFallback>\n  </Avatar>\n</template>\n",
+      "type": "registry:component",
+      "target": "app/components/current-user-avatar.vue"
+    },
+    {
+      "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserName.ts",
+      "content": "import { ref, onMounted } from 'vue'\n// @ts-ignore\nimport { createClient } from \"@/lib/supabase/client\"\n\nexport function useCurrentUserName() {\n  const name = ref<string | null>(null)\n\n  const fetchProfileName = async () => {\n    const { data, error } = await createClient().auth.getSession()\n\n    if (error) {\n      console.error(error)\n      return\n    }\n\n    name.value = data.session?.user.user_metadata.full_name ?? '?'\n  }\n\n  onMounted(() => {\n    fetchProfileName()\n  })\n\n  return {\n    name,\n  }\n}\n",
+      "type": "registry:component",
+      "target": "app/composables/useCurrentUserName.ts"
+    },
+    {
+      "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserImage.ts",
+      "content": "import { ref, onMounted } from 'vue'\n// @ts-ignore\nimport { createClient } from \"@/lib/supabase/client\"\n\nexport function useCurrentUserImage() {\n  const image = ref<string | null>(null)\n\n  const fetchUserImage = async () => {\n    const { data, error } = await createClient().auth.getSession()\n\n    if (error) {\n      console.error(error)\n      return\n    }\n\n    image.value = data.session?.user.user_metadata.avatar_url ?? null\n  }\n\n  onMounted(() => {\n    fetchUserImage()\n  })\n\n  return {\n    image,\n  }\n}\n",
+      "type": "registry:component",
+      "target": "app/composables/useCurrentUserImage.ts"
+    }
+  ]
+}

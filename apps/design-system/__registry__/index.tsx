@@ -104,6 +104,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-responsive": {
+      name: "admonition-responsive",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-responsive")),
+      source: "",
+      files: ["registry/default/example/admonition-responsive.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "admonition-button": {
       name: "admonition-button",
       type: "components:example",
@@ -137,6 +148,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-sandwiched": {
+      name: "admonition-sandwiched",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-sandwiched")),
+      source: "",
+      files: ["registry/default/example/admonition-sandwiched.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "alert-demo": {
       name: "alert-demo",
       type: "components:example",
@@ -144,6 +166,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/alert-demo")),
       source: "",
       files: ["registry/default/example/alert-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-collapsible-demo": {
+      name: "alert-collapsible-demo",
+      type: "components:example",
+      registryDependencies: ["alert","collapsible","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-collapsible-demo")),
+      source: "",
+      files: ["registry/default/example/alert-collapsible-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -1266,6 +1299,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/separator-demo")),
       source: "",
       files: ["registry/default/example/separator-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "sheet-confirm-on-close-demo": {
+      name: "sheet-confirm-on-close-demo",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button","input","label","separator","sheet"],
+      component: React.lazy(() => import("@/registry/default/example/sheet-confirm-on-close-demo")),
+      source: "",
+      files: ["registry/default/example/sheet-confirm-on-close-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

@@ -6,6 +6,9 @@ on:
     - cron: '0 4 * * 1'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   settings:
     runs-on: blacksmith-4vcpu-ubuntu-2404

@@ -1,11 +1,12 @@
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Area,
   Bar,
   CartesianGrid,
+  Customized,
   Label,
   Line,
   ComposedChart as RechartComposedChart,
@@ -14,11 +15,10 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Customized,
 } from 'recharts'
-
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
+
 import { ChartHeader } from './ChartHeader'
 import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
@@ -29,7 +29,7 @@ import {
   updateStackedChartColors,
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
-import { numberFormatter, useChartSize } from './Charts.utils'
+import { computeYAxisDomain, formatPercentage, numberFormatter, useChartSize } from './Charts.utils'
 import {
   calculateTotalChartAggregate,
   CustomLabel,
@@ -191,8 +191,29 @@ export function ComposedChart({
     )
   }
 
+  function formatHighlightedValue(value: any) {
+    if (typeof value !== 'number') {
+      return value
+    }
+
+    if (shouldFormatBytes) {
+      const bytesValue = isNetworkChart ? Math.abs(value) : value
+      const formatted = formatBytes(bytesValue, valuePrecision)
+      return format === 'bytes-per-second' ? `${formatted}/s` : formatted
+    }
+
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
+
+    if (valuePrecision === 0 && value > 0 && value < 1) {
+      return '<1'
+    }
+
+    return numberFormatter(value, valuePrecision)
+  }
+
   function computeHighlightedValue() {
-    const maxAttribute = attributes.find((a) => a.isMaxValue)
     const referenceLines = attributes.filter(
       (attribute) => attribute?.provider === 'reference-line'
     )
@@ -231,24 +252,6 @@ export function ComposedChart({
     }
 
     return highlightedValue
-  }
-
-  function formatHighlightedValue(value: any) {
-    if (typeof value !== 'number') {
-      return value
-    }
-
-    if (shouldFormatBytes) {
-      const bytesValue = isNetworkChart ? Math.abs(value) : value
-      const formatted = formatBytes(bytesValue, valuePrecision)
-      return format === 'bytes-per-second' ? `${formatted}/s` : formatted
-    }
-
-    if (valuePrecision === 0 && value > 0 && value < 1) {
-      return '<1'
-    }
-
-    return numberFormatter(value, valuePrecision)
   }
 
   const maxAttribute = attributes.find((a) => a.isMaxValue)
@@ -307,7 +310,9 @@ export function ComposedChart({
     const attribute = attributes.find((attr) => attr.attribute === att.name)
     return !attribute?.isMaxValue
   })
+
   const visibleAttributes = stackedAttributes.filter((att) => !hiddenAttributes.has(att.name))
+
   const isPercentage = format === '%'
   const isRamChart =
     !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
@@ -332,6 +337,28 @@ export function ComposedChart({
     ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
   )
   const yDomain = [0, yMaxFromVisible]
+
+  const yAxisDomain = useMemo(
+    () =>
+      computeYAxisDomain({
+        isPercentage,
+        showMaxValue,
+        yMaxFromVisible,
+        maxAttributeKey: maxAttribute?.attribute,
+        showMaxLine: _showMaxValue,
+        data,
+        visibleAttributeNames: visibleAttributes.map((a) => a.name),
+      }),
+    [
+      isPercentage,
+      showMaxValue,
+      yMaxFromVisible,
+      maxAttribute,
+      _showMaxValue,
+      data,
+      visibleAttributes,
+    ]
+  )
 
   if (data.length === 0) {
     return (
@@ -430,7 +457,7 @@ export function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={isPercentage && !showMaxValue ? yDomain : ['auto', 'auto']}
+            domain={yAxisDomain}
             key={yAxisKey}
           />
           <XAxis

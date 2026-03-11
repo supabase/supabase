@@ -68,6 +68,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       model,
       error: modelError,
       promptProviderOptions,
+      providerOptions,
     } = await getModel({
       provider: 'openai',
       routingKey: projectRef,
@@ -155,6 +156,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const { text } = await generateText({
       model,
+      providerOptions,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools,

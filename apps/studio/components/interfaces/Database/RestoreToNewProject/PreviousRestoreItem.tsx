@@ -15,8 +15,10 @@ export const PreviousRestoreItem = ({ clone }: { clone: CloneStatus['clones'][nu
         </div>
         <div>
           <TimestampInfo
-            className="font-mono text-xs text-foreground-lighter"
+            className="text-left !text-sm font-mono tracking-tight text-foreground-lighter"
+            displayAs="utc"
             utcTimestamp={clone.inserted_at ?? ''}
+            labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
           />
         </div>
       </div>
@@ -33,8 +35,10 @@ export const PreviousRestoreItem = ({ clone }: { clone: CloneStatus['clones'][nu
         </div>
         <div>
           <TimestampInfo
-            className="font-mono text-xs text-foreground-lighter"
+            className="text-left !text-sm font-mono tracking-tight text-foreground-lighter"
+            displayAs="utc"
             utcTimestamp={clone.inserted_at ?? ''}
+            labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
           />
         </div>
         <div className="flex items-center justify-end text-foreground-lighter group-hover:text-foreground">

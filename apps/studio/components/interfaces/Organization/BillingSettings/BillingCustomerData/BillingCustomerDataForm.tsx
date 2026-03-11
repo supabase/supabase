@@ -1,8 +1,6 @@
 import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { useId, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { z } from 'zod'
-
-import { useMemo, useState } from 'react'
 import {
   Button,
   cn,
@@ -21,6 +19,8 @@ import {
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import { COUNTRIES } from './BillingAddress.constants'
 import { TAX_IDS } from './TaxID.constants'
 
@@ -53,6 +53,8 @@ export const BillingCustomerDataForm = ({
 }: BillingCustomerDataFormProps) => {
   const [showCountriesPopover, setShowCountriesPopover] = useState(false)
   const [showTaxIDsPopover, setShowTaxIDsPopover] = useState(false)
+  const countryListboxId = useId()
+  const taxIdListboxId = useId()
 
   const onSelectTaxIdType = (name: string) => {
     const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
@@ -136,6 +138,8 @@ export const BillingCustomerDataForm = ({
                       role="combobox"
                       size="medium"
                       disabled={disabled}
+                      aria-expanded={showCountriesPopover}
+                      aria-controls={countryListboxId}
                       className={cn(
                         'w-full justify-between h-[34px]',
                         !field.value && 'text-muted'
@@ -154,7 +158,12 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                <PopoverContent
+                  id={countryListboxId}
+                  sameWidthAsTrigger
+                  className="p-0"
+                  align="start"
+                >
                   <Command>
                     <CommandInput placeholder="Search country..." />
                     <CommandList>
@@ -246,6 +255,8 @@ export const BillingCustomerDataForm = ({
                       role="combobox"
                       size="medium"
                       disabled={disabled}
+                      aria-expanded={showTaxIDsPopover}
+                      aria-controls={taxIdListboxId}
                       className={cn(
                         'w-full justify-between h-[34px] pr-2',
                         !selectedTaxId && 'text-muted'
@@ -260,7 +271,12 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                <PopoverContent
+                  id={taxIdListboxId}
+                  sameWidthAsTrigger
+                  className="p-0"
+                  align="start"
+                >
                   <Command>
                     <CommandInput placeholder="Search tax ID..." />
                     <CommandList>
