@@ -10,10 +10,16 @@ export interface McpClientDeepLinkOptions {
   isPlatform?: boolean
 }
 
+export interface McpClientInstructionOptions {
+  isPlatform?: boolean
+}
+
 export interface McpClient {
   key: string
   label: string
   icon?: string
+  /** When true, use -icon-dark.svg in dark theme; otherwise the same -icon.svg is used for both themes. */
+  hasDistinctDarkIcon?: boolean
   docsUrl?: string
   externalDocsUrl?: string
   configFile?: string
@@ -23,11 +29,13 @@ export interface McpClient {
   deepLinkDescription?: React.ReactNode
   primaryInstructions?: (
     config: McpClientConfig,
-    onCopy: (type?: McpOnCopyCallback) => void
+    onCopy: (type?: McpOnCopyCallback) => void,
+    options?: McpClientInstructionOptions
   ) => React.ReactNode
   alternateInstructions?: (
     config: McpClientConfig,
-    onCopy: (type?: McpOnCopyCallback) => void
+    onCopy: (type?: McpOnCopyCallback) => void,
+    options?: McpClientInstructionOptions
   ) => React.ReactNode
 }
 

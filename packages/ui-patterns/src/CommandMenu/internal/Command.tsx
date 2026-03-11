@@ -1,11 +1,12 @@
 'use client'
 
-import { type PropsWithChildren, forwardRef } from 'react'
-import { CommandItem_Shadcn_, cn } from 'ui'
-import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
+import { forwardRef, type PropsWithChildren } from 'react'
+import { cn, CommandItem_Shadcn_ } from 'ui'
+
 import { useCommandMenuTelemetryContext } from '../api/hooks/useCommandMenuTelemetryContext'
+import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
 import { useResetCommandMenu, useSetCommandMenuOpen } from '../api/hooks/viewHooks'
-import type { ICommand, IActionCommand, IRouteCommand } from './types'
+import type { IActionCommand, ICommand, IRouteCommand } from './types'
 
 const isActionCommand = (command: ICommand): command is IActionCommand => 'action' in command
 const isRouteCommand = (command: ICommand): command is IRouteCommand => 'route' in command

@@ -23,17 +23,6 @@ import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
 import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import duration from 'dayjs/plugin/duration'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
-import Head from 'next/head'
-import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { type ComponentProps, ErrorInfo, useCallback } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
-
 import {
   FeatureFlagProvider,
   getFlags,
@@ -45,12 +34,19 @@ import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { FeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
 import { MainScrollContainerProvider } from 'components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
+import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { customFont, sourceCodePro } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -58,6 +54,10 @@ import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
+import Head from 'next/head'
+import { NuqsAdapter } from 'nuqs/adapters/next/pages'
+import { ErrorInfo, useCallback, type ComponentProps } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
@@ -173,19 +173,22 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         enableSystem
                         disableTransitionOnChange
                       >
-                        <AiAssistantStateContextProvider>
-                          <CommandProvider>
-                            <FeaturePreviewContextProvider>
-                              <MainScrollContainerProvider>
-                                {getLayout(<Component {...pageProps} />)}
-                              </MainScrollContainerProvider>
-                              <StudioCommandMenu />
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                            <SonnerToaster position="top-right" />
-                            <MonacoThemeProvider />
-                          </CommandProvider>
-                        </AiAssistantStateContextProvider>
+                        <DevToolbarProvider apiUrl={API_URL}>
+                          <AiAssistantStateContextProvider>
+                            <CommandProvider>
+                              <FeaturePreviewContextProvider>
+                                <MainScrollContainerProvider>
+                                  {getLayout(<Component {...pageProps} />)}
+                                </MainScrollContainerProvider>
+                                <StudioCommandMenu />
+                                <FeaturePreviewModal />
+                              </FeaturePreviewContextProvider>
+                              <SonnerToaster position="top-right" />
+                              <MonacoThemeProvider />
+                            </CommandProvider>
+                          </AiAssistantStateContextProvider>
+                          <DevToolbar />
+                        </DevToolbarProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>

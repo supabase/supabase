@@ -1,15 +1,15 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { cn, Separator, CodeBlock } from 'ui'
+import { cn, CodeBlock, Separator } from 'ui'
 
+import { InfoTooltip } from '../info-tooltip'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
 import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
 import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
-import { InfoTooltip } from '../info-tooltip'
 
 export interface McpConfigPanelProps {
   basePath: string

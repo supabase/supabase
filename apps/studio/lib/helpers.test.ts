@@ -206,8 +206,9 @@ describe('copyToClipboard', () => {
   })
 
   it('uses clipboard.write if available', async () => {
-    await copyToClipboard('hello')
+    const promise = copyToClipboard('hello')
     vi.runAllTimers()
+    await promise
     expect(writeMock).toHaveBeenCalled()
   })
 

@@ -197,14 +197,29 @@ services:
       - name: cors
 
   ## Analytics routes
-  - name: analytics-v1
-    _comment: 'Analytics: /analytics/v1/* -> http://logflare:4000/*'
-    url: http://analytics:4000/
-    routes:
-      - name: analytics-v1-all
-        strip_path: true
-        paths:
-          - /analytics/v1/
+  ## Not used - Studio and Vector talk directly to analytics via Docker networking.
+  ## If external access is needed, add routes with key-auth matching Logflare's x-api-key auth.
+  # - name: analytics-v1-api
+  #   _comment: 'Analytics: /analytics/v1/api/endpoints/* -> http://logflare:4000/api/endpoints/*'
+  #   url: http://analytics:4000/api/endpoints
+  #   routes:
+  #     - name: analytics-v1-api
+  #       strip_path: true
+  #       paths:
+  #         - /analytics/v1/api/endpoints/
+  # - name: analytics-v1
+  #   _comment: 'Analytics: /analytics/v1/* -> http://logflare:4000/*'
+  #   url: http://analytics:4000/
+  #   routes:
+  #     - name: dashboard-v1-all
+  #       strip_path: true
+  #       paths:
+  #         - /analytics/v1
+  #   plugins:
+  #     - name: cors
+  #     - name: basic-auth
+  #       config:
+  #         hide_credentials: true
 
   ## Secure Database routes
   - name: meta

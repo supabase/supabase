@@ -2658,6 +2658,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/analytics/replication',
+    destination: '/docs/guides/database/replication/replication-setup',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
     destination: '/docs/guides/auth/server-side/advanced-guide',
   },
@@ -2833,7 +2838,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/oauth-scopes',
-    destination: '/docs/guides/integrations/build-a-supabase-integration/oauth-scopes',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
   },
   {
     permanent: true,
@@ -3090,5 +3095,16 @@ module.exports = [
     permanent: true,
     source: '/design',
     destination: '/design-system',
+  },
+  {
+    source: '/redeem',
+    has: [
+      {
+        type: 'query',
+        key: 'code',
+      },
+    ],
+    destination: '/dashboard/redeem?code=:code',
+    permanent: false,
   },
 ]

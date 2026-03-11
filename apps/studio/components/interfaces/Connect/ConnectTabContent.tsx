@@ -6,7 +6,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { pluckObjectFields } from 'lib/helpers'
 import { useTrack } from 'lib/telemetry/track'
 import { cn, CopyCallbackContext } from 'ui'
@@ -34,8 +34,7 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
   ({ projectKeys, filePath, connectionTab, selectedFrameworkOrTool, ...props }, ref) => {
     const { ref: projectRef } = useParams()
     const track = useTrack()
-    const { data: selectedOrg } = useSelectedOrganizationQuery()
-    const allowPgBouncerSelection = useMemo(() => selectedOrg?.plan.id !== 'free', [selectedOrg])
+    const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
 
     const handleCopy = () => {
       const trackingProperties: {

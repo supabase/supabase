@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
-import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import type Author from '~/types/author'
-import type PostTypes from '~/types/post'
+import authors from '@/lib/authors.json'
+import type Author from '@/types/author'
+import type PostTypes from '@/types/post'
 
 interface Props {
   post: PostTypes
@@ -29,11 +29,10 @@ const BlogGridItem = ({ post }: Props) => {
     return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
   }
 
-  const imageUrl = post.isCMS
-    ? post.imgThumb || post.imgSocial || '/images/blog/blog-placeholder.png'
-    : resolveImagePath(post.imgThumb) ||
-      resolveImagePath(post.imgSocial) ||
-      '/images/blog/blog-placeholder.png'
+  const imageUrl =
+    resolveImagePath(post.imgThumb) ||
+    resolveImagePath(post.imgSocial) ||
+    '/images/blog/blog-placeholder.png'
 
   return (
     <Link

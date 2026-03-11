@@ -1,5 +1,7 @@
-import { render, fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { useState } from 'react'
+import { describe, expect, it } from 'vitest'
+
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -8,7 +10,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from './index'
-import { useState } from 'react'
 
 // This fixes a "ReferenceError: ResizeObserver is not defined" error in the test
 class ResizeObserver {

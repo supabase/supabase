@@ -12,8 +12,8 @@ import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import {
@@ -46,7 +46,8 @@ const FormSchema = z.object({
 
 export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { hasAccess: hasAccessToPerformance, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('auth.performance_settings')
   const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
@@ -72,8 +73,7 @@ export const PerformanceSettingsForm = () => {
   })
   const maxConnectionLimit = maxConnData?.maxConnections ?? 60
 
-  const isProPlan = organization?.plan.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlan
+  const promptUpgrade = IS_PLATFORM && !isLoadingEntitlement && !hasAccessToPerformance
 
   const { mutate: updateAuthConfig, isPending: isSaving } = useAuthConfigUpdateMutation()
 
@@ -101,7 +101,7 @@ export const PerformanceSettingsForm = () => {
 
   const onSubmitRequestDurationForm = (values: any) => {
     if (!project?.ref) return console.error('Project ref is required')
-    if (!isProPlan) return
+    if (!hasAccessToPerformance) return
 
     setIsUpdatingRequestDurationForm(true)
 
@@ -181,7 +181,7 @@ export const PerformanceSettingsForm = () => {
     )
   }
 
-  if (isLoadingAuthConfig) {
+  if (isLoadingAuthConfig || isLoadingEntitlement) {
     return (
       <ScaffoldSection isFullWidth>
         <GenericSkeletonLoader />
@@ -192,7 +192,7 @@ export const PerformanceSettingsForm = () => {
   return (
     <>
       <ScaffoldSection isFullWidth>
-        {promptProPlanUpgrade && (
+        {promptUpgrade && (
           <UpgradeToPro
             source="authPerformance"
             featureProposition="configure advanced Auth server settings"
@@ -232,7 +232,7 @@ export const PerformanceSettingsForm = () => {
                                 min={5}
                                 max={30}
                                 {...field}
-                                disabled={!canUpdateConfig || promptProPlanUpgrade}
+                                disabled={!canUpdateConfig || promptUpgrade}
                               />
                             </PrePostTab>
                           </div>
@@ -254,13 +254,13 @@ export const PerformanceSettingsForm = () => {
                   </Button>
                 )}
                 <Button
-                  type={promptProPlanUpgrade ? 'default' : 'primary'}
+                  type={promptUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
                     !canUpdateConfig ||
                     isUpdatingRequestDurationForm ||
                     !requestDurationForm.formState.isDirty ||
-                    promptProPlanUpgrade
+                    promptUpgrade
                   }
                   loading={isUpdatingRequestDurationForm}
                 >
@@ -325,7 +325,7 @@ export const PerformanceSettingsForm = () => {
                         >
                           <SelectTrigger_Shadcn_
                             size="small"
-                            disabled={!canUpdateConfig || promptProPlanUpgrade}
+                            disabled={!canUpdateConfig || promptUpgrade}
                           >
                             <SelectValue_Shadcn_>
                               {field.value === 'percent' ? 'Percentage' : 'Absolute'}
@@ -376,7 +376,7 @@ export const PerformanceSettingsForm = () => {
                                     ? 80
                                     : Math.floor(maxConnectionLimit * 0.8)
                                 }
-                                disabled={!canUpdateConfig || promptProPlanUpgrade}
+                                disabled={!canUpdateConfig || promptUpgrade}
                               />
                             </PrePostTab>
                           </div>
@@ -408,7 +408,7 @@ export const PerformanceSettingsForm = () => {
                   </Button>
                 )}
                 <Button
-                  type={promptProPlanUpgrade ? 'default' : 'primary'}
+                  type={promptUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
                     !canUpdateConfig || isUpdatingDatabaseForm || !databaseForm.formState.isDirty
