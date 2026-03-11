@@ -41,7 +41,7 @@ When the rate limit is exceeded, calling another Edge Function throws a `RateLim
 <TabPanel id="supabase-js" label="supabase-js">
 
 ```typescript
-import { createClient, RateLimitError } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (err) {
-    if (err instanceof RateLimitError) {
+    if (err instanceof Deno.errors.RateLimitError) {
       // Use retryAfterMs to tell the client when to retry
       const retryAfterSeconds = Math.ceil(err.retryAfterMs / 1000)
       return new Response(
@@ -133,7 +133,7 @@ You can also use `retryAfterMs` to implement automatic retries within your funct
 <TabPanel id="supabase-js" label="supabase-js">
 
 ```typescript
-import { createClient, RateLimitError } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -153,7 +153,7 @@ async function invokeWithRetry(
       if (error) throw error
       return data
     } catch (err) {
-      if (err instanceof RateLimitError && attempt < maxRetries - 1) {
+      if (err instanceof Deno.errors.RateLimitError && attempt < maxRetries - 1) {
         // Wait for the recommended duration before retrying
         await new Promise((resolve) => setTimeout(resolve, err.retryAfterMs))
         continue
