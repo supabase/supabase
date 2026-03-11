@@ -143,7 +143,6 @@ const HomePageCover = (props) => {
                   <Link key={i} href={framework.href} passHref className="no-underline">
                     <IconPanel
                       iconSize={iconSize}
-                      hideArrow
                       tooltip={framework.tooltip}
                       icon={iconToUse}
                     />
