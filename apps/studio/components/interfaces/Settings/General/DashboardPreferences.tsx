@@ -65,14 +65,6 @@ export const DashboardPreferences = () => {
 
   return (
     <PageSection>
-      <PageSectionMeta>
-        <PageSectionSummary>
-          <PageSectionTitle>Dashboard preferences</PageSectionTitle>
-          <PageSectionDescription>
-            Configure how the dashboard interacts with your project
-          </PageSectionDescription>
-        </PageSectionSummary>
-      </PageSectionMeta>
       <PageSectionContent>
         {isLoading ? (
           <Card>
