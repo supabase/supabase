@@ -117,7 +117,15 @@ Once replication is enabled and you have a Postgres publication, you can add a d
 
 #### Choose and configure your destination
 
-Follow these steps to configure your destination. Right now, **BigQuery** is the only managed destination available in Replication. We are working on adding more destinations in the future.
+Follow these steps to configure your destination. Right now, **BigQuery** is the only managed destination available in Replication.
+
+<Admonition type="note" title="Why Analytics Buckets are no longer listed here">
+
+We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
+
+At the moment, BigQuery is the only supported destination, but we are actively working on expanding capabilities.
+
+</Admonition>
 
 [BigQuery](https://cloud.google.com/bigquery) is Google's fully managed data warehouse. You can replicate your database tables to BigQuery for analytics and reporting.
 
