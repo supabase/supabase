@@ -58,7 +58,9 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const availableModeIds = useAvailableConnectModes()
-  const availableActions = CONNECT_ACTIONS.filter((action) => availableModeIds.includes(action.mode))
+  const availableActions = CONNECT_ACTIONS.filter((action) =>
+    availableModeIds.includes(action.mode)
+  )
 
   const hasTrackedExposure = useRef(false)
 
