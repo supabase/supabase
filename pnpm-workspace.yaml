@@ -67,18 +67,19 @@ onlyBuiltDependencies:
 
 overrides:
   '@aws-sdk/core>fast-xml-parser': ^5.3.5
-  '@mapbox/node-pre-gyp>tar': ^7.5.8
+  '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
-  cacache>tar: ^7.5.8
+  cacache>tar: ^7.5.11
   esbuild: ^0.25.2
   lodash: 'catalog:'
   lodash-es: 'catalog:'
-  node-gyp>tar: ^7.5.8
+  node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
   openapi-sampler>fast-xml-parser: ^5.3.5
   payload>undici: ^7.18.2
   refractor>prismjs: ^1.30.0
+  supabase>tar: ^7.5.11
   tmp: ^0.2.4
 
 patchedDependencies:

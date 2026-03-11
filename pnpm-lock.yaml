@@ -66,18 +66,19 @@ catalogs:
 
 overrides:
   '@aws-sdk/core>fast-xml-parser': ^5.3.5
-  '@mapbox/node-pre-gyp>tar': ^7.5.8
+  '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
-  cacache>tar: ^7.5.8
+  cacache>tar: ^7.5.11
   esbuild: ^0.25.2
   lodash: ^4.17.23
   lodash-es: ^4.17.23
-  node-gyp>tar: ^7.5.8
+  node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
   openapi-sampler>fast-xml-parser: ^5.3.5
   payload>undici: ^7.18.2
   refractor>prismjs: ^1.30.0
+  supabase>tar: ^7.5.11
   tmp: ^0.2.4
 
 patchedDependencies:
@@ -17361,8 +17362,8 @@ packages:
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
 
-  tar@7.5.9:
-    resolution: {integrity: sha512-BTLcK0xsDh2+PUe9F6c2TlRp4zOOBMTkoQHQIWSIzI0R7KG46uEwq4OPk2W7bZcprBMsuaeFsqwYr7pjh6CuHg==}
+  tar@7.5.11:
+    resolution: {integrity: sha512-ChjMH33/KetonMTAtpYdgUFr0tbz69Fp2v7zWxQfYZX4g5ZN2nOBXm1R2xyA+lMIKrLKIoKAwFj93jE/avX9cQ==}
     engines: {node: '>=18'}
 
   termi-link@1.1.0:
@@ -21384,7 +21385,7 @@ snapshots:
       npmlog: 5.0.1
       rimraf: 3.0.2
       semver: 7.7.3
-      tar: 7.5.9
+      tar: 7.5.11
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -21397,7 +21398,7 @@ snapshots:
       node-fetch: 2.7.0(encoding@0.1.13)
       nopt: 8.1.0
       semver: 7.7.3
-      tar: 7.5.9
+      tar: 7.5.11
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -27732,7 +27733,7 @@ snapshots:
       promise-inflight: 1.0.1
       rimraf: 3.0.2
       ssri: 8.0.1
-      tar: 7.5.9
+      tar: 7.5.11
       unique-filename: 1.1.1
     transitivePeerDependencies:
       - bluebird
@@ -27749,7 +27750,7 @@ snapshots:
       minipass-pipeline: 1.2.4
       p-map: 4.0.0
       ssri: 10.0.6
-      tar: 7.5.9
+      tar: 7.5.11
       unique-filename: 3.0.0
 
   call-bind-apply-helpers@1.0.2:
@@ -33463,7 +33464,7 @@ snapshots:
       nopt: 7.2.1
       proc-log: 3.0.0
       semver: 7.7.3
-      tar: 7.5.9
+      tar: 7.5.11
       which: 4.0.0
     transitivePeerDependencies:
       - supports-color
@@ -33478,7 +33479,7 @@ snapshots:
       npmlog: 6.0.2
       rimraf: 3.0.2
       semver: 7.7.3
-      tar: 7.5.9
+      tar: 7.5.11
       which: 2.0.2
     transitivePeerDependencies:
       - bluebird
@@ -36738,7 +36739,7 @@ snapshots:
       bin-links: 6.0.0
       https-proxy-agent: 7.0.6(supports-color@8.1.1)
       node-fetch: 3.3.2
-      tar: 7.5.9
+      tar: 7.5.11
     transitivePeerDependencies:
       - supports-color
 
@@ -36865,7 +36866,7 @@ snapshots:
       fast-fifo: 1.3.2
       streamx: 2.22.0
 
-  tar@7.5.9:
+  tar@7.5.11:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
