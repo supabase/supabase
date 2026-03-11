@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
 
 import type { ConnectMode, ProjectKeys } from './Connect.types'
+import { CONNECT_MODES } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useConnectState } from './useConnectState'
@@ -14,8 +15,6 @@ import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useTrack } from 'lib/telemetry/track'
-
-const CONNECT_MODES: readonly ConnectMode[] = ['framework', 'direct', 'orm', 'mcp'] as const
 
 function isConnectMode(value: string): value is ConnectMode {
   return CONNECT_MODES.some((mode) => mode === value)

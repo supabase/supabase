@@ -33,6 +33,7 @@ import { MergeRequestButton } from './MergeRequestButton'
 import { Connect } from '@/components/interfaces/Connect/Connect'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
+import type { ConnectSectionVariant } from '@/components/interfaces/ProjectHome/ConnectSection.config'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
@@ -75,7 +76,7 @@ export const LayoutHeader = ({
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
 
-  const connectSectionVariant = usePHFlag<string | false>('connectSection')
+  const connectSectionVariant = usePHFlag<ConnectSectionVariant | false>('connectSection')
   const isFlagResolved = connectSectionVariant !== undefined
   const isConnectSheetEnabled = connectSectionVariant === 'connect'
 

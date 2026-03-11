@@ -1913,7 +1913,7 @@ export interface HomeConnectSectionExposedEvent {
     /**
      * The experiment variant shown to the user
      */
-    variant: string
+    variant: 'connect' | 'getting-started'
   }
   groups: TelemetryGroups
 }
