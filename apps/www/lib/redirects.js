@@ -6,6 +6,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/hardening-data-api',
+    destination: '/docs/guides/api/hardening-data-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+    destination: '/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/platform/compute-add-ons',
     destination: '/docs/guides/platform/compute-and-disk',
   },

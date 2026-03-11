@@ -45,6 +45,7 @@
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
+    "jsdom": "^28.1.0",
     "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
