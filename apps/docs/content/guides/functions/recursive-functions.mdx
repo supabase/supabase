@@ -19,6 +19,7 @@ Rate limiting applies to **outbound `fetch()` calls** made by your Edge Function
 <Admonition type="note">
 
 Inbound requests to your Edge Functions and requests to external APIs (e.g., Stripe, OpenAI) are **not** subject to this rate limit. Only outbound calls from one Edge Function to another Edge Function are counted.
+
 </Admonition>
 
 ## Rate limit budget
@@ -289,4 +290,4 @@ async function processWithDelay(items: any[]) {
 
 Currently, all plans have the same rate limit budget. We are working on introducing custom limits for different use cases.
 
-If you need a higher rate limit for your project,  [contact support](https://supabase.com/dashboard/support/new) with details about your use case.
+If you need a higher rate limit for your project,  [contact support](/dashboard/support/new) with details about your use case.
