@@ -34,6 +34,8 @@ export function mergeSectionOrder(stored: string[]): string[] {
   return merged
 }
 
+// Temporary: getSectionVisibility and related types support the connectSection
+// experiment (connect vs getting-started). Remove after the experiment concludes.
 interface SectionVisibilityInput {
   connectSectionVariant: ConnectSectionVariant | false | undefined
   isMatureProject: boolean

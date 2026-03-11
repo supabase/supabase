@@ -2,6 +2,7 @@ import { Box, Cable, Database, Sparkles } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { ConnectMode } from '../ConnectSheet/Connect.types'
 
+// Temporary: experiment variants for the connectSection A/B test. Remove after the experiment.
 export type ConnectSectionVariant = 'connect' | 'getting-started'
 
 export type ConnectAction = {
