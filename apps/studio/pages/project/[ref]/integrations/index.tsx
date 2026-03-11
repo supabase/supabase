@@ -52,13 +52,17 @@ const IntegrationsPage: NextPageWithLayout = () => {
     error,
     isPending: isLoadingAvailableIntegrations,
     isError,
-    isSuccess,
+    isSuccess: isSuccessAvailableIntegrations,
   } = useAvailableIntegrations()
 
-  const { installedIntegrations, isLoading: isLoadingInstalledIntegrations } =
-    useInstalledIntegrations()
+  const {
+    installedIntegrations,
+    isLoading: isLoadingInstalledIntegrations,
+    isSuccess: isSuccessInstalledIntegrations,
+  } = useInstalledIntegrations()
   const installedIds = installedIntegrations.map((i) => i.id)
   const isLoading = isLoadingAvailableIntegrations || isLoadingInstalledIntegrations
+  const isSuccess = isSuccessAvailableIntegrations && isSuccessInstalledIntegrations
 
   // Dynamic page content based on selected category
   const pageContent = useMemo(() => {
