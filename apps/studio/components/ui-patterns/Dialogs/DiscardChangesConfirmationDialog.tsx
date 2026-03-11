@@ -14,21 +14,23 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-interface DiscardChangesConfirmationDialogProps extends ConfirmOnCloseModalProps {
+export interface DiscardChangesConfirmationDialogProps extends ConfirmOnCloseModalProps {
   title?: ReactNode
   description?: ReactNode
   confirmLabel?: ReactNode
   cancelLabel?: ReactNode
+  size?: React.ComponentProps<typeof AlertDialogContent>['size']
 }
 
 export const DiscardChangesConfirmationDialog = ({
   visible,
   onClose,
   onCancel,
-  title = 'Discard changes?',
-  description = 'Are you sure you want to discard your changes? Any unsaved changes will be lost.',
+  title = 'Unsaved changes',
+  description = 'You have unsaved changes. Are you sure you want to discard them?',
   confirmLabel = 'Discard changes',
   cancelLabel = 'Keep editing',
+  size = 'tiny',
 }: DiscardChangesConfirmationDialogProps) => {
   const isConfirmingRef = useRef(false)
 
@@ -59,7 +61,7 @@ export const DiscardChangesConfirmationDialog = ({
 
   return (
     <AlertDialog open={visible} onOpenChange={handleOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent size={size}>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           {description !== undefined && description !== null && (

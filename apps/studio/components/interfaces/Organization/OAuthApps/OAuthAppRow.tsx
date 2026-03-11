@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Edit, MoreVertical, Trash } from 'lucide-react'
 
-import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -12,6 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -35,36 +36,36 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
   )
 
   return (
-    <Table.tr>
-      <Table.td>
+    <TableRow>
+      <TableCell className="w-[62px] min-w-[62px] max-w-[62px]">
         <div
-          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center"
+          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center text-xs"
           style={{ backgroundImage: app.icon ? `url('${app.icon}')` : 'none' }}
         >
           {!!app.icon ? '' : `${app.name[0]}`}
         </div>
-      </Table.td>
-      <Table.td>
+      </TableCell>
+      <TableCell>
         <p title={app.name} className="truncate">
           {app.name}
         </p>
-      </Table.td>
-      <Table.td>
+      </TableCell>
+      <TableCell>
         <div className="flex items-center gap-x-2">
-          <p className="font-mono truncate" title={app.client_id}>
+          <p className="text-xs font-mono truncate" title={app.client_id}>
             {app.client_id}
           </p>
           <CopyButton type="default" iconOnly text={app.client_id ?? ''} className="px-1" />
         </div>
-      </Table.td>
-      <Table.td>
+      </TableCell>
+      <TableCell>
         <TimestampInfo
           utcTimestamp={app.created_at ?? ''}
           labelFormat="DD/MM/YYYY, HH:mm:ss"
           className="text-sm"
         />
-      </Table.td>
-      <Table.td align="right">
+      </TableCell>
+      <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="default" icon={<MoreVertical />} className="px-1" />
@@ -113,7 +114,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
             </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }

@@ -167,6 +167,161 @@ test.describe('SQL Editor', () => {
     }
   })
 
+  test('should block execution for alter database connection limit 0', async ({ ref }) => {
+    await expect(page.getByText('Loading...')).not.toBeVisible()
+    await page.locator('.view-lines').click()
+    await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.keyboard.type(`alter database postgres connection limit 0;`)
+
+    // Track whether the SQL editor dispatches this specific query to pg-meta
+    let queryDispatched = false
+    const listener = (request: any) => {
+      if (
+        request.url().includes('query?key=') &&
+        request.method() === 'POST' &&
+        request.postData()?.includes('connection limit 0')
+      ) {
+        queryDispatched = true
+      }
+    }
+    page.on('request', listener)
+
+    await page.getByTestId('sql-run-button').click()
+
+    // verify warning modal blocks execution
+    await expect(
+      page.getByRole('heading', { name: 'Potential issue detected with' })
+    ).toBeVisible()
+    await expect(
+      page.getByText('Query will prevent connections to your database')
+    ).toBeVisible()
+    expect(queryDispatched).toBe(false)
+
+    // cancel should dismiss without executing
+    await page.getByRole('button', { name: 'Cancel' }).click()
+    expect(queryDispatched).toBe(false)
+
+    page.removeListener('request', listener)
+
+    // clear SQL snippet
+    if (!isCLI()) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    } else {
+      await page.reload()
+    }
+  })
+
+  test('should block execution for alter database allow_connections false', async ({ ref }) => {
+    await expect(page.getByText('Loading...')).not.toBeVisible()
+    await page.locator('.view-lines').click()
+    await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.keyboard.type(`ALTER DATABASE postgres ALLOW_CONNECTIONS false;`)
+
+    // Track whether the SQL editor dispatches this specific query to pg-meta
+    let queryDispatched = false
+    const listener = (request: any) => {
+      if (
+        request.url().includes('query?key=') &&
+        request.method() === 'POST' &&
+        request.postData()?.includes('ALLOW_CONNECTIONS false')
+      ) {
+        queryDispatched = true
+      }
+    }
+    page.on('request', listener)
+
+    await page.getByTestId('sql-run-button').click()
+
+    // verify warning modal blocks execution
+    await expect(
+      page.getByRole('heading', { name: 'Potential issue detected with' })
+    ).toBeVisible()
+    await expect(
+      page.getByText('Query will prevent connections to your database')
+    ).toBeVisible()
+    expect(queryDispatched).toBe(false)
+
+    // cancel should dismiss without executing
+    await page.getByRole('button', { name: 'Cancel' }).click()
+    expect(queryDispatched).toBe(false)
+
+    page.removeListener('request', listener)
+
+    // clear SQL snippet
+    if (!isCLI()) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    } else {
+      await page.reload()
+    }
+  })
+
+  test('should block execution for update without where clause', async ({ ref }) => {
+    await expect(page.getByText('Loading...')).not.toBeVisible()
+    await page.locator('.view-lines').click()
+    await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.keyboard.type(`update countries set name = 'test';`)
+
+    // Track whether the SQL editor dispatches this specific query to pg-meta
+    let queryDispatched = false
+    const listener = (request: any) => {
+      if (
+        request.url().includes('query?key=') &&
+        request.method() === 'POST' &&
+        request.postData()?.includes("set name = 'test'")
+      ) {
+        queryDispatched = true
+      }
+    }
+    page.on('request', listener)
+
+    await page.getByTestId('sql-run-button').click()
+
+    // verify warning modal blocks execution
+    await expect(
+      page.getByRole('heading', { name: 'Potential issue detected with' })
+    ).toBeVisible()
+    await expect(page.getByText('Query uses update without a where clause')).toBeVisible()
+    expect(queryDispatched).toBe(false)
+
+    // cancel should dismiss without executing
+    await page.getByRole('button', { name: 'Cancel' }).click()
+    expect(queryDispatched).toBe(false)
+
+    page.removeListener('request', listener)
+
+    // clear SQL snippet
+    if (!isCLI()) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    } else {
+      await page.reload()
+    }
+  })
+
+  test('should not show warning modal for safe alter database statement', async ({ ref }) => {
+    await expect(page.getByText('Loading...')).not.toBeVisible()
+    await page.locator('.view-lines').click()
+    await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.keyboard.type(`alter database postgres set statement_timeout = 60000;`)
+
+    const sqlMutationPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByTestId('sql-run-button').click()
+    await sqlMutationPromise
+
+    // verify warning modal is NOT visible - query should execute directly
+    await expect(
+      page.getByRole('heading', { name: 'Potential issue detected with' })
+    ).not.toBeVisible()
+
+    // clear SQL snippet
+    if (!isCLI()) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    } else {
+      await page.reload()
+    }
+  })
+
   test('exporting works as expected', async ({ ref }) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()

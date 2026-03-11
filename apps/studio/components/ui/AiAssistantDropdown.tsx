@@ -1,7 +1,9 @@
 import { AiPromptCopiedEvent } from 'common/telemetry-constants'
+import { Chatgpt, Claude } from 'icons'
 import { useTrack } from 'lib/telemetry/track'
 import { Check, ChevronDown, Copy } from 'lucide-react'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, ReactNode, useEffect, useState } from 'react'
+
 import {
   AiIconAnimation,
   Button,
@@ -10,6 +12,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
@@ -17,6 +20,17 @@ import {
 } from 'ui'
 
 type TelemetrySource = AiPromptCopiedEvent['properties']['source']
+
+const EXTERNAL_AI_TOOLS = [
+  { label: 'Ask ChatGPT', url: 'https://chatgpt.com/', promptParam: 'q', icon: Chatgpt },
+  { label: 'Ask Claude', url: 'https://claude.ai/new', promptParam: 'q', icon: Claude },
+]
+
+export interface AiAssistantDropdownItem {
+  label: string
+  icon?: ReactNode
+  onClick: () => void
+}
 
 export interface AiAssistantDropdownProps {
   buildPrompt: () => string
@@ -30,6 +44,10 @@ export interface AiAssistantDropdownProps {
   loading?: boolean
   className?: string
   tooltip?: string
+  copyLabel?: string
+  showExternalAI?: boolean
+  extraDropdownItems?: ReactNode
+  additionalDropdownItems?: AiAssistantDropdownItem[]
 }
 
 export function AiAssistantDropdown({
@@ -44,6 +62,10 @@ export function AiAssistantDropdown({
   loading = false,
   className,
   tooltip,
+  copyLabel = 'Copy prompt',
+  showExternalAI = false,
+  extraDropdownItems,
+  additionalDropdownItems,
 }: AiAssistantDropdownProps) {
   const track = useTrack()
   const [showCopied, setShowCopied] = useState(false)
@@ -64,6 +86,15 @@ export function AiAssistantDropdown({
     if (telemetrySource) {
       track('ai_prompt_copied', { source: telemetrySource })
     }
+  }
+
+  const handleOpenExternalAI = (tool: (typeof EXTERNAL_AI_TOOLS)[number]) => {
+    const prompt = buildPrompt()
+    window.open(
+      `${tool.url}?${tool.promptParam}=${encodeURIComponent(prompt)}`,
+      '_blank',
+      'noreferrer'
+    )
   }
 
   const handleOpenAssistant = () => {
@@ -95,11 +126,38 @@ export function AiAssistantDropdown({
             icon={<ChevronDown size={12} />}
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuContent align="end" className="w-44">
+          {extraDropdownItems}
           <DropdownMenuItem onClick={handleCopyPrompt} className="gap-2">
             {showCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
-            {showCopied ? 'Copied!' : 'Copy prompt'}
+            {showCopied ? 'Copied!' : copyLabel}
           </DropdownMenuItem>
+          {showExternalAI && (
+            <>
+              <DropdownMenuSeparator />
+              {EXTERNAL_AI_TOOLS.map((tool) => (
+                <DropdownMenuItem
+                  key={tool.url}
+                  className="gap-2"
+                  onClick={() => handleOpenExternalAI(tool)}
+                >
+                  <tool.icon size={14} />
+                  {tool.label}
+                </DropdownMenuItem>
+              ))}
+            </>
+          )}
+          {additionalDropdownItems && additionalDropdownItems.length > 0 && (
+            <>
+              <DropdownMenuSeparator />
+              {additionalDropdownItems.map((item, i) => (
+                <DropdownMenuItem key={i} onClick={item.onClick} className="gap-2">
+                  {item.icon}
+                  {item.label}
+                </DropdownMenuItem>
+              ))}
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

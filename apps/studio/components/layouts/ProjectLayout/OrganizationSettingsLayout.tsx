@@ -2,18 +2,23 @@ import Head from 'next/head'
 import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
+import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
 import { WithSidebar } from 'components/layouts/AccountLayout/WithSidebar'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
-interface OrganizationSettingsSectionsProps {
+interface OrganizationSettingsMenuItemsProps {
   slug?: string
-  currentPath: string
   showSecuritySettings?: boolean
   showSsoSettings?: boolean
   showLegalDocuments?: boolean
+  showPlatformWebhooks?: boolean
+}
+
+interface OrganizationSettingsSectionsProps extends OrganizationSettingsMenuItemsProps {
+  currentPath: string
 }
 
 interface OrganizationSettingsLayoutProps {
@@ -27,13 +32,79 @@ export const getOrganizationSettingsDocumentTitle = (
   title: string
 ) => `${getOrganizationSettingsPageTitle(pageTitle)} | ${title}`
 
-export const generateOrganizationSettingsSections = ({
+export const generateOrganizationSettingsMenuItems = ({
   slug,
-  currentPath,
   showSecuritySettings = true,
   showSsoSettings = true,
   showLegalDocuments = true,
+  showPlatformWebhooks = true,
+}: OrganizationSettingsMenuItemsProps) => [
+  {
+    key: 'general',
+    label: 'General',
+    href: `/org/${slug}/general`,
+  },
+  ...(showSecuritySettings
+    ? [
+        {
+          key: 'security',
+          label: 'Security',
+          href: `/org/${slug}/security`,
+        },
+      ]
+    : []),
+  {
+    key: 'apps',
+    label: 'OAuth Apps',
+    href: `/org/${slug}/apps`,
+  },
+  ...(showSsoSettings
+    ? [
+        {
+          key: 'sso',
+          label: 'SSO',
+          href: `/org/${slug}/sso`,
+        },
+      ]
+    : []),
+  ...(showPlatformWebhooks
+    ? [
+        {
+          key: 'webhooks',
+          label: 'Webhooks',
+          href: `/org/${slug}/webhooks`,
+        },
+      ]
+    : []),
+  {
+    key: 'audit',
+    label: 'Audit Logs',
+    href: `/org/${slug}/audit`,
+  },
+  ...(showLegalDocuments
+    ? [
+        {
+          key: 'documents',
+          label: 'Legal Documents',
+          href: `/org/${slug}/documents`,
+        },
+      ]
+    : []),
+]
+
+export const generateOrganizationSettingsSections = ({
+  currentPath,
+  slug,
+  showSecuritySettings = true,
+  showSsoSettings = true,
+  showLegalDocuments = true,
+  showPlatformWebhooks = true,
 }: OrganizationSettingsSectionsProps): SidebarSection[] => {
+  const isLinkActive = (key: string, href: string) =>
+    key === 'webhooks'
+      ? currentPath === href || currentPath.startsWith(`${href}/`)
+      : currentPath === href
+
   const configurationLinks = [
     {
       key: 'general',
@@ -66,6 +137,15 @@ export const generateOrganizationSettingsSections = ({
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
+    ...(showPlatformWebhooks
+      ? [
+          {
+            key: 'webhooks',
+            label: 'Webhooks',
+            href: `/org/${slug}/webhooks`,
+          },
+        ]
+      : []),
   ]
 
   const complianceLinks = [
@@ -91,7 +171,7 @@ export const generateOrganizationSettingsSections = ({
       heading: 'Configuration',
       links: configurationLinks.map((item) => ({
         ...item,
-        isActive: currentPath === item.href,
+        isActive: isLinkActive(item.key, item.href),
       })),
     },
     {
@@ -99,7 +179,7 @@ export const generateOrganizationSettingsSections = ({
       heading: 'Connections',
       links: connectionsLinks.map((item) => ({
         ...item,
-        isActive: currentPath === item.href,
+        isActive: isLinkActive(item.key, item.href),
       })),
     },
     {
@@ -107,7 +187,7 @@ export const generateOrganizationSettingsSections = ({
       heading: 'Compliance',
       links: complianceLinks.map((item) => ({
         ...item,
-        isActive: currentPath === item.href,
+        isActive: isLinkActive(item.key, item.href),
       })),
     },
   ]
@@ -118,6 +198,7 @@ function OrganizationSettingsLayout({
   pageTitle,
 }: PropsWithChildren<OrganizationSettingsLayoutProps>) {
   const { slug } = useParams()
+  const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
   const fullCurrentPath = useCurrentPath()
   const currentPath = normalizeOrganizationSettingsPath(fullCurrentPath)
   const { appTitle } = useCustomContent(['app:title'])
@@ -134,11 +215,12 @@ function OrganizationSettingsLayout({
   ])
 
   const sections = generateOrganizationSettingsSections({
-    slug,
     currentPath,
+    slug,
     showSecuritySettings,
     showSsoSettings,
     showLegalDocuments,
+    showPlatformWebhooks,
   })
 
   return (

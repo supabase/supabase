@@ -67,7 +67,7 @@ A 401 status code alone doesn't confirm a JWT check failure by itself. The log m
 
 ![image](/docs/img/troubleshooting/401_in_the_logs.png)
 
-Instead of manually reviewing the logs, you can run the below query in the [log explorer](<https://supabase.com/dashboard/project/_/logs/explorer?q=SELECT+DISTINCT%0A++++req.pathname+AS+function_name,%0A++++res.status_code%0A++FROM+function_edge_logs%0A++CROSS+JOIN+UNNEST(metadata)+AS+metadata+%0A++CROSS+JOIN+UNNEST(metadata.request)+AS+req+%0A++CROSS+JOIN+UNNEST(metadata.response)+AS+res+%0AWHERE+status_code+=+401+AND+metadata.execution_id+IS+NULL%0ALIMIT+10;&its=&ite=>) to get a list of functions that were impacted by the check:
+Instead of manually reviewing the logs, you can run the below query in the [log explorer](/dashboard/project/_/logs/explorer?q=SELECT+DISTINCT%0A++++req.pathname+AS+function_name,%0A++++res.status_code%0A++FROM+function_edge_logs%0A++CROSS+JOIN+UNNEST(metadata)+AS+metadata+%0A++CROSS+JOIN+UNNEST(metadata.request)+AS+req+%0A++CROSS+JOIN+UNNEST(metadata.response)+AS+res+%0AWHERE+status_code+=+401+AND+metadata.execution_id+IS+NULL%0ALIMIT+10;&its=&ite=>) to get a list of functions that were impacted by the check:
 
 ```sql
 select distinct
@@ -123,11 +123,12 @@ If you've migrated to [asymmetric keys (publishable/secret)](/dashboard/project/
     # remember to substitute in your PROJECT_ID, FUNCTION_NAME, and SECRET_TOKEN
 
 curl 'https://api.supabase.com/v1/projects/PROJECT_ID/functions/FUNCTION_NAME?verify_jwt=false' \
-—request PATCH \
-—header 'Content-Type: application/vnd.denoland.eszip' \
-—header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
-—data '""'
-```
+--request PATCH \
+--header 'Content-Type: application/vnd.denoland.eszip' \
+--header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+--data '""'
+
+````
 </AccordionItem>
 
   </div>

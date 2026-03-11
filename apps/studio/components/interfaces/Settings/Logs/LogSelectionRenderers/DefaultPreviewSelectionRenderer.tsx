@@ -15,6 +15,7 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
+import { ErrorCodeTooltip } from '../ErrorCodeTooltip'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
 
@@ -60,6 +61,7 @@ const PropertyRow = ({
   const isUserAgent = keyName === 'user_agent'
   const isEventMessage = keyName === 'event_message'
   const isPath = keyName === 'path'
+  const isErrorCode = keyName === 'error_code'
 
   function getSearchPairs() {
     if (isSearch && typeof value === 'string') {
@@ -163,6 +165,10 @@ const PropertyRow = ({
                   <div className="flex items-center gap-1 justify-end">
                     <ResponseCodeFormatter value={value} />
                   </div>
+                ) : isErrorCode ? (
+                  <ErrorCodeTooltip errorCode={String(value)} service={service}>
+                    <div className="truncate">{value}</div>
+                  </ErrorCodeTooltip>
                 ) : (
                   <div className="truncate">{value}</div>
                 )}
