@@ -375,6 +375,7 @@ allow_list = [
     "asyncpg",
     "bcrypt",
     "behaviors",
+    "backpressure",
     "camelCase",
     "dbdev",
     "degit",
