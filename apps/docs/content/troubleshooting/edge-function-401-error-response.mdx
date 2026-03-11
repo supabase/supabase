@@ -67,7 +67,7 @@ A 401 status code alone doesn't confirm a JWT check failure by itself. The log m
 
 ![image](/docs/img/troubleshooting/401_in_the_logs.png)
 
-Instead of manually reviewing the logs, you can run the below query in the [log explorer](/dashboard/project/_/logs/explorer?q=SELECT+DISTINCT%0A++++req.pathname+AS+function_name,%0A++++res.status_code%0A++FROM+function_edge_logs%0A++CROSS+JOIN+UNNEST(metadata)+AS+metadata+%0A++CROSS+JOIN+UNNEST(metadata.request)+AS+req+%0A++CROSS+JOIN+UNNEST(metadata.response)+AS+res+%0AWHERE+status_code+=+401+AND+metadata.execution_id+IS+NULL%0ALIMIT+10;&its=&ite=>) to get a list of functions that were impacted by the check:
+Instead of manually reviewing the logs, you can run the below query in the [log explorer](</dashboard/project/_/logs/explorer?q=SELECT+DISTINCT%0A++++req.pathname+AS+function_name,%0A++++res.status_code%0A++FROM+function_edge_logs%0A++CROSS+JOIN+UNNEST(metadata)+AS+metadata+%0A++CROSS+JOIN+UNNEST(metadata.request)+AS+req+%0A++CROSS+JOIN+UNNEST(metadata.response)+AS+res+%0AWHERE+status_code+=+401+AND+metadata.execution_id+IS+NULL%0ALIMIT+10;&its=&ite=%3E>) to get a list of functions that were impacted by the check:
 
 ```sql
 select distinct
@@ -158,3 +158,4 @@ If you would like to continue using the JWT check, make sure that your [Supabase
 - [Debugging Edge Functions](/docs/guides/functions/logging)
 - [Quickstart Deployment: Dashboard](/docs/guides/functions/quickstart-dashboard)
 - [Quickstart Deployment: CLI](/docs/guides/functions/quickstart)
+````
