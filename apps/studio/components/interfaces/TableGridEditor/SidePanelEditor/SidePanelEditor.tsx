@@ -699,12 +699,12 @@ export const SidePanelEditor = ({
               entityTypesEntries
                 .map(([, data]) => data?.pages?.[0]?.data?.count)
                 .find((count) => typeof count === 'number') ??
-              queryClient
-                .getQueryData<unknown[]>(tableKeys.list(project?.ref, payload.schema, true))
-                ?.length ??
-              queryClient
-                .getQueryData<unknown[]>(tableKeys.list(project?.ref, payload.schema, false))
-                ?.length
+              queryClient.getQueryData<unknown[]>(
+                tableKeys.list(project?.ref, payload.schema, true)
+              )?.length ??
+              queryClient.getQueryData<unknown[]>(
+                tableKeys.list(project?.ref, payload.schema, false)
+              )?.length
 
             createTableSpan.setAttributes({
               'table.name': payload.name,
@@ -802,7 +802,7 @@ export const SidePanelEditor = ({
             } catch (error) {
               createTableSpan.setAttribute('table.error', 1)
               Sentry.captureException(error, {
-                tags: { 'workflow': 'create-table' },
+                tags: { workflow: 'create-table' },
               })
               saveTableError = true
               throw error

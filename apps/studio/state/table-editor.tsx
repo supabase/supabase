@@ -107,12 +107,9 @@ export const createTableEditorState = () => {
     /* Tables */
     onAddTable: (templateData?: Partial<TableField>) => {
       // Record that the table creator was opened
-      Sentry.startSpan(
-        { name: 'table_creator.opened', op: 'ui.action' },
-        (span) => {
-          span.setAttribute('table_creator.opened', 1)
-        }
-      )
+      Sentry.startSpan({ name: 'table_creator.opened', op: 'ui.action' }, (span) => {
+        span.setAttribute('table_creator.opened', 1)
+      })
 
       state.ui = {
         open: 'side-panel',
