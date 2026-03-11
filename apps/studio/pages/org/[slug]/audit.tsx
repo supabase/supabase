@@ -37,9 +37,7 @@ const OrgAuditLogs: NextPageWithLayout = () => {
 
 OrgAuditLogs.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout
-      browserTitle={{ section: 'Audit Logs', surface: 'Organization Settings' }}
-    >
+    <OrganizationLayout browserTitle={{ section: 'Audit Logs', surface: 'Organization Settings' }}>
       <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>

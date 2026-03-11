@@ -31,9 +31,7 @@ const OrgOAuthApps: NextPageWithLayout = () => {
 
 OrgOAuthApps.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout
-      browserTitle={{ section: 'OAuth Apps', surface: 'Organization Settings' }}
-    >
+    <OrganizationLayout browserTitle={{ section: 'OAuth Apps', surface: 'Organization Settings' }}>
       <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>

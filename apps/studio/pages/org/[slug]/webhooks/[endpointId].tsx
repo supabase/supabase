@@ -15,9 +15,7 @@ const OrgWebhookEndpointSettings: NextPageWithLayout = () => {
 
 OrgWebhookEndpointSettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout
-      browserTitle={{ section: 'Webhooks', surface: 'Organization Settings' }}
-    >
+    <OrganizationLayout browserTitle={{ section: 'Webhooks', surface: 'Organization Settings' }}>
       <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>

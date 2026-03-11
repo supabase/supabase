@@ -41,9 +41,7 @@ const OrgSecuritySettings: NextPageWithLayout = () => {
 
 OrgSecuritySettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout
-      browserTitle={{ section: 'Security', surface: 'Organization Settings' }}
-    >
+    <OrganizationLayout browserTitle={{ section: 'Security', surface: 'Organization Settings' }}>
       <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>
