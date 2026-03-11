@@ -261,7 +261,7 @@ allow_list = [
     "Multiplatform",
     "MySQL",
     "[Nn]amespaces?",
-    "Nano",
+    "[Nn]ano",
     "Netlify",
     "Next.js",
     "[Nn]ginx",

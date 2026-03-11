@@ -359,7 +359,7 @@ const TerraformReferencePage = async () => {
 
   return (
     <GuideTemplate meta={meta} editLink={editLink}>
-      The Terraform Provider provices access to{' '}
+      The Terraform Provider provides access to{' '}
       <Link
         href="https://developer.hashicorp.com/terraform/language/resources"
         rel="noopener noreferrer"
