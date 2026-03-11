@@ -1,5 +1,6 @@
 import { stripIndent } from 'common-tags'
 import {
+  checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   isUpdateWithoutWhere,
@@ -258,5 +259,58 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
     DESTRUCTIVE_QUERIES.forEach((query) => {
       expect(checkDestructiveQuery(query), `Query ${query} should be destructive`).toBe(true)
     })
+  })
+})
+
+describe('SQLEditor.utils:checkAlterDatabaseConnection', () => {
+  it('detects connection limit 0', () => {
+    const match = checkAlterDatabaseConnection('alter database postgres connection limit 0;')
+    expect(match).toBe(true)
+  })
+
+  it('detects allow_connections false', () => {
+    const match = checkAlterDatabaseConnection('alter database postgres allow_connections false;')
+    expect(match).toBe(true)
+  })
+
+  it('detects case-insensitive match', () => {
+    const match = checkAlterDatabaseConnection('ALTER DATABASE postgres CONNECTION LIMIT 0;')
+    expect(match).toBe(true)
+  })
+
+  it('detects statement among multiple statements', () => {
+    const match = checkAlterDatabaseConnection(stripIndent`
+      select * from countries;
+      alter database postgres connection limit 0;
+    `)
+    expect(match).toBe(true)
+  })
+
+  it('does not flag unrelated alter database statement', () => {
+    const match = checkAlterDatabaseConnection(
+      'alter database postgres set statement_timeout = 60000;'
+    )
+    expect(match).toBe(false)
+  })
+
+  it('does not flag non-alter statements', () => {
+    const match = checkAlterDatabaseConnection('select * from countries;')
+    expect(match).toBe(false)
+  })
+
+  it('ignores statements inside comments', () => {
+    const match = checkAlterDatabaseConnection(stripIndent`
+      -- alter database postgres connection limit 0;
+      select 1;
+    `)
+    expect(match).toBe(false)
+  })
+
+  it('detects both dangerous statements in same query', () => {
+    const match = checkAlterDatabaseConnection(stripIndent`
+      alter database postgres connection limit 0;
+      alter database postgres allow_connections false;
+    `)
+    expect(match).toBe(true)
   })
 })

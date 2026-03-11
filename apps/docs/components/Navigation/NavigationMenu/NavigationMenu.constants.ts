@@ -1664,6 +1664,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/status-codes' as `/${string}`,
         },
         {
+          name: 'Recursive/Nested function calls',
+          url: '/guides/functions/recursive-functions' as `/${string}`,
+        },
+        {
           name: 'Limits',
           url: '/guides/functions/limits' as `/${string}`,
           enabled: billingEnabled,
@@ -2042,10 +2046,6 @@ export const storage: NavMenuConstant = {
         {
           name: 'Iceberg Catalog',
           url: '/guides/storage/analytics/connecting-to-analytics-bucket' as `/${string}`,
-        },
-        {
-          name: 'Realtime Data-Sync',
-          url: '/guides/storage/analytics/replication' as `/${string}`,
         },
         {
           name: 'Query with Postgres',

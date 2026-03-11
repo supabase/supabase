@@ -5,20 +5,25 @@ import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { Menu, Search } from 'lucide-react'
-import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { CommandMenuTrigger, MobileSheetNav } from 'ui-patterns'
+import { CommandMenuTrigger } from 'ui-patterns'
+
+import { useMobileSheet } from './MobileSheetContext'
 
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { OrgSelector } from './OrgSelector'
 import { ProjectBranchSelector } from './ProjectBranchSelector'
 
 const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef, slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const isProjectScope = !!projectRef
   const showOrgSelection = slug || (selectedOrganization && projectRef)
+  const router = useRouter()
+  const { openMenu } = useMobileSheet()
+  const { ref: projectRef } = useParams()
 
   return (
     <div className="w-full flex flex-row md:hidden">
@@ -58,9 +63,7 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
                 'transition'
               )}
             >
-              <div className="flex items-center space-x-2">
-                <Search size={18} strokeWidth={2} />
-              </div>
+              <Search size={18} strokeWidth={2} />
             </button>
           </CommandMenuTrigger>
           <UserDropdown />
@@ -70,14 +73,11 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
               type="default"
               className="flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30"
               icon={<Menu />}
-              onClick={() => setIsSheetOpen(true)}
+              onClick={() => openMenu()}
             />
           )}
         </div>
       </nav>
-      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen} data-state="expanded">
-        <SidebarContent />
-      </MobileSheetNav>
     </div>
   )
 }

@@ -13,18 +13,18 @@ export const AnimatedLogos = () => {
     {
       id: 'datadog',
       name: 'Datadog',
-      icon: <Datadog fill="currentColor" strokeWidth={0} size={iconSize} />,
+      icon: <Datadog fill="currentColor" size={iconSize} />,
     },
     {
       id: 'loki',
       name: 'Loki',
-      icon: <Grafana fill="currentColor" strokeWidth={0} size={iconSize} />,
+      icon: <Grafana fill="currentColor" size={iconSize} />,
     },
     { id: 'https', name: 'HTTPS', icon: <BracesIcon size={iconSize} /> },
     {
       id: 'sentry',
       name: 'Sentry',
-      icon: <Sentry fill="currentColor" strokeWidth={0} size={iconSize} />,
+      icon: <Sentry fill="currentColor" size={iconSize} />,
     },
   ]
 
