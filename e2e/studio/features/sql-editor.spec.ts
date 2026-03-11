@@ -167,6 +167,101 @@ test.describe('SQL Editor', () => {
     }
   })
 
+  test('should show warning modal for alter database connection limit 0', async ({ ref }) => {
+    await expect(page.getByText('Loading...')).not.toBeVisible()
+    await page.locator('.view-lines').click()
+    await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.keyboard.type(`alter database postgres connection limit 0;`)
+    await page.getByTestId('sql-run-button').click()
+
+    // verify warning modal is visible with the correct message
+    await expect(
+      page.getByRole('heading', { name: 'Potential issue detected with' })
+    ).toBeVisible()
+    await expect(
+      page.getByText('Query will prevent connections to your database')
+    ).toBeVisible()
+    await page.getByRole('button', { name: 'Cancel' }).click()
+
+    // clear SQL snippet
+    if (!isCLI()) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    } else {
+      await page.reload()
+    }
+  })
+
+  test('should show warning modal for alter database allow_connections false', async ({ ref }) => {
+    await expect(page.getByText('Loading...')).not.toBeVisible()
+    await page.locator('.view-lines').click()
+    await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.keyboard.type(`ALTER DATABASE postgres ALLOW_CONNECTIONS false;`)
+    await page.getByTestId('sql-run-button').click()
+
+    // verify warning modal is visible with the correct message
+    await expect(
+      page.getByRole('heading', { name: 'Potential issue detected with' })
+    ).toBeVisible()
+    await expect(
+      page.getByText('Query will prevent connections to your database')
+    ).toBeVisible()
+    await page.getByRole('button', { name: 'Cancel' }).click()
+
+    // clear SQL snippet
+    if (!isCLI()) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    } else {
+      await page.reload()
+    }
+  })
+
+  test('should show warning modal for update without where clause', async ({ ref }) => {
+    await expect(page.getByText('Loading...')).not.toBeVisible()
+    await page.locator('.view-lines').click()
+    await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.keyboard.type(`update countries set name = 'test';`)
+    await page.getByTestId('sql-run-button').click()
+
+    // verify warning modal is visible with the correct message
+    await expect(
+      page.getByRole('heading', { name: 'Potential issue detected with' })
+    ).toBeVisible()
+    await expect(page.getByText('Query uses update without a where clause')).toBeVisible()
+    await page.getByRole('button', { name: 'Cancel' }).click()
+
+    // clear SQL snippet
+    if (!isCLI()) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    } else {
+      await page.reload()
+    }
+  })
+
+  test('should not show warning modal for safe alter database statement', async ({ ref }) => {
+    await expect(page.getByText('Loading...')).not.toBeVisible()
+    await page.locator('.view-lines').click()
+    await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.keyboard.type(`alter database postgres set statement_timeout = 60000;`)
+
+    const sqlMutationPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByTestId('sql-run-button').click()
+    await sqlMutationPromise
+
+    // verify warning modal is NOT visible - query should execute directly
+    await expect(
+      page.getByRole('heading', { name: 'Potential issue detected with' })
+    ).not.toBeVisible()
+
+    // clear SQL snippet
+    if (!isCLI()) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    } else {
+      await page.reload()
+    }
+  })
+
   test('exporting works as expected', async ({ ref }) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()
