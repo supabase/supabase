@@ -12,6 +12,7 @@ import { ConnectStepsSection } from './ConnectStepsSection'
 import { useConnectState } from './useConnectState'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useAppStateSnapshot } from '@/state/app-state'
 import { useTrack } from 'lib/telemetry/track'
 
 const CONNECT_MODES: readonly ConnectMode[] = ['framework', 'direct', 'orm', 'mcp'] as const
@@ -30,24 +31,21 @@ export const ConnectSheet = () => {
     parseAsBoolean.withDefault(false)
   )
   const [connectTab, setConnectTab] = useQueryState('connectTab', parseAsString)
-  const [connectSource, setConnectSource] = useQueryState('connectSource', parseAsString)
+  const { connectSheetSource, setConnectSheetSource } = useAppStateSnapshot()
   const track = useTrack()
   const prevShowConnect = useRef(false)
 
   useEffect(() => {
     if (showConnect && !prevShowConnect.current) {
-      track('connect_sheet_opened', {
-        source: (connectSource as 'header_button' | 'connect_section') ?? 'header_button',
-      })
-      setConnectSource(null)
+      track('connect_sheet_opened', { source: connectSheetSource })
+      setConnectSheetSource('header_button')
     }
     prevShowConnect.current = showConnect
-  }, [showConnect, connectSource, track, setConnectSource])
+  }, [showConnect, connectSheetSource, track, setConnectSheetSource])
 
   const handleOpenChange = (sheetOpen: boolean) => {
     if (!sheetOpen) {
       setConnectTab(null)
-      setConnectSource(null)
     }
     setShowConnect(sheetOpen)
   }

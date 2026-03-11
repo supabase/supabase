@@ -10,6 +10,7 @@ import { Card, CardContent, cn } from 'ui'
 
 import type { ConnectMode } from '../ConnectSheet/Connect.types'
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 type ConnectAction = {
   mode: ConnectMode
@@ -51,10 +52,10 @@ interface ConnectSectionProps {
 
 export const ConnectSection = ({ variant }: ConnectSectionProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
+  const { setConnectSheetSource } = useAppStateSnapshot()
   const track = useTrack()
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
   const [, setConnectTab] = useQueryState('connectTab', parseAsString)
-  const [, setConnectSource] = useQueryState('connectSource', parseAsString)
 
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -75,7 +76,7 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
   const handleConnectClick = (mode: ConnectMode) => {
     track('home_connect_action_clicked', { mode })
     setConnectTab(mode)
-    setConnectSource('connect_section')
+    setConnectSheetSource('connect_section')
     setShowConnect(true)
   }
 
