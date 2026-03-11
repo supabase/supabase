@@ -32,27 +32,21 @@ const CommandList = forwardRef<
       {...props}
     >
       <CommandEmpty listRef={innerRef}>No results found.</CommandEmpty>
-      {(() => {
-        return commandSections.map((section) => {
-          if (section.commands.every((command) => command.defaultHidden) && !query) return null
+      {commandSections.map((section) => {
+        if (section.commands.every((command) => command.defaultHidden) && !query) return null
 
-          const visibleCommands = section.commands.filter(
-            (command) => !command.defaultHidden || query
-          )
-
-          return (
-            <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
-              {visibleCommands.map((command) => {
-                return (
-                  <CommandItem key={command.id} command={command}>
-                    <TextHighlighter>{command.name}</TextHighlighter>
-                  </CommandItem>
-                )
-              })}
-            </CommandGroup>
-          )
-        })
-      })()}
+        return (
+          <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
+            {section.commands
+              .filter((command) => !command.defaultHidden || query)
+              .map((command) => (
+                <CommandItem key={command.id} command={command}>
+                  <TextHighlighter>{command.name}</TextHighlighter>
+                </CommandItem>
+              ))}
+          </CommandGroup>
+        )
+      })}
     </CommandList_Shadcn_>
   )
 })

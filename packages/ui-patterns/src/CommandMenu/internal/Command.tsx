@@ -65,7 +65,7 @@ const CommandItem = forwardRef<
     // Send telemetry event
     if (telemetryContext?.onTelemetry) {
       const event = {
-        action: 'command_menu_item_clicked' as const,
+        action: 'command_menu_command_clicked' as const,
         properties: {
           command_name: command.name,
           command_value: command.value,

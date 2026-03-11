@@ -2291,7 +2291,7 @@ export interface CommandMenuSearchSubmittedEvent {
  * @page any
  */
 export interface CommandMenuCommandClickedEvent {
-  action: 'command_menu_item_clicked'
+  action: 'command_menu_command_clicked'
   properties: {
     /**
      * The clicked command

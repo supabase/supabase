@@ -262,7 +262,7 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         onInteractOutside={() => setOpen(false)}
         onEscapeKeyDown={(e) => {
           e.preventDefault()
-          return query ? setQuery('') : page ? popPage() : setOpen(false)
+          return query ? setQuery('') : page ? popPage() : handleOpenChange(false)
         }}
         size={size}
         className={cn(

@@ -8,7 +8,6 @@ import type {
   CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
-import { posthogClient } from 'common'
 import { useConsentToast } from 'ui-patterns/consent'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
@@ -24,7 +23,6 @@ export function useDocsCommandMenuTelemetry() {
         | CommandMenuSearchSubmittedEvent
     ) => {
       sendTelemetryEvent(event)
-      posthogClient.capture(event.action, event.properties, hasAcceptedConsent)
     },
     [sendTelemetryEvent, hasAcceptedConsent]
   )

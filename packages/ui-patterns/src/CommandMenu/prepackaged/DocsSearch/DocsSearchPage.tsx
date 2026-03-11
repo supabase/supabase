@@ -7,7 +7,7 @@ import {
   useDocsSearch,
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
@@ -82,19 +82,22 @@ const DocsSearchPage = () => {
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useCrossCompatRouter()
 
-  function trackResultClicked(name: string, path: string) {
-    telemetryContext?.onTelemetry?.({
-      action: 'command_menu_item_clicked',
-      properties: {
-        command_name: name,
-        command_type: 'route',
-        search_query: query || undefined,
-        result_path: path,
-        app: telemetryContext.app,
-      },
-      groups: {},
-    })
-  }
+  const trackResultClicked = useCallback(
+    function trackResultClicked(name: string, path: string) {
+      telemetryContext?.onTelemetry?.({
+        action: 'command_menu_command_clicked',
+        properties: {
+          command_name: name,
+          command_type: 'route',
+          search_query: query || undefined,
+          result_path: path,
+          app: telemetryContext.app,
+        },
+        groups: {},
+      })
+    },
+    [query]
+  )
 
   async function openLink(pageType: PageType, link: string) {
     switch (pageType) {
