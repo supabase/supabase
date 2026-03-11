@@ -12,12 +12,6 @@ Storage supports [standard](/docs/guides/storage/uploads/standard-uploads), [res
 
 Storage supports presigning a URL using query parameters. Specifically, Supabase Storage expects requests to be made using [AWS Signature Version 4](https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html). To enable this feature, enable the S3 connection via S3 protocol in the Settings page for Supabase Storage.
 
-<Admonition type="note">
-
-The S3 protocol is currently in Public Alpha. If you encounter any issues or have feature requests, [contact us](/dashboard/support/new).
-
-</Admonition>
-
 <Admonition type="caution">
 
 **S3 versioning is not supported.** Supabase Storage does not enable S3's versioning capabilities for buckets. Deleted objects are permanently removed and cannot be restored.

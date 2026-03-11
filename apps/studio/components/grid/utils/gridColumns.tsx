@@ -1,4 +1,3 @@
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import { CalculatedColumn, RenderCellProps } from 'react-data-grid'
 
 import { DefaultValue } from '../components/common/DefaultValue'
@@ -39,6 +38,7 @@ import {
   isTextColumn,
   isTimeColumn,
 } from './types'
+import { COLUMN_MIN_WIDTH } from '@/components/grid/constants'
 
 export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 
@@ -73,7 +73,6 @@ export function getGridColumns(
       width: columnWidth,
       minWidth: COLUMN_MIN_WIDTH,
       frozen: false,
-      isLastFrozenColumn: false,
       renderHeaderCell: (props) => (
         <ColumnHeader
           {...props}

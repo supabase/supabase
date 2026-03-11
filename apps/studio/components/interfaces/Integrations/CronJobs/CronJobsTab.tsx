@@ -5,7 +5,6 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { isGreaterThanOrEqual } from 'lib/semver'
@@ -14,11 +13,10 @@ import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { MouseEvent, UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { LoadingLine, Sheet, SheetContent } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { LoadingLine } from 'ui'
 
 import { formatCronJobColumns } from './CronJobs.utils'
-import { CronJobRunDetailsOverflowNoticeV2 } from './CronJobsTab.CleanupNotice'
+import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
 import { CronJobsTabDataGrid } from './CronJobsTab.DataGrid'
 import { CronJobsTabHeader } from './CronJobsTab.Header'
 import { useCronJobsData } from './CronJobsTab.useCronJobsData'
@@ -34,7 +32,6 @@ export const CronjobsTab = () => {
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
-  const [isDirty, setIsDirty] = useState(false)
   const [search, setSearch] = useState(searchQuery)
 
   const handleSearchSubmit = () => {
@@ -142,13 +139,6 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(false)
     cleanPointerEventsNoneOnBody(500)
   }
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
-    onClose: () => {
-      setIsDirty(false)
-      onClose()
-    },
-  })
 
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
@@ -171,7 +161,12 @@ export const CronjobsTab = () => {
             onCreateJob={onOpenCreateJobSheet}
           />
           <LoadingLine loading={grid.isLoading || grid.isRefetching || grid.isFetchingNextPage} />
-          {grid.isMinimal && <CronJobRunDetailsOverflowNoticeV2 refetchJobs={grid.refetch} />}
+          {grid.isMinimal && (
+            <CronJobRunDetailsOverflowNotice
+              queryCost={grid.queryCost}
+              refetchJobs={grid.refetch}
+            />
+          )}
           <CronJobsTabDataGrid
             columns={columns}
             rows={grid.rows}
@@ -187,18 +182,11 @@ export const CronjobsTab = () => {
 
       <DeleteCronJob />
 
-      <Sheet open={!!createCronJobSheetShown || !!cronJobForEditing} onOpenChange={confirmOnClose}>
-        <SheetContent size="default" tabIndex={undefined}>
-          <CreateCronJobSheet
-            selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
-            supportsSeconds={supportsSeconds}
-            onDirty={setIsDirty}
-            onClose={onClose}
-            onCloseWithConfirmation={confirmOnClose}
-          />
-        </SheetContent>
-      </Sheet>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <CreateCronJobSheet
+        open={!!createCronJobSheetShown || !!cronJobForEditing}
+        selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
+        onClose={onClose}
+      />
     </>
   )
 }
@@ -222,20 +210,4 @@ const CronJobsFooter = ({ count }: CronJobsFooterProps) => (
       `Total: ${count.value ?? 0} jobs${count.isEstimate ? ' (estimate)' : ''}`
     )}
   </div>
-)
-
-// Confirmation modal for unsaved changes
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
 )

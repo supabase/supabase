@@ -8,10 +8,16 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 
 import { useUser } from './auth'
-import { hasConsented } from './consent-state'
+import { hasConsented, useConsentState } from './consent-state'
 import { IS_PLATFORM, IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
+import type { FirstReferrerData, MwDiagData } from './first-referrer-cookie'
+import {
+  isExternalReferrer,
+  parseFirstReferrerCookie,
+  parseMwDiagCookie,
+} from './first-referrer-cookie'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useParams, useTelemetryCookie } from './hooks'
 import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
@@ -28,11 +34,14 @@ const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
 // Reexports GoogleTagManager with the right API key set
 export const TelemetryTagManager = () => {
-  const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
+  // useConsentState is used here to trigger a re-render when consent state changes
+  const { hasAccepted } = useConsentState()
 
-  if (!isGTMEnabled) {
-    return
-  }
+  const isGTMEnabled = Boolean(
+    IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && hasAccepted
+  )
+
+  if (!isGTMEnabled) return null
 
   return (
     <Script
@@ -96,25 +105,27 @@ function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
   }
 }
 
-function isExternalReferrer(referrer: string) {
-  try {
-    const hostname = new URL(referrer).hostname
-    return hostname !== 'supabase.com' && !hostname.endsWith('.supabase.com')
-  } catch {
-    return false
-  }
+interface HandlePageTelemetryOptions {
+  apiUrl: string
+  pathname?: string
+  featureFlags?: Record<string, unknown>
+  slug?: string
+  ref?: string
+  telemetryDataOverride?: SharedTelemetryData
+  firstReferrerData?: FirstReferrerData | null
+  mwDiagData?: MwDiagData | null
 }
 
-function handlePageTelemetry(
-  API_URL: string,
-  pathname?: string,
-  featureFlags?: {
-    [key: string]: unknown
-  },
-  slug?: string,
-  ref?: string,
-  telemetryDataOverride?: SharedTelemetryData
-) {
+function handlePageTelemetry({
+  apiUrl: API_URL,
+  pathname,
+  featureFlags,
+  slug,
+  ref,
+  telemetryDataOverride,
+  firstReferrerData,
+  mwDiagData,
+}: HandlePageTelemetryOptions) {
   // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
     const livePageData = getSharedTelemetryData(pathname)
@@ -133,10 +144,51 @@ function handlePageTelemetry(
             referrer: shouldUseCookieReferrer ? cookieReferrer! : liveReferrer,
           },
         }
-      : livePageData
-    const firstTouchAttributionProps = telemetryDataOverride
-      ? getFirstTouchAttributionProps(telemetryDataOverride)
-      : {}
+      : { ...livePageData, ph: { ...livePageData.ph } }
+    const firstTouchAttributionProps: Record<string, string> = {
+      ...(telemetryDataOverride ? getFirstTouchAttributionProps(telemetryDataOverride) : {}),
+    }
+
+    // --- First-referrer edge cookie handoff ---
+    // If the edge cookie has external context and the current referrer is internal,
+    // override the referrer so PostHog gets the real acquisition source.
+    const firstReferrerCookiePresent = Boolean(firstReferrerData)
+    let firstReferrerCookieConsumed = false
+
+    if (
+      firstReferrerData &&
+      isExternalReferrer(firstReferrerData.referrer) &&
+      !isExternalReferrer(pageData.ph.referrer)
+    ) {
+      pageData.ph.referrer = firstReferrerData.referrer
+      firstReferrerCookieConsumed = true
+
+      // Prefer attribution context captured at the external entry point.
+      const { utms, click_ids, landing_url } = firstReferrerData
+
+      Object.entries(utms).forEach(([key, value]) => {
+        const phKey = key.startsWith('utm_') ? `$${key}` : key
+        firstTouchAttributionProps[phKey] = value
+      })
+
+      Object.entries(click_ids).forEach(([key, value]) => {
+        firstTouchAttributionProps[key] = value
+      })
+
+      try {
+        const url = new URL(landing_url)
+        firstTouchAttributionProps.first_touch_url = url.href
+        firstTouchAttributionProps.first_touch_pathname = url.pathname
+
+        if (url.search) {
+          firstTouchAttributionProps.first_touch_search = url.search
+        } else {
+          delete firstTouchAttributionProps.first_touch_search
+        }
+      } catch {
+        // Skip if landing URL is malformed
+      }
+    }
 
     const $referrer = pageData.ph.referrer
     const $referring_domain = (() => {
@@ -170,6 +222,20 @@ function handlePageTelemetry(
       ...Object.fromEntries(
         Object.entries(featureFlags || {}).map(([k, v]) => [`$feature/${k}`, v])
       ),
+      // Measurement properties for handoff observability
+      // Only included on the initial pageview (when firstReferrerData is explicitly
+      // passed as null or a value — subsequent pageviews leave it as undefined)
+      ...(firstReferrerData !== undefined && {
+        first_referrer_cookie_present: firstReferrerCookiePresent,
+        first_referrer_cookie_consumed: firstReferrerCookieConsumed,
+      }),
+      // Phase 1 middleware diagnostic: present only when _sb_mw_diag cookie was found
+      // (i.e., the request was routed through www middleware on /dashboard or /docs)
+      ...(mwDiagData && {
+        mw_diag_hit: mwDiagData.hit,
+        mw_diag_would_stamp: mwDiagData.would_stamp,
+        mw_diag_has_existing_cookie: mwDiagData.has_existing_cookie,
+      }),
     })
   }
 
@@ -234,13 +300,13 @@ export const PageTelemetry = ({
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(
-      API_URL,
-      pathnameRef.current,
-      featureFlagsRef.current,
+    return handlePageTelemetry({
+      apiUrl: API_URL,
+      pathname: pathnameRef.current,
+      featureFlags: featureFlagsRef.current,
       slug,
-      ref
-    ).catch((e) => {
+      ref,
+    }).catch((e) => {
       console.error('Problem sending telemetry page:', e)
     })
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
@@ -283,7 +349,12 @@ export const PageTelemetry = ({
       hasAcceptedConsent &&
       !hasSentInitialPageTelemetryRef.current
     ) {
-      const cookies = document.cookie.split(';')
+      // Read the edge-set cookies (cross-app handoff)
+      const cookieHeader = document.cookie
+      const firstReferrerData = parseFirstReferrerCookie(cookieHeader)
+      const mwDiagData = parseMwDiagCookie(cookieHeader)
+
+      const cookies = cookieHeader.split(';')
       const telemetryCookieValue = cookies
         .map((cookie) => cookie.trim())
         .find((cookie) => cookie.startsWith(`${TELEMETRY_DATA}=`))
@@ -294,24 +365,42 @@ export const PageTelemetry = ({
           const telemetryData = JSON.parse(
             decodeURIComponent(telemetryCookieValue)
           ) as SharedTelemetryData
-          handlePageTelemetry(
-            API_URL,
-            pathnameRef.current,
-            featureFlagsRef.current,
+          handlePageTelemetry({
+            apiUrl: API_URL,
+            pathname: pathnameRef.current,
+            featureFlags: featureFlagsRef.current,
             slug,
             ref,
-            telemetryData
-          )
+            telemetryDataOverride: telemetryData,
+            firstReferrerData,
+            mwDiagData,
+          })
         } catch (error) {
           if (!IS_PROD) {
             console.warn('Invalid telemetry cookie data:', error)
           }
-          handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, slug, ref)
+          handlePageTelemetry({
+            apiUrl: API_URL,
+            pathname: pathnameRef.current,
+            featureFlags: featureFlagsRef.current,
+            slug,
+            ref,
+            firstReferrerData,
+            mwDiagData,
+          })
         } finally {
           clearTelemetryDataCookie()
         }
       } else {
-        handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, slug, ref)
+        handlePageTelemetry({
+          apiUrl: API_URL,
+          pathname: pathnameRef.current,
+          featureFlags: featureFlagsRef.current,
+          slug,
+          ref,
+          firstReferrerData,
+          mwDiagData,
+        })
       }
 
       hasSentInitialPageTelemetryRef.current = true

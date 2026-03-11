@@ -1,24 +1,25 @@
-import type { PostgresRole } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
-import SparkBar from 'components/ui/SparkBar'
+import { SparkBar } from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
-import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { CreateRolePanel } from './CreateRolePanel'
-import { DeleteRoleModal } from './DeleteRoleModal'
 import { RoleRow } from './RoleRow'
 import { RoleRowSkeleton } from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
+import { useDatabaseRoleDeleteMutation } from '@/data/database-roles/database-role-delete-mutation'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
@@ -27,7 +28,6 @@ export const RolesList = () => {
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
-  const deletingRoleIdRef = useRef<string | null>(null)
 
   const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -40,25 +40,34 @@ export const RolesList = () => {
   })
   const maxConnectionLimit = maxConnData?.maxConnections
 
-  const { data, isPending: isLoading } = useDatabaseRolesQuery({
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const [isCreatingRole, setIsCreatingRole] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-
-  const { setValue: setSelectedRoleIdToDelete, value: roleToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (id: string) => (id ? data?.find((role) => role.id.toString() === id) : undefined),
-    enabled: !!data,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`),
+  const {
+    mutate: deleteDatabaseRole,
+    isPending: isDeleting,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseRoleDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted role`)
+      setSelectedRoleIdToDelete(null)
+    },
   })
 
+  const [isCreatingRole, setIsCreatingRole] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false)
+  )
+
+  const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = useQueryState('delete', parseAsString)
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
+  const roleToDelete = roles?.find((role) => role.id.toString() === selectedRoleIdToDelete)
 
   const filteredRoles = (
     filterType === 'active' ? roles.filter((role) => role.activeConnections > 0) : roles
@@ -76,6 +85,23 @@ export const RolesList = () => {
     (r) => -r.activeConnections
   )
 
+  const deleteRole = async () => {
+    if (!project) return console.error('Project is required')
+    if (!roleToDelete) return console.error('Failed to delete role: role is missing')
+    deleteDatabaseRole({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      id: roleToDelete.id,
+    })
+  }
+
+  useEffect(() => {
+    if (isSuccess && !!selectedRoleIdToDelete && !roleToDelete && !isSuccessDelete) {
+      toast('Role cannot be found')
+      setSelectedRoleIdToDelete(null)
+    }
+  }, [isSuccess, selectedRoleIdToDelete, roleToDelete, isSuccessDelete, setSelectedRoleIdToDelete])
+
   return (
     <>
       <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
@@ -86,7 +112,7 @@ export const RolesList = () => {
             placeholder="Search for a role"
             icon={<Search />}
             value={filterString}
-            onChange={(event: any) => setFilterString(event.target.value)}
+            onChange={(event) => setFilterString(event.target.value)}
             actions={
               filterString && (
                 <Button
@@ -102,24 +128,24 @@ export const RolesList = () => {
           />
           <div className="flex items-center border border-strong rounded-full w-min h-[26px]">
             <button
-              className={[
+              className={cn(
                 'text-xs w-[80px] h-full text-center rounded-l-full flex items-center justify-center transition',
                 filterType === 'all'
                   ? 'bg-overlay-hover text-foreground'
-                  : 'hover:bg-surface-200 text-foreground-light',
-              ].join(' ')}
+                  : 'hover:bg-surface-200 text-foreground-light'
+              )}
               onClick={() => setFilterType('all')}
             >
               All roles
             </button>
             <div className="h-full w-[1px] border-r border-strong"></div>
             <button
-              className={[
+              className={cn(
                 'text-xs w-[80px] h-full text-center rounded-r-full flex items-center justify-center transition',
                 filterType === 'active'
                   ? 'bg-overlay-hover text-foreground'
-                  : 'hover:bg-surface-200 text-foreground-light',
-              ].join(' ')}
+                  : 'hover:bg-surface-200 text-foreground-light'
+              )}
               onClick={() => setFilterType('active')}
             >
               Active roles
@@ -227,16 +253,18 @@ export const RolesList = () => {
 
       <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
 
-      <DeleteRoleModal
-        role={roleToDelete as unknown as PostgresRole}
+      <ConfirmationModal
         visible={!!roleToDelete}
-        onClose={() => setSelectedRoleIdToDelete(null)}
-        onDelete={() => {
-          if (roleToDelete) {
-            deletingRoleIdRef.current = roleToDelete.id.toString()
-          }
-        }}
-      />
+        loading={isDeleting}
+        onCancel={() => setSelectedRoleIdToDelete(null)}
+        title={`Confirm to delete role "${roleToDelete?.name}"`}
+        onConfirm={deleteRole}
+      >
+        <p className="text-sm">
+          This will automatically revoke any membership of this role in other roles, and this action
+          cannot be undone.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }

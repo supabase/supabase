@@ -26,6 +26,10 @@ vi.mock('components/interfaces/Billing/Subscription/Subscription.utils', () => (
   subscriptionHasHipaaAddon: vi.fn(),
 }))
 
+vi.mock('data/entitlements/entitlements-query', () => ({
+  checkEntitlement: vi.fn(),
+}))
+
 describe('ai/org-ai-details', () => {
   let mockGetOrganizations: ReturnType<typeof vi.fn>
   let mockGetProjectDetail: ReturnType<typeof vi.fn>
@@ -33,6 +37,7 @@ describe('ai/org-ai-details', () => {
   let mockGetProjectSettings: ReturnType<typeof vi.fn>
   let mockGetAiOptInLevel: ReturnType<typeof vi.fn>
   let mockSubscriptionHasHipaaAddon: ReturnType<typeof vi.fn>
+  let mockCheckEntitlement: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
     vi.clearAllMocks()
@@ -45,6 +50,7 @@ describe('ai/org-ai-details', () => {
     const subscriptionUtils = await import(
       'components/interfaces/Billing/Subscription/Subscription.utils'
     )
+    const entitlementsQuery = await import('data/entitlements/entitlements-query')
 
     mockGetOrganizations = vi.mocked(orgsQuery.getOrganizations)
     mockGetProjectDetail = vi.mocked(projectQuery.getProjectDetail)
@@ -52,11 +58,13 @@ describe('ai/org-ai-details', () => {
     mockGetProjectSettings = vi.mocked(settingsQuery.getProjectSettings)
     mockGetAiOptInLevel = vi.mocked(aiHook.getAiOptInLevel)
     mockSubscriptionHasHipaaAddon = vi.mocked(subscriptionUtils.subscriptionHasHipaaAddon)
+    mockCheckEntitlement = vi.mocked(entitlementsQuery.checkEntitlement)
 
     // Default mocks for subscription/settings (no HIPAA)
     mockGetOrgSubscription.mockResolvedValue({ addons: [] })
     mockGetProjectSettings.mockResolvedValue({ is_sensitive: false })
     mockSubscriptionHasHipaaAddon.mockReturnValue(false)
+    mockCheckEntitlement.mockResolvedValue({ hasAccess: false })
   })
 
   describe('getOrgAIDetails', () => {
@@ -121,6 +129,8 @@ describe('ai/org-ai-details', () => {
         aiOptInLevel: 'schema_only',
         isLimited: true,
         isHipaaEnabled: false,
+        orgId: 1,
+        planId: 'free',
       })
     })
 
@@ -138,6 +148,7 @@ describe('ai/org-ai-details', () => {
       mockGetOrganizations.mockResolvedValue([mockOrg])
       mockGetProjectDetail.mockResolvedValue(mockProject)
       mockGetAiOptInLevel.mockReturnValue('full')
+      mockCheckEntitlement.mockResolvedValue({ hasAccess: true })
 
       const result = await getOrgAIDetails({
         orgSlug: 'test-org',
@@ -259,6 +270,7 @@ describe('ai/org-ai-details', () => {
       mockGetOrganizations.mockResolvedValue(mockOrgs)
       mockGetProjectDetail.mockResolvedValue(mockProject)
       mockGetAiOptInLevel.mockReturnValue('full')
+      mockCheckEntitlement.mockResolvedValue({ hasAccess: true })
 
       const result = await getOrgAIDetails({
         orgSlug: 'test-org',
@@ -266,7 +278,7 @@ describe('ai/org-ai-details', () => {
         projectRef: 'test-project',
       })
 
-      expect(result.isLimited).toBe(false) // Pro plan
+      expect(result.isLimited).toBe(false) // Has advance model entitlement
     })
 
     it('should return isHipaaEnabled true when subscription has HIPAA addon and project is sensitive', async () => {

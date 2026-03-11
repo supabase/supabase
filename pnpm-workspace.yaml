@@ -6,16 +6,16 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.95.3
-  '@supabase/postgrest-js': 2.95.3
-  '@supabase/realtime-js': 2.95.3
-  '@supabase/supabase-js': 2.95.3
+  '@supabase/auth-js': 2.99.1
+  '@supabase/postgrest-js': 2.99.1
+  '@supabase/realtime-js': 2.99.1
+  '@supabase/supabase-js': 2.99.1
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
-  next: ^15.5.10
-  lodash-es: ^4.17.23
   lodash: ^4.17.23
+  lodash-es: ^4.17.23
+  next: ^15.5.10
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -36,7 +36,6 @@ ignoredBuiltDependencies:
   - esbuild
   - libpg-query
   - msw
-  - node-pty
   - protobufjs
   - sharp
 
@@ -45,7 +44,7 @@ minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
-  - 'next'
+  - next
   - '@next/*'
   - ai
   - js-yaml
@@ -59,18 +58,30 @@ minimumReleaseAgeExclude:
   - lodash-es
   - lodash
   - next-mdx-remote
+  - react-resizable-panels
+  - swiper@12.1.2
+  - immutable
 
 onlyBuiltDependencies:
+  - node-pty
   - supabase
 
 overrides:
+  '@ardatan/relay-compiler>immutable': ^3.8.3
+  '@aws-sdk/core>fast-xml-parser': ^4.5.4
+  '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
+  cacache>tar: ^7.5.11
   esbuild: ^0.25.2
-  nodemailer: ^7.0.11
-  lodash-es: 'catalog:'
   lodash: 'catalog:'
+  lodash-es: 'catalog:'
+  node-gyp>tar: ^7.5.11
+  nodemailer: ^7.0.11
   payload>undici: ^7.18.2
   refractor>prismjs: ^1.30.0
-  tar: ^7.5.7
+  supabase>tar: ^7.5.11
   tmp: ^0.2.4
+
+patchedDependencies:
+  react-data-grid: patches/react-data-grid.patch

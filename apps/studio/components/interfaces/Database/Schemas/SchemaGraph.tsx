@@ -1,10 +1,10 @@
-import type { PostgresSchema } from '@supabase/postgres-meta'
+import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toPng, toSvg } from 'html-to-image'
 import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 
 import 'reactflow/dist/style.css'
@@ -22,6 +22,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { tablesToSQL } from 'lib/helpers'
 import { toast } from 'sonner'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   copyToClipboard,
@@ -32,6 +33,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { ColumnEditionContextProvider, ColumnEditionContextType } from './ColumnEditionContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
@@ -43,6 +46,8 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const [selectedTable, setSelectedTable] = useState<PostgresTable | null>(null)
+  const snap = useTableEditorStateSnapshot()
 
   const [copied, setCopied] = useState(false)
   useEffect(() => {
@@ -78,7 +83,7 @@ export const SchemaGraph = () => {
   })
 
   const {
-    data: tables,
+    data: tables = [],
     error: errorTables,
     isSuccess: isSuccessTables,
     isPending: isLoadingTables,
@@ -89,6 +94,7 @@ export const SchemaGraph = () => {
     schema: selectedSchema,
     includeColumns: true,
   })
+  const hasNoTables = isSuccessSchemas && tables.length === 0
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
   const [, setStoredPositions] = useLocalStorage(
@@ -190,16 +196,37 @@ export const SchemaGraph = () => {
     }
   }
 
+  const isFirstLoad = useRef(true)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
       getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
-        setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+        // Prevent resetting a view after first load to avoid layout changes after editing a column
+        if (isFirstLoad.current) {
+          isFirstLoad.current = false
+          setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+        }
       })
     }
   }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme])
+
+  const columnEditionContext = useMemo<ColumnEditionContextType>(
+    () => ({
+      onEditColumn: (tableId, columnId) => {
+        const table = tables.find((table) => table.id === tableId)
+        if (!table || table.columns == null) return
+
+        const column = table.columns.find((column) => column.id === columnId)
+        if (!column) return
+
+        setSelectedTable(table)
+        snap.onEditColumn(column)
+      },
+    }),
+    [tables, snap]
+  )
 
   return (
     <>
@@ -221,66 +248,68 @@ export const SchemaGraph = () => {
               selectedSchemaName={selectedSchema}
               onSelectSchema={setSelectedSchema}
             />
-            <div className="flex items-center gap-x-2">
-              <ButtonTooltip
-                type="outline"
-                icon={copied ? <Check /> : <Copy />}
-                onClick={() => {
-                  if (tables) {
-                    copyToClipboard(tablesToSQL(tables))
-                    setCopied(true)
-                  }
-                }}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: (
-                      <div className="max-w-[180px] space-y-2 text-foreground-light">
-                        <p className="text-foreground">Note</p>
-                        <p>
-                          This schema is for context or debugging only. Table order and constraints
-                          may be invalid. Not meant to be run as-is.
-                        </p>
-                      </div>
-                    ),
-                  },
-                }}
-              >
-                Copy as SQL
-              </ButtonTooltip>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <ButtonTooltip
-                    aria-label="Download Schema"
-                    type="default"
-                    loading={isDownloading}
-                    className="px-1.5"
-                    icon={<Download />}
-                    tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-32">
-                  <DropdownMenuItem onClick={() => downloadImage('png')}>
-                    Download as PNG
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => downloadImage('svg')}>
-                    Download as SVG
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <ButtonTooltip
-                type="default"
-                onClick={resetLayout}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'Automatically arrange the layout of all nodes',
-                  },
-                }}
-              >
-                Auto layout
-              </ButtonTooltip>
-            </div>
+            {!hasNoTables && (
+              <div className="flex items-center gap-x-2">
+                <ButtonTooltip
+                  type="outline"
+                  icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
+                  onClick={() => {
+                    if (tables) {
+                      copyToClipboard(tablesToSQL(tables))
+                      setCopied(true)
+                    }
+                  }}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: (
+                        <div className="max-w-[180px] space-y-2 text-foreground-light">
+                          <p className="text-foreground">Note</p>
+                          <p>
+                            This schema is for context or debugging only. Table order and
+                            constraints may be invalid. Not meant to be run as-is.
+                          </p>
+                        </div>
+                      ),
+                    },
+                  }}
+                >
+                  Copy as SQL
+                </ButtonTooltip>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <ButtonTooltip
+                      aria-label="Download Schema"
+                      type="default"
+                      loading={isDownloading}
+                      className="px-1.5"
+                      icon={<Download />}
+                      tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-32">
+                    <DropdownMenuItem onClick={() => downloadImage('png')}>
+                      Download as PNG
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => downloadImage('svg')}>
+                      Download as SVG
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <ButtonTooltip
+                  type="default"
+                  onClick={resetLayout}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: 'Automatically arrange the layout of all nodes',
+                    },
+                  }}
+                >
+                  Auto layout
+                </ButtonTooltip>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -297,7 +326,7 @@ export const SchemaGraph = () => {
       )}
       {isSuccessTables && (
         <>
-          {tables.length === 0 ? (
+          {hasNoTables ? (
             <div className="flex items-center justify-center w-full h-full">
               <Admonition
                 type="default"
@@ -320,41 +349,44 @@ export const SchemaGraph = () => {
               </Admonition>
             </div>
           ) : (
-            <div className="w-full h-full">
-              <ReactFlow
-                defaultNodes={[]}
-                defaultEdges={[]}
-                defaultEdgeOptions={{
-                  type: 'smoothstep',
-                  animated: true,
-                  deletable: false,
-                }}
-                nodeTypes={nodeTypes}
-                fitView
-                minZoom={0.8}
-                maxZoom={1.8}
-                proOptions={{ hideAttribution: true }}
-                onNodeDragStop={() => saveNodePositions()}
-              >
-                <Background
-                  gap={16}
-                  className="[&>*]:stroke-foreground-muted opacity-[25%]"
-                  variant={BackgroundVariant.Dots}
-                  color={'inherit'}
-                />
-                <MiniMap
-                  pannable
-                  zoomable
-                  nodeColor={miniMapNodeColor}
-                  maskColor={miniMapMaskColor}
-                  className="border rounded-md shadow-sm"
-                />
-                <SchemaGraphLegend />
-              </ReactFlow>
-            </div>
+            <ColumnEditionContextProvider value={columnEditionContext}>
+              <div className="w-full h-full">
+                <ReactFlow
+                  defaultNodes={[]}
+                  defaultEdges={[]}
+                  defaultEdgeOptions={{
+                    type: 'smoothstep',
+                    animated: true,
+                    deletable: false,
+                  }}
+                  nodeTypes={nodeTypes}
+                  fitView
+                  minZoom={0.8}
+                  maxZoom={1.8}
+                  proOptions={{ hideAttribution: true }}
+                  onNodeDragStop={() => saveNodePositions()}
+                >
+                  <Background
+                    gap={16}
+                    className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                    variant={BackgroundVariant.Dots}
+                    color={'inherit'}
+                  />
+                  <MiniMap
+                    pannable
+                    zoomable
+                    nodeColor={miniMapNodeColor}
+                    maskColor={miniMapMaskColor}
+                    className="border rounded-md shadow-sm"
+                  />
+                  <SchemaGraphLegend />
+                </ReactFlow>
+              </div>
+            </ColumnEditionContextProvider>
           )}
         </>
       )}
+      <SidePanelEditor selectedTable={selectedTable ?? undefined} includeColumns />
     </>
   )
 }

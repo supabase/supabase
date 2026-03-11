@@ -3,11 +3,7 @@ export function EmptyState() {
 }
 
 export function GroupHeader({ label }: { label: string }) {
-  return (
-    <div className="px-2 py-1.5 text-xs text-foreground-lighter font-medium tracking-wide">
-      {label}
-    </div>
-  )
+  return <div className="px-2 py-1.5 text-xs text-foreground-lighter font-mono">{label}</div>
 }
 
 export function GroupSeparator() {
