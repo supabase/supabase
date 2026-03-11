@@ -6,7 +6,6 @@ import { SortableSection } from 'components/interfaces/ProjectHome/SortableSecti
 import { TopSection } from 'components/interfaces/ProjectHome/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import dayjs from 'dayjs'
-import { useTrackExperimentExposure } from 'hooks/misc/useTrackExperimentExposure'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { usePHFlag } from 'hooks/ui/useFlag'
@@ -81,15 +80,6 @@ export const ProjectHome = () => {
     }
   }, [enableBranching, snap])
 
-  // PostHog experiment exposure (both variants). ConnectSection also fires
-  // home_connect_section_exposed as a custom analytics event for the connect variant.
-  useTrackExperimentExposure(
-    'connectSection',
-    typeof connectSectionVariant === 'string' && !isMatureProject && !!project
-      ? connectSectionVariant
-      : undefined
-  )
-
   useEffect(() => {
     setSectionOrder((items) => {
       const knownItems = items.filter((id) => DEFAULT_SECTION_ORDER.includes(id))
@@ -158,7 +148,7 @@ export const ProjectHome = () => {
                   if (id === 'connect' && shouldShowConnectSection) {
                     return (
                       <SortableSection key={id} id={id}>
-                        <ConnectSection variant={connectSectionVariant} />
+                        <ConnectSection variant={connectSectionVariant as string} />
                       </SortableSection>
                     )
                   }

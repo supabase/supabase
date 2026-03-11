@@ -10,8 +10,8 @@ import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useConnectState } from './useConnectState'
+import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 const CONNECT_MODES: readonly ConnectMode[] = ['framework', 'direct', 'orm', 'mcp'] as const
 
@@ -22,15 +22,7 @@ function isConnectMode(value: string): value is ConnectMode {
 export const ConnectSheet = () => {
   const { ref: projectRef } = useParams()
 
-  const {
-    projectConnectionShowAppFrameworks: showAppFrameworks,
-    projectConnectionShowMobileFrameworks: showMobileFrameworks,
-    projectConnectionShowOrms: showOrms,
-  } = useIsFeatureEnabled([
-    'project_connection:show_app_frameworks',
-    'project_connection:show_mobile_frameworks',
-    'project_connection:show_orms',
-  ])
+  const availableModeIds = useAvailableConnectModes()
 
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
@@ -66,18 +58,6 @@ export const ConnectSheet = () => {
       publishableKey: publishableKey?.api_key ?? null,
     }
   }, [endpoint, anonKey?.api_key, publishableKey?.api_key])
-
-  const availableModeIds = useMemo(() => {
-    const modes: string[] = []
-    const showFrameworks = showAppFrameworks || showMobileFrameworks
-
-    if (showFrameworks) modes.push('framework')
-    modes.push('direct')
-    if (showOrms) modes.push('orm')
-    modes.push('mcp')
-
-    return modes
-  }, [showAppFrameworks, showMobileFrameworks, showOrms])
 
   const availableModes = useMemo(
     () => schema.modes.filter((m) => availableModeIds.includes(m.id)),

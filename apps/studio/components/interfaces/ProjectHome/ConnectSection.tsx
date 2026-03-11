@@ -8,8 +8,8 @@ import { useEffect, useRef } from 'react'
 import { Card, CardContent, cn } from 'ui'
 
 import type { ConnectMode } from '../ConnectSheet/Connect.types'
+import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 type ConnectAction = {
   mode: ConnectMode
@@ -57,21 +57,8 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
 
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const {
-    projectConnectionShowAppFrameworks: showAppFrameworks,
-    projectConnectionShowMobileFrameworks: showMobileFrameworks,
-    projectConnectionShowOrms: showOrms,
-  } = useIsFeatureEnabled([
-    'project_connection:show_app_frameworks',
-    'project_connection:show_mobile_frameworks',
-    'project_connection:show_orms',
-  ])
-
-  const availableActions = CONNECT_ACTIONS.filter((action) => {
-    if (action.mode === 'framework') return showAppFrameworks || showMobileFrameworks
-    if (action.mode === 'orm') return showOrms
-    return true
-  })
+  const availableModeIds = useAvailableConnectModes()
+  const availableActions = CONNECT_ACTIONS.filter((action) => availableModeIds.includes(action.mode))
 
   const hasTrackedExposure = useRef(false)
 
