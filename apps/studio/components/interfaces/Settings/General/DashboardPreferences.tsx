@@ -21,6 +21,7 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -45,6 +46,7 @@ const DEFAULT_PREFERENCE: DashboardPreference = {
  * [Joshen] JFYI am not convinced about the UX of this, will iterate over time
  * and only release to public when we're satisfied with how it behaves
  * - Where should "Dashboard preferences" live
+ * - Preferences currently only apply to the user via local storage until we have middleware support that will persist the setting on the project for all users
  * - Should selecting which database to run queries for dashboard be an option for users to configure (or for us to just default to)
  *   - I'd love for this to work seamlessly, but main concern atm is latency which is region dependent
  * - Also, current database logic only applies to Table Editor atm, will need to extend it further to other pages
@@ -78,7 +80,13 @@ export const DashboardPreferences = () => {
 
   return (
     <PageSection>
-      <PageSectionContent>
+      <PageSectionContent className="flex flex-col gap-y-4">
+        {/* [Joshen] Ideally we're able to persist this for all users in the project, but will need support in our middleware */}
+        <Admonition
+          type="note"
+          title="Preferences currently do not affect other members of this project"
+        />
+
         {isLoading ? (
           <Card>
             <CardContent>
