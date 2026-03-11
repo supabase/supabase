@@ -66,7 +66,7 @@ catalogs:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
-  '@aws-sdk/core>fast-xml-parser': ^5.3.5
+  '@aws-sdk/core>fast-xml-parser': ^4.5.4
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
@@ -76,7 +76,6 @@ overrides:
   lodash-es: ^4.17.23
   node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
-  openapi-sampler>fast-xml-parser: ^5.3.5
   payload>undici: ^7.18.2
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
@@ -11886,8 +11885,8 @@ packages:
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==}
 
-  fast-xml-parser@5.3.6:
-    resolution: {integrity: sha512-QNI3sAvSvaOiaMl8FYU4trnEzCwiRr8XMWgAHzlrWpTSj+QaCSvOf1h82OEP1s4hiAXhnbXSyFWCf4ldZzZRVA==}
+  fast-xml-parser@4.5.4:
+    resolution: {integrity: sha512-jE8ugADnYOBsu1uaoayVl1tVKAMNOXyjwvv2U6udEA2ORBhDooJDWoGxTkhd4Qn4yh59JVVt/pKXtjPwx9OguQ==}
     hasBin: true
 
   fastest-stable-stringify@2.0.2:
@@ -17228,8 +17227,8 @@ packages:
     resolution: {integrity: sha512-aT2BU9KkizY9SATf14WhhYVv2uOapBWX0OFWF4xvcj1mPaNotlSc2CsxpS4DS46ZueSppmCF5BX1sNYBtwBvfw==}
     engines: {node: '>=12.*'}
 
-  strnum@2.1.2:
-    resolution: {integrity: sha512-l63NF9y/cLROq/yqKXSLtcMeeyOfnSQlfMSlzFt/K73oIaD8DGaQWd7Z34X9GPiKqP5rbSh84Hl4bOlLcjiSrQ==}
+  strnum@1.1.2:
+    resolution: {integrity: sha512-vrN+B7DBIoTTZjnPNewwhx6cBA/H+IS7rfW68n7XxC1y7uoiGQBxaKzqucGUgavX15dJgiGztLJ8vxuEzwqBdA==}
 
   structured-clone-es@1.0.0:
     resolution: {integrity: sha512-FL8EeKFFyNQv5cMnXI31CIMCsFarSVI2bF0U0ImeNE3g/F1IvJQyqzOXxPBRXiwQfyBTlbNe88jh1jFW0O/jiQ==}
@@ -19121,7 +19120,7 @@ snapshots:
       '@smithy/util-body-length-browser': 4.0.0
       '@smithy/util-middleware': 4.2.8
       '@smithy/util-utf8': 4.0.0
-      fast-xml-parser: 5.3.6
+      fast-xml-parser: 4.5.4
       tslib: 2.8.1
 
   '@aws-sdk/core@3.826.0':
@@ -19139,7 +19138,7 @@ snapshots:
       '@smithy/util-body-length-browser': 4.0.0
       '@smithy/util-middleware': 4.2.8
       '@smithy/util-utf8': 4.0.0
-      fast-xml-parser: 5.3.6
+      fast-xml-parser: 4.5.4
       tslib: 2.8.1
 
   '@aws-sdk/credential-provider-cognito-identity@3.830.0':
@@ -29860,9 +29859,9 @@ snapshots:
 
   fast-uri@3.0.6: {}
 
-  fast-xml-parser@5.3.6:
+  fast-xml-parser@4.5.4:
     dependencies:
-      strnum: 2.1.2
+      strnum: 1.1.2
 
   fastest-stable-stringify@2.0.2: {}
 
@@ -33978,7 +33977,7 @@ snapshots:
   openapi-sampler@1.6.1:
     dependencies:
       '@types/json-schema': 7.0.15
-      fast-xml-parser: 5.3.6
+      fast-xml-parser: 4.5.4
       json-pointer: 0.6.2
 
   openapi-types@10.0.0: {}
@@ -36674,7 +36673,7 @@ snapshots:
       '@types/node': 22.13.14
       qs: 6.15.0
 
-  strnum@2.1.2: {}
+  strnum@1.1.2: {}
 
   structured-clone-es@1.0.0: {}
 
