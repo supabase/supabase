@@ -1,18 +1,14 @@
 import { useParams } from 'common'
 import { ConnectButton } from 'components/interfaces/ConnectButton/ConnectButton'
-import { SidebarContent } from 'components/interfaces/Sidebar'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { Menu, Search } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns'
 
-import { useMobileSheet } from './MobileSheetContext'
-
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
+import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
 import { ProjectBranchSelector } from './ProjectBranchSelector'
 
@@ -21,9 +17,7 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const isProjectScope = !!projectRef
   const showOrgSelection = slug || (selectedOrganization && projectRef)
-  const router = useRouter()
   const { openMenu } = useMobileSheet()
-  const { ref: projectRef } = useParams()
 
   return (
     <div className="w-full flex flex-row md:hidden">
