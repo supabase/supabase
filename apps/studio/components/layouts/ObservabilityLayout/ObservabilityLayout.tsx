@@ -14,7 +14,7 @@ import { ProjectLayout } from '../ProjectLayout'
 import ObservabilityMenu from './ObservabilityMenu'
 
 interface ObservabilityLayoutProps {
-  title?: string
+  title: string
 }
 
 const ObservabilityLayoutContent = ({
