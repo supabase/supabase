@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
+import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import {
   calculateErrorRate,
   calculateSuccessRate,

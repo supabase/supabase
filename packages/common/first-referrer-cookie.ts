@@ -286,14 +286,12 @@ export interface MwDiagData {
 export function parseMwDiagCookie(cookieHeader: string): MwDiagData | null {
   try {
     const cookies = cookieHeader.split(';')
-    const match = cookies
-      .map((c) => c.trim())
-      .find((c) => c.startsWith(`${MW_DIAG_COOKIE_NAME}=`))
+    const match = cookies.map((c) => c.trim()).find((c) => c.startsWith(`${MW_DIAG_COOKIE_NAME}=`))
 
     if (!match) return null
 
-    const value = match.slice(`${MW_DIAG_COOKIE_NAME}=`.length)
-    const params = new URLSearchParams(value)
+    const rawValue = match.slice(`${MW_DIAG_COOKIE_NAME}=`.length)
+    const params = new URLSearchParams(decodeURIComponent(rawValue))
 
     if (params.get('hit') !== '1') return null
 
