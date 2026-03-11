@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { del, handleError, put } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
+import { invalidateOrganizationsQuery } from './organizations-query'
 
 export type OrganizationTaxIdUpdateVariables = {
   slug?: string
@@ -70,6 +71,8 @@ export const useOrganizationTaxIdUpdateMutation = ({
 
       // We already have the data, no need to refetch
       queryClient.setQueryData(organizationKeys.taxId(slug), data.tax_id)
+      // Invalidate the organizations list so organization_missing_tax_id is refreshed
+      await invalidateOrganizationsQuery(queryClient)
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
