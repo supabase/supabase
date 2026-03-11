@@ -5217,7 +5217,6 @@ export interface components {
           name: string
           opt_in_tags: string[]
           organization_missing_address: boolean
-          organization_missing_tax_id: boolean
           organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
@@ -7229,7 +7228,6 @@ export interface components {
             | 'assistant.advance_model'
             | 'integrations.github_connections'
             | 'dedicated_pooler'
-            | 'observability.dashboard_advanced_metrics'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -7583,7 +7581,6 @@ export interface components {
       name: string
       opt_in_tags: string[]
       organization_missing_address: boolean
-      organization_missing_tax_id: boolean
       organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
@@ -8450,11 +8447,9 @@ export interface components {
       max_payload_size_in_kb: number | null
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second: number | null
-      /** @description Whether to enable presence */
-      presence_enabled: boolean
       /** @description Whether to only allow private channels */
       private_only: boolean | null
-      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
+      /** @description Whether to suspend realtime */
       suspend: boolean | null
     }
     RegionsInfo: {
@@ -10288,11 +10283,9 @@ export interface components {
       max_payload_size_in_kb?: number
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second?: number
-      /** @description Whether to enable presence */
-      presence_enabled?: boolean
       /** @description Whether to only allow private channels */
       private_only?: boolean
-      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
+      /** @description Whether to suspend realtime */
       suspend?: boolean
     }
     UpdateReplicationDestinationBody: {
@@ -17273,7 +17266,6 @@ export interface operations {
           | 'assistant.advance_model'
           | 'integrations.github_connections'
           | 'dedicated_pooler'
-          | 'observability.dashboard_advanced_metrics'
       }
       header?: never
       path?: never
