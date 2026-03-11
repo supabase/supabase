@@ -358,15 +358,15 @@ export const MOBILES: ConnectionType[] = [
 
 export const ORMS: ConnectionType[] = [
   {
-    key: 'prisma-legacy',
-    label: 'Prisma (Legacy)',
+    key: 'prisma',
+    label: 'Prisma',
     icon: 'prisma',
     guideLink: 'https://supabase.com/partners/integrations/prisma',
     children: [],
   },
   {
-    key: 'prisma',
-    label: 'Prisma',
+    key: 'prisma-legacy',
+    label: 'Prisma (Legacy)',
     icon: 'prisma',
     guideLink: 'https://supabase.com/partners/integrations/prisma',
     children: [],
