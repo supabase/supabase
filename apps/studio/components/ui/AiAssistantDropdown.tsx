@@ -1,10 +1,9 @@
 import { AiPromptCopiedEvent } from 'common/telemetry-constants'
-import { BASE_PATH } from 'lib/constants'
+import { Chatgpt, Claude } from 'icons'
 import { useTrack } from 'lib/telemetry/track'
 import { Check, ChevronDown, Copy } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
+
 import {
   AiIconAnimation,
   Button,
@@ -23,21 +22,8 @@ import {
 type TelemetrySource = AiPromptCopiedEvent['properties']['source']
 
 const EXTERNAL_AI_TOOLS = [
-  {
-    label: 'Open in ChatGPT',
-    url: 'https://chatgpt.com/',
-    promptParam: 'q',
-    icon: {
-      light: '/img/mcp-clients/openai-icon.svg',
-      dark: '/img/mcp-clients/openai-icon-dark.svg',
-    },
-  },
-  {
-    label: 'Open in Claude.ai',
-    url: 'https://claude.ai/new',
-    promptParam: 'q',
-    icon: { light: '/img/mcp-clients/claude-icon.svg', dark: '/img/mcp-clients/claude-icon.svg' },
-  },
+  { label: 'Ask ChatGPT', url: 'https://chatgpt.com/', promptParam: 'q', icon: Chatgpt },
+  { label: 'Ask Claude', url: 'https://claude.ai/new', promptParam: 'q', icon: Claude },
 ]
 
 export interface AiAssistantDropdownItem {
@@ -82,7 +68,6 @@ export function AiAssistantDropdown({
   additionalDropdownItems,
 }: AiAssistantDropdownProps) {
   const track = useTrack()
-  const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -156,12 +141,7 @@ export function AiAssistantDropdown({
                   className="gap-2"
                   onClick={() => handleOpenExternalAI(tool)}
                 >
-                  <Image
-                    src={`${BASE_PATH}${resolvedTheme?.includes('dark') ? tool.icon.dark : tool.icon.light}`}
-                    alt={tool.label}
-                    width={14}
-                    height={14}
-                  />
+                  <tool.icon size={14} />
                   {tool.label}
                 </DropdownMenuItem>
               ))}
