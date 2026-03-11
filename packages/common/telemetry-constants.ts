@@ -2326,6 +2326,54 @@ export interface SidebarOpenedEvent {
 }
 
 /**
+ * User opened an org menu submenu in the mobile navigation sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgSubmenuOpenedEvent {
+  action: 'org_submenu_opened'
+  properties: {
+    /** The key of the submenu item that was opened */
+    itemKey: string
+    /** The display label of the submenu item */
+    itemLabel: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the back button in the mobile org menu to return to the top-level menu.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgMenuBackClickedEvent {
+  action: 'org_menu_back_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a menu item in the mobile org navigation sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgMenuItemClickedEvent {
+  action: 'org_menu_item_clicked'
+  properties: {
+    /** The key identifying the menu item */
+    itemKey: string
+    /** The navigation href of the menu item */
+    itemHref: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User toggled the inline editor setting in account preferences.
  *
  * @group Events
@@ -2863,4 +2911,7 @@ export type TelemetryEvent =
   | IntegrationInstallFailedEvent
   | IntegrationUninstallCompletedEvent
   | RlsEventTriggerBannerCreateButtonClickedEvent
+  | OrgSubmenuOpenedEvent
+  | OrgMenuBackClickedEvent
+  | OrgMenuItemClickedEvent
   | PricingCalculatorExperimentExposedEvent

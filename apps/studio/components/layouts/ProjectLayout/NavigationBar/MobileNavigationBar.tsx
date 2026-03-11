@@ -1,19 +1,19 @@
 import { useParams } from 'common'
-import { SidebarContent } from 'components/interfaces/Sidebar'
 import { IS_PLATFORM } from 'lib/constants'
 import { Menu, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { Button, cn } from 'ui'
-import { CommandMenuTrigger, MobileSheetNav } from 'ui-patterns'
+import { CommandMenuTrigger } from 'ui-patterns'
+
+import { useMobileSheet } from './MobileSheetContext'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
   const router = useRouter()
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const { openMenu } = useMobileSheet()
   const { ref: projectRef } = useParams()
 
   return (
@@ -39,6 +39,7 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
         <div className="flex gap-2">
           <CommandMenuTrigger>
             <button
+              type="button"
               className={cn(
                 'group',
                 'flex-grow h-[30px] rounded-md',
@@ -50,9 +51,7 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
                 'transition'
               )}
             >
-              <div className="flex items-center space-x-2">
-                <Search size={18} strokeWidth={2} />
-              </div>
+              <Search size={18} strokeWidth={2} />
             </button>
           </CommandMenuTrigger>
           {!hideMobileMenu && (
@@ -61,14 +60,11 @@ const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) =
               type="default"
               className="flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30"
               icon={<Menu />}
-              onClick={() => setIsSheetOpen(true)}
+              onClick={() => openMenu()}
             />
           )}
         </div>
       </nav>
-      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen} data-state="expanded">
-        <SidebarContent />
-      </MobileSheetNav>
     </div>
   )
 }
