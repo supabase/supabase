@@ -67,6 +67,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       enabled: platformWebhooksEnabled,
     },
     {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
+      name: 'Project API documentation',
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+      enabled: true,
+      isNew: false,
+      isPlatformOnly: false,
+      isDefaultOptIn: false,
+    },
+    {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
       name: 'Column-level privileges',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
