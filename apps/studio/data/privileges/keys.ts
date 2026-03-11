@@ -36,5 +36,11 @@ export const privilegeKeys = {
       ...(selectedSchemas ? ([selectedSchemas] as const) : []),
     ] as const,
   defaultPrivileges: (projectRef: string | undefined, schema?: string) =>
-    ['projects', projectRef, 'privileges', 'default-privileges', ...(schema ? [schema] : [])] as const,
+    [
+      'projects',
+      projectRef,
+      'privileges',
+      'default-privileges',
+      ...(schema ? [schema] : []),
+    ] as const,
 }
