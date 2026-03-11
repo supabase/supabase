@@ -1,6 +1,105 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
+  content: {
+    Tables: {
+      error: {
+        Row: {
+          code: string
+          created_at: string | null
+          deleted_at: string | null
+          http_status_code: number | null
+          id: string
+          message: string | null
+          metadata: Json | null
+          service: string
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          deleted_at?: string | null
+          http_status_code?: number | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          service: string
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          http_status_code?: number | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          service?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'error_service_fkey'
+            columns: ['service']
+            isOneToOne: false
+            referencedRelation: 'service'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      service: {
+        Row: {
+          created_at: string | null
+          deleted_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      delete_error_codes_except: {
+        Args: {
+          skip_codes: Json
+        }
+        Returns: number
+      }
+      update_error_code: {
+        Args: {
+          code: string
+          service: string
+          http_status_code?: number
+          message?: string
+          metadata?: Json
+        }
+        Returns: boolean
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -102,6 +201,7 @@ export type Database = {
       }
       meetups: {
         Row: {
+          city: string | null
           country: string | null
           created_at: string
           display_info: string | null
@@ -111,9 +211,11 @@ export type Database = {
           launch_week: string
           link: string | null
           start_at: string | null
+          timezone: string | null
           title: string | null
         }
         Insert: {
+          city?: string | null
           country?: string | null
           created_at?: string
           display_info?: string | null
@@ -123,9 +225,11 @@ export type Database = {
           launch_week: string
           link?: string | null
           start_at?: string | null
+          timezone?: string | null
           title?: string | null
         }
         Update: {
+          city?: string | null
           country?: string | null
           created_at?: string
           display_info?: string | null
@@ -135,6 +239,7 @@ export type Database = {
           launch_week?: string
           link?: string | null
           start_at?: string | null
+          timezone?: string | null
           title?: string | null
         }
         Relationships: [
@@ -189,6 +294,48 @@ export type Database = {
         }
         Relationships: []
       }
+      page_nimbus: {
+        Row: {
+          checksum: string | null
+          content: string | null
+          fts_tokens: unknown | null
+          id: number
+          last_refresh: string | null
+          meta: Json | null
+          path: string
+          source: string | null
+          title_tokens: unknown | null
+          type: string | null
+          version: string | null
+        }
+        Insert: {
+          checksum?: string | null
+          content?: string | null
+          fts_tokens?: unknown | null
+          id?: never
+          last_refresh?: string | null
+          meta?: Json | null
+          path: string
+          source?: string | null
+          title_tokens?: unknown | null
+          type?: string | null
+          version?: string | null
+        }
+        Update: {
+          checksum?: string | null
+          content?: string | null
+          fts_tokens?: unknown | null
+          id?: never
+          last_refresh?: string | null
+          meta?: Json | null
+          path?: string
+          source?: string | null
+          title_tokens?: unknown | null
+          type?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       page_section: {
         Row: {
           content: string | null
@@ -226,6 +373,47 @@ export type Database = {
             columns: ['page_id']
             isOneToOne: false
             referencedRelation: 'page'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      page_section_nimbus: {
+        Row: {
+          content: string | null
+          embedding: string | null
+          heading: string | null
+          id: number
+          page_id: number
+          rag_ignore: boolean | null
+          slug: string | null
+          token_count: number | null
+        }
+        Insert: {
+          content?: string | null
+          embedding?: string | null
+          heading?: string | null
+          id?: never
+          page_id: number
+          rag_ignore?: boolean | null
+          slug?: string | null
+          token_count?: number | null
+        }
+        Update: {
+          content?: string | null
+          embedding?: string | null
+          heading?: string | null
+          id?: never
+          page_id?: number
+          rag_ignore?: boolean | null
+          slug?: string | null
+          token_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'page_section_nimbus_page_id_fkey'
+            columns: ['page_id']
+            isOneToOne: false
+            referencedRelation: 'page_nimbus'
             referencedColumns: ['id']
           },
         ]
@@ -421,6 +609,22 @@ export type Database = {
           slugs: string[]
         }[]
       }
+      docs_search_embeddings_nimbus: {
+        Args: {
+          embedding: string
+          match_threshold: number
+        }
+        Returns: {
+          id: number
+          path: string
+          type: string
+          title: string
+          subtitle: string
+          description: string
+          headings: string[]
+          slugs: string[]
+        }[]
+      }
       docs_search_fts: {
         Args: {
           query: string
@@ -433,6 +637,27 @@ export type Database = {
           subtitle: string
           description: string
         }[]
+      }
+      docs_search_fts_nimbus: {
+        Args: {
+          query: string
+        }
+        Returns: {
+          id: number
+          path: string
+          type: string
+          title: string
+          subtitle: string
+          description: string
+        }[]
+      }
+      get_full_content_url: {
+        Args: {
+          type: string
+          path: string
+          slug: string
+        }
+        Returns: string
       }
       get_last_revalidation_for_tags: {
         Args: {
@@ -491,6 +716,40 @@ export type Database = {
         }
         Returns: string[]
       }
+      match_embedding: {
+        Args: {
+          embedding: string
+          match_threshold?: number
+          max_results?: number
+        }
+        Returns: {
+          content: string | null
+          embedding: string | null
+          heading: string | null
+          id: number
+          page_id: number
+          rag_ignore: boolean | null
+          slug: string | null
+          token_count: number | null
+        }[]
+      }
+      match_embedding_nimbus: {
+        Args: {
+          embedding: string
+          match_threshold?: number
+          max_results?: number
+        }
+        Returns: {
+          content: string | null
+          embedding: string | null
+          heading: string | null
+          id: number
+          page_id: number
+          rag_ignore: boolean | null
+          slug: string | null
+          token_count: number | null
+        }[]
+      }
       match_page_sections_v2: {
         Args: {
           embedding: string
@@ -506,6 +765,99 @@ export type Database = {
           rag_ignore: boolean | null
           slug: string | null
           token_count: number | null
+        }[]
+      }
+      match_page_sections_v2_nimbus: {
+        Args: {
+          embedding: string
+          match_threshold: number
+          min_content_length: number
+        }
+        Returns: {
+          content: string | null
+          embedding: string | null
+          heading: string | null
+          id: number
+          page_id: number
+          rag_ignore: boolean | null
+          slug: string | null
+          token_count: number | null
+        }[]
+      }
+      search_content: {
+        Args: {
+          embedding: string
+          include_full_content?: boolean
+          match_threshold?: number
+          max_result?: number
+        }
+        Returns: {
+          id: number
+          page_title: string
+          type: string
+          href: string
+          content: string
+          metadata: Json
+          subsections: Json[]
+        }[]
+      }
+      search_content_hybrid: {
+        Args: {
+          query_text: string
+          query_embedding: string
+          max_result?: number
+          full_text_weight?: number
+          semantic_weight?: number
+          rrf_k?: number
+          match_threshold?: number
+          include_full_content?: boolean
+        }
+        Returns: {
+          id: number
+          page_title: string
+          type: string
+          href: string
+          content: string
+          metadata: Json
+          subsections: Json[]
+        }[]
+      }
+      search_content_hybrid_nimbus: {
+        Args: {
+          query_text: string
+          query_embedding: string
+          max_result?: number
+          full_text_weight?: number
+          semantic_weight?: number
+          rrf_k?: number
+          match_threshold?: number
+          include_full_content?: boolean
+        }
+        Returns: {
+          id: number
+          page_title: string
+          type: string
+          href: string
+          content: string
+          metadata: Json
+          subsections: Json[]
+        }[]
+      }
+      search_content_nimbus: {
+        Args: {
+          embedding: string
+          include_full_content?: boolean
+          match_threshold?: number
+          max_result?: number
+        }
+        Returns: {
+          id: number
+          page_title: string
+          type: string
+          href: string
+          content: string
+          metadata: Json
+          subsections: Json[]
         }[]
       }
       update_last_changed_checksum: {

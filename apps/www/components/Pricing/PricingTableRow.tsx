@@ -35,9 +35,11 @@ export const pricingTooltips: PricingTooltips = {
   'database.pausing': {
     main: 'Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard.',
   },
-
-  'database.bandwidth': {
-    main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period.',
+  'database.egress': {
+    main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
+  },
+  'storage.cachedEgress': {
+    main: 'Billing is based on the total sum of outgoing Storage traffic in GB throughout your billing period that is served from our CDN cache.',
   },
   'auth.totalUsers': {
     main: 'The maximum number of users your project can have',
@@ -61,6 +63,7 @@ export const pricingTooltips: PricingTooltips = {
   'auth.thirdPartyMAUs': {
     main: 'Users who use the Supabase platform through a third-party authentication provider (Firebase Auth, Auth0 or Cognito).\nBilling is based on the sum of distinct third-party users requesting your API through the billing period. Resets every billing cycle.',
   },
+
   'storage.size': {
     main: "The sum of all objects' size in your storage buckets.\nBilling is prorated down to the hour and will be displayed as GB-Hrs on your invoice.",
   },
@@ -84,10 +87,22 @@ export const pricingTooltips: PricingTooltips = {
     main: "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
   },
   'security.logDrain': {
-    main: 'Only events processed and sent to destinations are counted. Bandwidth required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
+    main: 'Only events processed and sent to destinations are counted. Egress required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
   },
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
+  },
+  'security.privateLink': {
+    main: (
+      <span className="prose text-xs">
+        AWS PrivateLink enables private connectivity between your AWS VPC and Supabase, keeping
+        traffic within the AWS network. Read more in our{' '}
+        <Link href="/docs/guides/platform/privatelink" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
   },
 
   'security.accessRoles': {
@@ -105,6 +120,35 @@ export const pricingTooltips: PricingTooltips = {
 
   'security.customDomains': {
     enterprise: 'Volume discounts available.',
+  },
+
+  'auth.auditLogs': {
+    main: (
+      <span className="prose text-xs">
+        Auth Audit Logs provide comprehensive tracking of authentication events. Audit logs are
+        automatically captured for all authentication events and help you monitor user
+        authentication activities, detect suspicious behavior, and maintain compliance with security
+        requirements. Read more in our{' '}
+        <Link href="/docs/guides/auth/audit-logs" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
+
+  'security.platformAuditLogs': {
+    main: (
+      <span className="prose text-xs">
+        Any Platform API/Dashboard actions performed by organization members are logged
+        automatically for auditing and security purposes. Includes actions such as creating a new
+        project, inviting members or changing project settings. Read more in our{' '}
+        <Link href="/docs/guides/security/platform-audit-logs" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
   },
 }
 
@@ -179,9 +223,12 @@ export const PricingTableRowDesktop = (props: any) => {
                           )}
                           {typeof planValue === 'string' ? planValue : planValue[0]}
                         </span>
-                        {typeof planValue !== 'string' && (
-                          <span className="text-lighter leading-4">{planValue[1]}</span>
-                        )}
+                        {Array.isArray(planValue) &&
+                          planValue.slice(1).map((val, idx) => (
+                            <span key={`planval_${i}_${idx}`} className="text-lighter leading-4">
+                              {val}
+                            </span>
+                          ))}
                       </div>
                     )}
                   </td>
@@ -246,9 +293,12 @@ export const PricingTableRowMobile = (props: any) => {
                         ? feat.plans[plan]
                         : feat.plans[plan][0]}
                     </span>
-                    {typeof feat.plans[plan] !== 'string' && (
-                      <span className="text-lighter leading-5">{feat.plans[plan][1]}</span>
-                    )}
+                    {Array.isArray(feat.plans[plan]) &&
+                      feat.plans[plan].slice(1).map((val, idx) => (
+                        <span key={`planval_mobile_${i}_${idx}`} className="text-lighter leading-5">
+                          {val}
+                        </span>
+                      ))}
                   </span>
                 )}
               </td>

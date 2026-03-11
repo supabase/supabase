@@ -2,15 +2,15 @@ import { X } from 'lucide-react'
 
 import { SheetClose, SheetHeader, SheetTitle, cn } from 'ui'
 
+interface CreateFunctionHeaderProps {
+  selectedFunction?: string
+  isDuplicating?: boolean
+}
+
 export const CreateFunctionHeader = ({
   selectedFunction,
-  assistantVisible,
-  setAssistantVisible,
-}: {
-  selectedFunction?: string
-  assistantVisible: boolean
-  setAssistantVisible: (v: boolean) => void
-}) => {
+  isDuplicating,
+}: CreateFunctionHeaderProps) => {
   return (
     <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
       <div className="flex flex-row gap-3 items-center max-w-[75%]">
@@ -27,33 +27,12 @@ export const CreateFunctionHeader = ({
         </SheetClose>
         <SheetTitle className="truncate">
           {selectedFunction !== undefined
-            ? `Edit '${selectedFunction}' function`
+            ? isDuplicating
+              ? `Duplicate function`
+              : `Edit '${selectedFunction}' function`
             : 'Add a new function'}
         </SheetTitle>
       </div>
-      {/* <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            aria-expanded={assistantVisible}
-            aria-controls="ai-chat-assistant"
-            className={cn(
-              !assistantVisible ? 'text-foreground-lighter' : 'text-light',
-              'hover:text-foreground',
-              'transition'
-            )}
-            onClick={() => setAssistantVisible(!assistantVisible)}
-          >
-            {!assistantVisible ? (
-              <PanelLeftClose size={19} strokeWidth={1} />
-            ) : (
-              <PanelRightClose size={19} strokeWidth={1} />
-            )}
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="left">
-          {assistantVisible ? 'Hide' : 'Show'} tools
-        </TooltipContent>
-      </Tooltip> */}
     </SheetHeader>
   )
 }

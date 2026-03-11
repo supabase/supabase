@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { integrationKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type VercelProjectsVariables = {
   organization_integration_id: string | undefined
@@ -42,13 +43,11 @@ export const useVercelProjectsQuery = <TData = VercelProjectsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<VercelProjectsData, VercelProjectsError, TData> = {}
+  }: UseCustomQueryOptions<VercelProjectsData, VercelProjectsError, TData> = {}
 ) =>
-  useQuery<VercelProjectsData, VercelProjectsError, TData>(
-    integrationKeys.vercelProjectList(organization_integration_id),
-    ({ signal }) => getVercelProjects({ organization_integration_id }, signal),
-    {
-      enabled: enabled && typeof organization_integration_id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<VercelProjectsData, VercelProjectsError, TData>({
+    queryKey: integrationKeys.vercelProjectList(organization_integration_id),
+    queryFn: ({ signal }) => getVercelProjects({ organization_integration_id }, signal),
+    enabled: enabled && typeof organization_integration_id !== 'undefined',
+    ...options,
+  })

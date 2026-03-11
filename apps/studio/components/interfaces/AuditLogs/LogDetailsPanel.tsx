@@ -9,7 +9,7 @@ export interface LogDetailsPanelProps {
   onClose: () => void
 }
 
-const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
+export const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
   return (
     <SidePanel
       size="large"
@@ -82,5 +82,3 @@ const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
     </SidePanel>
   )
 }
-
-export default LogDetailsPanel

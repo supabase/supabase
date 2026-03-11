@@ -39,7 +39,7 @@ Instead, we'll rely on the Supabase client to do some of the work on the **`web`
 That means you will want to refrain from running any `yarn rw prisma migrate` commands and also double check your build commands on deployment to ensure Prisma won't reset your database. Prisma currently doesn't support cross-schema foreign keys, so introspecting the schema fails due
 to how your Supabase `public` schema references the `auth.users`.
 
-<$Partial path="project_setup.mdx" />
+<$Partial path="project_setup.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
 
 ## Building the app
 
@@ -103,13 +103,13 @@ Say, **yes** and it will setup the Supabase client in your app and also provide 
 ```
 
 Next, we want to save the environment variables in a `.env`.
-We need the `API URL` as well as the `anon` and `jwt_secret` keys that you copied [earlier](#get-the-api-keys).
+We need the `API URL` as well as the key and `jwt_secret` that you copied [earlier](#get-api-details).
 
 <$CodeTabs>
 
 ```bash name=.env
 SUPABASE_URL=YOUR_SUPABASE_URL
-SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
+SUPABASE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
 ```
 

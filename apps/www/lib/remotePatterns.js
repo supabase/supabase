@@ -6,6 +6,12 @@ module.exports = [
     pathname: '**',
   },
   {
+    protocol: 'http',
+    hostname: 'localhost',
+    port: '3030',
+    pathname: '**',
+  },
+  {
     protocol: 'https',
     hostname: 'avatars.githubusercontent.com',
     port: '',
@@ -60,6 +66,12 @@ module.exports = [
     pathname: '**',
   },
   {
+    protocol: 'http',
+    hostname: '127.0.0.1',
+    port: '54321',
+    pathname: '**',
+  },
+  {
     protocol: 'https',
     hostname: 'xguihxuzqibwxjnimxev.supabase.co',
     port: '',
@@ -94,5 +106,12 @@ module.exports = [
     hostname: 'media.licdn.com',
     port: '',
     pathname: '/dms/image/**',
+  },
+  // OG Edge Function
+  {
+    protocol: 'https',
+    hostname: 'zhfonblqamxferhoguzj.supabase.co',
+    port: '',
+    pathname: '/functions/v1/generate-og',
   },
 ]

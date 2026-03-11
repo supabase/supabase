@@ -1,7 +1,8 @@
-import { BlockPreview } from '@/components/block-preview'
-import { ComponentPreview } from '@/components/component-preview'
 import Link from 'next/link'
 import { Button_Shadcn_ } from 'ui'
+
+import { BlockPreview } from '@/components/block-preview'
+import { ComponentPreview } from '@/components/component-preview'
 
 // Horizontal grid line component
 const HorizontalGridLine = () => <div className="col-span-12 h-px bg-border/30" />
@@ -41,8 +42,8 @@ export default function Home() {
                       UI Blocks for Supabase Projects
                     </h1>
                     <h2 className="text-lg text-foreground-light mb-4">
-                      A collection of components and blocks built on the shadcn/ui library that
-                      connect your front-end to your Supabase back-end via a single command.
+                      A collection of React components and blocks built on the shadcn/ui library
+                      that connect your front-end to your Supabase back-end via a single command.
                     </h2>
                     <Button_Shadcn_ variant="secondary" size="lg" className="mt-4">
                       <Link href="/docs/getting-started/quickstart">Get Started</Link>

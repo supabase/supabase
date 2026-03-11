@@ -2,8 +2,11 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { createClient } from 'jsr:@supabase/supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
+import { createClient } from 'npm:supabase-js@2'
+// New approach (v2.95.0+)
+import { corsHeaders } from 'jsr:@supabase/supabase-js@2/cors'
+// For older versions:
+// import { corsHeaders } from '../_shared/cors.ts'
 
 console.log(`Function "get-tshirt-competition" up and running!`)
 

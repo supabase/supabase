@@ -1,6 +1,4 @@
-import fs from 'fs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-// import { parse } from 'react-docgen'
 
 export function ComponentProps(props: any) {
   // map through all props types for this component DropdownMenu
@@ -10,10 +8,6 @@ export function ComponentProps(props: any) {
   // /** My first component */
   // export default ({ name }: { name: string }) => <div>{{name}}</div>;
   // `
-
-  //   const documentation = parse(code)
-  //
-  //   console.log(documentation)
 
   // console.log('from the component props', JSON.parse(props.docs))
 

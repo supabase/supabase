@@ -1,11 +1,6 @@
-export const LOCAL_STORAGE_KEYS = {
-  SAVED_ORG: 'docs.ui.user.selected.org',
-  SAVED_PROJECT: 'docs.ui.user.selected.project',
-  SAVED_BRANCH: 'docs.ui.user.selected.branch',
-} as const
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
-
 type StorageType = 'local' | 'session'
 
 function getStorage(storageType: StorageType) {
@@ -17,7 +12,7 @@ export function store(storageType: StorageType, key: LocalStorageKey, value: str
   const storage = getStorage(storageType)
 
   try {
-    storage.setItem(key, value)
+    storage.setItem(key as string, value)
   } catch {
     console.error(`Failed to set storage item with key "${key}"`)
   }
@@ -26,13 +21,13 @@ export function store(storageType: StorageType, key: LocalStorageKey, value: str
 export function retrieve(storageType: StorageType, key: LocalStorageKey) {
   if (typeof window === 'undefined') return
   const storage = getStorage(storageType)
-  return storage.getItem(key)
+  return storage.getItem(key as string)
 }
 
 export function remove(storageType: StorageType, key: LocalStorageKey) {
   if (typeof window === 'undefined') return
   const storage = getStorage(storageType)
-  return storage.removeItem(key)
+  return storage.removeItem(key as string)
 }
 
 export function storeOrRemoveNull(

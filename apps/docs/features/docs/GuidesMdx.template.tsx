@@ -1,16 +1,16 @@
 import { ExternalLink } from 'lucide-react'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 import { cn } from 'ui'
 
 import Breadcrumbs from '~/components/Breadcrumbs'
-import GuidesTableOfContents from '~/components/GuidesTableOfContents'
+import GuidesSidebar from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { type GuideFrontmatter } from '~/lib/docs'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -71,7 +71,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             'relative',
             'transition-all ease-out',
             'duration-100',
-            hideToc ? 'col-span-12' : 'col-span-12 md:col-span-9'
+            'col-span-12 md:col-span-9'
           )}
         >
           <Breadcrumbs className="mb-2" />
@@ -90,8 +90,11 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             )}
             <hr className="not-prose border-t-0 border-b my-8" />
 
-            {content && <MDXRemoteBase source={content} options={mdxOptions} />}
+            {content && (
+              <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />
+            )}
             {children}
+
             <footer className="mt-16 not-prose">
               <a
                 href={
@@ -104,34 +107,34 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
                   'transition-colors'
                 )}
                 target="_blank"
-                rel="noreferrer noopener"
+                rel="noreferrer noopener edit"
               >
                 Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
               </a>
             </footer>
           </article>
         </div>
-        {!hideToc && (
-          <GuidesTableOfContents
-            video={meta?.tocVideo}
-            className={cn(
-              'hidden md:flex',
-              'col-span-3 self-start',
-              'sticky',
-              /**
-               * --header-height: height of nav
-               * 1px: height of nav border
-               * 2rem: content padding
-               */
-              'top-[calc(var(--header-height)+1px+2rem)]',
-              // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
-              'max-h-[calc(100vh-var(--header-height)-3rem)]'
-            )}
-          />
-        )}
+        <GuidesSidebar
+          video={meta?.tocVideo}
+          hideToc={hideToc}
+          className={cn(
+            'hidden md:flex',
+            'col-span-3 self-start',
+            'sticky',
+            /**
+             * --header-height: height of nav
+             * 1px: height of nav border
+             * 2rem: content padding
+             */
+            'top-[calc(var(--header-height)+1px+2rem)]',
+            // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
+            'max-h-[calc(100vh-var(--header-height)-3rem)]'
+          )}
+        />
       </div>
     </TocAnchorsProvider>
   )
 }
 
 export { GuideTemplate, newEditLink }
+export type { EditLink }

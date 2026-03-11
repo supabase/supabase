@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type AuthorizedAppsVariables = {
@@ -37,13 +37,11 @@ export const useAuthorizedAppsQuery = <TData = AuthorizedAppsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<AuthorizedAppsData, AuthorizedAppsError, TData> = {}
+  }: UseCustomQueryOptions<AuthorizedAppsData, AuthorizedAppsError, TData> = {}
 ) =>
-  useQuery<AuthorizedAppsData, AuthorizedAppsError, TData>(
-    oauthAppKeys.authorizedApps(slug),
-    ({ signal }) => getAuthorizedApps({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<AuthorizedAppsData, AuthorizedAppsError, TData>({
+    queryKey: oauthAppKeys.authorizedApps(slug),
+    queryFn: ({ signal }) => getAuthorizedApps({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

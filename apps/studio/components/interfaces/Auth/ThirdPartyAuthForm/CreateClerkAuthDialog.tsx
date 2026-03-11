@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
 import {
   Button,
@@ -22,7 +22,6 @@ import {
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { InlineLink } from 'components/ui/InlineLink'
 
 interface CreateClerkAuthIntegrationProps {
   visible: boolean
@@ -60,7 +59,7 @@ export const CreateClerkAuthIntegrationDialog = ({
   onDelete,
 }: CreateClerkAuthIntegrationProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: createAuthIntegration, isLoading } = useCreateThirdPartyAuthIntegrationMutation({
+  const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
       toast.success(`Successfully created a new Clerk integration.`)
       onClose()
@@ -138,10 +137,10 @@ export const CreateClerkAuthIntegrationDialog = ({
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          <Button disabled={isLoading} type="default" onClick={() => onClose()}>
+          <Button disabled={isPending} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
+          <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
             Create connection
           </Button>
         </DialogFooter>

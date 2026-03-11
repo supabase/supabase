@@ -3,6 +3,7 @@ import { Clock, Heart, Server, SquareStack, Telescope } from 'lucide-react'
 import {
   IconBranching,
   IconGitHub,
+  IconGitBranch,
   IconMenuApi,
   IconMenuAuth,
   IconMenuCli,
@@ -30,6 +31,7 @@ import {
   IconSecurity,
   IconSupport,
   IconTroubleshooting,
+  IconUI,
 } from './MenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className?: string) {
@@ -84,6 +86,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconMenuCli width={width} height={height} className={className} />
     case 'status':
       return <IconMenuStatus width={width} height={height} className={className} />
+    case 'git-branch':
+      return <IconGitBranch width={width} height={height} className={className} />
     case 'github':
       return <IconGitHub width={width} height={height} className={className} />
     case 'support':
@@ -102,6 +106,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <Clock width={width} height={height} className={className} />
     case 'queues':
       return <SquareStack width={width} height={height} className={className} />
+    case 'ui':
+      return <IconUI width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }

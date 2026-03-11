@@ -12,6 +12,22 @@ source:
 
 <ComponentPreview name="sheet-demo" peekCode wide />
 
+1. **Use for side panels**
+
+   - Forms with multiple fields
+   - Settings panels
+   - Detailed editors
+
+2. **Consider screen size**
+
+   - Sheets work well on desktop
+   - On mobile, consider full-screen or bottom sheet variants
+
+3. **Structure content clearly**
+   - Use `SheetHeader` and `SheetTitle` for context
+   - Use `SheetSection` to group related fields
+   - Use `SheetFooter` for actions
+
 ## Installation
 
 <Tabs defaultValue="cli">
@@ -80,11 +96,21 @@ import {
 
 ## Examples
 
-### Side
+### Nonmodal
 
-Use the `side` property to `<SheetContent />` to indicate the edge of the screen where the component will appear. The values can be `top`, `right`, `bottom` or `left`.
+This sheet is nonmodal, meaning it does not block the underlying content. It’s useful when
+you want to display content that complements the main content of the screen.
 
-<ComponentPreview name="sheet-side" />
+<ComponentPreview name="sheet-nonmodal" />
+
+To have the underlying content resize to fit the sheet (so nothing is overlapping) use the Sidebar component
+or build a custom panel. You can refer to the following Studio components for guidance:
+
+- `AIAssistant`
+- `EditorPanel`
+- `AdvisorPanel`
+
+See [`LayoutSidebarProvider`](https://github.com/supabase/supabase/blob/master/apps/studio/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider.tsx) for more.
 
 ### Size
 
@@ -104,3 +130,11 @@ You can adjust the size of the sheet using CSS classes:
   </SheetContent>
 </Sheet>
 ```
+
+### Side
+
+Use the `side` property to `<SheetContent />` to indicate the edge of the screen where the component will appear. The values can be `top`, `right`, `bottom` or `left`.
+
+<ComponentPreview name="sheet-side" />
+
+That said, stick to the default `right` unless you have a strong reason not to.

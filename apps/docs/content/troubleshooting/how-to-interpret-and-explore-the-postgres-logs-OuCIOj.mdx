@@ -35,7 +35,7 @@ Logs provide insights into Postgres operations. They help meet compliance requir
 
 ## Querying logs
 
-The most practical way to explore and filter logs is through the [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer).
+The most practical way to explore and filter logs is through the [Logs Explorer](/dashboard/project/_/logs/explorer).
 
 It uses a subset of BigQuery SQL syntax and pre-parses queries for optimization. This imposes three primary limitations:
 
@@ -259,11 +259,11 @@ limit 100;
 
 ### Customized object and role activity logging
 
-> ⚠️ NOTE: This is specifically designated for those using the `postgres` role or [custom roles](https://supabase.com/docs/guides/database/postgres/roles) to interact with their database. Those utilizing the Database REST API should reference the [Database API Logging Guide](https://github.com/orgs/supabase/discussions/22849) instead.
+> ⚠️ NOTE: This is specifically designated for those using the `postgres` role or [custom roles](/docs/guides/database/postgres/roles) to interact with their database. Those utilizing the Database REST API should reference the [Database API Logging Guide](https://github.com/orgs/supabase/discussions/22849) instead.
 
 When recording what is accessed and by whom, logging based on database roles and objects is the most reliable way to ensure a proper trail of activity.
 
-You can use the [pg_audit](https://supabase.com/docs/guides/database/extensions/pgaudit) extension to selectively log relevant queries (not just errors) by certain roles, against specific database objects.
+You can use the [pg_audit](/docs/guides/database/extensions/pgaudit) extension to selectively log relevant queries (not just errors) by certain roles, against specific database objects.
 
 You should take care when using the extension to not log all database events, but only what is absolutely necessary. Over-logging can strain the database and create log noise that makes it difficult to filter for relevant events.
 
@@ -281,7 +281,7 @@ where
 
 ### Filtering by IP
 
-> If you are connecting from a known, limited range of IP addresses, you should enable [network restrictions](https://supabase.com/docs/guides/platform/network-restrictions).
+> If you are connecting from a known, limited range of IP addresses, you should enable [network restrictions](/docs/guides/platform/network-restrictions).
 
 Monitoring IPs becomes tricky when dealing with dynamic addressing, such as those from serverless or edge environments. This challenge amplifies when relying on certain poolers, such as Prisma Accelerate, Supavisor, or Cloudflare's Hyperdrive, as they record the pooler's IP, not the true origin.
 
@@ -367,7 +367,7 @@ show log_min_messages; -- default WARNING
 
 #### Configuring queries logged
 
-By default, only failed queries are logged. The [PGAudit extension](https://supabase.com/docs/guides/database/extensions/pgaudit) extends Postgres's built-in logging abilities. It can be used to selectively track all queries in your database by:
+By default, only failed queries are logged. The [PGAudit extension](/docs/guides/database/extensions/pgaudit) extends Postgres's built-in logging abilities. It can be used to selectively track all queries in your database by:
 
 - role
 - session
@@ -376,7 +376,7 @@ By default, only failed queries are logged. The [PGAudit extension](https://supa
 
 #### Logging within database functions
 
-To track or debug functions, logging can be configured by following the [function debugging guide](https://supabase.com/docs/guides/database/functions#general-logging)
+To track or debug functions, logging can be configured by following the [function debugging guide](/docs/guides/database/functions#general-logging)
 
 # Frequently Asked Questions
 
@@ -396,7 +396,7 @@ To see the default types of events that are logged, you can check this [guide](h
 
 - [Regex for filtering logs](https://github.com/orgs/supabase/discussions/22640)
 - [Debugging with the DB API logs](https://github.com/orgs/supabase/discussions/22849)
-- [Debugging Database Functions](https://supabase.com/docs/guides/database/functions#debugging-functions)
-- [pg_audit](https://supabase.com/docs/guides/database/extensions/pgaudit)
-- [Supabase Logging](https://supabase.com/docs/guides/platform/logs)
-- [Self-Hosting Logs](https://supabase.com/docs/reference/self-hosting-analytics/introduction)
+- [Debugging Database Functions](/docs/guides/database/functions#debugging-functions)
+- [pg_audit](/docs/guides/database/extensions/pgaudit)
+- [Supabase Logging](/docs/guides/platform/logs)
+- [Self-Hosting Logs](/docs/reference/self-hosting-analytics/introduction)

@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm'
 import type { ICommonMarkdown } from '~/components/reference/Reference.types'
 
 async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
-  let markdownContent = []
+  let markdownContent: any[] = []
   /**
    * Read all the markdown files that might have
    *  - custom text
@@ -40,13 +40,12 @@ async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
         // introPage: introPages.includes(x),
         content: content
           ? await serialize(content ?? '', {
+              blockJS: false,
               // MDX's available options, see the MDX docs for more info.
               // https://mdxjs.com/packages/mdx/#compilefile-options
               mdxOptions: {
-                useDynamicImport: true,
                 remarkPlugins: [remarkGfm],
               },
-              // Indicates whether or not to parse the frontmatter from the mdx source
             })
           : null,
       })

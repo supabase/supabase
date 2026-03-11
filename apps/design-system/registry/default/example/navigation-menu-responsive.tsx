@@ -1,11 +1,11 @@
 'use client'
 
-import * as React from 'react'
 import Link from 'next/link'
-
-import { NavigationMenuViewport, ScrollArea, ScrollBar, buttonVariants, cn } from 'ui'
+import * as React from 'react'
 // import { Icons } from '@/components/icons'
 import {
+  buttonVariants,
+  cn,
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
@@ -13,6 +13,9 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
+  NavigationMenuViewport,
+  ScrollArea,
+  ScrollBar,
 } from 'ui'
 
 const components: { title: string; href: string; description: string }[] = [
@@ -144,11 +147,12 @@ export default function NavigationMenuDemo() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link href="/docs" legacyBehavior passHref>
-              <NavigationMenuLink className={buttonVariants({ type: 'text', size: 'small' })}>
-                Documentation
-              </NavigationMenuLink>
-            </Link>
+            <NavigationMenuLink
+              href="/docs"
+              className={buttonVariants({ type: 'text', size: 'small' })}
+            >
+              Documentation
+            </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>
         <ScrollBar orientation="horizontal" />

@@ -1,10 +1,8 @@
-import { Check, ChevronsUpDown, Database, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
-import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { ActionBar } from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Check, ChevronsUpDown, Database, Plus } from 'lucide-react'
+import { useEffect, useId, useState } from 'react'
 import {
   Button,
   cn,
@@ -25,6 +23,8 @@ import {
   ScrollArea,
   SidePanel,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
@@ -48,6 +48,7 @@ const WrapperTableEditor = ({
   initialData,
 }: WrapperTableEditorProps) => {
   const [open, setOpen] = useState(false)
+  const listboxId = useId()
   const [selectedTableIndex, setSelectedTableIndex] = useState<string>('')
 
   useEffect(() => {
@@ -101,6 +102,8 @@ const WrapperTableEditor = ({
                 <Button
                   type="default"
                   role="combobox"
+                  aria-expanded={open}
+                  aria-controls={listboxId}
                   className={cn(
                     'w-full justify-between',
                     !selectedTableIndex && 'text-muted-foreground'
@@ -113,7 +116,7 @@ const WrapperTableEditor = ({
                   {!!selectedTableIndex ? tables[Number(selectedTableIndex)].label : '---'}
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
+              <PopoverContent_Shadcn_ id={listboxId} className="p-0" sameWidthAsTrigger>
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Find a table..." />
                   <CommandList_Shadcn_>
@@ -216,10 +219,10 @@ const TableForm = ({
   onSubmit: OnSubmitFn
   initialData: any
 }) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const {
     data: schemas,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useSchemasQuery({
     projectRef: project?.ref,

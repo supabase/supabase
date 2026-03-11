@@ -11,7 +11,7 @@ import { useDatabaseQueueMessageDeleteMutation } from 'data/database-queues/data
 import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
 import { useDatabaseQueueMessageReadMutation } from 'data/database-queues/database-queue-messages-read-mutation'
 import dayjs from 'dayjs'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON } from 'lib/helpers'
 import {
   Button,
@@ -48,25 +48,25 @@ export const MessageDetailsPanel = ({
   setSelectedMessage,
 }: MessageDetailsPanelProps) => {
   const { id: _id, childId: queueName } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   useEscapeKeydown(() => setSelectedMessage(null))
 
   const {
     mutate: archiveMessage,
-    isLoading: isLoadingArchive,
+    isPending: isLoadingArchive,
     isSuccess: isSuccessArchive,
   } = useDatabaseQueueMessageArchiveMutation()
 
   const {
     mutate: readMessage,
-    isLoading: isLoadingRead,
+    isPending: isLoadingRead,
     isSuccess: isSuccessRead,
   } = useDatabaseQueueMessageReadMutation()
 
   const {
     mutate: deleteMessage,
-    isLoading: isLoadingDelete,
+    isPending: isLoadingDelete,
     isSuccess: isSuccessDelete,
   } = useDatabaseQueueMessageDeleteMutation()
 
@@ -77,11 +77,15 @@ export const MessageDetailsPanel = ({
 
   return (
     <ResizablePanel
-      defaultSize={30}
-      maxSize={45}
-      minSize={30}
+      defaultSize="30"
+      maxSize="45"
+      minSize="30"
       collapsible
-      onCollapse={() => setSelectedMessage(null)}
+      onResize={(panelSize) => {
+        if (panelSize.asPercentage === 0) {
+          setSelectedMessage(null)
+        }
+      }}
       className="bg-studio border-t pointer-events-auto"
     >
       <Button
@@ -146,7 +150,7 @@ export const MessageDetailsPanel = ({
                       readMessage({
                         projectRef: project!.ref,
                         connectionString: project?.connectionString,
-                        queryName: queueName!,
+                        queueName: queueName!,
                         messageId: selectedMessage.msg_id,
                         duration: 60,
                       })
@@ -173,7 +177,7 @@ export const MessageDetailsPanel = ({
                       archiveMessage({
                         projectRef: project!.ref,
                         connectionString: project?.connectionString,
-                        queryName: queueName!,
+                        queueName: queueName!,
                         messageId: selectedMessage.msg_id,
                       })
                     },

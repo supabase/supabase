@@ -1,4 +1,4 @@
-import { range } from 'lodash'
+import { range } from 'lib/helpers'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'

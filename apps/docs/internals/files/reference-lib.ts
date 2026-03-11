@@ -5,6 +5,7 @@ export async function generateReferencePages() {
   return (
     await Promise.all(
       Object.keys(REFERENCES)
+        .filter((key) => REFERENCES[key].enabled !== false)
         .flatMap((key) => {
           if (REFERENCES[key].versions.length === 0) {
             return [
@@ -32,6 +33,7 @@ export async function generateReferencePages() {
               link: isLatestVersion
                 ? `reference/${libPath}/${section.slug}`
                 : `reference/${libPath}/${version}/${section.slug}`,
+              priority: 0.8,
             })) ?? []
           )
         })

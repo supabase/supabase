@@ -10,7 +10,7 @@ interface AllowAllModalProps {
 
 const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   const { ref } = useParams()
-  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
     })

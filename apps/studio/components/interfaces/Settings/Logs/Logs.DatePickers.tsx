@@ -1,16 +1,84 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { Clock, HistoryIcon, Lock } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
-import type { DatetimeHelper } from './Logs.types'
-import { ChevronLeft, ChevronRight, Clock, XIcon } from 'lucide-react'
-import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
-import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import { Label } from '@ui/components/shadcn/ui/label'
+import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import {
+  Button,
+  ButtonProps,
+  Calendar,
+  Input_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  cn,
+  copyToClipboard,
+} from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
-import { PropsWithChildren } from 'react'
+import type { DatetimeHelper } from './Logs.types'
+type Unit = 'minute' | 'hour' | 'day'
+
+export type ParsedCustomInput =
+  | { type: 'number'; value: number }
+  | { type: 'unit'; value: number; unit: Unit }
+  | { type: 'invalid' }
+
+export const parseCustomInput = (input: string): ParsedCustomInput => {
+  const trimmed = input.trim().toLowerCase()
+  if (!trimmed) return { type: 'invalid' }
+
+  // Try to match "number + optional space + unit prefix"
+  const match = trimmed.match(/^(\d+)\s*([a-z]*)$/)
+  if (!match) return { type: 'invalid' }
+
+  const [, numStr, unitStr] = match
+  const value = parseInt(numStr, 10)
+
+  if (isNaN(value) || value <= 0) return { type: 'invalid' }
+
+  if (!unitStr) {
+    return { type: 'number', value }
+  }
+
+  // Match if unitStr is a prefix of any unit name or its first letter
+  const units: Unit[] = ['minute', 'hour', 'day']
+  const matchedUnit = units.find((u) => u.startsWith(unitStr) || u[0] === unitStr)
+
+  if (!matchedUnit) return { type: 'invalid' }
+
+  return { type: 'unit', value, unit: matchedUnit }
+}
+
+export const generateDynamicHelper = (value: number, unit: Unit): DatetimeHelper => {
+  return {
+    text: `Last ${value} ${unit}${value === 1 ? '' : 's'}`,
+    calcFrom: () => dayjs().subtract(value, unit).toISOString(),
+    calcTo: () => dayjs().toISOString(),
+  }
+}
+
+export const generateDynamicHelpers = (value: number): DatetimeHelper[] => {
+  const units: Unit[] = ['minute', 'hour', 'day']
+  return units.map((unit) => generateDynamicHelper(value, unit))
+}
+
+export const generateHelpersFromInput = (input: string): DatetimeHelper[] | null => {
+  const parsed = parseCustomInput(input)
+
+  switch (parsed.type) {
+    case 'number':
+      return generateDynamicHelpers(parsed.value)
+    case 'unit':
+      return [generateDynamicHelper(parsed.value, parsed.unit)]
+    case 'invalid':
+      return null
+  }
+}
 
 export type DatePickerValue = {
   to: string
@@ -19,20 +87,42 @@ export type DatePickerValue = {
   text?: string
 }
 
-interface Props {
+interface LogsDatePickerProps {
   value: DatePickerValue
-  onSubmit: (args: DatePickerValue) => void
   helpers: DatetimeHelper[]
+  onSubmit: (value: DatePickerValue) => void
+  buttonTriggerProps?: ButtonProps
+  popoverContentProps?: typeof PopoverContent_Shadcn_
+  hideWarnings?: boolean
+  align?: 'start' | 'end' | 'center'
 }
 
-export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<Props>) => {
+export const LogsDatePicker = ({
+  onSubmit,
+  helpers,
+  value,
+  buttonTriggerProps,
+  popoverContentProps,
+  hideWarnings,
+  align = 'end',
+}: PropsWithChildren<LogsDatePickerProps>) => {
   const [open, setOpen] = useState(false)
+  const [customValue, setCustomValue] = useState('')
+
+  const displayedHelpers = useMemo(() => {
+    if (!customValue.trim()) return helpers
+    const generated = generateHelpersFromInput(customValue)
+    return generated ?? []
+  }, [customValue, helpers])
 
   // Reset the state when the popover closes
   useEffect(() => {
     if (!open) {
+      setCustomValue('')
       setStartDate(value.from ? new Date(value.from) : null)
-      setEndDate(value.to ? new Date(value.to) : new Date())
+      const defaultEndDate = value.to ? new Date(value.to) : new Date()
+      setEndDate(defaultEndDate)
+      setCurrentMonth(new Date(defaultEndDate))
 
       const fromDate = value.from ? new Date(value.from) : null
       const toDate = value.to ? new Date(value.to) : null
@@ -57,7 +147,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
   }, [open, value])
 
   const handleHelperChange = (newValue: string) => {
-    const selectedHelper = helpers.find((h) => h.text === newValue)
+    const selectedHelper = displayedHelpers.find((h) => h.text === newValue)
     if (onSubmit && selectedHelper) {
       onSubmit({
         to: selectedHelper.calcTo(),
@@ -72,6 +162,9 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
 
   const [startDate, setStartDate] = useState<Date | null>(value.from ? new Date(value.from) : null)
   const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : new Date())
+  const [currentMonth, setCurrentMonth] = useState<Date>(() =>
+    value.to ? new Date(value.to) : new Date()
+  )
 
   const [startTime, setStartTime] = useState({
     HH: startDate?.getHours().toString() || '00',
@@ -142,6 +235,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
 
           setStartDate(fromDate)
           setEndDate(toDate)
+          setCurrentMonth(new Date(toDate))
 
           // Update time states
           setStartTime({
@@ -166,7 +260,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
       })
   }
 
-  function handleCopy() {
+  const handleCopy = useCallback(() => {
     if (!startDate || !endDate) return
 
     const fromDate = new Date(startDate)
@@ -176,14 +270,15 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
     fromDate.setHours(+startTime.HH, +startTime.mm, +startTime.ss)
     toDate.setHours(+endTime.HH, +endTime.mm, +endTime.ss)
 
-    navigator.clipboard.writeText(
+    copyToClipboard(
       JSON.stringify({
         from: fromDate.toISOString(),
         to: toDate.toISOString(),
       })
     )
+
     setCopied(true)
-  }
+  }, [startDate, endDate, startTime, endTime])
 
   useEffect(() => {
     if (pasted) {
@@ -194,54 +289,85 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
   }, [pasted])
 
   useEffect(() => {
-    document.addEventListener('paste', handlePaste)
-    document.addEventListener('copy', handleCopy)
+    if (open) {
+      document.addEventListener('paste', handlePaste)
+      document.addEventListener('copy', handleCopy)
+    }
     return () => {
       document.removeEventListener('paste', handlePaste)
       document.removeEventListener('copy', handleCopy)
     }
-  }, [startDate, endDate])
+  }, [open, startDate, endDate, handleCopy])
 
   const isLargeRange =
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
     LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
+
+  const showHelperBadge = (helper?: DatetimeHelper) => {
+    if (!helper) return false
+    if (!entitledToAuditLogDays) return false
+
+    const day = Math.abs(dayjs().diff(dayjs(helper.calcFrom()), 'day'))
+    if (day <= entitledToAuditLogDays) return false
+    return true
+  }
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" icon={<Clock size={12} />}>
+        <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
           {value.isHelper
             ? value.text
             : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ side="bottom" align="start" className="flex w-full p-0">
-        <RadioGroup
-          onValueChange={handleHelperChange}
-          value={value.isHelper ? value.text : ''}
-          className="border-r p-2 flex flex-col gap-px"
-        >
-          {helpers.map((helper) => (
-            <Label
-              key={helper.text}
-              className={cn(
-                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs',
-                {
-                  'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
-                }
-              )}
-            >
-              <RadioGroupItem
-                hidden
+      <PopoverContent_Shadcn_
+        className="flex w-full p-0"
+        side="bottom"
+        align={align}
+        {...popoverContentProps}
+      >
+        <div className="border-r p-2 flex flex-col gap-px">
+          <Input_Shadcn_
+            type="text"
+            placeholder="e.g. 2h, 30m, 7d"
+            value={customValue}
+            onChange={(e) => setCustomValue(e.target.value)}
+            className="mb-2 text-xs h-7 rounded-sm"
+          />
+          <RadioGroup
+            onValueChange={handleHelperChange}
+            value={value.isHelper ? value.text : ''}
+            className="flex flex-col gap-px"
+          >
+            {displayedHelpers.map((helper) => (
+              <Label
                 key={helper.text}
-                value={helper.text}
-                disabled={helper.disabled}
-                aria-disabled={helper.disabled}
-              ></RadioGroupItem>
-              {helper.text}
-            </Label>
-          ))}
-        </RadioGroup>
+                className={cn(
+                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
+                  {
+                    'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
+                  }
+                )}
+              >
+                <RadioGroupItem
+                  hidden
+                  key={helper.text}
+                  value={helper.text}
+                  disabled={helper.disabled}
+                  aria-disabled={helper.disabled}
+                ></RadioGroupItem>
+                {helper.text}
+                {showHelperBadge(helper) ? (
+                  <Lock size={12} className="text-foreground-muted" />
+                ) : null}
+              </Label>
+            ))}
+          </RadioGroup>
+        </div>
 
         <div>
           <div className="flex p-2 gap-2 items-center">
@@ -270,8 +396,13 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
               />
             </div>
             <div className="flex-shrink">
-              <Button
-                icon={<XIcon size={14} />}
+              <ButtonTooltip
+                tooltip={{
+                  content: {
+                    text: 'Clear time range',
+                  },
+                }}
+                icon={<HistoryIcon size={14} />}
                 type="text"
                 size="tiny"
                 className="px-1.5"
@@ -279,55 +410,22 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
                   setStartTime({ HH: '00', mm: '00', ss: '00' })
                   setEndTime({ HH: '00', mm: '00', ss: '00' })
                 }}
-              ></Button>
+              ></ButtonTooltip>
             </div>
           </div>
           <div className="p-2 border-t">
-            <DatePicker
-              inline
-              selectsRange
-              onChange={(dates) => {
-                handleDatePickerChange(dates)
+            <Calendar
+              mode="range"
+              month={currentMonth}
+              onMonthChange={(month) => setCurrentMonth(new Date(month))}
+              selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
+              onSelect={(range) => {
+                handleDatePickerChange([range?.from ?? null, range?.to ?? null])
               }}
-              dateFormat="MMMM d, yyyy h:mm aa"
-              dayClassName={() => 'cursor-pointer'}
-              startDate={startDate}
-              endDate={endDate}
-              renderCustomHeader={({
-                date,
-                decreaseMonth,
-                increaseMonth,
-                prevMonthButtonDisabled,
-                nextMonthButtonDisabled,
-              }) => (
-                <div className="flex items-center justify-between">
-                  <div className="flex w-full items-center justify-between">
-                    <Button
-                      onClick={decreaseMonth}
-                      disabled={prevMonthButtonDisabled}
-                      icon={<ChevronLeft size={14} strokeWidth={2} />}
-                      type="text"
-                      size="tiny"
-                      className="px-1.5"
-                    ></Button>
-                    <span className="text-sm text-foreground-light">
-                      {dayjs(date).format('MMMM YYYY')}
-                    </span>
-                    <Button
-                      onClick={increaseMonth}
-                      disabled={nextMonthButtonDisabled}
-                      icon={<ChevronRight size={14} strokeWidth={2} />}
-                      type="text"
-                      size="tiny"
-                      className="px-1.5"
-                    ></Button>
-                  </div>
-                </div>
-              )}
             />
           </div>
-          {isLargeRange && (
-            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning-600">
+          {isLargeRange && !hideWarnings && (
+            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning">
               Large ranges may result in memory errors for <br /> big projects.
             </div>
           )}
@@ -348,8 +446,10 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
             <Button
               type="default"
               onClick={() => {
-                setStartDate(new Date())
-                setEndDate(new Date())
+                const today = new Date()
+                setCurrentMonth(today)
+                setStartDate(new Date(today))
+                setEndDate(new Date(today))
               }}
             >
               Today

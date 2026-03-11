@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "social-auth-vue",
+  "type": "registry:block",
+  "title": "Social Auth flow for Vue and Supabase",
+  "description": "Social Auth flow for Vue and Supabase",
+  "dependencies": [
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [
+    "button",
+    "card"
+  ],
+  "files": [
+    {
+      "path": "registry/default/social-auth/vue/components/login-form.vue",
+      "content": "<script setup lang=\"ts\">\nimport { ref } from \"vue\"\nimport { createClient } from \"@/lib/supabase/client\"\nimport { cn } from \"@/lib/utils\"\n\nimport { Button } from \"@/components/ui/button\"\nimport {\n  Card,\n  CardContent,\n  CardDescription,\n  CardHeader,\n  CardTitle,\n} from \"@/components/ui/card\"\n\nconst error = ref<string | null>(null)\nconst isLoading = ref(false)\n\nconst handleSocialLogin = async (e: Event) => {\n  e.preventDefault()\n  const supabase = createClient()\n  isLoading.value = true\n  error.value = null\n\n  try {\n    const { error: supabaseError } = await supabase.auth.signInWithOAuth({\n      provider: \"github\",\n    })\n\n    if (supabaseError) throw supabaseError\n    window.location.href = \"/protected\"\n  } catch (err: unknown) {\n    error.value = err instanceof Error ? err.message : \"An error occurred\"\n    isLoading.value = false\n  }\n}\n</script>\n\n<template>\n  <div :class=\"cn('flex flex-col gap-6')\">\n    <Card>\n      <CardHeader>\n        <CardTitle class=\"text-2xl\">Welcome!</CardTitle>\n        <CardDescription>Sign in to your account to continue</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <form @submit=\"handleSocialLogin\">\n          <div class=\"flex flex-col gap-6\">\n            <p v-if=\"error\" class=\"text-sm text-destructive-500\">{{ error }}</p>\n            <Button type=\"submit\" class=\"w-full\" :disabled=\"isLoading\">\n              {{ isLoading ? \"Logging in...\" : \"Continue with GitHub\" }}\n            </Button>\n          </div>\n        </form>\n      </CardContent>\n    </Card>\n  </div>\n</template>\n",
+      "type": "registry:component",
+      "target": "components/login-form.vue"
+    }
+  ]
+}

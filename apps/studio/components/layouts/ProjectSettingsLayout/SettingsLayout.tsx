@@ -1,67 +1,78 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
-
 import { useParams } from 'common'
+import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
-import { IS_PLATFORM } from 'lib/constants'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { useRouter } from 'next/router'
+import type { PropsWithChildren } from 'react'
+
+import { ProjectLayout } from '../ProjectLayout'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
-interface SettingsLayoutProps {
-  title?: string
-}
-
-const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
+/**
+ * Menu-only component for the settings section. Used by the desktop sidebar and by the
+ * mobile sheet submenu. Must not wrap ProjectLayout so that opening the settings submenu
+ * in the mobile sheet does not overwrite registerOpenMenu and break the menu button.
+ */
+export const SettingsProductMenu = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 
-  useEffect(() => {
-    if (!IS_PLATFORM) {
-      router.push('/project/default')
-    }
-  }, [router])
-
-  // billing pages live under /billing/invoices and /billing/subscription, etc
-  // so we need to pass the [5]th part of the url to the menu
   const page = router.pathname.includes('billing')
     ? router.pathname.split('/')[5]
     : router.pathname.split('/')[4]
 
   const {
     projectAuthAll: authEnabled,
+    authenticationShowProviders: authProvidersEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
     billingInvoices: invoicesEnabled,
+    projectSettingsLegacyJwtKeys: legacyJWTKeysEnabled,
+    projectSettingsLogDrains,
+    billingAll,
   } = useIsFeatureEnabled([
     'project_auth:all',
+    'authentication:show_providers',
     'project_edge_function:all',
     'project_storage:all',
     'billing:invoices',
+    'project_settings:legacy_jwt_keys',
+    'project_settings:log_drains',
+    'billing:all',
   ])
-
-  const newApiKeys = useFlag('newApiKeys')
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
     auth: authEnabled,
+    authProviders: authProvidersEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,
-    newApiKeys,
+    legacyJwtKeys: legacyJWTKeysEnabled,
+    logDrains: projectSettingsLogDrains,
+    billing: billingAll,
+    platformWebhooks: platformWebhooksEnabled,
   })
 
+  return <ProductMenu page={page} menu={menuRoutes} />
+}
+
+interface SettingsLayoutProps {
+  title?: string
+}
+
+export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   return (
     <ProjectLayout
       isBlocking={false}
       title={title || 'Settings'}
       product="Settings"
-      productMenu={<ProductMenu page={page} menu={menuRoutes} />}
+      productMenu={<SettingsProductMenu />}
     >
       {children}
     </ProjectLayout>

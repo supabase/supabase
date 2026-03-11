@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { subscriptionKeys } from './keys'
 
 export type ProjectAddonsVariables = {
@@ -32,14 +32,15 @@ export type ProjectAddonsError = ResponseError
 
 export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
   { projectRef }: ProjectAddonsVariables,
-  { enabled = true, ...options }: UseQueryOptions<ProjectAddonsData, ProjectAddonsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ProjectAddonsData, ProjectAddonsError, TData> = {}
 ) =>
-  useQuery<ProjectAddonsData, ProjectAddonsError, TData>(
-    subscriptionKeys.addons(projectRef),
-    ({ signal }) => getProjectAddons({ projectRef }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
-      staleTime: 60 * 60 * 1000, // 60 minutes
-      ...options,
-    }
-  )
+  useQuery<ProjectAddonsData, ProjectAddonsError, TData>({
+    queryKey: subscriptionKeys.addons(projectRef),
+    queryFn: ({ signal }) => getProjectAddons({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    staleTime: 60 * 60 * 1000,
+    ...options,
+  })

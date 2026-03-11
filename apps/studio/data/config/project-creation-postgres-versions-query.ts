@@ -1,21 +1,14 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
-import { components } from 'api-types'
+import { useQuery } from '@tanstack/react-query'
 import { handleError, post } from 'data/fetchers'
 import { CloudProvider } from 'shared-data'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { configKeys } from './keys'
 
 export type ProjectCreationPostgresVersionsVariables = {
   cloudProvider: CloudProvider
   dbRegion: string
   organizationSlug: string | undefined
-}
-
-export type ProjectCreationPostgresVersion = components['schemas']['ProjectCreationVersionInfo']
-
-export type ProjectCreationPostgresVersionsResponse = {
-  available_versions: ProjectCreationPostgresVersion[]
 }
 
 export async function getPostgresCreationVersions(
@@ -44,30 +37,28 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     ProjectCreationPostgresVersionData,
     ProjectCreationPostgresVersionError,
     TData
   > = {}
 ) => {
-  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>(
-    configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
-    ({ signal }) =>
+  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>({
+    queryKey: configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
+    queryFn: ({ signal }) =>
       getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof organizationSlug !== 'undefined' &&
-        organizationSlug !== '_' &&
-        typeof dbRegion !== 'undefined',
-      ...options,
-    }
-  )
+    enabled:
+      enabled &&
+      typeof organizationSlug !== 'undefined' &&
+      organizationSlug !== '_' &&
+      typeof dbRegion !== 'undefined',
+    ...options,
+  })
 }
 
 export const useAvailableOrioleImageVersion = (
   { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
-  { enabled }: { enabled?: boolean }
+  { enabled = true }: { enabled?: boolean } = {}
 ) => {
   const { data } = useProjectCreationPostgresVersionsQuery(
     {
@@ -75,7 +66,13 @@ export const useAvailableOrioleImageVersion = (
       dbRegion,
       organizationSlug,
     },
-    { enabled }
+    {
+      enabled,
+      select(data) {
+        return (data?.available_versions ?? []).find((x) => x.postgres_engine === '17-oriole')
+      },
+    }
   )
-  return (data?.available_versions ?? []).find((x) => x.postgres_engine === '17-oriole')
+
+  return data
 }

@@ -1,38 +1,40 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import { AlertCircle } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
   Radio,
   SidePanel,
-  cn,
 } from 'ui'
-import { ExternalLink, AlertCircle } from 'lucide-react'
+
+import { DocsButton } from '@/components/ui/DocsButton'
 
 const CustomDomainSidePanel = () => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
-  const canUpdateCustomDomain = useCheckPermissions(
+  const { can: canUpdateCustomDomain } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -40,8 +42,8 @@ const CustomDomainSidePanel = () => {
   const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'customDomain'
 
-  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
+  const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled custom domain`)
       closePanel()
@@ -50,7 +52,7 @@ const CustomDomainSidePanel = () => {
       toast.error(`Unable to enable custom domain: ${error.message}`)
     },
   })
-  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled custom domain`)
       closePanel()
@@ -67,7 +69,8 @@ const CustomDomainSidePanel = () => {
   const availableOptions =
     (addons?.available_addons ?? []).find((addon) => addon.type === 'custom_domain')?.variants ?? []
 
-  const isFreePlan = organization?.plan?.id === 'free'
+  const { hasAccess: hasAccessToCustomDomain, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('custom_domain')
   const hasChanges = selectedOption !== (subscriptionCDOption?.variant.identifier ?? 'cd_none')
   const selectedCustomDomain = availableOptions.find(
     (option) => option.identifier === selectedOption
@@ -98,9 +101,10 @@ const CustomDomainSidePanel = () => {
       visible={visible}
       onCancel={closePanel}
       onConfirm={onConfirm}
-      loading={isLoading || isSubmitting}
+      loading={isLoading || isSubmitting || isLoadingEntitlement}
       disabled={
-        isFreePlan ||
+        !hasAccessToCustomDomain ||
+        isLoadingEntitlement ||
         isLoading ||
         !hasChanges ||
         isSubmitting ||
@@ -109,24 +113,16 @@ const CustomDomainSidePanel = () => {
         (subscriptionCDOption === undefined && customDomainsDisabledDueToQuota)
       }
       tooltip={
-        isFreePlan
+        !hasAccessToCustomDomain
           ? 'Unable to enable custom domain on a Free Plan'
           : !canUpdateCustomDomain
             ? 'You do not have permission to update custom domain'
             : undefined
       }
       header={
-        <div className="flex items-center justify-between">
+        <div className="flex w-full items-center justify-between">
           <h4>Custom domains</h4>
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <Link
-              href="https://supabase.com/docs/guides/platform/custom-domains"
-              target="_blank"
-              rel="noreferrer"
-            >
-              About custom domains
-            </Link>
-          </Button>
+          <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
         </div>
       }
     >
@@ -155,7 +151,7 @@ const CustomDomainSidePanel = () => {
             page after enabling the add-on.
           </p>
 
-          <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
+          <div className={cn('!mt-8 pb-4', !hasAccessToCustomDomain && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
               size="tiny"
@@ -178,7 +174,9 @@ const CustomDomainSidePanel = () => {
                       Use the default supabase domain for your API
                     </p>
                     <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-foreground text-sm">$0</p>
+                      <p className="text-foreground text-sm" translate="no">
+                        $0
+                      </p>
                       <p className="text-foreground-light translate-y-[1px]"> / month</p>
                     </div>
                   </div>
@@ -189,7 +187,7 @@ const CustomDomainSidePanel = () => {
                   className="col-span-4 !p-0"
                   name="custom-domain"
                   key={option.identifier}
-                  disabled={isFreePlan}
+                  disabled={!hasAccessToCustomDomain}
                   checked={selectedOption === option.identifier}
                   label={option.name}
                   value={option.identifier}
@@ -203,7 +201,9 @@ const CustomDomainSidePanel = () => {
                         Present a branded experience to your users
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                        <p className="text-foreground text-sm" translate="no">
+                          {formatCurrency(option.price)}
+                        </p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -220,7 +220,7 @@ const CustomDomainSidePanel = () => {
             </p>
           )}
 
-          {isFreePlan && (
+          {!hasAccessToCustomDomain && (
             <Alert
               withIcon
               variant="info"

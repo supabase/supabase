@@ -122,7 +122,7 @@ Sign up at [Supabase Dashboard](https://supabase.com/dashboard) and create a new
 
 ```dotenv
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-project-apikey>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<your-project-apikey>
 ```
 
 2. **Configure Production Variables:**
@@ -137,7 +137,7 @@ SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS=https://<your-app-url>.vercel.app/**
 Encrypt GitHub credentials in dotenv file:
 
 ```bash
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.production
+npx @dotenvx/dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.production
 ```
 
 This also creates the encryption key in `supabase/.env.production` and the decryption key in `supabase/.env.keys`.
@@ -145,9 +145,9 @@ This also creates the encryption key in `supabase/.env.production` and the decry
 3. **Deploy to Supabase Remote:**
 
 ```bash
-npx dotenvx run -f supabase/.env.production -- npx supabase link
-npx dotenvx run -f supabase/.env.production -- npx supabase db push
-npx dotenvx run -f supabase/.env.production -- npx supabase config push
+npx @dotenvx/dotenvx run -f supabase/.env.production -- npx supabase link
+npx @dotenvx/dotenvx run -f supabase/.env.production -- npx supabase db push
+npx @dotenvx/dotenvx run -f supabase/.env.production -- npx supabase config push
 ```
 
 ### How to Use with Preview Branches
@@ -159,7 +159,7 @@ Here's how to set up encrypted secrets for your preview branches:
 1. **Generate Key Pair and Encrypt Your Secrets:**
 
 ```bash
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.preview
+npx @dotenvx/dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.preview
 ```
 
 This creates a new encryption key in `supabase/.env.preview` and a new decryption key in `supabase/.env.keys`, specifically for your preview branches.

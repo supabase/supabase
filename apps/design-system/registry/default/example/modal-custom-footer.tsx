@@ -32,9 +32,7 @@ export default function ModalVerticalCustomFooter() {
         customFooter={
           <div className="flex items-center gap-3">
             <div>
-              <Badge variant="destructive" dot size="small">
-                Proceed with caution
-              </Badge>
+              <Badge variant="destructive">Proceed with caution</Badge>
             </div>
             <Button type="secondary">Cancel</Button>
             <Button type="danger">Delete</Button>

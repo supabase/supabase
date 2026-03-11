@@ -3,7 +3,6 @@
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
-import SVG from 'react-inlinesvg'
 import {
   Button,
   DropdownMenu,
@@ -13,10 +12,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  RadioGroupLargeItem_Shadcn_,
   RadioGroup_Shadcn_,
-  Theme,
   singleThemes,
+  Theme,
 } from 'ui'
 
 const ThemeSwitcherDropdown = () => {

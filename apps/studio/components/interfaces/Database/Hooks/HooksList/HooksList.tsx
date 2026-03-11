@@ -1,32 +1,30 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, map as lodashMap, uniqBy } from 'lodash'
-import { BookOpen, Search } from 'lucide-react'
-import { useState } from 'react'
-import { Button, Input } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { noop } from 'lib/void'
-import HooksListEmpty from './HooksListEmpty'
-import SchemaTable from './SchemaTable'
 import { DocsButton } from 'components/ui/DocsButton'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
+import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { includes, map as lodashMap, uniqBy } from 'lodash'
+import { Search } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useState } from 'react'
+import { Input } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-export interface HooksListProps {
-  createHook: () => void
-  editHook: (hook: any) => void
-  deleteHook: (hook: any) => void
-}
+import { HooksListEmpty } from './HooksListEmpty'
+import { SchemaTable } from './SchemaTable'
 
-const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: HooksListProps) => {
-  const { project } = useProjectContext()
+export const HooksList = () => {
+  const { data: project } = useSelectedProjectQuery()
+
+  const [, setShowCreateHookForm] = useQueryState('new', parseAsBoolean.withDefault(false))
+
   const {
-    data: hooks,
-    isLoading,
+    data: hooks = [],
+    isPending: isLoading,
     isSuccess,
     isError,
     error,
@@ -36,13 +34,15 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
   })
   const [filterString, setFilterString] = useState<string>('')
 
-  const filteredHooks = (hooks || []).filter((x: any) =>
+  const filteredHooks = hooks.filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
 
-  const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canCreateWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
 
   return (
     <div className="w-full space-y-4">
@@ -50,15 +50,15 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
         <Input
           placeholder="Search for a webhook"
           size="tiny"
-          icon={<Search size="14" />}
+          icon={<Search />}
           value={filterString}
           className="w-52"
           onChange={(e) => setFilterString(e.target.value)}
         />
         <div className="flex items-center gap-x-2">
-          <DocsButton href="https://supabase.com/docs/guides/database/webhooks" />
+          <DocsButton href={`${DOCS_URL}/guides/database/webhooks`} />
           <ButtonTooltip
-            onClick={() => createHook()}
+            onClick={() => setShowCreateHookForm(true)}
             disabled={!isPermissionsLoaded || !canCreateWebhooks}
             tooltip={{
               content: {
@@ -94,19 +94,11 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
                 onResetFilter={() => setFilterString('')}
               />
             )}
-            {filteredHookSchemas.map((schema: any) => (
-              <SchemaTable
-                key={schema}
-                filterString={filterString}
-                schema={schema}
-                editHook={editHook}
-                deleteHook={deleteHook}
-              />
+            {filteredHookSchemas.map((schema) => (
+              <SchemaTable key={schema} filterString={filterString} schema={schema} />
             ))}
           </>
         ))}
     </div>
   )
 }
-
-export default HooksList

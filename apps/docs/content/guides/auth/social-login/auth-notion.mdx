@@ -11,7 +11,7 @@ To enable Notion Auth for your project, you need to set up a Notion Application 
 Setting up Notion logins for your application consists of 3 parts:
 
 - Create and configure a Notion Application [Notion Developer Portal](https://www.notion.so/my-integrations)
-- Retrieve your OAuth client ID and OAuth client secret and add them to your [Supabase Project](https://supabase.com/dashboard)
+- Retrieve your OAuth client ID and OAuth client secret and add them to your [Supabase Project](/dashboard)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Create your notion integration
@@ -61,7 +61,7 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<your-anon-key>')
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
 
 // ---cut---
 async function signInWithNotion() {
@@ -88,6 +88,7 @@ Future<void> signInWithNotion() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Notion` as the `Provider`:
@@ -99,6 +100,7 @@ suspend fun signInWithNotion() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -116,7 +118,7 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<your-anon-key>')
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
 
 // ---cut---
 async function signOut() {
@@ -136,6 +138,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -147,6 +150,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources

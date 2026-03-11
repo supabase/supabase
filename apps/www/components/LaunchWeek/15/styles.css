@@ -1,0 +1,8 @@
+/* Font face definitions for Launch Week 15 */
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('/fonts/launchweek/15/SuisseIntl-Book.otf') format('otf');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

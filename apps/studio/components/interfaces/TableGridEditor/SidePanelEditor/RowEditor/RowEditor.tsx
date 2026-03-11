@@ -1,16 +1,16 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import type { Dictionary } from 'types'
-import { SidePanel } from 'ui'
-import ActionBar from '../ActionBar'
+import { SidePanel, Toggle } from 'ui'
+
+import { ActionBar } from '../ActionBar'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
-import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
-import HeaderTitle from './HeaderTitle'
-import InputField from './InputField'
+import { ForeignRowSelector } from './ForeignRowSelector/ForeignRowSelector'
+import { HeaderTitle } from './HeaderTitle'
+import { InputField } from './InputField'
 import { JsonEditor } from './JsonEditor'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
@@ -32,7 +32,9 @@ export interface RowEditorProps {
   updateEditorDirty: () => void
 }
 
-const RowEditor = ({
+const formId = 'row-editor-panel'
+
+export const RowEditor = ({
   row,
   selectedTable,
   visible = false,
@@ -55,13 +57,14 @@ const RowEditor = ({
   const isEditingJson = selectedValueForJsonEdit !== undefined
 
   const [loading, setLoading] = useState(false)
+  const [createMore, setCreateMore] = useState(false)
 
   const [requiredFields, optionalFields] = partition(
     rowFields,
     (rowField: any) => !rowField.isNullable
   )
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -141,7 +144,14 @@ const RowEditor = ({
         configuration.rowIdx = row!.idx
       }
 
-      saveChanges(payload, isNewRecord, configuration, () => setLoading(false))
+      saveChanges(payload, isNewRecord, { ...configuration, createMore }, (err?: any) => {
+        setLoading(false)
+        if (!err && createMore && isNewRecord) {
+          const freshFields = generateRowFields(undefined, selectedTable, foreignKeys)
+          setRowFields(freshFields)
+          setErrors({})
+        }
+      })
     } else {
       setLoading(false)
     }
@@ -157,7 +167,8 @@ const RowEditor = ({
 
   return (
     <SidePanel
-      hideFooter
+      data-testid="side-panel-row-editor"
+      // hideFooter
       size="large"
       key="RowEditor"
       visible={visible}
@@ -166,31 +177,60 @@ const RowEditor = ({
         isEditingText || isEditingJson || isSelectingForeignKey ? ' mr-32' : ''
       }`}
       onCancel={closePanel}
+      customFooter={
+        <ActionBar
+          loading={loading}
+          formId={formId}
+          backButtonLabel="Cancel"
+          applyButtonLabel="Save"
+          closePanel={closePanel}
+          hideApply={!editable}
+          visible={visible}
+        >
+          {isNewRecord && editable && (
+            <div className="flex items-center gap-x-2">
+              <Toggle
+                size="tiny"
+                checked={createMore}
+                onChange={() => setCreateMore(!createMore)}
+              />
+              <label
+                className="text-foreground-light text-sm cursor-pointer select-none"
+                onClick={() => setCreateMore(!createMore)}
+              >
+                Create more
+              </label>
+            </div>
+          )}
+        </ActionBar>
+      }
     >
-      <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
+      <form id={formId} onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
           <div className="flex flex-grow flex-col">
-            <SidePanel.Content>
-              <div className="space-y-10 py-6">
-                {requiredFields.map((field: RowField) => {
-                  return (
-                    <InputField
-                      key={field.id}
-                      field={field}
-                      errors={errors}
-                      onUpdateField={onUpdateField}
-                      onEditJson={setSelectedValueForJsonEdit}
-                      onEditText={setSelectedValueForTextEdit}
-                      onSelectForeignKey={() => onOpenForeignRowSelector(field)}
-                      isEditable={editable}
-                    />
-                  )
-                })}
-              </div>
-            </SidePanel.Content>
+            {requiredFields.length > 0 && (
+              <SidePanel.Content>
+                <div className="space-y-10 py-6">
+                  {requiredFields.map((field: RowField) => {
+                    return (
+                      <InputField
+                        key={field.id}
+                        field={field}
+                        errors={errors}
+                        onUpdateField={onUpdateField}
+                        onEditJson={setSelectedValueForJsonEdit}
+                        onEditText={setSelectedValueForTextEdit}
+                        onSelectForeignKey={() => onOpenForeignRowSelector(field)}
+                        isEditable={editable}
+                      />
+                    )
+                  })}
+                </div>
+              </SidePanel.Content>
+            )}
             {optionalFields.length > 0 && (
               <>
-                <SidePanel.Separator />
+                {requiredFields.length > 0 && <SidePanel.Separator />}
                 <SidePanel.Content>
                   <div className="space-y-10 py-6">
                     <div>
@@ -241,15 +281,6 @@ const RowEditor = ({
               readOnly={!editable}
             />
           </div>
-          <div className="flex-shrink">
-            <ActionBar
-              loading={loading}
-              backButtonLabel="Cancel"
-              applyButtonLabel="Save"
-              closePanel={closePanel}
-              hideApply={!editable}
-            />
-          </div>
         </div>
       </form>
 
@@ -266,5 +297,3 @@ const RowEditor = ({
     </SidePanel>
   )
 }
-
-export default RowEditor

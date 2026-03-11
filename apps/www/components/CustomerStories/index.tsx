@@ -1,17 +1,19 @@
-import { PropsWithChildren } from 'react'
-import dynamic from 'next/dynamic'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useTheme } from 'next-themes'
-import { ArrowRight } from 'lucide-react'
+'use client'
 
+import { ArrowRight } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
+import Link from 'next/link'
+import { PropsWithChildren } from 'react'
+
+import SectionHeader from 'components/UI/SectionHeader'
 import { Button, cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import SectionHeader from 'components/UI/SectionHeader'
 import Panel from '~/components/Panel'
 
-import customerStories from '~/data/CustomerStories'
 import type { CustomerStoryType } from '~/data/CustomerStories'
+import customerStories from '~/data/CustomerStories'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 const CustomersSliderMobile = dynamic(() => import('./CustomersSliderMobile'))
@@ -21,8 +23,8 @@ const CustomerStories = () => (
   <div id="customers" className="overflow-hidden pb-16 md:pb-24">
     <SectionContainer className="!pb-8 w-full flex gap-4 justify-between flex-col xl:flex-row xl:items-end">
       <SectionHeader
-        title="Infrastructure"
-        title_alt=" to innovate and scale with ease."
+        title="Trusted by the world’s"
+        title_alt=" most innovative companies."
         subtitle="Customer Stories"
         paragraph="See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work."
         className="xl:w-1/2"
@@ -32,7 +34,7 @@ const CustomerStories = () => (
           <Link href="/customers">View all stories</Link>
         </Button>
         <Button asChild type="default">
-          <Link href="/events">View Events</Link>
+          <Link href="/events">View events</Link>
         </Button>
       </div>
     </SectionContainer>

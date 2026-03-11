@@ -1,6 +1,7 @@
-import { expect, test, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, expect, test } from 'vitest'
+
 import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -68,7 +69,7 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   )
 
   // Update publication
-  const { sql: updateSql } = pgMeta.publications.update(res!, {
+  const { sql: updateSql } = pgMeta.publications.update(res!.id, {
     name: 'b',
     publish_insert: false,
     tables: [],
@@ -150,12 +151,9 @@ withTestDatabase('tables with uppercase', async ({ executeQuery }) => {
   )
 
   // Update publication
-  const { sql: updateSql } = pgMeta.publications.update(
-    { id: res!.id },
-    {
-      tables: ['T'],
-    }
-  )
+  const { sql: updateSql } = pgMeta.publications.update(res!.id, {
+    tables: ['T'],
+  })
   await executeQuery(updateSql)
 
   // Verify update
@@ -241,7 +239,7 @@ withTestDatabase('update no tables -> all tables', async ({ executeQuery }) => {
   const res = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update publication
-  const { sql: updateSql } = pgMeta.publications.update(res!, {
+  const { sql: updateSql } = pgMeta.publications.update(res!.id, {
     tables: null,
   })
   await executeQuery(updateSql)
@@ -287,7 +285,7 @@ withTestDatabase('update all tables -> no tables', async ({ executeQuery }) => {
   const res = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update publication
-  const { sql: updateSql } = pgMeta.publications.update(res!, {
+  const { sql: updateSql } = pgMeta.publications.update(res!.id, {
     tables: [],
   })
   await executeQuery(updateSql)

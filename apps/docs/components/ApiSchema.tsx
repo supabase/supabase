@@ -6,11 +6,11 @@ import { Tabs, TabPanel } from '~/features/ui/Tabs'
 type IParamProps = any
 
 const ApiSchema = ({ schema, id }: IParamProps) => {
-  let example: string
+  let example: string | undefined
   try {
     example = sample(schema, { skipReadOnly: true, quiet: true })
   } catch {
-    // ignore
+    example = undefined
   }
   return (
     <Tabs

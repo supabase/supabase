@@ -5,6 +5,7 @@ import { Button, Form, Input, Modal, Tooltip, TooltipContent, TooltipTrigger } f
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { DOCS_URL } from 'lib/constants'
 import { HelpCircle } from 'lucide-react'
 import {
   checkIfPrivate,
@@ -36,7 +37,7 @@ const AddRestrictionModal = ({
   const ipv6Restrictions = data?.config?.dbAllowedCidrsV6 ?? []
   const restrictedIps = ipv4Restrictions.concat(ipv6Restrictions)
 
-  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => {
         toast.success('Successfully added restriction')
@@ -165,7 +166,7 @@ const AddRestrictionModal = ({
                   title="Note: Restrictions only apply to direct connections to your database and connection pooler"
                   description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
                   urlLabel="Learn more"
-                  url="https://supabase.com/docs/guides/platform/network-restrictions#limitations"
+                  url={`${DOCS_URL}/guides/platform/network-restrictions#limitations`}
                 />
                 <div className="flex space-x-4">
                   <div className="w-[55%]">
@@ -216,12 +217,13 @@ const AddRestrictionModal = ({
               {isValidCIDR ? (
                 <Modal.Content className="space-y-1">
                   <p className="text-sm">
-                    The address range <code className="text-xs">{normalizedAddress}</code> will be
-                    restricted
+                    The address range <code className="text-code-inline">{normalizedAddress}</code>{' '}
+                    will be restricted
                   </p>
                   <p className="text-sm text-foreground-light">
-                    Selected address space: <code className="text-xs">{addressRange.start}</code> to{' '}
-                    <code className="text-xs">{addressRange.end}</code>{' '}
+                    Selected address space:{' '}
+                    <code className="text-code-inline">{addressRange.start}</code> to{' '}
+                    <code className="text-code-inline">{addressRange.end}</code>{' '}
                   </p>
                   <p className="text-sm text-foreground-light">
                     Number of addresses: {availableAddresses}

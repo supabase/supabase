@@ -3,7 +3,7 @@ import { RotateCcw } from 'lucide-react'
 
 import { Button } from 'ui'
 
-function InputResetButton({ isDirty, onClick }: { isDirty: boolean; onClick: () => void }) {
+export function InputResetButton({ isDirty, onClick }: { isDirty: boolean; onClick: () => void }) {
   return (
     <AnimatePresence initial={false}>
       {isDirty && (
@@ -28,5 +28,3 @@ function InputResetButton({ isDirty, onClick }: { isDirty: boolean; onClick: () 
     </AnimatePresence>
   )
 }
-
-export { InputResetButton }

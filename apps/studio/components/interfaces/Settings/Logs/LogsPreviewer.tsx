@@ -1,33 +1,82 @@
-import dayjs from 'dayjs'
-import { Rewind } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import dayjs from 'dayjs'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import useSingleLog from 'hooks/analytics/useSingleLog'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { Rewind } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import LogTable from './LogTable'
-import { DatePickerValue } from './Logs.DatePickers'
+
 import {
-  LOGS_TABLES,
   LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LOGS_TABLES,
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from './Logs.constants'
+import { DatePickerValue } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
-import { maybeShowUpgradePrompt } from './Logs.utils'
+import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
+import { LogTable } from './LogTable'
 import UpgradePrompt from './UpgradePrompt'
+
+/**
+ * Calculates the appropriate time range for bar click filtering based on the current time range duration.
+ *
+ * @param currentRangeStart - The start timestamp of the current time range
+ * @param currentRangeEnd - The end timestamp of the current time range
+ * @param clickedTimestamp - The timestamp of the clicked bar
+ * @returns Object containing the new start and end timestamps for filtering
+ */
+export const calculateBarClickTimeRange = (
+  currentRangeStart: string,
+  currentRangeEnd: string | undefined,
+  clickedTimestamp: string
+) => {
+  const datumTimestamp = dayjs(clickedTimestamp).toISOString()
+
+  // Calculate the current time range duration in hours
+  // If currentRangeEnd is not provided, use current time as the end
+  const endTime = currentRangeEnd ? dayjs(currentRangeEnd) : dayjs()
+  const currentRangeDuration = endTime.diff(dayjs(currentRangeStart), 'hour', true)
+
+  let rangeOffset: number
+  let rangeUnit: dayjs.ManipulateType
+
+  if (currentRangeDuration >= 12) {
+    // For ranges >= 12h, use 1h range
+    rangeOffset = 0.5
+    rangeUnit = 'hour'
+  } else if (currentRangeDuration >= 1) {
+    // For ranges >= 1h but < 12h, use 5min range
+    rangeOffset = 2.5
+    rangeUnit = 'minute'
+  } else if (currentRangeDuration >= 1 / 30) {
+    // 2 minutes = 1/30 hour
+    // For ranges >= 2min but < 1h, use 2min range
+    rangeOffset = 1
+    rangeUnit = 'minute'
+  } else {
+    // For ranges < 2min, use 15sec range
+    rangeOffset = 7.5
+    rangeUnit = 'second'
+  }
+
+  return {
+    start: dayjs(datumTimestamp).subtract(rangeOffset, rangeUnit).toISOString(),
+    end: dayjs(datumTimestamp).add(rangeOffset, rangeUnit).toISOString(),
+  }
+}
 
 /**
  * Acts as a container component for the entire log display
@@ -60,7 +109,7 @@ export const LogsPreviewer = ({
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { db } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [showChart, setShowChart] = useState(true)
@@ -70,6 +119,18 @@ export const LogsPreviewer = ({
 
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange, filters, setFilters } =
     useLogsUrlState()
+
+  useEffect(() => {
+    if (timestampStart && timestampEnd) {
+      setSelectedDatePickerValue({
+        to: timestampEnd,
+        from: timestampStart,
+        text: `${dayjs(timestampStart).format('DD MMM, HH:mm')} - ${dayjs(timestampEnd).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      })
+    }
+  }, [timestampStart, timestampEnd])
+
   const [selectedLogId, setSelectedLogId] = useSelectedLog()
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
 
@@ -143,6 +204,9 @@ export const LogsPreviewer = ({
     refresh()
   }
 
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
+
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
       setSearch(query || '')
@@ -150,8 +214,10 @@ export const LogsPreviewer = ({
     } else if (event === 'event-chart-bar-click') {
       setTimeRange(from || '', to || '')
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from || '', organization?.plan?.id)
-
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        from || '',
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       } else {
@@ -163,7 +229,10 @@ export const LogsPreviewer = ({
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
@@ -186,39 +255,42 @@ export const LogsPreviewer = ({
     }
   }, [db, isSuccess])
 
+  // Common props shared between both filter panel components to avoid duplication
+  const filterPanelProps = {
+    className: filterPanelClassName,
+    csvData: logData,
+    isLoading,
+    newCount,
+    onRefresh: handleRefresh,
+    onSearch: handleSearch,
+    defaultSearchValue: search,
+    defaultToValue: timestampEnd,
+    defaultFromValue: timestampStart,
+    queryUrl: `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
+      params.sql || ''
+    )}&its=${encodeURIComponent(timestampStart)}&ite=${encodeURIComponent(timestampEnd)}`,
+    onSelectTemplate,
+    filters,
+    onFiltersChange: setFilters,
+    table,
+    condensedLayout,
+    isShowingEventChart: showChart,
+    onToggleEventChart: () => setShowChart(!showChart),
+    onSelectedDatabaseChange: (id: string) => {
+      setFilters({ ...filters, database: id !== projectRef ? id : undefined })
+      const { db, ...params } = router.query
+      router.push({
+        pathname: router.pathname,
+        query: id !== projectRef ? { ...router.query, db: id } : params,
+      })
+    },
+    selectedDatePickerValue,
+    setSelectedDatePickerValue,
+  }
+
   return (
     <div className="flex-1 flex flex-col h-full">
-      <PreviewFilterPanel
-        className={filterPanelClassName}
-        csvData={logData}
-        isLoading={isLoading}
-        newCount={newCount}
-        onRefresh={handleRefresh}
-        onSearch={handleSearch}
-        defaultSearchValue={search}
-        defaultToValue={timestampEnd}
-        defaultFromValue={timestampStart}
-        queryUrl={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
-          params.sql || ''
-        )}&its=${encodeURIComponent(timestampStart)}&ite=${encodeURIComponent(timestampEnd)}`}
-        onSelectTemplate={onSelectTemplate}
-        filters={filters}
-        onFiltersChange={setFilters}
-        table={table}
-        condensedLayout={condensedLayout}
-        isShowingEventChart={showChart}
-        onToggleEventChart={() => setShowChart(!showChart)}
-        onSelectedDatabaseChange={(id: string) => {
-          setFilters({ ...filters, database: id !== projectRef ? id : undefined })
-          const { db, ...params } = router.query
-          router.push({
-            pathname: router.pathname,
-            query: id !== projectRef ? { ...router.query, db: id } : params,
-          })
-        }}
-        selectedDatePickerValue={selectedDatePickerValue}
-        setSelectedDatePickerValue={setSelectedDatePickerValue}
-      />
+      <PreviewFilterPanel {...filterPanelProps} />
       {children}
       <div
         className={
@@ -233,10 +305,11 @@ export const LogsPreviewer = ({
               onBarClick={(datum) => {
                 if (!datum?.timestamp) return
 
-                const datumTimestamp = dayjs(datum.timestamp).toISOString()
-
-                const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
-                const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+                const { start, end } = calculateBarClickTimeRange(
+                  timestampStart,
+                  timestampEnd,
+                  datum.timestamp
+                )
 
                 handleSearch('event-chart-bar-click', {
                   query: filters.search_query?.toString(),
@@ -246,7 +319,7 @@ export const LogsPreviewer = ({
               }}
               EmptyState={
                 <div className="flex flex-col items-center justify-center h-[67px]">
-                  <h2 className="text-foreground-light text-xs">No data</h2>
+                  <p className="text-foreground-light text-xs">No data</p>
                   <p className="text-foreground-lighter text-xs">
                     It may take up to 24 hours for data to refresh
                   </p>
@@ -297,5 +370,3 @@ export const LogsPreviewer = ({
     </div>
   )
 }
-
-export default LogsPreviewer

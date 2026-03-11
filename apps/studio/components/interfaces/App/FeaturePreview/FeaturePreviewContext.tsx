@@ -1,65 +1,19 @@
-import { noop } from 'lodash'
-
-import { FeatureFlagContext } from 'common'
-import { useFlag } from 'hooks/ui/useFlag'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { EMPTY_OBJ } from 'lib/void'
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
-import { APISidePanelPreview } from './APISidePanelPreview'
-import { CLSPreview } from './CLSPreview'
-import { InlineEditorPreview } from './InlineEditorPreview'
-import { LayoutUpdatePreview } from './LayoutUpdatePreview'
-import { SqlEditorTabsPreview } from './SqlEditorTabs'
-import { TableEditorTabsPreview } from './TableEditorTabs'
+import { noop } from 'lodash'
+import { useQueryState } from 'nuqs'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from 'react'
 
-export const FEATURE_PREVIEWS = [
-  {
-    key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
-    name: 'Layout Update for Organizations',
-    content: <LayoutUpdatePreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33670',
-    isNew: false,
-    isPlatformOnly: true,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    name: 'Directly edit database entities',
-    content: <InlineEditorPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
-    isNew: true,
-    isPlatformOnly: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
-    name: 'Table Editor Tabs',
-    content: <TableEditorTabsPreview />,
-    isNew: true,
-    isPlatformOnly: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
-    name: 'SQL Editor Tabs',
-    content: <SqlEditorTabsPreview />,
-    isNew: true,
-    isPlatformOnly: true,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-    name: 'Project API documentation',
-    content: <APISidePanelPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    isNew: false,
-    isPlatformOnly: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
-    name: 'Column-level privileges',
-    content: <CLSPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
-    isNew: false,
-    isPlatformOnly: false,
-  },
-]
+import { useFeaturePreviews } from './useFeaturePreviews'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -75,38 +29,30 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const enableNewLayoutPreview = useFlag('newLayoutPreview')
-
-  // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
-  const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
-    switch (feature.key) {
-      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
-        return enableNewLayoutPreview
-      default:
-        return false
-    }
-  }
+  const featurePreviews = useFeaturePreviews()
 
   const [flags, setFlags] = useState(() =>
-    FEATURE_PREVIEWS.reduce((a, b) => {
-      return { ...a, [b.key]: false }
-    }, {})
+    featurePreviews.reduce((a, b) => ({ ...a, [b.key]: false }), {})
   )
+
+  const initializeFlags = useStaticEffectEvent(() => {
+    setFlags(
+      featurePreviews.reduce((a, b) => {
+        const defaultOptIn = b.isDefaultOptIn
+        const localStorageValue = localStorage.getItem(b.key)
+        return {
+          ...a,
+          [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+        }
+      }, {})
+    )
+  })
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setFlags(
-        FEATURE_PREVIEWS.reduce((a, b) => {
-          const defaultOptIn = isDefaultOptIn(b)
-          const localStorageValue = localStorage.getItem(b.key)
-          return {
-            ...a,
-            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
-          }
-        }, {})
-      )
+      initializeFlags()
     }
-  }, [hasLoaded])
+  }, [hasLoaded, initializeFlags])
 
   const value = {
     flags,
@@ -134,24 +80,86 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
 }
 
-export const useIsInlineEditorEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
+export const useUnifiedLogsPreview = () => {
+  const { flags, onUpdateFlag } = useFeaturePreviewContext()
+  const unifiedLogsEnabled = useFlag('unifiedLogs')
+
+  const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+
+  const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
+  const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
+
+  return { isEnabled, enable, disable }
 }
 
-export const useIsTableEditorTabsEnabled = () => {
+export const useIsBranching2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
 }
 
-export const useIsSQLEditorTabsEnabled = () => {
+export const useIsPgDeltaDiffEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  if (!IS_PLATFORM) return false
-  return flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
+  return pgDeltaDiffEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
 }
 
-export const useIsNewLayoutEnabled = (): boolean => {
+export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  if (!IS_PLATFORM) return false
-  return flags[LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+}
+
+export const useIsQueueOperationsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
+}
+
+export const useIsPlatformWebhooksEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const platformWebhooksEnabled = useFlag('platformWebhooks')
+  return platformWebhooksEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]
+}
+
+export const useIsTableFilterBarEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
+}
+
+export const useFeaturePreviewModal = () => {
+  const featurePreviews = useFeaturePreviews()
+  const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
+
+  const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
+  const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
+
+  const selectedFeatureKey = (
+    !selectedFeatureKeyFromQuery ? featurePreviews[0].key : selectedFeatureKeyFromQuery
+  ) as (typeof featurePreviews)[number]['key']
+
+  const selectFeaturePreview = useCallback(
+    (featureKey: (typeof featurePreviews)[number]['key']) => {
+      setFeaturePreviewModal(featureKey)
+    },
+    [setFeaturePreviewModal]
+  )
+
+  const toggleFeaturePreviewModal = useCallback(
+    (value: boolean) => {
+      if (!value) {
+        setFeaturePreviewModal(null)
+      } else {
+        selectFeaturePreview(selectedFeatureKey)
+      }
+    },
+    [selectFeaturePreview, setFeaturePreviewModal, selectedFeatureKey]
+  )
+
+  return useMemo(
+    () => ({
+      showFeaturePreviewModal,
+      selectedFeatureKey,
+      selectFeaturePreview,
+      toggleFeaturePreviewModal,
+    }),
+    [showFeaturePreviewModal, selectedFeatureKey, selectFeaturePreview, toggleFeaturePreviewModal]
+  )
 }

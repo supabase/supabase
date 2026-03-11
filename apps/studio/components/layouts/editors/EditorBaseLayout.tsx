@@ -1,49 +1,76 @@
+import { useParams } from 'common'
 import { usePathname } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
-
-import { useParams } from 'common'
-import {
-  useIsSQLEditorTabsEnabled,
-  useIsTableEditorTabsEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
-import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
+
+import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
-  hideTabs?: boolean
   title?: string
   product?: string
+  productMenuClassName?: string
 }
 
-export const EditorBaseLayout = ({ children, title, product, ...props }: ExplorerLayoutProps) => {
+export const EditorBaseLayout = ({
+  children,
+  title,
+  product,
+  productMenuClassName,
+  productMenu,
+  browserTitle,
+}: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
   const editor = useEditorType()
+  const tabs = useTabsStateSnapshot()
 
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
-  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+  const hasNoOpenTabs =
+    editor === 'table' ? tabs.openTabs.filter((x) => !x.startsWith('sql')).length === 0 : false
+  const hideTabs =
+    pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql` || hasNoOpenTabs
 
-  const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
-  const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
-  const hideTabs = pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql`
+  const activeEditorTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
+  const activeEditorTabEntity =
+    activeEditorTab === undefined
+      ? undefined
+      : editor === 'sql'
+        ? activeEditorTab.type === 'sql'
+          ? activeEditorTab.metadata?.name || activeEditorTab.label
+          : undefined
+        : editor === 'table'
+          ? activeEditorTab.type !== 'sql'
+            ? activeEditorTab.metadata?.name || activeEditorTab.label
+            : undefined
+          : undefined
+
+  const mergedBrowserTitle = {
+    ...browserTitle,
+    entity: browserTitle?.entity ?? activeEditorTabEntity,
+  }
 
   return (
-    <ProjectLayoutWithAuth resizableSidebar={true} title={title} product={product} {...props}>
+    <ProjectLayoutWithAuth
+      resizableSidebar
+      title={title}
+      product={product}
+      browserTitle={mergedBrowserTitle}
+      productMenuClassName={productMenuClassName}
+      productMenu={productMenu}
+    >
       <div className="flex flex-col h-full">
-        {tableEditorTabsEnabled || sqlEditorTabsEnabled ? (
-          <div
-            className={cn(
-              'h-10 flex items-center',
-              !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
-            )}
-          >
-            {hideTabs ? <CollapseButton hideTabs={hideTabs} /> : <EditorTabs />}
-          </div>
-        ) : null}
+        <div
+          className={cn(
+            'h-10 md:min-h-[var(--header-height)] flex items-center',
+            !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
+          )}
+        >
+          {hideTabs ? <CollapseButton hideTabs={hideTabs} /> : <EditorTabs />}
+        </div>
         <div className="h-full">{children}</div>
       </div>
     </ProjectLayoutWithAuth>

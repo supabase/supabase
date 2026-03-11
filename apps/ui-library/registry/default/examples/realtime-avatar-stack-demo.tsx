@@ -1,12 +1,14 @@
 'use client'
 
-import { AvatarStack } from '@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack'
-import { RealtimeUser } from '@/registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room'
-import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
+import { REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
 import { useUser } from 'common'
 import { useEffect, useMemo, useState } from 'react'
 import { Label_Shadcn_, Switch } from 'ui'
+
 import { getRandomUser } from './utils'
+import { AvatarStack } from '@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack'
+import { RealtimeUser } from '@/registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room'
+import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 
 const supabase = createClient()
 const roomName = 'realtime-avatar-stack-demo'
@@ -57,14 +59,14 @@ const RealtimeAvatarStackDemo = () => {
         setUsersMap(newUsers)
       })
       .subscribe(async (status) => {
-        if (status !== 'SUBSCRIBED') {
-          return
+        if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
+          await room.track({
+            name: currentUserName,
+            image: currentUserImage,
+          })
+        } else {
+          setUsersMap(null)
         }
-
-        await room.track({
-          name: currentUserName,
-          image: currentUserImage,
-        })
       })
 
     return () => {

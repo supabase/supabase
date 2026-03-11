@@ -10,16 +10,17 @@ Claims returned must conform to our specification. Supabase Auth will check for 
 
 These are the fields currently available on an access token:
 
-Required Claims: `iss`, `aud`, `exp`, `iat`, `sub`, `role`, `aal`, `session_id`
-Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`, `email`, `phone`
+Required Claims: `iss`, `aud`, `exp`, `iat`, `sub`, `role`, `aal`, `session_id`, `email`, `phone`, `is_anonymous`
+
+Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
 
 **Inputs**
 
-| Field                   | Type     | Description                                                                                                                                                                                                                           |
-| ----------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `user_id`               | `string` | Unique identifier for the user attempting to sign in.                                                                                                                                                                                 |
-| `claims`                | `object` | Claims which are included in the access token.                                                                                                                                                                                        |
-| `authentication_method` | `string` | The authentication method used to request the access token. Possible values include: `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`, `anonymous`. |
+| Field                   | Type     | Description                                                                                                                                                                                                                                                                |
+| ----------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `user_id`               | `string` | Unique identifier for the user attempting to sign in.                                                                                                                                                                                                                      |
+| `claims`                | `object` | Claims which are included in the access token.                                                                                                                                                                                                                             |
+| `authentication_method` | `string` | The authentication method used to request the access token. Possible values include: `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`, `oauth_provider/authorization_code`, `anonymous`. |
 
 <Tabs
   scrollable
@@ -44,7 +45,8 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`, `email`, 
     "aal": "aal1",
     "amr": [ { "method": "anonymous", "timestamp": 1715686621 } ],
     "session_id": "4b938a09-5372-4177-a314-cfa292099ea2",
-    "is_anonymous": true
+    "is_anonymous": true,
+    "client_id": "oauth-client-id-if-oauth-flow"
   },
   "authentication_method": "anonymous"
 }
@@ -142,6 +144,10 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`, `email`, 
         "is_anonymous": {
           "type": "boolean",
           "x-faker": "random.boolean"
+        },
+        "client_id": {
+          "type": "string",
+          "x-faker": "random.uuid"
         }
       },
       "required": [
@@ -174,6 +180,7 @@ Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`, `email`, 
         "email/signup",
         "email_change",
         "token_refresh",
+        "oauth_provider/authorization_code",
         "anonymous"
       ]
     }
@@ -241,7 +248,10 @@ as $$
       'sub',
       'role',
       'aal',
-      'session_id'
+      'session_id',
+      'email',
+      'phone',
+      'is_anonymous'
    ] loop
       if original_claims ? claim then
         -- original_claims contains one of the listed claims, set it on new_claims
@@ -303,58 +313,6 @@ as $$
     -- Return the modified or original event
     return event;
   end;
-$$;
-
-grant all
-  on table public.profiles
-  to supabase_auth_admin;
-
-revoke all
-  on table public.profiles
-  from authenticated, anon, public;
-```
-
-</TabPanel>
-<TabPanel id="add-metadata-claim-plv8" label="Add claim via plv8">
-You can add custom claims to the access token. In this example, we fetch the level of an existing user from the `profiles` table and assign new users a default level of zero.
-
-For convenience, we enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions) to run JavaScript within our query.
-
-Create a `profiles` table to hold information:
-
-```sql
-create table profiles (
-  user_id uuid not null primary key references auth.users (id),
-  level integer,
-  is_admin boolean not null default false
-);
-```
-
-```sql
-create or replace function custom_access_token_hook(event jsonb)
-returns jsonb
-language plv8
-as $$
-  var user_level;
-
-  -- Fetch the current user's level from the profiles table
-  var result = plv8.execute("select level from public.profiles where user_id = $1", [event.user_id]);
-  if (result.length > 0) {
-    user_level = result[0].level;
-  } else {
-    -- Assign a default level of 0 if no level is found
-    user_level = 0;
-  }
-
-  -- Check if 'claims' exists in the event object; if not, initialize it
-  if (!event.claims) {
-    event.claims = {};
-  }
-
-  -- Update the level in the claims
-  event.claims.level = user_level;
-
-  return event;
 $$;
 
 grant all

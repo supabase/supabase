@@ -1,16 +1,19 @@
+import { useParams } from 'common'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
+import CopyButton from 'components/ui/CopyButton'
+import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { ExternalLink, Loader2 } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
-
-import { useParams } from 'common'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import CopyButton from 'components/ui/CopyButton'
-import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import Results from './Results'
 
 export type UtilityTabResultsProps = {
@@ -18,14 +21,15 @@ export type UtilityTabResultsProps = {
   isExecuting?: boolean
   isDisabled?: boolean
   onDebug: () => void
+  buildDebugPrompt: () => string
   isDebugging?: boolean
 }
 
 const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
-  ({ id, isExecuting, isDisabled, isDebugging, onDebug }) => {
+  ({ id, isExecuting, isDisabled, isDebugging, onDebug, buildDebugPrompt }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
-    const organization = useSelectedOrganization()
+    const { data: organization } = useSelectedOrganizationQuery()
     const snapV2 = useSqlEditorV2StateSnapshot()
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
@@ -33,7 +37,8 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
     const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
     // Customers on HIPAA plans should not have access to Supabase AI
-    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
+    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
     const isTimeout =
       result?.error?.message?.includes('canceling statement due to statement timeout') ||
@@ -70,11 +75,13 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 </p>
                 <p className="text-sm text-foreground-light">
                   You can either{' '}
-                  <InlineLink href="https://supabase.com/docs/guides/platform/performance#examining-query-performance">
+                  <InlineLink
+                    href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
+                  >
                     optimize your query
                   </InlineLink>
                   , or{' '}
-                  <InlineLink href="https://supabase.com/docs/guides/database/timeouts">
+                  <InlineLink href={`${DOCS_URL}/guides/database/timeouts`}>
                     increase the statement timeout
                   </InlineLink>
                   {' or '}
@@ -133,7 +140,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                   type="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
-                    snapV2.resetResult(id)
+                    snapV2.resetResults(id)
                   }}
                 >
                   Switch to primary database
@@ -150,13 +157,14 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 </Tooltip>
               )}
               {!hasHipaaAddon && (
-                <Button
-                  icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugging} />}
+                <AiAssistantDropdown
+                  label="Debug with Assistant"
+                  buildPrompt={buildDebugPrompt}
+                  onOpenAssistant={onDebug}
+                  telemetrySource="sql_debug"
                   disabled={!!isDisabled || isDebugging}
-                  onClick={onDebug}
-                >
-                  Debug with Supabase AI
-                </Button>
+                  loading={isDebugging}
+                />
               )}
             </div>
           </div>

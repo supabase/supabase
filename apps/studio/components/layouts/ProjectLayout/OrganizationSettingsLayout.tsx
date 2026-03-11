@@ -1,87 +1,246 @@
-import Link from 'next/link'
+import Head from 'next/head'
 import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import type { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
+import { WithSidebar } from 'components/layouts/AccountLayout/WithSidebar'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import { NavMenu, NavMenuItem } from 'ui'
-import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
-function OrganizationSettingsLayout({ children }: PropsWithChildren) {
-  const newLayoutPreview = useIsNewLayoutEnabled()
+interface OrganizationSettingsMenuItemsProps {
+  slug?: string
+  showSecuritySettings?: boolean
+  showSsoSettings?: boolean
+  showLegalDocuments?: boolean
+  showPlatformWebhooks?: boolean
+}
 
-  const { slug } = useParams()
-  const fullCurrentPath = useCurrentPath()
-  // Get the path without any hash values
-  const [currentPath] = fullCurrentPath.split('#')
+interface OrganizationSettingsSectionsProps extends OrganizationSettingsMenuItemsProps {
+  currentPath: string
+}
 
-  // hide these settings in the new layout
-  // when path equals `/org/${slug}/team`
-  // or `/org/${slug}/integrations`
-  // or `/org/${slug}/usage`
-  // make the function
-  const isHidden = (path: string) => {
-    return (
-      newLayoutPreview &&
-      (path === `/org/${slug}/team` ||
-        path === `/org/${slug}/integrations` ||
-        path === `/org/${slug}/usage` ||
-        path === `/org/${slug}/billing`)
-    )
-  }
+interface OrganizationSettingsLayoutProps {
+  pageTitle?: string
+}
 
-  if (isHidden(currentPath)) {
-    return children
-  }
+export const normalizeOrganizationSettingsPath = (path: string) => path.split('#')[0]
+export const getOrganizationSettingsPageTitle = (pageTitle?: string) => pageTitle ?? 'Settings'
+export const getOrganizationSettingsDocumentTitle = (
+  pageTitle: string | undefined,
+  title: string
+) => `${getOrganizationSettingsPageTitle(pageTitle)} | ${title}`
 
-  const navMenuItems = [
+export const generateOrganizationSettingsMenuItems = ({
+  slug,
+  showSecuritySettings = true,
+  showSsoSettings = true,
+  showLegalDocuments = true,
+  showPlatformWebhooks = true,
+}: OrganizationSettingsMenuItemsProps) => [
+  {
+    key: 'general',
+    label: 'General',
+    href: `/org/${slug}/general`,
+  },
+  ...(showSecuritySettings
+    ? [
+        {
+          key: 'security',
+          label: 'Security',
+          href: `/org/${slug}/security`,
+        },
+      ]
+    : []),
+  {
+    key: 'apps',
+    label: 'OAuth Apps',
+    href: `/org/${slug}/apps`,
+  },
+  ...(showSsoSettings
+    ? [
+        {
+          key: 'sso',
+          label: 'SSO',
+          href: `/org/${slug}/sso`,
+        },
+      ]
+    : []),
+  ...(showPlatformWebhooks
+    ? [
+        {
+          key: 'webhooks',
+          label: 'Webhooks',
+          href: `/org/${slug}/webhooks`,
+        },
+      ]
+    : []),
+  {
+    key: 'audit',
+    label: 'Audit Logs',
+    href: `/org/${slug}/audit`,
+  },
+  ...(showLegalDocuments
+    ? [
+        {
+          key: 'documents',
+          label: 'Legal Documents',
+          href: `/org/${slug}/documents`,
+        },
+      ]
+    : []),
+]
+
+export const generateOrganizationSettingsSections = ({
+  currentPath,
+  slug,
+  showSecuritySettings = true,
+  showSsoSettings = true,
+  showLegalDocuments = true,
+  showPlatformWebhooks = true,
+}: OrganizationSettingsSectionsProps): SidebarSection[] => {
+  const isLinkActive = (key: string, href: string) =>
+    key === 'webhooks'
+      ? currentPath === href || currentPath.startsWith(`${href}/`)
+      : currentPath === href
+
+  const configurationLinks = [
     {
+      key: 'general',
       label: 'General',
       href: `/org/${slug}/general`,
     },
-    !newLayoutPreview && {
-      label: 'Team',
-      href: `/org/${slug}/team`,
-    },
-    !newLayoutPreview && {
-      label: 'Integrations',
-      href: `/org/${slug}/integrations`,
-    },
-    !newLayoutPreview && {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-    },
-    !newLayoutPreview && {
-      label: 'Usage',
-      href: `/org/${slug}/usage`,
-    },
+    ...(showSecuritySettings
+      ? [
+          {
+            key: 'security',
+            label: 'Security',
+            href: `/org/${slug}/security`,
+          },
+        ]
+      : []),
+    ...(showSsoSettings
+      ? [
+          {
+            key: 'sso',
+            label: 'SSO',
+            href: `/org/${slug}/sso`,
+          },
+        ]
+      : []),
+  ]
+
+  const connectionsLinks = [
     {
+      key: 'apps',
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
+    ...(showPlatformWebhooks
+      ? [
+          {
+            key: 'webhooks',
+            label: 'Webhooks',
+            href: `/org/${slug}/webhooks`,
+          },
+        ]
+      : []),
+  ]
+
+  const complianceLinks = [
     {
+      key: 'audit',
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
     },
+    ...(showLegalDocuments
+      ? [
+          {
+            key: 'documents',
+            label: 'Legal Documents',
+            href: `/org/${slug}/documents`,
+          },
+        ]
+      : []),
+  ]
+
+  return [
     {
-      label: 'Legal Documents',
-      href: `/org/${slug}/documents`,
+      key: 'configuration',
+      heading: 'Configuration',
+      links: configurationLinks.map((item) => ({
+        ...item,
+        isActive: isLinkActive(item.key, item.href),
+      })),
+    },
+    {
+      key: 'connections',
+      heading: 'Connections',
+      links: connectionsLinks.map((item) => ({
+        ...item,
+        isActive: isLinkActive(item.key, item.href),
+      })),
+    },
+    {
+      key: 'compliance',
+      heading: 'Compliance',
+      links: complianceLinks.map((item) => ({
+        ...item,
+        isActive: isLinkActive(item.key, item.href),
+      })),
     },
   ]
+}
+
+function OrganizationSettingsLayout({
+  children,
+  pageTitle,
+}: PropsWithChildren<OrganizationSettingsLayoutProps>) {
+  const { slug } = useParams()
+  const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
+  const fullCurrentPath = useCurrentPath()
+  const currentPath = normalizeOrganizationSettingsPath(fullCurrentPath)
+  const { appTitle } = useCustomContent(['app:title'])
+  const titleSuffix = appTitle || 'Supabase'
+
+  const {
+    organizationShowSsoSettings: showSsoSettings,
+    organizationShowSecuritySettings: showSecuritySettings,
+    organizationShowLegalDocuments: showLegalDocuments,
+  } = useIsFeatureEnabled([
+    'organization:show_sso_settings',
+    'organization:show_security_settings',
+    'organization:show_legal_documents',
+  ])
+
+  const sections = generateOrganizationSettingsSections({
+    currentPath,
+    slug,
+    showSecuritySettings,
+    showSsoSettings,
+    showLegalDocuments,
+    showPlatformWebhooks,
+  })
 
   return (
     <>
-      <ScaffoldContainerLegacy className="mb-0">
-        <ScaffoldTitle>Organization Settings</ScaffoldTitle>
-        <NavMenu className="overflow-x-auto" aria-label="Organization menu navigation">
-          {(navMenuItems.filter(Boolean) as { label: string; href: string }[]).map((item) => (
-            <NavMenuItem key={item.label} active={currentPath === item.href}>
-              <Link href={item.href}>{item.label}</Link>
-            </NavMenuItem>
-          ))}
-        </NavMenu>
-      </ScaffoldContainerLegacy>
-      <main className="h-full w-full overflow-y-auto">{children}</main>
+      <Head>
+        <title>{getOrganizationSettingsDocumentTitle(pageTitle, titleSuffix)}</title>
+        <meta name="description" content="Supabase Studio" />
+      </Head>
+      <WithSidebar
+        title="Organization Settings"
+        breadcrumbs={[]}
+        sections={sections}
+        header={
+          <div className="border-default flex min-h-[var(--header-height)] items-center border-b px-6">
+            <h4 className="text-lg">Settings</h4>
+          </div>
+        }
+      >
+        {children}
+      </WithSidebar>
     </>
   )
 }

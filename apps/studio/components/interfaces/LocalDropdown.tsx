@@ -1,10 +1,9 @@
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { Command, FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
-
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -19,14 +18,22 @@ import {
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
 
-export const LocalDropdown = () => {
+import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+
+export const LocalDropdown = ({
+  triggerClassName,
+  contentClassName,
+}: {
+  triggerClassName?: string
+  contentClassName?: string
+}) => {
   const { theme, setTheme } = useTheme()
-  const snap = useAppStateSnapshot()
   const setCommandMenuOpen = useSetCommandMenuOpen()
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="border flex-shrink-0 px-3" asChild>
+      <DropdownMenuTrigger className={cn('border flex-shrink-0 px-3', triggerClassName)} asChild>
         <Button
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
@@ -34,16 +41,19 @@ export const LocalDropdown = () => {
           <ProfileImage className="w-8 h-8 rounded-md" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-44">
+      <DropdownMenuContent side="bottom" align="end" className={cn('w-44', contentClassName)}>
         <DropdownMenuItem
-          className="flex gap-2"
-          onClick={() => snap.setShowFeaturePreviewModal(true)}
-          onSelect={() => snap.setShowFeaturePreviewModal(true)}
+          className="flex gap-2 cursor-pointer"
+          onClick={() => toggleFeaturePreviewModal(true)}
+          onSelect={() => toggleFeaturePreviewModal(true)}
         >
           <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Feature previews
         </DropdownMenuItem>
-        <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
+        <DropdownMenuItem
+          className="flex gap-2 cursor-pointer"
+          onClick={() => setCommandMenuOpen(true)}
+        >
           <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Command menu
         </DropdownMenuItem>
@@ -57,7 +67,11 @@ export const LocalDropdown = () => {
             }}
           >
             {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+              <DropdownMenuRadioItem
+                key={theme.value}
+                value={theme.value}
+                className="cursor-pointer"
+              >
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}

@@ -25,13 +25,13 @@ const Examples: Example[] = [
     title: 'Stripe Subscriptions Starter',
     description:
       'The all-in-one subscription starter kit for high-performance SaaS applications, powered by Stripe, Supabase, and Vercel.',
-    author: 'Vercel',
-    author_url: 'https://github.com/vercel',
-    author_img: 'https://avatars.githubusercontent.com/u/14985020',
-    repo_name: 'vercel/nextjs-subscription-payments',
-    repo_url: 'https://github.com/vercel/nextjs-subscription-payments',
+    author: 'Supabase Community',
+    author_url: 'https://github.com/supabase-community',
+    author_img: 'https://avatars.githubusercontent.com/u/54469796',
+    repo_name: 'supabase-community/nextjs-subscription-payments',
+    repo_url: 'https://github.com/supabase-community/nextjs-subscription-payments',
     vercel_deploy_url:
-      'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnextjs-subscription-payments&env=NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,STRIPE_SECRET_KEY&envDescription=Enter%20your%20Stripe%20API%20keys.&envLink=https%3A%2F%2Fdashboard.stripe.com%2Fapikeys&project-name=nextjs-subscription-payments&repository-name=nextjs-subscription-payments&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnextjs-subscription-payments%2Ftree%2Fmain',
+      'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase-community%2Fnextjs-subscription-payments&env=NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,STRIPE_SECRET_KEY&envDescription=Enter%20your%20Stripe%20API%20keys.&envLink=https%3A%2F%2Fdashboard.stripe.com%2Fapikeys&project-name=nextjs-subscription-payments&repository-name=nextjs-subscription-payments&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase-community%2Fnextjs-subscription-payments%2Ftree%2Fmain',
     demo_url: 'https://subscription-payments.vercel.app/',
   },
   {
@@ -292,7 +292,7 @@ const Examples: Example[] = [
     title: 'Huggingface Image Captioning',
     description:
       'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from Supabase Edge Functions.',
-    repo_url: 'https://supabase.com/docs/guides/functions/auth',
+    repo_url: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
   },
   {
     type: 'example',

@@ -1,15 +1,15 @@
-import { Clipboard, Expand } from 'lucide-react'
+import { Copy, Expand } from 'lucide-react'
 import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
-import { copyToClipboard } from 'lib/helpers'
 import {
   cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  copyToClipboard,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
 
@@ -53,7 +53,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
             }}
             onFocusCapture={(e) => e.stopPropagation()}
           >
-            <Clipboard size={14} />
+            <Copy size={12} />
             Copy cell content
           </ContextMenuItem_Shadcn_>
           <ContextMenuItem_Shadcn_
@@ -61,7 +61,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
             onSelect={() => setExpandCell(true)}
             onFocusCapture={(e) => e.stopPropagation()}
           >
-            <Expand size={14} />
+            <Expand size={12} />
             View cell content
           </ContextMenuItem_Shadcn_>
         </ContextMenuContent_Shadcn_>

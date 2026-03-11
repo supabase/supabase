@@ -1,12 +1,14 @@
+import AlertError from 'components/ui/AlertError'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-
-import AlertError from 'components/ui/AlertError'
-import NoSearchResults from 'components/ui/NoSearchResults'
 import { buttonVariants, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
+import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
@@ -17,6 +19,8 @@ const CATEGORIES = [
 ] as const
 
 export const AvailableIntegrations = () => {
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+
   const [selectedCategory, setSelectedCategory] = useQueryState(
     'category',
     parseAsString.withDefault('all').withOptions({ clearOnDefault: true })
@@ -26,16 +30,20 @@ export const AvailableIntegrations = () => {
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
 
-  const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
-    useInstalledIntegrations()
+  const { data: allIntegrations = [] } = useAvailableIntegrations()
+  const { installedIntegrations, error, isError, isLoading, isSuccess } = useInstalledIntegrations()
 
   const installedIds = installedIntegrations.map((i) => i.id)
 
   // available integrations for install
+  const availableIntegrations = integrationsWrappers
+    ? allIntegrations
+    : allIntegrations.filter((x) => !x.id.endsWith('_wrapper'))
   const integrationsByCategory =
     selectedCategory === 'all'
       ? availableIntegrations
       : availableIntegrations.filter((i) => i.type === selectedCategory)
+
   const filteredIntegrations = (
     search.length > 0
       ? integrationsByCategory.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))

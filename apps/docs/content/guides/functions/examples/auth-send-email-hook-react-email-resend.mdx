@@ -19,7 +19,7 @@ To get the most out of this guide, you’ll need to:
 - [Create a Resend API key](https://resend.com/api-keys)
 - [Verify your domain](https://resend.com/domains)
 
-Make sure you have the latest version of the [Supabase CLI](https://supabase.com/docs/guides/cli#installation) installed.
+Make sure you have the latest version of the [Supabase CLI](/docs/guides/cli#installation) installed.
 
 ### 1. Create Supabase function
 
@@ -41,7 +41,7 @@ import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { MagicLinkEmail } from './_templates/magic-link.tsx'
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string)
-const hookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string
+const hookSecret = (Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string).replace('v1,whsec_', '')
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') {
@@ -279,12 +279,12 @@ Store these secrets in your `.env` file.
 
 ```bash supabase/functions/.env
 RESEND_API_KEY=your_resend_api_key
-SEND_EMAIL_HOOK_SECRET=<base64_secret>
+SEND_EMAIL_HOOK_SECRET="v1,whsec_<base64_secret>"
 ```
 
 <Admonition type="note">
 
-You can generate the secret in the [Auth Hooks](/dashboard/project/_/auth/hooks) section of the Supabase dashboard. Make sure to remove the `v1,whsec_` prefix!
+You can generate the secret in the [Auth Hooks](/dashboard/project/_/auth/hooks) section of the Supabase dashboard.
 
 </Admonition>
 
@@ -294,7 +294,7 @@ Set the secrets from the `.env` file:
 supabase secrets set --env-file supabase/functions/.env
 ```
 
-Now your Supabase Edge Function will be triggered anytime an Auth Email needs to be send to the user!
+Now your Supabase Edge Function will be triggered anytime an Auth Email needs to be sent to the user!
 
 ## More resources
 

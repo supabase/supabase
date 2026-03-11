@@ -1,18 +1,31 @@
-import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
+import {
+  DiamondIcon,
+  Edit,
+  ExternalLink,
+  Fingerprint,
+  Hash,
+  InfoIcon,
+  Key,
+  Table2,
+} from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { Button, cn } from 'ui'
+import { useColumnEditionContext } from './ColumnEditionContext'
 
 // ReactFlow is scaling everything by the factor of 2
-const TABLE_NODE_WIDTH = 320
-const TABLE_NODE_ROW_HEIGHT = 40
+export const TABLE_NODE_WIDTH = 320
+export const TABLE_NODE_ROW_HEIGHT = 40
 
 export type TableNodeData = {
-  id?: number
+  id: number
+  schema: string
   name: string
-  ref: string
+  ref?: string
   isForeign: boolean
+  description: string
   columns: {
     id: string
     isPrimary: boolean
@@ -24,7 +37,7 @@ export type TableNodeData = {
   }[]
 }
 
-const TableNode = ({
+export const TableNode = ({
   data,
   targetPosition,
   sourcePosition,
@@ -33,13 +46,14 @@ const TableNode = ({
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
+  const columnEditionContext = useColumnEditionContext()
 
   const itemHeight = 'h-[22px]'
 
   return (
     <>
       {data.isForeign ? (
-        <header className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative text-default flex gap-1 items-center">
+        <header className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center">
           {data.name}
           {targetPosition && (
             <Handle
@@ -57,7 +71,7 @@ const TableNode = ({
         >
           <header
             className={cn(
-              'text-[0.55rem] pl-2 pr-1 bg-alternative text-default flex items-center justify-between',
+              'text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center justify-between',
               itemHeight
             )}
           >
@@ -65,13 +79,30 @@ const TableNode = ({
               <Table2 strokeWidth={1} size={12} className="text-light" />
               {data.name}
             </div>
-            {data.id && !placeholder && (
-              <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={`/project/${data.ref}/editor/${data.id}`}>
-                  <ExternalLink size={10} className="text-foreground-light" />
-                </Link>
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {data.description && (
+                <Tooltip>
+                  <TooltipTrigger asChild className="cursor-default ">
+                    <InfoIcon size={10} className="text-light" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{data.description}</TooltipContent>
+                </Tooltip>
+              )}
+
+              {!placeholder && (
+                <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
+                  <Link
+                    href={buildTableEditorUrl({
+                      projectRef: data.ref,
+                      tableId: data.id,
+                      schema: data.schema,
+                    })}
+                  >
+                    <ExternalLink size={10} className="text-foreground-light" />
+                  </Link>
+                </Button>
+              )}
+            </div>
           </header>
 
           {data.columns.map((column) => (
@@ -82,6 +113,8 @@ const TableNode = ({
                 'border-t',
                 'border-t-[0.5px]',
                 'hover:bg-scale-500 transition cursor-default',
+                'group',
+                'pr-1',
                 itemHeight
               )}
               key={column.id}
@@ -125,7 +158,7 @@ const TableNode = ({
                 <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[85px]">
                   {column.name}
                 </span>
-                <span className="px-2 inline-flex justify-end font-mono text-lighter text-[0.4rem]">
+                <span className="pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem] group-hover:hidden">
                   {column.format}
                 </span>
               </div>
@@ -145,6 +178,23 @@ const TableNode = ({
                   className={cn(hiddenNodeConnector, '!right-0')}
                 />
               )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="text"
+                    className="hidden group-hover:inline-block absolute right-0 px-0 mr-1 w-[16px] h-[16px] rounded"
+                    onClick={() => {
+                      columnEditionContext.onEditColumn(data.id, column.id)
+                    }}
+                  >
+                    <Edit size={10} className="text-foreground-light" />
+                    <span className="sr-only">
+                      Edit {data.name} {column.name} column
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Edit column</TooltipContent>
+              </Tooltip>
             </div>
           ))}
         </div>
@@ -152,5 +202,3 @@ const TableNode = ({
     </>
   )
 }
-
-export { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode }

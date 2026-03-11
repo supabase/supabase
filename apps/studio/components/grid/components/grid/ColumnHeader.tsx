@@ -1,5 +1,5 @@
 import type { XYCoord } from 'dnd-core'
-import { ArrowRight, Key, Link, Lock } from 'lucide-react'
+import { ArrowRight, Key, Lightbulb, Link, Lock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
@@ -7,8 +7,12 @@ import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEdito
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  useColumnHasIndexSuggestion,
+  useTableIndexAdvisor,
+} from '../../context/TableIndexAdvisorContext'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
-import { ColumnMenu } from '../menu'
+import { ColumnMenu } from '../menu/ColumnMenu'
 
 export function ColumnHeader<R>({
   column,
@@ -17,6 +21,7 @@ export function ColumnHeader<R>({
   isEncrypted,
   format,
   foreignKey,
+  comment,
 }: ColumnHeaderProps<R>) {
   const ref = useRef<HTMLDivElement>(null)
   const columnIdx = column.idx
@@ -24,10 +29,14 @@ export function ColumnHeader<R>({
   const columnFormat = getColumnFormat(columnType, format)
   const snap = useTableEditorTableStateSnapshot()
   const hoverValue = column.name as string
+  const hasIndexSuggestion = useColumnHasIndexSuggestion(column.name as string)
+  const { openSheet } = useTableIndexAdvisor()
 
   // keep snap.gridColumns' order in sync with data grid component
   useEffect(() => {
-    if (snap.gridColumns[columnIdx].key != columnKey) {
+    const snapGridColumnKey = snap.gridColumns[columnIdx]?.key
+
+    if (snapGridColumnKey != columnKey) {
       snap.updateColumnIdx(columnKey, columnIdx)
     }
   }, [columnKey, columnIdx, snap.gridColumns])
@@ -125,9 +134,18 @@ export function ColumnHeader<R>({
               </TooltipContent>
             </Tooltip>
           )}
-          <span className="sb-grid-column-header__inner__name" title={hoverValue}>
-            {column.name}
-          </span>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <span className="sb-grid-column-header__inner__name">{column.name}</span>
+            </TooltipTrigger>
+            {!!comment && (
+              <TooltipContent side="bottom" className="max-w-xs text-center">
+                {comment}
+              </TooltipContent>
+            )}
+          </Tooltip>
+
           <span className="sb-grid-column-header__inner__format">
             {columnFormat}
             {columnFormat === 'bytea' ? ` (hex)` : ''}
@@ -139,6 +157,21 @@ export function ColumnHeader<R>({
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
                 Encrypted column
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {hasIndexSuggestion && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="flex items-center"
+                  onClick={() => openSheet(column.name as string)}
+                >
+                  <Lightbulb size={14} strokeWidth={2} className="!text-warning" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-normal">
+                Index might improve performance. Click for details.
               </TooltipContent>
             </Tooltip>
           )}

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-css-tags */
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import Document, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
 

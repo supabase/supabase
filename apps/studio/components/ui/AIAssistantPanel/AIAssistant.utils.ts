@@ -1,10 +1,16 @@
 import { authKeys } from 'data/auth/keys'
 import { databaseExtensionsKeys } from 'data/database-extensions/keys'
+import { databaseIndexesKeys } from 'data/database-indexes/keys'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { databaseTriggerKeys } from 'data/database-triggers/keys'
 import { databaseKeys } from 'data/database/keys'
 import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
+import { handleError } from 'data/fetchers'
 import { tableKeys } from 'data/tables/keys'
+import { tryParseJson } from 'lib/helpers'
+import { toast } from 'sonner'
+import { ResponseError } from 'types'
+
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
 
 // [Joshen] This is just very basic identification, but possible can extend perhaps
@@ -67,7 +73,7 @@ export const isReadOnlySelect = (query: string): boolean => {
 }
 
 const getContextKey = (pathname: string) => {
-  const [_, __, ___, ...rest] = pathname.split('/')
+  const [, , , ...rest] = pathname.split('/')
   const key = rest.join('/')
   return key
 }
@@ -93,8 +99,26 @@ export const getContextualInvalidationKeys = ({
         'database/triggers': [databaseTriggerKeys.list(ref)],
         'database/types': [enumeratedTypesKeys.list(ref)],
         'database/extensions': [databaseExtensionsKeys.list(ref)],
-        'database/indexes': [databaseKeys.indexes(ref, schema)],
+        'database/indexes': [databaseIndexesKeys.list(ref, schema)],
       } as const
     )[key] ?? []
   )
+}
+
+export const onErrorChat = (error: Error) => {
+  const parsedError = error ? tryParseJson(error.message) : undefined
+
+  try {
+    handleError(parsedError?.error || parsedError || error)
+  } catch (e: any) {
+    if (e instanceof ResponseError) {
+      toast.error(e.message)
+    } else if (e instanceof Error) {
+      toast.error(e.message)
+    } else if (typeof e === 'string') {
+      toast.error(e)
+    } else {
+      toast.error('An unknown error occurred')
+    }
+  }
 }

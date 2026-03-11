@@ -1,11 +1,12 @@
-import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/server'
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { getWebRequest } from '@tanstack/react-start/server'
+import { getRequest } from '@tanstack/react-start/server'
+
+import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/server'
 
 const confirmFn = createServerFn({ method: 'GET' })
-  .validator((searchParams: unknown) => {
+  .inputValidator((searchParams: unknown) => {
     if (
       searchParams &&
       typeof searchParams === 'object' &&
@@ -18,7 +19,7 @@ const confirmFn = createServerFn({ method: 'GET' })
     throw new Error('Invalid search params')
   })
   .handler(async (ctx) => {
-    const request = getWebRequest()
+    const request = getRequest()
 
     if (!request) {
       throw redirect({ to: `/auth/error`, search: { error: 'No request' } })
@@ -27,7 +28,8 @@ const confirmFn = createServerFn({ method: 'GET' })
     const searchParams = ctx.data
     const token_hash = searchParams['token_hash'] as string
     const type = searchParams['type'] as EmailOtpType | null
-    const next = (searchParams['next'] ?? '/') as string
+    const _next = searchParams['next'] as string
+    const next = _next?.startsWith('/') ? _next : '/'
 
     if (token_hash && type) {
       const supabase = createClient()

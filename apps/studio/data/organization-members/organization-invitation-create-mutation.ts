@@ -1,10 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationCreateInvitationVariables = {
@@ -39,7 +39,7 @@ export const useOrganizationCreateInvitationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationCreateInvitationVariables
@@ -52,13 +52,14 @@ export const useOrganizationCreateInvitationMutation = ({
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationCreateInvitationVariables
-  >((vars) => createOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => createOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.rolesV2(slug)),
-        queryClient.invalidateQueries(organizationKeysV1.members(slug)),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
       ])
 
       await onSuccess?.(data, variables, context)

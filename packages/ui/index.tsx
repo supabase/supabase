@@ -17,6 +17,7 @@ export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
 export * from './src/components/CodeBlock'
 export * from './src/components/SimpleCodeBlock'
+export * from './src/components/Mermaid'
 
 // NAV
 
@@ -38,6 +39,7 @@ export { Heading } from './src/components/CustomHTMLElements'
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
+export * from './src/components/AnimatedCounter'
 export * from './src/lib/utils'
 
 // DATA ENTRY
@@ -125,6 +127,21 @@ export {
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
 
+export * from './src/components/AlertCollapsible'
+
+export {
+  Field as Field_Shadcn_,
+  FieldContent as FieldContent_Shadcn_,
+  FieldDescription as FieldDescription_Shadcn_,
+  FieldError as FieldError_Shadcn_,
+  FieldGroup as FieldGroup_Shadcn_,
+  FieldLabel as FieldLabel_Shadcn_,
+  FieldLegend as FieldLegend_Shadcn_,
+  FieldSeparator as FieldSeparator_Shadcn_,
+  FieldSet as FieldSet_Shadcn_,
+  FieldTitle as FieldTitle_Shadcn_,
+} from './src/components/shadcn/ui/field'
+
 export {
   useFormField as useFormField_Shadcn_,
   Form as Form_Shadcn_,
@@ -177,6 +194,8 @@ export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 
 export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
+export { ButtonGroup, ButtonGroupItem } from './src/components/shadcn/ui/button-group'
+
 export {
   Breadcrumb as Breadcrumb_Shadcn_,
   BreadcrumbItem as BreadcrumbItem_Shadcn_,
@@ -202,6 +221,7 @@ export * from './src/components/shadcn/ui/hover-card'
 export * from './src/components/shadcn/ui/aspect-ratio'
 
 export * from './src/components/shadcn/ui/table'
+export * from './src/components/ShadowScrollArea'
 
 export {
   Collapsible as Collapsible_Shadcn_,
@@ -221,6 +241,7 @@ export {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
+  TooltipPortal,
 } from './src/components/shadcn/ui/tooltip'
 
 export {
@@ -279,3 +300,6 @@ export * from './src/components/Icon/icons/IconYoutubeSolid'
 
 // Export hooks
 export * from './src/lib/Hooks'
+export * from './src/components/hooks/use-mobile'
+
+export * from './src/components/KeyboardShortcut/KeyboardShortcut'

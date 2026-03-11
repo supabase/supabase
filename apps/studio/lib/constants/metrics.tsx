@@ -287,6 +287,14 @@ export const METRICS: Metric[] = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
+
+  {
+    key: 'total_cached_egress',
+    label: 'All Cached Egress',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_STORAGE,
+  },
+
   {
     key: 'total_storage_patch_requests',
     label: 'Storage PATCH Requests',

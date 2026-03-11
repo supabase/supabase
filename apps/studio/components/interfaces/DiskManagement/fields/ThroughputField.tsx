@@ -11,7 +11,6 @@ import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { calculateThroughputPrice } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import {
-  COMPUTE_BASELINE_THROUGHPUT,
   DISK_LIMITS,
   DiskType,
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
@@ -35,7 +34,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
   const watchedComputeSize = watch('computeSize')
   const throughput_mbps = formState.defaultValues?.throughput
 
-  const { isLoading, error } = useDiskAttributesQuery({ projectRef })
+  const { isPending: isLoading, error } = useDiskAttributesQuery({ projectRef })
 
   const throughputPrice = calculateThroughputPrice({
     storageType: form.getValues('storageType') as DiskType,
@@ -129,13 +128,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                       <Input_Shadcn_
                         type="number"
                         {...field}
-                        value={
-                          disableIopsInput
-                            ? COMPUTE_BASELINE_THROUGHPUT[
-                                watchedComputeSize as keyof typeof COMPUTE_BASELINE_THROUGHPUT
-                              ]
-                            : field.value
-                        }
+                        value={field.value}
                         onChange={(e) => {
                           setValue('throughput', e.target.valueAsNumber, {
                             shouldDirty: true,

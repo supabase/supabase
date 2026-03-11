@@ -1,5 +1,7 @@
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
+import { Badge } from 'ui'
+
 type IParamProps = any
 
 /**
@@ -12,17 +14,11 @@ const Param = ({ name, isOptional, type, description, children, isPrimitive }: I
         {!isPrimitive && (
           <span className="text-sm text-foreground font-mono font-medium">{name ?? 'no-name'}</span>
         )}
-        <span>
-          {isOptional ? (
-            <div className="text-[10px] px-3 tracking-wide font-mono text-foreground-lighter">
-              Optional
-            </div>
-          ) : (
-            <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
-              REQUIRED
-            </div>
-          )}
-        </span>
+        {isOptional ? (
+          <Badge variant="default">Optional</Badge>
+        ) : (
+          <Badge variant="warning">Required</Badge>
+        )}
         <span className="text-foreground-muted text-xs">{type ?? 'no type'}</span>
       </div>
       {description && (

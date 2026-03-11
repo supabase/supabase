@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -28,15 +29,18 @@ import { getSemver, semverGte, semverLte } from './LocalVersionPopover.utils'
 export const LocalVersionPopover = () => {
   const { data, isSuccess } = useCLIReleaseVersionQuery()
   const currentCliVersion = data?.current
-  const hasLatestCLIVersion = isSuccess && !!data?.latest
+  const latestCliVersion = data?.latest
+  const hasLatestCLIVersion = isSuccess && !!latestCliVersion
 
-  const current = getSemver(data?.current)
-  const latest = getSemver(data?.latest)
+  const current = getSemver(currentCliVersion)
+  const latest = getSemver(latestCliVersion)
 
   const hasUpdate =
-    !!current && !!latest ? data?.current !== data?.latest && semverLte(current, latest) : false
+    !!current && !!latest
+      ? currentCliVersion !== latestCliVersion && semverLte(current, latest)
+      : false
   const isBeta =
-    !!current && !!latest && data?.current !== data?.latest && semverGte(current, latest)
+    !!current && !!latest && currentCliVersion !== latestCliVersion && semverGte(current, latest)
 
   const approximateNextRelease = !!data?.published_at
     ? dayjs(data?.published_at).utc().add(14, 'day').format('DD MMM YYYY')
@@ -47,7 +51,7 @@ export const LocalVersionPopover = () => {
   return (
     <Popover_Shadcn_>
       <PopoverTrigger_Shadcn_ className="flex items-center">
-        <Badge variant={isBeta ? 'warning' : hasUpdate ? 'brand' : 'default'}>
+        <Badge variant={isBeta ? 'warning' : hasUpdate ? 'success' : 'default'}>
           {isBeta ? 'Beta' : hasUpdate ? 'Update available' : 'Latest'}
         </Badge>
       </PopoverTrigger_Shadcn_>
@@ -78,7 +82,7 @@ export const LocalVersionPopover = () => {
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="windows">
                   <SimpleCodeBlock parentClassName="bg-selection rounded !px-2">
-                    scoop upgrade supabase
+                    scoop update supabase
                   </SimpleCodeBlock>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="linux">
@@ -131,7 +135,9 @@ export const LocalVersionPopover = () => {
                   <p className="text-sm">
                     Supabase CLI releases follows a two-week schedule, with stable updates available
                     through the{' '}
-                    <InlineLink href="https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux#updating-the-supabase-cli">
+                    <InlineLink
+                      href={`${DOCS_URL}/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux#updating-the-supabase-cli`}
+                    >
                       CLI
                     </InlineLink>
                     .
@@ -154,7 +160,7 @@ export const LocalVersionPopover = () => {
                     </p>
                   }
                   <DocsButton
-                    href="https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux#using-beta-version"
+                    href={`${DOCS_URL}/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux#using-beta-version`}
                     className="!no-underline mt-2"
                   />
                 </Admonition>
@@ -165,7 +171,7 @@ export const LocalVersionPopover = () => {
             <a
               target="_blank"
               rel="noreferrer noopener"
-              href="https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux"
+              href={`${DOCS_URL}/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux`}
             >
               CLI Docs
             </a>
@@ -180,7 +186,7 @@ export const LocalVersionPopover = () => {
           {hasLatestCLIVersion && hasUpdate && !isBeta && (
             <div className="flex flex-col gap-y-1">
               <p className="text-xs">Available version:</p>
-              <p className="text-sm font-mono">{data.latest}</p>
+              <p className="text-sm font-mono">{latestCliVersion}</p>
             </div>
           )}
         </div>

@@ -1,21 +1,31 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-
 import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { useRouter } from 'next/router'
+import type { PropsWithChildren } from 'react'
+
+import { ProjectLayout } from '../ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
+
+/**
+ * Menu-only component for the Realtime section. Used by the desktop sidebar and by the
+ * mobile sheet submenu. Must not wrap ProjectLayout so that opening the realtime submenu
+ * in the mobile sheet does not overwrite registerOpenMenu and break the menu button.
+ */
+export const RealtimeProductMenu = () => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+  const page = router.pathname.split('/')[4]
+
+  return <ProductMenu page={page} menu={generateRealtimeMenu(project ?? undefined)} />
+}
 
 export interface RealtimeLayoutProps {
   title: string
 }
 
-const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
-  const project = useSelectedProject()
-  const enableRealtimeSettings = useFlag('enableRealtimeSettings')
-
+export const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
+  const { data: project } = useSelectedProjectQuery()
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
@@ -23,12 +33,7 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
     <ProjectLayout
       title={title}
       product="Realtime"
-      productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateRealtimeMenu(project!, { enableRealtimeSettings })}
-        />
-      }
+      productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project)} />}
     >
       {children}
     </ProjectLayout>

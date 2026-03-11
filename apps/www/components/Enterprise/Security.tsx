@@ -1,10 +1,10 @@
 import React, { FC } from 'react'
-import type { LucideIcon } from 'lucide-react'
-
 import { TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
-interface Props {
+import type { LucideIcon } from 'lucide-react'
+
+export interface SecuritySectionProps {
   id: string
   label: string | JSX.Element
   heading: string | JSX.Element
@@ -27,7 +27,7 @@ type FeatureProps = {
   heading: string
 }
 
-const EnterpriseSecurity: FC<Props> = (props) => {
+const EnterpriseSecurity: FC<SecuritySectionProps> = (props) => {
   return (
     <SectionContainer
       id={props.id}
@@ -56,7 +56,7 @@ const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
   const Icon: LucideIcon = feature.icon
 
   return (
-    <li className="flex flex-nowrap items-center h-fit gap-2 sm:gap-4 text-foreground text-xs sm:text-sm">
+    <li className="flex flex-nowrap items-center h-fit gap-2 sm:gap-4 text-foreground-light text-xs sm:text-sm">
       <figure className="border not-prose bg-surface-100 flex h-8 w-8 items-center justify-center rounded-md">
         <Icon className="w-4 h-4 stroke-1" />
       </figure>

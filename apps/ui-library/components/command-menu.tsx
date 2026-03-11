@@ -4,9 +4,6 @@ import { CircleIcon, LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
-
-import { COMMAND_ITEMS } from '@/config/docs'
-import { cn } from '@/lib/utils'
 import {
   Button,
   CommandDialog,
@@ -18,6 +15,9 @@ import {
   CommandSeparator_Shadcn_,
   DialogProps,
 } from 'ui'
+
+import { COMMAND_ITEMS } from '@/config/docs'
+import { cn } from '@/lib/utils'
 
 export function CommandMenu({ ...props }: DialogProps) {
   const router = useRouter()

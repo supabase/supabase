@@ -1,22 +1,36 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import authors from 'lib/authors.json'
-import PostTypes from '../../types/post'
+
+import authors from '@/lib/authors.json'
+import type PostTypes from '@/types/post'
 
 function FeaturedThumb(blog: PostTypes) {
-  // @ts-ignore
-  const authorArray = blog.author.split(',')
-
+  // For static posts, look up author info from authors.json
+  const authorArray = blog.author?.split(',').map((a) => a.trim()) || []
   const author = []
+
   for (let i = 0; i < authorArray.length; i++) {
-    // @ts-ignore
-    author.push(
-      authors.find((authors: any) => {
-        // @ts-ignore
-        return authors.author_id === authorArray[i]
-      })
-    )
+    const foundAuthor = authors.find((authors: any) => {
+      return authors.author_id === authorArray[i]
+    })
+    if (foundAuthor) {
+      author.push(foundAuthor)
+    }
   }
+
+  return renderFeaturedThumb(blog, author)
+}
+
+function renderFeaturedThumb(blog: PostTypes, author: any[]) {
+  const resolveImagePath = (img: string | undefined): string | null => {
+    if (!img) return null
+    return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
+  }
+
+  const imageUrl =
+    resolveImagePath(blog.imgThumb) ||
+    resolveImagePath(blog.imgSocial) ||
+    '/images/blog/blog-placeholder.png'
 
   return (
     <div key={blog.slug} className="w-full">
@@ -26,11 +40,12 @@ function FeaturedThumb(blog: PostTypes) {
       >
         <div className="relative w-full aspect-[2/1] lg:col-span-3 lg:aspect-[3/2] overflow-auto rounded-lg border">
           <Image
-            src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
+            src={imageUrl}
             fill
             sizes="100%"
             quality={100}
-            className="object-cover"
+            priority
+            className="object-cover bg-alternative"
             alt="blog thumbnail"
           />
         </div>
@@ -47,13 +62,21 @@ function FeaturedThumb(blog: PostTypes) {
           </div>
 
           <div className="flex flex-col w-max gap-2">
-            {author.map((author: any, i: number) => {
+            {author.filter(Boolean).map((author: any, i: number) => {
+              const authorImageUrl =
+                typeof author.author_image_url === 'string'
+                  ? author.author_image_url
+                  : (author.author_image_url as { url: string })?.url || ''
+
               return (
-                <div className="flex items-center space-x-2" key={i}>
-                  {author.author_image_url && (
+                <div
+                  className="flex items-center space-x-2"
+                  key={`author-feat-${i}-${author.author}`}
+                >
+                  {imageUrl && (
                     <div className="relative h-6 w-6 overflow-auto">
                       <Image
-                        src={author.author_image_url}
+                        src={authorImageUrl}
                         alt={`${author.author} avatar`}
                         className="rounded-full object-cover"
                         fill

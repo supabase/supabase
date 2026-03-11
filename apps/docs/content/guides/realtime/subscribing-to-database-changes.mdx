@@ -13,7 +13,7 @@ You can use Supabase to subscribe to real-time database changes. There are two o
 
 ## Using Broadcast
 
-To automatically send messages when a record is created, updated, or deleted, we can attach a [Postgres trigger](/docs/guides/database/postgres/triggers) to any table. Supabase Realtime provides a `realtime.broadcast_changes()` function which we can use in conjunction with a trigger.
+To automatically send messages when a record is created, updated, or deleted, we can attach a [Postgres trigger](/docs/guides/database/postgres/triggers) to any table. Supabase Realtime provides a `realtime.broadcast_changes()` function which we can use in conjunction with a trigger. This function will use a private channel and needs broadcast authorization RLS policies to be met.
 
 ### Broadcast authorization
 
@@ -36,11 +36,12 @@ Let's create a function that we can call any time a record is created, updated, 
 ```sql
 create or replace function public.your_table_changes()
 returns trigger
+security definer
 language plpgsql
 as $$
 begin
   perform realtime.broadcast_changes(
-    'topic:' || coalesce(NEW.topic, OLD.topic) ::text, -- topic - the topic to which we're broadcasting
+    'topic:' || coalesce(NEW.id, OLD.id) ::text,       -- topic - the topic to which you're broadcasting where you can use the topic id to build the topic name
     TG_OP,                                             -- event - the event that triggered the function
     TG_OP,                                             -- operation - the operation that triggered the function
     TG_TABLE_NAME,                                     -- table - the table that caused the trigger

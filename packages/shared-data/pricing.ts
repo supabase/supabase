@@ -36,7 +36,7 @@ export type FeatureKey =
   | 'database.pitr'
   | 'database.pausing'
   | 'database.branching'
-  | 'database.bandwidth'
+  | 'database.egress'
   | 'auth.totalUsers'
   | 'auth.maus'
   | 'auth.userDataOwnership'
@@ -44,7 +44,7 @@ export type FeatureKey =
   | 'auth.socialOAuthProviders'
   | 'auth.customSMTPServer'
   | 'auth.removeSupabaseBranding'
-  | 'auth.auditTrails'
+  | 'auth.auditLogs'
   | 'auth.basicMFA'
   | 'auth.advancedMFAPhone'
   | 'auth.thirdPartyMAUs'
@@ -57,6 +57,7 @@ export type FeatureKey =
   | 'storage.size'
   | 'storage.customAccessControls'
   | 'storage.maxFileSize'
+  | 'storage.cachedEgress'
   | 'storage.cdn'
   | 'storage.transformations'
   | 'storage.byoc'
@@ -68,13 +69,14 @@ export type FeatureKey =
   | 'realtime.messagesPerMonth'
   | 'realtime.maxMessageSize'
   | 'dashboard.teamMembers'
-  | 'dashboard.auditTrails'
+  | 'security.platformAuditLogs'
   | 'security.byoc'
   | 'security.logRetention'
   | 'security.logDrain'
   | 'security.metricsEndpoint'
   | 'security.soc2'
   | 'security.hipaa'
+  | 'security.privateLink'
   | 'security.sso'
   | 'security.uptimeSla'
   | 'security.accessRoles'
@@ -175,15 +177,15 @@ export const pricing: Pricing = {
         title: 'Branching',
         plans: {
           free: false,
-          pro: '$0.32 per branch, per day',
-          team: '$0.32 per branch, per day',
+          pro: '$0.01344 per branch, per hour',
+          team: '$0.01344 per branch, per hour',
           enterprise: 'Custom',
         },
         usage_based: true,
       },
       {
-        key: 'database.bandwidth',
-        title: 'Bandwidth',
+        key: 'database.egress',
+        title: 'Egress',
         plans: {
           free: '5 GB included',
           pro: ['250 GB included', 'then $0.09 per GB'],
@@ -277,8 +279,8 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        key: 'auth.auditTrails',
-        title: 'Audit trails',
+        key: 'auth.auditLogs',
+        title: 'Auth Audit Logs',
         plans: {
           free: '1 hour',
           pro: '7 days',
@@ -406,6 +408,17 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
+        key: 'storage.cachedEgress',
+        title: 'Cached Egress',
+        plans: {
+          free: '5 GB included',
+          pro: ['250 GB included', 'then $0.03 per GB'],
+          team: ['250 GB included', 'then $0.03 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
         key: 'storage.customAccessControls',
         title: 'Custom access controls',
         plans: {
@@ -421,8 +434,8 @@ export const pricing: Pricing = {
         title: 'Max file upload size',
         plans: {
           free: '50 MB',
-          pro: '50 GB',
-          team: '50 GB',
+          pro: '500 GB',
+          team: '500 GB',
           enterprise: 'Custom',
         },
         usage_based: false,
@@ -520,7 +533,7 @@ export const pricing: Pricing = {
         key: 'realtime.maxMessageSize',
         title: 'Max Message Size',
         plans: {
-          free: '250 KB',
+          free: '256 KB',
           pro: '3 MB',
           team: '3 MB',
           enterprise: 'Custom',
@@ -541,17 +554,6 @@ export const pricing: Pricing = {
           pro: 'Unlimited',
           team: 'Unlimited',
           enterprise: 'Unlimited',
-        },
-        usage_based: false,
-      },
-      {
-        key: 'dashboard.auditTrails',
-        title: 'Audit trails',
-        plans: {
-          free: false,
-          pro: false,
-          team: true,
-          enterprise: true,
         },
         usage_based: false,
       },
@@ -588,15 +590,22 @@ export const pricing: Pricing = {
         title: 'Log Drain',
         plans: {
           free: false,
-          pro: false,
-          team: [
-            '$60 per drain per month',
-            'and $0.20 per Million processed',
-            'and $0.09 per GB bandwidth',
-          ],
+          pro: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
+          team: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           enterprise: 'Custom',
         },
         usage_based: true,
+      },
+      {
+        key: 'security.platformAuditLogs',
+        title: 'Platform Audit Logs',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
       },
       {
         key: 'security.metricsEndpoint',
@@ -628,6 +637,17 @@ export const pricing: Pricing = {
           pro: false,
           team: 'Available as paid add-on',
           enterprise: 'Available as paid add-on',
+        },
+        usage_based: false,
+      },
+      {
+        key: 'security.privateLink',
+        title: 'AWS PrivateLink',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
         },
         usage_based: false,
       },

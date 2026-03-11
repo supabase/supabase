@@ -3,17 +3,19 @@ import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
   resourceWarnings?: ResourceWarning
   projectStatus: InferredProjectStatus
+  renderMode?: 'alert' | 'badge'
 }
 
 export const ProjectCardStatus = ({
   resourceWarnings: allResourceWarnings,
   projectStatus,
+  renderMode = 'alert',
 }: ProjectCardWarningsProps) => {
   const showResourceExhaustionWarnings = false
 
@@ -47,17 +49,30 @@ export const ProjectCardStatus = ({
       : undefined
 
   const getTitle = () => {
-    if (projectStatus === 'isPaused') return 'Project is paused'
-    if (projectStatus === 'isPausing') return 'Project is pausing'
-    if (projectStatus === 'isRestarting') return 'Project is restarting'
-    if (projectStatus === 'isResizing') return 'Project is resizing'
-    if (projectStatus === 'isComingUp') return 'Project is coming up'
-    if (projectStatus === 'isRestoring') return 'Project is restoring'
-    if (projectStatus === 'isUpgrading') return 'Project is upgrading'
-    if (projectStatus === 'isRestoreFailed') return 'Project restore failed'
-    if (projectStatus === 'isPauseFailed') return 'Project pause failed'
+    switch (projectStatus) {
+      case 'isPaused':
+        return renderMode === 'badge' ? 'Paused' : 'Project is paused'
+      case 'isPausing':
+        return renderMode === 'badge' ? 'Pausing' : 'Project is pausing'
+      case 'isRestarting':
+        return renderMode === 'badge' ? 'Restarting' : 'Project is restarting'
+      case 'isResizing':
+        return renderMode === 'badge' ? 'Resizing' : 'Project is resizing'
+      case 'isComingUp':
+        return renderMode === 'badge' ? 'Starting' : 'Project is coming up'
+      case 'isRestoring':
+        return renderMode === 'badge' ? 'Restoring' : 'Project is restoring'
+      case 'isUpgrading':
+        return renderMode === 'badge' ? 'Upgrading' : 'Project is upgrading'
+      case 'isRestoreFailed':
+        return renderMode === 'badge' ? 'Restore Failed' : 'Project restore failed'
+      case 'isPauseFailed':
+        return renderMode === 'badge' ? 'Pause Failed' : 'Project pause failed'
+    }
 
-    if (!resourceWarnings) return undefined
+    if (!resourceWarnings) {
+      return renderMode === 'badge' && projectStatus === 'isHealthy' ? 'Active' : undefined
+    }
 
     // If none of the paused/restoring states match, proceed with the default logic
     return activeWarnings.length > 1
@@ -106,37 +121,85 @@ export const ProjectCardStatus = ({
     (activeWarnings.length === 0 || warningContent === undefined) &&
     projectStatus === 'isHealthy'
   ) {
+    if (renderMode === 'badge') {
+      return (
+        // Badge must be wrapped in a div in order to be centered in table cell
+        <div className="flex items-center">
+          <Badge variant="success">Active</Badge>
+        </div>
+      )
+    }
     return null
   }
 
+  if (renderMode === 'badge') {
+    // Render a fallback en dash if no title is available
+    if (!alertTitle) return <span className="text-xs text-foreground-muted">–</span>
+
+    const badgeVariant = isCritical
+      ? 'destructive'
+      : activeWarnings.length > 0 ||
+          projectStatus === 'isPauseFailed' ||
+          projectStatus === 'isRestoreFailed'
+        ? 'warning'
+        : projectStatus === 'isHealthy'
+          ? 'success'
+          : 'default'
+
+    return (
+      // Badge must be wrapped in a div in order to be centered in table cell
+      <div className="flex items-center">
+        {alertDescription ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge variant={badgeVariant}>{alertTitle}</Badge>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{alertDescription}</TooltipContent>
+          </Tooltip>
+        ) : (
+          <Badge variant={badgeVariant}>{alertTitle}</Badge>
+        )}
+      </div>
+    )
+  }
+
+  // Only render if an alert title is available
+  if (!alertTitle) return null
+
   return (
-    <Alert_Shadcn_
-      variant={alertType}
-      className={cn(
-        'border-0 p-5 pb-[1.25rem]',
-        'bg-transparent',
-        '[&>svg]:left-[1.25rem] [&>svg]:top-3.5 [&>svg]:border',
-        !isCritical ? '[&>svg]:text-foreground [&>svg]:bg-surface-100' : ''
-      )}
-    >
-      {['isPaused', 'isPausing'].includes(projectStatus ?? '') ? (
-        <PauseCircle strokeWidth={1.5} size={12} />
-      ) : ['isRestoring', 'isComingUp', 'isRestarting', 'isResizing'].includes(
-          projectStatus ?? ''
-        ) ? (
-        <RefreshCcw strokeWidth={1.5} size={12} />
-      ) : (
-        <AlertTriangle strokeWidth={1.5} size={12} />
-      )}
-      <div className="flex justify-between items-center w-full gap-x-1">
-        <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle}</AlertTitle_Shadcn_>
+    <div role="alert" className={cn('w-full p-5 pb-[1.25rem] flex flex-row gap-x-2 items-center')}>
+      {/* Icon */}
+      <div
+        className={cn(
+          'shrink-0 w-6 h-6 border rounded-md flex items-center justify-center',
+          alertType === 'destructive' && 'border-destructive-400 [&>svg]:text-destructive-600',
+          alertType === 'warning' && 'border-warning-400 [&>svg]:text-warning-600',
+          alertType === 'default' && 'border-strong [&>svg]:text-foreground'
+        )}
+      >
+        {['isPaused', 'isPausing'].includes(projectStatus ?? '') ? (
+          <PauseCircle strokeWidth={1.5} size={14} />
+        ) : ['isRestoring', 'isComingUp', 'isRestarting', 'isResizing'].includes(
+            projectStatus ?? ''
+          ) ? (
+          <RefreshCcw strokeWidth={1.5} size={14} />
+        ) : (
+          <AlertTriangle strokeWidth={1.5} size={14} />
+        )}
+      </div>
+      {/* Text and tooltip icon */}
+      <div className="flex items-center w-full gap-x-2">
+        <p className="text-xs">{alertTitle}</p>
         <Tooltip>
           <TooltipTrigger>
-            <Info size={14} className="text-foreground-light hover:text-foreground" />
+            <Info
+              size={12}
+              className="text-foreground-lighter hover:text-foreground transition-colors"
+            />
           </TooltipTrigger>
           <TooltipContent side="bottom">{alertDescription}</TooltipContent>
         </Tooltip>
       </div>
-    </Alert_Shadcn_>
+    </div>
   )
 }

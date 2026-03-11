@@ -1,16 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { debounce } from 'lodash'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
 import { useProjectCloneMutation } from 'data/projects/clone-mutation'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { passwordStrength } from 'lib/helpers'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import {
   Button,
@@ -38,6 +36,7 @@ interface CreateNewProjectDialogProps {
   onOpenChange: (value: boolean) => void
   onCloneSuccess: () => void
   additionalMonthlySpend: NewProjectPrice
+  hasAccess?: boolean
 }
 
 export const CreateNewProjectDialog = ({
@@ -47,10 +46,9 @@ export const CreateNewProjectDialog = ({
   onOpenChange,
   onCloneSuccess,
   additionalMonthlySpend,
+  hasAccess,
 }: CreateNewProjectDialogProps) => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
-
+  const { data: project } = useSelectedProjectQuery()
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
 
@@ -67,28 +65,21 @@ export const CreateNewProjectDialog = ({
     },
   })
 
-  const isFreePlan = organization?.plan?.id === 'free'
-
   const { data: cloneBackups } = useCloneBackupsQuery(
     { projectRef: project?.ref },
-    { enabled: !isFreePlan }
+    { enabled: hasAccess }
   )
   const hasPITREnabled = cloneBackups?.pitr_enabled
 
-  const { mutate: triggerClone, isLoading: cloneMutationLoading } = useProjectCloneMutation({
+  const { mutate: triggerClone, isPending: cloneMutationLoading } = useProjectCloneMutation({
     onError: (error) => {
-      console.error('error', error)
-      toast.error('Failed to restore to new project')
+      toast.error(`Failed to restore to new project: ${error.message}`)
     },
     onSuccess: () => {
       toast.success('Restoration process started')
       onCloneSuccess()
     },
   })
-
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value: string) => checkPasswordStrength(value), 300)
-  ).current
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
@@ -99,7 +90,7 @@ export const CreateNewProjectDialog = ({
   const generatePassword = () => {
     const password = generateStrongPassword()
     form.setValue('password', password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   return (
@@ -162,7 +153,7 @@ export const CreateNewProjectDialog = ({
                     <FormControl_Shadcn_>
                       <Input
                         id="db-password"
-                        label="Database Password"
+                        label="Database password"
                         type="password"
                         placeholder="Type in a strong password"
                         value={field.value}
@@ -173,11 +164,11 @@ export const CreateNewProjectDialog = ({
                           if (value == '') {
                             setPasswordStrengthScore(-1)
                             setPasswordStrengthMessage('')
-                          } else delayedCheckPasswordStrength(value)
+                          } else checkPasswordStrength(value)
                         }}
                         descriptionText={
                           <PasswordStrengthBar
-                            passwordStrengthScore={passwordStrengthScore}
+                            passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
                             password={field.value}
                             passwordStrengthMessage={passwordStrengthMessage}
                             generateStrongPassword={generatePassword}

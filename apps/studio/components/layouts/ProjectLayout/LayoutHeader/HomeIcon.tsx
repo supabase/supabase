@@ -1,19 +1,18 @@
-import Image from 'next/image'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { cn } from 'ui'
 
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-
-export const HomeIcon = () => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-  const showLayoutHeader = useShowLayoutHeader()
-  const selectedOrganization = useSelectedOrganization()
+export const HomeIcon = ({ className }: { className?: string }) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: organizations } = useOrganizationsQuery()
+
+  const largeLogo = useIsFeatureEnabled('branding:large_logo')
 
   const router = useRouter()
   const [lastVisitedOrganization] = useLocalStorageQuery(
@@ -21,29 +20,21 @@ export const HomeIcon = () => {
     ''
   )
 
-  if (!showLayoutHeader && !newLayoutPreview) return null
-
   const getDefaultOrgRedirect = () => {
     if (lastVisitedOrganization) return `/org/${lastVisitedOrganization}`
     if (selectedOrganization?.slug) return `/org/${selectedOrganization.slug}`
     if (organizations && organizations.length > 0) return `/org/${organizations[0].slug}`
-    return '/projects'
+    return '/organizations'
   }
 
-  const href = IS_PLATFORM
-    ? newLayoutPreview
-      ? getDefaultOrgRedirect()
-      : `/projects`
-    : '/project/default'
+  const href = IS_PLATFORM ? getDefaultOrgRedirect() : '/project/default'
 
   return (
-    <Link href={href} className="items-center justify-center flex-shrink-0 hidden md:flex">
-      <Image
+    <Link href={href} className={cn('items-center justify-center flex-shrink-0 flex', className)}>
+      <img
         alt="Supabase"
         src={`${router.basePath}/img/supabase-logo.svg`}
-        width={18}
-        height={18}
-        className="w-[18px] h-[18px]"
+        className={largeLogo ? 'h-[20px]' : 'h-[18px]'}
       />
     </Link>
   )

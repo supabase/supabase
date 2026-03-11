@@ -1,29 +1,49 @@
-import EdgeFunctionSecrets from 'components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { EdgeFunctionSecrets } from 'components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
+import { FunctionsSecretsEmptyStateLocal } from 'components/interfaces/Functions/FunctionsEmptyState'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const SecretsPage: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer size="large" className="pt-6">
-      <EdgeFunctionSecrets />
-    </ScaffoldContainer>
+    <PageContainer size="large">
+      <PageSection>
+        <PageSectionContent className="space-y-4 md:space-y-8">
+          {IS_PLATFORM ? <EdgeFunctionSecrets /> : <FunctionsSecretsEmptyStateLocal />}
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   )
 }
 
 SecretsPage.getLayout = (page) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>
-        <PageLayout
-          size="large"
-          title="Edge Function Secrets"
-          subtitle="Manage the secrets for your project's edge functions"
-        >
+      <EdgeFunctionsLayout title="Secrets">
+        <div className="w-full min-h-full flex flex-col items-stretch">
+          <PageHeader size="large">
+            <PageHeaderMeta>
+              <PageHeaderSummary>
+                <PageHeaderTitle>Edge Function Secrets</PageHeaderTitle>
+                <PageHeaderDescription>
+                  Manage encrypted values for your functions
+                </PageHeaderDescription>
+              </PageHeaderSummary>
+            </PageHeaderMeta>
+          </PageHeader>
+
           {page}
-        </PageLayout>
+        </div>
       </EdgeFunctionsLayout>
     </DefaultLayout>
   )

@@ -1,0 +1,521 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+
+    "account:show_security_settings": {
+      "type": "boolean",
+      "description": "Show the account security settings page"
+    },
+
+    "ai:opt_in_level_disabled": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'disabled'"
+    },
+    "ai:opt_in_level_schema": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema'"
+    },
+    "ai:opt_in_level_schema_and_log": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log'"
+    },
+    "ai:opt_in_level_schema_and_log_and_data": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log_and_data'"
+    },
+
+    "authentication:sign_in_providers": {
+      "type": "boolean",
+      "description": "Enable the authentication sign in / providers page"
+    },
+    "authentication:third_party_auth": {
+      "type": "boolean",
+      "description": "Enable the authentication third party auth page"
+    },
+    "authentication:rate_limits": {
+      "type": "boolean",
+      "description": "Enable the authentication rate limits page"
+    },
+    "authentication:emails": {
+      "type": "boolean",
+      "description": "Enable the authentication emails page"
+    },
+    "authentication:multi_factor": {
+      "type": "boolean",
+      "description": "Enable the authentication multi factor page"
+    },
+    "authentication:attack_protection": {
+      "type": "boolean",
+      "description": "Enable the authentication attack protection page"
+    },
+    "authentication:performance": {
+      "type": "boolean",
+      "description": "Enable the authentication performance page"
+    },
+
+    "authentication:show_providers": {
+      "type": "boolean",
+      "description": "Show the providers section in the authentication Sign In / Providers page"
+    },
+    "authentication:show_manual_linking": {
+      "type": "boolean",
+      "description": "Show the manual linking toggle in the authentication Sign In / Providers page under User Signups"
+    },
+    "authentication:show_send_invitation": {
+      "type": "boolean",
+      "description": "Show the send invitation option in the authentication users page"
+    },
+    "authentication:show_provider_filter": {
+      "type": "boolean",
+      "description": "Show the provider filter in the authentication users page"
+    },
+    "authentication:show_sort_by_email": {
+      "type": "boolean",
+      "description": "Show the sort by email option in the authentication users page"
+    },
+    "authentication:show_sort_by_phone": {
+      "type": "boolean",
+      "description": "Show the sort by phone option in the authentication users page"
+    },
+    "authentication:show_user_type_filter": {
+      "type": "boolean",
+      "description": "Show the user type filter in the authentication users page"
+    },
+    "authentication:show_email_phone_columns": {
+      "type": "boolean",
+      "description": "Show the email and phone columns in the authentication users page"
+    },
+
+    "billing:all": {
+      "type": "boolean",
+      "description": "Enable the billing settings page"
+    },
+
+    "branding:large_logo": {
+      "type": "boolean",
+      "description": "Show larger logo sizes throughout the apps"
+    },
+    "cli:disable_custom_profiles": {
+      "type": "boolean",
+      "description": "Disable custom CLI profiles feature"
+    },
+    "dashboard_auth:sign_up": {
+      "type": "boolean",
+      "description": "Enable the sign up page in the dashboard"
+    },
+    "dashboard_auth:sign_in_with_github": {
+      "type": "boolean",
+      "description": "Enable the sign in with github provider"
+    },
+    "dashboard_auth:sign_in_with_sso": {
+      "type": "boolean",
+      "description": "Enable the sign in with sso provider"
+    },
+    "dashboard_auth:sign_in_with_email": {
+      "type": "boolean",
+      "description": "Enable the sign in with email/password provider"
+    },
+    "dashboard_auth:show_testimonial": {
+      "type": "boolean",
+      "description": "Enable the testimonial on the sign in/up page"
+    },
+    "dashboard_auth:show_tos": {
+      "type": "boolean",
+      "description": "Enable the terms of service link on the sign in/up page"
+    },
+
+    "database:replication": {
+      "type": "boolean",
+      "description": "Enable the database replication page"
+    },
+    "database:roles": {
+      "type": "boolean",
+      "description": "Enable the database roles page"
+    },
+    "database:restore_to_new_project": {
+      "type": "boolean",
+      "description": "Enable the restore to new project page under backups"
+    },
+    "database:network_restrictions": {
+      "type": "boolean",
+      "description": "Show the network restrictions setting under database settings"
+    },
+
+    "docs:auth_architecture": {
+      "type": "boolean",
+      "description": "Enable docs on Auth architecture"
+    },
+    "docs:auth_configuration": {
+      "type": "boolean",
+      "description": "Enable auth configuration docs"
+    },
+    "docs:auth_flows": {
+      "type": "boolean",
+      "description": "Enable docs on auth flows"
+    },
+    "docs:auth_full_security": {
+      "type": "boolean",
+      "description": "Full auth security docs enabled"
+    },
+    "docs:auth_troubleshooting": {
+      "type": "boolean",
+      "description": "Enable auth troubleshooting docs"
+    },
+    "docs:compliance": {
+      "type": "boolean",
+      "description": "Enable documentation on compliance"
+    },
+    "docs:contribution": {
+      "type": "boolean",
+      "description": "Enable documentation on contribution"
+    },
+    "docs:fdw": {
+      "type": "boolean",
+      "description": "Enable documentation on foreign data wrappers"
+    },
+    "docs:footer": {
+      "type": "boolean",
+      "description": "Enable footer on docs site"
+    },
+    "docs:navigation_dropdown_links_home": {
+      "type": "boolean",
+      "description": "Should the navigation dropdown homepage link go to Supabase.com or the dashboard"
+    },
+    "docs:framework_quickstarts": {
+      "type": "boolean",
+      "description": "Enable framework quickstarts documentation"
+    },
+    "docs:full_getting_started": {
+      "type": "boolean",
+      "description": "Enable full getting started documentation"
+    },
+    "docs:full_platform": {
+      "type": "boolean",
+      "description": "Enable full platform documentation"
+    },
+    "docs:hide_cli_profiles": {
+      "type": "boolean",
+      "description": "Hide docs on CLI profiles"
+    },
+    "docs:local_development": {
+      "type": "boolean",
+      "description": "Enable local development documentation"
+    },
+    "docs:mobile_tutorials": {
+      "type": "boolean",
+      "description": "Enable mobile tutorials getting started documentation"
+    },
+    "docs:pgtap": {
+      "type": "boolean",
+      "description": "Enable pgtap started documentation"
+    },
+    "docs:production_checklist": {
+      "type": "boolean",
+      "description": "Enable production checklist"
+    },
+    "docs:self-hosting": {
+      "type": "boolean",
+      "description": "Enable documentation for self-hosting"
+    },
+    "docs:web_apps": {
+      "type": "boolean",
+      "description": "Enable web apps getting started documentation"
+    },
+
+    "edge_functions:show_stripe_example": {
+      "type": "boolean",
+      "description": "Show all the Stripe example in edge function templates in the edge functions page."
+    },
+    "edge_functions:show_all_edge_function_invocation_examples": {
+      "type": "boolean",
+      "description": "Show all the invocation examples in the edge function details page. (If off, it will only show cURL and Javascript invocation examples)"
+    },
+
+    "feedback:docs": {
+      "type": "boolean",
+      "description": "Enable feedback submission for docs site"
+    },
+
+    "integrations:partners": {
+      "type": "boolean",
+      "description": "Show all third-party-managed integrations"
+    },
+    "integrations:wrappers": {
+      "type": "boolean",
+      "description": "Show all wrappers (FDW) under project integrations"
+    },
+    "integrations:vercel": {
+      "type": "boolean",
+      "description": "Enable the vercel integration section in the organization and project settings pages"
+    },
+    "integrations:aws_private_link": {
+      "type": "boolean",
+      "description": "Enable the AWS PrivateLink integration section in the project settings pages"
+    },
+
+    "infrastructure:read_replicas": {
+      "type": "boolean",
+      "description": "Enable read replicas management"
+    },
+
+    "logs:templates": {
+      "type": "boolean",
+      "description": "Enable the logs templates page"
+    },
+    "logs:collections": {
+      "type": "boolean",
+      "description": "Enable the logs collections page"
+    },
+    "logs:metadata": {
+      "type": "boolean",
+      "description": "Show the metadata field for logs in logs explorer"
+    },
+    "logs:show_metadata_ip_template": {
+      "type": "boolean",
+      "description": "Show the Metadata IP template in the logs explorer"
+    },
+
+    "organization:show_sso_settings": {
+      "type": "boolean",
+      "description": "Show the SSO settings tab in the organization settings page"
+    },
+    "organization:show_security_settings": {
+      "type": "boolean",
+      "description": "Show the security settings tab in the organization settings page"
+    },
+    "organization:show_legal_documents": {
+      "type": "boolean",
+      "description": "Show the legal documents tab in the organization settings page"
+    },
+
+    "profile:show_email": {
+      "type": "boolean",
+      "description": "Show the user's email address in the toolbar"
+    },
+    "profile:show_information": {
+      "type": "boolean",
+      "description": "Shows the user's profile information (first name, last name) in account preferences"
+    },
+    "profile:show_analytics_and_marketing": {
+      "type": "boolean",
+      "description": "Shows the analytics and marketing section in account preferences"
+    },
+    "profile:show_account_deletion": {
+      "type": "boolean",
+      "description": "Shows the account deletion section in account preferences"
+    },
+
+    "project_connection:show_app_frameworks": {
+      "type": "boolean",
+      "description": "Show the app frameworks tab in the connect modal"
+    },
+    "project_connection:show_mobile_frameworks": {
+      "type": "boolean",
+      "description": "Show the mobile frameworks tab in the connect modal"
+    },
+    "project_connection:show_orms": {
+      "type": "boolean",
+      "description": "Show the orms tab in the connect modal"
+    },
+
+    "project_creation:show_advanced_config": {
+      "type": "boolean",
+      "description": "Show the advanced configuration option in the project creation flow"
+    },
+
+    "project_homepage:show_instance_size": {
+      "type": "boolean",
+      "description": "Show the instance size badge in the project homepage and infrastructure settings"
+    },
+    "project_homepage:show_examples": {
+      "type": "boolean",
+      "description": "Show the example projects in the project homepage"
+    },
+
+    "project_addons:dedicated_ipv4_address": {
+      "type": "boolean",
+      "description": "Show the dedicated IPv4 address addon"
+    },
+    "project_addons:show_compute_price": {
+      "type": "boolean",
+      "description": "Show the compute price in the compute and disk page"
+    },
+
+    "project_settings:custom_domains": {
+      "type": "boolean",
+      "description": "Show the custom domain configuration section + custom domain addon"
+    },
+    "project_settings:show_disable_legacy_api_keys": {
+      "type": "boolean",
+      "description": "Show the disable legacy API keys section in project settings API Keys page"
+    },
+    "project_settings:legacy_jwt_keys": {
+      "type": "boolean",
+      "description": "Enable the legacy JWT secret page in project settings"
+    },
+    "project_settings:log_drains": {
+      "type": "boolean",
+      "description": "Enable the log drains page in project settings"
+    },
+    "project_settings:restart_project": {
+      "type": "boolean",
+      "description": "Show the option to restart project in project settings (If off, only fast database reboot will be shown)"
+    },
+    "project_settings:database_upgrades": {
+      "type": "boolean",
+      "description": "Show database upgrade callouts in the project settings infrastructure page"
+    },
+
+    "quickstarts:hide_nimbus": {
+      "type": "boolean",
+      "description": "Whether to show the Nimbus quickstart"
+    },
+
+    "reports:all": {
+      "type": "boolean",
+      "description": "Enable the project reports page"
+    },
+
+    "sdk:auth": {
+      "type": "boolean",
+      "description": "Enable Auth SDK docs"
+    },
+    "sdk:csharp": {
+      "type": "boolean",
+      "description": "Enable the C# SDK"
+    },
+    "sdk:dart": {
+      "type": "boolean",
+      "description": "Enable the Dart/Flutter SDK"
+    },
+    "sdk:kotlin": {
+      "type": "boolean",
+      "description": "Enable the Kotlin SDK"
+    },
+    "sdk:python": {
+      "type": "boolean",
+      "description": "Enable the Python SDK"
+    },
+    "sdk:swift": {
+      "type": "boolean",
+      "description": "Enable the Swift SDK"
+    },
+
+    "storage:analytics": {
+      "type": "boolean",
+      "description": "Enable Analytics Buckets in Storage"
+    },
+    "storage:vectors": {
+      "type": "boolean",
+      "description": "Enable Vector Buckets in Storage"
+    },
+
+    "search:fullIndex": {
+      "type": "boolean",
+      "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
+    },
+
+    "support:show_client_libraries": {
+      "type": "boolean",
+      "description": "Show the client libraries dropdown input and suggestions in the support form if the category 'API and client libraries' is selected"
+    }
+  },
+  "required": [
+    "account:show_security_settings",
+    "ai:opt_in_level_disabled",
+    "ai:opt_in_level_schema",
+    "ai:opt_in_level_schema_and_log",
+    "ai:opt_in_level_schema_and_log_and_data",
+    "authentication:performance",
+    "authentication:attack_protection",
+    "authentication:emails",
+    "authentication:multi_factor",
+    "authentication:rate_limits",
+    "authentication:show_email_phone_columns",
+    "authentication:show_manual_linking",
+    "authentication:show_provider_filter",
+    "authentication:show_providers",
+    "authentication:show_send_invitation",
+    "authentication:show_sort_by_email",
+    "authentication:show_sort_by_phone",
+    "authentication:show_user_type_filter",
+    "authentication:sign_in_providers",
+    "authentication:third_party_auth",
+    "billing:all",
+    "dashboard_auth:sign_up",
+    "dashboard_auth:sign_in_with_github",
+    "dashboard_auth:sign_in_with_sso",
+    "dashboard_auth:sign_in_with_email",
+    "dashboard_auth:show_tos",
+    "database:replication",
+    "database:roles",
+    "database:restore_to_new_project",
+    "database:network_restrictions",
+    "docs:auth_architecture",
+    "docs:auth_configuration",
+    "docs:auth_flows",
+    "docs:auth_full_security",
+    "docs:auth_troubleshooting",
+    "docs:compliance",
+    "docs:contribution",
+    "docs:fdw",
+    "docs:footer",
+    "docs:framework_quickstarts",
+    "docs:full_getting_started",
+    "docs:full_platform",
+    "docs:hide_cli_profiles",
+    "docs:local_development",
+    "docs:mobile_tutorials",
+    "docs:pgtap",
+    "docs:production_checklist",
+    "docs:self-hosting",
+    "docs:web_apps",
+    "feedback:docs",
+    "integrations:partners",
+    "integrations:wrappers",
+    "integrations:vercel",
+    "integrations:aws_private_link",
+    "infrastructure:read_replicas",
+    "profile:show_email",
+    "profile:show_information",
+    "profile:show_analytics_and_marketing",
+    "profile:show_account_deletion",
+    "logs:templates",
+    "logs:collections",
+    "logs:metadata",
+    "logs:show_metadata_ip_template",
+    "organization:show_sso_settings",
+    "organization:show_security_settings",
+    "organization:show_legal_documents",
+    "project_creation:show_advanced_config",
+    "project_homepage:show_instance_size",
+    "project_homepage:show_examples",
+    "project_addons:dedicated_ipv4_address",
+    "project_addons:show_compute_price",
+    "project_settings:custom_domains",
+    "project_settings:show_disable_legacy_api_keys",
+    "project_settings:legacy_jwt_keys",
+    "project_settings:log_drains",
+    "project_settings:restart_project",
+    "project_settings:database_upgrades",
+    "project_connection:show_app_frameworks",
+    "project_connection:show_mobile_frameworks",
+    "project_connection:show_orms",
+    "quickstarts:hide_nimbus",
+    "reports:all",
+    "sdk:auth",
+    "sdk:csharp",
+    "sdk:dart",
+    "sdk:kotlin",
+    "sdk:python",
+    "sdk:swift",
+    "storage:analytics",
+    "storage:vectors",
+    "search:fullIndex"
+  ],
+  "additionalProperties": false
+}

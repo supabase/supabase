@@ -1,5 +1,5 @@
 import { KJUR } from 'jsrsasign'
-import { useState, ChangeEvent } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { Button, CodeBlock, Input, Select } from 'ui'
 
 const JWT_HEADER = { alg: 'HS256', typ: 'JWT' }
@@ -53,13 +53,13 @@ const generateRandomString = (length: number) => {
   return result
 }
 
-export default function JwtGenerator({}) {
+export default function JwtGenerator() {
   const secret = generateRandomString(40)
 
   const [jwtSecret, setJwtSecret] = useState(secret)
   const [token, setToken] = useState(anonToken)
   const [signedToken, setSignedToken] = useState('')
-  const [err, setErr] = useState<string>(null)
+  const [err, setErr] = useState<string>('')
 
   const handleKeySelection = (e: ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value
@@ -71,7 +71,7 @@ export default function JwtGenerator({}) {
     try {
       const newTok = JSON.parse(e.target.value)
       setToken(newTok)
-      setErr(null)
+      setErr('')
     } catch (err) {
       const errMessage =
         !!err && typeof err === 'object' && 'message' in err && typeof err.message === 'string'
@@ -110,6 +110,7 @@ export default function JwtGenerator({}) {
       <div className="grid mb-8">
         <label htmlFor="token">The JWT will be generated from this info:</label>
         <Input.TextArea
+          key={JSON.stringify(token)}
           id="token"
           type="text"
           rows={6}

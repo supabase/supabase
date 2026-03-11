@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { sqlKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 type OngoingQuery = {
   pid: number
@@ -18,7 +19,7 @@ select pid, query, query_start from pg_stat_activity where state = 'active' and 
 
 export type OngoingQueriesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getOngoingQueries(
@@ -43,13 +44,11 @@ export const useOngoingQueriesQuery = <TData = OngoingQueriesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OngoingQueriesData, OngoingQueriesError, TData> = {}
+  }: UseCustomQueryOptions<OngoingQueriesData, OngoingQueriesError, TData> = {}
 ) =>
-  useQuery<OngoingQueriesData, OngoingQueriesError, TData>(
-    sqlKeys.ongoingQueries(projectRef),
-    ({ signal }) => getOngoingQueries({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<OngoingQueriesData, OngoingQueriesError, TData>({
+    queryKey: sqlKeys.ongoingQueries(projectRef),
+    queryFn: ({ signal }) => getOngoingQueries({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -22,6 +22,7 @@ import AuthProviders from '~/data/auth.json'
 const SplitCodeBlockCarousel = dynamic(
   () => import('~/components/Carousels/SplitCodeBlockCarousel')
 )
+const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
@@ -108,7 +109,7 @@ function AuthPage() {
                   </div>
                   {AuthProviders.map((auth, i) => {
                     return (
-                      <div className="flex w-fit items-center" key={i}>
+                      <div className="flex w-fit items-center text-foreground-light" key={i}>
                         <NextImage
                           src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
                           alt={`${auth.name} auth login icon`}
@@ -149,6 +150,27 @@ function AuthPage() {
             </div>
           </div>
         </SectionContainer>
+
+        <SingleQuote
+          id="quote"
+          className="[&_q]:max-w-2xl"
+          quote={{
+            text: 'Supabase is not only super easy to get started, but also provides all the backend solutions we require as we continue to grow.',
+            author: 'Alfred Lua',
+            role: 'Cofounder of Pebblely',
+            link: '/customers/pebblely',
+            logo: (
+              <NextImage
+                draggable={false}
+                src="/images/blog/avatars/alfred-lua-pebblely.jpeg"
+                alt="Alfred Lua, Cofounder of Pebblely"
+                className="w-10 h-10 rounded-full overflow-hidden object-cover"
+                width={28}
+                height={28}
+              />
+            ),
+          }}
+        />
 
         <SectionContainer>
           <APISection

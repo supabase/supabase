@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { ArrowRight, SearchIcon } from 'lucide-react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
+
 import {
   cn,
   DropdownMenu,
@@ -11,14 +12,35 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ChartHighlight } from './useChartHighlight'
-import { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
-const ChartHighlightActions = ({
+export type UpdateDateRange = (from: string, to: string) => void
+
+export type ChartHighlightActionContext = {
+  start: string
+  end: string
+  clear: () => void
+  chartId?: string
+}
+
+export type ChartHighlightAction = {
+  id: string
+  label: string | ((ctx: ChartHighlightActionContext) => string)
+  icon?: ReactNode
+  isDisabled?: (ctx: ChartHighlightActionContext) => boolean
+  rightSlot?: ReactNode | ((ctx: ChartHighlightActionContext) => ReactNode)
+  onSelect: (ctx: ChartHighlightActionContext) => void
+}
+
+export const ChartHighlightActions = ({
   chartHighlight,
   updateDateRange,
+  actions,
+  chartId,
 }: {
   chartHighlight?: ChartHighlight
-  updateDateRange: UpdateDateRange
+  updateDateRange?: UpdateDateRange
+  actions?: ChartHighlightAction[]
+  chartId?: string
 }) => {
   const { left: selectedRangeStart, right: selectedRangeEnd, clearHighlight } = chartHighlight ?? {}
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)
@@ -27,12 +49,34 @@ const ChartHighlightActions = ({
     setIsOpen(!!chartHighlight?.popoverPosition && selectedRangeStart !== selectedRangeEnd)
   }, [chartHighlight?.popoverPosition])
 
-  const disableZoomIn = dayjs(selectedRangeEnd).diff(dayjs(selectedRangeStart), 'minutes') < 10
-  const handleZoomIn = () => {
-    if (disableZoomIn) return
-    updateDateRange(selectedRangeStart!, selectedRangeEnd!)
-    clearHighlight && clearHighlight()
-  }
+  const ctx: ChartHighlightActionContext | undefined =
+    selectedRangeStart && selectedRangeEnd && clearHighlight
+      ? { start: selectedRangeStart, end: selectedRangeEnd, clear: clearHighlight, chartId }
+      : undefined
+
+  const defaultActions: ChartHighlightAction[] = useMemo(() => {
+    if (!updateDateRange || !ctx) return []
+    const isDisabled = dayjs(ctx.end).diff(dayjs(ctx.start), 'minutes') < 10
+    return [
+      {
+        id: 'zoom-in',
+        label: 'Zoom in',
+        icon: <SearchIcon className="text-foreground-lighter" size={12} />,
+        rightSlot: isDisabled ? <span className="text-xs">Min. 10 minutes</span> : null,
+        isDisabled: () => isDisabled,
+        onSelect: ({ start, end, clear }) => {
+          if (isDisabled) return
+          updateDateRange(start, end)
+          clear()
+        },
+      },
+    ]
+  }, [ctx, updateDateRange])
+
+  const allActions: ChartHighlightAction[] = useMemo(() => {
+    const provided = actions ?? []
+    return [...defaultActions, ...provided]
+  }, [defaultActions, actions])
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -45,31 +89,41 @@ const ChartHighlightActions = ({
         }}
       />
       <DropdownMenuContent className="flex flex-col gap-1 p-1 w-fit text-left">
-        <DropdownMenuLabel className="flex items-center justify-center text-foreground-lighter font-mono gap-1 text-xs">
+        <DropdownMenuLabel className="flex items-center justify-center text-foreground-light font-mono gap-x-2 text-xs">
           <span>{dayjs(selectedRangeStart).format('MMM D, H:mm')}</span>
           <ArrowRight size={10} />
           <span>{dayjs(selectedRangeEnd).format('MMM D, H:mm')}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="my-0" />
-        <DropdownMenuItem
-          disabled={disableZoomIn}
-          className={cn('group', disableZoomIn && '!bg-transparent')}
-        >
-          <button
-            disabled={disableZoomIn}
-            onClick={handleZoomIn}
-            className="w-full flex items-center gap-1.5"
-          >
-            <SearchIcon className="text-foreground-lighter" size={12} />
-            <span className="flex-grow text-left text-foreground-light">Zoom in</span>
-            {disableZoomIn && (
-              <span className="text-foreground-muted text-xs">10 minutes min.</span>
-            )}
-          </button>
-        </DropdownMenuItem>
+        {allActions.map((action) => {
+          const disabled = ctx && action.isDisabled ? action.isDisabled(ctx) : false
+          let labelNode: ReactNode = null
+          if (typeof action.label === 'function') {
+            labelNode = ctx ? action.label(ctx) : null
+          } else {
+            labelNode = action.label
+          }
+          let rightNode: ReactNode = null
+          if (typeof action.rightSlot === 'function') {
+            rightNode = ctx ? action.rightSlot(ctx) : null
+          } else {
+            rightNode = action.rightSlot ?? null
+          }
+          return (
+            <DropdownMenuItem asChild key={action.id} disabled={disabled} className={cn('group')}>
+              <button
+                disabled={disabled}
+                onClick={() => ctx && action.onSelect({ ...ctx })}
+                className="w-full flex items-center gap-1.5"
+              >
+                {action.icon}
+                <span className="flex-grow text-left">{labelNode}</span>
+                {rightNode}
+              </button>
+            </DropdownMenuItem>
+          )
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   )
 }
-
-export default ChartHighlightActions

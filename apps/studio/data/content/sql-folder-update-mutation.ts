@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { contentKeys } from './keys'
 
 export type UpdateSQLSnippetFolderVariables = {
@@ -37,31 +37,33 @@ export const useSQLSnippetFolderCreateMutation = ({
   invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateSQLSnippetFolderData, ResponseError, UpdateSQLSnippetFolderVariables>,
+  UseCustomMutationOptions<
+    UpdateSQLSnippetFolderData,
+    ResponseError,
+    UpdateSQLSnippetFolderVariables
+  >,
   'mutationFn'
 > & {
   invalidateQueriesOnSuccess?: boolean
 } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdateSQLSnippetFolderData, ResponseError, UpdateSQLSnippetFolderVariables>(
-    (args) => updateSQLSnippetFolder(args),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        if (invalidateQueriesOnSuccess) {
-          await queryClient.invalidateQueries(contentKeys.folders(projectRef))
-        }
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update folder: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UpdateSQLSnippetFolderData, ResponseError, UpdateSQLSnippetFolderVariables>({
+    mutationFn: (args) => updateSQLSnippetFolder(args),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      if (invalidateQueriesOnSuccess) {
+        await queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) })
+      }
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update folder: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

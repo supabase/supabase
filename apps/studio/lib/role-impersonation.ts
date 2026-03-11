@@ -1,7 +1,8 @@
+import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import type { User } from 'data/auth/users-infinite-query'
 import { RoleImpersonationState as ValtioRoleImpersonationState } from 'state/role-impersonation-state'
+
 import { uuidv4 } from './helpers'
-import type { INTERNAL_Snapshot } from 'valtio'
 
 type PostgrestImpersonationRole =
   | {
@@ -39,7 +40,7 @@ export type CustomImpersonationRole = {
 
 export type ImpersonationRole = PostgrestImpersonationRole | CustomImpersonationRole
 
-function getExp1HourFromNow() {
+export function getExp1HourFromNow() {
   return Math.floor((Date.now() + 60 * 60 * 1000) / 1000)
 }
 
@@ -100,11 +101,11 @@ function getPostgrestRoleImpersonationSql(
   const unexpiredClaims = { ...claims, exp: getExp1HourFromNow() }
 
   return `
-    select set_config('role', '${role.role}', true),
-           set_config('request.jwt.claims', '${JSON.stringify(unexpiredClaims).replaceAll("'", "''")}', true),
-           set_config('request.method', 'POST', true),
-           set_config('request.path', '/impersonation-example-request-path', true),
-           set_config('request.headers', '{"accept": "*/*"}', true);
+select set_config('role', ${literal(role.role)}, true),
+set_config('request.jwt.claims', ${literal(JSON.stringify(unexpiredClaims))}, true),
+set_config('request.method', 'POST', true),
+set_config('request.path', '/impersonation-example-request-path', true),
+set_config('request.headers', '{"accept": "*/*"}', true);
   `.trim()
 }
 
@@ -114,8 +115,8 @@ export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
 
 function getCustomRoleImpersonationSql(roleName: string) {
   return /* SQL */ `
-    set local role '${roleName}';
-  `
+    set local role ${literal(roleName)};
+  `.trim()
 }
 
 export type RoleImpersonationState = Pick<ValtioRoleImpersonationState, 'role' | 'claims'>
@@ -142,7 +143,7 @@ export function wrapWithRoleImpersonation(sql: string, state?: RoleImpersonation
     select 1 as "${ROLE_IMPERSONATION_NO_RESULTS}";
 
     ${sql}
-  `
+  `.trim()
 }
 
 function encodeText(data: string) {

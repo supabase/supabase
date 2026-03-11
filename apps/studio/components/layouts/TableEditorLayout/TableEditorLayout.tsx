@@ -1,12 +1,58 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { PropsWithChildren } from 'react'
-import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PropsWithChildren, useEffect } from 'react'
 
-const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
+import { ProjectLayoutWithAuth } from '../ProjectLayout'
+import { SaveQueueActionBar } from '@/components/grid/components/footer/operations/SaveQueueActionBar'
+import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { BannerTableEditorFilter } from '@/components/ui/BannerStack/Banners/BannerTableEditorFilter'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+
+const TABLE_EDITOR_NEW_FILTER_BANNER_ID = 'table-editor-new-filter-banner'
+
+export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
+  const { ref } = useParams()
+  const { addBanner, dismissBanner } = useBannerStack()
+  const isTableFilterBarEnabled = useIsTableFilterBarEnabled()
+
+  const [isTableEditorNewFilterBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
+
+  const { can: canReadTables, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'tables'
+  )
+
+  useEffect(() => {
+    if (!isPermissionsLoaded) return
+
+    if (canReadTables && !isTableEditorNewFilterBannerDismissed && !isTableFilterBarEnabled) {
+      addBanner({
+        id: TABLE_EDITOR_NEW_FILTER_BANNER_ID,
+        priority: 2,
+        isDismissed: false,
+        content: <BannerTableEditorFilter />,
+      })
+    } else {
+      dismissBanner(TABLE_EDITOR_NEW_FILTER_BANNER_ID)
+    }
+
+    return () => {
+      dismissBanner(TABLE_EDITOR_NEW_FILTER_BANNER_ID)
+    }
+  }, [
+    addBanner,
+    dismissBanner,
+    canReadTables,
+    isPermissionsLoaded,
+    isTableEditorNewFilterBannerDismissed,
+    isTableFilterBarEnabled,
+  ])
 
   if (isPermissionsLoaded && !canReadTables) {
     return (
@@ -16,7 +62,10 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     )
   }
 
-  return <>{children}</>
+  return (
+    <>
+      {children}
+      <SaveQueueActionBar />
+    </>
+  )
 }
-
-export default TableEditorLayout

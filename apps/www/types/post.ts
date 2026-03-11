@@ -1,6 +1,10 @@
-type PostTypes = {
-  slug?: string
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+
+import type { getSortedPosts } from '@/lib/posts'
+
+export interface PostTypes {
   type: 'casestudy' | 'blog' | 'event'
+  slug?: string
   title: string
   name?: string
   date: string
@@ -12,8 +16,10 @@ type PostTypes = {
     url: string
   }
   content?: string
-  thumb: string
-  image?: string
+  imgThumb?: string // Used by blog posts and case studies
+  imgSocial?: string // Used by blog posts
+  thumb?: string // Used by events
+  thumb_light?: string // Used by events (light mode variant)
   readingTime?: string
   description: string
   url: string
@@ -35,7 +41,159 @@ type PostTypes = {
     href: string
     target?: '_blank' | '_self'
     label?: string
-  } // used on event previews to link to a custom event page
+  }
 }
+
+export type Event = {
+  slug: string
+  source: string
+  content: any
+}
+
+type EventType = 'webinar' | 'meetup' | 'conference' | 'talk' | 'hackathon' | 'launch_week'
+
+type CTA = {
+  url: string
+  label?: string
+  disabled_label?: string
+  disabled?: boolean
+  target?: '_blank' | '_self'
+}
+
+type CompanyType = {
+  name: string
+  website_url: string
+  logo: string
+  logo_light: string
+}
+
+export type StaticAuthor = {
+  author: string
+  author_image_url: string | null
+  author_url: string
+  position: string
+}
+
+export type Blog = {
+  slug: string
+  title: string
+  description?: string
+  content: MDXRemoteSerializeResult
+  toc: string | { content: string }
+  author?: string
+  authors?: StaticAuthor[]
+  date: string
+  categories?: string[]
+  tags?:
+    | string[]
+    | Array<{
+        id: number
+        documentId: string
+        name: string
+        createdAt: string
+        updatedAt: string
+        publishedAt: string
+      }>
+  toc_depth?: number
+  video?: string
+  docs_url?: string
+  blog_url?: string
+  url?: string
+  source: string
+  imgSocial?: string
+  imgThumb?: string
+  youtubeHero?: string
+  launchweek?: number | string
+  meta_title?: string
+  meta_description?: string
+  meta_image?: string
+}
+
+export type BlogData = {
+  slug: string
+  title: string
+  description?: string
+  content: MDXRemoteSerializeResult
+  toc: string | { content: string }
+  author?: string
+  authors?: StaticAuthor[]
+  date: string
+  categories?: string[]
+  tags?:
+    | string[]
+    | Array<{
+        id: number
+        documentId: string
+        name: string
+        createdAt: string
+        updatedAt: string
+        publishedAt: string
+      }>
+  toc_depth?: number
+  docs_url?: string
+  blog_url?: string
+  url?: string
+  source: string
+  imgSocial?: string
+  imgThumb?: string
+  youtubeHero?: string
+  launchweek?: number | string
+  meta_title?: string
+  meta_description?: string
+  meta_image?: string
+  video?: string
+}
+
+export type Tag =
+  | string
+  | {
+      name: string
+      id: number
+      documentId: string
+      createdAt: string
+      updatedAt: string
+      publishedAt: string
+    }
+
+export type Category = string | { name: string }
+
+// Add a new type for processed blog data
+export type ProcessedBlogData = Blog &
+  BlogData & {
+    needsSerialization?: boolean
+  }
+
+export type ProcessedEventData = EventData & {
+  needsSerialization?: boolean
+}
+
+export interface EventData {
+  title: string
+  subtitle?: string
+  main_cta?: CTA
+  description: string
+  type: EventType
+  company?: CompanyType
+  onDemand?: boolean
+  disable_page_build?: boolean
+  duration?: string
+  timezone?: string
+  tags?: string[]
+  date: string
+  end_date?: string
+  speakers: string
+  speakers_label?: string
+  og_image?: string
+  thumb?: string
+  thumb_light?: string
+  youtubeHero?: string
+  author_url?: string
+  launchweek?: number | string
+  meta_title?: string
+  meta_description?: string
+  video?: string
+}
+
+export type PostReturnType = ReturnType<typeof getSortedPosts>[number]
 
 export default PostTypes

@@ -1,7 +1,5 @@
 export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
-  indexes: (projectRef: string | undefined, schema?: string) =>
-    ['projects', projectRef, 'indexes', schema].filter(Boolean),
   keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
   migrations: (projectRef: string | undefined) => ['projects', projectRef, 'migrations'] as const,
   tableColumns: (
@@ -29,8 +27,8 @@ export const databaseKeys = {
     ['projects', projectRef, 'index-advisor', { query }] as const,
   tableConstraints: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'table-constraints', id] as const,
-  foreignKeyConstraints: (projectRef: string | undefined, schema?: string) =>
-    ['projects', projectRef, 'foreign-key-constraints', schema] as const,
+  foreignKeyConstraints: (projectRef: string | undefined, schema?: string, options = {}) =>
+    ['projects', projectRef, 'foreign-key-constraints', schema, options] as const,
   databaseSize: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database-size'] as const,
   maxConnections: (projectRef: string | undefined) =>
@@ -39,4 +37,15 @@ export const databaseKeys = {
     ['projects', projectRef, 'pgbouncer', 'status'] as const,
   pgbouncerConfig: (projectRef: string | undefined) =>
     ['projects', projectRef, 'pgbouncer', 'config'] as const,
+  checkPrimaryKeysExists: (
+    projectRef: string | undefined,
+    tables: { name: string; schema: string }[]
+  ) => ['projects', projectRef, 'check-primary-keys', tables] as const,
+  tableIndexAdvisor: (
+    projectRef: string | undefined,
+    schema: string | undefined,
+    table: string | undefined
+  ) => ['projects', projectRef, 'table-index-advisor', schema, table] as const,
+  supamonitorEnabled: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'supamonitor-enabled'] as const,
 }

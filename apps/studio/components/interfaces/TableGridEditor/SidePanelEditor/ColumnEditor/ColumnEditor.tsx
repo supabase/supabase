@@ -1,15 +1,9 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { isEmpty, noop } from 'lodash'
-import { ExternalLink, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import {
-  CONSTRAINT_TYPE,
   Constraint,
+  CONSTRAINT_TYPE,
   useTableConstraintsQuery,
 } from 'data/database/constraints-query'
 import {
@@ -17,10 +11,17 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
+import { isEmpty, noop } from 'lodash'
+import { ExternalLink, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import type { Dictionary } from 'types'
 import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
-import ActionBar from '../ActionBar'
+
+import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -55,13 +56,14 @@ export interface ColumnEditorProps {
       primaryKey?: Constraint
       foreignKeyRelations: ForeignKey[]
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      createMore?: boolean
     },
     resolve: any
   ) => void
   updateEditorDirty: () => void
 }
 
-const ColumnEditor = ({
+export const ColumnEditor = ({
   column,
   selectedTable,
   visible = false,
@@ -70,11 +72,12 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  const [createMore, setCreateMore] = useState(false)
   const [placeholder, setPlaceholder] = useState(
     getPlaceholderText(columnFields?.format, columnFields?.name)
   )
@@ -83,8 +86,9 @@ const ColumnEditor = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const enumTypes = (types ?? []).filter(
-    (type) => !PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+    (type) => !protectedSchemas.find((s) => s.name === type.schema)
   )
 
   const { data: constraints } = useTableConstraintsQuery({
@@ -173,15 +177,27 @@ const ColumnEditor = ({
 
       if (isEmpty(errors)) {
         const payload = isNewRecord
-          ? generateCreateColumnPayload(selectedTable.id, columnFields)
+          ? generateCreateColumnPayload(selectedTable, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
         const configuration = {
           columnId: column?.id,
           primaryKey,
           foreignKeyRelations: fkRelations,
           existingForeignKeyRelations: foreignKeys,
+          createMore,
         }
-        saveChanges(payload, isNewRecord, configuration, resolve)
+        saveChanges(payload, isNewRecord, configuration, (err?: any) => {
+          resolve()
+          if (!err && createMore && isNewRecord) {
+            const freshColumnFields = generateColumnField({
+              schema: selectedTable.schema,
+              table: selectedTable.name,
+            })
+            setColumnFields(freshColumnFields)
+            setFkRelations([])
+            setErrors({})
+          }
+        })
       } else {
         resolve()
       }
@@ -204,12 +220,30 @@ const ColumnEditor = ({
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
-        />
+          visible={visible}
+        >
+          {isNewRecord && (
+            <div className="flex items-center gap-x-2">
+              <Toggle
+                size="tiny"
+                checked={createMore}
+                onChange={() => setCreateMore(!createMore)}
+              />
+              <label
+                className="text-foreground-light text-sm cursor-pointer select-none"
+                onClick={() => setCreateMore(!createMore)}
+              >
+                Create more
+              </label>
+            </div>
+          )}
+        </ActionBar>
       }
     >
       <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <Input
+            id="name"
             label="Name"
             type="text"
             descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
@@ -219,6 +253,7 @@ const ColumnEditor = ({
             onChange={(event: any) => onUpdateField({ name: event.target.value })}
           />
           <Input
+            id="description"
             label="Description"
             labelOptional="Optional"
             type="text"
@@ -246,7 +281,7 @@ const ColumnEditor = ({
                   icon={<ExternalLink size={14} strokeWidth={2} />}
                 >
                   <Link
-                    href="https://supabase.com/docs/guides/database/tables#data-types"
+                    href={`${DOCS_URL}/guides/database/tables#data-types`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -371,5 +406,3 @@ const ColumnEditor = ({
     </SidePanel>
   )
 }
-
-export default ColumnEditor

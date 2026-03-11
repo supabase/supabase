@@ -19,10 +19,12 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
 
       <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`
-SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
-        `}
+          {[
+            '',
+            `SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+            `SUPABASE_KEY=${projectKeys?.publishableKey ?? projectKeys?.anonKey ?? 'your-anon-key'}`,
+            '',
+          ].join('\n')}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
@@ -32,7 +34,7 @@ SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
 import { createClient } from "@refinedev/supabase";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
   db: {
@@ -49,13 +51,13 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
       <ConnectTabContent value="src/App.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
-import { Refine, WelcomePage } from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import routerBindings, {
+import routerProvider, {
   DocumentTitleHandler,
   NavigateToResource,
   UnsavedChangesNotifier,
-} from "@refinedev/react-router-v6";
+} from "@refinedev/react-router";
 import { dataProvider, liveProvider } from "@refinedev/supabase";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -72,7 +74,7 @@ function App() {
           dataProvider={dataProvider(supabaseClient)}
           liveProvider={liveProvider(supabaseClient)}
           authProvider={authProvider}
-          routerProvider={routerBindings}
+          routerProvider={routerProvider}
           options={{
             syncWithLocation: true,
             warnWhenUnsavedChanges: true,

@@ -21,7 +21,7 @@ const DropAllReplicasConfirmationModal = ({
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
   const { data: databases } = useReadReplicasQuery({ projectRef })
-  const { mutateAsync: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation()
+  const { mutateAsync: removeReadReplica, isPending: isRemoving } = useReadReplicaRemoveMutation()
 
   const onConfirmRemove = async () => {
     if (!projectRef) return console.error('Project is required')
@@ -42,8 +42,8 @@ const DropAllReplicasConfirmationModal = ({
       toast.success(`Tearing down all read replicas`)
 
       await Promise.all([
-        queryClient.invalidateQueries(replicaKeys.list(projectRef)),
-        queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
+        queryClient.invalidateQueries({ queryKey: replicaKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: replicaKeys.loadBalancers(projectRef) }),
       ])
 
       onSuccess()
