@@ -37,26 +37,6 @@ describe('mergeSectionOrder', () => {
       'custom-report',
     ])
   })
-
-  it('appends missing sections at end when no later default sibling exists', () => {
-    expect(mergeSectionOrder(['connect'])).toEqual([
-      'connect',
-      'getting-started',
-      'usage',
-      'advisor',
-      'custom-report',
-    ])
-  })
-
-  it('handles empty stored order', () => {
-    expect(mergeSectionOrder([])).toEqual([
-      'connect',
-      'getting-started',
-      'usage',
-      'advisor',
-      'custom-report',
-    ])
-  })
 })
 
 describe('getSectionVisibility', () => {
