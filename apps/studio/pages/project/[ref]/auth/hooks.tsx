@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -60,7 +59,7 @@ const Hooks: NextPageWithLayout = () => {
 
 Hooks.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Auth Hooks">{page}</AuthLayout>
   </DefaultLayout>
 )
 

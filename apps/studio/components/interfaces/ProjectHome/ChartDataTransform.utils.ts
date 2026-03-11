@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+
 import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 
 /**

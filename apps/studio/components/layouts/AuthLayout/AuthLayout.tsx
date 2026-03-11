@@ -14,16 +14,15 @@ const AuthProductMenu = () => {
 
   useAuthConfigPrefetch({ projectRef })
   const page = router.pathname.split('/')[4]
-
   const menu = useGenerateAuthMenu()
 
   return <ProductMenu page={page} menu={menu} />
 }
 
-const AuthLayout = ({ children }: PropsWithChildren<{}>) => {
+const AuthLayout = ({ title, children }: PropsWithChildren<{ title: string }>) => {
   return (
     <ProjectLayout
-      title="Authentication"
+      title={title}
       product="Authentication"
       productMenu={<AuthProductMenu />}
       isBlocking={false}
