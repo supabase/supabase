@@ -2,12 +2,12 @@ TEAM
 
 Supabase is 100% remote.
 
+AJ Matias
 Aaron Brooks
 Aaron Byrne
 Ada Wong
 Adam Mohammed
 Adam Mokan
-AJ Matias
 Akash Manimaran
 Alaister Young
 Alan De Los Santos
@@ -35,9 +35,9 @@ Bo Lu
 Bobbie Soedirgo
 Brendan Stephens
 Brent Newson
-Carel de Waal
 Cameron Blackwood
 Cameron Michie
+Carel de Waal
 Cemal Kılıç
 Chandana Anumula
 Charis Lam
@@ -115,21 +115,22 @@ Jim Chanco Jr
 Joakim Ahrlin
 Joaquim Moreno
 Joel Low
-John Fitzgerald
 Joel Martin
+Joey Freeland
 Johan Bergström
+John Fitzgerald
 John Pena
 John Schaeffer
 Jon M
 Jonny Summers-Muir
 Jordi Enric
-José Luis Ledesma
 Joshen Lim
+José Luis Ledesma
 Julien Goux
 Kalleby Santos
-Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
+Kanishk Dudeja
 Karan S
 Karlo Ison
 Katerina Skroumpelou
@@ -150,18 +151,17 @@ Lindsay Moss
 Long Hoang
 Luca Forstner
 Lukas Bernert
-Łukasz Niemier
 Maksym Ionutsa
 Manan Gupta
 Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
 Marouane Souda
-Matthew Hambright
+Mats Kindahl
 Matt Johnston
 Matt Rossman
+Matthew Hambright
 Matthias Luft
-Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
 Miles Thomas
@@ -192,8 +192,8 @@ Rodrigo Esteves
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
-Ryan Goulet
 Ruan Maia
+Ryan Goulet
 Sam Meech-Ward
 Sam Rome
 Sam Rose
@@ -211,9 +211,9 @@ Stephen Morgan
 Steve Chavez
 Steven Eubank
 Stojan Dimitrovski
-Szymon Mentel
 Sugu Sougoumarane
 Supun Sudaraka Kalidasa
+Szymon Mentel
 Taha Le Bras
 Tanun Chalermsinsuwan
 Taryn King
@@ -227,8 +227,8 @@ Tina Ha
 Tom Ashley
 Tom G
 Tomás Pozo
-Tyler Hillery
 Tyler Fontaine
+Tyler Hillery
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
@@ -237,6 +237,7 @@ Yuliya Marinova
 Yuri Santana
 Zach Marinov
 Zsolt Pazmandy
+Łukasz Niemier
 ____________
 
 JOBS
