@@ -3,8 +3,6 @@ import userEvent from '@testing-library/user-event'
 import {
   LogsDatePicker,
   parseCustomInput,
-  convertToDays,
-  getAvailableInForDays,
   generateDynamicHelper,
   generateDynamicHelpers,
   generateHelpersFromInput,
@@ -70,39 +68,6 @@ describe('parseCustomInput', () => {
   })
 })
 
-describe('convertToDays', () => {
-  test('converts minutes to days', () => {
-    expect(convertToDays(1440, 'minute')).toBe(1)
-    expect(convertToDays(720, 'minute')).toBe(0.5)
-  })
-
-  test('converts hours to days', () => {
-    expect(convertToDays(24, 'hour')).toBe(1)
-    expect(convertToDays(48, 'hour')).toBe(2)
-  })
-
-  test('days remain unchanged', () => {
-    expect(convertToDays(7, 'day')).toBe(7)
-  })
-})
-
-describe('getAvailableInForDays', () => {
-  test('returns all plans for <= 1 day', () => {
-    expect(getAvailableInForDays(0.5)).toEqual(['free', 'pro', 'team', 'enterprise', 'platform'])
-    expect(getAvailableInForDays(1)).toEqual(['free', 'pro', 'team', 'enterprise', 'platform'])
-  })
-
-  test('returns pro+ for <= 7 days', () => {
-    expect(getAvailableInForDays(2)).toEqual(['pro', 'team', 'enterprise', 'platform'])
-    expect(getAvailableInForDays(7)).toEqual(['pro', 'team', 'enterprise', 'platform'])
-  })
-
-  test('returns team+ for > 7 days', () => {
-    expect(getAvailableInForDays(8)).toEqual(['team', 'enterprise', 'platform'])
-    expect(getAvailableInForDays(30)).toEqual(['team', 'enterprise', 'platform'])
-  })
-})
-
 describe('generateDynamicHelper', () => {
   test('generates helper with correct text', () => {
     const helper = generateDynamicHelper(5, 'hour')
@@ -119,14 +84,6 @@ describe('generateDynamicHelper', () => {
     expect(generateDynamicHelper(2, 'minute').text).toBe('Last 2 minutes')
     expect(generateDynamicHelper(2, 'hour').text).toBe('Last 2 hours')
     expect(generateDynamicHelper(2, 'day').text).toBe('Last 2 days')
-  })
-
-  test('generates helper with correct availableIn based on time range', () => {
-    const minuteHelper = generateDynamicHelper(30, 'minute')
-    expect(minuteHelper.availableIn).toEqual(['free', 'pro', 'team', 'enterprise', 'platform'])
-
-    const dayHelper = generateDynamicHelper(14, 'day')
-    expect(dayHelper.availableIn).toEqual(['team', 'enterprise', 'platform'])
   })
 
   test('calcFrom returns correct ISO string', () => {

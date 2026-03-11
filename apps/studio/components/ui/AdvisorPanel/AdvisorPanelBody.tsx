@@ -1,10 +1,10 @@
-import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
-
 import { Lint } from 'data/lint/lint-query'
 import { Notification } from 'data/notifications/notifications-v2-query'
+import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   formatItemDate,
@@ -57,7 +57,7 @@ export const AdvisorPanelBody = ({
   hasProjectRef = true,
 }: AdvisorPanelBodyProps) => {
   // Show notice if no project ref and trying to view project-specific tabs
-  if (!hasProjectRef && activeTab !== 'messages') {
+  if (!hasProjectRef && activeTab !== 'messages' && activeTab !== 'all') {
     return <NoProjectNotice />
   }
 

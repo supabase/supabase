@@ -59,6 +59,21 @@ export const precisionFormatter = (num: number, precision: number): string => {
 }
 
 /**
+ * Formats a number compactly for Y-axis ticks by abbreviating large values.
+ * Prevents long numbers like 1,000,000 from overflowing the Y-axis width.
+ *
+ * @example
+ * compactNumberFormatter(999)        // "999"
+ * compactNumberFormatter(1000)       // "1K"
+ * compactNumberFormatter(1500)       // "1.5K"
+ * compactNumberFormatter(1000000)    // "1M"
+ * compactNumberFormatter(2500000)    // "2.5M"
+ */
+export const compactNumberFormatter = (num: number): string => {
+  return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(num)
+}
+
+/**
  * Formats a percentage, trimming decimals at 100.
  *
  * @example
@@ -97,6 +112,66 @@ export const timestampFormatter = (
     return dayjs.utc(value).format(format)
   }
   return dayjs(value).format(format)
+}
+
+/**
+ * Computes the Y-axis domain for a ComposedChart that may contain stacked Bar components
+ * and an optional max-value reference Line.
+ *
+ * Recharts' `['auto', 'auto']` domain does not correctly include a Line component's values
+ * when stacked Bars are present — the domain is derived only from the bar data, so the
+ * reference line (e.g. Max IOPS) and any bars that exceed it get visually clipped.
+ * This function returns an explicit `[0, max]` domain when a visible reference line exists.
+ *
+ * @example
+ * // Max IOPS reference line at 25 000, bars reach up to 25 403
+ * computeYAxisDomain({ maxAttributeKey: 'disk_iops_max', showMaxLine: true, ... })
+ * // → [0, 25403]
+ *
+ * // Percentage chart zoomed in (no max line toggle)
+ * computeYAxisDomain({ isPercentage: true, showMaxValue: false, yMaxFromVisible: 75, ... })
+ * // → [0, 75]
+ *
+ * // No max reference line — let Recharts auto-scale
+ * computeYAxisDomain({ maxAttributeKey: undefined, ... })
+ * // → ['auto', 'auto']
+ */
+export function computeYAxisDomain({
+  isPercentage,
+  showMaxValue,
+  yMaxFromVisible,
+  maxAttributeKey,
+  showMaxLine,
+  data,
+  visibleAttributeNames,
+}: {
+  isPercentage: boolean
+  showMaxValue: boolean
+  yMaxFromVisible: number
+  maxAttributeKey: string | undefined
+  showMaxLine: boolean
+  data: Record<string, unknown>[]
+  visibleAttributeNames: string[]
+}): [number, number] | ['auto', 'auto'] {
+  if (isPercentage && !showMaxValue) return [0, yMaxFromVisible]
+  if (!maxAttributeKey || !showMaxLine) return ['auto', 'auto']
+
+  const maxRefValue = data.reduce((max, point) => {
+    const val = point[maxAttributeKey]
+    return typeof val === 'number' ? Math.max(max, val) : max
+  }, 0)
+
+  if (maxRefValue <= 0) return ['auto', 'auto']
+
+  const maxStackedTotal = data.reduce((max, point) => {
+    const total = visibleAttributeNames.reduce((sum, name) => {
+      const val = point[name]
+      return sum + (typeof val === 'number' ? val : 0)
+    }, 0)
+    return Math.max(max, total)
+  }, 0)
+
+  return [0, Math.max(maxRefValue, maxStackedTotal)]
 }
 
 /**

@@ -1,8 +1,8 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-
 import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { notificationKeys } from './keys'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10
@@ -12,9 +12,9 @@ export type NotificationVariables = {
   limit?: number
   status?: 'new' | 'seen' | 'archived'
   filters: {
-    priority: readonly string[]
-    organizations: readonly string[]
-    projects: readonly string[]
+    priority?: readonly string[]
+    organizations?: readonly string[]
+    projects?: readonly string[]
   }
 }
 
@@ -37,16 +37,17 @@ export type NotificationData = {
 
 export async function getNotifications(options: NotificationVariables, signal?: AbortSignal) {
   const { status, filters, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
+  const { priority = [], organizations = [], projects = [] } = filters
+
   const { data, error } = await get('/platform/notifications', {
     params: {
       query: {
         offset: page * limit,
         limit,
-        // [Alaister]: 'as any' is needed because the API types don't reflect an array of strings
-        ...(status !== undefined ? { status } : { status: ['new', 'seen'].join(',') as any }),
-        ...(filters.priority.length > 0 ? { priority: filters.priority.join(',') as any } : {}),
-        ...(filters.organizations.length > 0 ? { org_slug: filters.organizations.join(',') } : {}),
-        ...(filters.projects.length > 0 ? { project_ref: filters.projects.join(',') } : {}),
+        ...(status !== undefined ? { status } : { status: ['new', 'seen'].join(',') }),
+        ...(priority.length > 0 ? { priority: priority.join(',') } : {}),
+        ...(organizations.length > 0 ? { org_slug: organizations.join(',') } : {}),
+        ...(projects.length > 0 ? { project_ref: projects.join(',') } : {}),
       },
     },
     headers: { Version: '2' },

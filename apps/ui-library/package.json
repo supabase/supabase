@@ -50,6 +50,7 @@
     "@supabase/postgrest-js": "catalog:",
     "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "@tanstack/react-query": "^5.83.0",
+    "api-types": "workspace:*",
     "@supabase/vue-blocks": "workspace:*",
     "axios": "^1.12.0",
     "class-variance-authority": "*",

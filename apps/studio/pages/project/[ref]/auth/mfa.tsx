@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
 import { MfaAuthSettingsForm } from 'components/interfaces/Auth/MfaAuthSettingsForm/MfaAuthSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
@@ -66,7 +65,7 @@ const MfaPage: NextPageWithLayout = () => {
 
 MfaPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Multi-Factor">{page}</AuthLayout>
   </DefaultLayout>
 )
 

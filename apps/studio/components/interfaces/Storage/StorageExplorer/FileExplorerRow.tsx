@@ -237,6 +237,11 @@ export const FileExplorerRow = ({
                         ],
                       },
                     ]),
+                {
+                  name: 'Download',
+                  icon: <Download size={14} strokeWidth={1} />,
+                  onClick: () => downloadFile(itemWithColumnIndex),
+                },
                 ...(canUpdateFiles
                   ? [
                       {
@@ -248,11 +253,6 @@ export const FileExplorerRow = ({
                         name: 'Move',
                         icon: <Move size={14} strokeWidth={1} />,
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
-                      },
-                      {
-                        name: 'Download',
-                        icon: <Download size={14} strokeWidth={1} />,
-                        onClick: () => downloadFile(itemWithColumnIndex),
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
                     ]

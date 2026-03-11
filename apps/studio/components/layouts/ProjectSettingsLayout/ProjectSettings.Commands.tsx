@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useRouter } from 'next/router'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
@@ -10,8 +11,10 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   const router = useRouter()
   const setIsOpen = useSetCommandMenuOpen()
-  let { ref } = useParams()
+  let { ref, slug } = useParams()
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   ref ||= '_'
+  const hasOrgSlug = typeof slug === 'string' && slug.length > 0 && slug !== '_'
 
   const { projectSettingsLogDrains, projectSettingsCustomDomains, authenticationSignInProviders } =
     useIsFeatureEnabled([
@@ -43,6 +46,26 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           : `/project/${ref}/auth/policies`,
         defaultHidden: true,
       },
+      ...(platformWebhooksEnabled
+        ? [
+            {
+              id: 'nav-project-settings-webhooks',
+              name: 'Project Webhooks',
+              route: `/project/${ref}/settings/webhooks`,
+              defaultHidden: true,
+            } as IRouteCommand,
+            ...(hasOrgSlug
+              ? [
+                  {
+                    id: 'nav-organization-settings-webhooks',
+                    name: 'Organization Webhooks',
+                    route: `/org/${slug}/webhooks`,
+                    defaultHidden: true,
+                  } as IRouteCommand,
+                ]
+              : []),
+          ]
+        : []),
       {
         id: 'nav-project-settings-api',
         name: 'API Settings',
@@ -146,6 +169,6 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           ]
         : []),
     ],
-    { ...options, deps: [ref] }
+    { ...options, deps: [platformWebhooksEnabled, ref, slug] }
   )
 }

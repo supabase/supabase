@@ -51,7 +51,7 @@ const RestoreToNewProjectPage: NextPageWithLayout = () => {
 
 RestoreToNewProjectPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Backups">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

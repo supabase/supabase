@@ -106,7 +106,9 @@ Before adding destinations, you need to enable replication for your project:
 <Image
   alt="Enable Replication"
   src="/docs/img/database/replication/replication-enable-replication.png"
-  zoomable
+
+width={3560}
+height={2146}
 />
 
 ### Step 3: Add a destination
@@ -115,114 +117,15 @@ Once replication is enabled and you have a Postgres publication, you can add a d
 
 #### Choose and configure your destination
 
-Follow these steps to configure your destination. The specific configuration depends on which destination type you choose. Both Analytics Buckets and BigQuery destinations are supported, though availability varies based on the planned roll-out strategy.
+Follow these steps to configure your destination. Right now, **BigQuery** is the only managed destination available in Replication.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="analytics-buckets"
-  queryGroup="destination"
->
-<TabPanel id="analytics-buckets" label="Analytics Buckets">
+<Admonition type="note" title="Why Analytics Buckets are no longer listed here">
 
-[Analytics Buckets](/docs/guides/storage/analytics/introduction) are specialized storage buckets in Supabase Storage designed for analytical workloads. They provide S3-compatible storage and use the [Apache Iceberg](https://iceberg.apache.org/) open table format, making your data accessible via standard tools like DuckDB, Spark, and other analytics platforms.
+We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
 
-When you replicate to Analytics Buckets, your database changes are automatically written in Iceberg format, creating tables in object storage that you can query for analytics.
+At the moment, BigQuery is the only supported destination, but we are actively working on expanding capabilities.
 
-##### Step 1: Create an analytics bucket
-
-First, create an analytics bucket to store your replicated data:
-
-1. Navigate to [Storage](/dashboard/project/_/storage/buckets) → **Analytics** in your Supabase Dashboard
-2. Click **New bucket**
-
-   <Image
-     alt="Create new analytics bucket"
-     src="/docs/img/database/replication/replication-iceberg-new-bucket.png"
-     zoomable
-   />
-
-3. Fill in the bucket details:
-
-   <Image
-     alt="Analytics bucket details"
-     src="/docs/img/database/replication/replication-iceberg-details.png"
-     zoomable
-   />
-
-   - **Name**: A unique name for your bucket (e.g., `analytics_warehouse`)
-   - **Region**: Select the region where your data will be stored
-
-4. Click **Create bucket**
-
-5. **Copy the credentials** displayed after bucket creation. You'll need these in the next steps:
-   - **Catalog Token**: Authentication token for accessing the Iceberg catalog
-   - **S3 Access Key ID**: Access key for S3-compatible storage
-   - **S3 Secret Access Key**: Secret key for S3-compatible storage
-
-##### Step 2: Configure analytics buckets as a destination
-
-1. Navigate to [Database](/dashboard/project/_/database/replication) → **replication** in your Supabase Dashboard
-2. Click **Add destination**
-
-   <Image
-     alt="Add Destination"
-     src="/docs/img/database/replication/replication-add-destination.png"
-     zoomable
-   />
-
-3. Configure the general settings:
-
-   - **Destination name**: A name to identify this destination (e.g., "Analytics Warehouse")
-   - **Publication**: The publication to replicate data from (created in [Step 1](#step-1-create-a-postgres-publication))
-   - **Destination type**: Select **Analytics Buckets**
-
-4. Configure Analytics Buckets settings:
-
-   - **Bucket**: The name of your analytics bucket from Step 1
-   - **Namespace**: The schema name where your tables will be replicated (e.g., `public`)
-   - **Catalog Token**: Authentication token from Step 1
-   - **S3 Access Key ID**: Access key from Step 1
-   - **S3 Secret Access Key**: Secret key from Step 1
-
-5. Configure **Advanced Settings** (optional):
-
-   - **Batch wait time (milliseconds)**: How long to wait for more changes before sending a batch. Default is recommended for optimal performance.
-
-6. Click **Create and start** to begin replication
-
-Your replication pipeline will now start copying data from your database to the analytics bucket in Iceberg format.
-
-##### How it works
-
-Once configured, replication to Analytics Buckets:
-
-1. Captures changes from your Postgres database (INSERT, UPDATE, DELETE, TRUNCATE operations)
-2. Batches changes for optimal performance
-3. Creates Iceberg tables automatically to match your Postgres schema
-4. Streams data to Analytics Buckets
-
-##### How tables are structured
-
-Replicated tables use a changelog structure:
-
-- Tables are created with a `_changelog` suffix in the name (e.g., `users_changelog`)
-- Each table contains a `cdc_operation` column indicating the operation type: `INSERT`, `UPDATE`, `DELETE`, or `TRUNCATE`
-- This append-only format preserves the complete history of all changes
-
-##### Limitations
-
-- **Append-only log**: Currently provides an append-only log format rather than a full table representation
-
-##### Additional resources
-
-- [Analytics Buckets documentation](/docs/guides/storage/analytics/introduction) - Learn more about Analytics Buckets and S3-compatible storage
-- [Realtime Data Sync to Analytics Buckets](/docs/guides/storage/analytics/replication) - Step-by-step guide for replicating to Analytics Buckets
-- [Apache Iceberg](https://iceberg.apache.org/) - Official Iceberg documentation
-
-</TabPanel>
-<TabPanel id="bigquery" label="BigQuery">
+</Admonition>
 
 [BigQuery](https://cloud.google.com/bigquery) is Google's fully managed data warehouse. You can replicate your database tables to BigQuery for analytics and reporting.
 
@@ -263,7 +166,8 @@ Before configuring BigQuery as a destination, set up the following in Google Clo
    <Image
      alt="BigQuery Configuration Settings"
      src="/docs/img/database/replication/replication-bigquery-details.png"
-     zoomable
+     width={3560}
+     height={2146}
    />
 
 3. Configure the general settings:
@@ -315,13 +219,11 @@ This structure handles table truncations seamlessly while maintaining query comp
 ##### Limitations
 
 - **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
+- **Table names**: Source table names cannot start or end with `_` when replicating to BigQuery
 
 ##### Additional resources
 
 - [BigQuery documentation](https://cloud.google.com/bigquery/docs) - Official Google BigQuery documentation
-
-</TabPanel>
-</Tabs>
 
 ### Step 4: Monitor your pipeline
 
@@ -330,7 +232,9 @@ After creating a destination, the replication pipeline will start and appear in 
 <Image
   alt="Replication Destinations List"
   src="/docs/img/database/replication/replication-destinations-list.png"
-  zoomable
+  width={3560}
+  height={2146}
+
 />
 
 For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [Replication Monitoring guide](/docs/guides/database/replication/replication-monitoring).
@@ -342,7 +246,9 @@ You can manage your pipeline from the destinations list using the actions menu.
 <Image
   alt="Pipeline Actions"
   src="/docs/img/database/replication/replication-pipeline-actions.png"
-  zoomable
+  width={3560}
+  height={2146}
+
 />
 
 Available actions:
@@ -428,7 +334,7 @@ Replication has the following limitations:
 - **No data transformation**: Data is replicated as-is without transformation
 - **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur?](/docs/guides/database/replication/replication-faq#can-data-duplicates-occur-during-pipeline-operations) for details
 
-Destination-specific limitations (such as Iceberg's append-only log format or BigQuery's row size limits) are detailed in each destination tab in [Step 3](#step-3-add-a-destination) above.
+Destination-specific limitations, such as BigQuery's row size limits, are documented in [Step 3](#step-3-add-a-destination) above.
 
 ### Future work
 

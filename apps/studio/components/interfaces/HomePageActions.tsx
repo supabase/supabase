@@ -1,30 +1,30 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import {
+  PROJECT_LIST_SORT_VALUES,
+  type ProjectListSort,
+} from 'components/interfaces/Home/ProjectList/ProjectListSort.utils'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
+import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { Button, ToggleGroup, ToggleGroupItem } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { FilterPopover } from '../ui/FilterPopover'
+import { SortDropdown } from '../ui/SortDropdown'
 
 interface HomePageActionsProps {
   slug?: string
   hideNewProject?: boolean
-  showViewToggle?: boolean
 }
 
-export const HomePageActions = ({
-  slug: _slug,
-  hideNewProject = false,
-  showViewToggle = false,
-}: HomePageActionsProps) => {
+export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePageActionsProps) => {
   const { slug: urlSlug } = useParams()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
@@ -35,15 +35,22 @@ export const HomePageActions = ({
     'status',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringLiteral(PROJECT_LIST_SORT_VALUES).withDefault('name_asc')
+  )
   const [viewMode, setViewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
 
-  const [filterStatusStorage, setFilterStatusStorage, { isSuccess }] = useLocalStorageQuery<
-    string[]
-  >(LOCAL_STORAGE_KEYS.PROJECTS_FILTER, [])
+  const [filterStatusStorage, setFilterStatusStorage, { isSuccess: isSuccessFilterStatusStorage }] =
+    useLocalStorageQuery<string[]>(LOCAL_STORAGE_KEYS.PROJECTS_FILTER, [])
+
+  const [sortStorage, setSortStorage, { isSuccess: isSuccessSortStorage }] =
+    useLocalStorageQuery<ProjectListSort>(LOCAL_STORAGE_KEYS.PROJECTS_SORT, 'name_asc')
 
   const { isFetching: isFetchingProjects } = useOrgProjectsInfiniteQuery(
     {
       slug,
+      sort,
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
@@ -51,17 +58,21 @@ export const HomePageActions = ({
   )
 
   useEffect(() => {
-    if (isSuccess && !!urlSlug) setFilterStatus(filterStatusStorage)
-  }, [filterStatusStorage, isSuccess, urlSlug, setFilterStatus])
+    if (isSuccessFilterStatusStorage && !!slug) setFilterStatus(filterStatusStorage)
+  }, [filterStatusStorage, isSuccessFilterStatusStorage, setFilterStatus, slug])
+
+  useEffect(() => {
+    if (isSuccessSortStorage && slug) setSort(sortStorage)
+  }, [sortStorage, isSuccessSortStorage, setSort, slug])
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-2 w-full">
+      <div className="flex flex-col gap-2 min-w-0 flex-1 basis-full md:basis-auto sm:flex-row sm:flex-wrap sm:items-center">
         <Input
           placeholder="Search for a project"
           icon={<Search />}
           size="tiny"
-          className="w-32 md:w-64"
+          className="w-full sm:w-32 md:w-64"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           actions={[
@@ -78,24 +89,35 @@ export const HomePageActions = ({
           ]}
         />
 
-        <FilterPopover
-          name="Status"
-          title="Filter projects by status"
-          options={[
-            { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
-            { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
-          ]}
-          activeOptions={filterStatus}
-          valueKey="key"
-          labelKey="label"
-          onSaveFilters={(options) => setFilterStatusStorage(options)}
-        />
+        <div className="flex items-center gap-2">
+          <FilterPopover
+            name="Status"
+            title="Filter projects by status"
+            options={[
+              { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
+              { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
+            ]}
+            activeOptions={filterStatus}
+            valueKey="key"
+            labelKey="label"
+            onSaveFilters={(options) => setFilterStatusStorage(options)}
+          />
 
-        {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
+          <SortDropdown
+            options={[
+              { label: 'name', value: 'name' },
+              { label: 'creation date', value: 'created' },
+            ]}
+            value={sort}
+            setValue={(val) => setSortStorage(val as ProjectListSort)}
+          />
+
+          {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        {showViewToggle && viewMode && setViewMode && (
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {viewMode && setViewMode && (
           <ToggleGroup
             type="single"
             size="sm"

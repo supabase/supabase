@@ -130,6 +130,7 @@ export type ActiveInputState =
   | { type: 'value'; path: ConditionPath }
   | { type: 'operator'; path: ConditionPath }
   | { type: 'group'; path: ConditionPath }
+  | { type: 'property'; path: ConditionPath }
   | null
 
 export type KeyboardNavigationConfig = {
@@ -139,4 +140,10 @@ export type KeyboardNavigationConfig = {
   onFilterChange: (filters: FilterGroup) => void
   highlightedConditionPath: ConditionPath | null
   setHighlightedConditionPath: (path: ConditionPath | null) => void
+}
+
+export type ResolvedPropertyChange = {
+  operator: string
+  value: string
+  focusTarget: 'operator' | 'value'
 }
