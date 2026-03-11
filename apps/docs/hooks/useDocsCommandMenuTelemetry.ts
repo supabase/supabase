@@ -8,12 +8,10 @@ import type {
   CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
-import { useConsentToast } from 'ui-patterns/consent'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 export function useDocsCommandMenuTelemetry() {
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const { hasAcceptedConsent } = useConsentToast()
   const onTelemetry = useCallback(
     (
       event:
@@ -24,7 +22,7 @@ export function useDocsCommandMenuTelemetry() {
     ) => {
       sendTelemetryEvent(event)
     },
-    [sendTelemetryEvent, hasAcceptedConsent]
+    [sendTelemetryEvent]
   )
 
   return { onTelemetry }
