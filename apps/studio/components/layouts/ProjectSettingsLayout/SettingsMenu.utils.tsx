@@ -25,6 +25,12 @@ export const generateSettingsMenu = (
         title: 'Configuration',
         items: [
           {
+            name: 'Platform Credentials',
+            key: 'credentials',
+            url: `/project/${ref}/settings/credentials`,
+            items: [],
+          },
+          {
             name: `Log Drains`,
             key: `log-drains`,
             url: `/project/${ref}/settings/log-drains`,
@@ -48,6 +54,12 @@ export const generateSettingsMenu = (
           name: 'General',
           key: 'general',
           url: `/project/${ref}/settings/general`,
+          items: [],
+        },
+        {
+          name: 'Platform Credentials',
+          key: 'credentials',
+          url: `/project/${ref}/settings/credentials`,
           items: [],
         },
         {
