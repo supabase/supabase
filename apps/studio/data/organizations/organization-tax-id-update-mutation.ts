@@ -71,8 +71,6 @@ export const useOrganizationTaxIdUpdateMutation = ({
 
       // We already have the data, no need to refetch
       queryClient.setQueryData(organizationKeys.taxId(slug), data.tax_id)
-      // Invalidate the organizations list so organization_missing_tax_id is refreshed
-      await invalidateOrganizationsQuery(queryClient)
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
