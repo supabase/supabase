@@ -35,7 +35,6 @@ export function ProjectCommandItem({
       value={`${project.name.replaceAll('"', '')}-${project.ref}`}
       className="cursor-pointer w-full"
       onSelect={handleSelect}
-      onClick={handleSelect}
       disabled={disabled}
     >
       {renderRow ? (
