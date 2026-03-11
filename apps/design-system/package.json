@@ -31,7 +31,7 @@
     "next-contentlayer2": "0.4.6",
     "next-themes": "^0.3.0",
     "react": "catalog:",
-    "react-data-grid": "7.0.0-beta.41",
+    "react-data-grid": "7.0.0-beta.47",
     "react-day-picker": "^9.11.1",
     "react-dom": "catalog:",
     "react-hook-form": "^7.45.0",

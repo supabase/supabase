@@ -19,7 +19,7 @@ There are two versions of this server: `Realtime` and `Realtime RLS`.
 `Realtime RLS` server works by:
 
 1. polling PostgreSQL's replication functionality (using PostgreSQL's logical decoding and [wal2json](https://github.com/eulerto/wal2json) output plugin)
-2. passing database changes to a [Write Ahead Log Realtime Unified Security (WALRUS)](https://github.com/supabase/walrus) PostgresSQL function and receiving a list of authorized subscribers depending on Row Level Security (RLS) policies
+2. passing database changes to a [Write Ahead Log Realtime Unified Security (WALRUS)](https://github.com/supabase/walrus) PostgreSQL function and receiving a list of authorized subscribers depending on Row Level Security (RLS) policies
 3. converting the changes into JSON
 4. broadcasting to authorized subscribers over WebSockets
 

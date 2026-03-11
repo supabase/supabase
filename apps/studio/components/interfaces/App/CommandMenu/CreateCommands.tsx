@@ -1,44 +1,44 @@
 'use client'
 
-import { useMemo } from 'react'
-import dynamic from 'next/dynamic'
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
+  Clock5,
   Code2,
   KeyRound,
+  Layers,
   ListChecks,
+  Lock,
   LockKeyhole,
+  Mail,
+  MessageCircle,
   Plus,
   Rows,
-  Vault,
   ShieldPlus,
+  Table2,
+  Telescope,
   UserCog,
   UserPlus,
+  Vault,
   Webhook,
   Zap,
-  Table2,
-  MessageCircle,
-  Mail,
-  Lock,
-  Telescope,
-  Clock5,
-  Layers,
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useMemo } from 'react'
+import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
   useRegisterCommands,
   useRegisterPage,
   useSetCommandMenuOpen,
 } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
-  useCreateCommandsConfig,
-  getIntegrationRoute,
   getIntegrationCommandName,
+  getIntegrationRoute,
+  useCreateCommandsConfig,
 } from './CreateCommands.utils'
-import type { CommandOptions } from 'ui-patterns/CommandMenu'
-import type { ICommand } from 'ui-patterns/CommandMenu'
 
 const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
 const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))
@@ -51,14 +51,12 @@ const Graphql = dynamic(() => import('icons').then((mod) => mod.Graphql))
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
 export function useCreateCommands(options?: CommandOptions) {
-  const enableCreateCommands = useFlag('enablecreatecommands')
   const setIsOpen = useSetCommandMenuOpen()
   const {
     ref,
     setPage,
     openSidebar,
     snap,
-    authenticationOauth21,
     authEnabled,
     edgeFunctionsEnabled,
     storageEnabled,
@@ -70,7 +68,6 @@ export function useCreateCommands(options?: CommandOptions) {
     passwordVerificationHook,
     passwordVerificationHookEnabled,
     beforeUserCreatedHook,
-    isFreePlan,
     isVectorBucketsEnabled,
     isAnalyticsBucketsEnabled,
     installedIntegrationIds,
@@ -185,7 +182,7 @@ export function useCreateCommands(options?: CommandOptions) {
                   },
                 ]
               : []),
-            ...(IS_PLATFORM && authenticationOauth21
+            ...(IS_PLATFORM
               ? [
                   {
                     id: 'create-oauth-app',
@@ -208,7 +205,6 @@ export function useCreateCommands(options?: CommandOptions) {
       passwordVerificationHook,
       passwordVerificationHookEnabled,
       beforeUserCreatedHook,
-      authenticationOauth21,
     ]
   )
 
@@ -293,24 +289,26 @@ export function useCreateCommands(options?: CommandOptions) {
               name: 'Create Storage Bucket (Analytics)',
               route: `/project/${ref}/storage/analytics?new=true`,
               icon: () => <AnalyticsBucket />,
-              badge: () => (isFreePlan ? <Badge>Pro</Badge> : null),
+              badge: () => <Badge variant="success">New</Badge>,
               className: !isAnalyticsBucketsEnabled
                 ? 'opacity-50 cursor-not-allowed pointer-events-none'
                 : '',
+              enabled: isAnalyticsBucketsEnabled,
             },
             {
               id: 'create-storage-bucket-vectors',
               name: 'Create Storage Bucket (Vectors)',
               route: `/project/${ref}/storage/vectors?new=true`,
               icon: () => <VectorBucket />,
-              badge: () => (isFreePlan ? <Badge>Pro</Badge> : null),
+              badge: () => <Badge variant="success">New</Badge>,
               className: !isVectorBucketsEnabled
                 ? 'opacity-50 cursor-not-allowed pointer-events-none'
                 : '',
+              enabled: isVectorBucketsEnabled,
             },
           ].filter(Boolean) as ICommand[])
         : [],
-    [ref, storageEnabled, isFreePlan, isAnalyticsBucketsEnabled, isVectorBucketsEnabled]
+    [ref, storageEnabled, isAnalyticsBucketsEnabled, isVectorBucketsEnabled]
   )
 
   const integrationsCommands = useMemo(() => {
@@ -349,8 +347,6 @@ export function useCreateCommands(options?: CommandOptions) {
               return <Webhook />
             case 'queues':
               return <Layers />
-            case 'graphiql':
-              return <Graphql />
             default:
               // Fallback to integration icon for other Postgres modules
               return integration.icon()
@@ -454,7 +450,7 @@ export function useCreateCommands(options?: CommandOptions) {
     },
     {
       deps: [sections],
-      enabled: enableCreateCommands,
+      enabled: true,
     }
   )
 
@@ -472,7 +468,7 @@ export function useCreateCommands(options?: CommandOptions) {
       ...options,
       orderSection: (sections) => sections,
       sectionMeta: { priority: 3 },
-      enabled: enableCreateCommands,
+      enabled: true,
     }
   )
 }

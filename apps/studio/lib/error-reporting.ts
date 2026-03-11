@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs'
-
 import { ResponseError } from 'types'
 
 type CaptureMessageOptions = {
@@ -29,25 +28,17 @@ const WHITELIST_ERRORS = [
 ]
 
 /**
- * Captures a critical error message to Sentry, filtering out whitelisted errors.
+ * Captures a critical error to Sentry, filtering out whitelisted errors.
  *
  * @param error - The error object (ResponseError, Error, or any object with a message property)
  * @param context - The context/action that failed (e.g., 'reset password', 'sign up', 'create project')
- *
- * @example
- * captureCriticalError(error, 'reset password')
- * // Captures: '[CRITICAL][reset password] Failed: <error.message>'
- *
- * @example
- * captureCriticalError(error, 'sign up')
- * // Captures: '[CRITICAL][sign up] Failed: <error.message>'
+ *   Attached as the `context` tag on the Sentry event.
  */
 export function captureCriticalError(
   error: ResponseError | Error | { message: string },
   context: string
 ): void {
-  const errorMessage = error instanceof Error ? error.message : error.message
-  if (!errorMessage) {
+  if (!error.message) {
     return
   }
 
@@ -84,13 +75,12 @@ function handleResponseError(error: ResponseError, context: string) {
 }
 
 function handleError(error: Error, context: string) {
-  const message = error.message
-  if (!message) {
+  if (!error.message) {
     return
   }
 
   captureMessage({
-    message,
+    message: error.message,
     context,
   })
 }
@@ -113,5 +103,14 @@ function captureMessage({ message, context }: CaptureMessageOptions) {
   if (WHITELIST_ERRORS.some((whitelisted) => message.includes(whitelisted))) {
     return
   }
-  Sentry.captureMessage(`[CRITICAL][${context}] Failed: ${message}`)
+  // Use captureException (vs captureMessage) so these appear as exceptions in Sentry
+  // and can have dedicated alert rules. Grouping is still by message since all
+  // CriticalErrors share the same synthetic stack trace.
+  Sentry.withScope((scope) => {
+    scope.setTag('critical', 'true')
+    scope.setTag('context', context)
+    const error = new Error(message)
+    error.name = `CriticalError`
+    Sentry.captureException(error)
+  })
 }

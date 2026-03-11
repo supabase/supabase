@@ -50,7 +50,9 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
   // unnecessary requests, although this behaviour still needs handling on the UI
   const { can: canReadCustomerProfile } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
-    'stripe.customer'
+    'stripe.customer',
+    undefined,
+    { organizationSlug: slug }
   )
 
   return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>({

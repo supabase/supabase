@@ -1,11 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode, useMemo } from 'react'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
@@ -16,20 +10,30 @@ import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationD
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { DevToolbarTrigger } from 'dev-tools'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
+import { ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { ReactNode, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns'
+
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
-import { HelpPopover } from './HelpPopover'
+import { HelpButton } from './HelpPanel/HelpButton'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
-import MergeRequestButton from './MergeRequestButton'
+import { MergeRequestButton } from './MergeRequestButton'
+import { Connect } from '@/components/interfaces/Connect/Connect'
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
+import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
+import { usePHFlag } from '@/hooks/ui/useFlag'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -43,6 +47,7 @@ const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanEl
       strokeLinejoin="round"
       fill="none"
       shapeRendering="geometricPrecision"
+      aria-hidden={true}
     >
       <path d="M16 3.549L7.12 20.600" />
     </svg>
@@ -64,12 +69,15 @@ export const LayoutHeader = ({
   showProductMenu,
   backToDashboardURL,
 }: LayoutHeaderProps) => {
-  const { ref: projectRef, slug } = useParams()
   const router = useRouter()
+  const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
+
+  const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
+  const isFlagResolved = connectSheetFlag !== undefined
+  const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
 
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
@@ -94,7 +102,7 @@ export const LayoutHeader = ({
 
   return (
     <>
-      <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
+      <header className="flex h-11 md:h-12 items-center flex-shrink-0 border-b">
         {backToDashboardURL && isAccountPage && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <Link
@@ -105,26 +113,31 @@ export const LayoutHeader = ({
             </Link>
           </div>
         )}
-        {(showProductMenu || isAccountPage) && (
-          <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
-            <button
-              title="Menu dropdown button"
-              className={cn(
-                'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
-              )}
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-              <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-            </button>
-          </div>
-        )}
         <div
           className={cn(
             'flex items-center justify-between h-full pr-3 flex-1 overflow-x-auto gap-x-8 pl-4'
           )}
         >
-          <div className="flex items-center text-sm">
+          <div className="flex md:hidden items-center text-sm not-sr-only">
+            <AnimatePresence>
+              {headerTitle && (
+                <motion.div
+                  className="flex items-center -ml-1"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{
+                    duration: 0.15,
+                    ease: 'easeOut',
+                  }}
+                >
+                  <LayoutHeaderDivider />
+                  <span className="text-foreground">{headerTitle}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <div className="hidden md:flex items-center text-sm">
             <HomeIcon />
             <div className="flex items-center md:pl-2">
               {showOrgSelection && IS_PLATFORM ? (
@@ -145,7 +158,7 @@ export const LayoutHeader = ({
                       ease: 'easeOut',
                     }}
                   >
-                    <LayoutHeaderDivider />
+                    {IS_PLATFORM && <LayoutHeaderDivider />}
                     <ProjectDropdown />
 
                     {exceedingLimits && (
@@ -156,34 +169,33 @@ export const LayoutHeader = ({
                       </div>
                     )}
 
-                    {selectedProject && (
+                    {selectedProject && IS_PLATFORM && (
                       <>
                         <LayoutHeaderDivider />
-                        {IS_PLATFORM && <BranchDropdown />}
+                        <BranchDropdown />
                       </>
                     )}
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              <AnimatePresence>
-                {headerTitle && (
-                  <motion.div
-                    className="flex items-center"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{
-                      duration: 0.15,
-                      ease: 'easeOut',
-                    }}
-                  >
-                    <LayoutHeaderDivider />
-                    <span className="text-foreground">{headerTitle}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
+            <AnimatePresence>
+              {headerTitle && (
+                <motion.div
+                  className="flex items-center"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{
+                    duration: 0.15,
+                    ease: 'easeOut',
+                  }}
+                >
+                  <LayoutHeaderDivider />
+                  <span className="text-foreground">{headerTitle}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <AnimatePresence>
               {projectRef && (
@@ -198,7 +210,7 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
-                  <Connect />
+                  <ConnectButton />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -208,9 +220,10 @@ export const LayoutHeader = ({
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
+                <DevToolbarTrigger />
                 <FeedbackDropdown />
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 md:gap-2">
                   <CommandMenuTriggerInput
                     showShortcut={commandMenuEnabled}
                     placeholder="Search..."
@@ -222,7 +235,7 @@ export const LayoutHeader = ({
                       '[&_.command-shortcut>div]:text-foreground-lighter'
                     )}
                   />
-                  <HelpPopover />
+                  <HelpButton />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
@@ -233,12 +246,12 @@ export const LayoutHeader = ({
                     )}
                   </AnimatePresence>
                 </div>
-                <UserDropdown />
+                <UserDropdown triggerClassName="hidden md:flex" />
               </>
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 md:gap-2">
                   <CommandMenuTriggerInput
                     placeholder="Search..."
                     className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
@@ -248,6 +261,7 @@ export const LayoutHeader = ({
                         [&_.command-shortcut>div]:text-foreground-lighter
                       "
                   />
+                  <HelpButton />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
@@ -258,12 +272,14 @@ export const LayoutHeader = ({
                     )}
                   </AnimatePresence>
                 </div>
-                <LocalDropdown />
+                <LocalDropdown triggerClassName="hidden md:flex" />
               </>
             )}
           </div>
         </div>
       </header>
+
+      {isFlagResolved ? isConnectSheetEnabled ? <ConnectSheet /> : <Connect /> : null}
     </>
   )
 }

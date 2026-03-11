@@ -5,23 +5,22 @@ import Auth from './Auth'
 import Account from './Account'
 
 function App() {
-  const [session, setSession] = useState(null)
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
     })
 
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
+    supabase.auth.onAuthStateChange(async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
     })
-
-    return () => data.subscription.unsubscribe();
   }, [])
 
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
-      {!session ? <Auth /> : <Account key={session.user.id} session={session} />}
+      {!user ? <Auth /> : <Account key={user.id} user={user} />}
     </div>
   )
 }

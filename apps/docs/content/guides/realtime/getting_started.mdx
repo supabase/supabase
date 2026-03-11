@@ -197,7 +197,7 @@ let channel = supabase.channel("room:lobby:messages") {
 
 ```python
 # Create a channel with a descriptive topic name
-channel = supabase.channel('room:lobby:messages', params={config={private= True }})
+channel = supabase.channel('room:lobby:messages', params={'config': {'private': True }})
 ```
 
 </TabPanel>

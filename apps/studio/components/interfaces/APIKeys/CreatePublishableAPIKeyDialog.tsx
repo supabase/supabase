@@ -1,11 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import { Plus } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { parseAsString, useQueryState } from 'nuqs'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import * as z from 'zod'
-
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
   Button,
   Dialog,
@@ -17,12 +15,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
@@ -38,10 +37,7 @@ export const CreatePublishableAPIKeyDialog = () => {
   const params = useParams()
   const projectRef = params?.ref as string
 
-  const [visible, setVisible] = useQueryState(
-    'new',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [visible, setVisible] = useQueryState('new', parseAsString.withDefault(''))
 
   const onOpenChange = (value: boolean) => {
     if (value) setVisible('publishable')

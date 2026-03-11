@@ -1,15 +1,13 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import z from 'zod'
-
 import { IS_PLATFORM } from 'common'
-import { InternalServerError } from 'lib/api/apiHelpers'
-import type { IncidentInfo } from 'lib/api/incident-status'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-const STATUSPAGE_API_URL = 'https://api.statuspage.io/v1'
-const STATUSPAGE_PAGE_ID = process.env.STATUSPAGE_PAGE_ID
-const STATUSPAGE_API_KEY = process.env.STATUSPAGE_API_KEY
-
-const INCIDENTS_ENDPOINT = `${STATUSPAGE_API_URL}/pages/${STATUSPAGE_PAGE_ID}/incidents/unresolved`
+import { InternalServerError } from '@/lib/api/apiHelpers'
+import {
+  getActiveIncidents,
+  type IncidentCache,
+  type IncidentInfo,
+} from '@/lib/api/incident-status'
+import { createAdminClient } from '@/lib/api/supabase-admin'
 
 /**
  * Cache on browser for 5 minutes
@@ -18,95 +16,41 @@ const INCIDENTS_ENDPOINT = `${STATUSPAGE_API_URL}/pages/${STATUSPAGE_PAGE_ID}/in
  */
 const CACHE_CONTROL_SETTINGS = 'public, max-age=300, s-maxage=300, stale-while-revalidate=60'
 
-const StatusPageIncidentsSchema = z.array(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    status: z.string(),
-    created_at: z.string(),
-    scheduled_for: z.string().nullable(),
-    impact: z.string(),
-  })
-)
+async function fetchIncidentCache(incidentIds: Array<string>): Promise<Map<string, IncidentCache>> {
+  const cacheMap = new Map<string, IncidentCache>()
 
-const getActiveIncidents = async (): Promise<IncidentInfo[]> => {
-  if (!STATUSPAGE_PAGE_ID) {
-    throw new InternalServerError('StatusPage page ID is not configured')
-  }
+  if (incidentIds.length === 0) return cacheMap
 
-  if (!STATUSPAGE_API_KEY) {
-    throw new InternalServerError('StatusPage API key is not configured')
-  }
+  const supabase = createAdminClient()
 
-  const response = await fetch(INCIDENTS_ENDPOINT, {
-    headers: {
-      Authorization: `OAuth ${STATUSPAGE_API_KEY}`,
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    cache: 'no-store',
-    signal: AbortSignal.timeout(30_000),
-  })
-  const responseText = await response.text()
-
-  if (!response.ok) {
-    throw new InternalServerError(`StatusPage API responded with ${response.status}`, {
-      status: response.status,
-      body: responseText,
-    })
-  }
-
-  let incidentsJson: unknown
   try {
-    incidentsJson = JSON.parse(responseText)
-  } catch (error) {
-    throw new InternalServerError('StatusPage API response could not be parsed as JSON', {
-      error: error instanceof Error ? error.message : error,
-      body: responseText,
-    })
-  }
+    const { data, error } = await supabase
+      .from('incident_status_cache')
+      .select('incident_id, affected_regions, affects_project_creation')
+      .in('incident_id', incidentIds)
 
-  const result = StatusPageIncidentsSchema.safeParse(incidentsJson)
-
-  if (!result.success) {
-    throw new InternalServerError('StatusPage API response did not match expected schema', {
-      issues: result.error.issues,
-    })
-  }
-
-  const now = Date.now()
-  const activeIncidents = result.data.filter((incident) => {
-    if (!incident.scheduled_for) {
-      return true
+    if (error) {
+      console.error('Failed to fetch incident_status_cache: %O', error)
+      return cacheMap
     }
 
-    const scheduledTime = Date.parse(incident.scheduled_for)
-    if (Number.isNaN(scheduledTime)) {
-      // Keep the record but note it locally for debugging
-      console.warn('Encountered incident with invalid scheduled_for date', {
-        incidentId: incident.id,
-        scheduled_for: incident.scheduled_for,
+    for (const row of data ?? []) {
+      cacheMap.set(row.incident_id, {
+        affected_regions: row.affected_regions ?? null,
+        affects_project_creation: row.affects_project_creation,
       })
-      return true
     }
+  } catch (error) {
+    console.error('Unexpected error fetching incident_status_cache: %O', error)
+  }
 
-    return scheduledTime <= now
-  })
-
-  return activeIncidents.map((incident) => ({
-    id: incident.id,
-    name: incident.name,
-    status: incident.status,
-    impact: incident.impact,
-    active_since: incident.scheduled_for ?? incident.created_at,
-  }))
+  return cacheMap
 }
 
 // Default export needed by Next.js convention
-// eslint-disable-next-line no-restricted-exports
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<IncidentInfo[] | { error: string }>
+  res: NextApiResponse<Array<IncidentInfo> | { error: string }>
 ) {
   if (!IS_PLATFORM) {
     return res.status(404).end()
@@ -125,11 +69,24 @@ export default async function handler(
   }
 
   try {
-    const incidents = await getActiveIncidents()
+    const allIncidents = await getActiveIncidents()
+
+    const bannerIncidents = allIncidents.filter(
+      (incident) =>
+        incident.impact !== 'maintenance' &&
+        incident.metadata?.dashboard_metadata?.show_banner === true
+    )
+
+    const cacheMap = await fetchIncidentCache(bannerIncidents.map((i) => i.id))
+
+    const enrichedIncidents = bannerIncidents.map((incident) => ({
+      ...incident,
+      cache: cacheMap.get(incident.id) ?? null,
+    }))
 
     res.setHeader('Cache-Control', CACHE_CONTROL_SETTINGS)
 
-    return res.status(200).json(incidents)
+    return res.status(200).json(enrichedIncidents)
   } catch (error) {
     if (error instanceof InternalServerError) {
       console.error('Failed to fetch active StatusPage incidents: %O', {

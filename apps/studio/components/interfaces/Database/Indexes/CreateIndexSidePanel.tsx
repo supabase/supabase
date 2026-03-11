@@ -44,7 +44,7 @@ interface CreateIndexSidePanelProps {
   onClose: () => void
 }
 
-const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
+export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
   const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = useIsOrioleDb()
 
@@ -420,5 +420,3 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     </SidePanel>
   )
 }
-
-export default CreateIndexSidePanel
