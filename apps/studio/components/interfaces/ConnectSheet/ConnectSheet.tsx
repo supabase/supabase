@@ -105,7 +105,11 @@ export const ConnectSheet = () => {
 
         <div className="flex flex-1 flex-col overflow-y-auto divide-y">
           <div className="p-8">
-            <ModeSelector modes={availableModes} selected={state.mode} onChange={handleModeChange} />
+            <ModeSelector
+              modes={availableModes}
+              selected={state.mode}
+              onChange={handleModeChange}
+            />
           </div>
 
           <div className="border-b p-8">

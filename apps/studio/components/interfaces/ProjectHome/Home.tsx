@@ -114,10 +114,7 @@ export const ProjectHome = () => {
   }, [setSectionOrder])
 
   const shouldShowConnectSection =
-    isConnectSectionFlagResolved &&
-    isConnectSectionEnabled &&
-    !isMatureProject &&
-    !!project
+    isConnectSectionFlagResolved && isConnectSectionEnabled && !isMatureProject && !!project
 
   const shouldShowGettingStarted =
     isConnectSectionFlagResolved &&
