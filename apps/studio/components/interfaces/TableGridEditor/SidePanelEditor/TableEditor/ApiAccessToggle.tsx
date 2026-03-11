@@ -146,7 +146,6 @@ const useTableApiAccessHandler = (
     : undefined
 
   const defaultPrivilegesEnabled = defaultPrivilegesQuery.data ?? true
-  console.log('defaultPrivilegesEnabled:', defaultPrivilegesEnabled)
   const defaultPrivilegesForNewTable = defaultPrivilegesEnabled
     ? DEFAULT_DATA_API_PRIVILEGES
     : EMPTY_DATA_API_PRIVILEGES
