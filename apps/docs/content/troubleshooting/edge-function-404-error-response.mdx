@@ -14,6 +14,7 @@ The edge function is not recognized by Supabase
 ## Context for the error
 
 If the Supabase Edge Function Runtime does not recognize the function specified in the URL endpoint:
+
 ```sh
 https://PROJECT_REF.supabase.co/functions/v1/UNRECOGNIZED_FUNCTION_NAME
 ```
@@ -30,12 +31,11 @@ If the tests return a 404 but don't match the criteria below, the error is comin
 
 </Admonition>
 
-
 ### Inspecting the return message from the request
 
 <Admonition type="caution">
 
-Platform 404 errors cannot be detected in the browser. Instead, to confirm 404s from the browser, you must [check the logs](#inspecting-the-logs) instead. 
+Platform 404 errors cannot be detected in the browser. Instead, to confirm 404s from the browser, you must [check the logs](#inspecting-the-logs) instead.
 
 Browsers misreport 404s as generic `CORS errors`. As a result, the [Supabase JavaScript client](/docs/reference/javascript/introduction) surfaces only a generic message: `Failed to send a request to the Edge Function`.
 
@@ -45,11 +45,10 @@ When an edge function fails due to a platform 404 error, it will return the erro
 
 ```json
 {
-	"code":"NOT_FOUND",
-	"message":"Requested function was not found"
+  "code": "NOT_FOUND",
+  "message": "Requested function was not found"
 }
 ```
-
 
 ### Inspecting the logs
 
@@ -59,29 +58,27 @@ Always configure an appropriate time frame when using the log explorer
 
         ![image](/docs/img/troubleshooting/edge_function_404_set_timeframe.png)
 
-
 </Admonition>
 
 One cannot inspect the function dashboard to find platform 404 errors, instead, you must run the below query in the [log explorer](/dashboard/project/_/logs/explorer?q=SELECT+DISTINCT%0A++++req.pathname+AS+function_name%2C%0A++++res.status_code%0AFROM+function_edge_logs%0ACROSS+JOIN+UNNEST%28metadata%29+AS+metadata+%0ACROSS+JOIN+UNNEST%28metadata.request%29+AS+req+%0ACROSS+JOIN+UNNEST%28metadata.response%29+AS+res+%0AWHERE+%0A++++status_code+%3D+404+%0A++++++++AND+%0A++++metadata.execution_id+IS+NULL%0ALIMIT+10%3B). Results will show all requests that reached Supabase but were rejected as unrecognizable.
 
 ```sql
-SELECT DISTINCT
-    req.pathname AS function_name,
-    res.status_code
-FROM function_edge_logs
-CROSS JOIN UNNEST(metadata) AS metadata 
-CROSS JOIN UNNEST(metadata.request) AS req 
-CROSS JOIN UNNEST(metadata.response) AS res 
-WHERE 
-    status_code = 404 
-        AND 
-    metadata.execution_id IS NULL
-LIMIT 10;
+select distinct
+  req.pathname as function_name,
+  res.status_code
+from
+  function_edge_logs
+  cross join UNNEST(metadata) as metadata
+  cross join UNNEST(metadata.request) as req
+  cross join UNNEST(metadata.response) as res
+where status_code = 404 and metadata.execution_id is null
+limit 10;
 ```
 
 ### Step 2: Check the function for typos
 
 In your code, make sure your function name doesn't have any typos, such as:
+
 - miscapitalizations
 - em-dashes instead of dashes
 - misplaced characters
@@ -112,9 +109,8 @@ supabase functions deploy
 
 Please then write in a ticket to [Supabase Support](/dashboard/support/new)
 
-
-
 ## Additional resources
+
 - [Securing Edge Functions](/docs/guides/functions/auth)
 - [Debugging Edge Functions](/docs/guides/functions/logging)
 - [Quickstart Deployment: Dashboard](/docs/guides/functions/quickstart-dashboard)
