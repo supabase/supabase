@@ -8,15 +8,16 @@ import { getDefaultPrivilegesStateSql } from './privileges.sql'
 export type DefaultPrivilegesVariables = {
   projectRef?: string
   connectionString?: string | null
+  schema?: string
 }
 
 export async function getDefaultPrivilegesState(
-  { projectRef, connectionString }: DefaultPrivilegesVariables,
+  { projectRef, connectionString, schema }: DefaultPrivilegesVariables,
   signal?: AbortSignal
 ): Promise<boolean> {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const sql = getDefaultPrivilegesStateSql()
+  const sql = getDefaultPrivilegesStateSql({ schema })
 
   const { result } = await executeSql(
     {
@@ -28,25 +29,27 @@ export async function getDefaultPrivilegesState(
     signal
   )
 
-  const revokeCount = (result[0] as { revoke_count: number }).revoke_count
-  return revokeCount === 0
+  const grantCount = (result[0] as { grant_count: number }).grant_count
+
+  return grantCount === 3
 }
 
 export type DefaultPrivilegesData = Awaited<ReturnType<typeof getDefaultPrivilegesState>>
 export type DefaultPrivilegesError = ResponseError
 
 export const defaultPrivilegesQueryOptions = (
-  { projectRef, connectionString }: DefaultPrivilegesVariables,
+  { projectRef, connectionString, schema }: DefaultPrivilegesVariables,
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
-    queryKey: privilegeKeys.defaultPrivileges(projectRef),
+    queryKey: privilegeKeys.defaultPrivileges(projectRef, schema),
     queryFn: ({ signal }) =>
       getDefaultPrivilegesState(
         {
           projectRef,
           connectionString,
+          schema,
         },
         signal
       ),

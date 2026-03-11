@@ -221,26 +221,28 @@ export function getExposedFunctionCountsSql({ selectedSchemas }: { selectedSchem
   `
 }
 
-export function getDefaultPrivilegesStateSql() {
+export function getDefaultPrivilegesStateSql({ schema = 'public' }: { schema?: string } = {}) {
   return /* SQL */ `
     select
-      count(*)::int as revoke_count
+      count(*)::int as grant_count
     from pg_default_acl d
     join pg_namespace n on n.oid = d.defaclnamespace
     join pg_roles r on r.oid = d.defaclrole
-    where n.nspname = 'public'
-      and r.rolname in ('postgres', 'supabase_admin')
+    where n.nspname = '${schema}'
+      and r.rolname = 'postgres'
       and d.defaclobjtype in ('r', 'f', 'S')
-      and d.defaclacl = '{}'
+      and exists (
+        select 1
+        from aclexplode(d.defaclacl) acl
+        join pg_roles gr on gr.oid = acl.grantee
+        where gr.rolname in ('anon', 'authenticated', 'service_role')
+      )
   `
 }
 
 export function buildDefaultPrivilegesSql(action: 'grant' | 'revoke') {
   const roles = ['anon', 'authenticated', 'service_role']
   const statements: string[] = []
-
-  // [Alaister] Opting for just the postgres role for now, as the supabase_admin
-  // role isn't able to be modified from the studio UI due to permissions.
 
   for (const role of roles) {
     if (action === 'grant') {
