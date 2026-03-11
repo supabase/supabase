@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import pgMeta from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
@@ -612,12 +613,18 @@ export const createTable = async ({
   // Execute all table creation SQL in a single transaction
   toast.loading(`Creating table ${payload.name}...`, { id: toastId })
 
-  await executeSql({
-    projectRef,
-    connectionString,
-    sql: sqlStatements.join(';\n'),
-    queryKey: ['table', 'create-with-columns'],
-  })
+  await Sentry.startSpan(
+    { name: 'create_table.execute_sql', op: 'db.sql.transaction' },
+    async (span) => {
+      span.setAttribute('sql.statement_count', sqlStatements.length)
+      await executeSql({
+        projectRef,
+        connectionString,
+        sql: sqlStatements.join(';\n'),
+        queryKey: ['table', 'create-with-columns'],
+      })
+    }
+  )
 
   // 6. Create generated RLS policies if any
   // [Joshen] Possible area for optimization to create all policies in a single query call
@@ -625,31 +632,38 @@ export const createTable = async ({
 
   const failedPolicies: GeneratedPolicy[] = []
   if (generatedPolicies.length > 0 && isRLSEnabled) {
-    toast.loading(`Creating ${generatedPolicies.length} policies for table...`, { id: toastId })
-    await Promise.all(
-      generatedPolicies.map(async (policy) => {
-        try {
-          return await createDatabasePolicy({
-            projectRef,
-            connectionString,
-            payload: {
-              name: policy.name,
-              table: policy.table,
-              schema: policy.schema,
-              definition: policy.definition,
-              check: policy.check,
-              action: policy.action,
-              command: policy.command,
-              roles: policy.roles,
-            },
+    await Sentry.startSpan(
+      { name: 'create_table.create_policies', op: 'db.policies.create' },
+      async (span) => {
+        span.setAttribute('policies.count', generatedPolicies.length)
+        toast.loading(`Creating ${generatedPolicies.length} policies for table...`, { id: toastId })
+        await Promise.all(
+          generatedPolicies.map(async (policy) => {
+            try {
+              return await createDatabasePolicy({
+                projectRef,
+                connectionString,
+                payload: {
+                  name: policy.name,
+                  table: policy.table,
+                  schema: policy.schema,
+                  definition: policy.definition,
+                  check: policy.check,
+                  action: policy.action,
+                  command: policy.command,
+                  roles: policy.roles,
+                },
+              })
+            } catch (error: any) {
+              console.error('Failed to generate policy', error.message)
+              failedPolicies.push(policy)
+            }
           })
-        } catch (error: any) {
-          console.error('Failed to generate policy', error.message)
-          failedPolicies.push(policy)
-        }
-      })
+        )
+        span.setAttribute('policies.failed_count', failedPolicies.length)
+        onCreatePoliciesSuccess?.()
+      }
     )
-    onCreatePoliciesSuccess?.()
   }
 
   // Track table creation event (fire-and-forget to avoid blocking)
@@ -692,102 +706,124 @@ export const createTable = async ({
   }
 
   // Fetch the created table
-  const table = await getTableQuery({
-    projectRef,
-    connectionString,
-    name: payload.name,
-    schema: payload.schema,
-  })
+  const table = await Sentry.startSpan(
+    { name: 'create_table.fetch_table', op: 'db.table.fetch' },
+    async () => {
+      return await getTableQuery({
+        projectRef,
+        connectionString,
+        name: payload.name,
+        schema: payload.schema,
+      })
+    }
+  )
 
   // If the user is importing data via a spreadsheet
   if (importContent !== undefined) {
-    if (importContent.file && importContent.rowCount > 0) {
-      // Via a CSV file
-      const { error }: any = await insertRowsViaSpreadsheet(
-        projectRef,
-        connectionString,
-        importContent.file,
-        table,
-        importContent.selectedHeaders,
-        (progress: number) => {
-          toast.loading(
-            <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-              <SparkBar
-                value={progress}
-                max={100}
-                type="horizontal"
-                barClass="bg-brand"
-                labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
-                labelBottomClass=""
-                labelTop={`${progress.toFixed(2)}%`}
-                labelTopClass="tabular-nums"
-              />
-            </div>,
-            { id: toastId }
+    await Sentry.startSpan(
+      { name: 'create_table.import_data', op: 'db.table.import' },
+      async (span) => {
+        const rowCount = importContent.file
+          ? importContent.rowCount
+          : importContent.rows?.length ?? 0
+        span.setAttribute('import.row_count', rowCount)
+        span.setAttribute('import.method', importContent.file ? 'csv' : 'paste')
+
+        if (importContent.file && importContent.rowCount > 0) {
+          // Via a CSV file
+          const { error }: any = await insertRowsViaSpreadsheet(
+            projectRef,
+            connectionString,
+            importContent.file,
+            table,
+            importContent.selectedHeaders,
+            (progress: number) => {
+              toast.loading(
+                <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+                  <SparkBar
+                    value={progress}
+                    max={100}
+                    type="horizontal"
+                    barClass="bg-brand"
+                    labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
+                    labelBottomClass=""
+                    labelTop={`${progress.toFixed(2)}%`}
+                    labelTopClass="tabular-nums"
+                  />
+                </div>,
+                { id: toastId }
+              )
+            }
+          )
+
+          if (error !== undefined) {
+            span.setAttribute('import.error', 1)
+            toast.error('Do check your spreadsheet if there are any discrepancies.')
+            const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
+            toast.error(message)
+            console.error('Error:', { error, message })
+          }
+        } else {
+          // Via text copy and paste
+          await insertTableRows(
+            projectRef,
+            connectionString,
+            table,
+            importContent.rows,
+            importContent.selectedHeaders,
+            (progress: number) => {
+              toast.loading(
+                <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+                  <SparkBar
+                    value={progress}
+                    max={100}
+                    type="horizontal"
+                    barClass="bg-brand"
+                    labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
+                    labelTop={`${progress.toFixed(2)}%`}
+                    labelTopClass="tabular-nums"
+                  />
+                </div>,
+                { id: toastId }
+              )
+            }
           )
         }
-      )
 
-      if (error !== undefined) {
-        toast.error('Do check your spreadsheet if there are any discrepancies.')
-        const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
-        toast.error(message)
-        console.error('Error:', { error, message })
-      }
-    } else {
-      // Via text copy and paste
-      await insertTableRows(
-        projectRef,
-        connectionString,
-        table,
-        importContent.rows,
-        importContent.selectedHeaders,
-        (progress: number) => {
-          toast.loading(
-            <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-              <SparkBar
-                value={progress}
-                max={100}
-                type="horizontal"
-                barClass="bg-brand"
-                labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
-                labelTop={`${progress.toFixed(2)}%`}
-                labelTopClass="tabular-nums"
-              />
-            </div>,
-            { id: toastId }
-          )
-        }
-      )
-    }
-
-    // For identity columns, manually raise the sequences (batched for performance)
-    const identityColumns = columns.filter((column) => column.isIdentity)
-    if (identityColumns.length > 0) {
-      const updateSequenceSQL = identityColumns
-        .map((column) =>
-          getUpdateIdentitySequenceSQL({
-            schema: table.schema,
-            table: table.name,
-            column: column.name,
+        // For identity columns, manually raise the sequences (batched for performance)
+        const identityColumns = columns.filter((column) => column.isIdentity)
+        if (identityColumns.length > 0) {
+          const updateSequenceSQL = identityColumns
+            .map((column) =>
+              getUpdateIdentitySequenceSQL({
+                schema: table.schema,
+                table: table.name,
+                column: column.name,
+              })
+            )
+            .join(';\n')
+          await executeSql({
+            projectRef,
+            connectionString,
+            sql: updateSequenceSQL,
+            queryKey: ['sequences', 'update-batch'],
           })
-        )
-        .join(';\n')
-      await executeSql({
-        projectRef,
-        connectionString,
-        sql: updateSequenceSQL,
-        queryKey: ['sequences', 'update-batch'],
-      })
-    }
+        }
+      }
+    )
   }
 
-  await prefetchEditorTablePage({
-    queryClient,
-    projectRef,
-    connectionString,
-    id: table.id,
-  })
+  await Sentry.startSpan(
+    { name: 'create_table.prefetch_editor', op: 'db.table.prefetch' },
+    async () => {
+      await prefetchEditorTablePage({
+        queryClient,
+        projectRef,
+        connectionString,
+        id: table.id,
+      })
+    }
+  )
 
   // Finally, return the created table
   return { table, failedPolicies }
