@@ -2648,6 +2648,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/analytics/replication',
+    destination: '/docs/guides/database/replication/replication-setup',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
     destination: '/docs/guides/auth/server-side/advanced-guide',
   },

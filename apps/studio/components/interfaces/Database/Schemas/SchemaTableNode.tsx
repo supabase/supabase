@@ -1,8 +1,19 @@
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
-import { DiamondIcon, ExternalLink, Fingerprint, Hash, InfoIcon, Key, Table2 } from 'lucide-react'
+import {
+  DiamondIcon,
+  Edit,
+  ExternalLink,
+  Fingerprint,
+  Hash,
+  InfoIcon,
+  Key,
+  Table2,
+} from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { useColumnEditionContext } from './ColumnEditionContext'
 
 // ReactFlow is scaling everything by the factor of 2
 export const TABLE_NODE_WIDTH = 320
@@ -35,6 +46,7 @@ export const TableNode = ({
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
+  const columnEditionContext = useColumnEditionContext()
 
   const itemHeight = 'h-[22px]'
 
@@ -101,6 +113,8 @@ export const TableNode = ({
                 'border-t',
                 'border-t-[0.5px]',
                 'hover:bg-scale-500 transition cursor-default',
+                'group',
+                'pr-1',
                 itemHeight
               )}
               key={column.id}
@@ -144,7 +158,7 @@ export const TableNode = ({
                 <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[85px]">
                   {column.name}
                 </span>
-                <span className="px-2 inline-flex justify-end font-mono text-lighter text-[0.4rem]">
+                <span className="pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem] group-hover:hidden">
                   {column.format}
                 </span>
               </div>
@@ -164,6 +178,23 @@ export const TableNode = ({
                   className={cn(hiddenNodeConnector, '!right-0')}
                 />
               )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="text"
+                    className="hidden group-hover:inline-block absolute right-0 px-0 mr-1 w-[16px] h-[16px] rounded"
+                    onClick={() => {
+                      columnEditionContext.onEditColumn(data.id, column.id)
+                    }}
+                  >
+                    <Edit size={10} className="text-foreground-light" />
+                    <span className="sr-only">
+                      Edit {data.name} {column.name} column
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Edit column</TooltipContent>
+              </Tooltip>
             </div>
           ))}
         </div>

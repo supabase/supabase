@@ -117,7 +117,7 @@ height={650}
 | Component           | Description                                            |
 | ------------------- | ------------------------------------------------------ |
 | **Used**            | RAM actively used by Postgres and the operating system |
-| **Cache + buffers** | Memory used for page cache and OS buffers        |
+| **Cache + buffers** | Memory used for page cache and OS buffers              |
 | **Free**            | Available unallocated memory                           |
 
 How it helps debug issues:
@@ -225,13 +225,13 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                         | Description                                                   |
-| -------------------------------------------------------------- | ------------------------------------------------------------- |
-| [Optimize disk-intensive queries](/docs/content/guides/database/query-optimization)  | Reduce queries that perform excessive reads/writes |
-  | Tune caching and batching                                      | Minimize repeated disk access and improve throughput headroom |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase throughput limits for sustained workloads            |
-| Review database design                                                               | Optimize schema and query patterns for efficiency  |
-| [Add strategic indexes](http://localhost:3001/docs/guides/database/postgres/indexes) | Reduce sequential scans with appropriate indexing  |
+| Action                                                                               | Description                                                   |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| [Optimize disk-intensive queries](/docs/content/guides/database/query-optimization)  | Reduce queries that perform excessive reads/writes            |
+| Tune caching and batching                                                            | Minimize repeated disk access and improve throughput headroom |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk)                       | Increase throughput limits for sustained workloads            |
+| Review database design                                                               | Optimize schema and query patterns for efficiency             |
+| [Add strategic indexes](http://localhost:3001/docs/guides/database/postgres/indexes) | Reduce sequential scans with appropriate indexing             |
 
 ### Disk size
 
@@ -244,7 +244,6 @@ src={{
     dark: '/docs/img/database/reports/disk-size-chart-dark.png',
     light: '/docs/img/database/reports/disk-size-chart-light.png',
   }}
-
 
 />
 
@@ -315,6 +314,7 @@ Actions you can take:
 | Review application code                                                                    | Ensure proper connection handling and cleanup                   |
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### Dedicated Pooler (PgBouncer) Client Connections
 
 Available on Team and Enterprise plans.
@@ -338,6 +338,7 @@ Actions you can take:
 | Review application code                                                                    | Ensure proper connection handling and cleanup                   |
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### Shared Pooler (Supavisor) Client Connections
 
 Available on Team and Enterprise plans.
@@ -367,14 +368,14 @@ Actions you can take:
 <Image
   alt="Disk Size chart"
 
-  zoomable
-  src={{
+zoomable
+src={{
     dark: '/docs/img/database/reports/disk-size-chart-dark.png',
     light: '/docs/img/database/reports/disk-size-chart-light.png',
   }}
 
-  width={2148}
-  height={654}
+width={2148}
+height={654}
 />
 
 | Component    | Description                                               |
@@ -411,7 +412,6 @@ The Edge Functions report provides insights into serverless function performance
 | Edge Function Execution Time         | Average function duration and performance | Performance optimization opportunities         |
 | Edge Function Invocations by Region  | Geographic distribution of function calls | Global usage patterns and latency optimization |
 
-
 ## PostgREST
 
 The PostgREST report provides insights into RESTful API performance, request patterns, and response characteristics.
@@ -429,7 +429,7 @@ The Realtime report tracks WebSocket connections, channel activity, and real-tim
 
 | Chart                                                      | Description                                                                             | Key Insights                                      |
 | ---------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| Connected Clients                                       | Active WebSocket connections over time                                                  | Concurrent user activity and connection stability |
+| Connected Clients                                          | Active WebSocket connections over time                                                  | Concurrent user activity and connection stability |
 | Broadcast Events                                           | Broadcast events over time                                                              | Real-time feature usage patterns                  |
 | Presence Events                                            | Presence events over time                                                               | Real-time feature usage patterns                  |
 | Postgres Changes Events                                    | Postgres Changes events over time                                                       | Real-time feature usage patterns                  |

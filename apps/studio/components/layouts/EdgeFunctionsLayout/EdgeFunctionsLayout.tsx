@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
-import type { PropsWithChildren } from 'react'
+import type { ComponentProps, PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 
@@ -35,11 +35,21 @@ export const EdgeFunctionsProductMenu = () => {
   return <ProductMenu page={page} menu={menuItems} />
 }
 
-const EdgeFunctionsLayout = ({ children }: PropsWithChildren<{}>) => {
+interface EdgeFunctionsLayoutProps {
+  title: string
+  browserTitle?: ComponentProps<typeof ProjectLayout>['browserTitle']
+}
+
+const EdgeFunctionsLayout = ({
+  children,
+  title,
+  browserTitle,
+}: PropsWithChildren<EdgeFunctionsLayoutProps>) => {
   return (
     <ProjectLayout
-      title="Edge Functions"
+      title={title}
       product="Edge Functions"
+      browserTitle={browserTitle}
       productMenu={<EdgeFunctionsProductMenu />}
       isBlocking={false}
     >
