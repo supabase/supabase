@@ -61,7 +61,8 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
 }) => {
   // Children.toArray clones elements (to assign keys) and accesses element.ref
   // internally, which triggers a React 19 warning. Children.forEach iterates
-  // without cloning, so it never touches .ref.
+  // without cloning, so it never touches .ref
+  // todo: remove this when we upgrade the radix packages to support react 19
   const childrenArr: PanelPropsProps[] = []
   Children.forEach(_children, (child) => {
     if (isValidElement(child)) childrenArr.push(child as unknown as PanelPropsProps)
