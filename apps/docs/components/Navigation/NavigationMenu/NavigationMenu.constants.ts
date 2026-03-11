@@ -1456,7 +1456,7 @@ export const queues: NavMenuConstant = {
 
 export const api: NavMenuConstant = {
   icon: 'rest',
-  title: 'REST API',
+  title: 'Data REST API',
   url: '/guides/api',
   items: [
     { name: 'Overview', url: '/guides/api', items: [] },
@@ -1470,13 +1470,13 @@ export const api: NavMenuConstant = {
       name: 'Security',
       url: '/guides/api',
       items: [
+        { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
         { name: 'Hardening the Data API', url: '/guides/api/hardening-data-api' },
         {
           name: 'Custom Claims & RBAC',
           url: '/guides/api/custom-claims-and-role-based-access-control-rbac',
         },
-        { name: 'How API Keys work', url: '/guides/api/api-keys' },
       ],
     },
     {

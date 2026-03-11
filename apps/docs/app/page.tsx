@@ -98,6 +98,18 @@ const postgresIntegrations = [
     href: '/guides/queues',
     description: 'Durable Message Queues with guaranteed delivery',
   },
+  {
+    title: 'Data REST API',
+    icon: 'rest',
+    href: '/guides/api',
+    description: 'Access your database through a RESTful API.',
+  },
+  {
+    title: 'GraphQL API',
+    icon: 'graphql',
+    href: '/guides/graphql',
+    description: 'Access your database through a GraphQL API.',
+  },
 ]
 
 const selfHostingOptions = [
