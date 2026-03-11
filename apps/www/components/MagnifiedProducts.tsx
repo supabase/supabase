@@ -1,18 +1,15 @@
-import { useRef } from 'react'
-import Link from 'next/link'
+import { DEFAULT_TRANSITION } from '~/lib/animations'
+import { useBreakpoint } from 'common'
 import {
-  MotionValue,
   motion,
+  MotionValue,
   useInView,
   useMotionValue,
   useSpring,
   useTransform,
 } from 'framer-motion'
-import { useBreakpoint } from 'common'
-import { Products } from './Sections/ProductsCta'
-import { cn } from 'ui'
-
-import { DEFAULT_TRANSITION } from '~/lib/animations'
+import Link from 'next/link'
+import { useRef } from 'react'
 import {
   PRODUCT_MODULES,
   PRODUCT_MODULES_NAMES,
@@ -21,6 +18,9 @@ import {
   PRODUCT_SHORTNAMES,
   products as PRODUCTS,
 } from 'shared-data/products'
+import { cn } from 'ui'
+
+import { Products } from './Sections/ProductsCta'
 
 function MagnifiedProducts({ currentProduct }: { currentProduct: Products | string }) {
   let mouseX = useMotionValue(Infinity)
@@ -174,7 +174,7 @@ const products = {
     description: 'Integrate your favorite ML-models to store, index and search vector embeddings.',
     description_short: '',
     label: '',
-    url: '/vector',
+    url: '/modules/vector',
   },
 }
 
