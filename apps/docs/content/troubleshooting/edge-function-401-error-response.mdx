@@ -123,10 +123,10 @@ If you've migrated to [asymmetric keys (publishable/secret)](/dashboard/project/
     # remember to substitute in your PROJECT_ID, FUNCTION_NAME, and SECRET_TOKEN
 
 curl 'https://api.supabase.com/v1/projects/PROJECT_ID/functions/FUNCTION_NAME?verify_jwt=false' \
-—request PATCH \
-—header 'Content-Type: application/vnd.denoland.eszip' \
-—header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
-—data '""'
+--request PATCH \
+--header 'Content-Type: application/vnd.denoland.eszip' \
+--header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+--data '""'
 ```
 </AccordionItem>
 
