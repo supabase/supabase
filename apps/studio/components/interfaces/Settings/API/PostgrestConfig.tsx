@@ -226,13 +226,13 @@ export const PostgrestConfig = () => {
           queryKey: privilegeKeys.exposedTablesInfinite(projectRef),
         }),
         queryClient.invalidateQueries({
-          queryKey: privilegeKeys.exposedTableCounts(projectRef, watchedDbSchema),
+          queryKey: privilegeKeys.exposedTableCounts(projectRef),
         }),
         queryClient.invalidateQueries({
           queryKey: privilegeKeys.exposedFunctionsInfinite(projectRef),
         }),
         queryClient.invalidateQueries({
-          queryKey: privilegeKeys.exposedFunctionCounts(projectRef, watchedDbSchema),
+          queryKey: privilegeKeys.exposedFunctionCounts(projectRef),
         }),
         queryClient.invalidateQueries({
           queryKey: privilegeKeys.defaultPrivileges(projectRef),
