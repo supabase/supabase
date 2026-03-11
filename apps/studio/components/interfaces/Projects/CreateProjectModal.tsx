@@ -8,8 +8,7 @@ import {
   DialogSection,
   DialogTitle,
   Input_Shadcn_,
-  FormLabel_Shadcn_,
-  FormDescription_Shadcn_,
+  Label_Shadcn_,
 } from 'ui'
 
 const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_]*$/
@@ -101,7 +100,7 @@ export const CreateProjectModal = ({ visible, onClose, onSuccess }: CreateProjec
 
         <DialogSection className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <FormLabel_Shadcn_ htmlFor="project-name">Project name</FormLabel_Shadcn_>
+            <Label_Shadcn_ htmlFor="project-name">Project name</Label_Shadcn_>
             <Input_Shadcn_
               id="project-name"
               placeholder="e.g. acme"
@@ -117,9 +116,9 @@ export const CreateProjectModal = ({ visible, onClose, onSuccess }: CreateProjec
             {validationError ? (
               <p className="text-xs text-destructive">{validationError}</p>
             ) : (
-              <FormDescription_Shadcn_>
+              <p className="text-xs text-foreground-lighter">
                 Lowercase letters, numbers, and underscores only. Max 59 characters.
-              </FormDescription_Shadcn_>
+              </p>
             )}
           </div>
 
