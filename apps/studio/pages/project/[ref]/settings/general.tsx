@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ComplianceConfig } from 'components/interfaces/Settings/General/ComplianceConfig/ProjectComplianceMode'
 import { CustomDomainConfig } from 'components/interfaces/Settings/General/CustomDomainConfig/CustomDomainConfig'
@@ -23,9 +23,14 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { DashboardPreferences } from '@/components/interfaces/Settings/General/DashboardPreferences'
+import { Project } from '@/components/interfaces/Settings/General/Project'
+
 const ProjectSettings: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const showDashboardPreferences = useFlag('dashboardPreferences')
 
   const isBranch = !!project?.parent_project_ref
   const { projectsTransfer: projectTransferEnabled, projectSettingsCustomDomains } =
@@ -55,7 +60,8 @@ const ProjectSettings: NextPageWithLayout = () => {
       </PageHeader>
       <PageContainer size="small">
         <General />
-
+        {showDashboardPreferences && <DashboardPreferences />}
+        <Project />
         {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
         {!isBranch && hasHipaaAddon && <ComplianceConfig />}
         {projectSettingsCustomDomains && <CustomDomainConfig />}
