@@ -1,7 +1,8 @@
 'use client'
 
+import { FormikConfig, useFormik } from 'formik'
 import { useReducer } from 'react'
-import { useFormik, FormikConfig } from 'formik'
+
 import { FormContextProvider } from './FormContext'
 
 // interface Props extends FormikProps<any>, Partial FormikConfig<any> {

@@ -1,13 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import { CloudProviderSelector } from 'components/interfaces/ProjectCreation/CloudProviderSelector'
 import { ComputeSizeSelector } from 'components/interfaces/ProjectCreation/ComputeSizeSelector'
@@ -53,13 +47,19 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { withAuth } from 'hooks/misc/withAuth'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
-import { isHomeNewVariant, type HomeNewFlagValue } from 'lib/featureFlags/homeNew'
+import { useProfile } from 'lib/profile'
 import { useTrack } from 'lib/telemetry/track'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
+import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { z } from 'zod'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
@@ -68,6 +68,7 @@ const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
   const defaultProvider = useDefaultProvider()
+  const { profile } = useProfile()
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
@@ -84,8 +85,6 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const homeNewVariant = usePHFlag<HomeNewFlagValue>('homeNew')
-  const isHomeNew = isHomeNewVariant(homeNewVariant)
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -117,7 +116,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: undefined,
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
-      useApiSchema: false,
+      enableRlsEventTrigger: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
     },
@@ -226,6 +225,14 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: currentOrg !== null }
   )
 
+  const userPrimaryEmail = profile?.primary_email?.toLowerCase()
+  const isUserAtFreeProjectLimit = userPrimaryEmail
+    ? membersExceededLimit.some(
+        (member) => member.primary_email?.toLowerCase() === userPrimaryEmail
+      )
+    : false
+  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
+
   const {
     mutate: createProject,
     isPending: isCreatingNewProject,
@@ -236,13 +243,16 @@ const Wizard: NextPageWithLayout = () => {
         'project_creation_simple_version_submitted',
         {
           instanceSize: form.getValues('instanceSize'),
+          enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
+          dataApiEnabled: form.getValues('dataApi'),
+          useOrioleDb: form.getValues('useOrioleDb'),
         },
         {
           project: res.ref,
           organization: res.organization_slug,
         }
       )
-      router.push(isHomeNew ? `/project/${res.ref}` : `/project/${res.ref}/building`)
+      router.push(`/project/${res.ref}`)
     },
   })
 
@@ -272,7 +282,7 @@ const Wizard: NextPageWithLayout = () => {
       postgresVersion,
       instanceSize,
       dataApi,
-      useApiSchema,
+      enableRlsEventTrigger,
       postgresVersionSelection,
       useOrioleDb,
     } = values
@@ -299,10 +309,11 @@ const Wizard: NextPageWithLayout = () => {
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
-      dataApiUseApiSchema: !dataApi ? false : useApiSchema,
+      dataApiUseApiSchema: false,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
+      ...(enableRlsEventTrigger ? { dbSql: AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } : {}),
     }
 
     if (postgresVersion) {
@@ -442,6 +453,23 @@ const Wizard: NextPageWithLayout = () => {
                     {showAdvancedConfig && !!availableOrioleVersion && (
                       <AdvancedConfiguration form={form} />
                     )}
+
+                    {shouldShowFreeProjectInfo ? (
+                      <Admonition
+                        className="rounded-none border-0 border-t"
+                        type="note"
+                        title="Need a free project?"
+                        description={
+                          <p>
+                            You can have up to 2 free projects across all organizations.{' '}
+                            <Link className="underline text-foreground" href="/new">
+                              Create a free organization
+                            </Link>{' '}
+                            to use them.
+                          </p>
+                        }
+                      />
+                    ) : null}
                   </>
                 )}
 
@@ -517,7 +545,7 @@ const PageLayout = withAuth(({ children }: PropsWithChildren) => {
 })
 
 Wizard.getLayout = (page) => (
-  <DefaultLayout headerTitle="New project">
+  <DefaultLayout hideMobileMenu headerTitle="New project">
     <PageLayout>{page}</PageLayout>
   </DefaultLayout>
 )

@@ -66,7 +66,7 @@ export const ExportDialog = ({
 
   const outputName = `${table?.name}_rows`
   const queryChains = !table ? undefined : getAllTableRowsSql({ table, sorts, filters })
-  const query = !!queryChains
+  const queryWithSemicolon = !!queryChains
     ? ignoreRoleImpersonation
       ? queryChains.sql.toSql()
       : wrapWithRoleImpersonation(
@@ -74,6 +74,8 @@ export const ExportDialog = ({
           roleImpersonationState as RoleImpersonationState
         )
     : ''
+
+  const query = queryWithSemicolon.replace(/;\s*$/, '')
 
   const csvExportCommand = `
 ${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()

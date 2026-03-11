@@ -1,11 +1,12 @@
 import {
-  forwardRef,
   createElement,
-  ReactSVG,
-  SVGProps,
+  forwardRef,
   ForwardRefExoticComponent,
+  ReactSVG,
   RefAttributes,
+  SVGProps,
 } from 'react'
+
 import defaultAttributes from './defaultAttributes'
 
 export type IconNode = [elementName: keyof ReactSVG, attrs: Record<string, string>][]
@@ -60,18 +61,14 @@ export const convertAttributesToCamelCase = (
   return converted
 }
 
-const createLucideIcon = (iconName: string, iconNode: IconNode): LucideIcon => {
+const createLucideIcon = (
+  iconName: string,
+  iconNode: IconNode,
+  svgDefaults?: Record<string, string>
+): LucideIcon => {
   const Component = forwardRef<SVGSVGElement, LucideProps>(
     (
-      {
-        color = 'currentColor',
-        size = 24,
-        strokeWidth = 2,
-        absoluteStrokeWidth,
-        className = '',
-        children,
-        ...rest
-      },
+      { color, size = 24, strokeWidth, absoluteStrokeWidth, className = '', children, ...rest },
       ref
     ) => {
       return createElement(
@@ -79,12 +76,15 @@ const createLucideIcon = (iconName: string, iconNode: IconNode): LucideIcon => {
         {
           ref,
           ...defaultAttributes,
+          ...svgDefaults,
           width: size,
           height: size,
-          stroke: color,
-          strokeWidth: absoluteStrokeWidth
-            ? (Number(strokeWidth) * 24) / Number(size)
-            : strokeWidth,
+          ...(color !== undefined && { stroke: color }),
+          ...(strokeWidth !== undefined && {
+            strokeWidth: absoluteStrokeWidth
+              ? (Number(strokeWidth) * 24) / Number(size)
+              : strokeWidth,
+          }),
           className: ['lucide', `lucide-${toKebabCase(iconName)}`, className].join(' '),
           ...rest,
         },

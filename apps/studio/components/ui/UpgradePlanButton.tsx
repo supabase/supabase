@@ -1,13 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { PropsWithChildren } from 'react'
-
 import { useFlag, useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import Link from 'next/link'
+import { PropsWithChildren } from 'react'
 import { Button } from 'ui'
+
 import { ButtonTooltip } from './ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from './RequestUpgradeToBillingOwners'
 
@@ -17,13 +17,14 @@ export const PLAN_REQUEST_EMPTY_PLACEHOLDER =
 interface UpgradePlanButtonProps {
   /** Stick to camel case for consistency */
   source: string
-  type?: 'default' | 'primary'
+  variant?: 'default' | 'primary'
   plan?: 'Pro' | 'Team' | 'Enterprise'
   addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
   /** Used in the default message template for request upgrade dialog, e.g: "Upgrade to ..." */
   featureProposition?: string
   disabled?: boolean
   className?: string
+  slug?: string
 }
 
 /**
@@ -33,25 +34,28 @@ interface UpgradePlanButtonProps {
  */
 export const UpgradePlanButton = ({
   source,
-  type = 'primary',
+  variant = 'primary',
   plan = 'Pro',
   addon,
   featureProposition,
   disabled,
   children,
   className,
+  slug: slugParam,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan?.id === 'free'
-  const slug = organization?.slug ?? '_'
+  const slug = slugParam ?? organization?.slug ?? '_'
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
   const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+    'stripe.subscriptions',
+    undefined,
+    { organizationSlug: slug }
   )
 
   const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
@@ -95,7 +99,7 @@ export const UpgradePlanButton = ({
     return (
       <ButtonTooltip
         disabled
-        type="primary"
+        type={variant}
         className={className}
         tooltip={{
           content: {
@@ -110,7 +114,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={type} disabled={disabled} className={className}>
+    <Button asChild type={variant} disabled={disabled} className={className}>
       {link}
     </Button>
   )

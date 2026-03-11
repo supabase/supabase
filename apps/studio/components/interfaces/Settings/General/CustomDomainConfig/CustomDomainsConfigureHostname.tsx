@@ -1,9 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-
 import { useParams } from 'common'
+import CopyButton from 'components/ui/CopyButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
@@ -11,6 +9,7 @@ import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domain
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Card,
@@ -18,19 +17,19 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
 
 const schema = z.object({
   domain: z.string().trim().min(1, 'A value for your custom domain is required'),
 })
 
-const CustomDomainsConfigureHostname = () => {
+export const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -72,6 +71,7 @@ const CustomDomainsConfigureHostname = () => {
   }
 
   const domain = form.watch('domain')
+  const trimmedDomain = domain.trim()
   const isSubmitting = isCheckingRecord || isCreating
 
   return (
@@ -102,7 +102,6 @@ const CustomDomainsConfigureHostname = () => {
                         autoComplete="off"
                       />
                     </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
                   </FormItemLayout>
                 )}
               />
@@ -115,12 +114,31 @@ const CustomDomainsConfigureHostname = () => {
               {domain ? <code className="text-code-inline">{domain}</code> : 'your custom domain'}{' '}
               resolving to{' '}
               {endpoint ? (
-                <code className="text-code-inline">{endpoint}</code>
+                <span className="inline-flex items-center gap-x-1">
+                  <code className="text-code-inline">{endpoint}</code>
+                  <CopyButton
+                    iconOnly
+                    type="text"
+                    className="h-5 w-5 min-w-0 p-0 [&_svg]:h-3 [&_svg]:w-3"
+                    text={endpoint}
+                  />
+                </span>
               ) : (
                 "your project's API URL"
               )}{' '}
               with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
               disable the proxy option.
+              <br />
+              {trimmedDomain.includes('.') ? (
+                <>
+                  Some DNS providers expect only the subdomain label{' '}
+                  <code className="text-code-inline">{trimmedDomain.split('.')[0]}</code>, while
+                  others accept the full hostname{' '}
+                  <code className="text-code-inline whitespace-nowrap">{trimmedDomain}</code>.
+                </>
+              ) : (
+                'Some DNS providers expect only the subdomain label, while others accept the full hostname.'
+              )}
             </p>
           </CardContent>
 
@@ -154,5 +172,3 @@ const CustomDomainsConfigureHostname = () => {
     </Form_Shadcn_>
   )
 }
-
-export default CustomDomainsConfigureHostname

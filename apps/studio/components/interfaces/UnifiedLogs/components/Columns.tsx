@@ -5,6 +5,7 @@ import { DataTableColumnLevelIndicator } from 'components/ui/DataTable/DataTable
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
+import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { AuthUserHoverCard } from './AuthUserHoverCard'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
@@ -109,6 +110,11 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       header: '',
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['status']>('status')
+        const label =
+          value != null
+            ? STATUS_CODE_LABELS[String(value) as keyof typeof STATUS_CODE_LABELS] ??
+              'Unknown status'
+            : null
         return (
           <div className="flex items-center gap-1">
             {/* {row.original.auth_user && (
@@ -117,10 +123,24 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
                 <AuthUserHoverCard authUser={row.original.auth_user} />
               </div>
             )} */}
-            <DataTableColumnStatusCode
-              value={value}
-              level={row.getValue<ColumnSchema['level']>('level')}
-            />
+            {label ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <DataTableColumnStatusCode
+                      value={value}
+                      level={row.getValue<ColumnSchema['level']>('level')}
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{label}</TooltipContent>
+              </Tooltip>
+            ) : (
+              <DataTableColumnStatusCode
+                value={value}
+                level={row.getValue<ColumnSchema['level']>('level')}
+              />
+            )}
           </div>
         )
       },

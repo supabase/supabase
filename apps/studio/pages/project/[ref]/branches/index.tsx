@@ -230,7 +230,7 @@ BranchesPage.getLayout = (page) => {
             rel="noreferrer"
             href="https://github.com/orgs/supabase/discussions/18937"
           >
-            Branching Feedback
+            Branching feedback
           </a>
         </Button>
         <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />

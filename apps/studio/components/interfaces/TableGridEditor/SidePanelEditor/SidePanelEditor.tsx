@@ -1,15 +1,13 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { isEmpty, isUndefined, noop } from 'lodash'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
-import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
-import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
-import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 import { useParams } from 'common'
+import {
+  queueCellEditWithOptimisticUpdate,
+  queueRowAddWithOptimisticUpdate,
+} from 'components/grid/utils/queueOperationUtils'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -22,7 +20,7 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { lintKeys } from 'data/lint/keys'
 import { privilegeKeys } from 'data/privileges/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
-import { isTableLike } from 'data/table-editor/table-editor-types'
+import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
@@ -31,19 +29,21 @@ import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { getTables } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { isValidExperimentVariant } from 'hooks/misc/useTableCreateGeneratePolicies'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
-import { usePHFlag } from 'hooks/ui/useFlag'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useTrack } from 'lib/telemetry/track'
+import { isEmpty, isUndefined, noop } from 'lodash'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot, type TableEditorState } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { ColumnEditor } from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
+import { OperationQueueSidePanel } from './OperationQueueSidePanel/OperationQueueSidePanel'
 import { ForeignRowSelector } from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { JsonEditor } from './RowEditor/JsonEditor'
 import { RowEditor } from './RowEditor/RowEditor'
@@ -55,6 +55,7 @@ import {
   createColumn,
   createTable,
   duplicateTable,
+  getRowFromSidePanel,
   insertRowsViaSpreadsheet,
   insertTableRows,
   updateColumn,
@@ -67,6 +68,10 @@ import {
 } from './TableEditor/ApiAccessToggle'
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
+import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
+import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 
 export type SaveTableParams =
   | SaveTableParamsNew
@@ -199,7 +204,7 @@ export const SidePanelEditor = ({
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
-  const generatePoliciesFlag = usePHFlag<string>('tableCreateGeneratePolicies')
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
@@ -221,7 +226,7 @@ export const SidePanelEditor = ({
     }
   )
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isEdited,
     onClose: () => {
       setIsEdited(false)
@@ -258,7 +263,7 @@ export const SidePanelEditor = ({
   const saveRow = async (
     payload: any,
     isNewRecord: boolean,
-    configuration: { identifiers: any; rowIdx: number },
+    configuration: { identifiers: any; rowIdx: number; createMore?: boolean },
     onComplete: (err?: any) => void
   ) => {
     if (!project || selectedTable === undefined) {
@@ -267,6 +272,25 @@ export const SidePanelEditor = ({
 
     let saveRowError: Error | undefined
     if (isNewRecord) {
+      // Queue the ADD_ROW operation if queue operations feature is enabled
+      if (isQueueOperationsEnabled && selectedTable.primary_keys.length > 0) {
+        queueRowAddWithOptimisticUpdate({
+          queryClient,
+          queueOperation: snap.queueOperation,
+          projectRef: project.ref,
+          tableId: selectedTable.id,
+          table: selectedTable as unknown as Entity,
+          rowData: payload,
+          enumArrayColumns,
+        })
+
+        // Close panel immediately without error
+        onComplete()
+        setIsEdited(false)
+        if (!configuration.createMore) snap.closeSidePanel()
+        return
+      }
+
       try {
         await createTableRows({
           projectRef: project.ref,
@@ -283,6 +307,49 @@ export const SidePanelEditor = ({
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
         if (selectedTable.primary_keys.length > 0) {
+          // Queue the operation if queue operations feature is enabled
+          if (isQueueOperationsEnabled) {
+            const changedColumn = Object.keys(payload)[0]
+            if (!changedColumn) {
+              saveRowError = new Error('No changed column')
+              toast.error('No changed column')
+              onComplete(saveRowError)
+              return
+            }
+
+            const row = getRowFromSidePanel(snap.sidePanel)
+
+            if (!row) {
+              saveRowError = new Error('No row found')
+              toast.error('No row found')
+              onComplete(saveRowError)
+              return
+            }
+
+            const oldValue = row[changedColumn]
+
+            queueCellEditWithOptimisticUpdate({
+              queryClient,
+              queueOperation: snap.queueOperation,
+              projectRef: project.ref,
+              tableId: selectedTable.id,
+              // Cast to Entity - the queue save mutation only uses id, name, schema
+              table: selectedTable as unknown as Entity,
+              row,
+              rowIdentifiers: configuration.identifiers,
+              columnName: changedColumn,
+              oldValue: oldValue,
+              newValue: payload[changedColumn],
+              enumArrayColumns,
+            })
+
+            // Close panel immediately without error
+            onComplete()
+            setIsEdited(false)
+            snap.closeSidePanel()
+            return
+          }
+
           try {
             await updateTableRow({
               projectRef: project.ref,
@@ -308,7 +375,7 @@ export const SidePanelEditor = ({
     onComplete(saveRowError)
     if (!saveRowError) {
       setIsEdited(false)
-      snap.closeSidePanel()
+      if (!configuration.createMore) snap.closeSidePanel()
     }
   }
 
@@ -374,6 +441,7 @@ export const SidePanelEditor = ({
       primaryKey?: Constraint
       foreignKeyRelations: ForeignKey[]
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      createMore?: boolean
     },
     resolve: any
   ) => {
@@ -427,6 +495,9 @@ export const SidePanelEditor = ({
           queryKey: databaseKeys.tableDefinition(project?.ref, selectedTable?.id),
         }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.list(project?.ref, selectedTable?.schema, includeColumns),
+        }),
       ])
 
       // We need to invalidate tableRowsAndCount after tableEditor
@@ -436,10 +507,10 @@ export const SidePanelEditor = ({
       })
 
       setIsEdited(false)
-      snap.closeSidePanel()
+      if (!configuration.createMore) snap.closeSidePanel()
     }
 
-    resolve()
+    resolve(response?.error)
   }
 
   /**
@@ -666,17 +737,6 @@ export const SidePanelEditor = ({
           )
         } else {
           toast.success(`Table ${table.name} is good to go!`, { id: toastId })
-        }
-
-        // Track experiment conversion if user is in the experiment
-        if (isValidExperimentVariant(generatePoliciesFlag)) {
-          track('table_create_generate_policies_experiment_converted', {
-            experiment_id: 'tableCreateGeneratePolicies',
-            variant: generatePoliciesFlag,
-            has_rls_enabled: isRLSEnabled,
-            has_rls_policies: generatedPolicies.length > 0,
-            has_generated_policies: generatedPolicies.length > 0,
-          })
         }
 
         onTableCreated(table)
@@ -936,22 +996,11 @@ export const SidePanelEditor = ({
         closePanel={onClosePanel}
         updateEditorDirty={setIsEdited}
       />
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <OperationQueueSidePanel
+        visible={snap.sidePanel?.type === 'operation-queue'}
+        closePanel={snap.closeSidePanel}
+      />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

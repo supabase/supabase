@@ -88,6 +88,11 @@ const nextConfig = {
               destination: '/sign-in',
               permanent: false,
             },
+            {
+              source: '/project/:ref/building',
+              destination: '/project/:ref',
+              permanent: false,
+            },
           ]
         : [
             {
@@ -118,6 +123,11 @@ const nextConfig = {
             {
               source: '/log-in',
               destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/project/:ref/building',
+              destination: '/project/:ref',
               permanent: false,
             },
           ]),
@@ -436,7 +446,17 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/settings/auth',
-        destination: '/project/:ref/auth',
+        destination: '/project/:ref/auth/providers',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/api',
+        destination: '/project/:ref/integrations/data_api/overview',
+        permanent: false,
+      },
+      {
+        source: '/project/:ref/api',
+        destination: '/project/:ref/integrations/data_api/docs',
         permanent: false,
       },
 
@@ -566,6 +586,15 @@ const nextConfig = {
         loaders: ['raw-loader'],
         as: '*.js',
       },
+      // special case for Deno libs to be loaded as a raw text. They're passed as raw text to the Monaco editor.
+      'edge-runtime.d.ts': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      'lib.deno.d.ts': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
     },
   },
   onDemandEntries: {
@@ -608,5 +637,11 @@ module.exports =
         // https://docs.sentry.io/product/crons/
         // https://vercel.com/docs/cron-jobs
         automaticVercelMonitors: true,
+
+        // Annotate bundles at build time so thirdPartyErrorFilterIntegration can
+        // distinguish our code from browser extensions / injected scripts at runtime.
+        unstable_sentryWebpackPluginOptions: {
+          applicationKey: 'supabase-studio',
+        },
       })
     : nextConfig

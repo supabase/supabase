@@ -345,7 +345,7 @@ Now to setup the RLS policies for each tables:
 
 ```sql
 -- Create a private schema to store all security definer functions utils
--- As such functions should never be in a API exposed schema
+-- As such functions should never be in an API exposed schema
 create schema if not exists private;
 -- Helper function for role checks
 create or replace function private.get_user_org_role(org_id bigint, user_id uuid)

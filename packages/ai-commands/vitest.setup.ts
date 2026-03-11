@@ -1,5 +1,6 @@
-import { config } from 'dotenv'
 import { statSync } from 'fs'
+import { config } from 'dotenv'
+
 import './test/extensions'
 
 if (!process.env.CI) {

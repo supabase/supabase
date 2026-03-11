@@ -1,11 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download, FileArchive, Send } from 'lucide-react'
-import { useRouter } from 'next/router'
-import React, { useEffect, useState, type PropsWithChildren } from 'react'
-import { toast } from 'sonner'
-
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
@@ -18,7 +13,11 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { DOCS_URL } from 'lib/constants'
+import { Download, FileArchive, Send } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState, type PropsWithChildren } from 'react'
+import { toast } from 'sonner'
 import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
@@ -42,11 +41,12 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 
 interface EdgeFunctionDetailsLayoutProps {
-  title?: string
+  title: string
 }
 
 const EdgeFunctionDetailsLayout = ({
@@ -91,6 +91,10 @@ const EdgeFunctionDetailsLayout = ({
     )
 
   const name = selectedFunction?.name || ''
+  const browserTitle = {
+    entity: functionSlug ? name || functionSlug : undefined,
+    section: title,
+  }
 
   const breadcrumbItems = [
     {
@@ -105,25 +109,29 @@ const EdgeFunctionDetailsLayout = ({
 
   const navigationItems = functionSlug
     ? [
+        ...(IS_PLATFORM
+          ? [
+              {
+                label: 'Overview',
+                href: `/project/${ref}/functions/${functionSlug}`,
+              },
+              {
+                label: 'Invocations',
+                href: `/project/${ref}/functions/${functionSlug}/invocations`,
+              },
+              {
+                label: 'Logs',
+                href: `/project/${ref}/functions/${functionSlug}/logs`,
+              },
+            ]
+          : []),
         {
-          label: 'Overview',
-          href: `/project/${ref}/functions/${functionSlug}`,
-        },
-        {
-          label: 'Invocations',
-          href: `/project/${ref}/functions/${functionSlug}/invocations`,
-        },
-        {
-          label: 'Logs',
-          href: `/project/${ref}/functions/${functionSlug}/logs`,
+          label: 'Details',
+          href: `/project/${ref}/functions/${functionSlug}/details`,
         },
         {
           label: 'Code',
           href: `/project/${ref}/functions/${functionSlug}/code`,
-        },
-        {
-          label: 'Details',
-          href: `/project/${ref}/functions/${functionSlug}/details`,
         },
       ]
     : []
@@ -211,16 +219,20 @@ const EdgeFunctionDetailsLayout = ({
 
   if (!isLoading && !canReadFunctions) {
     return (
-      <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
+      <ProjectLayout
+        title={title || 'Edge Functions'}
+        product="Edge Functions"
+        browserTitle={browserTitle}
+      >
         <NoPermission isFullPage resourceText="access your project's edge functions" />
       </ProjectLayout>
     )
   }
 
   return (
-    <EdgeFunctionsLayout>
+    <EdgeFunctionsLayout title={title} browserTitle={browserTitle}>
       <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader size="full">
+        <PageHeader size="full" className="sticky top-0 z-10 bg-background">
           {breadcrumbItems.length > 0 && (
             <PageHeaderBreadcrumb>
               <BreadcrumbList>
@@ -266,19 +278,23 @@ const EdgeFunctionDetailsLayout = ({
                       Download
                     </Button>
                   </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ align="end" portal className="p-0">
-                    <div className="p-3 flex flex-col gap-y-2">
-                      <p className="text-xs text-foreground-light">Download via CLI</p>
-                      <Input
-                        copy
-                        showCopyOnHover
-                        readOnly
-                        containerClassName=""
-                        className="text-xs font-mono tracking-tighter"
-                        value={`supabase functions download ${functionSlug}`}
-                      />
-                    </div>
-                    <Separator className="!bg-border-overlay" />
+                  <PopoverContent_Shadcn_ align="end" className="p-0">
+                    {IS_PLATFORM && (
+                      <>
+                        <div className="p-3 flex flex-col gap-y-2">
+                          <p className="text-xs text-foreground-light">Download via CLI</p>
+                          <Input
+                            copy
+                            showCopyOnHover
+                            readOnly
+                            containerClassName=""
+                            className="text-xs font-mono tracking-tighter"
+                            value={`supabase functions download ${functionSlug}`}
+                          />
+                        </div>
+                        <Separator className="!bg-border-overlay" />
+                      </>
+                    )}
                     <div className="py-2 px-1">
                       <Button
                         type="text"
@@ -297,13 +313,15 @@ const EdgeFunctionDetailsLayout = ({
                     icon={<Send />}
                     onClick={() => {
                       setIsOpen(true)
-                      sendEvent({
-                        action: 'edge_function_test_side_panel_opened',
-                        groups: {
-                          project: ref ?? 'Unknown',
-                          organization: org?.slug ?? 'Unknown',
-                        },
-                      })
+                      if (IS_PLATFORM) {
+                        sendEvent({
+                          action: 'edge_function_test_side_panel_opened',
+                          groups: {
+                            project: ref ?? 'Unknown',
+                            organization: org?.slug ?? 'Unknown',
+                          },
+                        })
+                      }
                     }}
                   >
                     Test

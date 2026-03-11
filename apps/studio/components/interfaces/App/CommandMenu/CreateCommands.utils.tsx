@@ -1,24 +1,24 @@
-import { useMemo } from 'react'
-import { useFlag, useParams } from 'common'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
-import { HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
-import {
-  useIsVectorBucketsEnabled,
-  useIsAnalyticsBucketsEnabled,
-} from 'data/config/project-storage-config-query'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSetPage } from 'ui-patterns/CommandMenu'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  type IntegrationDefinition,
-  INTEGRATIONS,
-} from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { useParams } from 'common'
 import type { Hook } from 'components/interfaces/Auth/Hooks/hooks.constants'
+import { HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
+import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
+import {
+  INTEGRATIONS,
+  type IntegrationDefinition,
+} from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import {
+  useIsAnalyticsBucketsEnabled,
+  useIsVectorBucketsEnabled,
+} from 'data/config/project-storage-config-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useMemo } from 'react'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { useSetPage } from 'ui-patterns/CommandMenu'
 
 export function getIntegrationRoute(
   integration: IntegrationDefinition,
@@ -45,6 +45,10 @@ export function getIntegrationRoute(
       return `/project/${ref}/integrations/webhooks/webhooks?new=true`
     case 'queues':
       return `/project/${ref}/integrations/queues/queues?new=true`
+    // Data API and GraphiQL don't have a create route
+    case 'data_api':
+    case 'graphiql':
+      return null
     default: {
       // For other integrations, try to find a navigation route that's not 'overview'
       const createRoute = integration.navigation?.find((nav) => nav.route !== 'overview')
@@ -70,7 +74,7 @@ export function getIntegrationCommandName(integration: IntegrationDefinition): s
     case 'cron':
       return 'Create Cron Job'
     case 'webhooks':
-      return 'Create Webhook'
+      return 'Create Database Webhook'
     case 'queues':
       return 'Create Queue'
     default:
@@ -85,19 +89,18 @@ export function useCreateCommandsConfig() {
   const { openSidebar } = useSidebarManagerSnapshot()
   const snap = useAiAssistantStateSnapshot()
 
-  // Auth
-  const authenticationOauth21 = useFlag('EnableOAuth21')
-
   const {
     projectAuthAll: authEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
     reportsAll: reportsEnabled,
+    integrationsWrappers: integrationsWrappersEnabled,
   } = useIsFeatureEnabled([
     'project_auth:all',
     'project_edge_function:all',
     'project_storage:all',
     'reports:all',
+    'integrations:wrappers',
   ])
 
   const {
@@ -163,18 +166,19 @@ export function useCreateCommandsConfig() {
     [installedIntegrations]
   )
 
-  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-
-  const allIntegrations = integrationsWrappers
-    ? INTEGRATIONS
-    : INTEGRATIONS.filter((x) => !x.id.endsWith('_wrapper'))
+  const allIntegrations = useMemo(
+    () =>
+      integrationsWrappersEnabled
+        ? INTEGRATIONS
+        : INTEGRATIONS.filter((x) => !x.id.endsWith('_wrapper')),
+    [integrationsWrappersEnabled]
+  )
 
   return {
     ref,
     setPage,
     openSidebar,
     snap,
-    authenticationOauth21,
     authEnabled,
     edgeFunctionsEnabled,
     storageEnabled,
@@ -190,7 +194,7 @@ export function useCreateCommandsConfig() {
     isVectorBucketsEnabled,
     isAnalyticsBucketsEnabled,
     installedIntegrationIds,
-    integrationsWrappers,
+    integrationsWrappers: integrationsWrappersEnabled,
     allIntegrations,
     reportsEnabled,
   }

@@ -1,5 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import {
+  compactNumberFormatter,
+  formatPercentage,
   isFloat,
   numberFormatter,
   precisionFormatter,
@@ -84,6 +86,54 @@ describe('precisionFormatter', () => {
 
   it('should format exactly zero normally', () => {
     expect(precisionFormatter(0, 2)).toBe('0.00')
+  })
+})
+
+describe('formatPercentage', () => {
+  it('should format 100 without decimals', () => {
+    expect(formatPercentage(100, 2)).toBe('100%')
+    expect(formatPercentage(100, 0)).toBe('100%')
+  })
+
+  it('should keep decimals for non-100 values', () => {
+    expect(formatPercentage(99.99, 2)).toBe('99.99%')
+    expect(formatPercentage(0.5, 2)).toBe('0.50%')
+  })
+
+  it('should use numberFormatter for integers below 100', () => {
+    expect(formatPercentage(50, 2)).toBe('50%')
+    expect(formatPercentage(1, 2)).toBe('1%')
+  })
+})
+
+describe('compactNumberFormatter', () => {
+  it('returns the number as-is below 1000', () => {
+    expect(compactNumberFormatter(0)).toBe('0')
+    expect(compactNumberFormatter(1)).toBe('1')
+    expect(compactNumberFormatter(999)).toBe('999')
+  })
+
+  it('formats thousands with K suffix', () => {
+    expect(compactNumberFormatter(1000)).toBe('1K')
+    expect(compactNumberFormatter(1500)).toBe('1.5K')
+    expect(compactNumberFormatter(64000)).toBe('64K')
+    expect(compactNumberFormatter(999999)).toBe('1M') // rounds up
+  })
+
+  it('formats millions with M suffix', () => {
+    expect(compactNumberFormatter(1_000_000)).toBe('1M')
+    expect(compactNumberFormatter(1_500_000)).toBe('1.5M')
+    expect(compactNumberFormatter(2_500_000)).toBe('2.5M')
+  })
+
+  it('formats billions with B suffix', () => {
+    expect(compactNumberFormatter(1_000_000_000)).toBe('1B')
+    expect(compactNumberFormatter(2_500_000_000)).toBe('2.5B')
+  })
+
+  it('handles negative numbers', () => {
+    expect(compactNumberFormatter(-1000)).toBe('-1K')
+    expect(compactNumberFormatter(-1_500_000)).toBe('-1.5M')
   })
 })
 

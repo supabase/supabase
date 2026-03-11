@@ -1,12 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
 import { PROJECT_ANALYTICS_URL } from 'lib/constants/api'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
-  const { ref } = req.query
 
   const missingEnvVars = envVarsSet()
 
@@ -29,16 +28,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       url.search = new URLSearchParams({
         'metadata[type]': 'log-drain',
       }).toString()
-      const resp = await fetch(url, {
+      const upstream = await fetch(url, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then((res) => {
-        return res.json()
       })
+
+      if (!upstream.ok) {
+        return res
+          .status(500)
+          .json({ error: { message: 'Failed to fetch log drains from upstream' } })
+      }
+
+      const resp = await upstream.json()
+
+      if (!Array.isArray(resp)) {
+        return res
+          .status(500)
+          .json({ error: { message: 'Unexpected response format from upstream' } })
+      }
 
       return res.status(200).json(resp)
     case 'POST':
