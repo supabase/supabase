@@ -1,13 +1,10 @@
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, Info } from 'lucide-react'
-import Link from 'next/link'
-import { SetStateAction } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
@@ -18,21 +15,24 @@ import { useIsAwsNimbusCloudProvider, useSelectedProjectQuery } from 'hooks/misc
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, InfoIcon } from 'ui'
-import { DocsButton } from 'components/ui/DocsButton'
+import { ExternalLink, Info } from 'lucide-react'
+import Link from 'next/link'
+import { SetStateAction } from 'react'
+import { toast } from 'sonner'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, InfoIcon } from 'ui'
 import {
   PageSection,
+  PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionContent,
 } from 'ui-patterns'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
 }
 
-const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
+export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -63,6 +63,10 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
       setShowIncreaseDiskSizeModal(false)
     },
   })
+
+  const { hasAccess: hasAccessToDiskSizeConfig } = useCheckEntitlements(
+    'instances.disk_modifications'
+  )
 
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
@@ -152,7 +156,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                               <Markdown
                                 className="max-w-full"
                                 content={`
-We auto-scale your disk as you need more storage, but can only do this once every 6 hours.
+We auto-scale your disk as you need more storage, but can only do this once every 4 hours.
 If you upload more than 1.5x the current size of your storage, your database will go
 into read-only mode. If you know how big your database is going to be, you can
 manually increase the size here.
@@ -173,12 +177,12 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
             <Alert_Shadcn_>
               <InfoIcon />
               <AlertTitle_Shadcn_>
-                {organization?.plan?.id === 'free'
+                {hasAccessToDiskSizeConfig === false
                   ? 'Disk size configuration is not available for projects on the Free Plan'
                   : 'Disk size configuration is only available when the spend cap has been disabled'}
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                {organization?.plan?.id === 'free' ? (
+                {hasAccessToDiskSizeConfig === false ? (
                   <p>
                     If you are intending to use more than 500MB of disk space, then you will need to
                     upgrade to at least the Pro Plan.
@@ -192,11 +196,11 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
                 <Button asChild type="default" className="mt-3">
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=${
-                      organization?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                      hasAccessToDiskSizeConfig === false ? 'subscriptionPlan' : 'costControl'
                     }`}
                     target="_blank"
                   >
-                    {organization?.plan?.id === 'free'
+                    {hasAccessToDiskSizeConfig === false
                       ? 'Upgrade subscription'
                       : 'Disable spend cap'}
                   </Link>
@@ -215,5 +219,3 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
     </>
   )
 }
-
-export default DiskSizeConfiguration

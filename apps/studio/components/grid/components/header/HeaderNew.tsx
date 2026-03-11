@@ -65,34 +65,25 @@ export const HeaderNew = ({
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2 overflow-x-auto ">
+      <div className="flex flex-wrap min-h-10 items-center bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2">
         {customHeader ? (
           customHeader
         ) : snap.selectedRows.size > 0 ? (
           <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
         ) : (
-          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} isRefetching={isRefetching} />
+          <div className="flex-1 min-w-[300px] flex items-center gap-2">
+            <FilterPopoverNew isRefetching={isRefetching} />
+          </div>
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto">
+          {!customHeader && snap.selectedRows.size === 0 && (
+            <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
+          )}
           <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
           {showInsertButton && <InsertButton />}
         </div>
       </div>
     </div>
-  )
-}
-
-const DefaultHeader = ({
-  tableQueriesEnabled = true,
-  isRefetching,
-}: Pick<HeaderProps, 'tableQueriesEnabled' | 'isRefetching'>) => {
-  return (
-    <>
-      <div className="flex-1 min-w-0 flex items-center gap-2">
-        <FilterPopoverNew isRefetching={isRefetching} />
-      </div>
-      <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
-    </>
   )
 }
 
@@ -223,6 +214,9 @@ type RowHeaderProps = {
 }
 
 const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
+  const { id: _id } = useParams()
+  const tableId = _id ? Number(_id) : undefined
+
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
@@ -238,14 +232,16 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const [isExporting, setIsExporting] = useState(false)
   const [showExportModal, setShowExportModal] = useState(false)
 
+  const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
+
   const { data } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: snap.table.id,
       sorts,
       filters,
       page: snap.page,
+      preflightCheck,
       limit: tableEditorSnap.rowsPerPage,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
@@ -255,7 +251,6 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const { data: countData } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,

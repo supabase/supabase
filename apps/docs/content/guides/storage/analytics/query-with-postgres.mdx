@@ -3,9 +3,15 @@ title: 'Query with PostgreSQL'
 subtitle: 'Query analytics bucket data directly from PostgreSQL using SQL.'
 ---
 
-Once your data flows into an analytics bucket—either via the [Replication Pipeline](/docs/guides/storage/analytics/replication) or custom pipelines—you can query it directly from Postgres using standard SQL.
+Once your data flows into an analytics bucket through your own ingestion pipeline, you can query it directly from Postgres using standard SQL.
 
 This is made possible by the [Iceberg Foreign Data Wrapper](/docs/guides/database/extensions/wrappers/iceberg), which creates a bridge between your Postgres database and Iceberg tables.
+
+<Admonition type="note" title="About ingestion">
+
+Managed replication into Analytics Buckets through Supabase ETL is no longer supported. This guide assumes your Analytics Bucket is being populated by your own ingestion pipeline.
+
+</Admonition>
 
 ## Setup overview
 
@@ -24,6 +30,9 @@ The dashboard provides the easiest setup experience:
 <Image
   alt="Query with PostgreSQL button on analytics bucket page"
   src="/docs/img/storage/query-analytics-with-postgres.png"
+
+width={1860}
+height={332}
 />
 
 3. Enter the **Postgres schema** where you want to create the foreign tables.
@@ -31,6 +40,9 @@ The dashboard provides the easiest setup experience:
 <Image
   alt="Select destination PostgreSQL schema"
   src="/docs/img/storage/query-analytics-schema-name.png"
+
+width={525}
+height={297}
 />
 
 4. Click **Connect**. The wrapper is now configured.

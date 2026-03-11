@@ -48,7 +48,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Project Settings</PageHeaderTitle>
             <PageHeaderDescription>
-              Configure general options, domains, transfers, and project lifecycle.
+              General configuration, domains, ownership, and lifecycle
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>

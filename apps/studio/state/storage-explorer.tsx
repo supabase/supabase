@@ -1,17 +1,14 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
+import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 
-import { ResponseError } from '@/types'
-import { LOCAL_STORAGE_KEYS } from 'common'
-import {
-  inverseValidObjectKeyRegex,
-  validObjectKeyRegex,
-} from 'components/interfaces/Storage/CreateBucketModal.utils'
+import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import {
   STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
@@ -19,38 +16,43 @@ import {
   STORAGE_SORT_BY,
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
-} from 'components/interfaces/Storage/Storage.constants'
+} from '@/components/interfaces/Storage/Storage.constants'
 import {
   StorageColumn,
   StorageItem,
   StorageItemMetadata,
   StorageItemWithColumn,
-} from 'components/interfaces/Storage/Storage.types'
+} from '@/components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
-} from 'components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
-import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { InlineLink } from 'components/ui/InlineLink'
-import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
-import { configKeys } from 'data/config/keys'
-import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
-import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
-import { getQueryClient } from 'data/query-client'
-import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
-import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
-import { deleteBucketPrefix } from 'data/storage/bucket-prefix-delete-mutation'
-import { Bucket } from 'data/storage/buckets-query'
-import { moveStorageObject } from 'data/storage/object-move-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { tryParseJson } from 'lib/helpers'
-import { lookupMime } from 'lib/mime'
-import { createProjectSupabaseClient } from 'lib/project-supabase-client'
-import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+  getPathAlongFoldersToIndex,
+  sanitizeNameForDuplicateInColumn,
+  validateFolderName,
+} from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
+import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
+import { configKeys } from '@/data/config/keys'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import type { ProjectStorageConfigResponse } from '@/data/config/project-storage-config-query'
+import { getQueryClient } from '@/data/query-client'
+import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation'
+import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
+import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
+import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
+import type { Bucket } from '@/data/storage/buckets-query'
+import { moveStorageObject } from '@/data/storage/object-move-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import { tryParseJson } from '@/lib/helpers'
+import { lookupMime } from '@/lib/mime'
+import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
+import { ResponseError } from '@/types'
 
 type UploadProgress = {
   percentage: number
@@ -62,7 +64,8 @@ type UploadProgress = {
 
 const LIMIT = 200
 const OFFSET = 0
-const BATCH_SIZE = 2
+const DEFAULT_RETRY_SECONDS = 5
+const RATE_LIMIT_RETRY_SECONDS = 60
 
 const DEFAULT_PREFERENCES = {
   view: STORAGE_VIEWS.COLUMNS,
@@ -72,7 +75,7 @@ const DEFAULT_PREFERENCES = {
 }
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
-let abortController: any
+let abortController: AbortController
 if (typeof window !== 'undefined') {
   abortController = new AbortController()
 }
@@ -80,11 +83,13 @@ if (typeof window !== 'undefined') {
 function createStorageExplorerState({
   projectRef,
   connectionString,
+  bucket,
   resumableUploadUrl,
   clientEndpoint,
 }: {
   projectRef: string
   connectionString: string
+  bucket?: Bucket
   resumableUploadUrl: string
   clientEndpoint: string
 }) {
@@ -98,8 +103,8 @@ function createStorageExplorerState({
     connectionString,
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
+    selectedBucket: bucket as Bucket,
 
-    // abortController,
     abortApiCalls: () => {
       if (abortController) {
         abortController.abort()
@@ -132,7 +137,6 @@ function createStorageExplorerState({
     popOpenedFolders: () => {
       state.openedFolders = state.openedFolders.slice(0, state.openedFolders.length - 1)
     },
-
     popOpenedFoldersAtIndex: (index: number) => {
       state.openedFolders = state.openedFolders.slice(0, index + 1)
     },
@@ -158,14 +162,6 @@ function createStorageExplorerState({
     selectedItemsToMove: [] as StorageItemWithColumn[],
     setSelectedItemsToMove: (items: StorageItemWithColumn[]) => {
       state.selectedItemsToMove = items
-    },
-
-    selectedBucket: {} as Bucket,
-    setSelectedBucket: (bucket: Bucket) => {
-      state.selectedBucket = bucket
-      state.setSelectedFilePreview(undefined)
-      state.clearOpenedFolders()
-      state.clearSelectedItems()
     },
 
     setSelectedItemToRename: (file: { name: string; columnIndex: number }) => {
@@ -234,38 +230,7 @@ function createStorageExplorerState({
       })
     },
 
-    openBucket: async (bucket: Bucket) => {
-      state.setSelectedBucket(bucket)
-    },
-
     // ======== Folders CRUD ========
-
-    getPathAlongOpenedFolders: (includeBucket = true) => {
-      if (includeBucket) {
-        return state.openedFolders.length > 0
-          ? `${state.selectedBucket.name}/${state.openedFolders.map((folder) => folder.name).join('/')}`
-          : state.selectedBucket.name
-      }
-      return state.openedFolders.map((folder) => folder.name).join('/')
-    },
-
-    getPathAlongFoldersToIndex: (index: number) => {
-      return state.openedFolders
-        .slice(0, index)
-        .map((folder) => folder.name)
-        .join('/')
-    },
-
-    validateFolderName: (name: string) => {
-      if (!validObjectKeyRegex.test(name)) {
-        const [match] = name.match(inverseValidObjectKeyRegex) ?? []
-        return !!match
-          ? `Folder name cannot contain the "${match}" character`
-          : 'Folder name contains an invalid special character'
-      }
-
-      return null
-    },
 
     addNewFolderPlaceholder: (columnIndex: number) => {
       const isPrepend = true
@@ -292,7 +257,7 @@ function createStorageExplorerState({
       onError?: () => void
     }) => {
       const autofix = false
-      const formattedName = state.sanitizeNameForDuplicateInColumn({
+      const formattedName = sanitizeNameForDuplicateInColumn(state, {
         name: folderName,
         autofix,
         columnIndex,
@@ -307,7 +272,7 @@ function createStorageExplorerState({
         return state.removeTempRows(columnIndex)
       }
 
-      const folderNameError = state.validateFolderName(formattedName)
+      const folderNameError = validateFolderName(formattedName)
       if (folderNameError) {
         onError?.()
         return toast.error(folderNameError)
@@ -639,7 +604,7 @@ function createStorageExplorerState({
         })
       }
 
-      const folderNameError = state.validateFolderName(newName)
+      const folderNameError = validateFolderName(newName)
       if (folderNameError) {
         onError?.()
         return toast.error(folderNameError)
@@ -660,10 +625,10 @@ function createStorageExplorerState({
         const files = await state.getAllItemsAlongFolder(folder)
 
         let progress = 0
-        let hasErrors = false
+        let failedFiles = 0
+        let retrySeconds = DEFAULT_RETRY_SECONDS
 
-        // Make this batched promises into a reusable function for storage, i think this will be super helpful
-        const promises = files.map((file) => {
+        for (const file of files) {
           const fromPath = `${file.prefix}/${file.name}`
           const pathSegments = fromPath.split('/')
           const toPath = pathSegments
@@ -671,50 +636,86 @@ function createStorageExplorerState({
             .concat(newName)
             .concat(pathSegments.slice(columnIndex + 1))
             .join('/')
-          return () => {
-            return new Promise<void>(async (resolve) => {
-              progress = progress + 1 / files.length
-              try {
-                await moveStorageObject({
-                  projectRef: state.projectRef,
-                  bucketId: state.selectedBucket.id,
-                  from: fromPath,
-                  to: toPath,
+
+          let success = false
+          let isRateLimited = false
+
+          for (let attempt = 0; attempt < 3 && !success; attempt++) {
+            try {
+              if (attempt > 0) {
+                await new Promise<void>((resolve) => {
+                  let seconds = retrySeconds
+                  const interval = setInterval(() => {
+                    toast(
+                      <SonnerProgress
+                        progress={Math.min(progress * 100, 100)}
+                        message={`Renaming folder to ${newName}`}
+                        description={`${isRateLimited ? 'API rate limited' : 'Error moving file'} - retrying in ${seconds} seconds (${attempt}/3)`}
+                      />,
+                      { id: toastId, closeButton: false, position: 'top-right', duration: Infinity }
+                    )
+
+                    seconds--
+                    if (seconds <= 0) {
+                      clearInterval(interval)
+                      resolve()
+                    }
+                  }, 1000)
                 })
-              } catch (error) {
-                hasErrors = true
-                toast.error(`Failed to move ${fromPath} to the new folder`)
               }
-              resolve()
-            })
+
+              await moveStorageObject({
+                projectRef: state.projectRef,
+                bucketId: state.selectedBucket.id,
+                from: fromPath,
+                to: toPath,
+              })
+              success = true
+            } catch (error) {
+              if ((error as ResponseError).code === 429) {
+                isRateLimited = true
+                retrySeconds = RATE_LIMIT_RETRY_SECONDS
+              } else {
+                isRateLimited = false
+                retrySeconds = DEFAULT_RETRY_SECONDS
+              }
+
+              if (attempt === 2) failedFiles += 1
+            }
           }
-        })
 
-        const batchedPromises = chunk(promises, BATCH_SIZE)
-        // [Joshen] I realised this can be simplified with just a vanilla for loop, no need for reduce
-        // Just take note, but if it's working fine, then it's okay
-
-        await batchedPromises.reduce(async (previousPromise, nextBatch) => {
-          await previousPromise
-          await Promise.all(nextBatch.map((batch) => batch()))
+          progress += 1 / files.length
           toast(
-            <SonnerProgress progress={progress * 100} message={`Renaming folder to ${newName}`} />,
-            { id: toastId, closeButton: false, position: 'top-right' }
+            <SonnerProgress
+              progress={Math.min(progress * 100, 100)}
+              message={`Renaming folder to ${newName}`}
+            />,
+            { id: toastId, closeButton: false, position: 'top-right', duration: Infinity }
           )
-        }, Promise.resolve())
+        }
 
-        if (!hasErrors) {
+        if (failedFiles === 0) {
           toast.success(`Successfully renamed folder to ${newName}`, {
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
           })
         } else {
-          toast.error(`Renamed folder to ${newName} with some errors`, {
-            id: toastId,
-            closeButton: true,
-            duration: SONNER_DEFAULT_DURATION,
-          })
+          toast.error(
+            <div>
+              <p>
+                Renamed folder to {newName} with {failedFiles} error{failedFiles > 1 ? 's' : ''}
+              </p>
+              <p className="text-foreground-light">
+                You may try again to rename the folder {originalName} to {newName}
+              </p>
+            </div>,
+            {
+              id: toastId,
+              closeButton: true,
+              duration: Infinity,
+            }
+          )
         }
 
         if (state.openedFolders[columnIndex]?.name === folder.name) {
@@ -796,8 +797,34 @@ function createStorageExplorerState({
           { id: toastId, closeButton: false, position: 'top-right' }
         )
 
+        // Pre-fetch all URLs in a single batch to avoid N management API calls
+        const filePaths = files.map((file) => `${file.prefix}/${file.name}`)
+        const urlByPath = new Map<string, string>()
+
+        if (state.selectedBucket.public) {
+          for (const filePath of filePaths) {
+            urlByPath.set(
+              filePath,
+              `${clientEndpoint}/storage/v1/object/public/${state.selectedBucket.id}/${filePath}`
+            )
+          }
+        } else {
+          const signedUrls = await signBucketObjects({
+            projectRef: state.projectRef,
+            bucketId: state.selectedBucket.id,
+            paths: filePaths,
+            expiresIn: 60 * 60, // 1 hour — enough for large folder downloads
+          })
+          for (const item of signedUrls) {
+            if (item.path && item.signedUrl) {
+              urlByPath.set(item.path, item.signedUrl)
+            }
+          }
+        }
+
         const promises = files.map((file) => {
           const fileMimeType = (file.metadata?.mimetype as string) ?? null
+          const filePath = `${file.prefix}/${file.name}`
           return () => {
             return new Promise<
               | {
@@ -808,26 +835,22 @@ function createStorageExplorerState({
               | boolean
             >(async (resolve) => {
               try {
-                // Get authenticated Supabase client for Storage API access
-                const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
+                const url = urlByPath.get(filePath)
+                if (!url) throw new Error(`Failed to retrieve file ${filePath}`)
 
-                // Use Storage API directly instead of Management API to avoid throttling
-                const { data, error } = await client.storage
-                  .from(state.selectedBucket.id)
-                  .download(`${file.prefix}/${file.name}`)
-
-                if (error) throw error
-                if (!data) throw new Error('No data returned from download')
+                const response = await fetch(url)
+                if (!response.ok) throw new Error(`Failed to retrieve file ${filePath}`)
+                const data = await response.blob()
 
                 progress = progress + 1 / files.length
 
                 resolve({
                   name: file.name,
                   prefix: file.prefix,
-                  blob: new Blob([data], { type: fileMimeType }),
+                  blob: new Blob([data], { type: fileMimeType ?? data.type }),
                 })
               } catch (error) {
-                console.error('Failed to download file', `${file.prefix}/${file.name}`)
+                console.error('Failed to download file', filePath)
                 resolve(false)
               }
             })
@@ -1066,7 +1089,7 @@ function createStorageExplorerState({
           const path = file.path.split('/')
           const topLevelFolder = path.length > 1 ? path[0] : null
           if (topLevelFolders.includes(topLevelFolder as string)) {
-            const newTopLevelFolder = state.sanitizeNameForDuplicateInColumn({
+            const newTopLevelFolder = sanitizeNameForDuplicateInColumn(state, {
               name: topLevelFolder as string,
               autofix,
               columnIndex,
@@ -1107,7 +1130,7 @@ function createStorageExplorerState({
 
         const isWithinFolder = (file?.path ?? '').split('/').length > 1
         const fileName = !isWithinFolder
-          ? state.sanitizeNameForDuplicateInColumn({ name: file.name, autofix })
+          ? sanitizeNameForDuplicateInColumn(state, { name: file.name, autofix })
           : file.name
         const unsanitizedFormattedFileName =
           has(file, ['path']) && isWithinFolder ? file.path : fileName
@@ -1159,17 +1182,17 @@ function createStorageExplorerState({
             let chunkSize: number
 
             if (fileSizeInMB < 30) {
-              chunkSize = 6 * 1024 * 1024
+              chunkSize = 6 * 1024 * 1024 // 6MB
             } else if (fileSizeInMB < 100) {
-              chunkSize = Math.floor(file.size / 8)
+              chunkSize = Math.floor(file.size / 8) // maximum 8 chunks, 12,5MB each
             } else if (fileSizeInMB < 500) {
-              chunkSize = Math.floor(file.size / 10)
+              chunkSize = Math.floor(file.size / 10) // maximum 10 chunks, 50MB each
             } else if (fileSizeInMB < 1024) {
-              chunkSize = Math.floor(file.size / 20)
+              chunkSize = Math.floor(file.size / 20) // maximum 20 chunks, 50MB each
             } else if (fileSizeInMB < 10 * 1024) {
-              chunkSize = Math.floor(file.size / 30)
+              chunkSize = Math.floor(file.size / 30) // maximum 30 chunks, 333MB each
             } else {
-              chunkSize = Math.floor(file.size / 50)
+              chunkSize = Math.floor(file.size / 50) // maximum 50 chunks
             }
 
             // Max chunk size is 500MB
@@ -1215,7 +1238,7 @@ function createStorageExplorerState({
                   const status = error.originalResponse?.getStatus()
 
                   switch (status) {
-                    case 415:
+                    case 415: {
                       // Unsupported mime type
                       toast.error(
                         capitalize(
@@ -1227,20 +1250,38 @@ function createStorageExplorerState({
                         }
                       )
                       break
-                    case 413:
+                    }
+                    case 413: {
                       // Payload too large
                       toast.error(
                         `Failed to upload ${file.name}: File size exceeds the bucket file size limit.`
                       )
                       break
-                    case 409:
+                    }
+                    case 409: {
                       // Resource already exists
                       toast.error(`Failed to upload ${file.name}: File name already exists.`)
                       break
-                    case 400:
-                      // Invalid key
-                      toast.error(`Failed to upload ${file.name}: File name is invalid`)
+                    }
+                    case 400: {
+                      const responseBody = error.originalResponse?.getBody()
+                      if (typeof responseBody === 'string') {
+                        if (responseBody.includes('Invalid key:')) {
+                          toast.error(`Failed to upload ${file.name}: File name is invalid.`)
+                          break
+                        }
+
+                        if (responseBody.includes('Invalid Compact JWS')) {
+                          toast.error(`Failed to upload ${file.name}: Invalid Compact JWS.`)
+                          break
+                        }
+                      }
+                      // if it's not handled by the two ifs, fallthrough to the default case which shows the generic error message
+                    }
+                    default: {
+                      toast.error(`Failed to upload ${file.name}: ${error.message}`)
                       break
+                    }
                   }
                 } else {
                   toast.error(`Failed to upload ${file.name}: ${error.message}`)
@@ -1513,17 +1554,17 @@ function createStorageExplorerState({
       const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
       try {
-        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
+        const url = await fetchFileUrl(
+          file.path,
+          state.projectRef,
+          state.selectedBucket.id,
+          state.selectedBucket.public
+        )
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`Failed to retrieve file ${file.path}`)
+        const data = await response.blob()
 
-        // Use Storage API directly instead of Management API to avoid throttling
-        const { data, error } = await client.storage
-          .from(state.selectedBucket.id)
-          .download(file.path)
-
-        if (error) throw error
-        if (!data) throw new Error('No data returned from download')
-
-        const newBlob = new Blob([data], { type: fileMimeType })
+        const newBlob = new Blob([data], { type: fileMimeType ?? data.type })
         const blobUrl = window.URL.createObjectURL(newBlob)
         const link = document.createElement('a')
         link.href = blobUrl
@@ -1557,17 +1598,18 @@ function createStorageExplorerState({
       if (!file.path) return false
 
       try {
-        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
-
-        const { data, error } = await client.storage
-          .from(state.selectedBucket.id)
-          .download(file.path)
-
-        if (error) throw error
-        if (!data) throw new Error('No data returned from download')
+        const url = await fetchFileUrl(
+          file.path,
+          state.projectRef,
+          state.selectedBucket.id,
+          state.selectedBucket.public
+        )
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`Failed to retrieve file ${file.path}`)
+        const data = await response.blob()
 
         const fileMimeType = file?.metadata?.mimetype ?? undefined
-        return { name: file.name, blob: new Blob([data], { type: fileMimeType }) }
+        return { name: file.name, blob: new Blob([data], { type: fileMimeType ?? data.type }) }
       } catch (err) {
         console.error('Failed to download file', file.path)
         return false
@@ -1652,7 +1694,7 @@ function createStorageExplorerState({
           columnIndex,
           updatedName: newName,
         })
-        const pathToFile = state.getPathAlongFoldersToIndex(columnIndex)
+        const pathToFile = getPathAlongFoldersToIndex(state, columnIndex)
 
         const fromPath = pathToFile.length > 0 ? `${pathToFile}/${originalName}` : originalName
         const toPath = pathToFile.length > 0 ? `${pathToFile}/${newName}` : newName
@@ -1720,54 +1762,6 @@ function createStorageExplorerState({
         // Select items within the range
         state.setSelectedItems(uniqBy(state.selectedItems.concat(rangeToSelect), 'id'))
       }
-    },
-
-    sanitizeNameForDuplicateInColumn: ({
-      name,
-      columnIndex,
-      autofix = false,
-    }: {
-      name: string
-      columnIndex?: number
-      autofix?: boolean
-    }) => {
-      const columnIndex_ = columnIndex !== undefined ? columnIndex : state.getLatestColumnIndex()
-      const currentColumn = state.columns[columnIndex_]
-      const currentColumnItems = currentColumn.items.filter(
-        (item) => item.status !== STORAGE_ROW_STATUS.EDITING
-      )
-      // [Joshen] JFYI storage does support folders of the same name with different casing
-      // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
-      // for folders of the same name with different casing
-      // We should remove this check once all projects are on the List V2 endpoint
-      const hasSameNameInColumn =
-        currentColumnItems.filter((item) => item.name.toLowerCase() === name.toLowerCase()).length >
-        0
-
-      if (hasSameNameInColumn) {
-        if (autofix) {
-          const fileNameSegments = name.split('.')
-          const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
-          const fileExt = fileNameSegments[fileNameSegments.length - 1]
-
-          const dupeNameRegex = new RegExp(
-            `${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`
-          )
-          const itemsWithSameNameInColumn = currentColumnItems.filter((item) =>
-            item.name.match(dupeNameRegex)
-          )
-
-          const updatedFileName = fileName + ` (${itemsWithSameNameInColumn.length + 1})`
-          return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
-        } else {
-          toast.error(
-            `The name ${name} already exists in the current directory. Please use a different name.`
-          )
-          return null
-        }
-      }
-
-      return name
     },
 
     addTempRow: ({
@@ -1872,13 +1866,14 @@ function createStorageExplorerState({
   return state
 }
 
-type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
+export type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
 
 const DEFAULT_STATE_CONFIG = {
   projectRef: '',
   connectionString: '',
   resumableUploadUrl: '',
   clientEndpoint: '',
+  bucket: {} as Bucket,
 }
 
 const StorageExplorerStateContext = createContext<StorageExplorerState>(
@@ -1887,14 +1882,17 @@ const StorageExplorerStateContext = createContext<StorageExplorerState>(
 
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
+  const { data: bucket } = useSelectedBucket()
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
-  const { data: endpointData, isSuccess: isSuccessSettings } = useProjectEndpointQuery({
-    projectRef: project?.ref,
-  })
+  const {
+    storageEndpoint,
+    hostEndpoint,
+    isSuccess: isSuccessSettings,
+  } = useProjectApiUrl({ projectRef: project?.ref })
 
   // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
   // before the project details were ready, hence the store kept returning project ref as undefined
@@ -1902,16 +1900,18 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   // So the useEffect here is to make sure that the project ref is loaded into the state properly
   // Although I'd be keen to re-investigate this to see if we can remove this
   useEffect(() => {
-    const hasDataReady = !!project?.ref
+    const hasDataReady = !!project && !!bucket
     const storeAlreadyLoaded = state.projectRef === project?.ref
 
     if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
-      const clientEndpoint = endpointData.endpoint
+      const clientEndpoint = storageEndpoint ?? hostEndpoint ?? ''
       const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
+
       setState(
         createStorageExplorerState({
-          projectRef: project?.ref ?? '',
+          projectRef: project.ref,
           connectionString: project.connectionString ?? '',
+          bucket,
           resumableUploadUrl,
           clientEndpoint,
         })
@@ -1919,12 +1919,13 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     }
   }, [
     state.projectRef,
-    project?.ref,
-    project?.connectionString,
+    project,
     stateRef,
     isPaused,
-    endpointData?.endpoint,
+    hostEndpoint,
+    storageEndpoint,
     isSuccessSettings,
+    bucket,
   ])
 
   return (

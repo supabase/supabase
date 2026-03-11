@@ -60,9 +60,59 @@ A good default is to use `Lax` which sends cookies when users are navigating to 
 
 ### Can I use server-side rendering with a CDN or cache?
 
-Yes, but you need to be careful to include at least the refresh token cookie value in the cache key. Otherwise you may be accidentally serving pages with data belonging to different users!
+Yes, but there are two specific scenarios that can cause users to receive another user's session. Both are related to caching of HTTP responses that contain `Set-Cookie` headers.
 
-Also be sure you set proper cache control headers. We recommend invalidating cache keys every hour or less.
+#### ISR (incremental static regeneration)
+
+If you use ISR on pages that trigger a Supabase session refresh, the cached response will include the `Set-Cookie` header containing the refreshed JWT. When that cached response is served to a subsequent user, their browser stores the token and they are signed in as the wrong person.
+
+Do not enable ISR on any route where authentication is handled or where a session refresh can occur. In Nuxt, avoid setting `isr` on authenticated routes. In Next.js, use `export const dynamic = 'force-dynamic'` on pages that require authentication.
+
+#### CDN and reverse proxy caching
+
+When `@supabase/ssr` refreshes a session token server-side, it writes the updated JWT to the HTTP response via a `Set-Cookie` header. If your CDN (e.g. Vercel Edge, Cloudflare) caches that response and serves it to a different user, that user's browser will store the cached token and be signed in as the wrong person.
+
+To prevent this, set `Cache-Control: private, no-store` on responses from any route that handles authentication, typically your middleware. Most CDNs respect this header and will not cache the response.
+
+#### Next.js middleware
+
+```ts
+const response = NextResponse.next()
+// ... supabase client setup and getUser() call
+response.headers.set('Cache-Control', 'private, no-store')
+return response
+```
+
+#### Nuxt server middleware
+
+```ts
+// ... supabase client setup and getUser() call
+setHeader(event, 'Cache-Control', 'private, no-store')
+```
+
+**CloudFront**
+
+CloudFront's behavior depends on its cache policy configuration and is not solely controlled by the `Cache-Control` response header. Even with `Cache-Control: private, no-store`, CloudFront can still cache the response and the `Set-Cookie` header if its cache policy has a Minimum TTL greater than 0, or if cookies and the `Set-Cookie` header are not forwarded to the origin.
+
+To protect against session leakage on CloudFront, use one or more of the following steps:
+
+- **Set Minimum TTL to 0** in your CloudFront cache policy. This allows `Cache-Control: no-store` to take effect as intended.
+- **Use `Cache-Control: no-cache="Set-Cookie"`** to instruct CloudFront not to cache the `Set-Cookie` header specifically, while still allowing other parts of the response to be cached.
+- **Disable caching entirely** for authenticated routes (e.g. your middleware path) by associating a cache policy with TTL set to 0, or by using the managed `CachingDisabled` policy for those behaviors.
+
+<Admonition type="note">
+
+On other managed CDN platforms (for example AWS Amplify), cache policies are configured at the platform level and may similarly not fully respect `Cache-Control` headers set in your application. Always verify your CDN's caching behavior for routes that set cookies.
+
+</Admonition>
+
+If you need to cache SSR pages for performance, apply caching only to routes that do not write `Set-Cookie` headers, and always include the refresh token cookie value in the cache key for any routes that serve user-specific content.
+
+#### Vercel Fluid compute (in-memory client sharing)
+
+Vercel's Fluid compute model can keep server instances warm and reuse them across requests. In some cases this means a Supabase client initialized in module scope — or stored in a shared variable — may be reused across requests from different users, causing one user's session to leak into another user's request.
+
+Always initialize the Supabase client inside the request handler, not at module level. Do not store the client or any user-specific state in a variable that persists between requests.
 
 ### Which authentication flows have PKCE support?
 

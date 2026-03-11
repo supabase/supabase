@@ -118,7 +118,9 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                 <FormControl_Shadcn_>
                   <Input_Shadcn_ {...field} placeholder="my_webhook" />
                 </FormControl_Shadcn_>
-                <p className="text-xs text-foreground-lighter">Do not use spaces/whitespaces</p>
+                <p className="mt-2 text-xs text-foreground-lighter">
+                  Do not use spaces/whitespaces
+                </p>
               </FormItemLayout>
             )}
           />

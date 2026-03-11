@@ -2590,6 +2590,12 @@ functions:
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
       - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
+      - An optional `jwt` parameter can be passed to check the AAL level of a specific JWT instead of the current session.
+    params:
+      - name: jwt
+        isOptional: true
+        type: string
+        description: An optional JWT to check the AAL level for. If not provided, the current session's JWT is used.
     examples:
       - id: get-aal
         name: Get the AAL details of a session
@@ -2614,6 +2620,12 @@ functions:
             }
             error: null
           }
+          ```
+      - id: get-aal-with-jwt
+        name: Get the AAL details for a specific JWT
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel(jwt)
           ```
   - id: admin-api
     title: 'Overview'
@@ -3224,7 +3236,7 @@ functions:
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            { ban_duration: '100y' }
+            { ban_duration: '876000h' }
           )
           ```
   - id: auth-js-gotrueadminapi-signout
@@ -7724,6 +7736,9 @@ functions:
   - id: postgrest-js-postgrestclient-constructor
     title: new PostgrestClient()
     $ref: '@supabase/postgrest-js.PostgrestClient.constructor'
+    notes: |
+      - A `timeout` option (in milliseconds) can be set to automatically abort requests that take too long.
+      - A `urlLengthLimit` option (default: 8000) can be set to control when URL length warnings are included in error messages for aborted requests.
     examples:
       - id: postgrest-js-postgrestclient-constructor-example-1
         name: Example 1
@@ -7734,6 +7749,18 @@ functions:
           const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
             headers: { apikey: 'public-anon-key' },
             schema: 'public',
+          })
+          ```
+      - id: postgrest-js-postgrestclient-constructor-with-timeout
+        name: With timeout
+        code: |-
+          ```ts
+          import PostgrestClient from '@supabase/postgrest-js'
+
+          const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
+            headers: { apikey: 'public-anon-key' },
+            schema: 'public',
+            timeout: 30000, // 30 second timeout
           })
           ```
   - id: postgrest-js-postgrestclient-from

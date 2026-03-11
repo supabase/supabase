@@ -407,7 +407,7 @@ Deno.serve(async (req) => {
   },
   {
     value: 'websocket-server',
-    name: 'Websocket Server Example',
+    name: 'WebSocket Server Example',
     description: 'Create a real-time WebSocket server',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";

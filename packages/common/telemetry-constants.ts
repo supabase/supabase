@@ -1657,6 +1657,46 @@ export interface BranchReviewWithAssistantClickedEvent {
 }
 
 /**
+ * Triggered when a user selects a branch from the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorBranchClickedEvent {
+  action: 'branch_selector_branch_clicked'
+  properties: {
+    branchId: string
+    branchName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Create branch" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorCreateClickedEvent {
+  action: 'branch_selector_create_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Manage branches" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorManageClickedEvent {
+  action: 'branch_selector_manage_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked on a DPA PDF link to open it.
  *
  * @group Events
@@ -2320,7 +2360,55 @@ export interface SidebarOpenedEvent {
     /**
      * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
      */
-    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
+    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel' | 'help-panel'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened an org menu submenu in the mobile navigation sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgSubmenuOpenedEvent {
+  action: 'org_submenu_opened'
+  properties: {
+    /** The key of the submenu item that was opened */
+    itemKey: string
+    /** The display label of the submenu item */
+    itemLabel: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the back button in the mobile org menu to return to the top-level menu.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgMenuBackClickedEvent {
+  action: 'org_menu_back_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a menu item in the mobile org navigation sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgMenuItemClickedEvent {
+  action: 'org_menu_item_clicked'
+  properties: {
+    /** The key identifying the menu item */
+    itemKey: string
+    /** The navigation href of the menu item */
+    itemHref: string
   }
   groups: TelemetryGroups
 }
@@ -2489,6 +2577,31 @@ export interface QueryPerformanceAIExplanationButtonClickedEvent {
 }
 
 /**
+ * User copied an AI prompt to clipboard instead of using the built-in assistant.
+ * This allows users to paste the prompt into external AI tools (Cursor, Claude, etc.)
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiPromptCopiedEvent {
+  action: 'ai_prompt_copied'
+  properties: {
+    /**
+     * Source/location where the prompt was copied from
+     */
+    source:
+      | 'explain_visualizer'
+      | 'query_performance'
+      | 'sql_debug'
+      | 'lint_detail'
+      | 'advisor_section'
+      | 'advisor_widget'
+      | 'branch_review'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User opened the request upgrade modal (for users without billing permissions).
  *
  * @group Events
@@ -2651,6 +2764,45 @@ export interface RlsEventTriggerBannerCreateButtonClickedEvent {
 }
 
 /**
+ * User was exposed to the pricing calculator experiment on the /pricing page.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingCalculatorExperimentExposedEvent {
+  action: 'pricing_calculator_experiment_exposed'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'pricingCalculatorExperiment'
+    /**
+     * Experiment variant: 'control' (existing compute section) or 'test' (new compute section)
+     */
+    variant: 'control' | 'test'
+  }
+}
+
+/**
+ * User clicked the Run button in the log explorer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/logs/explorer
+ */
+export interface LogExplorerQueryRunButtonClickedEvent {
+  action: 'log_explorer_query_run_button_clicked'
+  properties: {
+    /**
+     * Whether the user is editing a saved query
+     */
+    is_saved_query: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2720,6 +2872,7 @@ export type TelemetryEvent =
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
+  | LogExplorerQueryRunButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
@@ -2754,6 +2907,9 @@ export type TelemetryEvent =
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
+  | BranchSelectorBranchClickedEvent
+  | BranchSelectorCreateClickedEvent
+  | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
   | HomeGettingStartedWorkflowClickedEvent
   | HomeGettingStartedStepClickedEvent
@@ -2788,6 +2944,7 @@ export type TelemetryEvent =
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
+  | AiPromptCopiedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
@@ -2797,3 +2954,7 @@ export type TelemetryEvent =
   | IntegrationInstallFailedEvent
   | IntegrationUninstallCompletedEvent
   | RlsEventTriggerBannerCreateButtonClickedEvent
+  | OrgSubmenuOpenedEvent
+  | OrgMenuBackClickedEvent
+  | OrgMenuItemClickedEvent
+  | PricingCalculatorExperimentExposedEvent

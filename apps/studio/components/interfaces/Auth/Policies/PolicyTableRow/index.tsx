@@ -1,12 +1,7 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { useParams } from 'common'
 import { noop } from 'lodash'
 import { memo, useMemo } from 'react'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Card,
   CardContent,
@@ -20,10 +15,15 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
 import type { PolicyTable } from './PolicyTableRow.types'
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useTablesRolesAccessQuery } from '@/data/tables/tables-roles-access-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface PolicyTableRowProps {
   table: PolicyTable
@@ -120,7 +120,10 @@ const PolicyTableRowComponent = ({
           <p className="text-foreground-light">
             No data will be selectable via Supabase APIs as this schema is not exposed. You may
             configure this in your project’s{' '}
-            <InlineLink href={`/project/${ref}/settings/api`}>API settings</InlineLink>.
+            <InlineLink href={`/project/${ref}/integrations/data_api/settings`}>
+              API settings
+            </InlineLink>
+            .
           </p>
         </Admonition>
       )}

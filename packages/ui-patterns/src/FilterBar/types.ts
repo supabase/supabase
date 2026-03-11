@@ -21,9 +21,32 @@ export type FilterOption = string | FilterOptionObject | CustomOptionObject
 export type AsyncOptionsFunction = (search?: string) => Promise<(string | FilterOptionObject)[]>
 export type SyncOptionsFunction = (search?: string) => (string | FilterOptionObject)[]
 
+export type FilterOperatorGroup = 'comparison' | 'pattern' | 'setNull' | 'uncategorized'
+
+export const OPERATOR_GROUP_LABELS: Record<FilterOperatorGroup, string> = {
+  comparison: 'COMPARISON',
+  pattern: 'PATTERN MATCHING',
+  setNull: 'SET & NULL CHECKS',
+  uncategorized: 'OTHER',
+}
+
+export const GROUP_ORDER: FilterOperatorGroup[] = [
+  'comparison',
+  'pattern',
+  'setNull',
+  'uncategorized',
+]
+
+export type OperatorDefinition = {
+  value: string
+  label: string
+  group: FilterOperatorGroup
+}
+
 export type FilterOperatorObject = {
   value: string
   label: string
+  group?: FilterOperatorGroup
 }
 
 export type FilterOperator = string | FilterOperatorObject
@@ -63,6 +86,31 @@ export type FilterBarAction = {
   ) => void | Promise<void>
 }
 
+export type MenuItem = {
+  value: string
+  label: string
+  icon?: React.ReactNode
+  isCustom?: boolean
+  customOption?: (props: CustomOptionProps) => React.ReactElement
+  isAction?: boolean
+  action?: FilterBarAction
+  actionInputValue?: string
+  group?: FilterOperatorGroup
+  operatorSymbol?: string
+  isDefaultOperator?: boolean
+  defaultValue?: string
+}
+
+export type GroupedMenuItem = {
+  item: MenuItem
+  index: number
+}
+
+export type MenuItemGroup = {
+  group: FilterOperatorGroup
+  items: GroupedMenuItem[]
+}
+
 export type SerializableFilterProperty = Pick<
   FilterProperty,
   'label' | 'name' | 'type' | 'operators'
@@ -84,6 +132,7 @@ export type ActiveInputState =
   | { type: 'value'; path: ConditionPath }
   | { type: 'operator'; path: ConditionPath }
   | { type: 'group'; path: ConditionPath }
+  | { type: 'property'; path: ConditionPath }
   | null
 
 export type KeyboardNavigationConfig = {
@@ -93,4 +142,10 @@ export type KeyboardNavigationConfig = {
   onFilterChange: (filters: FilterGroup) => void
   highlightedConditionPath: ConditionPath | null
   setHighlightedConditionPath: (path: ConditionPath | null) => void
+}
+
+export type ResolvedPropertyChange = {
+  operator: string
+  value: string
+  focusTarget: 'operator' | 'value'
 }

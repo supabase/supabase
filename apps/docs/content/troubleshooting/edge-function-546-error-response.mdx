@@ -1,56 +1,328 @@
 ---
-title = "Edge Function 546 error response"
+title = "546 - WORKER_LIMIT Exceeded"
 topics = [ "functions" ]
 keywords = [ "546", "error", "resource", "memory", "cpu", "event loop", "edge function" ]
+database_id = "4e6ff2e4-2abb-4fba-8233-5883b3d56fb0"
 
 [[errors]]
 http_status_code = 546
-message = "Edge Function error"
+message = "WORKER_LIMIT"
 ---
 
-The 546 error typically indicates resource exhaustion or code issues in your Edge Function.
+A 546 error indicates that an edge function used more resources (CPU or Memory) than it was allocated.
 
-## Common causes
+## Context for the error
 
-### Memory or CPU limits
+Edge functions run in transient servers called **isolates**. Each isolate:
 
-Your function may have exceeded available resources. Check the resource usage metrics in your dashboard at Functions > [Your Function] > Metrics.
+- Handles one request at a time
+- Is bound to a single function (e.g. an isolate for `func_one` will never serve `func_two`)
 
-### Event loop completion
+When a request arrives, the runtime assigns it to a free isolate or spins up a new one if all existing isolates are busy. Each isolate also has resource limitations.
 
-If logs show "Event loop completed," your function has implementation issues. Check your function code for:
+| Resource   | Limit |
+| ---------- | ----- |
+| CPU cycles | 2s    |
+| Memory     | 250MB |
 
-- Syntax errors
-- Infinite loops
-- Unresolved promises
+Once an isolate uses 50% of any resource, it will finish the current request and then shut down.
 
-## Debugging steps
+However, if that remaining request exhausts all CPU or memory before completion, the isolate will terminate immediately and return a 546 response.
 
-### Run the function locally
+## Solving the error
 
-Use the Supabase CLI to run your function locally and get detailed stack traces:
+### Step 1: Identifying the error
 
-```bash
+When an edge function fails due to internal CPU or memory limits, it will return the error:
+
+```json
+{
+  "code": "WORKER_LIMIT",
+  "message": "Function failed due to not having enough compute resources (please check logs)"
+}
+```
+
+In the [function dashboard's](/dashboard/project/_/functions/) `Logs` tab, you can find the specific error message:
+
+- `Memory limit exceeded`
+- `CPU Time exceeded`
+
+![image](/docs/img/troubleshooting/limit_logs.png)
+
+Alternatively, you can filter for the specific errors from the function using the [log explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++fl.event_message%2C%0A++content.timestamp%2C%0A++fel.function_name%2C%0A++fel.status_code%0AFROM+function_logs+fl%0ALEFT+JOIN+UNNEST%28fl.metadata%29+AS+content+ON+TRUE%0ALEFT+JOIN+%28%0A++SELECT%0A++++em.execution_id%2C%0A++++req.pathname+AS+function_name%2C%0A++++res.status_code%0A++FROM+function_edge_logs%0A++LEFT+JOIN+UNNEST%28metadata%29+AS+em+ON+TRUE%0A++LEFT+JOIN+UNNEST%28em.request%29+AS+req+ON+TRUE%0A++LEFT+JOIN+UNNEST%28em.response%29+AS+res+ON+TRUE%0A%29+fel+ON+content.execution_id+%3D+fel.execution_id%0AWHERE+%0A++content.level+%3D+%27error%27%0A++++AND%0A++fel.status_code+%3D+546%0AORDER+BY+function_name%2C+timestamp%0ALIMIT+5)
+
+```sql
+select
+  fl.event_message,
+  content.timestamp,
+  fel.function_name,
+  fel.status_code
+from
+  function_logs as fl
+  left join UNNEST(fl.metadata) as content on true
+  left join (
+    select
+      em.execution_id,
+      req.pathname as function_name,
+      res.status_code
+    from
+      function_edge_logs
+      left join UNNEST(metadata) as em on true
+      left join UNNEST(em.request) as req on true
+      left join UNNEST(em.response) as res on true
+  ) as fel
+    on content.execution_id = fel.execution_id
+where content.level = 'error' and fel.status_code = 546
+order by timestamp, function_name
+limit 20;
+```
+
+## Step 2: Check error frequency
+
+Before optimizing, run the below query in the [Log Explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++COUNT%28id%29+AS+total_responses%2C%0A++COUNTIF%28response.status_code+%3D+546%29+AS+total_546%2C%0A++SAFE_DIVIDE%28COUNTIF%28response.status_code+%3D+546%29%2C+COUNT%28*%29%29+*+100+AS+pct_546%0AFROM+function_edge_logs%0ACROSS+JOIN+UNNEST%28function_edge_logs.metadata%29+AS+metadata%0ACROSS+JOIN+UNNEST%28metadata.response%29+AS+response%0ACROSS+JOIN+UNNEST%28metadata.request%29+AS+request%0AWHERE+pathname+%3D+%27%2Ffunctions%2Fv1%2FYOUR_FUNCTION_NAME%27+) to understand how often 546s are occurring relative to total requests:
+
+```sql
+select
+  COUNT(id) as total_responses,
+  COUNTIF(response.status_code = 546) as total_546,
+  SAFE_DIVIDE(COUNTIF(response.status_code = 546), COUNT(*)) * 100 as pct_546
+from
+  function_edge_logs
+  cross join UNNEST(function_edge_logs.metadata) as metadata
+  cross join UNNEST(metadata.response) as response
+  cross join UNNEST(metadata.request) as request
+where method != 'OPTIONS' and pathname = '/functions/v1/YOUR_FUNCTION_NAME';
+-- <-- add your function name to inspect specific endpoints
+```
+
+Depending on the results, you may be able to determine if the event is an edge case or affecting a function's overall behavior.
+
+### Interpreting the results
+
+| 546-rate | What it likely means                                                                                                            |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| < 5%     | May be an anomaly or edge case with how your function is structure or responds to payloads. May be acceptable for your use case |
+| 5-50%    | Affecting a meaningful portion of traffic                                                                                       |
+| > 50%    | Nearly all requests are over-resourced; the function needs significant work                                                     |
+
+## Step 2: Narrowing down the cause
+
+### Experimenting locally
+
+{/* Note to future maintainers: it would be really nice to have copy/paste commands for setting up a local environment right in the guide */}
+
+The same constraints placed on edge function's hosted by Supabase are also imposed by the test environment spun-up by the CLI. You can follow the function's [local development guide](/docs/guides/functions/quickstart) to set up a test environment and then serve your function locally:
+
+```sh
 supabase functions serve your-function --debug
 ```
 
-The local console provides full stack traces with line numbers, making it easier to identify the source of errors.
+Then try experimenting with different stress tests to see if you can induce 546s. Some tests worth trying may involve:
 
-### Check function logs
+- sending a large payload
+- testing varying paths or query parameters
+- sending multiple requests at once
 
-Navigate to Functions > [Your Function] > Logs in the dashboard. Look for:
+If you find a reliable way to induce the error, you may want to [log](/docs/guides/functions/logging) between operations to gain more visibility or [configure chrome dev-tools](/docs/guides/functions/debugging-tools) to pinpoint the underlying logic that is failing.
 
-- Error messages
-- Resource usage warnings
-- Shutdown events with specific reasons
+### Exploring for failure patterns in the logs
 
-### Review example implementations
+There are a few other queries that may be useful for identifying patterns around 546 errors.
 
-Compare your function against working examples in the [Edge Functions examples repository](https://github.com/supabase/supabase/tree/master/examples/edge-functions).
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Checking if a specific version is an offender"
+      id="item-1"
+    >
+        Every time you update a function, its version number increments. It may be that you made an update and it's only a specific version that is problematic.
+
+        You can check error frequency by version with the below query:
+
+```sql
+select
+  COUNT(id) as total_responses,
+  version,
+  COUNTIF(response.status_code = 546) as total_546,
+  SAFE_DIVIDE(COUNTIF(response.status_code = 546), COUNT(*)) * 100 as pct_546
+from
+  function_edge_logs
+  cross join UNNEST(function_edge_logs.metadata) as metadata
+  cross join UNNEST(metadata.response) as response
+  cross join UNNEST(metadata.request) as request
+where method != 'OPTIONS' and pathname = '/functions/v1/FUNCTION_NAME' -- <--OPTIONAL FILTER: add specific function name to target query
+group by version
+having pct_546 > 5 -- <--Failure percentage threshold. The query only shows versions with a 5% or above 546 error rate
+order by pct_546;
+```
+
+    </AccordionItem>
+
+  </div>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Check error frequency by time"
+      id="item-2"
+    >
+
+    You can check to see how frequent 546 errors are per hour with the below query:
+
+    ```sql
+
+SELECT
+FORMAT_TIMESTAMP("%Y-%m-%d %H:00", TIMESTAMP(timestamp), "UTC") AS hour,
+COUNT(id) AS total_responses,
+
+COUNTIF(response.status_code = 546) AS total_546,
+
+SAFE_DIVIDE(COUNTIF(response.status_code = 546), COUNT(id)) \* 100
+AS pct_546
+
+FROM function_edge_logs
+CROSS JOIN UNNEST(function_edge_logs.metadata) AS metadata
+CROSS JOIN UNNEST(metadata.response) AS response
+CROSS JOIN UNNEST(metadata.request) AS request
+WHERE pathname = '/functions/v1/FUNCTION_NAME'--<--OPTIONAL FILTER: add specific function name to target query
+group by hour
+ORDER by hour DESC
+LIMIT 24;
+
+````
+
+    The output may look like:
+    ![image](/docs/img/troubleshooting/546_errors_by_hour.png)
+
+    If the failures are concentrated to a specific time, you can check if you made any updates around that period or if users were engaging in atypical behavior, such as sending larger payloads.
+
+
+    </AccordionItem>
+
+  </div>
+
+      <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Check requests per isolate"
+      id="item-3"
+    >
+
+    If your isolates are serving more than 2 requests before retiring, it suggests variability in how much processing each request needs. In that case, you may want to cross compare your successful requests with your failed ones. Maybe there's a query parameter or specific content-length header that makes failures more likely.
+
+    ```sql
+
+SELECT
+COUNT(fel.id) AS requests_served,
+metadata.execution_id AS isolate_id
+FROM function_logs
+LEFT JOIN UNNEST(function_logs.metadata) AS metadata ON TRUE
+LEFT JOIN (
+SELECT
+em.execution_id,
+id,
+pathname,
+method
+FROM function_edge_logs
+LEFT JOIN UNNEST(function_edge_logs.metadata) AS em ON TRUE
+LEFT JOIN UNNEST(em.request) AS req ON TRUE
+) fel ON metadata.execution_id = fel.execution_id
+WHERE
+metadata.reason IN ('Memory', 'CPUTime')
+AND
+method <> 'OPTIONS' --ignore OPTION requests
+AND
+pathname = '/functions/v1/FUNCTION_NAME' --<-- add your function name to inspect specific endpoints
+GROUP BY metadata.execution_id
+````
+
+    </AccordionItem>
+
+  </div>
+</Accordion>
+
+## Step 3: Correcting the error
+
+The only way to manage the error is to reduce resource consumption per request. There are a few strategies one can go about.
+
+### 1. Refactor logic:
+
+If you believe a portion of your function is overly aggressive, try testing locally whether refactoring reduces resource overuse.
+
+Common culprits:
+
+**CPU intensive recursions**: intensive loops or recursion can quickly exhaust CPU
+
+```js
+// This will exhaust CPU allocation when called repeatedly
+function fib(n: number): number {
+  if (n <= 1) return n;
+  return fib(n - 1) + fib(n - 2); // high levels of recursion
+}
+
+for (let i = 0; i < 100; i++) {
+  fib(40);
+}
+```
+
+**Unbounded memory allocation**: filling large arrays in a tight loop prevents the garbage collector from freeing memory
+
+```js
+// Each iteration allocates ~100s of KB. During the loops, all memory is consumed before GC can intervene
+let ref = []
+for (let i = 0; i < 1000; i++) {
+  ref.push(new Array(10e4).fill('data'))
+}
+```
+
+You can compare your function against working examples in the [Edge Function docs](/docs/guides/functions#examples) for insight on how to rework your code.
+
+### 2. Swap in a lighter package:
+
+If you're using a dependency that does more than you need, look for a lighter or more performant alternative.
+
+### 3. Offload operations to the database:
+
+If you are performing logic to process data from Supabase Postgres, you may be able to handle the processing within the database directly by using [database functions](/docs/guides/database/functions?queryGroups=language&language=js) or refactored queries.
+
+### 4. Offload operations to an external API:
+
+Instead of managing all operations within the function itself, there may be an external API that can execute CPU or memory intensive jobs on its behalf. One [example](/docs/guides/functions/examples/screenshots) would be using an external API for orchestrating a headless browser and then just using the edge function to manage the output of the activity instead of everything all in place.
+
+### 5. Split operations into individual functions:
+
+Break a large function into smaller ones, each responsible for a single sub-task. Stitch the results together at the app level or via an orchestrating function.
+
+<Admonition type="caution">
+
+If you have functions that call other functions, always implement an escape condition. Supabase will terminate functions that recursively self-call past a certain depth, but your code should enforce its own limit.
+
+</Admonition>
+
+### 6. Move to a less restrictive platform:
+
+Edge functions have a hard resource limit. If your work requires more resources than we permit, you can look into other solutions, such as AWS Lambda, that are less restrictive, or [self-host edge functions](/docs/reference/self-hosting-functions/introduction) and reconfigure the settings.
+
+## Example cases
+
+### Image processing
+
+Performing edits against images or other large files can be both CPU and Memory intensive. Some approaches for reducing load is using more performant processing libraries, processing outside by using an API or the requester's server, or restricting the file size to reduce strain.
+
+### AI embedding generation and inference
+
+AI models process data into embeddings (large arrays), that they can more understand. Edge Functions are capable of managing [some small models directly](/blog/ai-inference-now-available-in-supabase-edge-functions); however, some require more processing power than what the edge function can support directly. In these cases, the solution is to manage the embeddings via an external source, such as OpenAI, Anthropic, etc. and to just use the edge function for light processing and coordination.
+
+### Web scraping
+
+Web scraping often requires a headless browser operator, such as [puppeteer](https://pptr.dev/) or [playwright](https://playwright.dev/) for rendering web pages. In this case, it is better to use an external API to manage the headless browser for you and then parse the results it returns with the edge function. There's an example in the function docs: [Taking Screenshots with Puppeteer](/docs/guides/functions/examples/screenshots)
 
 ## Additional resources
 
 - [Edge Function shutdown reasons explained](./edge-function-shutdown-reasons-explained)
-- [Edge Function wall clock time limit reached](./edge-function-wall-clock-time-limit-reached-Nk38bW)
 - [Monitoring resource usage](./edge-function-monitoring-resource-usage)
 - [Debugging Edge Functions](/docs/guides/functions/logging)

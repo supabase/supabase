@@ -4,8 +4,7 @@ import { QUERY_PERFORMANCE_CHART_TABS } from './QueryPerformance.constants'
 import { Loader2 } from 'lucide-react'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import type { ChartDataPoint } from './WithMonitor/WithMonitor.utils'
-import { calculatePercentilesFromHistogram } from './WithMonitor/WithMonitor.utils'
+import type { ChartDataPoint } from './QueryPerformance.types'
 
 interface QueryPerformanceChartProps {
   dateRange?: {
@@ -62,33 +61,11 @@ export const QueryPerformanceChart = ({
 
     switch (selectedMetric) {
       case 'query_latency': {
-        let trueP95: number = 0
-
-        if (parsedLogs && parsedLogs.length > 0) {
-          const bucketCount = parsedLogs[0]?.resp_calls?.length || 50
-          const combinedHistogram = new Array(bucketCount).fill(0)
-
-          parsedLogs.forEach((log) => {
-            if (log.resp_calls && Array.isArray(log.resp_calls)) {
-              log.resp_calls.forEach((count: number, index: number) => {
-                if (index < combinedHistogram.length) {
-                  combinedHistogram[index] += count
-                }
-              })
-            }
-          })
-
-          // [kemal]: this might need a revisit
-          const percentiles = calculatePercentilesFromHistogram(combinedHistogram)
-          trueP95 = percentiles.p95
-        } else {
-          // [kemal]: fallback to weighted average
-          const totalCalls = chartData.reduce((sum, d) => sum + d.calls, 0)
-          trueP95 =
-            totalCalls > 0
-              ? chartData.reduce((sum, d) => sum + d.p95_time * d.calls, 0) / totalCalls
-              : 0
-        }
+        const totalCalls = chartData.reduce((sum, d) => sum + d.calls, 0)
+        const trueP95 =
+          totalCalls > 0
+            ? chartData.reduce((sum, d) => sum + d.p95_time * d.calls, 0) / totalCalls
+            : 0
 
         return [
           {
@@ -167,12 +144,7 @@ export const QueryPerformanceChart = ({
     >()
 
     queryLogs.forEach((log) => {
-      const timestamps = [log.bucket_start_time, log.bucket, log.timestamp, log.ts]
-      const validTimestamp = timestamps.find((t) => t && !isNaN(new Date(t).getTime()))
-
-      if (!validTimestamp) return
-
-      const time = new Date(validTimestamp).getTime()
+      const time = new Date(log.timestamp).getTime()
       const meanTime = log.mean_time ?? log.mean_exec_time ?? log.mean_query_time ?? 0
       const rowsRead = log.rows_read ?? log.rows ?? 0
       const calls = log.calls ?? 0
@@ -258,8 +230,14 @@ export const QueryPerformanceChart = ({
 
     const baseAttributes = attributeMap[selectedMetric] || []
 
-    // Add selected query line based on current metric
     if (currentSelectedQuery && querySpecificData) {
+      const dimmedBaseAttributes = baseAttributes.map((attr) => ({
+        ...attr,
+        color: attr.color
+          ? { light: attr.color.light + '4D', dark: attr.color.dark + '4D' }
+          : attr.color,
+      }))
+
       const selectedQueryAttributes: Record<string, MultiAttribute> = {
         query_latency: {
           attribute: 'selected_query_time',
@@ -297,7 +275,7 @@ export const QueryPerformanceChart = ({
 
       const selectedQueryAttr = selectedQueryAttributes[selectedMetric]
       if (selectedQueryAttr) {
-        return [...baseAttributes, selectedQueryAttr]
+        return [...dimmedBaseAttributes, selectedQueryAttr]
       }
     }
 
@@ -360,12 +338,7 @@ export const QueryPerformanceChart = ({
                   hideHighlightArea={true}
                   showTooltip={true}
                   showGrid={true}
-                  showLegend={
-                    selectedMetric === 'query_latency' ||
-                    selectedMetric === 'cache_hits' ||
-                    selectedMetric === 'rows_read' ||
-                    selectedMetric === 'calls'
-                  }
+                  showLegend={true}
                   showTotal={false}
                   showMaxValue={false}
                   updateDateRange={updateDateRange}

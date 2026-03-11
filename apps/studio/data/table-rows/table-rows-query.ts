@@ -1,6 +1,6 @@
 import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
-import { type QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
@@ -16,11 +16,13 @@ import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { handleError } from '../fetchers'
-import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
+import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
+import { timeout } from '@/lib/helpers'
 
-export interface GetTableRowsArgs {
+interface GetTableRowsArgs {
   table?: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
@@ -87,10 +89,6 @@ function getRetryAfter(error: any): number | undefined {
   return undefined
 }
 
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 export async function executeWithRetry<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
@@ -106,7 +104,7 @@ export async function executeWithRetry<T>(
         const retryAfter = getRetryAfter(error)
         const delayMs = retryAfter ? retryAfter * 1000 : baseDelay * Math.pow(2, attempt)
 
-        await sleep(delayMs)
+        await timeout(delayMs)
         continue
       }
       throw error
@@ -267,7 +265,7 @@ export const fetchAllTableRows = async ({
 
         if (result.length < rowsPerPage) break
 
-        await sleep(THROTTLE_DELAY)
+        await timeout(THROTTLE_DELAY)
       } catch (error) {
         throw new Error(
           `Error fetching all table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -294,7 +292,7 @@ export const fetchAllTableRows = async ({
 
         if (result.length < rowsPerPage) break
 
-        await sleep(THROTTLE_DELAY)
+        await timeout(THROTTLE_DELAY)
       } catch (error) {
         throw new Error(
           `Error fetching all table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -306,19 +304,20 @@ export const fetchAllTableRows = async ({
   return rows.filter((row) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
 }
 
-export type TableRows = { rows: SupaRow[] }
+type TableRows = { rows: SupaRow[] }
 
-export type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
+type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
   queryClient: QueryClient
   projectRef?: string
   connectionString?: string | null
   tableId?: number
+  preflightCheck?: boolean
 }
 
 export type TableRowsData = TableRows
-export type TableRowsError = ExecuteSqlError
+type TableRowsError = ExecuteSqlError
 
-export async function getTableRows(
+async function getTableRows(
   {
     queryClient,
     projectRef,
@@ -329,6 +328,7 @@ export async function getTableRows(
     sorts,
     limit,
     page,
+    preflightCheck = false,
   }: TableRowsVariables,
   signal?: AbortSignal
 ) {
@@ -375,7 +375,7 @@ export async function getTableRows(
         sql,
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-        preflightCheck: true,
+        preflightCheck,
       },
       signal
     )
@@ -391,29 +391,51 @@ export async function getTableRows(
 }
 
 export const useTableRowsQuery = <TData = TableRowsData>(
-  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>,
+  { projectRef, tableId, ...args }: Omit<TableRowsVariables, 'queryClient' | 'connectionString'>,
   { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
+  const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
+
+  // [Joshen] Exclude preflightCheck from query key
+  const { preflightCheck, ...othersArgs } = args
+
   return useQuery<TableRowsData, TableRowsError, TData>({
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
-      ...args,
+      readReplicaIdentifier,
+      ...othersArgs,
     }),
     queryFn: ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof tableId !== 'undefined' &&
+      (!IS_PLATFORM || typeof connectionString !== 'undefined'),
     ...options,
   })
 }
 
+type PrefetchTableRowsVariables = Omit<TableRowsVariables, 'queryClient'> & {
+  readReplicaIdentifier?: string
+}
+
 export function prefetchTableRows(
   client: QueryClient,
-  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
+  {
+    projectRef,
+    connectionString,
+    tableId,
+    readReplicaIdentifier,
+    ...args
+  }: PrefetchTableRowsVariables
 ) {
   return client.fetchQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- readReplicaIdentifier is used as a stable version of connectionString
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
+      readReplicaIdentifier,
       ...args,
     }),
     queryFn: ({ signal }) =>
