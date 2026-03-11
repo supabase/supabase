@@ -1286,6 +1286,8 @@ functions:
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
+    notes: |
+      - Since v2.41.1, the unenroll response uses `id` instead of `factorId` to match the server response format. If upgrading from an earlier version, update your code to use `response.id`.
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -1297,6 +1299,7 @@ functions:
               factorId: "34e770dd-9ff9-416c-87fa-43b31d7ef225"
             )
           )
+          print(response.id) // ID of the unenrolled factor
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'

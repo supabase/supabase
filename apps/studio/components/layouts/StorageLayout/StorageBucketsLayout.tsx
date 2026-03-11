@@ -1,11 +1,10 @@
-import Link from 'next/link'
-import { PropsWithChildren } from 'react'
-
 import { IS_PLATFORM, useParams } from 'common'
 import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
 import { useStorageV2Page } from 'components/interfaces/Storage/Storage.utils'
 import { DocsButton } from 'components/ui/DocsButton'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import {
   PageHeader,

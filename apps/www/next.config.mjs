@@ -49,6 +49,7 @@ const nextConfig = {
     'shared-data',
     'icons',
     'api-types',
+    'marketing',
     // needed to make the octokit packages work in /changelog
     '@octokit/plugin-paginate-graphql',
   ],
@@ -99,6 +100,24 @@ const nextConfig = {
               process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
                 ? 'max-age=31536000; includeSubDomains; preload'
                 : '',
+          },
+        ],
+      },
+      {
+        source: '/(docs|blog)/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+        ],
+      },
+      {
+        source: '/dashboard/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
           },
         ],
       },

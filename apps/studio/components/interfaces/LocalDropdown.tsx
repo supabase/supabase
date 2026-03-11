@@ -1,7 +1,6 @@
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { Command, FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
-
 import {
   Button,
   DropdownMenu,
@@ -17,12 +16,13 @@ import {
   Theme,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
+
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const LocalDropdown = () => {
   const { theme, setTheme } = useTheme()
   const setCommandMenuOpen = useSetCommandMenuOpen()
-  const { openFeaturePreviewModal } = useFeaturePreviewModal()
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
 
   return (
     <DropdownMenu>
@@ -36,14 +36,17 @@ export const LocalDropdown = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="w-44">
         <DropdownMenuItem
-          className="flex gap-2"
-          onClick={openFeaturePreviewModal}
-          onSelect={openFeaturePreviewModal}
+          className="flex gap-2 cursor-pointer"
+          onClick={() => toggleFeaturePreviewModal(true)}
+          onSelect={() => toggleFeaturePreviewModal(true)}
         >
           <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Feature previews
         </DropdownMenuItem>
-        <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
+        <DropdownMenuItem
+          className="flex gap-2 cursor-pointer"
+          onClick={() => setCommandMenuOpen(true)}
+        >
           <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Command menu
         </DropdownMenuItem>
@@ -57,7 +60,11 @@ export const LocalDropdown = () => {
             }}
           >
             {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+              <DropdownMenuRadioItem
+                key={theme.value}
+                value={theme.value}
+                className="cursor-pointer"
+              >
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}

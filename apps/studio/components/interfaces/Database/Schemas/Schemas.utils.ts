@@ -2,10 +2,12 @@ import dagre from '@dagrejs/dagre'
 import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
+
 import 'reactflow/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { tryParseJson } from 'lib/helpers'
+
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
 
 const NODE_SEP = 25
@@ -41,6 +43,7 @@ export async function getGraphDataFromTables(
       ref,
       id: table.id,
       name: table.name,
+      description: table.comment ?? '',
       schema: table.schema,
       isForeign: false,
       columns,
@@ -78,6 +81,7 @@ export async function getGraphDataFromTables(
           ref: ref!,
           schema: rel.target_table_schema,
           name: targetId,
+          description: '',
           isForeign: true,
           columns: [],
         }

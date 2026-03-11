@@ -4,20 +4,20 @@ import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Form_Shadcn_, SidePanel } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
 import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from '@/hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { uuidv4 } from '@/lib/helpers'
 
 export type HTTPArgument = { id: string; name: string; value: string }
@@ -97,12 +97,25 @@ export const EditHookPanel = () => {
   )
   const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToEdit)
 
+  // Webhook IDs aren't stable across edits because the update mutation drops and recreates the
+  // trigger, assigning a new ID. This causes a brief window where the old selectedHookIdToEdit
+  // no longer matches any hook, incorrectly triggering the "Webhook not found" toast. Since this
+  // is an edge case, we use an ad-hoc ref to suppress the toast when the panel is closing rather
+  // than a more involved solution
+  const isClosingRef = useRef(false)
+
   const visible = showCreateHookForm || !!selectedHook
+
+  const onClose = () => {
+    isClosingRef.current = true
+    setShowCreateHookForm(false)
+    setSelectedHookIdToEdit(null)
+  }
 
   const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully created new webhook "${res.name}"`)
+      onSuccess: (_, variables) => {
+        toast.success(`Successfully created new webhook "${variables.payload.name}"`)
         onClose()
       },
       onError: (error) => {
@@ -149,17 +162,19 @@ export const EditHookPanel = () => {
     },
   })
 
-  const onClose = () => {
-    setShowCreateHookForm(false)
-    setSelectedHookIdToEdit(null)
-  }
-
   useEffect(() => {
-    if (isSuccess && !!selectedHookIdToEdit && !selectedHook) {
+    if (isSuccess && !!selectedHookIdToEdit && !selectedHook && !isClosingRef.current) {
       toast('Webhook not found')
       setSelectedHookIdToEdit(null)
     }
   }, [isSuccess, selectedHook, selectedHookIdToEdit, setSelectedHookIdToEdit])
+
+  // Reset the closing ref when the panel fully closes
+  useEffect(() => {
+    if (!visible) {
+      isClosingRef.current = false
+    }
+  }, [visible])
 
   // Reset form when panel opens with new selectedHook
   useEffect(() => {
@@ -273,7 +288,7 @@ export const EditHookPanel = () => {
 
   // This is intentionally kept outside of the useConfirmOnClose hook to force RHF to update the isDirty state.
   const isDirty = form.formState.isDirty
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => onClose(),
   })
@@ -325,22 +340,7 @@ export const EditHookPanel = () => {
           </form>
         </Form_Shadcn_>
       </SidePanel>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

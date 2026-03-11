@@ -1,11 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
 import dayjs from 'dayjs'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { RefreshCw } from 'lucide-react'
@@ -14,8 +13,8 @@ import { useCallback, useMemo, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
-import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
+import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
 
@@ -25,14 +24,8 @@ export const ObservabilityOverview = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { plan } = useCurrentOrgPlan()
   const queryClient = useQueryClient()
 
-  const authReportEnabled = useFlag('authreportv2')
-  const edgeFnReportEnabled = useFlag('edgefunctionreport')
-  const realtimeReportEnabled = useFlag('realtimeReport')
-  const storageReportEnabled = useFlag('storagereport')
-  const postgrestReportEnabled = useFlag('postgrestreport')
   const { projectStorageAll: storageSupported } = useIsFeatureEnabled(['project_storage:all'])
 
   const DEFAULT_INTERVAL: ChartIntervalKey = '1day'
@@ -77,7 +70,7 @@ export const ObservabilityOverview = () => {
         reportUrl: `/project/${projectRef}/observability/auth`,
         logsUrl: `/project/${projectRef}/logs/auth-logs`,
         enabled: true,
-        hasReport: authReportEnabled,
+        hasReport: true,
       },
       {
         key: 'functions' as const,
@@ -85,7 +78,7 @@ export const ObservabilityOverview = () => {
         reportUrl: `/project/${projectRef}/observability/edge-functions`,
         logsUrl: `/project/${projectRef}/logs/edge-functions-logs`,
         enabled: true,
-        hasReport: edgeFnReportEnabled,
+        hasReport: true,
       },
       {
         key: 'realtime' as const,
@@ -93,7 +86,7 @@ export const ObservabilityOverview = () => {
         reportUrl: `/project/${projectRef}/observability/realtime`,
         logsUrl: `/project/${projectRef}/logs/realtime-logs`,
         enabled: true,
-        hasReport: realtimeReportEnabled,
+        hasReport: true,
       },
       {
         key: 'storage' as const,
@@ -101,7 +94,7 @@ export const ObservabilityOverview = () => {
         reportUrl: `/project/${projectRef}/observability/storage`,
         logsUrl: `/project/${projectRef}/logs/storage-logs`,
         enabled: storageSupported,
-        hasReport: storageReportEnabled,
+        hasReport: true,
       },
       {
         key: 'postgrest' as const,
@@ -109,18 +102,10 @@ export const ObservabilityOverview = () => {
         reportUrl: `/project/${projectRef}/observability/postgrest`,
         logsUrl: `/project/${projectRef}/logs/postgrest-logs`,
         enabled: true,
-        hasReport: postgrestReportEnabled,
+        hasReport: true,
       },
     ],
-    [
-      projectRef,
-      authReportEnabled,
-      edgeFnReportEnabled,
-      realtimeReportEnabled,
-      storageReportEnabled,
-      storageSupported,
-      postgrestReportEnabled,
-    ]
+    [projectRef, storageSupported]
   )
 
   const enabledServices = serviceBase.filter((s) => s.enabled)
@@ -162,15 +147,13 @@ export const ObservabilityOverview = () => {
             </TooltipContent>
           </Tooltip>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Button type="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
             Refresh
           </Button>
           <ChartIntervalDropdown
             value={interval}
             onChange={(interval) => setInterval(interval as ChartIntervalKey)}
-            planId={plan?.id}
-            planName={plan?.name}
             organizationSlug={organization?.slug}
             dropdownAlign="end"
             tooltipSide="left"

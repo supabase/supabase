@@ -49,6 +49,7 @@ export const SupabaseGrid = ({
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
@@ -76,11 +77,11 @@ export const SupabaseGrid = ({
   } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId,
       sorts,
       filters,
       page: snap.page,
+      preflightCheck,
       limit: tableEditorSnap.rowsPerPage,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },

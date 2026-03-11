@@ -1,4 +1,4 @@
-import { getScheduleDeleteCronJobRunDetailsSql } from 'data/sql/queries/delete-cron-job-run-details'
+import { getScheduleDeleteCronJobRunDetailsSql } from 'data/database-cron-jobs/database-cron-jobs.sql'
 import { CheckCircle2, XCircle } from 'lucide-react'
 import {
   Button,
@@ -16,6 +16,9 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -24,15 +27,15 @@ import {
   useCronJobsCleanupActions,
   type BatchDeletionProgress,
 } from './CronJobsTab.useCleanupActions'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface CronJobRunDetailsOverflowNoticeV2Props {
+  queryCost?: number
   refetchJobs: () => void
 }
 
-export const CronJobRunDetailsOverflowNoticeV2 = (
-  props: CronJobRunDetailsOverflowNoticeV2Props
-) => {
+export const CronJobRunDetailsOverflowNotice = (props: CronJobRunDetailsOverflowNoticeV2Props) => {
   return (
     <Admonition
       type="note"
@@ -46,6 +49,7 @@ export const CronJobRunDetailsOverflowNoticeV2 = (
 }
 
 const CronJobRunDetailsOverflowDialog = ({
+  queryCost,
   refetchJobs,
 }: CronJobRunDetailsOverflowNoticeV2Props) => {
   const { data: project } = useSelectedProjectQuery()
@@ -75,7 +79,10 @@ const CronJobRunDetailsOverflowDialog = ({
       <DialogTrigger asChild>
         <Button type="default">Learn more</Button>
       </DialogTrigger>
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent
+        aria-describedby={undefined}
+        onOpenAutoFocus={(event) => event.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Last run for cron jobs omitted for overview</DialogTitle>
         </DialogHeader>
@@ -89,8 +96,17 @@ const CronJobRunDetailsOverflowDialog = ({
           </p>
 
           <p className="text-sm">
-            However, the join was skipped as the estimated query cost exceeds safety thresholds,
-            likely due to the size of{' '}
+            However, the join was skipped as the{' '}
+            <Tooltip>
+              <TooltipTrigger className={InlineLinkClassName}>estimated query cost</TooltipTrigger>
+              <TooltipContent side="bottom" className="flex flex-col gap-y-1">
+                <p>Estimated cost: {queryCost?.toLocaleString()}</p>
+                <p className="text-foreground-light">
+                  Determined via the <code className="text-code-inline">EXPLAIN</code> command
+                </p>
+              </TooltipContent>
+            </Tooltip>{' '}
+            exceeds safety thresholds, likely due to the size of{' '}
             <code className="text-code-inline !break-keep">cron.job_run_details</code> table.
           </p>
         </DialogSection>

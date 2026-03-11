@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test'
+
 import { env, STORAGE_STATE_PATH } from './env.config.js'
 
 const IS_CI = !!process.env.CI
@@ -110,6 +111,9 @@ export default defineConfig({
         '--enable-features=NetworkService,NetworkServiceInProcess', // Uses modern network service in-process for better performance
       ],
     },
+    contextOptions: {
+      reducedMotion: 'reduce',
+    },
   },
   projects: [
     {
@@ -132,10 +136,12 @@ export default defineConfig({
       },
     },
   ],
-  reporter: [
-    ['list'],
-    ['html', { open: 'never' }],
-    ['json', { outputFile: 'test-results/test-results.json' }],
-  ],
+  reporter: IS_CI
+    ? [['list'], ['blob']]
+    : [
+        ['list'],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'test-results/test-results.json' }],
+      ],
   webServer: createWebServerConfig(),
 })

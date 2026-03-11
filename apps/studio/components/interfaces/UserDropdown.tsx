@@ -2,7 +2,7 @@ import { ProfileImage } from 'components/ui/ProfileImage'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfileNameAndPicture } from 'lib/profile'
-import { Command, FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
+import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -21,7 +21,6 @@ import {
   singleThemes,
   Theme,
 } from 'ui'
-import { useCommandMenuOpenedTelemetry, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
@@ -32,14 +31,7 @@ export function UserDropdown() {
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
-  const setCommandMenuOpen = useSetCommandMenuOpen()
-  const sendTelemetry = useCommandMenuOpenedTelemetry()
-  const { openFeaturePreviewModal } = useFeaturePreviewModal()
-
-  const handleCommandMenuOpen = () => {
-    setCommandMenuOpen(true)
-    sendTelemetry()
-  }
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
 
   return (
     <DropdownMenu>
@@ -62,7 +54,7 @@ export function UserDropdown() {
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-              {!!username && (
+              {!!username ? (
                 <>
                   <span title={username} className="w-full text-left text-foreground truncate">
                     {username}
@@ -76,11 +68,15 @@ export function UserDropdown() {
                     </span>
                   )}
                 </>
+              ) : (
+                <span title={primaryEmail} className="w-full text-left text-foreground truncate">
+                  {primaryEmail}
+                </span>
               )}
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="/account/me"
                   onClick={() => {
@@ -94,9 +90,9 @@ export function UserDropdown() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="flex gap-2"
-                onClick={openFeaturePreviewModal}
-                onSelect={openFeaturePreviewModal}
+                className="flex gap-2 cursor-pointer"
+                onClick={() => toggleFeaturePreviewModal(true)}
+                // onSelect={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
@@ -124,7 +120,11 @@ export function UserDropdown() {
             }}
           >
             {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+              <DropdownMenuRadioItem
+                key={theme.value}
+                value={theme.value}
+                className="cursor-pointer"
+              >
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}
@@ -135,6 +135,7 @@ export function UserDropdown() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
+                className="cursor-pointer"
                 onSelect={() => {
                   router.push('/logout')
                 }}

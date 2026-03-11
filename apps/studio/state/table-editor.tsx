@@ -10,15 +10,15 @@ import { generateTableChangeKey } from 'components/grid/utils/queueOperationUtil
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
-import { PropsWithChildren, createContext, useContext } from 'react'
+import { createContext, PropsWithChildren, useContext } from 'react'
 import type { Dictionary } from 'types'
 import { proxy, useSnapshot } from 'valtio'
 
 import {
   NewQueuedOperation,
+  QueuedOperationType,
   type OperationQueueState,
   type QueueStatus,
-  QueuedOperationType,
 } from './table-editor-operation-queue.types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
@@ -330,6 +330,16 @@ export const createTableEditorState = () => {
         },
       })
       return state.operationQueue.operations.some((op) => op.id === key)
+    },
+
+    /**
+     * Toggle the preflight check behaviour for each table
+     */
+    tablesToIgnorePreflightCheck: [] as number[],
+    setTableToIgnorePreflightCheck: (id: number) => {
+      const set = new Set<number>(state.tablesToIgnorePreflightCheck)
+      set.add(id)
+      state.tablesToIgnorePreflightCheck = [...set]
     },
   })
 
