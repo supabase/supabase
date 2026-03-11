@@ -2,12 +2,12 @@ TEAM
 
 Supabase is 100% remote.
 
-AJ Matias
 Aaron Brooks
 Aaron Byrne
 Ada Wong
 Adam Mohammed
 Adam Mokan
+AJ Matias
 Akash Manimaran
 Alaister Young
 Alan De Los Santos
@@ -124,8 +124,8 @@ John Schaeffer
 Jon M
 Jonny Summers-Muir
 Jordi Enric
-Joshen Lim
 José Luis Ledesma
+Joshen Lim
 Julien Goux
 Kalleby Santos
 Kamil Ogórek
@@ -151,6 +151,7 @@ Lindsay Moss
 Long Hoang
 Luca Forstner
 Lukas Bernert
+Łukasz Niemier
 Maksym Ionutsa
 Manan Gupta
 Marcus Weiner
@@ -237,7 +238,6 @@ Yuliya Marinova
 Yuri Santana
 Zach Marinov
 Zsolt Pazmandy
-Łukasz Niemier
 ____________
 
 JOBS
