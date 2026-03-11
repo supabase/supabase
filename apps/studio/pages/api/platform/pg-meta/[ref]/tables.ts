@@ -22,12 +22,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 /**
  * Construct the pgMeta redirection url passing along the filtering query params.
- * In self-hosted mode, injects included_schemas=co_{ref} for schema isolation
+ * In self-hosted mode, overrides included_schemas with the project's co_{ref} schema
  * so the Table Editor only shows tables belonging to the selected project.
  */
 export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
-  const query = Object.entries(req.query).reduce((query, entry) => {
-    const [key, value] = entry
+  const ref = req.query.ref as string
+  const query = new URLSearchParams()
+
+  // Copy query params, excluding the dynamic route param 'ref'
+  for (const [key, value] of Object.entries(req.query)) {
+    if (key === 'ref') continue
+    // In self-hosted mode, skip any incoming included_schemas — we override it below
+    if (!IS_PLATFORM && key === 'included_schemas') continue
+
     if (Array.isArray(value)) {
       for (const v of value) {
         query.append(key, v)
@@ -35,23 +42,16 @@ export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
     } else if (value) {
       query.set(key, value)
     }
-    return query
-  }, new URLSearchParams())
-
-  let url = `${PG_META_URL}/${endpoint}`
-  if (Object.keys(req.query).length > 0) {
-    url += `?${query}`
   }
 
-  // Self-hosted schema isolation: inject included_schemas so pg-meta only returns
-  // tables from the project's co_{ref} schema (locked CONTEXT.md decision).
-  if (!IS_PLATFORM) {
-    const ref = req.query.ref as string
-    const sep = url.includes('?') ? '&' : '?'
-    url = `${url}${sep}included_schemas=co_${ref}`
+  // Self-hosted schema isolation: override included_schemas so pg-meta only returns
+  // objects from the project's co_{ref} schema (locked CONTEXT.md decision).
+  if (!IS_PLATFORM && ref) {
+    query.set('included_schemas', `co_${ref}`)
   }
 
-  return url
+  const qs = query.toString()
+  return `${PG_META_URL}/${endpoint}${qs ? `?${qs}` : ''}`
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
