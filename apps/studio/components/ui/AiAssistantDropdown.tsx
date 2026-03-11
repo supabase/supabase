@@ -3,7 +3,6 @@ import { Chatgpt, Claude } from 'icons'
 import { useTrack } from 'lib/telemetry/track'
 import { Check, ChevronDown, Copy } from 'lucide-react'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
-
 import {
   AiIconAnimation,
   Button,
@@ -22,8 +21,20 @@ import {
 type TelemetrySource = AiAssistantSource
 
 const EXTERNAL_AI_TOOLS = [
-  { label: 'Ask ChatGPT', url: 'https://chatgpt.com/', promptParam: 'q', icon: Chatgpt, toolId: 'chatgpt' as const },
-  { label: 'Ask Claude', url: 'https://claude.ai/new', promptParam: 'q', icon: Claude, toolId: 'claude' as const },
+  {
+    label: 'Ask ChatGPT',
+    url: 'https://chatgpt.com/',
+    promptParam: 'q',
+    icon: Chatgpt,
+    toolId: 'chatgpt' as const,
+  },
+  {
+    label: 'Ask Claude',
+    url: 'https://claude.ai/new',
+    promptParam: 'q',
+    icon: Claude,
+    toolId: 'claude' as const,
+  },
 ]
 
 export interface AiAssistantDropdownItem {
