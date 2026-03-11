@@ -42,10 +42,13 @@ jobs:
 
       - name: Regenerate JS client libraries tsdoc files
         working-directory: apps/docs/spec
+        env:
+          SOURCE: ${{ github.event.inputs.source }}
+          VERSION: ${{ github.event.inputs.version }}
         run: |
           echo "Regenerating tsdoc files for JS client libraries..."
-          echo "Source: ${{ github.event.inputs.source }}"
-          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Source: ${SOURCE}"
+          echo "Version: ${VERSION}"
           make
 
       - name: Generate new typespec snapshot
@@ -68,7 +71,7 @@ jobs:
           commit-message: 'docs: update js sdk docs (${{ github.event.inputs.version }})'
           title: 'docs: update js sdk docs (${{ github.event.inputs.version }})'
           body: |
-            Updates JS sdk documentation following stable release. 
+            Updates JS sdk documentation following stable release.
             Ran `make` in apps/docs/spec to regenerate tsdoc files.
 
             **Details:**

@@ -1664,6 +1664,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/status-codes' as `/${string}`,
         },
         {
+          name: 'Recursive/Nested function calls',
+          url: '/guides/functions/recursive-functions' as `/${string}`,
+        },
+        {
           name: 'Limits',
           url: '/guides/functions/limits' as `/${string}`,
           enabled: billingEnabled,

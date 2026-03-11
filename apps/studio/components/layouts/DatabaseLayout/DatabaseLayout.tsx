@@ -7,7 +7,7 @@ import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateDatabaseMenu } from './DatabaseMenu.utils'
 
 export interface DatabaseLayoutProps {
-  title?: string
+  title: string
 }
 
 const DatabaseProductMenu = () => {
@@ -18,9 +18,14 @@ const DatabaseProductMenu = () => {
   return <ProductMenu page={page} menu={menu} />
 }
 
-const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
+const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
   return (
-    <ProjectLayout product="Database" productMenu={<DatabaseProductMenu />} isBlocking={false}>
+    <ProjectLayout
+      title={title}
+      product="Database"
+      productMenu={<DatabaseProductMenu />}
+      isBlocking={false}
+    >
       {children}
     </ProjectLayout>
   )

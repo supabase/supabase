@@ -5,6 +5,9 @@ on:
     branches: [master]
   workflow_dispatch: # Allow manual triggering
 
+permissions:
+  contents: read
+
 jobs:
   trigger-nimbus-sync:
     runs-on: ubuntu-latest
