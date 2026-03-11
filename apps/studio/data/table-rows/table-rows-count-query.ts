@@ -82,23 +82,25 @@ export async function getTableRowsCount(
 export const useTableRowsCountQuery = <TData = TableRowsCountData>(
   {
     projectRef,
-    connectionString: connectionStringOverride,
     tableId,
     ...args
-  }: Omit<TableRowsCountVariables, 'queryClient'>,
+  }: Omit<TableRowsCountVariables, 'queryClient' | 'connectionString'>,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  const { connectionString: connectionStringReadOps, type } = useConnectionStringForReadOps()
-  const connectionString = connectionStringOverride || connectionStringReadOps
+  const {
+    connectionString,
+    identifier: readReplicaIdentifier,
+    type,
+  } = useConnectionStringForReadOps()
 
   return useQuery<TableRowsCountData, TableRowsCountError, TData>({
     queryKey: tableRowKeys.tableRowsCount(projectRef, {
       table: { id: tableId },
-      connectionString,
+      readReplicaIdentifier,
       ...args,
     }),
     queryFn: ({ signal }) =>
