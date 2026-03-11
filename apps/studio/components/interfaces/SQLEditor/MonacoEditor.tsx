@@ -1,6 +1,6 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
@@ -21,8 +21,8 @@ export type MonacoEditorProps = {
   id: string
   snippetName: string
   className?: string
-  editorRef: MutableRefObject<IStandaloneCodeEditor | null>
-  monacoRef: MutableRefObject<Monaco | null>
+  editorRef: RefObject<IStandaloneCodeEditor | null>
+  monacoRef: RefObject<Monaco | null>
   autoFocus?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void

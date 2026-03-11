@@ -1,7 +1,7 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
 import type { editor } from 'monaco-editor'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -39,7 +39,7 @@ interface CodeEditorProps {
     explainCode: CodeEditorActions
     closeAssistant: CodeEditorActions
   }>
-  editorRef?: MutableRefObject<editor.IStandaloneCodeEditor | undefined>
+  editorRef?: RefObject<editor.IStandaloneCodeEditor | undefined>
   onInputChange?: (value?: string) => void
 }
 

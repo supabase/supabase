@@ -1,7 +1,7 @@
 import Editor, { Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
 import type { editor } from 'monaco-editor'
-import { MutableRefObject, useEffect, useRef } from 'react'
+import { RefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -26,8 +26,8 @@ interface RLSCodeEditorProps {
   onChange?: () => void
   onMount?: () => void
 
-  editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
-  monacoRef?: MutableRefObject<Monaco>
+  editorRef: RefObject<editor.IStandaloneCodeEditor | null>
+  monacoRef?: RefObject<Monaco>
 }
 
 export const RLSCodeEditor = ({
