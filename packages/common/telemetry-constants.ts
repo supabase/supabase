@@ -1657,6 +1657,46 @@ export interface BranchReviewWithAssistantClickedEvent {
 }
 
 /**
+ * Triggered when a user selects a branch from the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorBranchClickedEvent {
+  action: 'branch_selector_branch_clicked'
+  properties: {
+    branchId: string
+    branchName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Create branch" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorCreateClickedEvent {
+  action: 'branch_selector_create_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Manage branches" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorManageClickedEvent {
+  action: 'branch_selector_manage_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked on a DPA PDF link to open it.
  *
  * @group Events
@@ -2867,6 +2907,9 @@ export type TelemetryEvent =
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
+  | BranchSelectorBranchClickedEvent
+  | BranchSelectorCreateClickedEvent
+  | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
   | HomeGettingStartedWorkflowClickedEvent
   | HomeGettingStartedStepClickedEvent

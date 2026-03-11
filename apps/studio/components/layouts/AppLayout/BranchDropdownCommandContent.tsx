@@ -1,7 +1,7 @@
 import type { Branch } from 'data/branches/branches-query'
+import { useTrack } from 'lib/telemetry/track'
 import { ListTree, MessageCircle, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import {
   Button,
   cn,
@@ -42,7 +42,7 @@ export function BranchDropdownCommandContent({
   onClose,
   onCreateBranch,
 }: BranchDropdownCommandContentProps) {
-  const router = useRouter()
+  const track = useTrack()
 
   if (embedded) {
     return (
@@ -86,6 +86,7 @@ export function BranchDropdownCommandContent({
             block
             className="col-span-full text-xs text-foreground-light hover:text-foreground"
             onClick={() => {
+              track('branch_selector_create_clicked')
               onClose()
               onCreateBranch()
             }}
@@ -138,10 +139,7 @@ export function BranchDropdownCommandContent({
           <CommandItem_Shadcn_
             className="cursor-pointer w-full"
             onSelect={() => {
-              onClose()
-              onCreateBranch()
-            }}
-            onClick={() => {
+              track('branch_selector_create_clicked')
               onClose()
               onCreateBranch()
             }}
@@ -154,10 +152,9 @@ export function BranchDropdownCommandContent({
           <CommandItem_Shadcn_
             className="cursor-pointer w-full"
             onSelect={() => {
+              track('branch_selector_manage_clicked')
               onClose()
-              router.push(`/project/${projectRef}/branches`)
             }}
-            onClick={onClose}
           >
             <Link
               href={`/project/${projectRef}/branches`}

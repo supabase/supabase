@@ -1,4 +1,5 @@
 import type { Branch } from 'data/branches/branches-query'
+import { useTrack } from 'lib/telemetry/track'
 import { Check, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -13,6 +14,7 @@ export interface BranchLinkProps {
 }
 
 export function BranchLink({ branch, isSelected, onClose }: BranchLinkProps) {
+  const track = useTrack()
   const router = useRouter()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
   const href =
@@ -23,7 +25,13 @@ export function BranchLink({ branch, isSelected, onClose }: BranchLinkProps) {
       <CommandItem_Shadcn_
         value={branch.name.replaceAll('"', '')}
         className="cursor-pointer w-full flex items-center justify-between text-sm md:text-xs p-2 md:py-1.5 md:px-2"
-        onSelect={() => onClose()}
+        onSelect={() => {
+          track('branch_selector_branch_clicked', {
+            branchId: branch.id,
+            branchName: branch.name,
+          })
+          onClose()
+        }}
       >
         <p className="truncate w-60 flex items-center gap-1" title={branch.name}>
           {branch.is_default && <Shield size={14} className="text-amber-900" />}
