@@ -59,11 +59,11 @@ export async function getEdgeFunctionBody(
       files: files as Omit<FileData, 'id' | 'selected' | 'state'>[],
     }
   } catch (error) {
-    if (error instanceof Error)
-      Sentry.captureException({
-        message: error.message,
-        data: { error, data, response, boundary },
+    if (error instanceof Error) {
+      Sentry.captureException(error, {
+        extra: { error, data, response, boundary },
       })
+    }
     throw error
   }
 }
