@@ -5,7 +5,6 @@ import { cn } from 'ui'
 export interface StatusCodeProps {
   method?: string
   statusCode: number | string | undefined
-  align?: 'center' | 'left' | 'right'
   className?: string
 }
 
@@ -72,43 +71,20 @@ export function getStatusColor(
   }
 }
 
-export const StatusCode = ({
-  method,
-  statusCode,
-  align = 'center',
-  className,
-}: StatusCodeProps) => {
+export const StatusCode = ({ method, statusCode, className }: StatusCodeProps) => {
   const colors = getStatusColor(statusCode, method)
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <span
-        className={cn(
-          'flex-shrink-0 flex text-xs font-mono w-[104px]',
-          method && align === 'center' && 'w-[120px]',
-          align === 'center' && 'items-center justify-center',
-          align === 'right' && 'items-end justify-end',
-          align === 'left' && 'items-start justify-start'
-        )}
-      >
+      <span className="flex-shrink-0 flex text-xs font-mono items-start justify-start">
         {method && (
-          <span
-            className={cn(
-              'w-1/2 flex items-center justify-end',
-              align === 'left' || (align === 'right' && 'w-auto')
-            )}
-          >
+          <span className="flex items-center justify-end">
             <span className="select-text py-0.5 px-2 text-right rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0 w-auto">
               {method}
             </span>
           </span>
         )}
-        <span
-          className={cn(
-            'w-1/2 flex items-center justify-start',
-            align === 'left' || (align === 'right' && 'w-auto')
-          )}
-        >
+        <span className="flex items-center justify-start">
           <span
             className={cn(
               'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums text-left w-auto',
