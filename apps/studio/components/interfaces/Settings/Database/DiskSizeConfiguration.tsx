@@ -1,3 +1,4 @@
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -62,6 +63,10 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
       setShowIncreaseDiskSizeModal(false)
     },
   })
+
+  const { hasAccess: hasAccessToDiskSizeConfig } = useCheckEntitlements(
+    'instances.disk_modifications'
+  )
 
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
@@ -172,12 +177,12 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
             <Alert_Shadcn_>
               <InfoIcon />
               <AlertTitle_Shadcn_>
-                {organization?.plan?.id === 'free'
+                {hasAccessToDiskSizeConfig === false
                   ? 'Disk size configuration is not available for projects on the Free Plan'
                   : 'Disk size configuration is only available when the spend cap has been disabled'}
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                {organization?.plan?.id === 'free' ? (
+                {hasAccessToDiskSizeConfig === false ? (
                   <p>
                     If you are intending to use more than 500MB of disk space, then you will need to
                     upgrade to at least the Pro Plan.
@@ -191,11 +196,11 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
                 <Button asChild type="default" className="mt-3">
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=${
-                      organization?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                      hasAccessToDiskSizeConfig === false ? 'subscriptionPlan' : 'costControl'
                     }`}
                     target="_blank"
                   >
-                    {organization?.plan?.id === 'free'
+                    {hasAccessToDiskSizeConfig === false
                       ? 'Upgrade subscription'
                       : 'Disable spend cap'}
                   </Link>

@@ -1,27 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildEntityMaps, getApiEndpoint, getProjectApiEndpoint } from './DataApi.utils'
-import type { ProjectSettings } from '@/data/config/project-settings-v2-query'
-import type {
-  CustomDomainResponse,
-  CustomDomainsData,
-} from '@/data/custom-domains/custom-domains-query'
+import { buildEntityMaps, getApiEndpoint } from './DataApi.utils'
 import type { ProjectJsonSchemaPaths } from '@/data/docs/project-json-schema-query'
 import type { LoadBalancer } from '@/data/read-replicas/load-balancers-query'
 import type { Database } from '@/data/read-replicas/replicas-query'
-
-const makeCustomDomainData = (hostname: string): CustomDomainsData => ({
-  customDomain: {
-    id: '',
-    ssl: {} as CustomDomainResponse['ssl'],
-    hostname,
-    status: 'active',
-    created_at: '',
-    custom_metadata: null,
-    custom_origin_server: '',
-  },
-  status: '5_services_reconfigured',
-})
 
 const makeDatabase = (
   identifier: string,
@@ -30,71 +12,13 @@ const makeDatabase = (
 
 const makeLoadBalancer = (endpoint: string): Pick<LoadBalancer, 'endpoint'> => ({ endpoint })
 
-describe('getProjectApiEndpoint', () => {
-  it('returns custom domain URL when custom domain is active', () => {
-    expect(
-      getProjectApiEndpoint({
-        settings: undefined,
-        customDomainData: makeCustomDomainData('api.example.com'),
-      })
-    ).toBe('https://api.example.com')
-  })
-
-  it('returns settings-based URL when no custom domain', () => {
-    expect(
-      getProjectApiEndpoint({
-        settings: {
-          app_config: { protocol: 'https', endpoint: 'abc.supabase.co' },
-        } as ProjectSettings,
-        customDomainData: undefined,
-      })
-    ).toBe('https://abc.supabase.co')
-  })
-
-  it('respects protocol from settings', () => {
-    expect(
-      getProjectApiEndpoint({
-        settings: {
-          app_config: { protocol: 'http', endpoint: 'localhost:54321' },
-        } as ProjectSettings,
-        customDomainData: undefined,
-      })
-    ).toBe('http://localhost:54321')
-  })
-
-  it('returns placeholder when settings are undefined', () => {
-    expect(
-      getProjectApiEndpoint({
-        settings: undefined,
-        customDomainData: undefined,
-      })
-    ).toBe('https://-')
-  })
-
-  it('ignores inactive custom domain', () => {
-    const inactiveCustomDomain: CustomDomainsData = {
-      customDomain: null,
-      status: '0_no_hostname_configured',
-    }
-
-    expect(
-      getProjectApiEndpoint({
-        settings: {
-          app_config: { protocol: 'https', endpoint: 'abc.supabase.co' },
-        } as ProjectSettings,
-        customDomainData: inactiveCustomDomain,
-      })
-    ).toBe('https://abc.supabase.co')
-  })
-})
-
 describe('getApiEndpoint', () => {
   it('returns custom domain URL when custom domain is active and primary database is selected', () => {
     expect(
       getApiEndpoint({
         selectedDatabaseId: 'project-ref',
         projectRef: 'project-ref',
-        customDomainData: makeCustomDomainData('api.example.com'),
+        resolvedEndpoint: 'https://api.example.com',
         loadBalancers: undefined,
         selectedDatabase: makeDatabase(
           'project-ref',
@@ -109,7 +33,7 @@ describe('getApiEndpoint', () => {
       getApiEndpoint({
         selectedDatabaseId: 'replica-1',
         projectRef: 'project-ref',
-        customDomainData: makeCustomDomainData('api.example.com'),
+        resolvedEndpoint: 'https://api.example.com',
         loadBalancers: undefined,
         selectedDatabase: makeDatabase(
           'replica-1',
@@ -124,7 +48,7 @@ describe('getApiEndpoint', () => {
       getApiEndpoint({
         selectedDatabaseId: 'load-balancer',
         projectRef: 'project-ref',
-        customDomainData: undefined,
+        resolvedEndpoint: 'https://project-ref.supabase.co',
         loadBalancers: [makeLoadBalancer('https://lb.supabase.co') as LoadBalancer],
         selectedDatabase: undefined,
       })
@@ -136,46 +60,26 @@ describe('getApiEndpoint', () => {
       getApiEndpoint({
         selectedDatabaseId: 'load-balancer',
         projectRef: 'project-ref',
-        customDomainData: undefined,
+        resolvedEndpoint: 'https://project-ref.supabase.co',
         loadBalancers: undefined,
         selectedDatabase: undefined,
       })
     ).toBe('')
   })
 
-  it('returns database restUrl for a normal database selection', () => {
+  it('returns database restUrl for a replica database selection', () => {
     expect(
       getApiEndpoint({
-        selectedDatabaseId: 'project-ref',
+        selectedDatabaseId: 'replica-2',
         projectRef: 'project-ref',
-        customDomainData: undefined,
+        resolvedEndpoint: 'https://project-ref.supabase.co',
         loadBalancers: undefined,
         selectedDatabase: makeDatabase(
-          'project-ref',
-          'https://project-ref.supabase.co/rest/v1'
+          'replica-2',
+          'https://replica-2.supabase.co/rest/v1'
         ) as Database,
       })
-    ).toBe('https://project-ref.supabase.co/rest/v1')
-  })
-
-  it('ignores custom domain when it is not active', () => {
-    const inactiveCustomDomain: CustomDomainsData = {
-      customDomain: null,
-      status: '0_no_hostname_configured',
-    }
-
-    expect(
-      getApiEndpoint({
-        selectedDatabaseId: 'project-ref',
-        projectRef: 'project-ref',
-        customDomainData: inactiveCustomDomain,
-        loadBalancers: undefined,
-        selectedDatabase: makeDatabase(
-          'project-ref',
-          'https://project-ref.supabase.co/rest/v1'
-        ) as Database,
-      })
-    ).toBe('https://project-ref.supabase.co/rest/v1')
+    ).toBe('https://replica-2.supabase.co/rest/v1')
   })
 })
 

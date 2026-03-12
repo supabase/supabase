@@ -165,6 +165,7 @@ export const HooksListing = () => {
           variant="destructive"
           loading={isDeletingAuthHook}
           title={`Confirm to delete ${selectedHookForDeletion?.title}`}
+          className={cn('md:px-0', selectedHookForDeletion?.method.type === 'postgres' && 'pb-0')}
           confirmLabel="Delete"
           confirmLabelLoading="Deleting"
           onCancel={() => setSelectedHookForDeletion(null)}
@@ -181,20 +182,20 @@ export const HooksListing = () => {
           }}
         >
           <div>
-            <p className="text-sm text-foreground-light">
+            <p className="md:px-5 text-sm text-foreground-light">
               Are you sure you want to delete the {selectedHookForDeletion?.title}?
             </p>
             {selectedHookForDeletion?.method.type === 'postgres' && (
               <>
-                <p className="text-sm text-foreground-light">
+                <p className="md:px-5 text-sm text-foreground-light">
                   The following statements will be executed on the{' '}
                   {selectedHookForDeletion?.method.schema}.
                   {selectedHookForDeletion?.method.functionName} function:
                 </p>
-                <div className={cn('mt-4', 'h-72')}>
+                <div className="mt-4 h-72">
                   <CodeEditor
+                    isReadOnly
                     id="deletion-hook-editor"
-                    isReadOnly={true}
                     language="pgsql"
                     value={getRevokePermissionStatements(
                       selectedHookForDeletion?.method.schema,

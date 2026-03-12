@@ -1,24 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
-
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
+import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 import {
   Button,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
 } from 'ui'
+
 import type { Commands } from './Functions.types'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
   closable?: boolean
@@ -36,18 +35,12 @@ export const TerminalInstructions = forwardRef<
   const { data: tokens } = useAccessTokensQuery()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+
+  const { data: endpoint } = useProjectApiUrl({ projectRef })
+  const functionsEndpoint = `${endpoint}/functions/v1`
 
   const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
-
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint ?? ''
-  const functionsEndpoint =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain.hostname}/functions/v1`
-      : `${protocol}://${endpoint}/functions/v1`
 
   // get the .co or .net TLD from the restUrl
   const restUrl = `https://${endpoint}`

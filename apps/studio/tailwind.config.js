@@ -8,7 +8,7 @@ module.exports = config({
     './../../packages/ui/src/**/*.{tsx,ts,js}',
     './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
   ],
-  plugins: [require('@tailwindcss/container-queries')],
+  plugins: [require('@tailwindcss/container-queries'), require('./tailwind-plugins/hit-area')],
   theme: {
     extend: {
       fontSize: {
@@ -98,12 +98,6 @@ module.exports = config({
           '50%': {
             transform: 'rotate(10deg) scale(1.5) translateY(2rem)',
           },
-        },
-        typewriter: {
-          from: { width: '0' },
-        },
-        'blink-caret': {
-          '50%': { borderColor: 'transparent' },
         },
       },
     },
