@@ -99,7 +99,7 @@ export function MobileMenuContent({
       }),
     [ref, project, isUnifiedLogsEnabled, showReports, isNewAPIDocsEnabled]
   )
-  const settingsRoutes = useMemo(() => generateSettingsRoutes(ref, project), [ref, project])
+  const settingsRoutes = useMemo(() => generateSettingsRoutes(ref), [ref])
 
   const homeRoute: Route = useMemo(
     () => ({

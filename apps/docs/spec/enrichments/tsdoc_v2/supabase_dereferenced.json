@@ -51,7 +51,7 @@
               "fileName": "packages/core/supabase-js/src/cors.ts",
               "line": 47,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/cors.ts#L47"
+              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/cors.ts#L47"
             }
           ],
           "type": {
@@ -106,7 +106,7 @@
               "fileName": "packages/core/supabase-js/src/cors.ts",
               "line": 71,
               "character": 13,
-              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/cors.ts#L71"
+              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/cors.ts#L71"
             }
           ],
           "type": {
@@ -133,7 +133,7 @@
           "fileName": "packages/core/supabase-js/src/cors.ts",
           "line": 1,
           "character": 0,
-          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/cors.ts#L1"
+          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/cors.ts#L1"
         }
       ]
     },
@@ -9523,7 +9523,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 317,
+                  "line": 484,
                   "character": 14
                 }
               ],
@@ -9537,7 +9537,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 317,
+                      "line": 484,
                       "character": 14
                     }
                   ],
@@ -9568,7 +9568,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 318,
+                                  "line": 485,
                                   "character": 8
                                 }
                               ],
@@ -9587,7 +9587,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 317,
+                              "line": 484,
                               "character": 47
                             }
                           ]
@@ -9626,7 +9626,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 304,
+                  "line": 471,
                   "character": 14
                 }
               ],
@@ -9640,7 +9640,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 304,
+                      "line": 471,
                       "character": 14
                     }
                   ],
@@ -9669,7 +9669,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 305,
+                                  "line": 472,
                                   "character": 8
                                 }
                               ],
@@ -9687,7 +9687,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 306,
+                                  "line": 473,
                                   "character": 8
                                 }
                               ],
@@ -9706,7 +9706,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 304,
+                              "line": 471,
                               "character": 42
                             }
                           ]
@@ -9745,7 +9745,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 347,
+                  "line": 514,
                   "character": 14
                 }
               ],
@@ -9759,7 +9759,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 347,
+                      "line": 514,
                       "character": 14
                     }
                   ],
@@ -9805,7 +9805,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 348,
+                                  "line": 515,
                                   "character": 8
                                 }
                               ],
@@ -9835,7 +9835,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 347,
+                              "line": 514,
                               "character": 53
                             }
                           ]
@@ -9859,7 +9859,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 292,
+                  "line": 459,
                   "character": 14
                 }
               ],
@@ -9873,7 +9873,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 292,
+                      "line": 459,
                       "character": 14
                     }
                   ],
@@ -9919,7 +9919,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 293,
+                                  "line": 460,
                                   "character": 8
                                 }
                               ],
@@ -9938,7 +9938,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 292,
+                              "line": 459,
                               "character": 64
                             }
                           ]
@@ -9975,7 +9975,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 157,
+                  "line": 324,
                   "character": 4
                 }
               ],
@@ -9997,7 +9997,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 157,
+                      "line": 324,
                       "character": 4
                     }
                   ],
@@ -10043,7 +10043,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 590,
+                  "line": 757,
                   "character": 4
                 }
               ],
@@ -10091,7 +10091,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 590,
+                      "line": 757,
                       "character": 4
                     }
                   ],
@@ -10186,7 +10186,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 596,
+                                  "line": 763,
                                   "character": 8
                                 }
                               ],
@@ -10214,7 +10214,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 598,
+                                  "line": 765,
                                   "character": 8
                                 }
                               ],
@@ -10236,7 +10236,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                          "line": 599,
+                                          "line": 766,
                                           "character": 12
                                         }
                                       ],
@@ -10260,7 +10260,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 598,
+                                      "line": 765,
                                       "character": 15
                                     }
                                   ]
@@ -10292,7 +10292,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 594,
+                                  "line": 761,
                                   "character": 8
                                 }
                               ],
@@ -10316,7 +10316,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 590,
+                              "line": 757,
                               "character": 38
                             }
                           ]
@@ -10352,7 +10352,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 602,
+                                      "line": 769,
                                       "character": 8
                                     }
                                   ],
@@ -10374,7 +10374,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 603,
+                                              "line": 770,
                                               "character": 12
                                             }
                                           ],
@@ -10394,7 +10394,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 604,
+                                              "line": 771,
                                               "character": 12
                                             }
                                           ],
@@ -10414,7 +10414,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 605,
+                                              "line": 772,
                                               "character": 12
                                             }
                                           ],
@@ -10438,7 +10438,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                          "line": 602,
+                                          "line": 769,
                                           "character": 14
                                         }
                                       ]
@@ -10454,7 +10454,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 607,
+                                      "line": 774,
                                       "character": 8
                                     }
                                   ],
@@ -10473,7 +10473,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 601,
+                                  "line": 768,
                                   "character": 16
                                 }
                               ]
@@ -10497,7 +10497,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 609,
+                                      "line": 776,
                                       "character": 8
                                     }
                                   ],
@@ -10515,7 +10515,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 610,
+                                      "line": 777,
                                       "character": 8
                                     }
                                   ],
@@ -10536,7 +10536,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 608,
+                                  "line": 775,
                                   "character": 8
                                 }
                               ]
@@ -10560,7 +10560,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 612,
+                                      "line": 779,
                                       "character": 8
                                     }
                                   ],
@@ -10578,7 +10578,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 613,
+                                      "line": 780,
                                       "character": 8
                                     }
                                   ],
@@ -10597,7 +10597,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 611,
+                                  "line": 778,
                                   "character": 8
                                 }
                               ]
@@ -10621,7 +10621,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 244,
+                  "line": 411,
                   "character": 4
                 }
               ],
@@ -10652,7 +10652,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 244,
+                      "line": 411,
                       "character": 4
                     }
                   ],
@@ -10684,7 +10684,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 245,
+                                      "line": 412,
                                       "character": 8
                                     }
                                   ],
@@ -10706,7 +10706,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 246,
+                                              "line": 413,
                                               "character": 12
                                             }
                                           ],
@@ -10727,7 +10727,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                          "line": 245,
+                                          "line": 412,
                                           "character": 14
                                         }
                                       ]
@@ -10743,7 +10743,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 248,
+                                      "line": 415,
                                       "character": 8
                                     }
                                   ],
@@ -10762,7 +10762,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 244,
+                                  "line": 411,
                                   "character": 26
                                 }
                               ]
@@ -10786,7 +10786,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 250,
+                                      "line": 417,
                                       "character": 8
                                     }
                                   ],
@@ -10808,7 +10808,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 251,
+                                              "line": 418,
                                               "character": 12
                                             }
                                           ],
@@ -10827,7 +10827,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                          "line": 250,
+                                          "line": 417,
                                           "character": 14
                                         }
                                       ]
@@ -10843,7 +10843,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 253,
+                                      "line": 420,
                                       "character": 8
                                     }
                                   ],
@@ -10864,7 +10864,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 249,
+                                  "line": 416,
                                   "character": 8
                                 }
                               ]
@@ -10888,7 +10888,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 255,
+                                      "line": 422,
                                       "character": 8
                                     }
                                   ],
@@ -10910,7 +10910,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 256,
+                                              "line": 423,
                                               "character": 12
                                             }
                                           ],
@@ -10929,7 +10929,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                          "line": 255,
+                                          "line": 422,
                                           "character": 14
                                         }
                                       ]
@@ -10945,7 +10945,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 258,
+                                      "line": 425,
                                       "character": 8
                                     }
                                   ],
@@ -10964,7 +10964,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 254,
+                                  "line": 421,
                                   "character": 8
                                 }
                               ]
@@ -10988,7 +10988,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 284,
+                  "line": 451,
                   "character": 4
                 }
               ],
@@ -11010,7 +11010,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 284,
+                      "line": 451,
                       "character": 4
                     }
                   ],
@@ -11066,7 +11066,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 399,
+                  "line": 566,
                   "character": 4
                 }
               ],
@@ -11088,7 +11088,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 399,
+                      "line": 566,
                       "character": 4
                     }
                   ],
@@ -11120,7 +11120,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 400,
+                                      "line": 567,
                                       "character": 8
                                     }
                                   ],
@@ -11142,7 +11142,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 401,
+                                              "line": 568,
                                               "character": 12
                                             }
                                           ],
@@ -11166,7 +11166,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                          "line": 400,
+                                          "line": 567,
                                           "character": 14
                                         }
                                       ]
@@ -11182,7 +11182,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 403,
+                                      "line": 570,
                                       "character": 8
                                     }
                                   ],
@@ -11201,7 +11201,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 399,
+                                  "line": 566,
                                   "character": 33
                                 }
                               ]
@@ -11225,7 +11225,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 405,
+                                      "line": 572,
                                       "character": 8
                                     }
                                   ],
@@ -11243,7 +11243,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 406,
+                                      "line": 573,
                                       "character": 8
                                     }
                                   ],
@@ -11264,7 +11264,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 404,
+                                  "line": 571,
                                   "character": 8
                                 }
                               ]
@@ -11385,12 +11385,12 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 412,
+                  "line": 579,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 416,
+                  "line": 583,
                   "character": 4
                 }
               ],
@@ -11412,7 +11412,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 412,
+                      "line": 579,
                       "character": 4
                     }
                   ],
@@ -11466,7 +11466,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 416,
+                      "line": 583,
                       "character": 4
                     }
                   ],
@@ -11514,12 +11514,12 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 356,
+                  "line": 523,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 373,
+                  "line": 540,
                   "character": 4
                 }
               ],
@@ -11541,7 +11541,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 356,
+                      "line": 523,
                       "character": 4
                     }
                   ],
@@ -11571,7 +11571,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 356,
+                              "line": 523,
                               "character": 32
                             }
                           ],
@@ -11585,7 +11585,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 356,
+                                  "line": 523,
                                   "character": 32
                                 }
                               ],
@@ -11654,7 +11654,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 357,
+                              "line": 524,
                               "character": 8
                             }
                           ],
@@ -11676,7 +11676,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 358,
+                                      "line": 525,
                                       "character": 12
                                     }
                                   ],
@@ -11697,7 +11697,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 357,
+                                  "line": 524,
                                   "character": 14
                                 }
                               ]
@@ -11714,7 +11714,7 @@
                       "sources": [
                         {
                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                          "line": 356,
+                          "line": 523,
                           "character": 92
                         }
                       ]
@@ -11757,7 +11757,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 373,
+                      "line": 540,
                       "character": 4
                     }
                   ],
@@ -11787,7 +11787,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 373,
+                              "line": 540,
                               "character": 32
                             }
                           ],
@@ -11801,7 +11801,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 373,
+                                  "line": 540,
                                   "character": 32
                                 }
                               ],
@@ -11881,7 +11881,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 374,
+                              "line": 541,
                               "character": 8
                             }
                           ],
@@ -11903,7 +11903,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 375,
+                                      "line": 542,
                                       "character": 12
                                     }
                                   ],
@@ -11924,7 +11924,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 374,
+                                  "line": 541,
                                   "character": 14
                                 }
                               ]
@@ -11941,7 +11941,7 @@
                       "sources": [
                         {
                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                          "line": 373,
+                          "line": 540,
                           "character": 101
                         }
                       ]
@@ -11959,7 +11959,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 227,
+                  "line": 394,
                   "character": 4
                 }
               ],
@@ -11981,7 +11981,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 227,
+                      "line": 394,
                       "character": 4
                     }
                   ],
@@ -12014,7 +12014,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 314,
+                  "line": 481,
                   "character": 4
                 }
               ],
@@ -12036,7 +12036,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 314,
+                      "line": 481,
                       "character": 4
                     }
                   ],
@@ -12075,7 +12075,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 315,
+                                  "line": 482,
                                   "character": 8
                                 }
                               ],
@@ -12094,7 +12094,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 314,
+                              "line": 481,
                               "character": 36
                             }
                           ]
@@ -12131,7 +12131,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 232,
+                  "line": 399,
                   "character": 4
                 }
               ],
@@ -12153,7 +12153,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 232,
+                      "line": 399,
                       "character": 4
                     }
                   ],
@@ -12201,7 +12201,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 386,
+                  "line": 553,
                   "character": 4
                 }
               ],
@@ -12223,7 +12223,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 386,
+                      "line": 553,
                       "character": 4
                     }
                   ],
@@ -12283,7 +12283,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 388,
+                                  "line": 555,
                                   "character": 8
                                 }
                               ],
@@ -12311,7 +12311,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 387,
+                                  "line": 554,
                                   "character": 8
                                 }
                               ],
@@ -12330,7 +12330,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 386,
+                              "line": 553,
                               "character": 51
                             }
                           ]
@@ -12366,7 +12366,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 390,
+                                      "line": 557,
                                       "character": 8
                                     }
                                   ],
@@ -12390,7 +12390,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 391,
+                                      "line": 558,
                                       "character": 8
                                     }
                                   ],
@@ -12409,7 +12409,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 389,
+                                  "line": 556,
                                   "character": 16
                                 }
                               ]
@@ -12433,7 +12433,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 393,
+                                      "line": 560,
                                       "character": 8
                                     }
                                   ],
@@ -12451,7 +12451,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 394,
+                                      "line": 561,
                                       "character": 8
                                     }
                                   ],
@@ -12472,7 +12472,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 392,
+                                  "line": 559,
                                   "character": 8
                                 }
                               ]
@@ -12496,7 +12496,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 300,
+                  "line": 467,
                   "character": 4
                 }
               ],
@@ -12518,7 +12518,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 300,
+                      "line": 467,
                       "character": 4
                     }
                   ],
@@ -12555,7 +12555,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 301,
+                                  "line": 468,
                                   "character": 8
                                 }
                               ],
@@ -12573,7 +12573,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 302,
+                                  "line": 469,
                                   "character": 8
                                 }
                               ],
@@ -12592,7 +12592,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 300,
+                              "line": 467,
                               "character": 31
                             }
                           ]
@@ -12712,7 +12712,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 185,
+                  "line": 352,
                   "character": 4
                 }
               ],
@@ -12734,7 +12734,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 185,
+                      "line": 352,
                       "character": 4
                     }
                   ],
@@ -12782,7 +12782,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 153,
+                  "line": 320,
                   "character": 4
                 }
               ],
@@ -12804,7 +12804,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 153,
+                      "line": 320,
                       "character": 4
                     }
                   ],
@@ -12852,7 +12852,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 203,
+                  "line": 370,
                   "character": 4
                 }
               ],
@@ -12890,7 +12890,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 203,
+                      "line": 370,
                       "character": 4
                     }
                   ],
@@ -12938,7 +12938,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 148,
+                  "line": 315,
                   "character": 4
                 }
               ],
@@ -12960,7 +12960,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 148,
+                      "line": 315,
                       "character": 4
                     }
                   ],
@@ -13008,7 +13008,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 222,
+                  "line": 389,
                   "character": 4
                 }
               ],
@@ -13030,7 +13030,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 222,
+                      "line": 389,
                       "character": 4
                     }
                   ],
@@ -13078,7 +13078,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 165,
+                  "line": 332,
                   "character": 4
                 }
               ],
@@ -13111,7 +13111,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 165,
+                      "line": 332,
                       "character": 4
                     }
                   ],
@@ -13158,7 +13158,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 166,
+                                      "line": 333,
                                       "character": 8
                                     }
                                   ],
@@ -13180,7 +13180,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 167,
+                                              "line": 334,
                                               "character": 12
                                             }
                                           ],
@@ -13200,7 +13200,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 168,
+                                              "line": 335,
                                               "character": 12
                                             }
                                           ],
@@ -13221,7 +13221,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                          "line": 166,
+                                          "line": 333,
                                           "character": 14
                                         }
                                       ]
@@ -13237,7 +13237,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 170,
+                                      "line": 337,
                                       "character": 8
                                     }
                                   ],
@@ -13256,7 +13256,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 165,
+                                  "line": 332,
                                   "character": 58
                                 }
                               ]
@@ -13280,7 +13280,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 172,
+                                      "line": 339,
                                       "character": 8
                                     }
                                   ],
@@ -13302,7 +13302,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 173,
+                                              "line": 340,
                                               "character": 12
                                             }
                                           ],
@@ -13320,7 +13320,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                              "line": 174,
+                                              "line": 341,
                                               "character": 12
                                             }
                                           ],
@@ -13339,7 +13339,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                          "line": 172,
+                                          "line": 339,
                                           "character": 14
                                         }
                                       ]
@@ -13355,7 +13355,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 176,
+                                      "line": 343,
                                       "character": 8
                                     }
                                   ],
@@ -13376,7 +13376,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 171,
+                                  "line": 338,
                                   "character": 8
                                 }
                               ]
@@ -13400,7 +13400,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 344,
+                  "line": 511,
                   "character": 4
                 }
               ],
@@ -13462,7 +13462,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 344,
+                      "line": 511,
                       "character": 4
                     }
                   ],
@@ -13508,7 +13508,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 345,
+                                  "line": 512,
                                   "character": 8
                                 }
                               ],
@@ -13538,7 +13538,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 344,
+                              "line": 511,
                               "character": 40
                             }
                           ]
@@ -13560,7 +13560,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 139,
+                  "line": 306,
                   "character": 4
                 }
               ],
@@ -13596,13 +13596,176 @@
                             "text": "A user if the server has \"autoconfirm\" OFF"
                           }
                         ]
+                      },
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Auth"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@remarks",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "- By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).\n- **Confirm email** determines if users need to confirm their email address after signing up.\n  - If **Confirm email** is enabled, a "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`user`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " is returned but "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`session`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " is null.\n  - If **Confirm email** is disabled, both a "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`user`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " and a "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`session`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " are returned.\n- When the user confirms their email address, they are redirected to the ["
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`SITE_URL`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": "](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) by default. You can modify your "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`SITE_URL`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).\n- If signUp() is called for an existing confirmed user:\n  - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.\n  - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`User already registered`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " is returned.\n- To fetch the currently logged-in user, refer to ["
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`getUser()`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": "](/docs/reference/javascript/auth-getuser)."
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Sign up with an email and password",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nconst { data, error } = await supabase.auth.signUp({\n  email: 'example@email.com',\n  password: 'example-password',\n})\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@exampleResponse",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Sign up with an email and password\n"
+                          },
+                          {
+                            "kind": "code",
+                            "text": "```json\n// Some fields may be null if \"confirm email\" is enabled.\n{\n  \"data\": {\n    \"user\": {\n      \"id\": \"11111111-1111-1111-1111-111111111111\",\n      \"aud\": \"authenticated\",\n      \"role\": \"authenticated\",\n      \"email\": \"example@email.com\",\n      \"email_confirmed_at\": \"2024-01-01T00:00:00Z\",\n      \"phone\": \"\",\n      \"last_sign_in_at\": \"2024-01-01T00:00:00Z\",\n      \"app_metadata\": {\n        \"provider\": \"email\",\n        \"providers\": [\n          \"email\"\n        ]\n      },\n      \"user_metadata\": {},\n      \"identities\": [\n        {\n          \"identity_id\": \"22222222-2222-2222-2222-222222222222\",\n          \"id\": \"11111111-1111-1111-1111-111111111111\",\n          \"user_id\": \"11111111-1111-1111-1111-111111111111\",\n          \"identity_data\": {\n            \"email\": \"example@email.com\",\n            \"email_verified\": false,\n            \"phone_verified\": false,\n            \"sub\": \"11111111-1111-1111-1111-111111111111\"\n          },\n          \"provider\": \"email\",\n          \"last_sign_in_at\": \"2024-01-01T00:00:00Z\",\n          \"created_at\": \"2024-01-01T00:00:00Z\",\n          \"updated_at\": \"2024-01-01T00:00:00Z\",\n          \"email\": \"example@email.com\"\n        }\n      ],\n      \"created_at\": \"2024-01-01T00:00:00Z\",\n      \"updated_at\": \"2024-01-01T00:00:00Z\"\n    },\n    \"session\": {\n      \"access_token\": \"<ACCESS_TOKEN>\",\n      \"token_type\": \"bearer\",\n      \"expires_in\": 3600,\n      \"expires_at\": 1700000000,\n      \"refresh_token\": \"<REFRESH_TOKEN>\",\n      \"user\": {\n        \"id\": \"11111111-1111-1111-1111-111111111111\",\n        \"aud\": \"authenticated\",\n        \"role\": \"authenticated\",\n        \"email\": \"example@email.com\",\n        \"email_confirmed_at\": \"2024-01-01T00:00:00Z\",\n        \"phone\": \"\",\n        \"last_sign_in_at\": \"2024-01-01T00:00:00Z\",\n        \"app_metadata\": {\n          \"provider\": \"email\",\n          \"providers\": [\n            \"email\"\n          ]\n        },\n        \"user_metadata\": {},\n        \"identities\": [\n          {\n            \"identity_id\": \"22222222-2222-2222-2222-222222222222\",\n            \"id\": \"11111111-1111-1111-1111-111111111111\",\n            \"user_id\": \"11111111-1111-1111-1111-111111111111\",\n            \"identity_data\": {\n              \"email\": \"example@email.com\",\n              \"email_verified\": false,\n              \"phone_verified\": false,\n              \"sub\": \"11111111-1111-1111-1111-111111111111\"\n            },\n            \"provider\": \"email\",\n            \"last_sign_in_at\": \"2024-01-01T00:00:00Z\",\n            \"created_at\": \"2024-01-01T00:00:00Z\",\n            \"updated_at\": \"2024-01-01T00:00:00Z\",\n            \"email\": \"example@email.com\"\n          }\n        ],\n        \"created_at\": \"2024-01-01T00:00:00Z\",\n        \"updated_at\": \"2024-01-01T00:00:00Z\"\n      }\n    }\n  },\n  \"error\": null\n}\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Sign up with a phone number and password (SMS)",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nconst { data, error } = await supabase.auth.signUp({\n  phone: '123456789',\n  password: 'example-password',\n  options: {\n    channel: 'sms'\n  }\n})\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@exampleDescription",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Sign up with a phone number and password (whatsapp)\nThe user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature."
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Sign up with a phone number and password (whatsapp)",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nconst { data, error } = await supabase.auth.signUp({\n  phone: '123456789',\n  password: 'example-password',\n  options: {\n    channel: 'whatsapp'\n  }\n})\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Sign up with additional user metadata",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nconst { data, error } = await supabase.auth.signUp(\n  {\n    email: 'example@email.com',\n    password: 'example-password',\n    options: {\n      data: {\n        first_name: 'John',\n        age: 27,\n      }\n    }\n  }\n)\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@exampleDescription",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Sign up with a redirect URL\n- See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project."
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Sign up with a redirect URL",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nconst { data, error } = await supabase.auth.signUp(\n  {\n    email: 'example@email.com',\n    password: 'example-password',\n    options: {\n      emailRedirectTo: 'https://example.com/welcome'\n    }\n  }\n)\n```"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 139,
+                      "line": 306,
                       "character": 4
                     }
                   ],
@@ -13650,7 +13813,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 488,
+                  "line": 655,
                   "character": 4
                 }
               ],
@@ -13687,7 +13850,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 488,
+                      "line": 655,
                       "character": 4
                     }
                   ],
@@ -13718,7 +13881,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 497,
+                  "line": 664,
                   "character": 4
                 }
               ],
@@ -13749,7 +13912,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 497,
+                      "line": 664,
                       "character": 4
                     }
                   ],
@@ -13780,7 +13943,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 422,
+                  "line": 589,
                   "character": 4
                 }
               ],
@@ -13802,7 +13965,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 422,
+                      "line": 589,
                       "character": 4
                     }
                   ],
@@ -13849,7 +14012,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 423,
+                                      "line": 590,
                                       "character": 8
                                     }
                                   ],
@@ -13873,7 +14036,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 424,
+                                      "line": 591,
                                       "character": 8
                                     }
                                   ],
@@ -13892,7 +14055,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 422,
+                                  "line": 589,
                                   "character": 52
                                 }
                               ]
@@ -13916,7 +14079,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 426,
+                                      "line": 593,
                                       "character": 8
                                     }
                                   ],
@@ -13934,7 +14097,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                      "line": 427,
+                                      "line": 594,
                                       "character": 8
                                     }
                                   ],
@@ -13955,7 +14118,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 425,
+                                  "line": 592,
                                   "character": 8
                                 }
                               ]
@@ -13979,7 +14142,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 289,
+                  "line": 456,
                   "character": 4
                 }
               ],
@@ -14001,7 +14164,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 289,
+                      "line": 456,
                       "character": 4
                     }
                   ],
@@ -14047,7 +14210,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                                  "line": 290,
+                                  "line": 457,
                                   "character": 8
                                 }
                               ],
@@ -14066,7 +14229,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                              "line": 289,
+                              "line": 456,
                               "character": 53
                             }
                           ]
@@ -14103,7 +14266,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                  "line": 207,
+                  "line": 374,
                   "character": 4
                 }
               ],
@@ -14125,7 +14288,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/auth-js/dist/module/GoTrueClient.d.ts",
-                      "line": 207,
+                      "line": 374,
                       "character": 4
                     }
                   ],
@@ -14186,6 +14349,21 @@
               "children": [
                 571, 560, 584, 548, 479, 684, 518, 538, 625, 464, 459, 635, 589, 512, 566, 515, 611,
                 554, 467, 500, 476, 503, 473, 509, 482, 579, 470, 663, 665, 642, 542, 506
+              ]
+            }
+          ],
+          "categories": [
+            {
+              "title": "Auth",
+              "children": [470]
+            },
+            {
+              "title": "Other",
+              "children": [
+                387, 391, 417, 418, 408, 452, 424, 439, 395, 437, 433, 423, 447, 448, 451, 453, 454,
+                412, 392, 393, 449, 409, 422, 416, 410, 394, 438, 450, 432, 411, 419, 396, 404, 571,
+                560, 584, 548, 479, 684, 518, 538, 625, 464, 459, 635, 589, 512, 566, 515, 611, 554,
+                467, 500, 476, 503, 473, 509, 482, 579, 663, 665, 642, 542, 506
               ]
             }
           ],
@@ -23314,9 +23492,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 112,
+                  "line": 279,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L112"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L279"
                 }
               ],
               "signatures": [
@@ -23335,11 +23513,255 @@
                     ],
                     "blockTags": [
                       {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Initializing"
+                          }
+                        ]
+                      },
+                      {
                         "tag": "@example",
+                        "name": "Creating a client",
                         "content": [
                           {
                             "kind": "code",
-                            "text": "```ts\nimport { createClient } from '@supabase/supabase-js'\n\nconst supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')\nconst { data } = await supabase.from('profiles').select('*')\n```"
+                            "text": "```js\nimport { createClient } from '@supabase/supabase-js'\n\n// Create a single supabase client for interacting with your database\nconst supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "With a custom domain",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nimport { createClient } from '@supabase/supabase-js'\n\n// Use a custom domain as the supabase URL\nconst supabase = createClient('https://my-custom-domain.com', 'publishable-or-anon-key')\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "With additional parameters",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nimport { createClient } from '@supabase/supabase-js'\n\nconst options = {\n  db: {\n    schema: 'public',\n  },\n  auth: {\n    autoRefreshToken: true,\n    persistSession: true,\n    detectSessionInUrl: true\n  },\n  global: {\n    headers: { 'x-my-custom-header': 'my-app-name' },\n  },\n}\nconst supabase = createClient(\"https://xyzcompany.supabase.co\", \"publishable-or-anon-key\", options)\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@exampleDescription",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "With custom schemas\nBy default the API server points to the "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`public`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " schema. You can enable other database schemas within the Dashboard.\nGo to [Settings > API > Exposed schemas](/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.\n\nNote: each client connection can only access a single schema, so the code above can access the "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`other_schema`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " schema but cannot access the "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`public`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " schema."
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "With custom schemas",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nimport { createClient } from '@supabase/supabase-js'\n\nconst supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {\n  // Provide a custom schema. Defaults to \"public\".\n  db: { schema: 'other_schema' }\n})\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@exampleDescription",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Custom fetch implementation\n"
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`supabase-js`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " uses the ["
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`cross-fetch`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": "](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,\nbut an alternative "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`fetch`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " implementation can be provided as an option.\nThis is most useful in environments where "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`cross-fetch`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " is not compatible (for instance Cloudflare Workers)."
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Custom fetch implementation",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nimport { createClient } from '@supabase/supabase-js'\n\nconst supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {\n  global: { fetch: fetch.bind(globalThis) }\n})\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@exampleDescription",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "React Native options with AsyncStorage\nFor React Native we recommend using "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`AsyncStorage`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " as the storage implementation for Supabase Auth."
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "React Native options with AsyncStorage",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nimport 'react-native-url-polyfill/auto'\nimport { createClient } from '@supabase/supabase-js'\nimport AsyncStorage from \"@react-native-async-storage/async-storage\";\n\nconst supabase = createClient(\"https://xyzcompany.supabase.co\", \"publishable-or-anon-key\", {\n  auth: {\n    storage: AsyncStorage,\n    autoRefreshToken: true,\n    persistSession: true,\n    detectSessionInUrl: false,\n  },\n});\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@exampleDescription",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "React Native options with Expo SecureStore\nIf you wish to encrypt the user's session information, you can use "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`aes-js`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " and store the encryption key in Expo SecureStore.\nThe "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`aes-js`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " library, a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode.\nA new 256-bit encryption key is generated using the "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`react-native-get-random-values`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " library.\nThis key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.\n\nPlease make sure that:\n- You keep the "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`expo-secure-store`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": ", "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`aes-js`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " and "
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`react-native-get-random-values`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": " libraries up-to-date.\n- Choose the correct ["
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`SecureStoreOptions`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": "](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs.\n  E.g. ["
+                          },
+                          {
+                            "kind": "code",
+                            "text": "`SecureStore.WHEN_UNLOCKED`"
+                          },
+                          {
+                            "kind": "text",
+                            "text": "](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.\n- Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities."
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "React Native options with Expo SecureStore",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```ts\nimport 'react-native-url-polyfill/auto'\nimport { createClient } from '@supabase/supabase-js'\nimport AsyncStorage from '@react-native-async-storage/async-storage';\nimport * as SecureStore from 'expo-secure-store';\nimport * as aesjs from 'aes-js';\nimport 'react-native-get-random-values';\n\n// As Expo's SecureStore does not support values larger than 2048\n// bytes, an AES-256 key is generated and stored in SecureStore, while\n// it is used to encrypt/decrypt values stored in AsyncStorage.\nclass LargeSecureStore {\n  private async _encrypt(key: string, value: string) {\n    const encryptionKey = crypto.getRandomValues(new Uint8Array(256 / 8));\n\n    const cipher = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(1));\n    const encryptedBytes = cipher.encrypt(aesjs.utils.utf8.toBytes(value));\n\n    await SecureStore.setItemAsync(key, aesjs.utils.hex.fromBytes(encryptionKey));\n\n    return aesjs.utils.hex.fromBytes(encryptedBytes);\n  }\n\n  private async _decrypt(key: string, value: string) {\n    const encryptionKeyHex = await SecureStore.getItemAsync(key);\n    if (!encryptionKeyHex) {\n      return encryptionKeyHex;\n    }\n\n    const cipher = new aesjs.ModeOfOperation.ctr(aesjs.utils.hex.toBytes(encryptionKeyHex), new aesjs.Counter(1));\n    const decryptedBytes = cipher.decrypt(aesjs.utils.hex.toBytes(value));\n\n    return aesjs.utils.utf8.fromBytes(decryptedBytes);\n  }\n\n  async getItem(key: string) {\n    const encrypted = await AsyncStorage.getItem(key);\n    if (!encrypted) { return encrypted; }\n\n    return await this._decrypt(key, encrypted);\n  }\n\n  async removeItem(key: string) {\n    await AsyncStorage.removeItem(key);\n    await SecureStore.deleteItemAsync(key);\n  }\n\n  async setItem(key: string, value: string) {\n    const encrypted = await this._encrypt(key, value);\n\n    await AsyncStorage.setItem(key, encrypted);\n  }\n}\n\nconst supabase = createClient(\"https://xyzcompany.supabase.co\", \"publishable-or-anon-key\", {\n  auth: {\n    storage: new LargeSecureStore(),\n    autoRefreshToken: true,\n    persistSession: true,\n    detectSessionInUrl: false,\n  },\n});\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "With a database query",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```ts\nimport { createClient } from '@supabase/supabase-js'\n\nconst supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')\n\nconst { data } = await supabase.from('profiles').select('*')\n```"
                           }
                         ]
                       }
@@ -23348,9 +23770,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                      "line": 112,
+                      "line": 279,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L112"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L279"
                     }
                   ],
                   "typeParameters": [
@@ -23398,7 +23820,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 44,
                                       "character": 8,
-                                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                                     }
                                   ],
                                   "type": {
@@ -23418,7 +23840,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 44,
                                   "character": 6,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                                 }
                               ]
                             }
@@ -23768,7 +24190,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 59,
                                   "character": 26,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                                 }
                               ],
                               "type": {
@@ -23788,7 +24210,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 59,
                               "character": 24,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                             }
                           ]
                         }
@@ -23869,7 +24291,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 62,
                                       "character": 25,
-                                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                     }
                                   ],
                                   "type": {
@@ -23892,7 +24314,7 @@
                                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                               "line": 62,
                                               "character": 47,
-                                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                             }
                                           ],
                                           "type": {
@@ -23912,7 +24334,7 @@
                                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                           "line": 62,
                                           "character": 45,
-                                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                         }
                                       ]
                                     }
@@ -23930,7 +24352,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 62,
                                   "character": 23,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                 }
                               ]
                             }
@@ -23980,7 +24402,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 65,
                                       "character": 10,
-                                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                                     }
                                   ],
                                   "type": {
@@ -24000,7 +24422,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 65,
                                   "character": 8,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                                 }
                               ]
                             }
@@ -24036,7 +24458,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 66,
                                       "character": 42,
-                                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                                     }
                                   ],
                                   "type": {
@@ -24056,7 +24478,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 66,
                                   "character": 40,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                                 }
                               ]
                             }
@@ -24232,7 +24654,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 88,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L88"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L88"
                 }
               ],
               "type": {
@@ -24248,7 +24670,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 88,
                       "character": 26,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L88"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L88"
                     }
                   ],
                   "signatures": [
@@ -24263,7 +24685,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 88,
                           "character": 26,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L88"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L88"
                         }
                       ],
                       "type": {
@@ -24314,7 +24736,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 73,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L73"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L73"
                 }
               ],
               "type": {
@@ -24340,7 +24762,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 81,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L81"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L81"
                 }
               ],
               "type": {
@@ -24367,7 +24789,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 87,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L87"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L87"
                 }
               ],
               "type": {
@@ -24389,7 +24811,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 86,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L86"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L86"
                 }
               ],
               "type": {
@@ -24618,7 +25040,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 83,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L83"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L83"
                 }
               ],
               "type": {
@@ -24644,7 +25066,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 90,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L90"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L90"
                 }
               ],
               "type": {
@@ -24678,7 +25100,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 74,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L74"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L74"
                 }
               ],
               "type": {
@@ -24702,7 +25124,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 80,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L80"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L80"
                 }
               ],
               "type": {
@@ -24728,7 +25150,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 84,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L84"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L84"
                 }
               ],
               "type": {
@@ -24786,7 +25208,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 78,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L78"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L78"
                 }
               ],
               "type": {
@@ -24812,7 +25234,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 85,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L85"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L85"
                 }
               ],
               "type": {
@@ -24833,7 +25255,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 82,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L82"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L82"
                 }
               ],
               "type": {
@@ -24865,9 +25287,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 114,
+                  "line": 281,
                   "character": 14,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L114"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L281"
                 }
               ],
               "type": {
@@ -24894,9 +25316,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 113,
+                  "line": 280,
                   "character": 14,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L113"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L280"
                 }
               ],
               "type": {
@@ -24913,9 +25335,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 197,
+                  "line": 364,
                   "character": 6,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L197"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L364"
                 }
               ],
               "getSignature": {
@@ -24935,9 +25357,9 @@
                 "sources": [
                   {
                     "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                    "line": 197,
+                    "line": 364,
                     "character": 6,
-                    "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L197"
+                    "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L364"
                   }
                 ],
                 "type": {
@@ -24960,9 +25382,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 311,
+                  "line": 478,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L311"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L478"
                 }
               ],
               "signatures": [
@@ -24983,9 +25405,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                      "line": 311,
+                      "line": 478,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L311"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L478"
                     }
                   ],
                   "parameters": [
@@ -25070,21 +25492,21 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 205,
+                  "line": 372,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L205"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L372"
                 },
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 209,
+                  "line": 376,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L209"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L376"
                 },
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 217,
+                  "line": 384,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L217"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L384"
                 }
               ],
               "signatures": [
@@ -25097,9 +25519,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                      "line": 205,
+                      "line": 372,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L205"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L372"
                     }
                   ],
                   "typeParameters": [
@@ -25198,9 +25620,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                      "line": 209,
+                      "line": 376,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L209"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L376"
                     }
                   ],
                   "typeParameters": [
@@ -25301,9 +25723,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 318,
+                  "line": 485,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L318"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L485"
                 }
               ],
               "signatures": [
@@ -25324,9 +25746,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                      "line": 318,
+                      "line": 485,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L318"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L485"
                     }
                   ],
                   "type": {
@@ -25351,9 +25773,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 335,
+                  "line": 502,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L335"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L502"
                 }
               ],
               "signatures": [
@@ -25374,9 +25796,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                      "line": 335,
+                      "line": 502,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L335"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L502"
                     }
                   ],
                   "type": {
@@ -25422,9 +25844,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 328,
+                  "line": 495,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L328"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L495"
                 }
               ],
               "signatures": [
@@ -25445,9 +25867,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                      "line": 328,
+                      "line": 495,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L328"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L495"
                     }
                   ],
                   "parameters": [
@@ -25514,9 +25936,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 264,
+                  "line": 431,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L264"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L431"
                 }
               ],
               "signatures": [
@@ -25537,9 +25959,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                      "line": 264,
+                      "line": 431,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L264"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L431"
                     }
                   ],
                   "typeParameters": [
@@ -25763,9 +26185,9 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                                  "line": 278,
+                                  "line": 445,
                                   "character": 6,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L278"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L445"
                                 }
                               ],
                               "type": {
@@ -25813,9 +26235,9 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                                  "line": 277,
+                                  "line": 444,
                                   "character": 6,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L277"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L444"
                                 }
                               ],
                               "type": {
@@ -25858,9 +26280,9 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                                  "line": 276,
+                                  "line": 443,
                                   "character": 6,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L276"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L443"
                                 }
                               ],
                               "type": {
@@ -25878,9 +26300,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                              "line": 275,
+                              "line": 442,
                               "character": 13,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L275"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L442"
                             }
                           ]
                         }
@@ -25987,9 +26409,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                  "line": 229,
+                  "line": 396,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L229"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L396"
                 }
               ],
               "signatures": [
@@ -26010,9 +26432,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
-                      "line": 229,
+                      "line": 396,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L229"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L396"
                     }
                   ],
                   "typeParameters": [
@@ -26155,12 +26577,25 @@
               "children": [192, 167, 196, 201, 198, 180, 176]
             }
           ],
+          "categories": [
+            {
+              "title": "Initializing",
+              "children": [119]
+            },
+            {
+              "title": "Other",
+              "children": [
+                159, 141, 145, 158, 150, 147, 162, 142, 144, 148, 143, 149, 146, 164, 163, 165, 192,
+                167, 196, 201, 198, 180, 176
+              ]
+            }
+          ],
           "sources": [
             {
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 37,
               "character": 21,
-              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L37"
+              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L37"
             }
           ],
           "typeParameters": [
@@ -26240,7 +26675,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 44,
                               "character": 8,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                             }
                           ],
                           "type": {
@@ -26260,7 +26695,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 44,
                           "character": 6,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                         }
                       ]
                     }
@@ -26730,7 +27165,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 59,
                           "character": 26,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                         }
                       ],
                       "type": {
@@ -26750,7 +27185,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 59,
                       "character": 24,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                     }
                   ]
                 }
@@ -26831,7 +27266,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 62,
                               "character": 25,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                             }
                           ],
                           "type": {
@@ -26854,7 +27289,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 62,
                                       "character": 47,
-                                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                     }
                                   ],
                                   "type": {
@@ -26874,7 +27309,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 62,
                                   "character": 45,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                 }
                               ]
                             }
@@ -26892,7 +27327,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 62,
                           "character": 23,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                         }
                       ]
                     }
@@ -26932,7 +27367,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 65,
                               "character": 10,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                             }
                           ],
                           "type": {
@@ -26952,7 +27387,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 65,
                           "character": 8,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                         }
                       ]
                     }
@@ -26988,7 +27423,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 66,
                               "character": 42,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                             }
                           ],
                           "type": {
@@ -27008,7 +27443,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 66,
                           "character": 40,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                         }
                       ]
                     }
@@ -41346,7 +41781,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 173,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L173"
+              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L173"
             }
           ],
           "typeParameters": [
@@ -48537,7 +48972,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 161,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L161"
+              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L161"
             }
           ],
           "typeParameters": [
@@ -48585,7 +49020,7 @@
                             "fileName": "packages/core/supabase-js/src/lib/types.ts",
                             "line": 161,
                             "character": 51,
-                            "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L161"
+                            "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L161"
                           }
                         ],
                         "type": {
@@ -48605,7 +49040,7 @@
                         "fileName": "packages/core/supabase-js/src/lib/types.ts",
                         "line": 161,
                         "character": 49,
-                        "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L161"
+                        "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L161"
                       }
                     ]
                   }
@@ -48656,7 +49091,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 162,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L162"
+              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L162"
             }
           ],
           "type": {
@@ -48685,7 +49120,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 160,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L160"
+              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L160"
             }
           ],
           "typeParameters": [
@@ -55364,7 +55799,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 28,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L28"
+              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L28"
             }
           ],
           "typeParameters": [
@@ -55414,7 +55849,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 154,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L154"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L154"
                     }
                   ],
                   "type": {
@@ -55430,7 +55865,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 154,
                           "character": 16,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L154"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L154"
                         }
                       ],
                       "signatures": [
@@ -55482,7 +55917,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 61,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L61"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L61"
                     }
                   ],
                   "type": {
@@ -55515,7 +55950,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 65,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L65"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L65"
                             }
                           ],
                           "type": {
@@ -55544,7 +55979,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 115,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L115"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L115"
                             }
                           ],
                           "type": {
@@ -55596,7 +56031,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 95,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L95"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L95"
                             }
                           ],
                           "type": {
@@ -55619,7 +56054,7 @@
                                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                                       "line": 95,
                                       "character": 36,
-                                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L95"
+                                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L95"
                                     }
                                   ],
                                   "signatures": [
@@ -55665,7 +56100,7 @@
                                                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                                                   "line": 95,
                                                   "character": 55,
-                                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L95"
+                                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L95"
                                                 }
                                               ],
                                               "indexSignatures": [
@@ -55680,7 +56115,7 @@
                                                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                                                       "line": 95,
                                                       "character": 57,
-                                                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L95"
+                                                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L95"
                                                     }
                                                   ],
                                                   "parameters": [
@@ -55738,7 +56173,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 111,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L111"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L111"
                             }
                           ],
                           "type": {
@@ -55780,7 +56215,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 121,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L121"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L121"
                             }
                           ],
                           "type": {
@@ -55821,7 +56256,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 73,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L73"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L73"
                             }
                           ],
                           "type": {
@@ -55850,7 +56285,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 99,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L99"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L99"
                             }
                           ],
                           "type": {
@@ -55891,7 +56326,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 69,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L69"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L69"
                             }
                           ],
                           "type": {
@@ -55920,7 +56355,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 126,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L126"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L126"
                             }
                           ],
                           "type": {
@@ -55962,7 +56397,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 107,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L107"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L107"
                             }
                           ],
                           "type": {
@@ -55994,7 +56429,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 61,
                           "character": 9,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L61"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L61"
                         }
                       ]
                     }
@@ -56029,7 +56464,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 32,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L32"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L32"
                     }
                   ],
                   "type": {
@@ -56054,7 +56489,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 33,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L33"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L33"
                             }
                           ],
                           "type": {
@@ -56097,7 +56532,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 45,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L45"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L45"
                             }
                           ],
                           "type": {
@@ -56137,7 +56572,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 58,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L58"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L58"
                             }
                           ],
                           "type": {
@@ -56157,7 +56592,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 32,
                           "character": 7,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L32"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L32"
                         }
                       ]
                     }
@@ -56176,7 +56611,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 133,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L133"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L133"
                     }
                   ],
                   "type": {
@@ -56217,7 +56652,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 137,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L137"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L137"
                             }
                           ],
                           "type": {
@@ -56251,7 +56686,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 141,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L141"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L141"
                             }
                           ],
                           "type": {
@@ -56286,7 +56721,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 133,
                           "character": 11,
-                          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L133"
+                          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L133"
                         }
                       ]
                     }
@@ -56313,7 +56748,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 131,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L131"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L131"
                     }
                   ],
                   "type": {
@@ -56336,7 +56771,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 132,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L132"
+                      "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L132"
                     }
                   ],
                   "type": {
@@ -56361,7 +56796,7 @@
                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                   "line": 28,
                   "character": 48,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/lib/types.ts#L28"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/lib/types.ts#L28"
                 }
               ]
             }
@@ -57762,7 +58197,7 @@
               "fileName": "packages/core/supabase-js/src/index.ts",
               "line": 41,
               "character": 13,
-              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/index.ts#L41"
+              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/index.ts#L41"
             }
           ],
           "signatures": [
@@ -57777,7 +58212,7 @@
                   "fileName": "packages/core/supabase-js/src/index.ts",
                   "line": 41,
                   "character": 28,
-                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/index.ts#L41"
+                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/index.ts#L41"
                 }
               ],
               "typeParameters": [
@@ -57825,7 +58260,7 @@
                                   "fileName": "packages/core/supabase-js/src/index.ts",
                                   "line": 45,
                                   "character": 8,
-                                  "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/index.ts#L45"
+                                  "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/index.ts#L45"
                                 }
                               ],
                               "type": {
@@ -57845,7 +58280,7 @@
                               "fileName": "packages/core/supabase-js/src/index.ts",
                               "line": 45,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/index.ts#L45"
+                              "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/index.ts#L45"
                             }
                           ]
                         }
@@ -59058,7 +59493,7 @@
           "fileName": "packages/core/supabase-js/src/index.ts",
           "line": 1,
           "character": 0,
-          "url": "https://github.com/supabase/supabase-js/blob/c338e2fc24ce9e085f87a2e8d6d39d6dc0a2d97f/packages/core/supabase-js/src/index.ts#L1"
+          "url": "https://github.com/supabase/supabase-js/blob/3f329cc73eac0e330271e2c96529c81c6ece012b/packages/core/supabase-js/src/index.ts#L1"
         }
       ]
     }

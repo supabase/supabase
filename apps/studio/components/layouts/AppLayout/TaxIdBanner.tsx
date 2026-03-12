@@ -1,4 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useRouter } from 'next/router'
 
 import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
@@ -6,7 +7,6 @@ import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 
 const SUPPORTED_TAX_ID_COUNTRIES = new Set(TAX_IDS.map((t) => t.countryIso2))
 
@@ -50,12 +50,12 @@ export const TaxIdBanner = () => {
   return (
     <HeaderBanner
       variant="note"
-      title="Add a Tax ID to your organization"
+      title="Missing tax ID"
       description={
         <>
-          If you are a registered business, please{' '}
-          <InlineLink href={`/org/${slug}/billing#address`}>add a Tax ID</InlineLink> to your
-          billing settings. Not applicable for individual users.
+          Registered businesses should{' '}
+          <InlineLink href={`/org/${slug}/billing#address`}>add a tax ID</InlineLink> to their
+          billing details
         </>
       }
       onDismiss={() => setIsDismissed(true)}
