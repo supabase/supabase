@@ -258,9 +258,7 @@ const ProjectLinks = () => {
     showReports,
     apiDocsSidePanel: isNewAPIDocsEnabled,
   })
-  const settingsRoutes = generateSettingsRoutes(ref, project, {
-    platformWebhooks: platformWebhooksEnabled,
-  })
+  const settingsRoutes = generateSettingsRoutes(ref)
 
   return (
     <SidebarMenu>
