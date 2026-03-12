@@ -26,7 +26,7 @@ const LogRowCodeBlock = ({ value, className }: { value: string; className?: stri
       className
     )}
   >
-    {JSON.stringify(value, null, 2)}
+    {typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
   </pre>
 )
 

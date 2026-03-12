@@ -19212,7 +19212,11 @@
                     "suspend": {
                       "type": "boolean",
                       "nullable": true,
-                      "description": "Whether to suspend realtime"
+                      "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+                    },
+                    "presence_enabled": {
+                      "type": "boolean",
+                      "description": "Whether to enable presence"
                     }
                   },
                   "required": [
@@ -19225,7 +19229,8 @@
                     "max_joins_per_second",
                     "max_presence_events_per_second",
                     "max_payload_size_in_kb",
-                    "suspend"
+                    "suspend",
+                    "presence_enabled"
                   ]
                 }
               }
@@ -19327,7 +19332,11 @@
                   },
                   "suspend": {
                     "type": "boolean",
-                    "description": "Whether to suspend realtime"
+                    "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+                  },
+                  "presence_enabled": {
+                    "type": "boolean",
+                    "description": "Whether to enable presence"
                   }
                 },
                 "additionalProperties": false
@@ -28704,7 +28713,11 @@
           "suspend": {
             "type": "boolean",
             "nullable": true,
-            "description": "Whether to suspend realtime"
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": {
+            "type": "boolean",
+            "description": "Whether to enable presence"
           }
         },
         "required": [
@@ -28717,7 +28730,8 @@
           "max_joins_per_second",
           "max_presence_events_per_second",
           "max_payload_size_in_kb",
-          "suspend"
+          "suspend",
+          "presence_enabled"
         ]
       },
       "UpdateRealtimeConfigBody": {
@@ -28777,7 +28791,11 @@
           },
           "suspend": {
             "type": "boolean",
-            "description": "Whether to suspend realtime"
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": {
+            "type": "boolean",
+            "description": "Whether to enable presence"
           }
         },
         "additionalProperties": false

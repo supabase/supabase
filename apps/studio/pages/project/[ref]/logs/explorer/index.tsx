@@ -476,7 +476,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
 LogsExplorerPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Explorer">{page}</LogsLayout>
   </DefaultLayout>
 )
 

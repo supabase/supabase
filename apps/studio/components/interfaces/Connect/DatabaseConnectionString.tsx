@@ -306,7 +306,7 @@ export const DatabaseConnectionString = () => {
             align="start"
             buttonProps={{
               size: 'small',
-              className: 'w-full justify-between pr-2.5 [&_svg]:h-4',
+              className: 'w-full pr-2.5 [&_svg]:h-4',
             }}
             className="w-full md:w-auto [&>span]:w-1/2 [&>span]:md:w-auto"
             onSelectId={handleDatabaseChange}
