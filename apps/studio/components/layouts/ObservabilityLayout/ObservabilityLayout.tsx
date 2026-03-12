@@ -14,7 +14,7 @@ import { ProjectLayout } from '../ProjectLayout'
 import ObservabilityMenu from './ObservabilityMenu'
 
 interface ObservabilityLayoutProps {
-  title?: string
+  title: string
 }
 
 const ObservabilityLayoutContent = ({
@@ -85,8 +85,8 @@ const ObservabilityLayoutContent = ({
   if (reportsAll) {
     return (
       <ProjectLayout
-        title={title}
         product="Observability"
+        browserTitle={{ section: title }}
         productMenu={<ObservabilityMenu />}
         isBlocking={false}
       >

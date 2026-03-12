@@ -1,4 +1,3 @@
-import { ParsedUrlQuery } from 'querystring'
 import { useParams } from 'common'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
@@ -6,32 +5,124 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
-import { Box, Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Box, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Badge, Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import type { ComponentProps } from 'react'
+import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
-export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
-  const queryArray = Object.entries(routerQueries)
+import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
+import { sanitizeRoute } from './ProjectDropdown.utils'
+import { ProjectRowLink } from './ProjectRowLink'
+import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 
-  if (queryArray.length > 1) {
-    // [Joshen] Ideally we shouldn't use hard coded numbers, but temp workaround
-    // for storage bucket route since its longer
-    const isStorageBucketRoute = 'bucketId' in routerQueries
-    const isSecurityAdvisorRoute = 'preset' in routerQueries
+// --- Sub-components ---
 
-    return route
-      .split('/')
-      .slice(0, isStorageBucketRoute || isSecurityAdvisorRoute ? 5 : 4)
-      .join('/')
-  } else {
-    return route
-  }
+interface ProjectDropdownNewProjectActionsProps {
+  organizationSlug: string | undefined
+  embedded: boolean
+  onClose: () => void
+  onNavigate: (href: string) => void
 }
 
-export const ProjectDropdown = () => {
+function ProjectDropdownNewProjectActions({
+  organizationSlug,
+  embedded,
+  onClose,
+  onNavigate,
+}: ProjectDropdownNewProjectActionsProps) {
+  const href = `/new/${organizationSlug}`
+
+  if (embedded) {
+    return (
+      <Button type="default" block size="small" asChild icon={<Plus size={14} strokeWidth={1.5} />}>
+        <Link
+          href={href}
+          onClick={onClose}
+          className="text-xs text-foreground-light hover:text-foreground"
+        >
+          New project
+        </Link>
+      </Button>
+    )
+  }
+
+  return (
+    <CommandGroup_Shadcn_>
+      <CommandItem_Shadcn_
+        className="cursor-pointer w-full"
+        onSelect={() => {
+          onClose()
+          onNavigate(href)
+        }}
+        onClick={onClose}
+      >
+        <Link href={href} onClick={onClose} className="w-full flex items-center gap-2">
+          <Plus size={14} strokeWidth={1.5} />
+          <p>New project</p>
+        </Link>
+      </CommandItem_Shadcn_>
+    </CommandGroup_Shadcn_>
+  )
+}
+
+function ProjectDropdownNonPlatformView({ projectName }: { projectName: string }) {
+  return (
+    <Button type="text">
+      <span className="text-sm">{projectName}</span>
+    </Button>
+  )
+}
+
+interface ProjectDropdownPlatformViewProps {
+  projectRef: string | undefined
+  projectName: string
+  selectorProps: Omit<
+    ComponentProps<typeof OrganizationProjectSelector>,
+    'renderTrigger' | 'embedded'
+  >
+}
+
+function ProjectDropdownPlatformView({
+  projectRef,
+  projectName,
+  selectorProps,
+}: ProjectDropdownPlatformViewProps) {
+  return (
+    <div className="flex items-center flex-shrink-0">
+      <Link
+        href={`/project/${projectRef}`}
+        className="flex items-center gap-2 flex-shrink-0 text-sm"
+      >
+        <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+        <span title={projectName} className="text-foreground max-w-32 lg:max-w-64 truncate">
+          {projectName}
+        </span>
+      </Link>
+
+      <OrganizationProjectSelector
+        {...selectorProps}
+        renderTrigger={() => <AppLayoutDropdownTriggerButton className="flex-shrink-0" />}
+      />
+    </div>
+  )
+}
+
+// --- Main component ---
+
+interface ProjectDropdownProps {
+  embedded?: boolean
+  className?: string
+  onClose?: () => void
+}
+
+export const ProjectDropdown = ({
+  embedded = false,
+  className,
+  onClose,
+}: ProjectDropdownProps = {}) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
@@ -47,92 +138,55 @@ export const ProjectDropdown = () => {
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const [open, setOpen] = useState(false)
+  const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
-    return <ShimmeringLoader className="w-[90px]" />
+    if (!embedded) return <GenericSkeletonLoader className="p-2" />
   }
 
-  return IS_PLATFORM ? (
-    <>
-      <Link
-        href={`/project/${project?.ref}`}
-        className="flex items-center gap-2 flex-shrink-0 text-sm"
-      >
-        <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span
-          title={selectedProject.name}
-          className="text-foreground max-w-32 lg:max-w-64 truncate"
-        >
-          {selectedProject.name}
-        </span>
-      </Link>
+  const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen
 
-      <OrganizationProjectSelector
-        open={open}
-        setOpen={setOpen}
+  const selectorProps = {
+    open,
+    setOpen: handleSetOpen,
+    selectedRef: ref,
+    onSelect: (project: { ref: string }) => {
+      const sanitizedRoute = sanitizeRoute(router.route, router.query)
+      const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+      close()
+      router.push(href)
+    },
+    renderRow: (project: { ref: string; name: string; status?: string }) => (
+      <ProjectRowLink
+        project={project}
         selectedRef={ref}
-        onSelect={(project) => {
-          const sanitizedRoute = sanitizeRoute(router.route, router.query)
-          const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-          router.push(href)
-        }}
-        renderTrigger={() => (
-          <Button
-            type="text"
-            size="tiny"
-            className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-          />
-        )}
-        renderRow={(project) => {
-          // [Joshen] Temp while we're interim between v1 and v2 billing
-          const sanitizedRoute = sanitizeRoute(router.route, router.query)
-          const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-          const isSelected = project.ref === ref
-          const isPaused = project.status === 'INACTIVE'
-
-          return (
-            <Link href={href} className="w-full flex items-center justify-between">
-              <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
-                {project.name}
-                {isPaused && <Badge className="ml-2">Paused</Badge>}
-              </span>
-              {isSelected && <Check size={16} />}
-            </Link>
-          )
-        }}
-        renderActions={() => {
-          return (
-            projectCreationEnabled && (
-              <CommandGroup_Shadcn_>
-                <CommandItem_Shadcn_
-                  className="cursor-pointer w-full"
-                  onSelect={() => {
-                    setOpen(false)
-                    router.push(`/new/${selectedOrganization?.slug}`)
-                  }}
-                  onClick={() => setOpen(false)}
-                >
-                  <Link
-                    href={`/new/${selectedOrganization?.slug}`}
-                    onClick={() => {
-                      setOpen(false)
-                    }}
-                    className="w-full flex items-center gap-2"
-                  >
-                    <Plus size={14} strokeWidth={1.5} />
-                    <p>New project</p>
-                  </Link>
-                </CommandItem_Shadcn_>
-              </CommandGroup_Shadcn_>
-            )
-          )
-        }}
+        route={router.route}
+        routerQueries={router.query}
       />
-    </>
+    ),
+    renderActions: (_setOpen: (value: boolean) => void, options?: { embedded?: boolean }) =>
+      projectCreationEnabled ? (
+        <ProjectDropdownNewProjectActions
+          organizationSlug={selectedOrganization?.slug}
+          embedded={options?.embedded ?? false}
+          onClose={close}
+          onNavigate={(href) => router.push(href)}
+        />
+      ) : null,
+  }
+
+  if (embedded)
+    return (
+      <OrganizationProjectSelector {...selectorProps} embedded className={className} fetchOnMount />
+    )
+
+  return IS_PLATFORM ? (
+    <ProjectDropdownPlatformView
+      projectRef={project?.ref}
+      projectName={selectedProject?.name ?? ''}
+      selectorProps={selectorProps}
+    />
   ) : (
-    <Button type="text">
-      <span className="text-sm">{selectedProject?.name}</span>
-    </Button>
+    <ProjectDropdownNonPlatformView projectName={selectedProject?.name ?? ''} />
   )
 }

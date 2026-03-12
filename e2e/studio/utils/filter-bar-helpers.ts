@@ -73,6 +73,24 @@ export async function addFilterWithDropdownValue(
   await rowsWaiter
 }
 
+export async function switchProperty(page: Page, currentColumnName: string, newColumnName: string) {
+  const conditionEl = page.getByTestId(`filter-condition-${currentColumnName}`)
+  await conditionEl
+    .locator(`span`, { hasText: new RegExp(`^${currentColumnName}$`, 'i') })
+    .first()
+    .click()
+
+  const searchInput = page.getByTestId(`filter-property-search-${currentColumnName}`)
+  await expect(searchInput).toBeVisible()
+
+  await searchInput.fill(newColumnName)
+
+  await expect(page.getByTestId(`filter-menu-item-${newColumnName}`)).toBeVisible()
+  await page.getByTestId(`filter-menu-item-${newColumnName}`).click()
+
+  await expect(page.getByTestId(`filter-condition-${newColumnName}`)).toBeVisible()
+}
+
 export async function setupFilterBarPage(page: Page, ref: string, editorUrl: string) {
   const loadPromise = waitForTableToLoad(page, ref)
   await page.goto(editorUrl)

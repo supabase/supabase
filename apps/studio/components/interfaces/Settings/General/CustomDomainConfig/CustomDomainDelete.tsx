@@ -1,12 +1,11 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { DOCS_URL } from 'lib/constants'
 import { Trash } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -15,7 +14,7 @@ export type CustomDomainDeleteProps = {
   customDomain: CustomDomainResponse
 }
 
-const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProps) => {
+export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProps) => {
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
   const { mutate: deleteCustomDomain, isPending: isDeletingCustomDomain } =
     useCustomDomainDeleteMutation({
@@ -85,5 +84,3 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
     </>
   )
 }
-
-export default CustomDomainDelete

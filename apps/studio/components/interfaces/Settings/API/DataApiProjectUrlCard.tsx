@@ -15,14 +15,14 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
-import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
 
 export const DataApiProjectUrlCard = () => {
   const { isPending: isLoading } = useSelectedProjectQuery()
@@ -31,7 +31,7 @@ export const DataApiProjectUrlCard = () => {
 
   const [querySource, setQuerySource] = useQueryState('source', parseAsString)
 
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const { data: resolvedEndpoint } = useProjectApiUrl({ projectRef })
   const {
     data: databases,
     isError,
@@ -55,7 +55,7 @@ export const DataApiProjectUrlCard = () => {
   const endpoint = getApiEndpoint({
     selectedDatabaseId: state.selectedDatabaseId,
     projectRef,
-    customDomainData,
+    resolvedEndpoint,
     loadBalancers,
     selectedDatabase,
   })

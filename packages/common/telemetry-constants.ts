@@ -1657,6 +1657,46 @@ export interface BranchReviewWithAssistantClickedEvent {
 }
 
 /**
+ * Triggered when a user selects a branch from the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorBranchClickedEvent {
+  action: 'branch_selector_branch_clicked'
+  properties: {
+    branchId: string
+    branchName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Create branch" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorCreateClickedEvent {
+  action: 'branch_selector_create_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Manage branches" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorManageClickedEvent {
+  action: 'branch_selector_manage_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked on a DPA PDF link to open it.
  *
  * @group Events
@@ -2326,6 +2366,54 @@ export interface SidebarOpenedEvent {
 }
 
 /**
+ * User opened an org menu submenu in the mobile navigation sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgSubmenuOpenedEvent {
+  action: 'org_submenu_opened'
+  properties: {
+    /** The key of the submenu item that was opened */
+    itemKey: string
+    /** The display label of the submenu item */
+    itemLabel: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the back button in the mobile org menu to return to the top-level menu.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgMenuBackClickedEvent {
+  action: 'org_menu_back_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a menu item in the mobile org navigation sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgMenuItemClickedEvent {
+  action: 'org_menu_item_clicked'
+  properties: {
+    /** The key identifying the menu item */
+    itemKey: string
+    /** The navigation href of the menu item */
+    itemHref: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User toggled the inline editor setting in account preferences.
  *
  * @group Events
@@ -2489,6 +2577,20 @@ export interface QueryPerformanceAIExplanationButtonClickedEvent {
 }
 
 /**
+ * Source/location where AI assistant actions originate from.
+ */
+export type AiAssistantSource =
+  | 'explain_visualizer'
+  | 'query_performance'
+  | 'sql_debug'
+  | 'lint_detail'
+  | 'advisor_section'
+  | 'advisor_widget'
+  | 'branch_review'
+  | 'log_explorer'
+  | 'error_code'
+
+/**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
  * This allows users to paste the prompt into external AI tools (Cursor, Claude, etc.)
  *
@@ -2501,14 +2603,45 @@ export interface AiPromptCopiedEvent {
     /**
      * Source/location where the prompt was copied from
      */
-    source:
-      | 'explain_visualizer'
-      | 'query_performance'
-      | 'sql_debug'
-      | 'lint_detail'
-      | 'advisor_section'
-      | 'advisor_widget'
-      | 'branch_review'
+    source: AiAssistantSource
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the main AI assistant button in the dropdown.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiAssistantDropdownButtonClickedEvent {
+  action: 'ai_assistant_dropdown_button_clicked'
+  properties: {
+    /**
+     * Source/location where the button was clicked
+     */
+    source: AiAssistantSource
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked an external AI tool link (ChatGPT or Claude) in the dropdown.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiExternalToolClickedEvent {
+  action: 'ai_external_tool_clicked'
+  properties: {
+    /**
+     * Source/location where the link was clicked
+     */
+    source: AiAssistantSource
+    /**
+     * Which external AI tool was selected
+     */
+    tool: 'chatgpt' | 'claude'
   }
   groups: TelemetryGroups
 }
@@ -2676,6 +2809,27 @@ export interface RlsEventTriggerBannerCreateButtonClickedEvent {
 }
 
 /**
+ * User was exposed to the pricing calculator experiment on the /pricing page.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingCalculatorExperimentExposedEvent {
+  action: 'pricing_calculator_experiment_exposed'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'pricingCalculatorExperiment'
+    /**
+     * Experiment variant: 'control' (existing compute section) or 'test' (new compute section)
+     */
+    variant: 'control' | 'test'
+  }
+}
+
+/**
  * User clicked the Run button in the log explorer.
  *
  * @group Events
@@ -2798,6 +2952,9 @@ export type TelemetryEvent =
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
+  | BranchSelectorBranchClickedEvent
+  | BranchSelectorCreateClickedEvent
+  | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
   | HomeGettingStartedWorkflowClickedEvent
   | HomeGettingStartedStepClickedEvent
@@ -2833,6 +2990,8 @@ export type TelemetryEvent =
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
   | AiPromptCopiedEvent
+  | AiAssistantDropdownButtonClickedEvent
+  | AiExternalToolClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
@@ -2842,3 +3001,7 @@ export type TelemetryEvent =
   | IntegrationInstallFailedEvent
   | IntegrationUninstallCompletedEvent
   | RlsEventTriggerBannerCreateButtonClickedEvent
+  | OrgSubmenuOpenedEvent
+  | OrgMenuBackClickedEvent
+  | OrgMenuItemClickedEvent
+  | PricingCalculatorExperimentExposedEvent

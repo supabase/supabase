@@ -1,10 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
@@ -16,8 +12,11 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useAddonsPagePanel } from 'state/addons-page'
-import { Button, Radio, SidePanel, cn } from 'ui'
+import { Button, cn, RadioGroup_Shadcn_, RadioGroupLargeItem_Shadcn_, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
@@ -62,12 +61,41 @@ const IPv4SidePanel = () => {
   const availableOptions =
     (addons?.available_addons ?? []).find((addon) => addon.type === 'ipv4')?.variants ?? []
 
-  const isFreePlan = organization?.plan?.id === 'free'
   const { hasAccess: hasAccessToIPv4, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('ipv4')
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
-  const isPgBouncerEnabled = !isFreePlan
+
+  const ipv4Options = [
+    {
+      value: 'ipv4_none',
+      id: 'ipv4_none',
+      title: 'No IPv4 address',
+      description: 'Use shared pooler or IPv6 for database connections.',
+      priceContent: (
+        <>
+          <p className="text-foreground text-sm">$0</p>
+          <p className="text-foreground-light translate-y-[1px] text-sm">/ month</p>
+        </>
+      ),
+      priceRowClassName: 'mt-2',
+    },
+    ...availableOptions.map((option) => ({
+      value: option.identifier,
+      id: option.identifier,
+      title: 'Dedicated IPv4 address',
+      description: 'Allow database connections from IPv4 networks.',
+      priceContent: (
+        <>
+          <p className="text-sm" translate="no">
+            {formatCurrency(option.price)}
+          </p>
+          <p className="text-foreground-light translate-y-[0.5px]">/ month / database</p>
+        </>
+      ),
+      priceRowClassName: 'mt-3',
+    })),
+  ]
 
   useEffect(() => {
     if (visible) {
@@ -112,26 +140,22 @@ const IPv4SidePanel = () => {
             : undefined
       }
       header={
-        <div className="flex items-center justify-between">
+        <div className="flex w-full items-center justify-between">
           <h4>Dedicated IPv4 address</h4>
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <Link
-              href={`${DOCS_URL}/guides/platform/ipv4-address`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              About dedicated IPv4 addresses
-            </Link>
-          </Button>
+          <DocsButton href={`${DOCS_URL}/guides/platform/ipv4-address`} />
         </div>
       }
     >
       <SidePanel.Content>
         <div className="py-6 space-y-4">
           <p className="text-sm">
-            Direct connections to the database only work if your client is able to resolve IPv6
-            addresses. Enabling the dedicated IPv4 add-on allows you to directly connect to your
-            database via a IPv4 address.
+            Your project’s direct connection endpoint and dedicated pooler are IPv6-only by default.
+            Enable the dedicated IPv4 address add-on to connect from IPv4-only networks.
+          </p>
+
+          <p className="text-sm">
+            The shared pooler endpoint accepts IPv4 connections by default and does not require this
+            add-on.
           </p>
 
           {!isAws && (
@@ -141,84 +165,42 @@ const IPv4SidePanel = () => {
             />
           )}
 
-          {isPgBouncerEnabled ? (
-            <Admonition
-              type="default"
-              title="The Dedicated Pooler does not support IPv4 addresses"
-              description="If you are connecting to your database via the Dedicated Pooler, you may need this add-on if your network does not support communicating via IPv6. Alternatively, you may consider using our Shared Pooler."
-            />
-          ) : (
-            <p className="text-sm">
-              If you are connecting via the Shared connection pooler, you do not need this add-on as
-              our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
-              <InlineLink href={`/project/${projectRef}/database/settings#connection-pooler`}>
-                project database settings
-              </InlineLink>
-              .
-            </p>
-          )}
-
-          <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
-            <Radio.Group
-              type="large-cards"
-              size="tiny"
-              id="ipv4"
-              onChange={(event: any) => setSelectedOption(event.target.value)}
-            >
-              <Radio
+          {isAws && (
+            <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
+              <RadioGroup_Shadcn_
                 name="ipv4"
-                checked={selectedOption === 'ipv4_none'}
-                className="col-span-4 !p-0"
-                label="No IPv4"
-                value="ipv4_none"
+                value={selectedOption}
+                onValueChange={setSelectedOption}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
-                <div className="w-full group">
-                  <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                    <p className="text-sm">No IPv4 address</p>
-                  </div>
-                  <div className="px-4 py-2 flex flex-col justify-between">
-                    <p className="text-foreground-light">
-                      Use connection pooler or IPv6 for direct connections
-                    </p>
-                    <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-foreground text-sm">$0</p>
-                      <p className="text-foreground-light translate-y-[1px]"> / month</p>
-                    </div>
-                  </div>
-                </div>
-              </Radio>
-              {availableOptions.map((option) => (
-                <Radio
-                  className="col-span-4 !p-0"
-                  name="ipv4"
-                  key={option.identifier}
-                  disabled={!hasAccessToIPv4 || !isAws}
-                  checked={selectedOption === option.identifier}
-                  label={option.name}
-                  value={option.identifier}
-                >
-                  <div className="w-full group">
-                    <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                      <p className="text-sm">Dedicated IPv4 address</p>
-                    </div>
-                    <div className="px-4 py-2">
-                      <p className="text-foreground-light">
-                        Allow direct database connections via IPv4 address
-                      </p>
-                      <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm" translate="no">
-                          {formatCurrency(option.price)}
-                        </p>
-                        <p className="text-foreground-light translate-y-[1px]">
-                          / month / database
-                        </p>
+                {ipv4Options.map((option) => (
+                  <RadioGroupLargeItem_Shadcn_
+                    key={option.id}
+                    value={option.value}
+                    label=""
+                    showIndicator={false}
+                    className={cn(
+                      'w-full gap-0 p-0 shadow-none bg-transparent cursor-pointer text-left',
+                      'border-default hover:border-control hover:bg-transparent'
+                    )}
+                  >
+                    <div className="px-4 py-3">
+                      <p className="text-sm font-medium">{option.title}</p>
+                      <p className="text-foreground-light text-sm mt-1">{option.description}</p>
+                      <div
+                        className={cn(
+                          'flex items-center space-x-1 text-sm',
+                          option.priceRowClassName
+                        )}
+                      >
+                        {option.priceContent}
                       </div>
                     </div>
-                  </div>
-                </Radio>
-              ))}
-            </Radio.Group>
-          </div>
+                  </RadioGroupLargeItem_Shadcn_>
+                ))}
+              </RadioGroup_Shadcn_>
+            </div>
+          )}
 
           {hasChanges && (
             <>
@@ -230,29 +212,25 @@ const IPv4SidePanel = () => {
               />
               {selectedOption !== 'ipv4_none' && (
                 <p className="text-sm text-foreground-light">
-                  By default, this is only applied to the Primary database for your project. If{' '}
-                  <Link
-                    href="/docs/guides/platform/read-replicas"
-                    className="text-brand"
-                    target="_blank"
-                  >
-                    Read replicas
-                  </Link>{' '}
+                  By default, this is only applied to the primary database for your project. If{' '}
+                  <InlineLink href={`${DOCS_URL}/guides/platform/read-replicas`} target="_blank">
+                    read replicas
+                  </InlineLink>{' '}
                   are used, each replica also gets its own IPv4 address, with a corresponding{' '}
                   <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
                   charge.
                 </p>
               )}
               <p className="text-sm text-foreground-light">
-                There are no immediate charges. The addon is billed at the end of your billing cycle
-                based on your usage and prorated to the hour.
+                There are no immediate charges. The add-on is billed at the end of your billing
+                cycle based on your usage and prorated to the hour.
               </p>
             </>
           )}
 
           {!hasAccessToIPv4 && (
             <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
-              <p>Upgrade your plan to enable a IPv4 address for your project</p>
+              <p>Upgrade your plan to enable an IPv4 address for your project</p>
               <Button asChild type="default">
                 <Link
                   href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=ipv4SidePanel`}

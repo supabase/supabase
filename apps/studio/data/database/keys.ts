@@ -27,8 +27,8 @@ export const databaseKeys = {
     ['projects', projectRef, 'index-advisor', { query }] as const,
   tableConstraints: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'table-constraints', id] as const,
-  foreignKeyConstraints: (projectRef: string | undefined, schema?: string) =>
-    ['projects', projectRef, 'foreign-key-constraints', schema] as const,
+  foreignKeyConstraints: (projectRef: string | undefined, schema?: string, options = {}) =>
+    ['projects', projectRef, 'foreign-key-constraints', schema, options] as const,
   databaseSize: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database-size'] as const,
   maxConnections: (projectRef: string | undefined) =>

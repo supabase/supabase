@@ -64,5 +64,3 @@ export const PolicyReview = ({
     </>
   )
 }
-
-export default PolicyReview

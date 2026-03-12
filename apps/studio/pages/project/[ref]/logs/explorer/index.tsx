@@ -414,6 +414,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               projectRef={projectRef}
               onSelectedLogChange={setSelectedLog}
               selectedLog={selectedLog || undefined}
+              sqlQuery={editorValue}
             />
 
             <div className="flex flex-row justify-end mt-2">
@@ -475,7 +476,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
 LogsExplorerPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Explorer">{page}</LogsLayout>
   </DefaultLayout>
 )
 

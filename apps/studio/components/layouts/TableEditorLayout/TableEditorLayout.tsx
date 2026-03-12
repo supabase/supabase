@@ -6,6 +6,7 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { SaveQueueActionBar } from '@/components/grid/components/footer/operations/SaveQueueActionBar'
+import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BannerTableEditorFilter } from '@/components/ui/BannerStack/Banners/BannerTableEditorFilter'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -15,6 +16,7 @@ const TABLE_EDITOR_NEW_FILTER_BANNER_ID = 'table-editor-new-filter-banner'
 export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { addBanner, dismissBanner } = useBannerStack()
+  const isTableFilterBarEnabled = useIsTableFilterBarEnabled()
 
   const [isTableEditorNewFilterBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED(ref ?? ''),
@@ -29,7 +31,7 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (!isPermissionsLoaded) return
 
-    if (canReadTables && !isTableEditorNewFilterBannerDismissed) {
+    if (canReadTables && !isTableEditorNewFilterBannerDismissed && !isTableFilterBarEnabled) {
       addBanner({
         id: TABLE_EDITOR_NEW_FILTER_BANNER_ID,
         priority: 2,
@@ -49,6 +51,7 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     canReadTables,
     isPermissionsLoaded,
     isTableEditorNewFilterBannerDismissed,
+    isTableFilterBarEnabled,
   ])
 
   if (isPermissionsLoaded && !canReadTables) {

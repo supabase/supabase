@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
@@ -18,7 +17,6 @@ import {
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
 
   const allIntegrations = useMemo(() => {
     return INTEGRATIONS.filter((integration) => {
@@ -28,12 +26,9 @@ export const useInstalledIntegrations = () => {
       ) {
         return false
       }
-      if (!stripeSyncEnabled && integration.id === 'stripe_sync_engine') {
-        return false
-      }
       return true
     })
-  }, [integrationsWrappers, stripeSyncEnabled])
+  }, [integrationsWrappers])
 
   const {
     data,
@@ -99,13 +94,6 @@ export const useInstalledIntegrations = () => {
       .sort((a, b) => a.name.localeCompare(b.name))
   }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled])
 
-  // available integrations are all integrations that can be installed. If an integration can't be installed (needed
-  // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
-  const availableIntegrations = useMemo(
-    () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
-    [allIntegrations]
-  )
-
   const error = fdwError || extensionsError || schemasError
   const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading
   const isError = isErrorFDWs || isErrorExtensions || isErrorSchemas
@@ -114,7 +102,6 @@ export const useInstalledIntegrations = () => {
   return {
     // show all integrations at once instead of showing partial results
     installedIntegrations: isLoading ? EMPTY_ARR : installedIntegrations,
-    availableIntegrations: isLoading ? EMPTY_ARR : availableIntegrations,
     error,
     isError,
     isLoading,

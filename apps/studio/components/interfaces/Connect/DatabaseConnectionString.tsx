@@ -8,12 +8,13 @@ import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configur
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
+import { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
@@ -67,6 +68,12 @@ export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
+  const {
+    hasAccess: hasDedicatedPooler,
+    isLoading: isLoadingEntitlement,
+    isSuccess: isSuccessEntitlement,
+  } = useCheckEntitlements('dedicated_pooler')
+  const sharedPoolerPreferred = !hasDedicatedPooler
 
   // URL state management
   const [queryType, setQueryType] = useQueryState('type', parseAsString.withDefault('uri'))
@@ -75,10 +82,6 @@ export const DatabaseConnectionString = () => {
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
   const [selectedMethod, setSelectedMethod] = useState<ConnectionStringMethod>('direct')
-
-  const sharedPoolerPreferred = useMemo(() => {
-    return org?.plan?.id === 'free'
-  }, [org])
 
   // Sync URL state with component state on mount and when URL changes
   useEffect(() => {
@@ -177,9 +180,9 @@ export const DatabaseConnectionString = () => {
       : isSuccessSupavisorConfig
 
   const error = poolerError || readReplicasError
-  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
+  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas || isLoadingEntitlement
   const isError = isErrorPoolerConfig || isErrorReadReplicas
-  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
+  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas && isSuccessEntitlement
 
   const sharedPoolerConfig = supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
   const poolingConfiguration = sharedPoolerPreferred ? sharedPoolerConfig : pgbouncerConfig
@@ -303,7 +306,7 @@ export const DatabaseConnectionString = () => {
             align="start"
             buttonProps={{
               size: 'small',
-              className: 'w-full justify-between pr-2.5 [&_svg]:h-4',
+              className: 'w-full pr-2.5 [&_svg]:h-4',
             }}
             className="w-full md:w-auto [&>span]:w-1/2 [&>span]:md:w-auto"
             onSelectId={handleDatabaseChange}

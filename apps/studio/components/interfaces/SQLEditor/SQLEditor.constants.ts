@@ -39,6 +39,14 @@ export const destructiveSqlRegex = [
   /^(.*;)?\s*(drop|delete|truncate|alter\s+table\s+.*\s+drop\s+column)\s/is,
 ]
 
+export const updateWithoutWhereRegex =
+  /(?:^|;)\s*update\s+(?:"[\w.]+"\."[\w.]+"|[\w.]+)\s+set\s+[\w\W]+?(?!\s*where\s)/is
+
+export const alterDatabasePreventConnectionStatements = [
+  'alter database postgres connection limit 0',
+  'alter database postgres allow_connections false',
+]
+
 export const ASSISTANT_TEMPLATES = [
   {
     name: 'Twitter clone',
