@@ -4,7 +4,7 @@ import { REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
 import { useCurrentUserImage } from './useCurrentUserImage'
 import { useCurrentUserName } from './useCurrentUserName'
 // @ts-ignore
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from '@/lib/supabase/client'
 
 const supabase = createClient()
 
@@ -29,8 +29,7 @@ export function useRealtimePresenceRoom(roomName: string) {
 
     room
       .on('presence', { event: 'sync' }, () => {
-        const newState =
-          room?.presenceState<{ image: string; name: string }>() ?? {}
+        const newState = room?.presenceState<{ image: string; name: string }>() ?? {}
 
         const newUsers = Object.fromEntries(
           Object.entries(newState).map(([key, values]) => {

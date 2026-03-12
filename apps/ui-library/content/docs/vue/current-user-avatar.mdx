@@ -24,11 +24,11 @@ property which gets populated automatically by Supabase Auth if the user logged 
 
 The `CurrentUserAvatar` component is designed to be used anywhere in your app. Add the `<CurrentUserAvatar />` component to your page and it will render the avatar of the current user, with a fallback.
 
-```html
+```vue
 <script setup lang="ts">
-// Asumes you have Header component created
-import Header from '@/components/Header.vue'
+// Assumes you have Header component created
 import CurrentUserAvatar from '@/components/CurrentUserAvatar.vue'
+import Header from '@/components/Header.vue'
 </script>
 
 <template>

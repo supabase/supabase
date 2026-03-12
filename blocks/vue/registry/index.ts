@@ -6,6 +6,14 @@ import { socialAuth } from './social-auth'
 import { currentUserAvatar } from './current-user-avatar'
 import { realtimeAvatarStack } from './realtime-avatar-stack'
 
-const blocks = [...clients, ...passwordBasedAuth, ...socialAuth, ...dropzone, ...realtimeCursor, ...currentUserAvatar, ...realtimeAvatarStack]
+const blocks = [
+  ...clients,
+  ...passwordBasedAuth,
+  ...socialAuth,
+  ...dropzone,
+  ...realtimeCursor,
+  ...currentUserAvatar,
+  ...realtimeAvatarStack,
+]
 
 export { blocks }

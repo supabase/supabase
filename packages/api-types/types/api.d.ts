@@ -3535,9 +3535,11 @@ export interface components {
       max_payload_size_in_kb: number | null
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second: number | null
+      /** @description Whether to enable presence */
+      presence_enabled: boolean
       /** @description Whether to only allow private channels */
       private_only: boolean | null
-      /** @description Whether to suspend realtime */
+      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend: boolean | null
     }
     RegionsInfo: {
@@ -4266,9 +4268,11 @@ export interface components {
       max_payload_size_in_kb?: number
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second?: number
+      /** @description Whether to enable presence */
+      presence_enabled?: boolean
       /** @description Whether to only allow private channels */
       private_only?: boolean
-      /** @description Whether to suspend realtime */
+      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean
     }
     UpdateRunStatusBody: {

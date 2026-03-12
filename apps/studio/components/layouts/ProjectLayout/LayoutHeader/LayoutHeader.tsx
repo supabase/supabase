@@ -47,6 +47,7 @@ const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanEl
       strokeLinejoin="round"
       fill="none"
       shapeRendering="geometricPrecision"
+      aria-hidden={true}
     >
       <path d="M16 3.549L7.12 20.600" />
     </svg>
@@ -101,7 +102,7 @@ export const LayoutHeader = ({
 
   return (
     <>
-      <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
+      <header className="flex h-11 md:h-12 items-center flex-shrink-0 border-b">
         {backToDashboardURL && isAccountPage && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <Link
@@ -117,7 +118,26 @@ export const LayoutHeader = ({
             'flex items-center justify-between h-full pr-3 flex-1 overflow-x-auto gap-x-8 pl-4'
           )}
         >
-          <div className="flex items-center text-sm">
+          <div className="flex md:hidden items-center text-sm not-sr-only">
+            <AnimatePresence>
+              {headerTitle && (
+                <motion.div
+                  className="flex items-center -ml-1"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{
+                    duration: 0.15,
+                    ease: 'easeOut',
+                  }}
+                >
+                  <LayoutHeaderDivider />
+                  <span className="text-foreground">{headerTitle}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <div className="hidden md:flex items-center text-sm">
             <HomeIcon />
             <div className="flex items-center md:pl-2">
               {showOrgSelection && IS_PLATFORM ? (
@@ -138,7 +158,7 @@ export const LayoutHeader = ({
                       ease: 'easeOut',
                     }}
                   >
-                    <LayoutHeaderDivider />
+                    {IS_PLATFORM && <LayoutHeaderDivider />}
                     <ProjectDropdown />
 
                     {exceedingLimits && (
@@ -149,34 +169,33 @@ export const LayoutHeader = ({
                       </div>
                     )}
 
-                    {selectedProject && (
+                    {selectedProject && IS_PLATFORM && (
                       <>
                         <LayoutHeaderDivider />
-                        {IS_PLATFORM && <BranchDropdown />}
+                        <BranchDropdown />
                       </>
                     )}
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              <AnimatePresence>
-                {headerTitle && (
-                  <motion.div
-                    className="flex items-center"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{
-                      duration: 0.15,
-                      ease: 'easeOut',
-                    }}
-                  >
-                    <LayoutHeaderDivider />
-                    <span className="text-foreground">{headerTitle}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
+            <AnimatePresence>
+              {headerTitle && (
+                <motion.div
+                  className="flex items-center"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{
+                    duration: 0.15,
+                    ease: 'easeOut',
+                  }}
+                >
+                  <LayoutHeaderDivider />
+                  <span className="text-foreground">{headerTitle}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <AnimatePresence>
               {projectRef && (
@@ -204,7 +223,7 @@ export const LayoutHeader = ({
                 <DevToolbarTrigger />
                 <FeedbackDropdown />
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 md:gap-2">
                   <CommandMenuTriggerInput
                     showShortcut={commandMenuEnabled}
                     placeholder="Search..."
@@ -227,12 +246,12 @@ export const LayoutHeader = ({
                     )}
                   </AnimatePresence>
                 </div>
-                <UserDropdown />
+                <UserDropdown triggerClassName="hidden md:flex" />
               </>
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 md:gap-2">
                   <CommandMenuTriggerInput
                     placeholder="Search..."
                     className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
@@ -253,7 +272,7 @@ export const LayoutHeader = ({
                     )}
                   </AnimatePresence>
                 </div>
-                <LocalDropdown />
+                <LocalDropdown triggerClassName="hidden md:flex" />
               </>
             )}
           </div>

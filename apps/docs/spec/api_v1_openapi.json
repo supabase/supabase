@@ -10257,8 +10257,9 @@
           "suspend": {
             "type": "boolean",
             "nullable": true,
-            "description": "Whether to suspend realtime"
-          }
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": { "type": "boolean", "description": "Whether to enable presence" }
         },
         "required": [
           "private_only",
@@ -10270,7 +10271,8 @@
           "max_joins_per_second",
           "max_presence_events_per_second",
           "max_payload_size_in_kb",
-          "suspend"
+          "suspend",
+          "presence_enabled"
         ]
       },
       "UpdateRealtimeConfigBody": {
@@ -10328,7 +10330,11 @@
             "maximum": 10000,
             "description": "Sets maximum number of payload size in KB rate limit"
           },
-          "suspend": { "type": "boolean", "description": "Whether to suspend realtime" }
+          "suspend": {
+            "type": "boolean",
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": { "type": "boolean", "description": "Whether to enable presence" }
         },
         "additionalProperties": false
       },
