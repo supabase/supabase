@@ -1,34 +1,30 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState, type ReactNode } from 'react'
-import { SubmitHandler, useForm, type UseFormReturn } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
 import { useParams } from 'common'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import { ProjectSecret } from 'data/secrets/secrets-query'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
-import { Eye, EyeOff, X } from 'lucide-react'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
+import { Eye, EyeOff } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { useLatest } from 'react-use'
+import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input,
   Input_Shadcn_,
-  Separator,
   Sheet,
-  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetSection,
   SheetTitle,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
 
 const FORM_ID = 'edit-secret-sidepanel'
 
@@ -46,21 +42,17 @@ interface EditSecretSheetProps {
 }
 
 export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetProps) {
+  const { ref: projectRef } = useParams()
   const secretName = useLatest(secret?.name)
+  const [showSecretValue, setShowSecretValue] = useState(false)
+
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
   })
-  useEffect(() => {
-    if (visible) {
-      form.reset({
-        name: secretName.current ?? '',
-        value: '',
-      })
-    }
-  }, [form, secretName, visible])
-  const isValid = form.formState.isValid
 
-  const { ref: projectRef } = useParams()
+  const isValid = form.formState.isValid
+  const isDirty = form.formState.isDirty
+
   const { mutate: updateSecret, isPending: isUpdating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully updated secret "${variables.secrets[0].name}"`)
@@ -74,21 +66,83 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
     })
   }
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
-    checkIsDirty: () => form.formState.isDirty,
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
     onClose,
   })
 
+  useEffect(() => {
+    if (visible) {
+      form.reset({ name: secretName.current ?? '', value: '' })
+    }
+  }, [form, secretName, visible])
+
   return (
-    <Sheet open={visible} onOpenChange={confirmOnClose}>
-      <SheetContent
-        showClose={false}
-        size={'default'}
-        className={'!min-w-screen lg:!min-w-[600px] flex flex-col'}
-      >
-        <Header />
-        <Separator />
-        <FormBody form={form} onSubmit={onSubmit} />
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
+      <SheetContent size="default" className={'!min-w-screen lg:!min-w-[600px] flex flex-col'}>
+        <SheetHeader className="py-3 flex flex-row gap-3 items-center">
+          <SheetTitle>Edit secret</SheetTitle>
+        </SheetHeader>
+
+        <SheetSection className="h-full">
+          <Form_Shadcn_ {...form}>
+            <form
+              id={FORM_ID}
+              className="flex flex-col gap-y-4"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField_Shadcn_
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout label="Name" layout="horizontal">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        {...field}
+                        readOnly
+                        className="!text-foreground-light cursor-not-allowed"
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+              <FormField_Shadcn_
+                control={form.control}
+                name="value"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Value"
+                    layout="horizontal"
+                    description="Secrets can’t be retrieved once saved. Enter a new value to overwrite the existing value."
+                  >
+                    <FormControl_Shadcn_>
+                      <Input
+                        {...field}
+                        type={showSecretValue ? 'text' : 'password'}
+                        placeholder="my-secret-value"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                        actions={
+                          <div className="mr-1">
+                            <Button
+                              type="text"
+                              className="px-1"
+                              icon={showSecretValue ? <EyeOff /> : <Eye />}
+                              onClick={() => setShowSecretValue(!showSecretValue)}
+                            />
+                          </div>
+                        }
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </Form_Shadcn_>
+        </SheetSection>
+
         <SheetFooter>
           <Button disabled={isUpdating} type="default" onClick={confirmOnClose}>
             Cancel
@@ -98,137 +152,8 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
           </Button>
         </SheetFooter>
       </SheetContent>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </Sheet>
-  )
-}
-
-const Header = (): ReactNode => {
-  return (
-    <SheetHeader className="py-3 flex flex-row gap-3 items-center border-b-0">
-      <SheetClose
-        className={cn(
-          'text-muted hover:text ring-offset-background hover:opacity-100',
-          'focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          'disabled:pointer-events-none data-[state=open]:bg-secondary',
-          'transition'
-        )}
-      >
-        <X className="h-3 w-3" />
-        <span className="sr-only">Close</span>
-      </SheetClose>
-      <SheetTitle>Edit secret</SheetTitle>
-    </SheetHeader>
-  )
-}
-
-type FormBodyProps = {
-  form: UseFormReturn<FormSchemaType>
-  onSubmit: SubmitHandler<FormSchemaType>
-}
-
-const FormBody = ({ form, onSubmit }: FormBodyProps): ReactNode => {
-  return (
-    <Form_Shadcn_ {...form}>
-      <form id={FORM_ID} className="flex-grow overflow-auto" onSubmit={form.handleSubmit(onSubmit)}>
-        <SheetSection>
-          <NameField form={form} />
-        </SheetSection>
-        <Separator />
-        <SheetSection className="space-y-4">
-          <SecretField form={form} />
-        </SheetSection>
-        <Separator />
-      </form>
-    </Form_Shadcn_>
-  )
-}
-
-type NameFieldProps = {
-  form: UseFormReturn<FormSchemaType>
-}
-
-const NameField = ({ form }: NameFieldProps): ReactNode => {
-  return (
-    <FormField_Shadcn_
-      control={form.control}
-      name="name"
-      render={({ field }) => (
-        <FormItemLayout label="Name" layout="horizontal">
-          <FormControl_Shadcn_>
-            <Input_Shadcn_
-              {...field}
-              readOnly
-              className="!text-foreground-light cursor-not-allowed"
-            />
-          </FormControl_Shadcn_>
-        </FormItemLayout>
-      )}
-    />
-  )
-}
-
-type SecretFieldProps = {
-  form: UseFormReturn<FormSchemaType>
-}
-
-const SecretField = ({ form }: SecretFieldProps): ReactNode => {
-  const [showSecretValue, setShowSecretValue] = useState(false)
-
-  return (
-    <FormField_Shadcn_
-      control={form.control}
-      name="value"
-      render={({ field }) => (
-        <FormItemLayout
-          label="Value"
-          layout="horizontal"
-          description="Secrets can’t be retrieved once saved. Enter a new value to overwrite the existing value."
-        >
-          <FormControl_Shadcn_>
-            <Input
-              {...field}
-              type={showSecretValue ? 'text' : 'password'}
-              placeholder="my-secret-value"
-              data-1p-ignore
-              data-lpignore="true"
-              data-form-type="other"
-              data-bwignore
-              actions={
-                <div className="mr-1">
-                  <Button
-                    type="text"
-                    className="px-1"
-                    icon={showSecretValue ? <EyeOff /> : <Eye />}
-                    onClick={() => setShowSecretValue(!showSecretValue)}
-                  />
-                </div>
-              }
-            />
-          </FormControl_Shadcn_>
-        </FormItemLayout>
-      )}
-    />
-  )
-}
-
-const CloseConfirmationModal = ({
-  visible,
-  onClose,
-  onCancel,
-}: ConfirmOnCloseModalProps): ReactNode => {
-  return (
-    <ConfirmationModal
-      visible={visible}
-      title="Discard changes"
-      confirmLabel="Discard"
-      onCancel={onCancel}
-      onConfirm={onClose}
-    >
-      <p className="text-sm text-foreground-light">
-        There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-        lost.
-      </p>
-    </ConfirmationModal>
   )
 }

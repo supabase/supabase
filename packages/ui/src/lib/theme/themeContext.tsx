@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useLayoutEffect, useMemo } from 'react'
-import { createContext } from 'react'
-import defaultTheme from './defaultTheme'
+import React, { createContext, useLayoutEffect, useMemo } from 'react'
 
 import { mergeDeep } from './../../lib/utils'
+import defaultTheme from './defaultTheme'
+
 // import useDarkMode from './utils/useDarkMode'
 
 interface ThemeContextInterface {

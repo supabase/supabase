@@ -1,22 +1,19 @@
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { Minus } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import type { ResponseError } from 'types'
 import {
   Button,
   TableCell,
@@ -27,46 +24,38 @@ import {
   WarningIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DeleteDestination } from './DeleteDestination'
-import { DestinationPanel } from './DestinationPanel/DestinationPanel'
-import { DestinationType } from './DestinationPanel/DestinationPanel.types'
-import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
+import { useDestinationInformation } from './useDestinationInformation'
 
 interface DestinationRowProps {
-  sourceId?: number
   destinationId: number
-  destinationName: string
-  type?: DestinationType
-  pipeline?: Pipeline
-  error: ResponseError | null
-  isLoading: boolean
-  isError: boolean
-  isSuccess: boolean
 }
 
-export const DestinationRow = ({
-  sourceId,
-  destinationId,
-  destinationName,
-  type,
-  pipeline,
-  error: pipelineError,
-  isLoading: isPipelineLoading,
-  isError: isPipelineError,
-  isSuccess: isPipelineSuccess,
-}: DestinationRowProps) => {
+export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
 
+  const { type, statusName, destination, pipeline, pipelineStatus, pipelineFetcher } =
+    useDestinationInformation({
+      id: destinationId,
+    })
   const {
-    data: pipelineStatusData,
+    error: pipelineError,
+    isPending: isPipelineLoading,
+    isError: isPipelineError,
+    isSuccess: isPipelineSuccess,
+  } = pipelineFetcher
+  const destinationName = destination?.name ?? ''
+
+  const {
     error: pipelineStatusError,
     isPending: isPipelineStatusLoading,
     isError: isPipelineStatusError,
@@ -78,16 +67,13 @@ export const DestinationRow = ({
     },
     { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
-  const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
-
-  const pipelineStatus = pipelineStatusData?.status
-  const statusName = getStatusName(pipelineStatus)
 
   // Fetch table-level replication status to surface errors in list view
   const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
@@ -162,12 +148,10 @@ export const DestinationRow = ({
               <ShimmeringLoader />
             ) : (
               <div>
-                <p title={destinationName} className="truncate">
-                  {destinationName}
-                </p>
-                <p className="text-foreground-lighter">
+                <p>
                   {type} (ID: {pipeline?.id})
                 </p>
+                <p className="text-foreground-lighter">{destinationName}</p>
               </div>
             )}
           </TableCell>
@@ -177,7 +161,7 @@ export const DestinationRow = ({
               <ShimmeringLoader />
             ) : (
               <PipelineStatus
-                pipelineStatus={pipelineStatusData?.status}
+                pipelineStatus={pipelineStatus?.status}
                 error={pipelineStatusError}
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
@@ -218,13 +202,13 @@ export const DestinationRow = ({
                 </Link>
               </Button>
               <RowMenu
+                destinationId={destinationId}
                 pipeline={pipeline}
-                pipelineStatus={pipelineStatusData?.status}
+                pipelineStatus={pipelineStatus?.status}
                 error={pipelineStatusError}
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
                 onDeleteClick={() => setShowDeleteDestinationForm(true)}
-                onEditClick={() => setShowEditDestinationPanel(true)}
                 hasUpdate={hasUpdate}
                 onUpdateClick={() => setShowUpdateVersionModal(true)}
               />
@@ -239,20 +223,6 @@ export const DestinationRow = ({
         onDelete={onDeleteClick}
         isLoading={isDeleting}
         name={destinationName}
-      />
-
-      <DestinationPanel
-        visible={showEditDestinationPanel}
-        type={type}
-        onClose={() => setShowEditDestinationPanel(false)}
-        existingDestination={{
-          sourceId,
-          destinationId: destinationId,
-          pipelineId: pipeline?.id,
-          enabled:
-            statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
-          statusName,
-        }}
       />
 
       <UpdateVersionModal

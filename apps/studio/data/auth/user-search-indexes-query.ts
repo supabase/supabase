@@ -1,8 +1,8 @@
-import pgMeta from '@supabase/pg-meta'
+import { getIndexStatusesSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-
 import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from 'types'
+
 import { authKeys } from './keys'
 
 type UsersIndexStatusesVariables = {
@@ -20,7 +20,7 @@ export async function getUserIndexStatuses(
   { projectRef, connectionString }: UsersIndexStatusesVariables,
   signal?: AbortSignal
 ): Promise<UsersIndexStatusesData> {
-  const sql = pgMeta.getIndexStatusesSQL()
+  const sql = getIndexStatusesSQL()
 
   const { result } = await executeSql<UsersIndexStatusesData>(
     {

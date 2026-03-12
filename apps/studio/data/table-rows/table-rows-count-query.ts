@@ -1,84 +1,21 @@
-import { Query } from '@supabase/pg-meta/src/query'
-import {
-  COUNT_ESTIMATE_SQL,
-  THRESHOLD_COUNT,
-} from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
-
+import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { tableRowKeys } from './keys'
-import { formatFilterValue } from './utils'
 import { UseCustomQueryOptions } from 'types'
 
-type GetTableRowsCountArgs = {
+import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { tableRowKeys } from './keys'
+import { getTableRowsCountSql } from './table-rows.sql'
+
+export type GetTableRowsCountArgs = {
   table?: SupaTable
   filters?: Filter[]
   enforceExactCount?: boolean
-}
-
-export const getTableRowsCountSql = ({
-  table,
-  filters = [],
-  enforceExactCount = false,
-}: GetTableRowsCountArgs) => {
-  if (!table) return ``
-
-  if (enforceExactCount) {
-    const query = new Query()
-    let queryChains = query.from(table.name, table.schema ?? undefined).count()
-    filters
-      .filter((x) => x.value && x.value !== '')
-      .forEach((x) => {
-        const value = formatFilterValue(table, x)
-        queryChains = queryChains.filter(x.column, x.operator, value)
-      })
-    return `select (${queryChains.toSql().slice(0, -1)}), false as is_estimate;`
-  } else {
-    const selectQuery = new Query()
-    let selectQueryChains = selectQuery.from(table.name, table.schema ?? undefined).select('*')
-    filters
-      .filter((x) => x.value && x.value != '')
-      .forEach((x) => {
-        const value = formatFilterValue(table, x)
-        selectQueryChains = selectQueryChains.filter(x.column, x.operator, value)
-      })
-    const selectBaseSql = selectQueryChains.toSql()
-
-    const countQuery = new Query()
-    let countQueryChains = countQuery.from(table.name, table.schema ?? undefined).count()
-    filters
-      .filter((x) => x.value && x.value != '')
-      .forEach((x) => {
-        const value = formatFilterValue(table, x)
-        countQueryChains = countQueryChains.filter(x.column, x.operator, value)
-      })
-    const countBaseSql = countQueryChains.toSql().slice(0, -1)
-
-    const sql = `
-${COUNT_ESTIMATE_SQL}
-
-with approximation as (
-    select reltuples as estimate
-    from pg_class
-    where oid = ${table.id}
-)
-select 
-  case 
-    when estimate = -1 then (select pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}'))
-    when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}')` : 'estimate'}
-    else (${countBaseSql})
-  end as count,
-  estimate = -1 or estimate > ${THRESHOLD_COUNT} as is_estimate
-from approximation;
-`.trim()
-
-    return sql
-  }
 }
 
 export type TableRowsCount = {
@@ -106,7 +43,8 @@ export async function getTableRowsCount(
     filters,
     roleImpersonationState,
     enforceExactCount,
-  }: TableRowsCountVariables,
+    isUsingReadReplica = false,
+  }: TableRowsCountVariables & { isUsingReadReplica?: boolean },
   signal?: AbortSignal
 ) {
   const entity = await prefetchTableEditor(queryClient, {
@@ -121,7 +59,7 @@ export async function getTableRowsCount(
   const table = parseSupaTable(entity)
 
   const sql = wrapWithRoleImpersonation(
-    getTableRowsCountSql({ table, filters, enforceExactCount }),
+    getTableRowsCountSql({ table, filters, enforceExactCount, isUsingReadReplica }),
     roleImpersonationState
   )
   const { result } = await executeSql(
@@ -142,18 +80,46 @@ export async function getTableRowsCount(
 }
 
 export const useTableRowsCountQuery = <TData = TableRowsCountData>(
-  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsCountVariables, 'queryClient'>,
+  {
+    projectRef,
+    tableId,
+    ...args
+  }: Omit<TableRowsCountVariables, 'queryClient' | 'connectionString'>,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
+  const {
+    connectionString,
+    identifier: readReplicaIdentifier,
+    type,
+  } = useConnectionStringForReadOps()
+
   return useQuery<TableRowsCountData, TableRowsCountError, TData>({
-    queryKey: tableRowKeys.tableRowsCount(projectRef, { table: { id: tableId }, ...args }),
+    queryKey: tableRowKeys.tableRowsCount(projectRef, {
+      table: { id: tableId },
+      readReplicaIdentifier,
+      ...args,
+    }),
     queryFn: ({ signal }) =>
-      getTableRowsCount({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+      getTableRowsCount(
+        {
+          queryClient,
+          projectRef,
+          connectionString,
+          tableId,
+          isUsingReadReplica: type === 'replica',
+          ...args,
+        },
+        signal
+      ),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof tableId !== 'undefined' &&
+      (!IS_PLATFORM || typeof connectionString !== 'undefined'),
     ...options,
   })
 }

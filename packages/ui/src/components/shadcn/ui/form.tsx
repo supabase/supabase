@@ -2,6 +2,7 @@
 
 import * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
+import { AnimatePresence, motion } from 'framer-motion'
 import * as React from 'react'
 import {
   Controller,
@@ -13,7 +14,6 @@ import {
   useWatch,
 } from 'react-hook-form'
 
-import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '../../../lib/utils/cn'
 import { Label } from './label'
 

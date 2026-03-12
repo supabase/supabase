@@ -4,6 +4,12 @@ export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 
+/**
+ * Indicates that the app is running in a test environment (E2E tests).
+ * Set via NEXT_PUBLIC_NODE_ENV=test in the generateLocalEnv.js script.
+ */
+export const IS_TEST_ENV = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
 export const API_URL = (() => {
   if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
   //  If running in platform, use API_URL from the env var

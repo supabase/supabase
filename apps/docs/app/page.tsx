@@ -98,6 +98,18 @@ const postgresIntegrations = [
     href: '/guides/queues',
     description: 'Durable Message Queues with guaranteed delivery',
   },
+  {
+    title: 'Data REST API',
+    icon: 'rest',
+    href: '/guides/api',
+    description: 'Access your database through a RESTful API.',
+  },
+  {
+    title: 'GraphQL API',
+    icon: 'graphql',
+    href: '/guides/graphql',
+    description: 'Access your database through a GraphQL API.',
+  },
 ]
 
 const selfHostingOptions = [
@@ -223,7 +235,7 @@ const HomePage = () => (
       <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
         <div className="col-span-4">
           <h2 id="postgres-integrations" className="scroll-mt-24 m-0">
-            Postgres Modules
+            Modules
           </h2>
         </div>
         <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">

@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { handleError, patch } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { authKeys } from './keys'
 
 export type UserUpdateVariables = {
@@ -37,8 +37,11 @@ export const useUserUpdateMutation = ({
   return useMutation<UserUpdateData, ResponseError, UserUpdateVariables>({
     mutationFn: (vars) => updateUser(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: authKeys.usersInfinite(projectRef) })
+      const { projectRef, userId } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: authKeys.usersInfinite(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: authKeys.user(projectRef, userId) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

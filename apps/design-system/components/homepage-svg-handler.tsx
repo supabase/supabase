@@ -1,7 +1,7 @@
 'use client'
 
-import SVG from 'react-inlinesvg'
 import { useTheme } from 'next-themes'
+import SVG from 'react-inlinesvg'
 import { cn } from 'ui'
 
 const HomepageSvgHandler = ({ name, className }: { name: string; className?: string }) => {

@@ -2,6 +2,7 @@
 
 import { cn, Switch } from 'ui'
 import { Label } from 'ui/src/components/shadcn/ui/label'
+
 import { InfoTooltip } from '../../info-tooltip'
 import {
   MultiSelector,

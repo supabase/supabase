@@ -83,6 +83,10 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
           </Item>
         </Submenu>
       )}
+      <Item onClick={({ props }) => onHandleClick('download', props.item)}>
+        <Download size={14} strokeWidth={1} />
+        <span className="ml-2 text-xs">Download</span>
+      </Item>
       {canUpdateFiles && [
         <Item key="rename-file" onClick={({ props }) => onHandleClick('rename', props.item)}>
           <Edit size={14} strokeWidth={1} />
@@ -91,10 +95,6 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
         <Item key="move-file" onClick={({ props }) => onHandleClick('move', props.item)}>
           <Move size={14} strokeWidth={1} />
           <span className="ml-2 text-xs">Move</span>
-        </Item>,
-        <Item key="download-file" onClick={({ props }) => onHandleClick('download', props.item)}>
-          <Download size={14} strokeWidth={1} />
-          <span className="ml-2 text-xs">Download</span>
         </Item>,
         <Separator key="file-separator" />,
         <Item key="delete-file" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
