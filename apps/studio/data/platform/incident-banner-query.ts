@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { IS_PLATFORM } from 'common'
+import { getAccessToken, IS_PLATFORM } from 'common'
 
 import { platformKeys } from './keys'
 import { BASE_PATH } from '@/lib/constants'
@@ -18,10 +18,11 @@ export type IncidentBannerData = { incidents: Array<IncidentBannerItem> }
 export type IncidentBannerError = unknown
 
 async function getIncidentBanner(signal?: AbortSignal): Promise<IncidentBannerData> {
+  const accessToken = await getAccessToken()
   const response = await fetch(`${BASE_PATH}/api/incident-banner`, {
     signal,
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
   })
   if (!response.ok) throw new Error(`Failed to fetch incident banner: ${response.statusText}`)
   return response.json()
