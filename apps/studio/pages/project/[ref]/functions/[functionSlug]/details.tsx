@@ -7,7 +7,7 @@ const PageLayout: NextPageWithLayout = () => <EdgeFunctionDetails />
 
 PageLayout.getLayout = (page) => (
   <DefaultLayout>
-    <EdgeFunctionDetailsLayout>{page}</EdgeFunctionDetailsLayout>
+    <EdgeFunctionDetailsLayout title="Details">{page}</EdgeFunctionDetailsLayout>
   </DefaultLayout>
 )
 

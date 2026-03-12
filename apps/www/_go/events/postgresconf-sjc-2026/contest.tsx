@@ -1,6 +1,12 @@
 import type { GoPageInput } from 'marketing'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
+
+import authors from '@/lib/authors.json'
+
+const speaker1 = authors.find((a) => a.author_id === 'deepthi_sigireddi')
+const speaker2 = authors.find((a) => a.author_id === 'sugu_sougoumarane')
 
 const page: GoPageInput = {
   template: 'lead-gen',
@@ -30,6 +36,66 @@ const page: GoPageInput = {
     ],
   },
   sections: [
+    {
+      type: 'single-column',
+      title: 'Multigres: One stop PostgreSQL Management and Scaling',
+      description: 'Conference Talk: Thursday, April 23, 2026 2:30pm PDT',
+      children: (
+        <div className="flex flex-col items-center gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl">
+            {speaker1 && (
+              <div className="flex flex-col items-center gap-4">
+                {speaker1.author_image_url && (
+                  <Image
+                    src={speaker1.author_image_url}
+                    alt={speaker1.author}
+                    width={192}
+                    height={192}
+                    className="rounded-full object-cover aspect-square w-48 h-48"
+                  />
+                )}
+                <div className="flex flex-col items-center gap-0">
+                  <p className="text-foreground-light font-medium text-center">
+                    {speaker1.author}
+                    {speaker1.position && `, ${speaker1.position}`}
+                  </p>
+                  <p className="text-foreground-lighter text-sm text-center">Supabase</p>
+                </div>
+              </div>
+            )}
+            {speaker2 && (
+              <div className="flex flex-col items-center gap-4">
+                {speaker2.author_image_url && (
+                  <Image
+                    src={speaker2.author_image_url}
+                    alt={speaker2.author}
+                    width={192}
+                    height={192}
+                    className="rounded-full object-cover aspect-square w-48 h-48"
+                  />
+                )}
+                <div className="flex flex-col items-center gap-0">
+                  <p className="text-foreground-light font-medium text-center">
+                    {speaker2.author}
+                    {speaker2.position && `, ${speaker2.position}`}
+                  </p>
+                  <p className="text-foreground-lighter text-sm text-center">Supabase</p>
+                </div>
+              </div>
+            )}
+          </div>
+          <Button asChild type="default" size="medium">
+            <Link
+              href="https://supabase.link/postgresconf-sjc-2026-slides"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download Slides
+            </Link>
+          </Button>
+        </div>
+      ),
+    },
     {
       type: 'single-column',
       id: 'how-to-enter',

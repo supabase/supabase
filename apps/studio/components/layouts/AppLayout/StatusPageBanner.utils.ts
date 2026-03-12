@@ -40,7 +40,7 @@ export function shouldShowBanner({
     if (hasUnknownRegions) return true
 
     // Region restriction: only show if the user has a database in an affected region
-    return affectedRegions.some((region) => userRegions.has(region))
+    return affectedRegions.some((region) => userRegions.has(region.toLowerCase()))
   })
 }
 

@@ -6,7 +6,7 @@ import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
@@ -74,12 +74,16 @@ export const ReportChartV2 = ({
   queryGroup,
 }: ReportChartV2Props) => {
   const { data: org } = useSelectedOrganizationQuery()
-  const { plan: orgPlan } = useCurrentOrgPlan()
-  const orgPlanId = orgPlan?.id
+  const { getEntitlementSetValues, isLoading: isEntitlementLoading } = useCheckEntitlements(
+    'observability.dashboard_advanced_metrics',
+    undefined,
+    { enabled: !!report.entitlement }
+  )
 
-  const isAvailable = !report?.availableIn || (orgPlanId && report.availableIn?.includes(orgPlanId))
+  const entitledFeatures = getEntitlementSetValues()
+  const isAvailable = !report.entitlement || entitledFeatures.includes(report.entitlement)
 
-  const canFetch = orgPlanId !== undefined && isAvailable
+  const canFetch = isAvailable
 
   const {
     data: queryResult,
@@ -129,7 +133,7 @@ export const ReportChartV2 = ({
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
   const chartHighlight = useChartHighlight()
 
-  if (!isAvailable) {
+  if (!isAvailable && !isEntitlementLoading) {
     return <ReportChartUpsell report={report} orgSlug={org?.slug ?? ''} />
   }
 
