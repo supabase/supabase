@@ -276,6 +276,7 @@ resources:
                     users:
                       inline_string: '${DASHBOARD_BASIC_AUTH}'
                       
+                # Copies ?apikey=... from the URL into the apikey header when clients omit the header.
                 - name: envoy.filters.http.lua
                   typed_config:
                     '@type': >-
@@ -301,7 +302,191 @@ resources:
                           end
                         end
                       end
-                      
+
+                # Translates the query parameter apikey into the matching internal JWT and rewrites the URL so only JWTs propagate downstream.
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local SECRET_KEY = "${SUPABASE_SECRET_KEY}"
+                      local PUBLISHABLE_KEY = "${SUPABASE_PUBLISHABLE_KEY}"
+                      local SERVICE_ROLE_JWT = "${SERVICE_ROLE_KEY_ASYMMETRIC}"
+                      local ANON_JWT = "${ANON_KEY_ASYMMETRIC}"
+                      local TRANSLATION_ENABLED = SECRET_KEY ~= "" and PUBLISHABLE_KEY ~= "" and SERVICE_ROLE_JWT ~= "" and ANON_JWT ~= ""
+
+                      local function translate_apikey(apikey)
+                        if apikey == nil or apikey == "" then
+                          return nil
+                        end
+
+                        if not TRANSLATION_ENABLED then
+                          return nil
+                        end
+
+                        if apikey == SECRET_KEY then
+                          return SERVICE_ROLE_JWT
+                        end
+
+                        if apikey == PUBLISHABLE_KEY then
+                          return ANON_JWT
+                        end
+
+                        return nil
+                      end
+
+                      local function extract_query_apikey(path)
+                        if path == nil or path == "" then
+                          return nil
+                        end
+
+                        local query_start = string.find(path, "?", 1, true)
+                        if query_start == nil then
+                          return nil
+                        end
+
+                        local query = string.sub(path, query_start + 1)
+                        for key, value in string.gmatch(query, "([^&]+)=([^&]*)") do
+                          if key == "apikey" and value ~= "" then
+                            return value
+                          end
+                        end
+
+                        return nil
+                      end
+
+                      local function replace_query_apikey(path, new_value)
+                        if path == nil or path == "" or new_value == nil or new_value == "" then
+                          return nil
+                        end
+
+                        local query_start = string.find(path, "?", 1, true)
+                        if query_start == nil then
+                          return nil
+                        end
+
+                        local base = string.sub(path, 1, query_start)
+                        local query = string.sub(path, query_start + 1)
+                        local updated = {}
+                        local replaced = false
+
+                        for part in string.gmatch(query, "([^&]+)") do
+                          local key, value = string.match(part, "([^=]+)=(.*)")
+                          if key == "apikey" then
+                            part = key .. "=" .. new_value
+                            replaced = true
+                          end
+                          table.insert(updated, part)
+                        end
+
+                        if not replaced then
+                          return nil
+                        end
+
+                        return base .. table.concat(updated, "&")
+                      end
+
+                      function envoy_on_request(request_handle)
+                        local headers = request_handle:headers()
+                        local path = headers:get(":path")
+                        local apikey = extract_query_apikey(path)
+                        local translated = translate_apikey(apikey)
+
+                        if translated == nil then
+                          return
+                        end
+
+                        headers:replace("apikey", translated)
+
+                        local rewritten_path = replace_query_apikey(path, translated)
+                        if rewritten_path ~= nil then
+                          headers:replace(":path", rewritten_path)
+                        end
+                      end
+
+                # Translates an apikey header into the appropriate internal JWT for downstream RBAC checks.
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local SECRET_KEY = "${SUPABASE_SECRET_KEY}"
+                      local PUBLISHABLE_KEY = "${SUPABASE_PUBLISHABLE_KEY}"
+                      local SERVICE_ROLE_JWT = "${SERVICE_ROLE_KEY_ASYMMETRIC}"
+                      local ANON_JWT = "${ANON_KEY_ASYMMETRIC}"
+                      local TRANSLATION_ENABLED = SECRET_KEY ~= "" and PUBLISHABLE_KEY ~= "" and SERVICE_ROLE_JWT ~= "" and ANON_JWT ~= ""
+
+                      local function translate_apikey(apikey)
+                        if apikey == nil or apikey == "" then
+                          return nil
+                        end
+
+                        if not TRANSLATION_ENABLED then
+                          return nil
+                        end
+
+                        if apikey == SECRET_KEY then
+                          return SERVICE_ROLE_JWT
+                        end
+
+                        if apikey == PUBLISHABLE_KEY then
+                          return ANON_JWT
+                        end
+
+                        return nil
+                      end
+
+                      function envoy_on_request(request_handle)
+                        local headers = request_handle:headers()
+                        local translated = translate_apikey(headers:get("apikey"))
+                        if translated ~= nil and translated ~= "" then
+                          headers:replace("apikey", translated)
+                        end
+                      end
+
+                # Synthesizes an Authorization header (Bearer …) from apikey when callers don’t provide a real JWT header.
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local function has_real_jwt(auth_header)
+                        if auth_header == nil or auth_header == "" then
+                          return false
+                        end
+
+                        if string.sub(auth_header, 1, 7) ~= "Bearer " then
+                          return false
+                        end
+
+                        return string.sub(auth_header, 1, 10) ~= "Bearer sb_"
+                      end
+
+                      local function format_authorization(value)
+                        if value == nil or value == "" then
+                          return nil
+                        end
+
+                        if string.sub(value, 1, 7) == "Bearer " then
+                          return value
+                        end
+
+                        return "Bearer " .. value
+                      end
+
+                      function envoy_on_request(request_handle)
+                        local headers = request_handle:headers()
+                        if has_real_jwt(headers:get("authorization")) then
+                          return
+                        end
+
+                        local apikey = headers:get("apikey")
+                        local authorization_value = format_authorization(apikey)
+                        if authorization_value ~= nil then
+                          headers:replace("authorization", authorization_value)
+                        end
+                      end
+
                 - name: envoy.filters.http.rbac
                   typed_config:
                     '@type': >-
@@ -319,6 +504,14 @@ resources:
                                 name: apikey
                                 string_match:
                                   exact: '${SERVICE_ROLE_KEY}'
+                            - header:
+                                name: apikey
+                                string_match:
+                                  exact: '${SERVICE_ROLE_KEY_ASYMMETRIC}'
+                            - header:
+                                name: authorization
+                                string_match:
+                                  exact: 'Bearer ${SERVICE_ROLE_KEY_ASYMMETRIC}'
                         apikey:
                           permissions:
                             - url_path:
@@ -345,6 +538,22 @@ resources:
                                 name: apikey
                                 string_match:
                                   exact: '${ANON_KEY}'
+                            - header:
+                                name: apikey
+                                string_match:
+                                  exact: '${SERVICE_ROLE_KEY_ASYMMETRIC}'
+                            - header:
+                                name: apikey
+                                string_match:
+                                  exact: '${ANON_KEY_ASYMMETRIC}'
+                            - header:
+                                name: authorization
+                                string_match:
+                                  exact: 'Bearer ${SERVICE_ROLE_KEY_ASYMMETRIC}'
+                            - header:
+                                name: authorization
+                                string_match:
+                                  exact: 'Bearer ${ANON_KEY_ASYMMETRIC}'
                                   
                 - name: envoy.filters.http.router
                   typed_config:
