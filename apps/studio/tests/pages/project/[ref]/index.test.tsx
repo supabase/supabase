@@ -32,7 +32,7 @@ describe('when IS_PLATFORM is true', () => {
 
   test('renders ProjectHome', async () => {
     const { default: HomePage } = await import('pages/project/[ref]/index')
-    render(<HomePage />)
+    render(<HomePage dehydratedState={undefined} />)
     expect(screen.getByTestId('project-home')).toBeInTheDocument()
     expect(screen.queryByTestId('old-home')).not.toBeInTheDocument()
   })
@@ -49,7 +49,7 @@ describe('when IS_PLATFORM is false', () => {
 
   test('renders Home', async () => {
     const { default: HomePage } = await import('pages/project/[ref]/index')
-    render(<HomePage />)
+    render(<HomePage dehydratedState={undefined} />)
     expect(screen.getByTestId('old-home')).toBeInTheDocument()
     expect(screen.queryByTestId('project-home')).not.toBeInTheDocument()
   })
