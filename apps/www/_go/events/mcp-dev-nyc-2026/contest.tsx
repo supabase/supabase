@@ -13,13 +13,13 @@ const page: GoPageInput = {
   metadata: {
     title: 'Win a Mac Mini | Supabase at MCP Dev Summit 2026',
     description:
-      'Thanks for connecting with us at MCP Dev Summit. Try Supabase. It\'s Postgres with everything you need to build AI-native agents. Enter for a chance to win a Mac Mini.',
+      "Thanks for connecting with us at MCP Dev Summit. Try Supabase. It's Postgres with everything you need to build AI-native agents. Enter for a chance to win a Mac Mini.",
   },
   hero: {
     title: 'Win a Mac Mini',
     subtitle: 'Supabase at MCP Dev Summit 2026',
     description:
-      'Thanks for connecting with us at MCP Dev Summit. Try Supabase. It\'s Postgres with everything you need to build AI-native agents. Enter for a chance to win a Mac Mini.',
+      "Thanks for connecting with us at MCP Dev Summit. Try Supabase. It's Postgres with everything you need to build AI-native agents. Enter for a chance to win a Mac Mini.",
     image: {
       src: '/images/landing-pages/postgresconf-sjc-2026/mac-mini.png',
       alt: 'Apple Mac Mini',
@@ -58,7 +58,11 @@ const page: GoPageInput = {
             <p className="text-foreground-lighter text-sm">Supabase</p>
           </div>
           <Button asChild type="default" size="medium">
-            <Link href="https://supabase.link/mcpdev-nyc-slides" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="https://supabase.link/mcpdev-nyc-slides"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Download Slides
             </Link>
           </Button>

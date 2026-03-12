@@ -7,8 +7,7 @@ const page: GoPageInput = {
   slug: 'pgconf-dev-2026/contest/thank-you',
   metadata: {
     title: "You're entered | Supabase at PGConf.dev 2026",
-    description:
-      'Thanks for entering the Supabase contest at PGConf.dev 2026. Good luck!',
+    description: 'Thanks for entering the Supabase contest at PGConf.dev 2026. Good luck!',
   },
   hero: {
     title: 'Thanks for entering',
