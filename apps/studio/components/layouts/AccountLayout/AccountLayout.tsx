@@ -1,7 +1,3 @@
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -9,8 +5,15 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
 import { buildStudioPageTitle } from 'lib/page-title'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import type { PropsWithChildren } from 'react'
+import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
+
+import { useMobileSheet } from '../ProjectLayout/NavigationBar/MobileSheetContext'
+import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
 
 export interface AccountLayoutProps {
@@ -20,6 +23,7 @@ export interface AccountLayoutProps {
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
+  const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
 
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
 
@@ -45,6 +49,61 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
     brand: brandTitle,
   })
 
+  const sections = useMemo(
+    () => [
+      {
+        key: 'account-settings',
+        heading: 'Account Settings',
+        links: [
+          {
+            key: 'preferences',
+            label: 'Preferences',
+            href: '/account/me',
+            isActive: currentPath === '/account/me',
+          },
+          {
+            key: 'access-tokens',
+            label: 'Access Tokens',
+            href: '/account/tokens',
+            isActive: currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
+          },
+          ...(showSecuritySettings
+            ? [
+                {
+                  key: 'security',
+                  label: 'Security',
+                  href: '/account/security',
+                  isActive: currentPath === '/account/security',
+                },
+              ]
+            : []),
+        ],
+      },
+      {
+        key: 'logs',
+        heading: 'Logs',
+        links: [
+          {
+            key: 'audit-logs',
+            label: 'Audit Logs',
+            href: '/account/audit',
+            isActive: currentPath === '/account/audit',
+          },
+        ],
+      },
+    ],
+    [currentPath, showSecuritySettings]
+  )
+
+  useLayoutEffect(() => {
+    const unregister = registerOpenMenu(() => {
+      setMobileSheetContent(
+        <AccountMenuContent sections={sections} onCloseSheet={() => setMobileSheetContent(null)} />
+      )
+    })
+    return unregister
+  }, [registerOpenMenu, setMobileSheetContent, sections])
+
   useEffect(() => {
     if (!IS_PLATFORM) {
       router.push('/project/default')
@@ -62,49 +121,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
           title=""
           breadcrumbs={[]}
           backToDashboardURL={backToDashboardURL}
-          sections={[
-            {
-              key: 'account-settings',
-              heading: 'Account Settings',
-              links: [
-                {
-                  key: 'preferences',
-                  label: 'Preferences',
-                  href: '/account/me',
-                  isActive: currentPath === '/account/me',
-                },
-                {
-                  key: 'access-tokens',
-                  label: 'Access Tokens',
-                  href: '/account/tokens',
-                  isActive:
-                    currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
-                },
-                ...(showSecuritySettings
-                  ? [
-                      {
-                        key: 'security',
-                        label: 'Security',
-                        href: '/account/security',
-                        isActive: currentPath === '/account/security',
-                      },
-                    ]
-                  : []),
-              ],
-            },
-            {
-              key: 'logs',
-              heading: 'Logs',
-              links: [
-                {
-                  key: 'audit-logs',
-                  label: 'Audit Logs',
-                  href: '/account/audit',
-                  isActive: currentPath === '/account/audit',
-                },
-              ],
-            },
-          ]}
+          sections={sections}
         >
           {children}
         </WithSidebar>

@@ -31,7 +31,7 @@ const User: NextPageWithLayout = () => {
 
 User.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout hideMobileMenu headerTitle="Account">
+    <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
         <AccountLayout title="Preferences">{page}</AccountLayout>
       </OrganizationLayout>

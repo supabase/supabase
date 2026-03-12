@@ -1,15 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { createContext, useContext, PropsWithChildren, useState, useCallback } from 'react'
-
-import { QueryIndexes } from 'components/interfaces/QueryPerformance/QueryIndexes'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { QueryIndexes } from 'components/interfaces/QueryPerformance/QueryIndexes'
 import { databaseKeys } from 'data/database/keys'
 import {
-  useTableIndexAdvisorQuery,
-  TableIndexAdvisorData,
+  cleanIndexColumnName,
   IndexAdvisorSuggestion,
+  TableIndexAdvisorData,
+  useTableIndexAdvisorQuery,
 } from 'data/database/table-index-advisor-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { createContext, PropsWithChildren, useCallback, useContext, useState } from 'react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 
 interface TableIndexAdvisorContextValue {
@@ -80,7 +80,7 @@ export function TableIndexAdvisorProvider({
         suggestion.index_statements.some((stmt) => {
           const match = stmt.match(/USING\s+\w+\s*\(([^)]+)\)/i)
           if (match) {
-            const columns = match[1].split(',').map((c) => c.trim().replace(/^"(.+)"$/, '$1'))
+            const columns = match[1].split(',').map((c) => cleanIndexColumnName(c))
             return columns.includes(columnName)
           }
           return false
@@ -101,6 +101,17 @@ export function TableIndexAdvisorProvider({
   // Get the first suggestion for the selected column to pass to QueryIndexes
   const selectedSuggestion = selectedColumn ? getSuggestionsForColumn(selectedColumn)[0] : null
 
+  const prefetchedIndexAdvisorResult = selectedSuggestion
+    ? {
+        errors: [],
+        index_statements: selectedSuggestion.index_statements,
+        startup_cost_before: selectedSuggestion.startup_cost_before,
+        startup_cost_after: selectedSuggestion.startup_cost_after,
+        total_cost_before: selectedSuggestion.total_cost_before,
+        total_cost_after: selectedSuggestion.total_cost_after,
+      }
+    : null
+
   const value: TableIndexAdvisorContextValue = {
     isLoading,
     isAvailable: isIndexAdvisorAvailable,
@@ -116,7 +127,7 @@ export function TableIndexAdvisorProvider({
     <TableIndexAdvisorContext.Provider value={value}>
       {children}
       <Sheet open={isSheetOpen} onOpenChange={(open) => !open && closeSheet()}>
-        <SheetContent className="flex flex-col gap-0 p-0 sm:max-w-[500px]">
+        <SheetContent className="flex flex-col gap-0 p-0 lg:!w-[calc(100vw-802px)] max-w-[700px]">
           <SheetHeader className="border-b px-5 py-3">
             <SheetTitle>Index Recommendation</SheetTitle>
           </SheetHeader>
@@ -125,6 +136,7 @@ export function TableIndexAdvisorProvider({
               selectedRow={{ query: selectedSuggestion.query }}
               columnName={selectedColumn}
               suggestedSelectQuery={selectedSuggestion.query}
+              prefetchedIndexAdvisorResult={prefetchedIndexAdvisorResult}
               onClose={closeSheet}
             />
           )}

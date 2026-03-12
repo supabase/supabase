@@ -29,7 +29,7 @@ export const LogPage: NextPageWithLayout = () => {
 
 LogPage.getLayout = (page) => (
   <DefaultLayout>
-    <EdgeFunctionDetailsLayout>{page}</EdgeFunctionDetailsLayout>
+    <EdgeFunctionDetailsLayout title="Logs">{page}</EdgeFunctionDetailsLayout>
   </DefaultLayout>
 )
 

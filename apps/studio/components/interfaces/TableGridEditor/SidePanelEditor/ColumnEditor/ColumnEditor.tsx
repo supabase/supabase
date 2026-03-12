@@ -243,6 +243,7 @@ export const ColumnEditor = ({
       <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <Input
+            id="name"
             label="Name"
             type="text"
             descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
@@ -252,6 +253,7 @@ export const ColumnEditor = ({
             onChange={(event: any) => onUpdateField({ name: event.target.value })}
           />
           <Input
+            id="description"
             label="Description"
             labelOptional="Optional"
             type="text"
