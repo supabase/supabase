@@ -1,9 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit2, MoreVertical, Trash } from 'lucide-react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { ProjectSecret } from 'data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Edit2, MoreVertical, Trash } from 'lucide-react'
 import {
   Button,
   DropdownMenu,

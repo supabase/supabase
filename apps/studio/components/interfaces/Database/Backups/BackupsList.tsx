@@ -1,20 +1,21 @@
-import dayjs from 'dayjs'
-import { Clock } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
 import { useSetProjectStatus } from 'data/projects/project-detail-query'
+import dayjs from 'dayjs'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Admonition } from 'ui-patterns/admonition'
+import { Clock } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { TimestampInfo } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
 import { BackupsStorageAlert } from './BackupsStorageAlert'
@@ -111,11 +112,17 @@ export const BackupsList = () => {
         }}
       >
         <div className="space-y-3">
-          <p className="text-sm">
-            This will restore your database to the backup made on{' '}
-            {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')} at{' '}
-            {dayjs(selectedBackup?.inserted_at).format('HH:mm:ss')} UTC.
-          </p>
+          {!!selectedBackup && (
+            <p className="text-sm">
+              This will restore your database to the backup made on{' '}
+              <TimestampInfo
+                displayAs="utc"
+                utcTimestamp={selectedBackup.inserted_at}
+                labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                className="!text-sm"
+              />
+            </p>
+          )}
 
           <Admonition
             showIcon={false}

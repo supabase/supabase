@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ChevronDownIcon } from '@heroicons/react/outline'

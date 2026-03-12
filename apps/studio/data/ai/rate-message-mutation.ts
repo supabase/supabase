@@ -13,6 +13,7 @@ export type RateMessageVariables = {
   projectRef: string
   orgSlug?: string
   reason?: string
+  spanId?: string
 }
 
 export async function rateMessage({
@@ -22,6 +23,7 @@ export async function rateMessage({
   projectRef,
   orgSlug,
   reason,
+  spanId,
 }: RateMessageVariables) {
   const url = `${BASE_PATH}/api/ai/feedback/rate`
 
@@ -29,7 +31,7 @@ export async function rateMessage({
   const response = await fetchHandler(url, {
     headers,
     method: 'POST',
-    body: JSON.stringify({ rating, messages, messageId, projectRef, orgSlug, reason }),
+    body: JSON.stringify({ rating, messages, messageId, projectRef, orgSlug, reason, spanId }),
   })
 
   let body: any

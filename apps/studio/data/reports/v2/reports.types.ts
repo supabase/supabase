@@ -40,7 +40,9 @@ export interface ReportConfig<FiltersType = any> {
   hideChartType: boolean
   defaultChartStyle: string
   titleTooltip: string
-  availableIn: string[]
+  /** Set member value to check against the `observability.dashboard_advanced_metrics` set entitlement. If undefined, chart is available to all plans. */
+  entitlement?: string
+  requiredPlan?: string
   format?: (value: unknown) => string
   YAxisProps?: YAxisProps
   xAxisKey?: string

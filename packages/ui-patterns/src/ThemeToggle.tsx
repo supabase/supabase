@@ -4,6 +4,7 @@ import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import {
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -11,7 +12,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   Theme,
-  cn,
   themes,
 } from 'ui'
 

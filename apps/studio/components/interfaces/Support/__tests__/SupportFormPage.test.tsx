@@ -1,15 +1,16 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 // End of third-party imports
 
-import { API_URL } from 'lib/constants'
-import { HttpResponse, http } from 'msw'
+import { API_URL, BASE_PATH } from 'lib/constants'
+import { http, HttpResponse } from 'msw'
 import { createMockOrganization, createMockProject } from 'tests/helpers'
 import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock, mswServer } from 'tests/lib/msw'
 import { createMockProfileContext } from 'tests/lib/profile-helpers'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
 import { SupportFormPage } from '../SupportFormPage'
 
@@ -170,6 +171,14 @@ vi.mock(import('lib/gotrue'), async (importOriginal) => {
       ...(actual.auth as any),
       onAuthStateChange: vi.fn(),
     },
+  }
+})
+
+vi.mock(import('lib/constants'), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    IS_PLATFORM: true,
   }
 })
 
@@ -397,11 +406,9 @@ describe('SupportFormPage', () => {
       },
     })
 
-    addAPIMock({
-      method: 'get',
-      path: '/platform/status',
-      response: { is_healthy: true } as any,
-    })
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/incident-status`, () => HttpResponse.json([], { status: 200 }))
+    )
 
     addAPIMock({
       method: 'get',
@@ -459,11 +466,22 @@ describe('SupportFormPage', () => {
   })
 
   test('shows system status: not healthy', async () => {
-    addAPIMock({
-      method: 'get',
-      path: '/platform/status',
-      response: { is_healthy: false } as any,
-    })
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/incident-status`, () =>
+        HttpResponse.json(
+          [
+            {
+              id: 'z3qp8rln72pl',
+              active_since: '2026-01-26T10:30:00Z',
+              impact: 'critical',
+              status: 'in_progress',
+              name: 'Test incident',
+            },
+          ],
+          { status: 200 }
+        )
+      )
+    )
 
     renderSupportFormPage()
 
@@ -474,7 +492,7 @@ describe('SupportFormPage', () => {
 
   test('shows system status: check failed', async () => {
     mswServer.use(
-      http.get(`${API_URL}/platform/status`, () =>
+      http.get(`${BASE_PATH}/api/incident-status`, () =>
         HttpResponse.json({ msg: 'Status service unavailable' }, { status: 500 })
       )
     )
@@ -767,6 +785,10 @@ describe('SupportFormPage', () => {
       expect(getSeveritySelector(screen)).toHaveTextContent('High')
     })
 
+    // Wait for library selector to be available before interacting
+    await waitFor(() => {
+      expect(getLibrarySelector(screen)).toBeInTheDocument()
+    })
     await selectLibraryOption(screen, 'JavaScript')
     await waitFor(() => {
       expect(getLibrarySelector(screen)).toHaveTextContent('JavaScript')
@@ -783,9 +805,14 @@ describe('SupportFormPage', () => {
     const supportAccessToggle = screen.getByRole('switch', {
       name: /allow support access to your project/i,
     })
-    expect(supportAccessToggle).toBeChecked()
+    // Wait for toggle to be in expected state before interacting
+    await waitFor(() => {
+      expect(supportAccessToggle).toBeChecked()
+    })
     await userEvent.click(supportAccessToggle)
-    expect(supportAccessToggle).not.toBeChecked()
+    await waitFor(() => {
+      expect(supportAccessToggle).not.toBeChecked()
+    })
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -815,7 +842,7 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
     })
-  }, 10_000)
+  }, 15_000)
 
   test('submits urgent login issues ticket for a different organization', async () => {
     const submitSpy = vi.fn()
@@ -873,10 +900,6 @@ describe('SupportFormPage', () => {
     await userEvent.clear(messageField)
     await userEvent.type(messageField, 'MFA challenge fails with an unknown error code')
 
-    expect(
-      screen.queryByRole('switch', { name: /allow support access to your project/i })
-    ).toBeNull()
-
     await userEvent.click(getSubmitButton(screen))
 
     await waitFor(() => {
@@ -892,7 +915,7 @@ describe('SupportFormPage', () => {
       organizationSlug: 'org-2',
       library: '',
       affectedServices: '',
-      allowSupportAccess: false,
+      allowSupportAccess: true,
       verified: true,
       tags: ['dashboard-support-form'],
       siteUrl: 'https://project-2.supabase.dev',

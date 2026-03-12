@@ -117,7 +117,7 @@ export type BucketsData = Awaited<ReturnType<typeof getBuckets>>
 export type BucketsWithPaginationData = Awaited<ReturnType<typeof getBucketsPaginated>>
 export type BucketsError = ResponseError
 
-const useBucketQuery = <TData = BucketData>(
+export const useBucketQuery = <TData = BucketData>(
   { projectRef, bucketId }: GetBucketParams,
   { enabled = true, ...options }: UseCustomQueryOptions<BucketData, BucketsError, TData>
 ) => {
@@ -128,22 +128,6 @@ const useBucketQuery = <TData = BucketData>(
     queryKey: storageKeys.bucket(projectRef, bucketId),
     queryFn: ({ signal }) => getBucket({ projectRef, bucketId }, signal),
     enabled: enabled && !!bucketId && isActive,
-    ...options,
-    retry: shouldRetryBucketsQuery,
-  })
-}
-
-export const useBucketsQuery = <TData = BucketsData>(
-  { projectRef }: BucketsVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions<BucketsData, BucketsError, TData> = {}
-) => {
-  const { data: project } = useSelectedProjectQuery()
-  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-
-  return useQuery<BucketsData, BucketsError, TData>({
-    queryKey: storageKeys.buckets(projectRef),
-    queryFn: ({ signal }) => getBuckets({ projectRef }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
     ...options,
     retry: shouldRetryBucketsQuery,
   })

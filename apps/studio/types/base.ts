@@ -85,24 +85,36 @@ export interface ResponseFailure {
 
 export type SupaResponse<T> = T | ResponseFailure
 
+// [Joshen] Trialing returning metadata for the error object. It's meant to be generic
+// but typed properly here, and we can create more types if needed with the | operator
+type CostMetadata = {
+  cost: number
+  sql: string
+}
+
+export type ErrorMetadata = CostMetadata
+
 export class ResponseError extends Error {
   code?: number
   requestId?: string
   retryAfter?: number
   requestPathname?: string
+  metadata?: CostMetadata
 
   constructor(
     message: string | undefined,
     code?: number,
     requestId?: string,
     retryAfter?: number,
-    requestPathname?: string
+    requestPathname?: string,
+    metadata?: CostMetadata
   ) {
     super(message || 'API error happened while trying to communicate with the server.')
     this.code = code
     this.requestId = requestId
     this.retryAfter = retryAfter
     this.requestPathname = requestPathname
+    this.metadata = metadata
   }
 }
 

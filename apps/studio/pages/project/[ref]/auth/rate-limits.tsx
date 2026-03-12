@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
 import { RateLimits } from 'components/interfaces/Auth/RateLimits/RateLimits'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
@@ -74,7 +73,7 @@ const RateLimitsPage: NextPageWithLayout = () => {
 
 RateLimitsPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Rate Limits">{page}</AuthLayout>
   </DefaultLayout>
 )
 

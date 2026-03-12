@@ -1,5 +1,3 @@
-import { ChevronRight } from 'lucide-react'
-
 import { useParams } from 'common'
 import { ColumnList } from 'components/interfaces/Database/Tables/ColumnList'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
@@ -11,6 +9,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ChevronRight } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
@@ -68,7 +67,7 @@ const DatabaseTables: NextPageWithLayout = () => {
 
 DatabaseTables.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Tables">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

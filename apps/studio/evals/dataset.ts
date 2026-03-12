@@ -94,4 +94,37 @@ export const dataset: AssistantEvalCase[] = [
         'Uses quotes around schema/table/columns with capital letters, special characters, and reserved keywords.',
     },
   },
+  {
+    input: {
+      prompt: 'Generate sample data for a blog with users, posts, and comments tables',
+    },
+    expected: {
+      requiredTools: ['execute_sql'],
+    },
+    metadata: {
+      category: ['sql_generation', 'schema_design'],
+      description: 'Invokes `execute_sql` from default "Generate sample data" prompt',
+    },
+  },
+  {
+    input: { prompt: 'Where can I go to create a support ticket?' },
+    expected: {
+      correctAnswer: 'https://supabase.com/dashboard/support/new',
+    },
+    metadata: {
+      category: ['general_help'],
+      description: 'Verifies AI provides valid support ticket URL',
+    },
+  },
+  {
+    input: { prompt: 'What is my OAuth callback URL for setting up GitHub authentication?' },
+    expected: {
+      requiredTools: ['search_docs'],
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Verifies template URLs like https://<project-ref>.supabase.co/auth/v1/callback are excluded from URL validity scoring',
+    },
+  },
 ]

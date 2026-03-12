@@ -1,4 +1,32 @@
-import { type SafeParseReturnType, z } from 'zod'
+import { z, type SafeParseReturnType } from 'zod'
+
+// Splits markdown into alternating [plain, code, plain, code, ...] segments.
+// Odd-indexed segments are already inside code spans/fences and should be left alone.
+const CODE_SEGMENT_REGEX = /(```[\s\S]*?```|`[^`]*`)/g
+
+// Matches bare placeholder URLs like https://xxx/<project-ref>/... outside markdown link
+// syntax. Stops at whitespace, ), or ] to avoid consuming link delimiters. Trailing prose
+// punctuation is stripped in the replacement callback below.
+const PLACEHOLDER_URL_REGEX = /(?<!\()https?:\/\/[^\s)\]]*<[a-z][a-z0-9]*(?:-[a-z0-9]+)*>[^\s)\]]*/g
+
+/**
+ * Wraps bare URLs containing <placeholder> patterns in backticks so they render in
+ * code font, regardless of whether the LLM remembered to wrap them.
+ */
+export function wrapPlaceholderUrls(markdown: string): string {
+  if (!markdown.includes('<')) return markdown
+  const segments = markdown.split(CODE_SEGMENT_REGEX)
+  return segments
+    .map((segment, i) => {
+      if (i % 2 === 1) return segment
+      return segment.replace(PLACEHOLDER_URL_REGEX, (url) => {
+        const trailingPunct = url.match(/[.,;:!?'"]+$/)?.[0] ?? ''
+        const cleanUrl = url.slice(0, url.length - trailingPunct.length)
+        return `\`${cleanUrl}\`` + trailingPunct
+      })
+    })
+    .join('')
+}
 
 // [Joshen] From https://github.com/remarkjs/react-markdown/blob/fda7fa560bec901a6103e195f9b1979dab543b17/lib/index.js#L425
 export function defaultUrlTransform(value: string) {

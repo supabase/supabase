@@ -1,49 +1,48 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DatabaseZap, Search } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
 import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { DatabaseZap, Search } from 'lucide-react'
+import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { DocsButton } from 'components/ui/DocsButton'
+
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 
 export const TriggersList = () => {
-  const [selectedTrigger, setSelectedTrigger] = useState<PostgresTrigger>()
-  const deletingTriggerIdRef = useRef<string | null>(null)
   const { data: project } = useSelectedProjectQuery()
-  const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
-  const [filterString, setFilterString] = useQueryState(
-    'search',
-    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
+  const [filterString, setFilterString] = useQueryState('search', parseAsString.withDefault(''))
+  const [tablesFilter, setTablesFilter] = useQueryState(
+    'tables',
+    parseAsJson(selectFilterSchema.parse).withDefault([])
   )
 
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
@@ -65,9 +64,10 @@ export const TriggersList = () => {
     data.filter((a) => !protectedSchemas.find((s) => s.name === a.schema)).length > 0
 
   const {
-    data: triggers,
+    data: triggers = [],
     error,
     isPending,
+    isSuccess,
     isError,
   } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -83,42 +83,26 @@ export const TriggersList = () => {
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const { setValue: setTriggerToEdit, value: triggerToEdit } = useQueryStateWithSelect({
-    urlKey: 'edit',
-    select: (id: string) => (id ? triggers?.find((fn) => fn.id.toString() === id) : undefined),
-    enabled: !!triggers,
-    onError: () => toast.error(`Trigger not found`),
-  })
 
-  const { setValue: setTriggerToDuplicate, value: triggerToDuplicate } = useQueryStateWithSelect({
-    urlKey: 'duplicate',
-    select: (id: string) => {
-      if (!id) return undefined
-      const original = triggers?.find((trigger) => trigger.id.toString() === id)
-      return original ? { ...original, name: `${original.name}_duplicate` } : undefined
+  const [triggerIdToEdit, setTriggerToEdit] = useQueryState('edit', parseAsString)
+  const triggerToEdit = triggers?.find((fn) => fn.id.toString() === triggerIdToEdit)
+
+  const [triggerIdToDuplicate, setTriggerToDuplicate] = useQueryState('duplicate', parseAsString)
+  const triggerToDuplicate = triggers?.find((fn) => fn.id.toString() === triggerIdToDuplicate)
+
+  const [triggerIdToDelete, setTriggerToDelete] = useQueryState('delete', parseAsString)
+  const triggerToDelete = triggers?.find((fn) => fn.id.toString() === triggerIdToDelete)
+
+  const {
+    mutate: deleteDatabaseTrigger,
+    isPending: isDeletingTrigger,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseTriggerDeleteMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Successfully removed ${variables.trigger.name}`)
+      setTriggerToDelete(null)
     },
-    enabled: !!triggers,
-    onError: () => toast.error(`Trigger not found`),
   })
-
-  const { setValue: setTriggerToDelete, value: triggerToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (id: string) => (id ? triggers?.find((fn) => fn.id.toString() === id) : undefined),
-    enabled: !!triggers,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingTriggerIdRef, selectedId, `Database Trigger not found`),
-  })
-
-  const { mutate: deleteDatabaseTrigger, isPending: isDeletingTrigger } =
-    useDatabaseTriggerDeleteMutation({
-      onSuccess: (_, variables) => {
-        toast.success(`Successfully removed ${variables.trigger.name}`)
-        setTriggerToDelete(null)
-      },
-      onError: () => {
-        deletingTriggerIdRef.current = null
-      },
-    })
 
   const createTrigger = () => {
     setTriggerToDuplicate(null)
@@ -133,7 +117,6 @@ execute function function_name();`)
       }
       openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
-      setSelectedTrigger(undefined)
       setShowCreateTriggerForm(true)
     }
   }
@@ -163,9 +146,40 @@ execute function function_name();`)
     }
   }
 
-  const deleteTrigger = (trigger: PostgresTrigger) => {
-    setTriggerToDelete(trigger.id.toString())
+  const onDeleteTrigger = () => {
+    if (!project) return console.error('Project is required')
+    if (!triggerToDelete) return console.error('Trigger ID is required')
+
+    deleteDatabaseTrigger({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      trigger: triggerToDelete,
+    })
   }
+
+  const schemaTriggers = triggers.filter((x) => x.schema === selectedSchema)
+  const tables = Array.from(new Set(schemaTriggers.map((x) => x.table))).sort()
+
+  useEffect(() => {
+    if (isSuccess && !!triggerIdToEdit && !triggerToEdit) {
+      toast('Trigger not found')
+      setTriggerToEdit(null)
+    }
+  }, [isSuccess, setTriggerToEdit, triggerIdToEdit, triggerToEdit])
+
+  useEffect(() => {
+    if (isSuccess && !!triggerIdToDuplicate && !triggerToDuplicate) {
+      toast('Trigger not found')
+      setTriggerToDuplicate(null)
+    }
+  }, [isSuccess, triggerIdToDuplicate, triggerToDuplicate, setTriggerToDuplicate])
+
+  useEffect(() => {
+    if (isSuccess && !!triggerIdToDelete && !triggerToDelete && !isSuccessDelete) {
+      toast('Trigger not found')
+      setTriggerToDelete(null)
+    }
+  }, [isSuccess, triggerIdToDelete, triggerToDelete, isSuccessDelete, setTriggerToDelete])
 
   if (isPending) {
     return <GenericSkeletonLoader />
@@ -174,8 +188,6 @@ execute function function_name();`)
   if (isError) {
     return <AlertError error={error} subject="Failed to retrieve database triggers" />
   }
-
-  const schemaTriggers = triggers.filter((x) => x.schema === selectedSchema)
 
   return (
     <>
@@ -196,6 +208,13 @@ execute function function_name();`)
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}
+            />
+            <ReportsSelectFilter
+              label="Table"
+              options={tables.map((type) => ({ label: type, value: type }))}
+              value={tablesFilter ?? []}
+              onChange={setTablesFilter}
+              showSearch
             />
           </div>
           <div className="flex items-center gap-2">
@@ -248,12 +267,9 @@ execute function function_name();`)
                 </TableHeader>
                 <TableBody>
                   <TriggerList
-                    schema={selectedSchema}
-                    filterString={filterString}
-                    isLocked={isSchemaLocked}
                     editTrigger={editTrigger}
                     duplicateTrigger={duplicateTrigger}
-                    deleteTrigger={deleteTrigger}
+                    deleteTrigger={(trigger) => setTriggerToDelete(trigger.id.toString())}
                   />
                 </TableBody>
               </Table>
@@ -263,33 +279,36 @@ execute function function_name();`)
       </div>
 
       <TriggerSheet
-        selectedTrigger={selectedTrigger}
-        open={showCreateTriggerForm}
+        selectedTrigger={triggerToEdit || triggerToDuplicate}
+        open={showCreateTriggerForm || !!triggerToEdit || !!triggerToDuplicate}
         onClose={() => {
           setShowCreateTriggerForm(false)
-        }}
-        isDuplicatingTrigger={false}
-      />
-
-      <TriggerSheet
-        selectedTrigger={triggerToEdit || triggerToDuplicate}
-        open={!!triggerToEdit || !!triggerToDuplicate}
-        onClose={() => {
           setTriggerToEdit(null)
           setTriggerToDuplicate(null)
         }}
         isDuplicatingTrigger={!!triggerToDuplicate}
       />
 
-      <DeleteTrigger
-        trigger={triggerToDelete}
+      <TextConfirmModal
+        variant="warning"
         visible={!!triggerToDelete}
-        setVisible={setTriggerToDelete}
-        onDelete={(params: Parameters<typeof deleteDatabaseTrigger>[0]) => {
-          deletingTriggerIdRef.current = params.trigger.id.toString()
-          deleteDatabaseTrigger(params)
+        onCancel={() => setTriggerToDelete(null)}
+        onConfirm={() => onDeleteTrigger()}
+        title="Delete this trigger"
+        loading={isDeletingTrigger}
+        confirmLabel={`Delete trigger ${triggerToDelete?.name}`}
+        confirmPlaceholder="Type in name of trigger"
+        confirmString={triggerToDelete?.name ?? ''}
+        text={
+          <>
+            This will delete your trigger called{' '}
+            <span className="text-bold text-foreground">{triggerToDelete?.name}</span> of schema{' '}
+            <span className="text-bold text-foreground">{triggerToDelete?.schema}</span>
+          </>
+        }
+        alert={{
+          title: 'You cannot recover this trigger once deleted.',
         }}
-        isLoading={isDeletingTrigger}
       />
     </>
   )
