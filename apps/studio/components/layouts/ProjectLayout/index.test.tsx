@@ -51,17 +51,31 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    create: (Component: any) => Component,
   },
 }))
 
 vi.mock('ui', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
+  CommandInput_Shadcn_: { displayName: 'CommandInput' },
+  Command_Shadcn_: { displayName: 'Command' },
+  CommandGroup_Shadcn_: { displayName: 'CommandGroup' },
+  CommandItem_Shadcn_: { displayName: 'CommandItem' },
+  CommandList_Shadcn_: { displayName: 'CommandList' },
   LogoLoader: () => <div data-testid="logo-loader" />,
   ResizableHandle: (props: any) => <div {...props} />,
   ResizablePanel: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   ResizablePanelGroup: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  Sidebar: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarContent: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarFooter: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarGroup: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarMenu: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  SidebarMenuButton: (props: any) => <div {...props} />,
+  SidebarMenuItem: (props: any) => <div {...props} />,
   useIsMobile: () => false,
   usePanelRef: () => undefined,
+  useSidebar: () => ({ setOpen: vi.fn() }),
 }))
 
 vi.mock('ui-patterns/MobileSheetNav/MobileSheetNav', () => ({
@@ -144,6 +158,7 @@ vi.mock('@/state/database-selector', () => ({
   }),
 }))
 
+import { MobileSheetProvider } from './NavigationBar/MobileSheetContext'
 import { ProjectLayout } from './index'
 
 describe('ProjectLayout title', () => {
@@ -160,9 +175,11 @@ describe('ProjectLayout title', () => {
 
   it('sets a composed document title and deduplicates identical section/surface labels', async () => {
     render(
-      <ProjectLayout title="Settings" product="Settings" isBlocking={false}>
-        <div>Page Content</div>
-      </ProjectLayout>
+      <MobileSheetProvider>
+        <ProjectLayout title="Settings" product="Settings" isBlocking={false}>
+          <div>Page Content</div>
+        </ProjectLayout>
+      </MobileSheetProvider>
     )
 
     await waitFor(() => {
@@ -174,14 +191,16 @@ describe('ProjectLayout title', () => {
 
   it('prefers entity-first browserTitle metadata when provided', async () => {
     render(
-      <ProjectLayout
-        title="Database"
-        product="Database"
-        browserTitle={{ entity: 'users', section: 'Tables' }}
-        isBlocking={false}
-      >
-        <div>Page Content</div>
-      </ProjectLayout>
+      <MobileSheetProvider>
+        <ProjectLayout
+          title="Database"
+          product="Database"
+          browserTitle={{ entity: 'users', section: 'Tables' }}
+          isBlocking={false}
+        >
+          <div>Page Content</div>
+        </ProjectLayout>
+      </MobileSheetProvider>
     )
 
     await waitFor(() => {

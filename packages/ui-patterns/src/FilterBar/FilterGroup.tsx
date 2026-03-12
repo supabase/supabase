@@ -143,7 +143,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     >
       <div
         className={cn(
-          'flex items-stretch',
+          'flex items-stretch flex-wrap',
           isRootGroup ? 'flex-1 min-w-0' : '',
           variant === 'pill' ? 'gap-1' : 'gap-0'
         )}

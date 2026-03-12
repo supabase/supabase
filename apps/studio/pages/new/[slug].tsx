@@ -85,7 +85,6 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const isHomeNew = usePHFlag('homeNew') === 'new-home'
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -253,7 +252,7 @@ const Wizard: NextPageWithLayout = () => {
           organization: res.organization_slug,
         }
       )
-      router.push(isHomeNew ? `/project/${res.ref}` : `/project/${res.ref}/building`)
+      router.push(`/project/${res.ref}`)
     },
   })
 
@@ -546,7 +545,7 @@ const PageLayout = withAuth(({ children }: PropsWithChildren) => {
 })
 
 Wizard.getLayout = (page) => (
-  <DefaultLayout headerTitle="New project">
+  <DefaultLayout hideMobileMenu headerTitle="New project">
     <PageLayout>{page}</PageLayout>
   </DefaultLayout>
 )

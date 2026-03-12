@@ -44,7 +44,7 @@ const ProvidersPage: NextPageWithLayout = () => {
 
 ProvidersPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="OAuth Server">{page}</AuthLayout>
   </DefaultLayout>
 )
 

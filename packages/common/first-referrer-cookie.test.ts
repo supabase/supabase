@@ -111,6 +111,20 @@ describe('first-referrer-cookie', () => {
       expect(parseFirstReferrerCookie(`${FIRST_REFERRER_COOKIE_NAME}=${encoded}`)).toBeNull()
     })
 
+    it('parses double-encoded cookies (legacy format before serializer fix)', () => {
+      const input = buildFirstReferrerData({
+        referrer: 'https://www.google.com/',
+        landingUrl: 'https://supabase.com/pricing?utm_source=google',
+      })
+
+      // Simulate the old double-encoding: encodeURIComponent(JSON.stringify(data))
+      // followed by Next.js cookies.set() encoding it again.
+      const doubleEncoded = encodeURIComponent(encodeURIComponent(JSON.stringify(input)))
+      const parsed = parseFirstReferrerCookie(`${FIRST_REFERRER_COOKIE_NAME}=${doubleEncoded}`)
+
+      expect(parsed).toEqual(input)
+    })
+
     it('drops non-string values in utms/click_ids', () => {
       const encoded = encodeURIComponent(
         JSON.stringify({
@@ -229,6 +243,33 @@ describe('first-referrer-cookie', () => {
       expect(parseMwDiagCookie(header)).toEqual({
         hit: true,
         would_stamp: true,
+        has_existing_cookie: false,
+      })
+    })
+
+    it('parses URL-encoded value from Next.js response.cookies.set()', () => {
+      const header = `${MW_DIAG_COOKIE_NAME}=hit%3D1%26would_stamp%3D1%26has_cookie%3D0`
+      expect(parseMwDiagCookie(header)).toEqual({
+        hit: true,
+        would_stamp: true,
+        has_existing_cookie: false,
+      })
+    })
+
+    it('parses URL-encoded value with has_cookie=1', () => {
+      const header = `${MW_DIAG_COOKIE_NAME}=hit%3D1%26would_stamp%3D0%26has_cookie%3D1`
+      expect(parseMwDiagCookie(header)).toEqual({
+        hit: true,
+        would_stamp: false,
+        has_existing_cookie: true,
+      })
+    })
+
+    it('parses URL-encoded value among multiple cookies', () => {
+      const header = `session=abc; ${MW_DIAG_COOKIE_NAME}=hit%3D1%26would_stamp%3D0%26has_cookie%3D0; theme=dark`
+      expect(parseMwDiagCookie(header)).toEqual({
+        hit: true,
+        would_stamp: false,
         has_existing_cookie: false,
       })
     })

@@ -4645,8 +4645,14 @@ export interface components {
     }
     AccountRequestDetailsDto: {
       email: string
+      email_matches: boolean
       expires_at: string
       id: string
+      linked_organization?: {
+        id: number
+        name: string
+        slug: string
+      }
       name?: string
       orchestrator: {
         stripe?: {
@@ -4839,6 +4845,9 @@ export interface components {
       name: string
       payment_intent_id: string
       size?: string
+    }
+    ConfirmRequestDto: {
+      organization_id?: number
     }
     ConfirmResponseDto: {
       organization_slug: string
@@ -5202,17 +5211,13 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner:
-            | 'fly'
-            | 'aws_marketplace'
-            | 'vercel_marketplace'
-            | 'stripe_product'
-            | null
+          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric' | null
           id: number
           is_owner: boolean
           name: string
           opt_in_tags: string[]
           organization_missing_address: boolean
+          organization_missing_tax_id: boolean
           organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
@@ -6556,7 +6561,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -7204,6 +7209,7 @@ export interface components {
             | 'auth.leaked_password_protection'
             | 'auth.advanced_auth_settings'
             | 'auth.performance_settings'
+            | 'auth.password_hibp'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
             | 'function.max_count'
@@ -7223,6 +7229,7 @@ export interface components {
             | 'assistant.advance_model'
             | 'integrations.github_connections'
             | 'dedicated_pooler'
+            | 'observability.dashboard_advanced_metrics'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -7570,12 +7577,13 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric' | null
       id: number
       is_owner: boolean
       name: string
       opt_in_tags: string[]
       organization_missing_address: boolean
+      organization_missing_tax_id: boolean
       organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
@@ -7633,7 +7641,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_product' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -8442,9 +8450,11 @@ export interface components {
       max_payload_size_in_kb: number | null
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second: number | null
+      /** @description Whether to enable presence */
+      presence_enabled: boolean
       /** @description Whether to only allow private channels */
       private_only: boolean | null
-      /** @description Whether to suspend realtime */
+      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend: boolean | null
     }
     RegionsInfo: {
@@ -10278,9 +10288,11 @@ export interface components {
       max_payload_size_in_kb?: number
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second?: number
+      /** @description Whether to enable presence */
+      presence_enabled?: boolean
       /** @description Whether to only allow private channels */
       private_only?: boolean
-      /** @description Whether to suspend realtime */
+      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean
     }
     UpdateReplicationDestinationBody: {
@@ -17241,6 +17253,7 @@ export interface operations {
           | 'auth.leaked_password_protection'
           | 'auth.advanced_auth_settings'
           | 'auth.performance_settings'
+          | 'auth.password_hibp'
           | 'backup.retention_days'
           | 'backup.restore_to_new_project'
           | 'function.max_count'
@@ -17260,6 +17273,7 @@ export interface operations {
           | 'assistant.advance_model'
           | 'integrations.github_connections'
           | 'dedicated_pooler'
+          | 'observability.dashboard_advanced_metrics'
       }
       header?: never
       path?: never
@@ -26442,7 +26456,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ConfirmRequestDto']
+      }
+    }
     responses: {
       200: {
         headers: {
@@ -26517,13 +26535,6 @@ export interface operations {
     }
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to send analytics server event */
-      500: {
         headers: {
           [name: string]: unknown
         }

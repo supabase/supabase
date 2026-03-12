@@ -1,9 +1,7 @@
-import { AiPromptCopiedEvent } from 'common/telemetry-constants'
-import { BASE_PATH } from 'lib/constants'
+import { AiAssistantSource } from 'common/telemetry-constants'
+import { Chatgpt, Claude } from 'icons'
 import { useTrack } from 'lib/telemetry/track'
 import { Check, ChevronDown, Copy } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import {
   AiIconAnimation,
@@ -20,23 +18,22 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-type TelemetrySource = AiPromptCopiedEvent['properties']['source']
+type TelemetrySource = AiAssistantSource
 
 const EXTERNAL_AI_TOOLS = [
   {
-    label: 'Open in ChatGPT',
+    label: 'Ask ChatGPT',
     url: 'https://chatgpt.com/',
     promptParam: 'q',
-    icon: {
-      light: '/img/mcp-clients/openai-icon.svg',
-      dark: '/img/mcp-clients/openai-icon-dark.svg',
-    },
+    icon: Chatgpt,
+    toolId: 'chatgpt' as const,
   },
   {
-    label: 'Open in Claude.ai',
+    label: 'Ask Claude',
     url: 'https://claude.ai/new',
     promptParam: 'q',
-    icon: { light: '/img/mcp-clients/claude-icon.svg', dark: '/img/mcp-clients/claude-icon.svg' },
+    icon: Claude,
+    toolId: 'claude' as const,
   },
 ]
 
@@ -82,7 +79,6 @@ export function AiAssistantDropdown({
   additionalDropdownItems,
 }: AiAssistantDropdownProps) {
   const track = useTrack()
-  const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -110,10 +106,18 @@ export function AiAssistantDropdown({
       '_blank',
       'noreferrer'
     )
+
+    if (telemetrySource) {
+      track('ai_external_tool_clicked', { source: telemetrySource, tool: tool.toolId })
+    }
   }
 
   const handleOpenAssistant = () => {
     onOpenAssistant()
+
+    if (telemetrySource) {
+      track('ai_assistant_dropdown_button_clicked', { source: telemetrySource })
+    }
   }
 
   const buttonContent = (
@@ -156,12 +160,7 @@ export function AiAssistantDropdown({
                   className="gap-2"
                   onClick={() => handleOpenExternalAI(tool)}
                 >
-                  <Image
-                    src={`${BASE_PATH}${resolvedTheme?.includes('dark') ? tool.icon.dark : tool.icon.light}`}
-                    alt={tool.label}
-                    width={14}
-                    height={14}
-                  />
+                  <tool.icon size={14} />
                   {tool.label}
                 </DropdownMenuItem>
               ))}

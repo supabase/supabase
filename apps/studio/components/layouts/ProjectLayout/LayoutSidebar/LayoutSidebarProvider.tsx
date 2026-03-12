@@ -34,6 +34,8 @@ export const SIDEBAR_KEYS = {
   HELP_PANEL: 'help-panel',
 } as const
 
+export type TYPEOF_SIDEBAR_KEYS = (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
+
 export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()

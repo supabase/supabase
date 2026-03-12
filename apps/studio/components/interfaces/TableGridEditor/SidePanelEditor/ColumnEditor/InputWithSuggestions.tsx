@@ -92,6 +92,7 @@ const InputWithSuggestions = ({
         inputClassName="pr-10"
         type="text"
         value={value}
+        title={value}
         onChange={onInputChange}
         data-testid={dataTestId}
         actions={

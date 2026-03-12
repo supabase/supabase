@@ -24,7 +24,8 @@ export const LogPage: NextPageWithLayout = () => {
   if (isUnifiedLogsEnabled) {
     return (
       <DefaultLayout>
-        <ProjectLayout>
+        {/* Omit the generic product segment here; project/org context already makes the route clear. */}
+        <ProjectLayout title="Unified Logs">
           <UnifiedLogs />
         </ProjectLayout>
       </DefaultLayout>
