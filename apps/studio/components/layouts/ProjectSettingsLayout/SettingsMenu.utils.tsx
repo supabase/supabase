@@ -112,6 +112,21 @@ export const useGenerateSettingsMenu = () => {
         },
       ],
     },
+    ...(IS_PLATFORM && showDashboardPreferences
+      ? [
+          {
+            title: 'Preferences',
+            items: [
+              {
+                name: 'Dashboard preferences',
+                key: 'preferences',
+                url: `/project/${ref}/settings/preferences`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
     {
       title: 'Integrations',
       items: [
@@ -157,20 +172,5 @@ export const useGenerateSettingsMenu = () => {
         },
       ],
     },
-    ...(IS_PLATFORM && showDashboardPreferences
-      ? [
-          {
-            title: 'Preferences',
-            items: [
-              {
-                name: 'Dashboard preferences',
-                key: 'preferences',
-                url: `/project/${ref}/settings/preferences`,
-                items: [],
-              },
-            ],
-          },
-        ]
-      : []),
   ]
 }
