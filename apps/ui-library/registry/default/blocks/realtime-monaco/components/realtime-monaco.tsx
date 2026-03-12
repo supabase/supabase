@@ -2,6 +2,7 @@
 
 import { Editor } from '@monaco-editor/react'
 import { Awareness } from 'y-protocols/awareness.js'
+import { SupabasePersistenceOptions } from '@supabase-labs/y-supabase'
 
 import { useConnectOnMount } from '../hooks/use-connect-on-mount'
 
@@ -11,6 +12,7 @@ type RealtimeMonacoProps = {
   height?: string | number
   className?: string
   awareness?: boolean | Awareness
+  persistence?: boolean | SupabasePersistenceOptions
   theme?: 'light' | 'dark'
 }
 
@@ -21,10 +23,11 @@ const RealtimeMonaco = ({
   language = 'javascript',
   height = DEFAULT_HEIGHT,
   awareness = true,
+  persistence,
   theme,
   ...rest
 }: RealtimeMonacoProps) => {
-  const { connectOnMount } = useConnectOnMount({ channel, awareness })
+  const { connectOnMount } = useConnectOnMount({ channel, persistence, awareness })
 
   return (
     <Editor

@@ -1,6 +1,6 @@
 'use client'
 
-import { SupabaseProvider } from '@supabase-community/y-supabase'
+import { SupabasePersistenceOptions, SupabaseProvider } from '@supabase-labs/y-supabase'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef } from 'react'
 import { MonacoBinding } from 'y-monaco'
@@ -11,12 +11,17 @@ import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/cli
 
 type UseConnectOnMountOptions = {
   channel: string
+  persistence?: boolean | SupabasePersistenceOptions
   awareness?: boolean | Awareness
 }
 
 const generateRandomColor = () => `hsl(${Math.floor(Math.random() * 360)}, 80%, 60%)`
 
-export function useConnectOnMount({ channel, awareness = true }: UseConnectOnMountOptions) {
+export function useConnectOnMount({
+  channel,
+  persistence,
+  awareness = true,
+}: UseConnectOnMountOptions) {
   const docRef = useRef<Y.Doc | null>(null)
   const providerRef = useRef<SupabaseProvider | null>(null)
   const bindingRef = useRef<MonacoBinding | null>(null)
@@ -34,7 +39,10 @@ export function useConnectOnMount({ channel, awareness = true }: UseConnectOnMou
       const doc = new Y.Doc()
       const yText = doc.getText('monaco')
       const supabase = createClient()
-      const provider = new SupabaseProvider(channel, doc, supabase, { awareness })
+      const provider = new SupabaseProvider(channel, doc, supabase as any, {
+        awareness,
+        persistence,
+      })
       const providerAwareness = provider.getAwareness()
 
       if (providerAwareness) {
@@ -67,7 +75,7 @@ export function useConnectOnMount({ channel, awareness = true }: UseConnectOnMou
           providerAwareness.getStates().forEach((state, clientId) => {
             const color = state?.user?.color
             const isValidHsl = /^hsl\(\d{1,3},\s*\d{1,3}%,\s*\d{1,3}%\)$/.test(color)
-            
+
             if (!isValidHsl) return
             if (!color) return
 

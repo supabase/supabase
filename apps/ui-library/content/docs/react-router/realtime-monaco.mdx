@@ -28,10 +28,12 @@ export default function MonacoPage() {
 
 ## Props
 
-| Prop         | Type                | Description                                   |
-| ------------ | ------------------- | --------------------------------------------- |
-| `channel`    | `string`            | Unique identifier for the shared editor.      |
-| `language?`  | `string`            | Monaco language id. Defaults to `javascript`. |
-| `height?`    | `string \| number`  | Editor height. Defaults to `550`.             |
-| `className?` | `string`            | Optional wrapper class name.                  |
-| `theme?`     | `'light' \| 'dark'` | Optional theme.                               |
+| Prop           | Type                                    | Description                                                                                                                                     |
+| -------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `channel`      | `string`                                | Unique channel name used to sync editor content between collaborators in the same session.                                                      |
+| `language?`    | `string`                                | Monaco [language identifier](https://code.visualstudio.com/docs/languages/identifiers) (e.g. `typescript`, `python`). Defaults to `javascript`. |
+| `height?`      | `string \| number`                      | Height of the editor container. Accepts a pixel number or CSS string (e.g. `"100%"`). Defaults to `550`.                                        |
+| `className?`   | `string`                                | CSS class applied to the editor wrapper element.                                                                                                |
+| `awareness?`   | `boolean \| Awareness`                  | Enables cursor and selection sharing between users. Pass `false` to disable or a custom `Awareness` instance. Defaults to `true`.               |
+| `persistence?` | `boolean \| SupabasePersistenceOptions` | Persists editor content to Supabase so it survives page reloads. Pass `true` for defaults or an options object for fine-grained control.        |
+| `theme?`       | `'light' \| 'dark'`                     | Color theme for the editor. Maps to Monaco's `light` and `vs-dark` themes.                                                                 |
