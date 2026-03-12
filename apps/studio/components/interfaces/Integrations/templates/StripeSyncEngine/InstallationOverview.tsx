@@ -228,9 +228,12 @@ export const StripeSyncInstallationPage = () => {
       status={
         <StatusDisplay
           status={installationStatus}
-          isInstallRequested={isInstallRequested || isInstallInitiated}
-          isUninstallRequested={isUninstallRequested || isUninstallInitiated}
+          isInstallRequested={isInstallRequested}
+          isInstallInitiated={isInstallInitiated}
+          isUninstallRequested={isUninstallRequested}
+          isUninstallInitiated={isUninstallInitiated}
           isUpgrade={upgradeAvailable}
+          timedOut={timedOut}
         />
       }
       actions={
