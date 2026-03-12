@@ -311,7 +311,6 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'antigravity',
     label: 'Antigravity',
     icon: 'antigravity',
-    iconExtension: 'png',
     configFile: '~/.gemini/antigravity/mcp_config.json',
     externalDocsUrl: 'https://antigravity.google/docs/mcp',
     transformConfig: (config): AntigravityMcpConfig => {
