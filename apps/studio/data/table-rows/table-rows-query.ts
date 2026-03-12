@@ -391,17 +391,11 @@ async function getTableRows(
 }
 
 export const useTableRowsQuery = <TData = TableRowsData>(
-  {
-    projectRef,
-    connectionString: connectionStringOverride,
-    tableId,
-    ...args
-  }: Omit<TableRowsVariables, 'queryClient'>,
+  { projectRef, tableId, ...args }: Omit<TableRowsVariables, 'queryClient' | 'connectionString'>,
   { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  const { connectionString: connectionStringReadOps } = useConnectionStringForReadOps()
-  const connectionString = connectionStringOverride || connectionStringReadOps
+  const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
 
   // [Joshen] Exclude preflightCheck from query key
   const { preflightCheck, ...othersArgs } = args
@@ -409,7 +403,7 @@ export const useTableRowsQuery = <TData = TableRowsData>(
   return useQuery<TableRowsData, TableRowsError, TData>({
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
-      connectionString,
+      readReplicaIdentifier,
       ...othersArgs,
     }),
     queryFn: ({ signal }) =>
@@ -423,14 +417,25 @@ export const useTableRowsQuery = <TData = TableRowsData>(
   })
 }
 
+type PrefetchTableRowsVariables = Omit<TableRowsVariables, 'queryClient'> & {
+  readReplicaIdentifier?: string
+}
+
 export function prefetchTableRows(
   client: QueryClient,
-  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
+  {
+    projectRef,
+    connectionString,
+    tableId,
+    readReplicaIdentifier,
+    ...args
+  }: PrefetchTableRowsVariables
 ) {
   return client.fetchQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- readReplicaIdentifier is used as a stable version of connectionString
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
-      connectionString,
+      readReplicaIdentifier,
       ...args,
     }),
     queryFn: ({ signal }) =>

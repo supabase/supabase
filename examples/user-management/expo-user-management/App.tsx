@@ -4,24 +4,34 @@ import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import Account from './components/Account'
 import { View } from 'react-native'
-import { Session } from '@supabase/supabase-js'
 
 export default function App() {
-  const [session, setSession] = useState<Session | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [email, setEmail] = useState<string | undefined>(undefined)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
+    supabase.auth.getClaims().then(({ data: { claims } }) => {
+      if (claims) {
+        setUserId(claims.sub)
+        setEmail(claims.email)
+      }
     })
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
+    supabase.auth.onAuthStateChange(async (_event, _session) => {
+      const { data: { claims } } = await supabase.auth.getClaims()
+      if (claims) {
+        setUserId(claims.sub)
+        setEmail(claims.email)
+      } else {
+        setUserId(null)
+        setEmail(undefined)
+      }
     })
   }, [])
 
   return (
     <View>
-      {session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />}
+      {userId ? <Account key={userId} userId={userId} email={email} /> : <Auth />}
     </View>
   )
 }

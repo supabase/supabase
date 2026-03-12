@@ -744,6 +744,12 @@ language="typescript"
 </TabPanel>
 </Tabs>
 
+## Caching considerations
+
+If your app uses ISR (Incremental Static Regeneration) or is deployed behind a CDN, caching of HTTP responses can cause users to receive another user's session. When a session is refreshed, the new token is written to the response via `Set-Cookie`. If that response is cached and served to a different user, that user will be signed in as the wrong person.
+
+See the [advanced Auth server-side rendering guide](/docs/guides/auth/server-side/advanced-guide#can-i-use-server-side-rendering-with-a-cdn-or-cache) for details and framework-specific examples.
+
 ## Next steps
 
 - Implement [Authentication using Email and Password](/docs/guides/auth/passwords)

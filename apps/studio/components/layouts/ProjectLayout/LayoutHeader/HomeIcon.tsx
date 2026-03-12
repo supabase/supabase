@@ -1,14 +1,14 @@
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { cn } from 'ui'
 
-export const HomeIcon = () => {
+export const HomeIcon = ({ className }: { className?: string }) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: organizations } = useOrganizationsQuery()
 
@@ -30,7 +30,7 @@ export const HomeIcon = () => {
   const href = IS_PLATFORM ? getDefaultOrgRedirect() : '/project/default'
 
   return (
-    <Link href={href} className="items-center justify-center flex-shrink-0 hidden md:flex">
+    <Link href={href} className={cn('items-center justify-center flex-shrink-0 flex', className)}>
       <img
         alt="Supabase"
         src={`${router.basePath}/img/supabase-logo.svg`}

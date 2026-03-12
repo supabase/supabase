@@ -1292,6 +1292,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "sheet-confirm-on-close-demo": {
+      name: "sheet-confirm-on-close-demo",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button","input","label","separator","sheet"],
+      component: React.lazy(() => import("@/registry/default/example/sheet-confirm-on-close-demo")),
+      source: "",
+      files: ["registry/default/example/sheet-confirm-on-close-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "sheet-demo": {
       name: "sheet-demo",
       type: "components:example",
