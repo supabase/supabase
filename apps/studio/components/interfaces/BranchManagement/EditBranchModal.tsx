@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useDebounce } from '@uidotdev/usehooks'
 import { Check, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -8,7 +9,6 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from 'components/ui/AlertError'
@@ -167,6 +167,19 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
         {
           onSuccess: () => {
             if (form.getValues('gitBranchName') !== requested) return
+
+            // Check if another branch is already linked to this git branch
+            const existingBranch = (branches ?? []).find(
+              (b) => b.git_branch === branchName && b.id !== branch?.id
+            )
+            if (existingBranch) {
+              setIsGitBranchValid(false)
+              form.setError('gitBranchName', {
+                message: `Branch "${existingBranch.name}" is already linked to git branch "${branchName}"`,
+              })
+              return
+            }
+
             setIsGitBranchValid(true)
             form.clearErrors('gitBranchName')
           },
@@ -181,7 +194,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
         }
       )
     },
-    [githubConnection, form, checkGithubBranchValidity, repoOwner, repoName]
+    [githubConnection, form, checkGithubBranchValidity, repoOwner, repoName, branches, branch]
   )
 
   // Pre-fill form when the modal becomes visible and branch data is available

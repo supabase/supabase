@@ -1,16 +1,8 @@
+import { useParams } from 'common'
+import { Database as DatabaseIcon } from 'icons'
 import { Loader2, Minus, MoreVertical, RotateCcw, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-
-import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
-import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
-import { type Database } from '@/data/read-replicas/replicas-query'
-import { DatabaseStatus } from '@/data/read-replicas/replicas-status-query'
-import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
-import { useParams } from 'common'
-import { Database as DatabaseIcon } from 'icons'
 import { AWS_REGIONS } from 'shared-data'
 import {
   Badge,
@@ -22,22 +14,28 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
+
 import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
+import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
+import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
+import { type Database } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 
 interface ReadReplicaRow {
   replica: Database
-  replicaStatus?: DatabaseStatus
   onUpdateReplica: () => void
 }
 
-export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: ReadReplicaRow) => {
+export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => {
   const { ref } = useParams()
-  const { identifier, region, status: baseStatus } = replica
-
-  const status = replicaStatus?.status ?? baseStatus
-  const initStatus = replicaStatus?.replicaInitializationStatus?.status
+  const { identifier, region, status } = replica
   const formattedId = formatDatabaseID(identifier ?? '')
 
   const {
@@ -56,13 +54,10 @@ export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: Read
   const [showConfirmRestart, setShowConfirmRestart] = useState(false)
   const [showConfirmDrop, setShowConfirmDrop] = useState(false)
 
-  const regionLabel = Object.values(AWS_REGIONS).find((x) => x.code === region)?.displayName
+  const regionMeta = Object.values(AWS_REGIONS).find((x) => x.code === region)
 
-  const isInTransition = useMemo(
-    () => getIsInTransition({ initStatus, status }),
-    [initStatus, status]
-  )
-  const statusLabel = useMemo(() => getStatusLabel({ initStatus, status }), [initStatus, status])
+  const isInTransition = useMemo(() => getIsInTransition({ status }), [status])
+  const statusLabel = useMemo(() => getStatusLabel({ status }), [status])
 
   return (
     <>
@@ -73,8 +68,13 @@ export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: Read
 
         <TableCell>
           <div>
-            <p>{regionLabel}</p>
-            <p className="text-foreground-lighter">Read Replica (ID: {formattedId})</p>
+            <p>Read Replica (ID: {formattedId})</p>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="text-foreground-lighter w-fit">{regionMeta?.displayName}</p>
+              </TooltipTrigger>
+              <TooltipContent side="right">{regionMeta?.code}</TooltipContent>
+            </Tooltip>
           </div>
         </TableCell>
 

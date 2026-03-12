@@ -7,8 +7,8 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { InlineLinkClassName } from 'components/ui/InlineLink'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -36,9 +36,10 @@ import {
 
 interface FeedbackWidgetProps {
   onClose: () => void
+  onSwitchToIssueOptions: () => void
 }
 
-export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
+export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidgetProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, slug } = useParams()
@@ -153,17 +154,46 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
     }
   }
 
+  // Hydrate form from localStorage once it's ready; deps intentionally omit storedFeedback/screenshot
+  // so we don't overwrite user edits when those values change after initial load.
   useEffect(() => {
     if (storedFeedback) setFeedback(storedFeedback)
     if (screenshot) setScreenshot(screenshot)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate once when localStorage is ready only
   }, [isSuccess])
 
+  // Persist debounced input to localStorage; only re-run when debounced value changes.
   useEffect(() => {
     if (debouncedFeedback.length > 0) setStoredFeedback(debouncedFeedback)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setStoredFeedback is stable; only sync on debounced value
   }, [debouncedFeedback])
 
+  const ThanksMessageView = () => (
+    <>
+      <div className="py-6 px-4 grid gap-4 text-center text-foreground-light">
+        <CircleCheck className="mx-auto text-brand-500" size={24} />
+        <div className="flex flex-col gap-1">
+          <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
+          <p className="text-sm text-balance">
+            We don’t always respond to feedback. If you need help with your project, use the button
+            below.
+          </p>
+        </div>
+      </div>
+      <PopoverSeparator_Shadcn_ />
+      <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
+        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+          Get help
+        </Button>
+        <Button type="default" size="tiny" onClick={onClose}>
+          Close
+        </Button>
+      </div>
+    </>
+  )
+
   return isFeedbackSent ? (
-    <ThanksMessage onClose={onClose} />
+    <ThanksMessageView />
   ) : (
     <>
       <div className="p-4">
@@ -208,7 +238,10 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
 
       <PopoverSeparator_Shadcn_ />
 
-      <div className="p-4 flex flex-row justify-end items-start">
+      <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
+        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+          Get help instead
+        </Button>
         <div className="flex items-center gap-2 flex-row">
           {!!screenshot ? (
             <div
@@ -290,31 +323,5 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
         </div>
       </div>
     </>
-  )
-}
-
-const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
-  return (
-    <div>
-      <div className="grid gap-3 py-3">
-        <div className="px-6 grid gap-4 text-center text-foreground-light">
-          <CircleCheck className="mx-auto text-brand-500" size={24} />
-          <div className="text-center flex flex-col">
-            <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
-            <p className="text-sm text-balance">
-              We don’t always respond to feedback. If you require assistance, please contact support
-              via the <HelpCircle className="inline-block" size={12} aria-label="Help" /> menu
-              instead.
-            </p>
-          </div>
-        </div>
-        <PopoverSeparator_Shadcn_ />
-        <div className="flex items-center justify-end px-4">
-          <Button type="default" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      </div>
-    </div>
   )
 }

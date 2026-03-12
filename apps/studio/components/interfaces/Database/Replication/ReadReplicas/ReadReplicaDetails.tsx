@@ -1,17 +1,6 @@
+import { useParams } from 'common'
 import { BarChart2 } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
-import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
-import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useReadReplicasStatusesQuery } from '@/data/read-replicas/replicas-status-query'
-import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
-import { BASE_PATH } from '@/lib/constants'
-import { useFlag, useParams } from 'common'
 import { AWS_REGIONS } from 'shared-data'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import {
@@ -28,9 +17,21 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useReadReplicasStatusesQuery } from '@/data/read-replicas/replicas-status-query'
+import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { BASE_PATH } from '@/lib/constants'
+
+const attribute = 'physical_replication_lag_physical_replication_lag_seconds'
+
 export const ReadReplicaDetails = () => {
   const { ref: projectRef, replicaId } = useParams()
-  const reportGranularityV2 = useFlag('reportGranularityV2')
 
   const { data = [], isPending: isLoadingDatabases } = useReadReplicasQuery({ projectRef })
   const replica = data.find((x) => x.identifier === replicaId)
@@ -55,16 +56,13 @@ export const ReadReplicaDetails = () => {
     { enabled: status === REPLICA_STATUS.ACTIVE_HEALTHY }
   )
 
-  const { selectedDateRange } = useReportDateRange(
-    REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
-    reportGranularityV2
-  )
+  const { selectedDateRange } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
   // [Joshen] This is unused but intentional to scaffold the usage for now, refer to comment below
   const { data: infraMonitoringData, isPending: isFetchingInfraMonitoring } =
     useInfraMonitoringAttributesQuery(
       {
         projectRef,
-        attributes: ['physical_replication_lag_physical_replica_lag_seconds'],
+        attributes: [attribute],
         databaseIdentifier: identifier,
         startDate: selectedDateRange.period_start.date,
         endDate: selectedDateRange.period_end.date,
@@ -73,26 +71,24 @@ export const ReadReplicaDetails = () => {
       { enabled: !!replica }
     )
 
-  // [Joshen] Temporarily hardcoding the data as the query to retrieve replication lag doesn't seem to be working
-  // https://linear.app/supabase/issue/INDATA-325/investigate-infra-monitoring-for-physical-replication-lag-physical
-  const chartData = useMemo(() => {
-    return Array.from({ length: 46 }, (_, i) => {
-      const date = new Date()
-      date.setMinutes(date.getMinutes() - i * 5) // Each point 5 minutes apart
-
-      return {
-        timestamp: date.toISOString(),
-        replication_lag: Math.floor(Math.random() * 100),
-      }
-    }).reverse()
-  }, [])
+  const chartData = useMemo(
+    () =>
+      infraMonitoringData?.data.map((x) => ({
+        timestamp: x.period_start,
+        [attribute]: (x as Record<string, string | number>)[attribute],
+      })) ?? [],
+    [infraMonitoringData?.data]
+  )
 
   return (
     <>
       <Chart className="mt-6" isLoading={isLoadingLag || isFetchingInfraMonitoring}>
         <ChartCard className="rounded-none border-x-0">
           <ChartHeader className="px-10">
-            <ChartMetric label="Replication lag" value={!!lagDuration ? `${lagDuration}s` : '-'} />
+            <ChartMetric
+              label="Replication lag"
+              value={lagDuration !== undefined ? `${lagDuration}s` : '-'}
+            />
           </ChartHeader>
           <ChartContent
             isEmpty={chartData.length === 0}
@@ -103,19 +99,22 @@ export const ReadReplicaDetails = () => {
                 description="It may take up to 24 hours for data to refresh"
               />
             }
-            loadingState={<ChartLoadingState />}
+            loadingState={<ChartLoadingState className="h-[228px]" />}
           >
             <div className="h-56 px-5">
               <ChartLine
+                showGrid
+                showYAxis
+                isFullHeight
                 data={chartData}
-                dataKey="replication_lag"
-                showGrid={true}
-                showYAxis={true}
+                dataKey={attribute}
                 YAxisProps={{
                   tickFormatter: (value) => `${value}s`,
                   width: 80,
                 }}
-                isFullHeight={true}
+                config={{
+                  [attribute]: { label: 'Replication lag' },
+                }}
               />
             </div>
           </ChartContent>

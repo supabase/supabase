@@ -4,8 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
 import {
   Button,
   Form_Shadcn_,
@@ -21,6 +19,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+import { z } from 'zod'
 
 const FormSchema = z.object({
   email: z

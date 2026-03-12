@@ -1,16 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Loader2, Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
@@ -21,8 +13,13 @@ import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Loader2, Plus } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -42,6 +39,8 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
+import z from 'zod'
+
 import {
   getAnalyticsBucketPublicationName,
   getAnalyticsBucketsDestinationName,
@@ -100,11 +99,10 @@ interface ConnectTablesDialogProps {
   onSuccessConnectTables: () => void
 }
 
+/** [Joshen] This component is currently not user-facing atm, might opt to clean up as we're likely not going to use this UI flow */
 export const ConnectTablesDialog = ({ onSuccessConnectTables }: ConnectTablesDialogProps) => {
   const { ref: projectRef, bucketId } = useParams()
   const [visible, setVisible] = useState(false)
-
-  const isEnabled = useFlag('storageAnalyticsVector') // Kill switch if we wanna hold off supporting connecting tables
 
   const { sourceId, pipeline, publication } = useAnalyticsBucketAssociatedEntities({
     projectRef,
@@ -115,16 +113,9 @@ export const ConnectTablesDialog = ({ onSuccessConnectTables }: ConnectTablesDia
   return (
     <Dialog open={visible} onOpenChange={setVisible}>
       <DialogTrigger asChild>
-        <ButtonTooltip
-          disabled={!isEnabled}
-          size="tiny"
-          type="primary"
-          icon={<Plus />}
-          onClick={() => setVisible(true)}
-          tooltip={{ content: { side: 'bottom', text: !isEnabled ? 'Coming soon' : undefined } }}
-        >
+        <Button size="tiny" type="primary" icon={<Plus />} onClick={() => setVisible(true)}>
           {isEditingExistingPublication ? 'Add tables' : 'Connect tables'}
-        </ButtonTooltip>
+        </Button>
       </DialogTrigger>
 
       {!sourceId ? (

@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useMemo, useRef } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { AlertError } from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -9,7 +6,9 @@ import { NoPermission } from 'components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo } from 'react'
+import { toast } from 'sonner'
 import {
   Card,
   Table,
@@ -21,6 +20,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
 
@@ -34,6 +34,7 @@ export const PublishableAPIKeys = () => {
   const {
     data: apiKeysData = [],
     error,
+    isSuccess: isSuccessApiKeys,
     isPending: isLoadingApiKeys,
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
@@ -53,34 +54,32 @@ export const PublishableAPIKeys = () => {
     [apiKeysData]
   )
 
-  // Track the ID being deleted to exclude it from error checking
-  const deletingAPIKeyIdRef = useRef<string | null>(null)
+  const [deleteId, setDeleteId] = useQueryState('deletePublishableKey', parseAsString)
+  const apiKeyToDelete = publishableApiKeys?.find((key) => key.id === deleteId)
 
-  const { value: apiKeyToDelete, setValue: setAPIKeyToDelete } = useQueryStateWithSelect({
-    urlKey: 'deletePublishableKey',
-    select: (id: string) => (id ? publishableApiKeys?.find((key) => key.id === id) : undefined),
-    enabled: !!publishableApiKeys?.length,
-    onError: (_error, selectedId) => {
-      handleErrorOnDelete(deletingAPIKeyIdRef, selectedId, `API Key not found`)
-    },
-  })
-
-  const { mutate: deleteAPIKey, isPending: isDeletingAPIKey } = useAPIKeyDeleteMutation({
+  const {
+    mutate: deleteAPIKey,
+    isPending: isDeletingAPIKey,
+    isSuccess: isDeleteSuccess,
+  } = useAPIKeyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted publishable key')
-      setAPIKeyToDelete(null)
-    },
-    onError: () => {
-      deletingAPIKeyIdRef.current = null
+      setDeleteId(null)
     },
   })
 
   const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'publishable' }>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!apiKey.id) return console.error('API key ID is required')
-    deletingAPIKeyIdRef.current = apiKey.id
     deleteAPIKey({ projectRef, id: apiKey.id })
   }
+
+  useEffect(() => {
+    if (isSuccessApiKeys && !!deleteId && !apiKeyToDelete && !isDeleteSuccess) {
+      toast('Unable to find publishable key')
+      setDeleteId(null)
+    }
+  }, [apiKeyToDelete, deleteId, isDeleteSuccess, isSuccessApiKeys, setDeleteId])
 
   return (
     <div>
@@ -125,7 +124,7 @@ export const PublishableAPIKeys = () => {
                   isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}
                   isDeleteModalOpen={apiKeyToDelete?.id === apiKey.id}
                   onDelete={() => onDeleteAPIKey(apiKey)}
-                  setKeyToDelete={setAPIKeyToDelete}
+                  setKeyToDelete={setDeleteId}
                 />
               ))}
             </TableBody>

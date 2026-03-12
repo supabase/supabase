@@ -1,26 +1,30 @@
+import { useHotKey } from 'hooks/ui/useHotKey'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { ReactNode, useMemo } from 'react'
-
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { formatCompactNumber } from './DataTable.utils'
 import { DataTableFilterControlsDrawer } from './DataTableFilters/DataTableFilterControlsDrawer'
 import { DataTableResetButton } from './DataTableResetButton'
 import { DataTableViewOptions } from './DataTableViewOptions'
 import { Kbd } from './primitives/Kbd'
-import { useControls } from './providers/ControlsProvider'
 import { useDataTable } from './providers/DataTableProvider'
 
 interface DataTableToolbarProps {
   renderActions?: () => ReactNode
+  isFilterBarOpen: boolean
+  setIsFilterBarOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
+export function DataTableToolbar({
+  renderActions,
+  isFilterBarOpen,
+  setIsFilterBarOpen,
+}: DataTableToolbarProps) {
   const { table, isLoading, columnFilters } = useDataTable()
-  const { open, setOpen } = useControls()
   const filters = table.getState().columnFilters
 
-  useHotKey(() => setOpen((prev) => !prev), 'b')
+  useHotKey(() => setIsFilterBarOpen((prev) => !prev), 'b')
 
   const rows = useMemo(
     () => ({
@@ -38,11 +42,11 @@ export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
             <Button
               size="tiny"
               type="default"
-              icon={open ? <PanelLeftClose /> : <PanelLeftOpen />}
-              onClick={() => setOpen((prev) => !prev)}
+              icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+              onClick={() => setIsFilterBarOpen((prev) => !prev)}
               className="hidden sm:flex"
             >
-              <span className="hidden md:block">{open ? 'Hide' : 'Show'} Controls</span>
+              <span className="hidden md:block">{isFilterBarOpen ? 'Hide' : 'Show'} Controls</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
