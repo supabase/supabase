@@ -58,7 +58,11 @@ const page: GoPageInput = {
             <p className="text-foreground-lighter text-sm">Supabase</p>
           </div>
           <Button asChild type="default" size="medium">
-            <Link href="https://supabase.link/ai-engineer-europe-2026-slides" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="https://supabase.link/ai-engineer-europe-2026-slides"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Download Slides
             </Link>
           </Button>
