@@ -50,10 +50,13 @@ const page: GoPageInput = {
               className="rounded-full object-cover aspect-square w-48 h-48"
             />
           )}
-          <p className="text-foreground-light font-medium">
-            {speaker?.author}
-            {speaker?.position && `, ${speaker.position}`}
-          </p>
+          <div className="flex flex-col items-center gap-0">
+            <p className="text-foreground-light font-medium">
+              {speaker?.author}
+              {speaker?.position && `, ${speaker.position}`}
+            </p>
+            <p className="text-foreground-lighter text-sm">Supabase</p>
+          </div>
           <Button asChild type="default" size="medium">
             <Link href="https://supabase.link/mcpdev-nyc-slides" target="_blank" rel="noopener noreferrer">
               Download Slides

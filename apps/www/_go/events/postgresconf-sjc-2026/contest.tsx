@@ -54,10 +54,13 @@ const page: GoPageInput = {
                     className="rounded-full object-cover aspect-square w-48 h-48"
                   />
                 )}
-                <p className="text-foreground-light font-medium text-center">
-                  {speaker1.author}
-                  {speaker1.position && `, ${speaker1.position}`}
-                </p>
+                <div className="flex flex-col items-center gap-0">
+                  <p className="text-foreground-light font-medium text-center">
+                    {speaker1.author}
+                    {speaker1.position && `, ${speaker1.position}`}
+                  </p>
+                  <p className="text-foreground-lighter text-sm text-center">Supabase</p>
+                </div>
               </div>
             )}
             {speaker2 && (
@@ -71,10 +74,13 @@ const page: GoPageInput = {
                     className="rounded-full object-cover aspect-square w-48 h-48"
                   />
                 )}
-                <p className="text-foreground-light font-medium text-center">
-                  {speaker2.author}
-                  {speaker2.position && `, ${speaker2.position}`}
-                </p>
+                <div className="flex flex-col items-center gap-0">
+                  <p className="text-foreground-light font-medium text-center">
+                    {speaker2.author}
+                    {speaker2.position && `, ${speaker2.position}`}
+                  </p>
+                  <p className="text-foreground-lighter text-sm text-center">Supabase</p>
+                </div>
               </div>
             )}
           </div>
