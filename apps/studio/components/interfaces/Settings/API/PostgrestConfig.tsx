@@ -125,7 +125,10 @@ export const PostgrestConfig = () => {
   const schemas = useMemo(
     () =>
       allSchemas
-        .filter((x) => !INTERNAL_SCHEMAS.some((schema) => schema === x.name))
+        .filter((x) => {
+          if (x.name === 'graphql_public') return true
+          return !INTERNAL_SCHEMAS.includes(x.name)
+        })
         .map((x) => {
           return {
             id: x.id,
