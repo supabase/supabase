@@ -207,6 +207,10 @@ export const featureGridSectionSchema = z.object({
   type: z.literal('feature-grid'),
   title: z.string().optional(),
   description: z.string().optional(),
+  columns: z
+    .union([z.literal(1), z.literal(2), z.literal(3)])
+    .optional()
+    .default(3),
   items: z.array(featureGridItemSchema).min(1).max(6),
 })
 

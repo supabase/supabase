@@ -7,7 +7,7 @@ import {
   useDocsSearch,
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
@@ -20,6 +20,7 @@ import {
   generateCommandClassNames,
   TextHighlighter,
   useCrossCompatRouter,
+  useCommandMenuTelemetryContext,
   useQuery,
   useSetCommandMenuOpen,
   useSetQuery,
@@ -75,9 +76,28 @@ const DocsSearchPage = () => {
   const setQuery = useSetQuery()
   const query = useQuery()
 
+  const telemetryContext = useCommandMenuTelemetryContext()
+
   const initialLoad = useRef(true)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useCrossCompatRouter()
+
+  const trackResultClicked = useCallback(
+    function trackResultClicked(name: string, path: string) {
+      telemetryContext?.onTelemetry?.({
+        action: 'command_menu_command_clicked',
+        properties: {
+          command_name: name,
+          command_type: 'route',
+          search_query: query || undefined,
+          result_path: path,
+          app: telemetryContext.app,
+        },
+        groups: {},
+      })
+    },
+    [query]
+  )
 
   async function openLink(pageType: PageType, link: string) {
     switch (pageType) {
@@ -182,6 +202,7 @@ const DocsSearchPage = () => {
                   key={`${page.path}-item`}
                   value={`${escapeAttributeSelector(page.title)}-item-index-${i}`}
                   onSelect={() => {
+                    trackResultClicked(page.title, page.path)
                     openLink(page.type, page.path)
                   }}
                   forceMount={true}
@@ -211,6 +232,10 @@ const DocsSearchPage = () => {
                           'ml-3 mb-3'
                         )}
                         onSelect={() => {
+                          trackResultClicked(
+                            section.heading ?? page.title,
+                            formatSectionUrl(page, section)
+                          )
                           openLink(page.type, formatSectionUrl(page, section))
                         }}
                         key={`${page.path}__${section.heading}-item`}

@@ -113,10 +113,6 @@ export const useAvailableIntegrations = () => {
         return false
       }
 
-      if (integration.id === 'data_api' && !IS_PLATFORM) {
-        return false
-      }
-
       return true
     })
   }, [integrationsWrappers, isCLI])
