@@ -1,7 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { organizationKeys } from 'data/organization-members/keys'
 import { useOrganizationMemberAssignRoleMutation } from 'data/organization-members/organization-member-role-assign-mutation'
@@ -14,12 +11,15 @@ import {
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import {
-  ProjectRoleConfiguration,
   deriveChanges,
   deriveRoleChangeActions,
   formatMemberRoleToProjectRoleConfiguration,
+  ProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
 
 interface UpdateRolesConfirmationModal {
