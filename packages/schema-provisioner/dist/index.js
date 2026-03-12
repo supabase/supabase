@@ -85,6 +85,20 @@ async function updateRegistryKeys(client, id, anonKey, serviceKey) {
     [anonKey, serviceKey, id]
   );
 }
+async function syncPostgrestSchemas(client) {
+  const baseSchemas = "public,storage,graphql_public";
+  const result = await client.query(
+    `SELECT schema_name FROM _admin.projects WHERE status = 'active' ORDER BY created_at ASC`
+  );
+  const projectSchemas = result.rows.map(
+    (row) => row.schema_name
+  );
+  const allSchemas = projectSchemas.length > 0 ? `${baseSchemas},${projectSchemas.join(",")}` : baseSchemas;
+  await client.query(
+    `ALTER ROLE authenticator SET pgrst.db_schemas = '${allSchemas}'`
+  );
+  await client.query(`NOTIFY pgrst, 'reload config'`);
+}
 
 // src/key-manager.ts
 import { SignJWT } from "jose";
@@ -136,14 +150,24 @@ function createRoleManager() {
           END IF;
         END $$
       `);
+      await client.query(`GRANT ${anonRoleId} TO authenticator`);
+      await client.query(`GRANT ${serviceRoleId} TO authenticator`);
       await client.query(`GRANT USAGE ON SCHEMA ${schemaId} TO ${anonRoleId}`);
-      await client.query(`GRANT SELECT ON ALL TABLES IN SCHEMA ${schemaId} TO ${anonRoleId}`);
+      await client.query(
+        `GRANT SELECT ON ALL TABLES IN SCHEMA ${schemaId} TO ${anonRoleId}`
+      );
       await client.query(
         `ALTER DEFAULT PRIVILEGES IN SCHEMA ${schemaId} GRANT SELECT ON TABLES TO ${anonRoleId}`
       );
-      await client.query(`GRANT USAGE ON SCHEMA ${schemaId} TO ${serviceRoleId}`);
-      await client.query(`GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA ${schemaId} TO ${serviceRoleId}`);
-      await client.query(`GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA ${schemaId} TO ${serviceRoleId}`);
+      await client.query(
+        `GRANT USAGE ON SCHEMA ${schemaId} TO ${serviceRoleId}`
+      );
+      await client.query(
+        `GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA ${schemaId} TO ${serviceRoleId}`
+      );
+      await client.query(
+        `GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA ${schemaId} TO ${serviceRoleId}`
+      );
       await client.query(
         `ALTER DEFAULT PRIVILEGES IN SCHEMA ${schemaId} GRANT ALL ON TABLES TO ${serviceRoleId}`
       );
@@ -208,6 +232,7 @@ function createSchemaProvisioner(config) {
         serviceKey = await keyManager.signServiceKey(validated.name);
         await updateRegistryKeys(client, project.id, anonKey, serviceKey);
         await updateRegistryStatus(client, project.id, "active");
+        await syncPostgrestSchemas(client);
         return {
           ...project,
           status: "active",
@@ -255,6 +280,7 @@ function createSchemaProvisioner(config) {
       );
       await roleManager.dropRoles(project.name, client);
       await deleteRegistryRow(client, project.id);
+      await syncPostgrestSchemas(client);
     } finally {
       client.release();
     }
@@ -282,6 +308,7 @@ function createSchemaProvisioner(config) {
         serviceKey = await keyManager.signServiceKey(project.name);
         await updateRegistryKeys(client, project.id, anonKey, serviceKey);
         await updateRegistryStatus(client, project.id, "active");
+        await syncPostgrestSchemas(client);
         return {
           ...project,
           status: "active",
@@ -326,6 +353,7 @@ function createSchemaProvisioner(config) {
       );
       await roleManager.dropRoles(project.name, client);
       await deleteRegistryRow(client, project.id);
+      await syncPostgrestSchemas(client);
     } finally {
       client.release();
     }
