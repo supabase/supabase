@@ -62,7 +62,6 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Total number of connected realtime clients.',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const data = await runInfraMonitoringQuery(
         projectRef,
@@ -95,7 +94,6 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'bar',
     titleTooltip: '',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const { data } = await runInfraMonitoringQuery(
         projectRef,
@@ -134,7 +132,6 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'bar',
     titleTooltip: '',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const { data } = await runInfraMonitoringQuery(
         projectRef,
@@ -173,7 +170,6 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'bar',
     titleTooltip: '',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const { data } = await runInfraMonitoringQuery(
         projectRef,
@@ -211,7 +207,6 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: '',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const data = await runInfraMonitoringQuery(
         projectRef,
@@ -245,7 +240,6 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Median size of message payloads sent',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}B`,
@@ -285,7 +279,8 @@ export const realtimeReports = ({
     defaultChartStyle: 'line',
     titleTooltip:
       'Median time between database commit and broadcast when using broadcast from database.',
-    availableIn: ['pro', 'team', 'enterprise', 'platform'],
+    entitlement: 'realtime',
+    requiredPlan: 'Pro',
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -325,7 +320,8 @@ export const realtimeReports = ({
     defaultChartStyle: 'line',
     titleTooltip:
       'Execution median time of RLS (Row Level Security) to subscribe to a private channel',
-    availableIn: ['pro', 'team', 'enterprise', 'platform'],
+    entitlement: 'realtime',
+    requiredPlan: 'Pro',
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -365,7 +361,8 @@ export const realtimeReports = ({
     defaultChartStyle: 'line',
     titleTooltip:
       'Execution median time of RLS (Row Level Security) to publish to a private channel',
-    availableIn: ['pro', 'team', 'enterprise', 'platform'],
+    entitlement: 'realtime',
+    requiredPlan: 'Pro',
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,

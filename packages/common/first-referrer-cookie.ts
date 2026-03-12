@@ -174,7 +174,7 @@ export function buildFirstReferrerData({
 // ---------------------------------------------------------------------------
 
 export function serializeFirstReferrerCookie(data: FirstReferrerData): string {
-  return encodeURIComponent(JSON.stringify(data))
+  return JSON.stringify(data)
 }
 
 // ---------------------------------------------------------------------------
@@ -319,7 +319,18 @@ export function parseFirstReferrerCookie(cookieHeader: string): FirstReferrerDat
     if (!match) return null
 
     const value = match.slice(`${FIRST_REFERRER_COOKIE_NAME}=`.length)
-    const parsed = JSON.parse(decodeURIComponent(value)) as unknown
+    const decoded = decodeURIComponent(value)
+    // Handle double-encoded cookies from before the serializer fix.
+    // Next.js cookies.set() encodes automatically, but serializeFirstReferrerCookie
+    // previously called encodeURIComponent too, producing double-encoded values.
+    let jsonString: string
+    try {
+      JSON.parse(decoded)
+      jsonString = decoded
+    } catch {
+      jsonString = decodeURIComponent(decoded)
+    }
+    const parsed = JSON.parse(jsonString) as unknown
 
     if (!parsed || typeof parsed !== 'object') return null
 

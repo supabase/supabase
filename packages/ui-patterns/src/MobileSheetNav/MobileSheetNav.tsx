@@ -44,6 +44,7 @@ const MobileSheetNav: React.FC<{
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         id="mobile-sheet-content"
+        aria-describedby={undefined}
         showClose={false}
         size="full"
         side="bottom"

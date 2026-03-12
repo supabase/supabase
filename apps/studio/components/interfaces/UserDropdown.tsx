@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -24,7 +25,13 @@ import {
 
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
-export function UserDropdown() {
+export function UserDropdown({
+  triggerClassName,
+  contentClassName,
+}: {
+  triggerClassName?: string
+  contentClassName?: string
+}) {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
@@ -35,7 +42,7 @@ export function UserDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="border flex-shrink-0 px-3">
+      <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
         <Button
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
@@ -50,7 +57,7 @@ export function UserDropdown() {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="bottom" align="end">
+      <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
