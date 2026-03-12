@@ -116,6 +116,7 @@
         "SUPPORT_SUPABASE_SECRET_KEY",
         "STATUSPAGE_API_KEY",
         "STATUSPAGE_PAGE_ID",
+        "INCIDENT_IO_API_KEY",
 		"LIVE_SUPABASE_SECRET_KEY"
       ],
       "passThroughEnv": [

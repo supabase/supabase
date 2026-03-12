@@ -25,6 +25,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/body',
   '/generate-attachment-url',
   '/incident-status',
+  '/incident-banner',
   '/status-override',
   '/api/integrations/stripe-sync',
   '/content/graphql',
