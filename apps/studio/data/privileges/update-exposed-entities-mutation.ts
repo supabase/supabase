@@ -41,6 +41,8 @@ export async function updateExposedEntities({
     sqlParts.push(buildFunctionPrivilegesSql(functionNamesToRemove, 'revoke'))
   }
 
+  if (sqlParts.length === 0) return
+
   await executeSql({
     projectRef,
     connectionString,
