@@ -12,5 +12,8 @@
     "tsconfig": "workspace:"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "zod": "catalog:"
+  }
 }

@@ -1,29 +1,29 @@
+import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ArrowUpRight } from 'lucide-react'
 
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import type { Organization } from 'types'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-export const generateSettingsMenu = (
-  ref?: string,
-  project?: Project,
-  organization?: Organization,
-  features?: {
-    auth?: boolean
-    authProviders?: boolean
-    edgeFunctions?: boolean
-    storage?: boolean
-    invoices?: boolean
-    legacyJwtKeys?: boolean
-    logDrains?: boolean
-    billing?: boolean
-  }
-): ProductMenuGroup[] => {
+export const useGenerateSettingsMenu = () => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+
+  const showDashboardPreferences = useFlag('dashboardPreferences')
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
+
+  const { projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled, billingAll: billingEnabled } =
+    useIsFeatureEnabled(['project_settings:legacy_jwt_keys', 'billing:all'])
+
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
   if (!IS_PLATFORM) {
     return [
       {
-        title: 'Project Settings',
+        title: 'Configuration',
         items: [
           {
             name: `Log Drains`,
@@ -35,19 +35,10 @@ export const generateSettingsMenu = (
       },
     ]
   }
-  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}`
-
-  const authEnabled = features?.auth ?? true
-  const authProvidersEnabled = features?.authProviders ?? true
-  const edgeFunctionsEnabled = features?.edgeFunctions ?? true
-  const storageEnabled = features?.storage ?? true
-  const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
-  const billingEnabled = features?.billing ?? true
 
   return [
     {
-      title: 'Project Settings',
+      title: 'Configuration',
       items: [
         {
           name: 'General',
@@ -60,12 +51,14 @@ export const generateSettingsMenu = (
           key: 'compute-and-disk',
           url: `/project/${ref}/settings/compute-and-disk`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'Infrastructure',
           key: 'infrastructure',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
+          url: `/project/${ref}/settings/infrastructure`,
           items: [],
+          disabled: !isProjectActive,
         },
 
         {
@@ -73,19 +66,26 @@ export const generateSettingsMenu = (
           key: 'integrations',
           url: `/project/${ref}/settings/integrations`,
           items: [],
+          disabled: !isProjectActive,
         },
+        ...(platformWebhooksEnabled
+          ? [
+              {
+                name: 'Webhooks',
+                key: 'webhooks',
+                url: `/project/${ref}/settings/webhooks`,
+                items: [],
+                disabled: !isProjectActive,
+              },
+            ]
+          : []),
 
-        {
-          name: 'Data API',
-          key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
         {
           name: 'API Keys',
           key: 'api-keys',
           url: `/project/${ref}/settings/api-keys/new`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'JWT Keys',
@@ -94,6 +94,7 @@ export const generateSettingsMenu = (
             ? `/project/${ref}/settings/jwt`
             : `/project/${ref}/settings/jwt/signing-keys`,
           items: [],
+          disabled: !isProjectActive,
         },
 
         {
@@ -101,6 +102,7 @@ export const generateSettingsMenu = (
           key: `log-drains`,
           url: `/project/${ref}/settings/log-drains`,
           items: [],
+          disabled: !isProjectActive,
         },
         {
           name: 'Add Ons',
@@ -108,64 +110,45 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/addons`,
           items: [],
         },
+      ],
+    },
+    ...(IS_PLATFORM && showDashboardPreferences
+      ? [
+          {
+            title: 'Preferences',
+            items: [
+              {
+                name: 'Dashboard preferences',
+                key: 'preferences',
+                url: `/project/${ref}/settings/preferences`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
+    {
+      title: 'Integrations',
+      items: [
+        {
+          name: 'Data API',
+          key: 'api',
+          url: `/project/${ref}/integrations/data_api/overview`,
+          items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          disabled: !isProjectActive,
+        },
         {
           name: 'Vault',
           key: 'vault',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
+          url: `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           label: 'Beta',
+          disabled: !isProjectActive,
         },
       ],
     },
-    {
-      title: 'Configuration',
-      items: [
-        {
-          name: 'Database',
-          key: 'database',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/database/settings`,
-          items: [],
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-        },
-        ...(authEnabled
-          ? [
-              {
-                name: 'Authentication',
-                key: 'auth',
-                url: authProvidersEnabled
-                  ? `/project/${ref}/auth/providers`
-                  : `/project/${ref}/auth/policies`,
-                items: [],
-                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-              },
-            ]
-          : []),
-        ...(storageEnabled
-          ? [
-              {
-                name: 'Storage',
-                key: 'storage',
-                url: `/project/${ref}/storage/settings`,
-                items: [],
-                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-              },
-            ]
-          : []),
-        ...(edgeFunctionsEnabled
-          ? [
-              {
-                name: 'Edge Functions',
-                key: 'functions',
-                url: `/project/${ref}/functions/secrets`,
-                items: [],
-                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-              },
-            ]
-          : []),
-      ],
-    },
-
     {
       title: 'Billing',
       items: [

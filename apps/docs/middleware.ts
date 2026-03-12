@@ -6,8 +6,19 @@ import { BASE_PATH } from '~/lib/constants'
 
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 
+const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
+
 export function middleware(request: NextRequest) {
   const url = new URL(request.url)
+
+  // Serve pre-generated .md files before the [[...slug]] page route can intercept them
+  if (url.pathname.startsWith(GUIDES_PATH + '/') && url.pathname.endsWith('.md')) {
+    const slug = url.pathname.slice(GUIDES_PATH.length + 1, -'.md'.length)
+    const rewriteUrl = new URL(url)
+    rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
+    return NextResponse.rewrite(rewriteUrl)
+  }
+
   if (!url.pathname.startsWith(REFERENCE_PATH)) {
     return NextResponse.next()
   }
@@ -56,5 +67,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/reference/:path*',
+  matcher: ['/reference/:path*', '/guides/:path*'],
 }

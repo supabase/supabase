@@ -1,7 +1,3 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
@@ -10,6 +6,9 @@ import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect } from 'react'
+import { toast } from 'sonner'
 
 // Ideally these could all be within a _middleware when we use Next 12
 export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
@@ -70,7 +69,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const isValidOrg = organizations.some((org) => org.slug === slug)
 
       if (!isValidOrg) {
-        toast.error("We couldn't find that organization")
+        toast.error('You do not have access to this organization')
         router.push(`${DEFAULT_HOME}?error=org_not_found&org=${slug}`)
         return
       }
@@ -83,7 +82,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
     // A successful request to project details will validate access to both project and branches
     if (!!ref && isErrorProject) {
-      toast.error('This project does not exist')
+      toast.error('You do not have access to this project')
       router.push(DEFAULT_HOME)
       return
     }

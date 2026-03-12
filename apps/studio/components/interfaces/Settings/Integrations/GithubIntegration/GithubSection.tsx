@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
+import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useParams } from 'common'
 import {
   ScaffoldContainer,
@@ -36,6 +37,8 @@ export const GitHubSection = () => {
 
   const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+
+  const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
 
   const { data: connections } = useGitHubConnectionsQuery(
     { organizationId: organization?.id },
@@ -74,6 +77,7 @@ export const GitHubSection = () => {
                 {promptProPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
+                      layout="vertical"
                       source="github-integration"
                       featureProposition="use GitHub integrations"
                       primaryText={`Upgrade to ${!!existingConnection ? 'manage' : 'unlock'} GitHub integration`}
@@ -81,10 +85,15 @@ export const GitHubSection = () => {
                     />
                   </div>
                 )}
-                <GitHubIntegrationConnectionForm
-                  disabled={promptProPlanUpgrade}
-                  connection={existingConnection}
-                />
+
+                {/* [Joshen] Show connection form if GH has already been authorized OR no GH authorization but on a paid plan */}
+                {/* So this shouldn't render if there's no GH authorization and on a free plan */}
+                {(!!gitHubAuthorization || !promptProPlanUpgrade) && (
+                  <GitHubIntegrationConnectionForm
+                    disabled={promptProPlanUpgrade}
+                    connection={existingConnection}
+                  />
+                )}
               </div>
             </div>
           )}

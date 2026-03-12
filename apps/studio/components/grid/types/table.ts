@@ -1,5 +1,6 @@
 import type { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import type { Dictionary } from 'types'
+
 import { GridForeignKey } from './base'
 
 export interface SupaColumn {
@@ -33,4 +34,26 @@ export interface SupaTable {
 
 export interface SupaRow extends Dictionary<any> {
   readonly idx: number
+}
+
+// Row markers for queue operations
+interface PendingAddMarker {
+  __tempId: string
+}
+
+interface PendingDeleteMarker {
+  __isDeleted: true
+}
+
+export type PendingAddRow = SupaRow & PendingAddMarker
+
+export type PendingDeleteRow = SupaRow & PendingDeleteMarker
+
+export function isPendingAddRow(row: SupaRow): row is PendingAddRow {
+  return '__tempId' in row && typeof (row as PendingAddRow).__tempId === 'string'
+}
+
+/** Check if row is pending deletion (has __isDeleted marker) */
+export function isPendingDeleteRow(row: SupaRow): row is PendingDeleteRow {
+  return '__isDeleted' in row && (row as PendingDeleteRow).__isDeleted === true
 }

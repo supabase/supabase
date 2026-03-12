@@ -1,9 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-import { type DragEvent, type PropsWithChildren, useRef, useState } from 'react'
+import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { entityTypeKeys } from 'data/entity-types/keys'
+import { lintKeys } from 'data/lint/keys'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -51,6 +54,8 @@ export const DisplayBlockRenderer = ({
   onChartConfigChange,
   onQueryRun,
 }: PropsWithChildren<DisplayBlockRendererProps>) => {
+  const queryClient = useQueryClient()
+
   const savedInitialArgs = useRef(initialArgs)
   const savedInitialResults = useRef(initialResults)
   const savedInitialConfig = useRef<ChartConfig>({
@@ -167,6 +172,10 @@ export const DisplayBlockRenderer = ({
             messageId,
             results: Array.isArray(data.result) ? data.result : undefined,
           })
+          if (queryType === 'mutation') {
+            queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
+            queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(ref) })
+          }
         },
         onError: (error) => {
           const lowerMessage = error.message.toLowerCase()

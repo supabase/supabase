@@ -1,17 +1,18 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { Home } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentQuery } from 'data/content/content-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Metric, METRIC_CATEGORIES, METRICS } from 'lib/constants/metrics'
+import { Home, Plus } from 'lucide-react'
+import { useState } from 'react'
+import { editorPanelState } from 'state/editor-panel-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { Dashboards } from 'types'
 import {
   Command_Shadcn_,
-  CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
@@ -24,6 +25,7 @@ import {
   SQL_ICON,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DEPRECATED_REPORTS } from './Reports.constants'
 
 interface MetricOptionsProps {
@@ -40,6 +42,7 @@ interface MetricOptionsProps {
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const [search, setSearch] = useState('')
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
@@ -56,7 +59,11 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
   const { mutate: sendEvent } = useSendEventMutation()
 
   const debouncedSearch = useDebounce(search, 300)
-  const { data, isPending: isLoading } = useContentQuery({
+  const {
+    data,
+    isPending: isLoading,
+    refetch,
+  } = useContentQuery({
     projectRef,
     type: 'sql',
     name: debouncedSearch.length === 0 ? undefined : debouncedSearch,
@@ -96,7 +103,11 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
           </DropdownMenuSub>
         )
       })}
-      <DropdownMenuSub>
+      <DropdownMenuSub
+        onOpenChange={(open) => {
+          if (open) refetch()
+        }}
+      >
         <DropdownMenuSubTrigger className="space-x-2">
           <SQL_ICON
             size={14}
@@ -120,9 +131,11 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                     <ShimmeringLoader />
                     <ShimmeringLoader className="w-3/4" />
                   </div>
-                ) : (
-                  <CommandEmpty_Shadcn_>No snippets found</CommandEmpty_Shadcn_>
-                )}
+                ) : !snippets?.length ? (
+                  <p className="text-xs text-center text-foreground-lighter py-3">
+                    No snippets found
+                  </p>
+                ) : null}
                 <CommandGroup_Shadcn_>
                   {snippets?.map((snippet) => (
                     <CommandItem_Shadcn_
@@ -154,6 +167,23 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                   ))}
                 </CommandGroup_Shadcn_>
               </CommandList_Shadcn_>
+
+              <div className="h-px bg-border-overlay -mx-1" />
+
+              <CommandGroup_Shadcn_>
+                <CommandItem_Shadcn_
+                  className="cursor-pointer w-full"
+                  onSelect={() => {
+                    editorPanelState.openAsNew()
+                    openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+                  }}
+                >
+                  <div className="w-full flex items-center gap-2">
+                    <Plus size={14} strokeWidth={1.5} />
+                    <p>Create snippet</p>
+                  </div>
+                </CommandItem_Shadcn_>
+              </CommandGroup_Shadcn_>
             </Command_Shadcn_>
           </DropdownMenuSubContent>
         </DropdownMenuPortal>

@@ -1,28 +1,47 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import LogTable from 'components/interfaces/Settings/Logs/LogTable'
+import { LogTable } from 'components/interfaces/Settings/Logs/LogTable'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { beforeAll, expect, test, vi } from 'vitest'
-import { render } from '../../helpers'
+import { customRender as render } from 'tests/lib/custom-render'
+import { expect, test, vi } from 'vitest'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 
-beforeAll(() => {
-  vi.mock('next/router', () => import('next-router-mock'))
-  vi.mock('nuqs', async () => {
-    let queryValue = 'example'
-    return {
-      useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
-    }
-  })
-})
+vi.mock('next/router', () => import('next-router-mock'))
+
+vi.mock('react-data-grid', () => ({
+  default: ({ columns, rows, renderers, role, headerRowHeight }: any) => (
+    <div role={role ?? 'table'}>
+      {headerRowHeight !== 0 && (
+        <div role="row">
+          {columns.map((col: any, colIdx: number) => (
+            <div key={colIdx} role="columnheader">
+              {col.renderHeaderCell ? col.renderHeaderCell({}) : col.name}
+            </div>
+          ))}
+        </div>
+      )}
+      {rows.map((row: any, rowIdx: number) => (
+        <div key={rowIdx} role="row">
+          {columns.map((col: any, colIdx: number) => (
+            <div key={colIdx} role="cell">
+              {col.renderCell?.({ row, rowIdx, isCellSelected: false })}
+            </div>
+          ))}
+        </div>
+      ))}
+      {rows.length === 0 && renderers?.noRowsFallback}
+    </div>
+  ),
+  Row: ({ row, ...props }: any) => <div role="row" {...props} />,
+}))
 
 const fakeMicroTimestamp = dayjs().unix() * 1000
 

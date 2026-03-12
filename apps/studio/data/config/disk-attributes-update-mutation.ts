@@ -5,13 +5,13 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { configKeys } from './keys'
 
-export const COOLDOWN_DURATION = 60 * 60 * 6
+export const COOLDOWN_DURATION = 60 * 60 * 4
 
 export type UpdateDiskAttributesVariables = {
   ref?: string
   storageType: 'gp3' | 'io2'
   provisionedIOPS: number
-  throughput?: number
+  throughput?: number // MB/s
   totalSize: number
 }
 
@@ -25,6 +25,8 @@ export async function updateDiskAttributes(updates: UpdateDiskAttributesVariable
     updates.storageType === 'gp3'
       ? {
           iops: updates.provisionedIOPS,
+          // API field name is throughput_mbps (legacy), but values are treated as MB/s in the platform API.
+          // If the platform switches to MiB/s, convert here before sending.
           throughput_mbps: updates.throughput!,
           size_gb: updates.totalSize,
           type: updates.storageType,
