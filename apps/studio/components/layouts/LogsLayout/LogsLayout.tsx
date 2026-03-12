@@ -20,20 +20,13 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   if (!canUseLogsExplorer) {
     if (isLoading) {
       return (
-        <ProjectLayout
-          isLoading
-          product="Logs & Analytics"
-          browserTitle={{ section: title }}
-        />
+        <ProjectLayout isLoading product="Logs & Analytics" browserTitle={{ section: title }} />
       )
     }
 
     if (!isLoading && !canUseLogsExplorer) {
       return (
-        <ProjectLayout
-          product="Logs & Analytics"
-          browserTitle={{ section: title }}
-        >
+        <ProjectLayout product="Logs & Analytics" browserTitle={{ section: title }}>
           <NoPermission isFullPage resourceText="access your project's logs" />
         </ProjectLayout>
       )
