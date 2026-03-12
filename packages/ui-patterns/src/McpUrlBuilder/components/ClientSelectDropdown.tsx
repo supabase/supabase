@@ -69,7 +69,6 @@ export const ClientSelectDropdown = ({
                   connection={selectedClient.icon}
                   theme={theme}
                   hasDistinctDarkIcon={selectedClient.hasDistinctDarkIcon}
-                  iconExtension={selectedClient.iconExtension}
                 />
               ) : (
                 <Bot size={12} aria-hidden={true} />
@@ -102,7 +101,6 @@ export const ClientSelectDropdown = ({
                       connection={client.icon}
                       theme={theme}
                       hasDistinctDarkIcon={client.hasDistinctDarkIcon}
-                      iconExtension={client.iconExtension}
                     />
                   ) : (
                     <Bot size={12} aria-hidden={true} />

@@ -20,8 +20,6 @@ export interface McpClient {
   icon?: string
   /** When true, use -icon-dark.svg in dark theme; otherwise the same -icon.svg is used for both themes. */
   hasDistinctDarkIcon?: boolean
-  /** File extension for the icon, defaults to 'svg'. Use 'png' when no SVG is available. */
-  iconExtension?: string
   docsUrl?: string
   externalDocsUrl?: string
   configFile?: string
