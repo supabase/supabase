@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn, Menu } from 'ui'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+
 import type { SidebarSection } from './AccountLayout.types'
 
 interface WithSidebarProps {
@@ -50,17 +50,6 @@ export const WithSidebar = ({
       <div className="flex flex-1 flex-col">
         <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
-      <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SidebarContent
-          title={title}
-          header={header}
-          sections={sections}
-          subitems={subitems}
-          subitemsParentKey={subitemsParentKey}
-          customSidebarContent={customSidebarContent}
-          backToDashboardURL={backToDashboardURL}
-        />
-      </MobileSheetNav>
     </div>
   )
 }

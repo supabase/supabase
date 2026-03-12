@@ -1,7 +1,7 @@
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateDatabaseMenu } from './DatabaseMenu.utils'
@@ -10,7 +10,7 @@ export interface DatabaseLayoutProps {
   title: string
 }
 
-const DatabaseProductMenu = () => {
+export const DatabaseProductMenu = () => {
   const router = useRouter()
   const page = router.pathname.split('/')[4]
   const menu = useGenerateDatabaseMenu()

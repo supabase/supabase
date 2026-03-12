@@ -10,7 +10,7 @@ const SupportPage: NextPageWithLayout = () => {
 
 SupportPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>{page}</DefaultLayout>
+    <DefaultLayout hideMobileMenu>{page}</DefaultLayout>
   </AppLayout>
 )
 

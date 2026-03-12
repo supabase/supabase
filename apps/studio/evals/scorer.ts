@@ -117,7 +117,7 @@ export const concisenessScorer: EvalScorer<
 > = async ({ input, output }) => {
   return await concisenessEvaluator({
     input: input.prompt,
-    output: serializeSteps(output.steps),
+    output: extractTextOnly(output.steps),
   })
 }
 

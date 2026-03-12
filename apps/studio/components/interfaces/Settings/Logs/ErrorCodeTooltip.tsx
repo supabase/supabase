@@ -120,6 +120,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
               label="Fix with AI"
               buildPrompt={buildPrompt}
               onOpenAssistant={handleOpenAssistant}
+              telemetrySource="error_code"
               copyLabel="Copy Markdown"
               showExternalAI
               extraDropdownItems={

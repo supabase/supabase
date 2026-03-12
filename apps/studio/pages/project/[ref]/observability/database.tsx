@@ -31,6 +31,7 @@ import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import dayjs from 'dayjs'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -72,7 +73,6 @@ const DatabaseUsage = () => {
     updateDateRange,
     datePickerValue,
     datePickerHelpers,
-    orgPlan,
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange,
@@ -123,12 +123,23 @@ const DatabaseUsage = () => {
     }
   )
 
+  const { getEntitlementSetValues, isLoading: isEntitlementLoading } = useCheckEntitlements(
+    'observability.dashboard_advanced_metrics'
+  )
+  const entitledFeatures = getEntitlementSetValues()
+
+  const isSpendCapEnabled =
+    entitledFeatures.includes('database') &&
+    !org?.usage_billing_enabled &&
+    project?.cloud_provider !== 'FLY'
+
   const REPORT_ATTRIBUTES = getReportAttributesV2(
-    org!,
+    entitledFeatures,
     project!,
     diskConfig,
     maxConnections,
-    defaultMaxClientConn
+    defaultMaxClientConn,
+    isSpendCapEnabled
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -245,9 +256,12 @@ const DatabaseUsage = () => {
         }
       >
         {selectedDateRange &&
-          orgPlan?.id &&
-          REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) =>
-            chart.availableIn?.includes(orgPlan?.id) ? (
+          REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => {
+            const chartAvailable =
+              !chart.entitlement ||
+              isEntitlementLoading ||
+              entitledFeatures.includes(chart.entitlement)
+            return chartAvailable ? (
               <LazyComposedChartHandler
                 key={chart.id}
                 {...chart}
@@ -269,14 +283,11 @@ const DatabaseUsage = () => {
             ) : (
               <ReportChartUpsell
                 key={chart.id}
-                report={{
-                  label: chart.label,
-                  availableIn: chart.availableIn ?? [],
-                }}
+                report={{ label: chart.label, requiredPlan: chart.requiredPlan }}
                 orgSlug={org?.slug ?? ''}
               />
             )
-          )}
+          })}
         {selectedDateRange && isReplicaSelected && (
           <Panel title="Replica Information">
             <Panel.Content>
