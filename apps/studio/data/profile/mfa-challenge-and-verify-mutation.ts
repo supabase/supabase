@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { captureCriticalError } from 'lib/error-reporting'
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
-import { UseCustomMutationOptions } from 'types'
+import type { UseCustomMutationOptions } from 'types'
 
 interface MFAChallengeAndVerifyVariables extends MFAChallengeAndVerifyParams {
   refreshFactors?: boolean
