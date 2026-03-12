@@ -16,6 +16,7 @@ interface SummarizeProjectAccessParams {
   roles: OrganizationRolesResponse | undefined
   projectRef?: string
   hasLimitedVisibility: boolean
+  currentUserId?: string
   maxVisibleMembers?: number
 }
 
@@ -46,6 +47,7 @@ export const summarizeProjectAccess = ({
   roles,
   projectRef,
   hasLimitedVisibility,
+  currentUserId,
   maxVisibleMembers = 12,
 }: SummarizeProjectAccessParams): ProjectAccessSummary => {
   const allRoles = [...(roles?.org_scoped_roles ?? []), ...(roles?.project_scoped_roles ?? [])]
@@ -59,7 +61,14 @@ export const summarizeProjectAccess = ({
     .filter((member) =>
       member.role_ids.some((roleId) => roleAppliesToProject(rolesById.get(roleId), projectRef))
     )
-    .sort((a, b) => (a.primary_email ?? '').localeCompare(b.primary_email ?? ''))
+    .sort((a, b) => {
+      const isCurrentUserA = !!currentUserId && a.gotrue_id === currentUserId
+      const isCurrentUserB = !!currentUserId && b.gotrue_id === currentUserId
+
+      if (isCurrentUserA && !isCurrentUserB) return -1
+      if (!isCurrentUserA && isCurrentUserB) return 1
+      return (a.primary_email ?? '').localeCompare(b.primary_email ?? '')
+    })
 
   const projectMembers = membersWithProjectAccess.map((member) => {
     const matchingRoleNames = member.role_ids

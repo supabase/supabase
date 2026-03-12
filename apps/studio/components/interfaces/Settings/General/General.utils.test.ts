@@ -154,4 +154,45 @@ describe('summarizeProjectAccess', () => {
     expect(summary.visibleMembers).toHaveLength(1)
     expect(summary.hiddenMembersCount).toBe(1)
   })
+
+  it('places current user at the top of project members', () => {
+    const summary = summarizeProjectAccess({
+      organizationMembers: [
+        {
+          gotrue_id: 'alpha-id',
+          username: 'Alpha',
+          primary_email: 'alpha@example.com',
+          role_ids: [1],
+        } as any,
+        {
+          gotrue_id: 'current-user-id',
+          username: 'Current User',
+          primary_email: 'zeta@example.com',
+          role_ids: [1],
+        } as any,
+        {
+          gotrue_id: 'beta-id',
+          username: 'Beta',
+          primary_email: 'beta@example.com',
+          role_ids: [1],
+        } as any,
+      ],
+      roles,
+      projectRef: 'ref-a',
+      hasLimitedVisibility: false,
+      currentUserId: 'current-user-id',
+      maxVisibleMembers: 2,
+    })
+
+    expect(summary.projectMembers.map((member) => member.id)).toEqual([
+      'current-user-id',
+      'alpha-id',
+      'beta-id',
+    ])
+    expect(summary.visibleMembers.map((member) => member.id)).toEqual([
+      'current-user-id',
+      'alpha-id',
+    ])
+    expect(summary.hiddenMembersCount).toBe(1)
+  })
 })

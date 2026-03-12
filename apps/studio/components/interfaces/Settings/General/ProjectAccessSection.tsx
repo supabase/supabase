@@ -84,6 +84,7 @@ export const ProjectAccessSection = () => {
     roles: organizationRoles,
     projectRef,
     hasLimitedVisibility,
+    currentUserId: profile?.gotrue_id,
   })
 
   const isLoadingProjectAccess = isLoadingOrganizationMembers || isLoadingOrganizationRoles
