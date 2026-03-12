@@ -259,7 +259,7 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         forceMount
         ref={contentRef}
         onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
-        onInteractOutside={() => setOpen(false)}
+        onInteractOutside={() => handleOpenChange(false)}
         onEscapeKeyDown={(e) => {
           e.preventDefault()
           return query ? setQuery('') : page ? popPage() : handleOpenChange(false)
