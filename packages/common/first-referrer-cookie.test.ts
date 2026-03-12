@@ -111,6 +111,20 @@ describe('first-referrer-cookie', () => {
       expect(parseFirstReferrerCookie(`${FIRST_REFERRER_COOKIE_NAME}=${encoded}`)).toBeNull()
     })
 
+    it('parses double-encoded cookies (legacy format before serializer fix)', () => {
+      const input = buildFirstReferrerData({
+        referrer: 'https://www.google.com/',
+        landingUrl: 'https://supabase.com/pricing?utm_source=google',
+      })
+
+      // Simulate the old double-encoding: encodeURIComponent(JSON.stringify(data))
+      // followed by Next.js cookies.set() encoding it again.
+      const doubleEncoded = encodeURIComponent(encodeURIComponent(JSON.stringify(input)))
+      const parsed = parseFirstReferrerCookie(`${FIRST_REFERRER_COOKIE_NAME}=${doubleEncoded}`)
+
+      expect(parsed).toEqual(input)
+    })
+
     it('drops non-string values in utms/click_ids', () => {
       const encoded = encodeURIComponent(
         JSON.stringify({
