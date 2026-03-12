@@ -13,6 +13,7 @@ export const LOCAL_STORAGE_KEYS = {
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
   INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
   MAINTENANCE_BANNER_DISMISSED: (id: string) => `maintenance-banner-dismissed-${id}`,
+  DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
 
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
@@ -103,6 +104,10 @@ export const LOCAL_STORAGE_KEYS = {
 
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
+
+  // Tax ID banner dismissed
+  TAX_ID_BANNER_DISMISSED: (slug: string) => `tax-id-banner-dismissed-${slug}`,
+
   TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED: (ref: string) =>
     `table-editor-new-filter-banner-dismissed-${ref}`,
 
