@@ -23,7 +23,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
         <ProjectLayout
           isLoading
           product="Logs & Analytics"
-          browserTitle={{ section: title, surface: 'Logs & Analytics' }}
+          browserTitle={{ section: title }}
         />
       )
     }
@@ -32,7 +32,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
       return (
         <ProjectLayout
           product="Logs & Analytics"
-          browserTitle={{ section: title, surface: 'Logs & Analytics' }}
+          browserTitle={{ section: title }}
         >
           <NoPermission isFullPage resourceText="access your project's logs" />
         </ProjectLayout>
@@ -43,7 +43,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   return (
     <ProjectLayout
       product="Logs & Analytics"
-      browserTitle={{ section: title, surface: 'Logs & Analytics' }}
+      browserTitle={{ section: title }}
       productMenu={<LogsSidebarMenuV2 />}
     >
       {children}

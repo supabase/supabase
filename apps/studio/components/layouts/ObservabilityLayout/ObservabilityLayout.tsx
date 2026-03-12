@@ -86,7 +86,7 @@ const ObservabilityLayoutContent = ({
     return (
       <ProjectLayout
         product="Observability"
-        browserTitle={{ section: title, surface: 'Observability' }}
+        browserTitle={{ section: title }}
         productMenu={<ObservabilityMenu />}
         isBlocking={false}
       >
