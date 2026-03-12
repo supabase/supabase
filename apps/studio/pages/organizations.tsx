@@ -1,23 +1,22 @@
-import { Plus, Search } from 'lucide-react'
-import Link from 'next/link'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import { NoOrganizationsState } from 'components/interfaces/Home/ProjectList/EmptyStates'
 import { OrganizationCard } from 'components/interfaces/Organization/OrganizationCard'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
 import { buildStudioPageTitle } from 'lib/page-title'
+import { Plus, Search } from 'lucide-react'
+import Head from 'next/head'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Button, Skeleton } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -30,7 +29,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
   const { error: orgNotFoundError, org: orgSlug } = useParams()
   const orgNotFound = orgNotFoundError === 'org_not_found'
   const pageTitle = buildStudioPageTitle({
-    section: 'Your Organizations',
+    section: 'Organizations',
     brand: appTitle || 'Supabase',
   })
 

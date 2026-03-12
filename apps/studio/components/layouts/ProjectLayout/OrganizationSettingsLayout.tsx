@@ -1,11 +1,10 @@
-import { PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
 import { WithSidebar } from 'components/layouts/AccountLayout/WithSidebar'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { PropsWithChildren } from 'react'
 
 interface OrganizationSettingsMenuItemsProps {
   slug?: string
@@ -182,7 +181,7 @@ export const generateOrganizationSettingsSections = ({
   ]
 }
 
-function OrganizationSettingsLayout({ children }: PropsWithChildren) {
+export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const { slug } = useParams()
   const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
   const fullCurrentPath = useCurrentPath()

@@ -9,7 +9,7 @@ const OrgUsage: NextPageWithLayout = () => {
 
 OrgUsage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout browserTitle={{ section: 'Usage' }}>{page}</OrganizationLayout>
+    <OrganizationLayout title="Usage">{page}</OrganizationLayout>
   </DefaultLayout>
 )
 

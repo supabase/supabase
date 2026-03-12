@@ -19,7 +19,7 @@ const OrgTeamSettings: NextPageWithLayout = () => {
 
 OrgTeamSettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout browserTitle={{ section: 'Team' }}>{page}</OrganizationLayout>
+    <OrganizationLayout title="Team">{page}</OrganizationLayout>
   </DefaultLayout>
 )
 
