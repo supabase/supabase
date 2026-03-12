@@ -97,7 +97,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const noAccessProjects = orgProjects.filter((project) => {
     return !projectsRoleConfiguration.some((p) => p.ref === project.ref)
   })
-  const numberOfProjectsWithAccess = orgProjects.length - noAccessProjects.length
+  const numberOfProjectsWithAccess = projectsRoleConfiguration.filter((p) => p.ref !== undefined).length
   const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
 
   const onSelectProject = (project: OrgProject) => {
