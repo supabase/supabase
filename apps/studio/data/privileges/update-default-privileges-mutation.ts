@@ -30,7 +30,6 @@ export async function updateDefaultPrivileges({
 type UpdateDefaultPrivilegesData = Awaited<ReturnType<typeof updateDefaultPrivileges>>
 
 export const useUpdateDefaultPrivilegesMutation = ({
-  onSuccess,
   onError,
   ...options
 }: Omit<
