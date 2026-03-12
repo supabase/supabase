@@ -55,7 +55,11 @@ const page: GoPageInput = {
             {speaker?.position && `, ${speaker.position}`}
           </p>
           <Button asChild type="default" size="medium">
-            <Link href="https://supabase.link/pgconf-dev-2026-slides" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="https://supabase.link/pgconf-dev-2026-slides"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Download Slides
             </Link>
           </Button>

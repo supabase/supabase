@@ -7,8 +7,7 @@ const page: GoPageInput = {
   slug: 'mcp/contest-thank-you',
   metadata: {
     title: "You're entered | Supabase at MCP Dev Summit 2026",
-    description:
-      'Thanks for entering the Supabase contest at MCP Dev Summit 2026. Good luck!',
+    description: 'Thanks for entering the Supabase contest at MCP Dev Summit 2026. Good luck!',
   },
   hero: {
     title: 'Thanks for entering',

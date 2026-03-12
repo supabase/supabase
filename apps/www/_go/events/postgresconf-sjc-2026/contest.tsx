@@ -79,7 +79,11 @@ const page: GoPageInput = {
             )}
           </div>
           <Button asChild type="default" size="medium">
-            <Link href="https://supabase.link/postgresconf-sjc-2026-slides" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="https://supabase.link/postgresconf-sjc-2026-slides"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Download Slides
             </Link>
           </Button>
