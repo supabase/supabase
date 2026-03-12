@@ -1,15 +1,15 @@
-import { PropsWithChildren } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PropsWithChildren } from 'react'
+
 import DatabaseLayout from './DatabaseLayout'
 
 type DatabaseTriggersLayoutProps = PropsWithChildren
 
-const DatabaseTriggersLayout = ({ children }: DatabaseTriggersLayoutProps) => {
+export const DatabaseTriggersLayout = ({ children }: DatabaseTriggersLayoutProps) => {
   const { ref } = useParams()
   const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
@@ -28,7 +28,7 @@ const DatabaseTriggersLayout = ({ children }: DatabaseTriggersLayoutProps) => {
   ]
 
   return (
-    <DatabaseLayout title="Database">
+    <DatabaseLayout title="Triggers">
       {isPermissionsLoaded && !canReadTriggers ? (
         <NoPermission isFullPage resourceText="view database triggers" />
       ) : (
@@ -44,5 +44,3 @@ const DatabaseTriggersLayout = ({ children }: DatabaseTriggersLayoutProps) => {
     </DatabaseLayout>
   )
 }
-
-export default DatabaseTriggersLayout

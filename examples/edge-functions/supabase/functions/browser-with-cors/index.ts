@@ -2,7 +2,11 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { corsHeaders } from '../_shared/cors.ts'
+// For @supabase/supabase-js v2.95.0+, import CORS headers directly from the SDK:
+import { corsHeaders } from 'jsr:@supabase/supabase-js@2/cors'
+
+// For older versions, use a shared cors.ts file:
+// import { corsHeaders } from '../_shared/cors.ts'
 
 console.log(`Function "browser-with-cors" up and running!`)
 

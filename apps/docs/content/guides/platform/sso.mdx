@@ -45,6 +45,20 @@ When SSO is enabled for an organization:
 - If an SSO user with the following email of `alice@foocorp.com` attempts to sign in with a GitHub account that uses the same email, a separate Supabase account is created and will not be linked to the SSO user's account.
 - SSO users will only see organizations/projects they've been invited to or auto-joined into. See [access control](/docs/guides/platform/access-control) for more details.
 
+## Enabling SSO for an organization
+
+- Review the steps above to configure your setup.
+- Invite users to the organization and ensure they join with their SSO linked account.
+- If a user is already a member of the organization under a non SSO account, they will need to be removed and invited again for them to join under their SSO account.
+
+<Admonition type="note">
+
+**No automatic linking:** Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
+
+Users will need to ensure they are logged in with the correct account when accepting invites or accessing organizations/projects.
+
+</Admonition>
+
 ## Disabling SSO for an organization
 
 If you disable the SSO provider for an organization, **all SSO users will immediately be unable to sign in**. Before disabling SSO, ensure you have at least one non-SSO owner account to prevent being locked out.

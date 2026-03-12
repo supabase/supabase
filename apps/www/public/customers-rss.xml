@@ -5,9 +5,23 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 17 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 19 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/hyper</guid>
+  <title>Hyper builds AI marketing agents on Supabase</title>
+  <link>https://supabase.com/customers/hyper</link>
+  <description>Hyper is an AI-native marketing platform with agents that operate across the entire marketing workflow. Supabase gives their three-person team the database platform to do it at enterprise scale.</description>
+  <pubDate>Fri, 19 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/brevo</guid>
+  <title>How Brevo built AI-powered sales workflows on Supabase, without waiting for engineering</title>
+  <link>https://supabase.com/customers/brevo</link>
+  <description>Brevo&apos;s Revenue Operations team built three production AI workflows connecting their CRM to Dust&apos;s AI agents via Supabase MCP—without a single engineering ticket.</description>
+  <pubDate>Thu, 18 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/exprealty</guid>
   <title>How eXp Realty Unlocked Enterprise Innovation and Cut SaaS Costs with Supabase</title>
   <link>https://supabase.com/customers/exprealty</link>

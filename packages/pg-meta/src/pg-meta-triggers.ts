@@ -1,7 +1,8 @@
-import { ident, literal } from './pg-format'
 import { z } from 'zod'
+
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
+import { ident, literal } from './pg-format'
 import { TRIGGERS_SQL } from './sql/triggers'
 
 type TriggerIdentifier = Pick<PGTrigger, 'id'> | Pick<PGTrigger, 'name' | 'schema' | 'table'>

@@ -1,5 +1,6 @@
-import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import { useSupabaseClient, useUser } from '@/lib/supabase-context'
+import { createServerClient } from '@supabase/ssr'
+import { serialize } from 'cookie'
 import { RealtimePresenceState } from '@supabase/supabase-js'
 import type { GetServerSidePropsContext, NextPage } from 'next'
 import { useEffect, useState } from 'react'
@@ -54,14 +55,35 @@ const HomePage: NextPage = () => {
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  // Create authenticated Supabase Client
-  const supabase = createServerSupabaseClient(ctx)
-  // Check if we have a session
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return Object.entries(ctx.req.cookies).map(([name, value]) => ({
+            name,
+            value: value ?? '',
+          }))
+        },
+        setAll(cookiesToSet) {
+          const existing = ctx.res.getHeader('Set-Cookie') ?? []
+          ctx.res.setHeader('Set-Cookie', [
+            ...(Array.isArray(existing) ? existing : [String(existing)]),
+            ...cookiesToSet.map(({ name, value, options }) =>
+              serialize(name, value, options)
+            ),
+          ])
+        },
+      },
+    }
+  )
 
-  if (!session)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user)
     return {
       redirect: {
         destination: '/login',
@@ -71,8 +93,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
   return {
     props: {
-      initialSession: session,
-      user: session.user,
+      user,
     },
   }
 }

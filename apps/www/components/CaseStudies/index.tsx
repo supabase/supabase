@@ -28,7 +28,7 @@ const CaseStudies = () => {
               type: 'casestudy',
               title: caseStudy.title,
               description: caseStudy.description,
-              thumb: `${basePath}/${caseStudy.imgUrl}`,
+              imgThumb: `${basePath}/${caseStudy.imgUrl}`,
               hideAuthor: true,
               url: caseStudy.url.replace('/blog/', ''),
               path: caseStudy.path,

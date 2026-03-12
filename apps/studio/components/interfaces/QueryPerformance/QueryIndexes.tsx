@@ -1,31 +1,35 @@
-import { Check, Table2, Lightbulb } from 'lucide-react'
-import { useState, useEffect } from 'react'
-
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
+import {
+  GetIndexAdvisorResultResponse,
+  useGetIndexAdvisorResult,
+} from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { Check, Lightbulb, Table2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
+  Accordion_Shadcn_,
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
-  Accordion_Shadcn_,
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
   CodeBlock,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { useIndexInvalidation } from './hooks/useIndexInvalidation'
 import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
 import {
@@ -33,15 +37,16 @@ import {
   createIndexes,
   hasIndexRecommendations,
 } from './IndexAdvisor/index-advisor.utils'
-import { QueryPerformanceRow } from './QueryPerformance.types'
 import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
 import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
+import { QueryPerformanceRow } from './QueryPerformance.types'
 
 interface QueryIndexesProps {
   selectedRow: Pick<QueryPerformanceRow, 'query'>
   columnName?: string
   suggestedSelectQuery?: string
+  prefetchedIndexAdvisorResult?: GetIndexAdvisorResultResponse | null
 
   onClose?: () => void
 }
@@ -53,6 +58,7 @@ export const QueryIndexes = ({
   selectedRow,
   columnName,
   suggestedSelectQuery,
+  prefetchedIndexAdvisorResult,
   onClose,
 }: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
@@ -82,21 +88,29 @@ export const QueryIndexes = ({
 
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
+  const hasPrefetchedResult = prefetchedIndexAdvisorResult !== undefined
+
   const {
-    data: indexAdvisorResult,
+    data: fetchedIndexAdvisorResult,
     error: indexAdvisorError,
     refetch,
     isError: isErrorIndexAdvisorResult,
-    isSuccess: isSuccessIndexAdvisorResult,
-    isLoading: isLoadingIndexAdvisorResult,
+    isSuccess: isFetchSuccessIndexAdvisorResult,
+    isLoading: isFetchLoadingIndexAdvisorResult,
   } = useGetIndexAdvisorResult(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       query: selectedRow?.['query'],
     },
-    { enabled: isIndexAdvisorEnabled }
+    { enabled: isIndexAdvisorEnabled && !hasPrefetchedResult }
   )
+
+  const indexAdvisorResult = hasPrefetchedResult
+    ? prefetchedIndexAdvisorResult
+    : fetchedIndexAdvisorResult
+  const isSuccessIndexAdvisorResult = hasPrefetchedResult || isFetchSuccessIndexAdvisorResult
+  const isLoadingIndexAdvisorResult = hasPrefetchedResult ? false : isFetchLoadingIndexAdvisorResult
 
   const {
     index_statements,
@@ -207,7 +221,9 @@ export const QueryIndexes = ({
           </div>
         </QueryPanelSection>
       )}
-      <QueryPanelSection className="pt-2 mb-6">
+      <QueryPanelSection
+        className={cn('mb-6', !suggestedSelectQuery && !columnName ? 'pt-2' : 'pt-6')}
+      >
         <div className="mb-4 flex flex-col gap-y-1">
           <h4 className="mb-2">Indexes in use</h4>
           <p className="text-sm text-foreground-light">
@@ -256,7 +272,9 @@ export const QueryIndexes = ({
       </QueryPanelSection>
       <QueryPanelSection className="flex flex-col gap-y-6 py-6 border-t">
         <div className="flex flex-col gap-y-1">
-          <h4 className="mb-2">New index recommendations</h4>
+          {(!isSuccessIndexAdvisorResult || indexAdvisorResult !== null) && (
+            <h4 className="mb-2">New index recommendations</h4>
+          )}
           {isLoadingExtensions ? (
             <GenericSkeletonLoader />
           ) : !isIndexAdvisorEnabled ? (
@@ -273,7 +291,14 @@ export const QueryIndexes = ({
               )}
               {isSuccessIndexAdvisorResult && (
                 <>
-                  {(index_statements ?? []).length === 0 ? (
+                  {indexAdvisorResult === null ? (
+                    <Admonition
+                      type="default"
+                      showIcon={true}
+                      title="Index recommendations not available"
+                      description="Index advisor could not analyze this query. This can happen if the query references tables, functions, or extensions that no longer exist or were deleted."
+                    />
+                  ) : (index_statements ?? []).length === 0 ? (
                     <Alert_Shadcn_ className="[&>svg]:rounded-full">
                       <Check />
                       <AlertTitle_Shadcn_>This query is optimized</AlertTitle_Shadcn_>

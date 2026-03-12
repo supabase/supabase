@@ -38,7 +38,7 @@ const PROVIDER_EMAIL = {
         'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
       type: 'boolean',
       link: `${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection`,
-      isPaid: true,
+      entitlementKey: 'auth.password_hibp',
     },
     PASSWORD_MIN_LENGTH: {
       title: 'Minimum password length',

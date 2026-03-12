@@ -13,7 +13,9 @@ import {
   Separator,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
+import { ErrorCodeTooltip } from '../ErrorCodeTooltip'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
 
@@ -24,7 +26,7 @@ const LogRowCodeBlock = ({ value, className }: { value: string; className?: stri
       className
     )}
   >
-    {JSON.stringify(value, null, 2)}
+    {typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
   </pre>
 )
 
@@ -59,6 +61,7 @@ const PropertyRow = ({
   const isUserAgent = keyName === 'user_agent'
   const isEventMessage = keyName === 'event_message'
   const isPath = keyName === 'path'
+  const isErrorCode = keyName === 'error_code'
 
   function getSearchPairs() {
     if (isSearch && typeof value === 'string') {
@@ -131,14 +134,14 @@ const PropertyRow = ({
         <DropdownMenuTrigger className="group w-full" data-testid={dataTestId}>
           <div className="rounded-md w-full overflow-hidden">
             <div
-              className={cn('flex h-10 w-full', {
+              className={cn('flex h-[var(--header-height)] w-full', {
                 'flex-col gap-1.5 h-auto': isExpanded,
                 'items-center group-hover:bg-surface-300 gap-4': !isExpanded,
               })}
             >
               <h3
                 className={cn('pl-3 text-foreground-lighter text-sm text-left', {
-                  'h-10 flex items-center': isExpanded,
+                  'h-[var(--header-height)] flex items-center': isExpanded,
                 })}
               >
                 {keyName}
@@ -162,6 +165,10 @@ const PropertyRow = ({
                   <div className="flex items-center gap-1 justify-end">
                     <ResponseCodeFormatter value={value} />
                   </div>
+                ) : isErrorCode ? (
+                  <ErrorCodeTooltip errorCode={String(value)} service={service}>
+                    <div className="truncate">{value}</div>
+                  </ErrorCodeTooltip>
                 ) : (
                   <div className="truncate">{value}</div>
                 )}

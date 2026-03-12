@@ -1,7 +1,8 @@
-import { HomepageSvgHandler } from '@/components/homepage-svg-handler'
 import { Auth, Database, Realtime } from 'icons/src/icons'
 import { Paintbrush } from 'lucide-react'
 import Link from 'next/link'
+
+import { HomepageSvgHandler } from '@/components/homepage-svg-handler'
 
 export default function Home() {
   return (

@@ -17,7 +17,6 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/onboarding/design',
   '/ai/feedback/classify',
   '/ai/docs',
-  '/ai/table-quickstart/generate-schemas',
   '/get-ip-address',
   '/get-utc-time',
   '/get-deployment-commit',
@@ -26,7 +25,9 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/body',
   '/generate-attachment-url',
   '/incident-status',
+  '/status-override',
   '/api/integrations/stripe-sync',
+  '/content/graphql',
 ]
 
 export function proxy(request: NextRequest) {

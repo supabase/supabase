@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
 import {
@@ -7,7 +5,9 @@ import {
   useUnifiedLogInspectionQuery,
 } from 'data/logs/unified-log-inspection-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useState } from 'react'
 import {
+  cn,
   CodeBlock,
   ResizableHandle,
   ResizablePanel,
@@ -16,19 +16,19 @@ import {
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  cn,
 } from 'ui'
+
+import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
+import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
 import {
   MemoizedEdgeFunctionBlock,
   MemoizedGoTrueBlock,
   MemoizedNetworkBlock,
-  MemoizedPostgRESTBlock,
   MemoizedPostgresBlock,
+  MemoizedPostgRESTBlock,
   MemoizedStorageBlock,
 } from './ServiceFlow/components/ServiceBlocks'
 import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
-import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
-import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 
@@ -89,9 +89,8 @@ export function ServiceFlowPanel({
         <ResizableHandle withHandle className="z-10" />
         <ResizablePanel
           id="log-sidepanel"
-          order={2}
-          defaultSize={1}
-          maxSize={40}
+          minSize={448}
+          maxSize={720}
           className={cn(
             'bg-dash-sidebar',
             'z-40',
@@ -99,7 +98,6 @@ export function ServiceFlowPanel({
             'md:absolute md:h-auto',
             // ' md:w-3/4',
             'xl:z-[1]',
-            'min-w-[28rem] max-w-[45rem]',
             'xl:relative xl:border-l-0'
           )}
         >

@@ -30,6 +30,7 @@ export type QueryPerformanceQueryOpts = {
   roles?: string[]
   runIndexAdvisor?: boolean
   minCalls?: number
+  minTotalTime?: number
   filterIndexAdvisor?: boolean
 }
 
@@ -40,6 +41,7 @@ export const useQueryPerformanceQuery = ({
   roles,
   runIndexAdvisor = false,
   minCalls,
+  minTotalTime,
   filterIndexAdvisor = false,
 }: QueryPerformanceQueryOpts) => {
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
@@ -51,6 +53,9 @@ export const useQueryPerformanceQuery = ({
       : '',
     searchQuery.length > 0 ? `statements.query ~* '${searchQuery}'` : '',
     typeof minCalls === 'number' && minCalls > 0 ? `statements.calls >= ${minCalls}` : '',
+    typeof minTotalTime === 'number' && minTotalTime > 0
+      ? `(statements.total_exec_time + statements.total_plan_time) >= ${minTotalTime}`
+      : '',
   ]
     .filter((x) => x.length > 0)
     .join(' AND ')
