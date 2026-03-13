@@ -77,7 +77,6 @@ export const LayoutHeader = ({
   const gitlessBranching = useIsBranching2Enabled()
 
   const connectSectionVariant = usePHFlag<ConnectSectionVariant | false>('connectSection')
-  const isFlagResolved = connectSectionVariant !== undefined
   const isConnectSheetEnabled = connectSectionVariant === 'connect'
 
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
@@ -280,7 +279,7 @@ export const LayoutHeader = ({
         </div>
       </header>
 
-      {isFlagResolved ? isConnectSheetEnabled ? <ConnectSheet /> : <Connect /> : null}
+      {isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
     </>
   )
 }
