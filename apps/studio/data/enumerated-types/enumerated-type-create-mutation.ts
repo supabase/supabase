@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeCreateVariables = {
@@ -23,11 +23,15 @@ export async function createEnumeratedType({
   description,
   values,
 }: EnumeratedTypeCreateVariables) {
-  const createSql = `create type "${schema}"."${name}" as enum (${values
-    .map((x) => `'${x}'`)
+  const escapedSchema = schema.replace(/"/g, '""')
+  const escapedName = name.replace(/"/g, '""')
+  const createSql = `create type "${escapedSchema}"."${escapedName}" as enum (${values
+    .map((x) => `'${x.replace(/'/g, "''")}'`)
     .join(', ')});`
   const commentSql =
-    description !== undefined ? `comment on type "${schema}"."${name}" is '${description}';` : ''
+    description !== undefined
+      ? `comment on type "${escapedSchema}"."${escapedName}" is '${description.replace(/'/g, "''")}';`
+      : ''
   const sql = wrapWithTransaction(`${createSql} ${commentSql}`)
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result

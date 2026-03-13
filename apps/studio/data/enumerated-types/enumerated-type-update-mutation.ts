@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeUpdateVariables = {
@@ -23,9 +23,15 @@ export async function updateEnumeratedType({
   description,
   values = [],
 }: EnumeratedTypeUpdateVariables) {
+  const escapedSchema = schema.replace(/"/g, '""')
+  const escapedOriginalName = name.original.replace(/"/g, '""')
+  const escapedUpdatedName = name.updated.replace(/"/g, '""')
+
   const statements: string[] = []
   if (name.original !== name.updated) {
-    statements.push(`alter type "${schema}"."${name.original}" rename to "${name.updated}";`)
+    statements.push(
+      `alter type "${escapedSchema}"."${escapedOriginalName}" rename to "${escapedUpdatedName}";`
+    )
   }
   if (values.length > 0) {
     values.forEach((x, idx) => {
@@ -34,24 +40,24 @@ export async function updateEnumeratedType({
           // Consider if any new enums were added before any existing enums
           const firstExistingEnumValue = values.find((x) => !x.isNew)
           statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
+            `alter type "${escapedSchema}"."${escapedUpdatedName}" add value '${x.updated.replace(/'/g, "''")}' before '${firstExistingEnumValue?.original.replace(/'/g, "''")}';`
           )
         } else {
           statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' after '${
-              values[idx - 1].updated
-            }';`
+            `alter type "${escapedSchema}"."${escapedUpdatedName}" add value '${x.updated.replace(/'/g, "''")}' after '${values[idx - 1].updated.replace(/'/g, "''")}';`
           )
         }
       } else if (x.original !== x.updated) {
         statements.push(
-          `alter type "${schema}"."${name.updated}" rename value '${x.original}' to '${x.updated}';`
+          `alter type "${escapedSchema}"."${escapedUpdatedName}" rename value '${x.original.replace(/'/g, "''")}' to '${x.updated.replace(/'/g, "''")}';`
         )
       }
     })
   }
   if (description !== undefined) {
-    statements.push(`comment on type "${schema}"."${name.updated}" is '${description}';`)
+    statements.push(
+      `comment on type "${escapedSchema}"."${escapedUpdatedName}" is '${description.replace(/'/g, "''")}';`
+    )
   }
 
   const sql = wrapWithTransaction(statements.join(' '))
