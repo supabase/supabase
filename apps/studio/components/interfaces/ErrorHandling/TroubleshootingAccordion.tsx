@@ -33,11 +33,11 @@ export function TroubleshootingAccordion({
       className={cn('w-full', className)}
       onValueChange={(value) => {
         const expanded = Boolean(value)
-        const step = expanded ? parseInt(value.replace('step-', ''), 10) : 0
+        const step = expanded ? parseInt(value.replace('step-', ''), 10) : null
         track('inline_error_troubleshooter_step_clicked', {
           errorType,
           step,
-          stepTitle: stepTitles?.[step],
+          stepTitle: step !== null ? stepTitles?.[step] : undefined,
           expanded,
         })
       }}

@@ -2605,9 +2605,9 @@ export interface InlineErrorTroubleshooterStepClickedEvent {
   properties: {
     /** ID of the matched error mapping */
     errorType: string
-    /** Step number that was toggled (1, 2, 3, ...) */
-    step: number
-    /** Title of the step that was toggled */
+    /** Step number that was clicked (1, 2, 3, ...) — null when a step is collapsed */
+    step: number | null
+    /** Title of the step that was clicked */
     stepTitle?: string
     /** Whether the step was opened (true) or closed (false) */
     expanded: boolean
