@@ -83,8 +83,7 @@ function FeaturesPage() {
       selectedProducts.length === 0 ||
       feature.products.some((product) => selectedProducts.includes(product))
 
-    const matchesSelfHosted =
-      !showSelfHostedOnly || feature.status?.availableOnSelfHosted === true
+    const matchesSelfHosted = !showSelfHostedOnly || feature.status?.availableOnSelfHosted === true
 
     return matchesSearch && matchesProduct && matchesSelfHosted
   })
