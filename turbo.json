@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**/*", "!.next/dev/**/*"]
     },
     "design-system#build": {
       "dependsOn": ["^build"],
@@ -20,7 +20,7 @@
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
     },
     "studio#build": {
       "dependsOn": ["^build"],
@@ -126,7 +126,7 @@
         "SNIPPETS_MANAGEMENT_FOLDER",
         "EDGE_FUNCTIONS_MANAGEMENT_FOLDER"
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*"]
     },
     "www#build": {
       "dependsOn": ["^build"],
@@ -198,7 +198,7 @@
         "CUSTOMERIO_API_KEY",
         "CUSTOMERIO_APP_API_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
     },
     "ui-library#build": {
       "dependsOn": ["^build"],
@@ -223,7 +223,7 @@
         "SUPABASE_MANAGEMENT_API_TOKEN",
         "OPENAI_API_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
     },
     "lint": {
       "outputs": []
