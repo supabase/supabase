@@ -45,7 +45,7 @@ const QueryInsightsReport: NextPageWithLayout = () => {
             value={datePickerValue.isHelper ? datePickerValue.text : undefined}
             onValueChange={handleSelect}
           >
-            <SelectTrigger_Shadcn_ size="tiny" className="w-[120px]">
+            <SelectTrigger_Shadcn_ size="tiny" className="w-[150px]">
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_ align="end">
