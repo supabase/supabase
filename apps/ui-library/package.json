@@ -47,10 +47,10 @@
     "@radix-ui/react-toggle-group": "*",
     "@radix-ui/react-tooltip": "*",
     "@react-router/fs-routes": "^7.4.0",
+    "@supabase-labs/y-supabase": "0.1.0",
     "@supabase/postgrest-js": "catalog:",
     "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "@supabase/vue-blocks": "workspace:*",
-    "@supabase-labs/y-supabase": "0.1.0",
     "@tanstack/react-query": "^5.83.0",
     "api-types": "workspace:*",
     "axios": "^1.12.0",
@@ -93,6 +93,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@babel/core": "*",
     "@react-router/dev": "^7.9.0",
     "@shikijs/compat": "^1.1.7",
     "@supabase/ssr": "^0.7.0",
