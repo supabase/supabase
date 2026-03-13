@@ -36,6 +36,7 @@ export {
   getExposedFunctionCountsSql,
   buildTablePrivilegesSql,
   buildFunctionPrivilegesSql,
+  buildDefaultPrivilegesSql,
 } from './sql/studio/privileges'
 export { getIndexesSQL } from './sql/studio/database/indexes'
 export { getDatabaseExtensionDefaultSchemaSQL } from './sql/studio/database/extensions'
