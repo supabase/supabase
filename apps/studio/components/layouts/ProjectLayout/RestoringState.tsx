@@ -83,9 +83,8 @@ export const RestoringState = () => {
   }
 
   useEffect(() => {
-    if (!isProjectStatusSuccess) return
-    if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-      // setIsCompleted(true)
+    if (isProjectStatusSuccess && projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+      setIsCompleted(true)
     }
   }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
 
