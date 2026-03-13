@@ -99,6 +99,10 @@ export type FeatureType = {
    */
   docsUrl?: string
   /**
+   * url to a related blog post
+   */
+  blogUrl?: string
+  /**
    * feature metadata on its status
    */
   status?: {
@@ -478,8 +482,6 @@ Supabase Read Replicas distribute read traffic across multiple databases. Use th
 ## Get Started
 
 Deploy your first Read Replica in minutes from Project Settings > Infrastructure. Choose a region—same region for analytics isolation, different region for geo-distribution. Select a compute size to match your workload.
-
-[Read blog post](https://supabase.com/blog/read-replicas-vs-bigger-compute)
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
