@@ -25,6 +25,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
   UI_PREVIEW_TABLE_FILTER_BAR: 'supabase-ui-table-filter-bar',
   UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
+  UI_PREVIEW_FLOATING_MOBILE_TOOLBAR: 'supabase-ui-floating-mobile-toolbar',
   UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',

@@ -4,6 +4,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
+import { buildStudioPageTitle } from 'lib/page-title'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
@@ -11,7 +12,7 @@ import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 
-import { useMobileSheet } from '../ProjectLayout/NavigationBar/MobileSheetContext'
+import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
 
@@ -27,7 +28,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
 
   const { appTitle } = useCustomContent(['app:title'])
-  const titleSuffix = appTitle || 'Supabase'
+  const brandTitle = appTitle || 'Supabase'
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -42,6 +43,11 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         : '/organizations'
 
   const currentPath = router.pathname
+  const pageTitle = buildStudioPageTitle({
+    section: title,
+    surface: 'Account',
+    brand: brandTitle,
+  })
 
   const sections = useMemo(
     () => [
@@ -107,7 +113,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   return (
     <>
       <Head>
-        <title>{title ? `${title} | ${titleSuffix}` : titleSuffix}</title>
+        <title>{pageTitle}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
       <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>

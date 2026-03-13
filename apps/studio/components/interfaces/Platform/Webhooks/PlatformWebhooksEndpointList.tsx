@@ -1,8 +1,7 @@
+import { createNavigationHandler } from 'lib/navigation'
 import { ChevronRight, Eye, MoreVertical, Plus, Search, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-
-import { createNavigationHandler } from 'lib/navigation'
 import {
   Badge,
   Button,
@@ -16,12 +15,13 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableHeadSort,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
 import { EmptyStatePresentational, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 
 interface PlatformWebhooksEndpointListProps {
@@ -189,7 +189,11 @@ export const PlatformWebhooksEndpointList = ({
                     >
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button type="default" icon={<MoreVertical />} className="w-7" />
+                          <Button
+                            type="default"
+                            icon={<MoreVertical />}
+                            className="w-7 hit-area-2"
+                          />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent side="bottom" align="end" className="w-40">
                           <DropdownMenuItem

@@ -11,7 +11,7 @@ import {
   generateProductRoutes,
   generateSettingsRoutes,
   generateToolRoutes,
-} from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
+} from 'components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import type { Route } from 'components/ui/ui.types'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'

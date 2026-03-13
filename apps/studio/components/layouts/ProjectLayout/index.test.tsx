@@ -2,6 +2,8 @@ import { render, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { MobileSheetProvider } from '../Navigation/NavigationBar/MobileSheetContext'
+import { ProjectLayout } from './index'
 import { STUDIO_PAGE_TITLE_SEPARATOR } from '@/lib/page-title'
 
 const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen } = vi.hoisted(() => ({
@@ -157,9 +159,6 @@ vi.mock('@/state/database-selector', () => ({
     setSelectedDatabaseId: mockSetSelectedDatabaseId,
   }),
 }))
-
-import { MobileSheetProvider } from './NavigationBar/MobileSheetContext'
-import { ProjectLayout } from './index'
 
 describe('ProjectLayout title', () => {
   beforeEach(() => {

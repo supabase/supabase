@@ -1,9 +1,12 @@
+import { CommandMenuInnerContent } from 'components/interfaces/App/CommandMenu/CommandMenu'
 import type { ReactNode } from 'react'
 import { sidebarManagerState, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { MobileSheetNav } from 'ui-patterns'
+import { CommandWrapper, MobileSheetNav } from 'ui-patterns'
 
-import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
-import type { TYPEOF_SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
+import {
+  SIDEBAR_KEYS,
+  type TYPEOF_SIDEBAR_KEYS,
+} from '../../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import type { MobileSheetContentType } from './MobileSheetContext'
 import { useMobileSheet } from './MobileSheetContext'
 
@@ -19,6 +22,13 @@ function getSheetChildren(
   activeSidebar: { id: string; component?: () => ReactNode } | null
 ): ReactNode {
   if (content === null) return null
+  if (content === 'search') {
+    return (
+      <CommandWrapper className="h-full flex flex-col bg-background">
+        <CommandMenuInnerContent />
+      </CommandWrapper>
+    )
+  }
   if (isSidebarId(content) && activeSidebar?.id === content) {
     return activeSidebar.component?.() ?? null
   }
@@ -39,7 +49,11 @@ const StudioMobileSheetNav = () => {
   }
 
   return (
-    <MobileSheetNav open={content !== null} onOpenChange={handleOpenChange}>
+    <MobileSheetNav
+      open={content !== null}
+      onOpenChange={handleOpenChange}
+      shouldCloseOnViewportResize={!activeSidebar}
+    >
       {sheetChildren}
     </MobileSheetNav>
   )

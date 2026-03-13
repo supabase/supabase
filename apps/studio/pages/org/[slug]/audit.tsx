@@ -1,10 +1,11 @@
 import { AuditLogs } from 'components/interfaces/Organization/AuditLogs/AuditLogs'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { OrganizationSettingsLayout } from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
+import { LogoLoader } from 'ui'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -12,7 +13,6 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import { LogoLoader } from 'ui'
 
 const OrgAuditLogs: NextPageWithLayout = () => {
   const { isPending: isLoadingPermissions } = usePermissionsQuery()
@@ -37,8 +37,8 @@ const OrgAuditLogs: NextPageWithLayout = () => {
 
 OrgAuditLogs.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout pageTitle="Audit Logs">{page}</OrganizationSettingsLayout>
+    <OrganizationLayout title="Audit Logs">
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>
 )

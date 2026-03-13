@@ -1,7 +1,3 @@
-import { isEqual } from 'lodash'
-import { ChevronDown, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -13,19 +9,23 @@ import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-proje
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
+import { isEqual } from 'lodash'
+import { ChevronDown, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Select_Shadcn_,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -36,13 +36,13 @@ import {
   TooltipContent,
   TooltipTrigger,
   WarningIcon,
-  cn,
 } from 'ui'
+
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
-  ProjectRoleConfiguration,
   formatMemberRoleToProjectRoleConfiguration,
+  ProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
 
 interface UpdateRolesPanelProps {
@@ -97,7 +97,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const noAccessProjects = orgProjects.filter((project) => {
     return !projectsRoleConfiguration.some((p) => p.ref === project.ref)
   })
-  const numberOfProjectsWithAccess = orgProjects.length - noAccessProjects.length
+  const numberOfProjectsWithAccess = projectsRoleConfiguration.filter(
+    (p) => p.ref !== undefined
+  ).length
   const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
 
   const onSelectProject = (project: OrgProject) => {

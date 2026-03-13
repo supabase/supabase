@@ -1,4 +1,5 @@
 import { useBreakpoint, useParams } from 'common'
+import { OrgCommandItem } from 'components/layouts/AppLayout/OrgCommandItem'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -24,8 +25,6 @@ import {
   SidebarMenuItem,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
-import { OrgCommandItem } from 'components/layouts/AppLayout/OrgCommandItem'
 
 import { OrgSelectorSheet } from './OrgSelectorSheet'
 
