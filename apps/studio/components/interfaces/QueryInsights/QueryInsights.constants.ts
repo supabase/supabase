@@ -23,6 +23,11 @@ export const getSupamonitorLogsQuery = (startTime: string, endTime: string) => {
   const safeEnd = new Date(endTime).toISOString()
 
   return `
+-- This query is run by Supabase Query Insights to aggregate pg_stat_statements
+-- data collected by the supamonitor extension. It reads from Logflare and groups
+-- execution metrics (timing, call counts, percentiles) by query and minute so
+-- the dashboard can surface slow queries, high-call patterns, and planning overhead.
+-- If you see this query in your logs, it is a read-only analytics query and safe to ignore.
 select
   TIMESTAMP_TRUNC(sml.timestamp, MINUTE) as timestamp,
   CAST(sml_parsed.application_name AS STRING) as application_name,
