@@ -40,6 +40,8 @@ export const useIncidentStatusQuery = <TData = IncidentStatusData>(
   useQuery<IncidentStatusData, IncidentStatusError, TData>({
     queryKey: platformKeys.incidentStatus(),
     queryFn: ({ signal }) => getIncidentStatus(signal),
+    // exponential backoff retry starting at 4s, 16s, 64s, 256s, up to 5 minutes
+    retryDelay: (attemptIndex) => Math.min(1000 * 4 ** attemptIndex, 1000 * 60 * 5),
     staleTime: 1000 * 60 * 5, // 5 minutes to match API cache
     ...options,
     // Enable in platform mode, or in test environment for E2E testing
