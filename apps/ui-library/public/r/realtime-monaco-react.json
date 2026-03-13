@@ -5,9 +5,9 @@
   "title": "Realtime Monaco",
   "description": "Real-time Monaco editor for collaborative applications.",
   "dependencies": [
-    "@monaco-editor/react",
-    "y-monaco",
-    "yjs",
+    "@monaco-editor/react@latest",
+    "y-monaco@latest",
+    "yjs@latest",
     "@supabase/supabase-js@latest"
   ],
   "registryDependencies": [],
@@ -19,7 +19,7 @@
     },
     {
       "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
-      "content": "'use client'\n\nimport { Editor } from '@monaco-editor/react'\nimport { Awareness } from 'y-protocols/awareness.js'\nimport { SupabasePersistenceOptions } from '@supabase-labs/y-supabase'\n\nimport { useConnectOnMount } from '../hooks/use-connect-on-mount'\n\ntype RealtimeMonacoProps = {\n  channel: string\n  language?: string\n  height?: string | number\n  className?: string\n  awareness?: boolean | Awareness\n  persistence?: boolean | SupabasePersistenceOptions\n  theme?: 'light' | 'dark'\n}\n\nconst DEFAULT_HEIGHT = 550\n\nconst RealtimeMonaco = ({\n  channel,\n  language = 'javascript',\n  height = DEFAULT_HEIGHT,\n  awareness = true,\n  persistence,\n  theme,\n  ...rest\n}: RealtimeMonacoProps) => {\n  const { connectOnMount } = useConnectOnMount({ channel, persistence, awareness })\n\n  return (\n    <Editor\n      height={height}\n      language={language}\n      theme={theme === 'dark' ? 'vs-dark' : 'light'}\n      onMount={connectOnMount}\n      {...rest}\n    />\n  )\n}\n\nexport { RealtimeMonaco }\n",
+      "content": "'use client'\n\nimport { Editor } from '@monaco-editor/react'\nimport { SupabasePersistenceOptions } from '@supabase-labs/y-supabase'\nimport { Awareness } from 'y-protocols/awareness.js'\n\nimport { useConnectOnMount } from '../hooks/use-connect-on-mount'\n\ntype RealtimeMonacoProps = {\n  channel: string\n  language?: string\n  height?: string | number\n  className?: string\n  awareness?: boolean | Awareness\n  persistence?: boolean | SupabasePersistenceOptions\n  theme?: 'light' | 'dark'\n}\n\nconst DEFAULT_HEIGHT = 550\n\nconst RealtimeMonaco = ({\n  channel,\n  language = 'javascript',\n  height = DEFAULT_HEIGHT,\n  awareness = true,\n  persistence,\n  theme,\n  ...rest\n}: RealtimeMonacoProps) => {\n  const { connectOnMount } = useConnectOnMount({ channel, persistence, awareness })\n\n  return (\n    <Editor\n      height={height}\n      language={language}\n      theme={theme === 'dark' ? 'vs-dark' : 'light'}\n      onMount={connectOnMount}\n      {...rest}\n    />\n  )\n}\n\nexport { RealtimeMonaco }\n",
       "type": "registry:component"
     },
     {
