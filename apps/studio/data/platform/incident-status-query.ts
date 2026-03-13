@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { getAccessToken } from 'common'
 import type { IncidentInfo } from 'lib/api/incident-status'
 import { BASE_PATH, IS_PLATFORM, IS_TEST_ENV } from 'lib/constants'
 import { partition } from 'lodash'
@@ -10,13 +9,11 @@ import { platformKeys } from './keys'
 export async function getIncidentStatus(
   signal?: AbortSignal
 ): Promise<{ maintenanceEvents: IncidentInfo[]; incidents: IncidentInfo[] }> {
-  const accessToken = await getAccessToken()
   const response = await fetch(`${BASE_PATH}/api/incident-status`, {
     signal,
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
     },
   })
 
