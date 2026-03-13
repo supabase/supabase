@@ -336,14 +336,14 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
 
   const exportParams = snap.allRowsSelected
     ? ({ type: 'fetch_all', filters, sorts } as const)
-    : ({
+    : {
         type: 'fetch_selected' as const,
         table: snap.table,
         selectedRows: allRows.filter((x) => snap.selectedRows.has(x.idx)),
         filters,
         sorts,
         roleImpersonationState: roleImpersonationState as RoleImpersonationState,
-      })
+      }
 
   const { exportCsv, confirmationModal: exportCsvConfirmationModal } = useExportAllRowsAsCsv(
     project
