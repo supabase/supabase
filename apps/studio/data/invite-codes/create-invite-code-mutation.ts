@@ -70,7 +70,7 @@ export const useCreateInviteCodeMutation = ({
       createInviteCode({ projectRef, clientEndpoint, projectId, maxSlots }),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: inviteCodeKeys.list(projectRef, clientEndpoint),
+        queryKey: ['projects', projectRef, 'invite-codes'],
       })
       await onSuccess?.(data)
     },
