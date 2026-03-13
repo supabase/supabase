@@ -2600,8 +2600,8 @@ export interface InlineErrorTroubleshooterExposedEvent {
  * @group Events
  * @source studio
  */
-export interface InlineErrorTroubleshooterAccordionToggledEvent {
-  action: 'inline_error_troubleshooter_accordion_toggled'
+export interface InlineErrorTroubleshooterStepClickedEvent {
+  action: 'inline_error_troubleshooter_step_clicked'
   properties: {
     /** ID of the matched error mapping */
     errorType: string
@@ -2920,7 +2920,7 @@ export type TelemetryEvent =
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
   | InlineErrorTroubleshooterExposedEvent
-  | InlineErrorTroubleshooterAccordionToggledEvent
+  | InlineErrorTroubleshooterStepClickedEvent
   | InlineErrorTroubleshooterActionClickedEvent
   | IntegrationInstallCompletedEvent
   | IntegrationInstallSubmittedEvent

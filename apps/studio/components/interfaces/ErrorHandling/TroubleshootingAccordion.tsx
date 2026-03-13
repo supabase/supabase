@@ -34,7 +34,7 @@ export function TroubleshootingAccordion({
       onValueChange={(value) => {
         const expanded = Boolean(value)
         const step = expanded ? parseInt(value.replace('step-', ''), 10) : 0
-        track('inline_error_troubleshooter_accordion_toggled', {
+        track('inline_error_troubleshooter_step_clicked', {
           errorType,
           step,
           stepTitle: stepTitles?.[step],
