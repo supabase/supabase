@@ -1,3 +1,5 @@
+/// <reference path="../../types/assets.d.ts" />
+
 import antigravityIcon from '../assets/antigravity-icon.svg'
 import claudeIcon from '../assets/claude-icon.svg'
 import cursorIcon from '../assets/cursor-icon.svg'
