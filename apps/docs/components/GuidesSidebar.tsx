@@ -27,7 +27,7 @@ function AiTools({ className }: { className?: string }) {
 
   async function copyMarkdown() {
     const mdUrl = `/docs/${path}.md`
-    
+
     try {
       const res = await fetch(mdUrl)
       const text = await res.text()
