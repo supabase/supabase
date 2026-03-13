@@ -36,6 +36,7 @@ import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
+import type { ConnectSectionVariant } from '@/components/interfaces/ProjectHome/ConnectSection.config'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -75,10 +76,9 @@ export const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
 
-  const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
   const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
-  const isFlagResolved = connectSheetFlag !== undefined
-  const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
+  const connectSectionVariant = usePHFlag<ConnectSectionVariant | false>('connectSection')
+  const isConnectSheetEnabled = connectSectionVariant === 'connect'
 
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
@@ -285,7 +285,7 @@ export const LayoutHeader = ({
         </div>
       </header>
 
-      {isFlagResolved ? isConnectSheetEnabled ? <ConnectSheet /> : <Connect /> : null}
+      {isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
     </>
   )
 }

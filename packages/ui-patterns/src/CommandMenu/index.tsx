@@ -20,6 +20,7 @@ export {
   useCommandMenuOpenedTelemetry,
   useCommandMenuTelemetry,
 } from './api/hooks/useCommandMenuTelemetry'
+export { useCommandMenuTelemetryContext } from './api/hooks/useCommandMenuTelemetryContext'
 export { useHistoryKeys } from './api/hooks/useHistoryKeys'
 export * from './api/hooks/viewHooks'
 export * from './api/utils'

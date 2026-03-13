@@ -71,6 +71,11 @@ export const appState = proxy({
     appState.mobileMenuOpen = value
   },
 
+  connectSheetSource: 'header_button' as 'header_button' | 'connect_section',
+  setConnectSheetSource: (value: 'header_button' | 'connect_section') => {
+    appState.connectSheetSource = value
+  },
+
   lastRouteBeforeVisitingAccountPage: '',
   setLastRouteBeforeVisitingAccountPage: (value: string) => {
     appState.lastRouteBeforeVisitingAccountPage = value

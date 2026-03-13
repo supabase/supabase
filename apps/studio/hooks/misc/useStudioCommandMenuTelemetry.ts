@@ -4,8 +4,9 @@ import { useParams } from 'common'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import type {
-  CommandMenuOpenedEvent,
+  CommandMenuClosedEvent,
   CommandMenuCommandClickedEvent,
+  CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
 
@@ -18,6 +19,7 @@ export function useStudioCommandMenuTelemetry() {
     (
       event:
         | CommandMenuOpenedEvent
+        | CommandMenuClosedEvent
         | CommandMenuCommandClickedEvent
         | CommandMenuSearchSubmittedEvent
     ) => {
