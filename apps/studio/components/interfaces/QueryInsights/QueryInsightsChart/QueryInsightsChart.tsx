@@ -13,11 +13,8 @@ import { Loader2 } from 'lucide-react'
 import type { ChartDataPoint } from '../QueryInsights.types'
 import { useTheme } from 'next-themes'
 import { QueryInsightsChartTooltip } from './QueryInsightsChartTooltip'
-import { CHART_TABS, LEGEND_ITEMS, CHART_TYPE } from './QueryInsightsChart.constants'
+import { CHART_TABS, LEGEND_ITEMS, CHART_TYPE, SEL_COLOR } from './QueryInsightsChart.constants'
 import { formatTime } from './QueryInsightsChart.utils'
-import { CHART_COLORS } from 'components/ui/Charts/Charts.constants'
-
-const SEL_COLOR = 'hsl(var(--chart-blue))'
 
 interface QueryInsightsChartProps {
   chartData: ChartDataPoint[]
@@ -37,7 +34,6 @@ export const QueryInsightsChart = ({
 
   const data = useMemo(() => {
     const normalize = (ts: number) => (ts > 1e13 ? Math.floor(ts / 1000) : ts)
-
     const selByTime = new Map((selectedChartData ?? []).map((d) => [normalize(d.period_start), d]))
 
     return chartData.map((d) => {
@@ -50,10 +46,10 @@ export const QueryInsightsChart = ({
         rows_read: d.rows_read,
         calls: d.calls,
         cache_hits: d.cache_hits,
-        sel_p50: sel?.p50_time ?? undefined,
-        sel_rows_read: sel?.rows_read ?? undefined,
-        sel_calls: sel?.calls ?? undefined,
-        sel_cache_hits: sel?.cache_hits ?? undefined,
+        sel_p50: sel?.p50_time,
+        sel_rows_read: sel?.rows_read,
+        sel_calls: sel?.calls,
+        sel_cache_hits: sel?.cache_hits,
       }
     })
   }, [chartData, selectedChartData])
@@ -81,18 +77,13 @@ export const QueryInsightsChart = ({
     })
   }
 
-  const isSeriesVisible = (dataKey: string) => !hiddenSeries.has(dataKey)
-
   const hasSelection = !!selectedChartData && selectedChartData.length > 0
   const selDataKey = selectedMetric === 'query_latency' ? 'sel_p50' : `sel_${selectedMetric}`
+  const legendItems = LEGEND_ITEMS[selectedMetric] ?? []
 
   return (
     <div className="bg-surface-100 border-b min-h-[320px]">
-      <Tabs_Shadcn_
-        value={selectedMetric}
-        onValueChange={(value) => setSelectedMetric(value)}
-        className="w-full"
-      >
+      <Tabs_Shadcn_ value={selectedMetric} onValueChange={setSelectedMetric} className="w-full">
         <TabsList_Shadcn_ className="flex justify-start rounded-none gap-x-4 border-b !mt-0 pt-0 px-6">
           {CHART_TABS.map((tab) => (
             <TabsTrigger_Shadcn_
@@ -107,37 +98,35 @@ export const QueryInsightsChart = ({
 
         <TabsContent_Shadcn_ value={selectedMetric} className="bg-surface-100 mt-0">
           <div className="w-full gap-4 mt-4 px-6 flex items-center justify-end">
-            {LEGEND_ITEMS[selectedMetric]?.map(
-              (item: { dataKey: string; label: string; color: string }) => (
-                <button
-                  key={item.dataKey}
-                  type="button"
-                  onClick={() => toggleSeries(item.dataKey)}
+            {legendItems.map((item: { dataKey: string; label: string; color: string }) => (
+              <button
+                key={item.dataKey}
+                type="button"
+                onClick={() => toggleSeries(item.dataKey)}
+                className={cn(
+                  'flex items-center gap-1.5 text-[11px] transition-colors cursor-pointer',
+                  !hiddenSeries.has(item.dataKey)
+                    ? 'text-foreground hover:text-foreground-light'
+                    : 'text-foreground-muted'
+                )}
+              >
+                <span
                   className={cn(
-                    'flex items-center gap-1.5 text-[11px] transition-colors cursor-pointer',
-                    isSeriesVisible(item.dataKey)
-                      ? 'text-foreground hover:text-foreground-light'
-                      : 'text-foreground-muted'
+                    'h-1.5 w-1.5 rounded-full transition-opacity',
+                    hiddenSeries.has(item.dataKey) && 'opacity-30'
                   )}
-                >
-                  <span
-                    className={cn(
-                      'h-1.5 w-1.5 rounded-full transition-opacity',
-                      !isSeriesVisible(item.dataKey) && 'opacity-30'
-                    )}
-                    style={{ backgroundColor: item.color }}
-                  />
-                  {item.label}
-                </button>
-              )
-            )}
+                  style={{ backgroundColor: item.color }}
+                />
+                {item.label}
+              </button>
+            ))}
             {hasSelection && (
               <button
                 type="button"
                 onClick={() => toggleSeries(selDataKey)}
                 className={cn(
                   'flex items-center gap-1.5 text-[11px] transition-colors cursor-pointer',
-                  isSeriesVisible(selDataKey)
+                  !hiddenSeries.has(selDataKey)
                     ? 'text-foreground hover:text-foreground-light'
                     : 'text-foreground-muted'
                 )}
@@ -145,7 +134,7 @@ export const QueryInsightsChart = ({
                 <span
                   className={cn(
                     'h-1.5 w-1.5 rounded-sm transition-opacity',
-                    !isSeriesVisible(selDataKey) && 'opacity-30'
+                    hiddenSeries.has(selDataKey) && 'opacity-30'
                   )}
                   style={{ backgroundColor: SEL_COLOR }}
                 />
@@ -165,181 +154,101 @@ export const QueryInsightsChart = ({
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  {selectedMetric === 'query_latency' ? (
-                    <AreaChart
-                      data={filteredData}
-                      margin={{ top: 4, left: 0, right: 0, bottom: 4 }}
-                    >
-                      <defs>
-                        {LEGEND_ITEMS.query_latency?.map((item) => (
-                          <linearGradient
-                            key={`gradient-${item.dataKey}`}
-                            id={`gradient-${item.dataKey}`}
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop offset="0%" stopColor={item.color} stopOpacity={0.15} />
-                            <stop offset="100%" stopColor={item.color} stopOpacity={0} />
-                          </linearGradient>
-                        ))}
-                        {hasSelection && (
-                          <linearGradient id="gradient-sel_p50" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={SEL_COLOR} stopOpacity={0.35} />
-                            <stop offset="100%" stopColor={SEL_COLOR} stopOpacity={0} />
-                          </linearGradient>
-                        )}
-                      </defs>
-                      <XAxis
-                        dataKey="time"
-                        tick={false}
-                        tickLine={false}
-                        axisLine={{ stroke: 'hsl(var(--border-default))' }}
-                        height={1}
-                      />
-                      <YAxis
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 10, fill: 'hsl(var(--foreground-muted))' }}
-                        tickCount={3}
-                        width={40}
-                        orientation="left"
-                        tickFormatter={(v) => `${Math.round(v)}ms`}
-                        mirror={true}
-                      />
-                      <Tooltip
-                        content={<QueryInsightsChartTooltip />}
-                        cursor={{
-                          stroke: isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-                          strokeWidth: 1,
-                        }}
-                      />
-                      <CartesianGrid
-                        horizontal={true}
-                        vertical={false}
-                        stroke="hsl(var(--border-default))"
-                        strokeOpacity={0.5}
-                      />
-                      {LEGEND_ITEMS.query_latency?.map((item) => (
-                        <Area
-                          key={item.dataKey}
-                          type={CHART_TYPE}
-                          dataKey={item.dataKey}
-                          stroke={item.color}
-                          strokeWidth={1}
-                          fill={`url(#gradient-${item.dataKey})`}
-                          dot={false}
-                          name={item.label}
-                          strokeOpacity={
-                            isSeriesVisible(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0
-                          }
-                          fillOpacity={isSeriesVisible(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0}
-                        />
+                  <AreaChart data={filteredData} margin={{ top: 4, left: 0, right: 0, bottom: 4 }}>
+                    <defs>
+                      {legendItems.map((item) => (
+                        <linearGradient
+                          key={`gradient-${item.dataKey}`}
+                          id={`gradient-${item.dataKey}`}
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop offset="0%" stopColor={item.color} stopOpacity={0.15} />
+                          <stop offset="100%" stopColor={item.color} stopOpacity={0} />
+                        </linearGradient>
                       ))}
                       {hasSelection && (
-                        <Area
-                          type={CHART_TYPE}
-                          dataKey="sel_p50"
-                          stroke={SEL_COLOR}
-                          strokeWidth={1}
-                          fill="url(#gradient-sel_p50)"
-                          dot={false}
-                          name="Selected query"
-                          connectNulls={false}
-                          strokeOpacity={isSeriesVisible('sel_p50') ? 1 : 0}
-                          fillOpacity={isSeriesVisible('sel_p50') ? 1 : 0}
-                        />
+                        <linearGradient
+                          id={`gradient-${selDataKey}`}
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop offset="0%" stopColor={SEL_COLOR} stopOpacity={0.35} />
+                          <stop offset="100%" stopColor={SEL_COLOR} stopOpacity={0} />
+                        </linearGradient>
                       )}
-                    </AreaChart>
-                  ) : (
-                    <AreaChart
-                      data={filteredData}
-                      margin={{ top: 4, left: 0, right: 0, bottom: 4 }}
-                    >
-                      <defs>
-                        {LEGEND_ITEMS[selectedMetric]?.map((item) => (
-                          <linearGradient
-                            key={`gradient-${item.dataKey}`}
-                            id={`gradient-${item.dataKey}`}
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop offset="0%" stopColor={item.color} stopOpacity={0.15} />
-                            <stop offset="100%" stopColor={item.color} stopOpacity={0} />
-                          </linearGradient>
-                        ))}
-                        {hasSelection && (
-                          <linearGradient id={`gradient-${selDataKey}`} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={SEL_COLOR} stopOpacity={0.35} />
-                            <stop offset="100%" stopColor={SEL_COLOR} stopOpacity={0} />
-                          </linearGradient>
-                        )}
-                      </defs>
-                      <Tooltip
-                        content={<QueryInsightsChartTooltip />}
-                        cursor={{
-                          stroke: isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-                          strokeWidth: 1,
-                        }}
+                    </defs>
+                    <XAxis
+                      dataKey="time"
+                      tick={false}
+                      tickLine={false}
+                      axisLine={{ stroke: 'hsl(var(--border-default))' }}
+                      height={1}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fill: 'hsl(var(--foreground-muted))' }}
+                      tickCount={3}
+                      width={40}
+                      orientation="left"
+                      tickFormatter={(v) =>
+                        selectedMetric === 'query_latency'
+                          ? `${Math.round(v)}ms`
+                          : `${Math.round(v)}`
+                      }
+                      mirror={true}
+                    />
+                    <Tooltip
+                      content={<QueryInsightsChartTooltip />}
+                      cursor={{
+                        stroke: isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+                        strokeWidth: 1,
+                      }}
+                    />
+                    <CartesianGrid
+                      horizontal={true}
+                      vertical={false}
+                      stroke="hsl(var(--border-default))"
+                      strokeOpacity={0.5}
+                    />
+                    {legendItems.map((item) => (
+                      <Area
+                        key={item.dataKey}
+                        type={CHART_TYPE}
+                        dataKey={item.dataKey}
+                        stroke={item.color}
+                        strokeWidth={1}
+                        fill={`url(#gradient-${item.dataKey})`}
+                        dot={false}
+                        name={item.label}
+                        strokeOpacity={
+                          !hiddenSeries.has(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0
+                        }
+                        fillOpacity={
+                          !hiddenSeries.has(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0
+                        }
                       />
-                      <XAxis
-                        dataKey="time"
-                        tick={false}
-                        tickLine={false}
-                        axisLine={{ stroke: 'hsl(var(--border-default))' }}
-                        height={1}
+                    ))}
+                    {hasSelection && (
+                      <Area
+                        type={CHART_TYPE}
+                        dataKey={selDataKey}
+                        stroke={SEL_COLOR}
+                        strokeWidth={1}
+                        fill={`url(#gradient-${selDataKey})`}
+                        dot={false}
+                        name="Selected query"
+                        connectNulls={false}
+                        strokeOpacity={!hiddenSeries.has(selDataKey) ? 1 : 0}
+                        fillOpacity={!hiddenSeries.has(selDataKey) ? 1 : 0}
                       />
-                      <YAxis
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 10, fill: 'hsl(var(--foreground-muted))' }}
-                        tickCount={3}
-                        width={40}
-                        orientation="left"
-                        tickFormatter={(v) => `${Math.round(v)}`}
-                        mirror={true}
-                      />
-                      <CartesianGrid
-                        horizontal={true}
-                        vertical={false}
-                        stroke="hsl(var(--border-default))"
-                        strokeOpacity={0.5}
-                      />
-                      {LEGEND_ITEMS[selectedMetric]?.map((item) => (
-                        <Area
-                          key={item.dataKey}
-                          type={CHART_TYPE}
-                          dataKey={item.dataKey}
-                          stroke={item.color}
-                          strokeWidth={1}
-                          fill={`url(#gradient-${item.dataKey})`}
-                          dot={false}
-                          name={item.label}
-                          strokeOpacity={
-                            isSeriesVisible(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0
-                          }
-                          fillOpacity={isSeriesVisible(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0}
-                        />
-                      ))}
-                      {hasSelection && (
-                        <Area
-                          type={CHART_TYPE}
-                          dataKey={selDataKey}
-                          stroke={SEL_COLOR}
-                          strokeWidth={1}
-                          fill={`url(#gradient-${selDataKey})`}
-                          dot={false}
-                          name="Selected query"
-                          connectNulls={false}
-                          strokeOpacity={isSeriesVisible(selDataKey) ? 1 : 0}
-                          fillOpacity={isSeriesVisible(selDataKey) ? 1 : 0}
-                        />
-                      )}
-                    </AreaChart>
-                  )}
+                    )}
+                  </AreaChart>
                 </ResponsiveContainer>
               )}
             </div>
