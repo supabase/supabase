@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
-type FeaturePreview = {
+export type FeaturePreview = {
   key: string
   name: string
   discussionsUrl?: string
