@@ -47,11 +47,7 @@ async function fetchIncidentCache(incidentIds: Array<string>): Promise<Map<strin
   return cacheMap
 }
 
-// Default export needed by Next.js convention
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Array<IncidentInfo> | { error: string }>
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!IS_PLATFORM) {
     return res.status(404).end()
   }
@@ -100,3 +96,5 @@ export default async function handler(
     return res.status(500).json({ error: 'Unable to fetch incidents at this time' })
   }
 }
+
+export default handler

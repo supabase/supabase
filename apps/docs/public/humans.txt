@@ -59,6 +59,7 @@ Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
 David Birdsong
+David Camacho Cateura
 David Weitzman
 Deepthi Sigireddi
 Deji I
@@ -115,6 +116,8 @@ Jim Chanco Jr
 Joakim Ahrlin
 Joaquim Moreno
 Joel Low
+Joey Freeland
+John Fitzgerald
 Joel Martin
 Johan Bergström
 John Pena

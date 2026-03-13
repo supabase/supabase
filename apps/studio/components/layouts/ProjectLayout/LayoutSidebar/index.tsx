@@ -1,13 +1,18 @@
 import { useBreakpoint } from 'common'
+import { useMobileSheet } from 'components/layouts/Navigation/NavigationBar/MobileSheetContext'
 import { useEffect } from 'react'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn, ResizableHandle, ResizablePanel } from 'ui'
-import { MobileSheetNav } from 'ui-patterns'
 
-import { useMobileSheet } from '../NavigationBar/MobileSheetContext'
+import { SIDEBAR_KEYS, type TYPEOF_SIDEBAR_KEYS } from './LayoutSidebarProvider'
 
-// Having these params as props as otherwise it's quite hard to visually check the sizes in DefaultLayout
-// as react resizeable panels requires all these values to be valid to render correctly
+function isSidebarId(content: unknown): content is TYPEOF_SIDEBAR_KEYS {
+  return (
+    typeof content === 'string' &&
+    Object.values(SIDEBAR_KEYS).includes(content as TYPEOF_SIDEBAR_KEYS)
+  )
+}
+
 interface LayoutSidebarProps {
   minSize?: string | number
   maxSize?: string | number
@@ -19,37 +24,24 @@ export const LayoutSidebar = ({
   maxSize = '50',
   defaultSize = '30',
 }: LayoutSidebarProps) => {
-  const { activeSidebar, closeActive } = useSidebarManagerSnapshot()
+  const { activeSidebar } = useSidebarManagerSnapshot()
   const isMobile = useBreakpoint('md')
-  const { content: mobileSheetContent, setContent: setMobileSheetContent } = useMobileSheet()
+  const { content: sheetContent, setContent: setMobileSheetContent } = useMobileSheet()
 
-  // On mobile the sidebar content is rendered in MobileSheetNav
   useEffect(() => {
-    if (isMobile && activeSidebar?.component) {
+    if (!isMobile) {
+      setMobileSheetContent(null)
+      return
+    }
+    if (activeSidebar?.component) {
       setMobileSheetContent(activeSidebar.id)
-    } else {
+    } else if (isSidebarId(sheetContent)) {
       setMobileSheetContent(null)
     }
-  }, [isMobile, activeSidebar, setMobileSheetContent])
+  }, [isMobile, activeSidebar, sheetContent, setMobileSheetContent])
 
   if (!activeSidebar?.component) return null
-
-  if (isMobile)
-    return (
-      <MobileSheetNav
-        shouldCloseOnRouteChange={false}
-        shouldCloseOnViewportResize={false}
-        open={mobileSheetContent !== null}
-        onOpenChange={(open: boolean) => {
-          if (!open) {
-            setMobileSheetContent(null)
-            closeActive()
-          }
-        }}
-      >
-        {activeSidebar?.component?.()}
-      </MobileSheetNav>
-    )
+  if (isMobile) return null
 
   return (
     <>
