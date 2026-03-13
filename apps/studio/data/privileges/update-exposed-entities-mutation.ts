@@ -54,7 +54,6 @@ export async function updateExposedEntities({
 type UpdateExposedEntitiesData = Awaited<ReturnType<typeof updateExposedEntities>>
 
 export const useUpdateExposedEntitiesMutation = ({
-  onSuccess,
   onError,
   ...options
 }: Omit<

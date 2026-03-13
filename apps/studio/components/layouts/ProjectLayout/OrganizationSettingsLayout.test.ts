@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import {
   generateOrganizationSettingsMenuItems,
   generateOrganizationSettingsSections,
-  getOrganizationSettingsDocumentTitle,
   normalizeOrganizationSettingsPath,
 } from './OrganizationSettingsLayout'
 
@@ -102,13 +101,5 @@ describe('OrganizationSettingsLayout helpers', () => {
       sections.flatMap((section) => section.links).find((item) => item.label === 'Webhooks')
         ?.isActive
     ).toBe(true)
-  })
-
-  it('uses settings as default document title when page title is not provided', () => {
-    expect(getOrganizationSettingsDocumentTitle(undefined, 'Supabase')).toBe('Settings | Supabase')
-  })
-
-  it('uses page title for document title when provided', () => {
-    expect(getOrganizationSettingsDocumentTitle('General', 'Supabase')).toBe('General | Supabase')
   })
 })

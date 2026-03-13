@@ -1,13 +1,11 @@
-import { Smartphone } from 'lucide-react'
-
 import { TOTPFactors } from 'components/interfaces/Account/TOTPFactors'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { Smartphone } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -90,9 +88,7 @@ const Security: NextPageWithLayout = () => {
 Security.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
-      <OrganizationLayout>
-        <AccountLayout title="Security">{page}</AccountLayout>
-      </OrganizationLayout>
+      <AccountLayout title="Security">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
 )

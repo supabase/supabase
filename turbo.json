@@ -70,6 +70,9 @@
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
         "PG_META_CRYPTO_KEY",
+        "PGRST_DB_SCHEMAS",
+        "PGRST_DB_MAX_ROWS",
+        "PGRST_DB_EXTRA_SEARCH_PATH",
         "POSTGRES_PASSWORD",
         "POSTGRES_HOST",
         "POSTGRES_USER_READ_WRITE",
@@ -113,6 +116,7 @@
         "SUPPORT_SUPABASE_SECRET_KEY",
         "STATUSPAGE_API_KEY",
         "STATUSPAGE_PAGE_ID",
+        "INCIDENT_IO_API_KEY",
 		"LIVE_SUPABASE_SECRET_KEY"
       ],
       "passThroughEnv": [

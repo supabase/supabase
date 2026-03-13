@@ -33,6 +33,7 @@ import { MergeRequestButton } from './MergeRequestButton'
 import { Connect } from '@/components/interfaces/Connect/Connect'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
+import type { ConnectSectionVariant } from '@/components/interfaces/ProjectHome/ConnectSection.config'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
@@ -75,9 +76,8 @@ export const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
 
-  const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
-  const isFlagResolved = connectSheetFlag !== undefined
-  const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
+  const connectSectionVariant = usePHFlag<ConnectSectionVariant | false>('connectSection')
+  const isConnectSheetEnabled = connectSectionVariant === 'connect'
 
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
@@ -279,7 +279,7 @@ export const LayoutHeader = ({
         </div>
       </header>
 
-      {isFlagResolved ? isConnectSheetEnabled ? <ConnectSheet /> : <Connect /> : null}
+      {isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
     </>
   )
 }
