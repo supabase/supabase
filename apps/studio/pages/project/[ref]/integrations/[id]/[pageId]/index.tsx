@@ -151,10 +151,6 @@ const IntegrationPage: NextPageWithLayout = () => {
     return null
   }
 
-  if (id === 'data_api' && !IS_PLATFORM) {
-    return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
-  }
-
   if (!integrationsWrappers && id?.endsWith('_wrapper')) {
     return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
   }

@@ -1941,6 +1941,60 @@ export interface HomeNewExperimentExposedEvent {
 }
 
 /**
+ * Connect section was shown to the user as part of the connectSection experiment.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectSectionExposedEvent {
+  action: 'home_connect_section_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: 'connect' | 'getting-started'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a connect action tile in the Connect section on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectActionClickedEvent {
+  action: 'home_connect_action_clicked'
+  properties: {
+    /**
+     * The connect mode that was clicked
+     */
+    mode: 'framework' | 'direct' | 'orm' | 'mcp'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the ConnectSheet panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface ConnectSheetOpenedEvent {
+  action: 'connect_sheet_opened'
+  properties: {
+    /**
+     * Where the sheet was opened from
+     */
+    source: 'header_button' | 'connect_section'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User reordered sections in HomeV2 using drag and drop.
  *
  * @group Events
@@ -2340,7 +2394,33 @@ export interface CommandMenuCommandClickedEvent {
     command_value?: string
     command_type: 'action' | 'route'
     /**
+     * The search query that was active when the command was clicked
+     */
+    search_query?: string
+    /**
+     * The path or URL the clicked item leads to (only present for route commands)
+     */
+    result_path?: string
+    /**
      * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User closed the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuClosedEvent {
+  action: 'command_menu_closed'
+  properties: {
+    /**
+     * In which app the command menu was closed
      */
     app: 'studio' | 'docs' | 'www'
   }
@@ -2961,6 +3041,9 @@ export type TelemetryEvent =
   | HomeGettingStartedClosedEvent
   | HomeGettingStartedSectionExposedEvent
   | HomeNewExperimentExposedEvent
+  | HomeConnectSectionExposedEvent
+  | HomeConnectActionClickedEvent
+  | ConnectSheetOpenedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
   | HomeProjectUsageServiceClickedEvent
@@ -2980,6 +3063,7 @@ export type TelemetryEvent =
   | TableCreateGeneratePoliciesExperimentConvertedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
+  | CommandMenuClosedEvent
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent

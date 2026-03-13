@@ -31,7 +31,7 @@ export const HelpButton = () => {
           })
         }
       }}
-      tooltip={{ content: { side: 'bottom', text: 'Help' } }}
+      tooltip={{ content: { text: 'Help' } }}
     >
       <HelpCircle
         size={16}

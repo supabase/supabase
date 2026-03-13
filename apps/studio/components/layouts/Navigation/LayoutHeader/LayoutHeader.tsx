@@ -1,5 +1,11 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsBranching2Enabled,
+  useIsFloatingMobileToolbarEnabled,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { Connect } from 'components/interfaces/Connect/Connect'
+import { ConnectButton } from 'components/interfaces/ConnectButton/ConnectButton'
+import { ConnectSheet } from 'components/interfaces/ConnectSheet/ConnectSheet'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
@@ -8,6 +14,7 @@ import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
 import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
+import { HelpButton } from 'components/ui/HelpPanel/HelpButton'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { DevToolbarTrigger } from 'dev-tools'
@@ -15,25 +22,21 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns'
 
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
-import { HelpButton } from './HelpPanel/HelpButton'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
-import { Connect } from '@/components/interfaces/Connect/Connect'
-import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
-import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
-import { usePHFlag } from '@/hooks/ui/useFlag'
+import type { ConnectSectionVariant } from '@/components/interfaces/ProjectHome/ConnectSection.config'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -58,7 +61,6 @@ interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
   breadcrumbs?: any[]
   headerTitle?: string
-  showProductMenu?: boolean
   backToDashboardURL?: string
 }
 
@@ -66,7 +68,6 @@ export const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerTitle,
-  showProductMenu,
   backToDashboardURL,
 }: LayoutHeaderProps) => {
   const router = useRouter()
@@ -75,9 +76,9 @@ export const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
 
-  const connectSheetFlag = usePHFlag<string | boolean>('connectSheet')
-  const isFlagResolved = connectSheetFlag !== undefined
-  const isConnectSheetEnabled = connectSheetFlag === true || connectSheetFlag === 'variation'
+  const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
+  const connectSectionVariant = usePHFlag<ConnectSectionVariant | false>('connectSection')
+  const isConnectSheetEnabled = connectSectionVariant === 'connect'
 
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
@@ -102,7 +103,12 @@ export const LayoutHeader = ({
 
   return (
     <>
-      <header className="flex h-11 md:h-12 items-center flex-shrink-0 border-b">
+      <header
+        className={cn(
+          'flex h-11 md:h-12 items-center flex-shrink-0 border-b',
+          showFloatingMobileToolbar && 'hidden md:flex'
+        )}
+      >
         {backToDashboardURL && isAccountPage && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <Link
@@ -279,7 +285,7 @@ export const LayoutHeader = ({
         </div>
       </header>
 
-      {isFlagResolved ? isConnectSheetEnabled ? <ConnectSheet /> : <Connect /> : null}
+      {isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
     </>
   )
 }
