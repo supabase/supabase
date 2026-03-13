@@ -1941,6 +1941,60 @@ export interface HomeNewExperimentExposedEvent {
 }
 
 /**
+ * Connect section was shown to the user as part of the connectSection experiment.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectSectionExposedEvent {
+  action: 'home_connect_section_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: 'connect' | 'getting-started'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a connect action tile in the Connect section on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectActionClickedEvent {
+  action: 'home_connect_action_clicked'
+  properties: {
+    /**
+     * The connect mode that was clicked
+     */
+    mode: 'framework' | 'direct' | 'orm' | 'mcp'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the ConnectSheet panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface ConnectSheetOpenedEvent {
+  action: 'connect_sheet_opened'
+  properties: {
+    /**
+     * Where the sheet was opened from
+     */
+    source: 'header_button' | 'connect_section'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User reordered sections in HomeV2 using drag and drop.
  *
  * @group Events
@@ -2987,6 +3041,9 @@ export type TelemetryEvent =
   | HomeGettingStartedClosedEvent
   | HomeGettingStartedSectionExposedEvent
   | HomeNewExperimentExposedEvent
+  | HomeConnectSectionExposedEvent
+  | HomeConnectActionClickedEvent
+  | ConnectSheetOpenedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
   | HomeProjectUsageServiceClickedEvent

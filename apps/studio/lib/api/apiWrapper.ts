@@ -31,9 +31,9 @@ export default async function apiWrapper(
     req: NextApiRequest,
     res: NextApiResponse,
     claims?: JwtPayload
-  ) => Promise<Response | void>,
+  ) => Promise<NextApiResponse | Response | void>,
   options?: { withAuth: boolean }
-): Promise<Response | void> {
+): Promise<NextApiResponse | Response | void> {
   try {
     const { withAuth } = options || {}
     let claims: JwtPayload | undefined

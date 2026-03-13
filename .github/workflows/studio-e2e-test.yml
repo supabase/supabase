@@ -17,7 +17,7 @@ jobs:
   test:
     name: 'E2E tests'
     timeout-minutes: 60
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     strategy:
       fail-fast: false
       matrix:

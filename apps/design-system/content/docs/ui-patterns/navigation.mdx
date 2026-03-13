@@ -12,3 +12,24 @@ Supabase has a necessarily complex navigation system to handle multiple products
 A horizontal list of related views within a consistent PageLayout context, allowing for clearer page-level organisation. Activating a NavMenu item should trigger a URL change.
 
 [NavMenu component guidelines](../components/nav-menu)
+
+## Page titles
+
+Browser page titles should follow a consistent most-specific-first structure so tabs and browser history are easier to scan:
+
+`Entity | Section | Surface | Project | Org | Supabase`
+
+Examples:
+
+- `users | Table Editor | My Project | My Org | Supabase`
+- `Backups | Database | My Project | My Org | Supabase`
+
+Implementation notes (Studio):
+
+- Use the shared title formatter in `apps/studio/lib/page-title.ts`
+- Prefer `ProjectLayout` for project-scoped pages
+- Prefer a layout's explicit `title` prop when a wrapper layout exposes one
+- Use `browserTitle` for additional segments such as `entity` or `surface`, or when rendering `ProjectLayout` directly
+- Use `browserTitle.entity` for the most specific resource (table/function/query) when available
+- `ProjectLayout.title` remains supported as legacy/deprecated compatibility when using `ProjectLayout` directly
+- Avoid assembling `document.title` ad hoc in individual pages/layouts
