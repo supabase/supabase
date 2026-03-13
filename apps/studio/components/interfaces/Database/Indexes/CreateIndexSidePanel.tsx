@@ -1,8 +1,3 @@
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { Fragment, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseIndexCreateMutation } from 'data/database-indexes/index-create-mutation'
@@ -11,32 +6,37 @@ import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectSeparator_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   SidePanel,
-  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { INDEX_TYPES } from './Indexes.constants'
 
 interface CreateIndexSidePanelProps {
@@ -54,7 +54,7 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
   const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
   const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [entitySearchTerm, setEntitySearchTerm] = useState('')
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -63,7 +63,7 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',
-    search: searchTerm,
+    search: entitySearchTerm,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -90,8 +90,8 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
     [entities?.pages]
   )
 
-  function handleSearchChange(value: string) {
-    setSearchTerm(value)
+  function handleEntitySearchChange(value: string) {
+    setEntitySearchTerm(value)
   }
 
   const columns = tableColumns?.[0]?.columns ?? []
@@ -139,6 +139,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     setSelectedEntity('')
     setSelectedColumns([])
     setSelectedIndexType(INDEX_TYPES[0].value)
+    setEntitySearchTerm('')
   }, [selectedSchema])
 
   useEffect(() => {
@@ -146,7 +147,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     setSelectedIndexType(INDEX_TYPES[0].value)
   }, [selectedEntity])
 
-  const isSelectEntityDisabled = entityTypes.length === 0
+  const isSelectEntityDisabled = entityTypes.length === 0 && entitySearchTerm === ''
 
   return (
     <SidePanel
@@ -187,11 +188,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 sameWidthAsTrigger
               >
                 <Command_Shadcn_>
-                  <CommandInput_Shadcn_
-                    placeholder="Find table..."
-                    value={searchTerm}
-                    onValueChange={handleSearchChange}
-                  />
+                  <CommandInput_Shadcn_ placeholder="Find schema..." />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
@@ -271,8 +268,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 <Command_Shadcn_ shouldFilter={false}>
                   <CommandInput_Shadcn_
                     placeholder="Find table..."
-                    value={searchTerm}
-                    onValueChange={handleSearchChange}
+                    value={entitySearchTerm}
+                    onValueChange={handleEntitySearchChange}
                   />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>
