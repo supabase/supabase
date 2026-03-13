@@ -220,9 +220,8 @@ const EdgeFunctionDetailsLayout = ({
   if (!isLoading && !canReadFunctions) {
     return (
       <ProjectLayout
-        title={title || 'Edge Functions'}
         product="Edge Functions"
-        browserTitle={browserTitle}
+        browserTitle={{ ...browserTitle, section: title || 'Edge Functions' }}
       >
         <NoPermission isFullPage resourceText="access your project's edge functions" />
       </ProjectLayout>

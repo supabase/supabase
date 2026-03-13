@@ -31,8 +31,8 @@ export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLa
   return (
     <ProjectLayout
       isBlocking={false}
-      title={title || 'Settings'}
       product="Settings"
+      browserTitle={{ section: title || 'Settings' }}
       productMenu={<SettingsProductMenu />}
     >
       {children}

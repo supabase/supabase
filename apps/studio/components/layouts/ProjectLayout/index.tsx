@@ -24,8 +24,6 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useSetMainScrollContainer } from '../MainScrollContainerContext'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
-
 import { getSectionKeyFromPathname, MobileMenuContent } from './LayoutHeader/MobileMenuContent'
 import { LoadingState } from './LoadingState'
 import { useMobileSheet } from './NavigationBar/MobileSheetContext'
@@ -47,6 +45,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
+import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -77,8 +76,6 @@ const routesToIgnorePostgrestConnection = [
 ]
 
 export interface ProjectLayoutProps {
-  /** @deprecated Use browserTitle.section instead. */
-  title?: string
   isLoading?: boolean
   isBlocking?: boolean
   product?: string
@@ -86,7 +83,6 @@ export interface ProjectLayoutProps {
   browserTitle?: {
     entity?: string
     section?: string
-    surface?: string
     override?: string
   }
   // Deprecated: use browserTitle.entity instead. Kept for backwards compatibility.
@@ -98,7 +94,6 @@ export interface ProjectLayoutProps {
 export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
   (
     {
-      title,
       isLoading = false,
       isBlocking = true,
       product = '',
@@ -141,8 +136,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       browserTitle?.override ||
       buildStudioPageTitle({
         entity: browserTitle?.entity ?? selectedTable,
-        section: browserTitle?.section ?? title,
-        surface: browserTitle?.surface ?? product,
+        section: browserTitle?.section,
+        surface: product,
         project: projectName,
         org: organizationName,
         brand: brandTitle,
