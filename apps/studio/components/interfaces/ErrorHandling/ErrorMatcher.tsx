@@ -27,7 +27,7 @@ export function ErrorMatcher({ title, error, supportFormParams, className }: Err
       className={className}
       onRender={
         mapping
-          ? () => track('inline_error_troubleshooter_shown', { errorType: mapping.id })
+          ? () => track('inline_error_troubleshooter_exposed', { errorType: mapping.id })
           : undefined
       }
       onSupportClick={

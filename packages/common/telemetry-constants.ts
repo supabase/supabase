@@ -2585,8 +2585,8 @@ export interface DashboardErrorCreatedEvent {
  * @group Events
  * @source studio
  */
-export interface InlineErrorTroubleshooterShownEvent {
-  action: 'inline_error_troubleshooter_shown'
+export interface InlineErrorTroubleshooterExposedEvent {
+  action: 'inline_error_troubleshooter_exposed'
   properties: {
     /** ID of the matched error mapping */
     errorType: string
@@ -2919,7 +2919,7 @@ export type TelemetryEvent =
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
-  | InlineErrorTroubleshooterShownEvent
+  | InlineErrorTroubleshooterExposedEvent
   | InlineErrorTroubleshooterAccordionToggledEvent
   | InlineErrorTroubleshooterActionClickedEvent
   | IntegrationInstallCompletedEvent
