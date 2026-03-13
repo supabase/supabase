@@ -1,9 +1,9 @@
 import { useQueryInsightsIssues } from '../hooks/useQueryInsightsIssues'
 import { useQueryInsightsScore } from '../hooks/useQueryInsightsScore'
+import { useQueryInsightsMetrics } from '../hooks/useQueryInsightsMetrics'
 import { HEALTH_COLORS, HEALTH_LEVELS } from './QueryInsightsHealth.constants'
 import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
 import { QueryInsightsHealthMetric } from './QueryInsightsHealthMetric'
-import { useMemo } from 'react'
 
 interface QueryInsightsHealthProps {
   data: QueryPerformanceRow[]
@@ -13,24 +13,10 @@ interface QueryInsightsHealthProps {
 export const QueryInsightsHealth = ({ data, isLoading }: QueryInsightsHealthProps) => {
   const { errors, indexIssues, slowQueries } = useQueryInsightsIssues(data)
   const { score, level } = useQueryInsightsScore({ errors, indexIssues, slowQueries })
+  const { avgP95, totalCalls, totalRowsRead, cacheHitRate } = useQueryInsightsMetrics(data)
 
   const color = HEALTH_COLORS[level]
   const label = HEALTH_LEVELS[level].label
-
-  const avgP95 = useMemo(() => {
-    const rows = data.filter((r) => (r.p95_time ?? 0) > 0)
-    if (rows.length === 0) return 0
-    return Math.round(rows.reduce((sum, r) => sum + (r.p95_time ?? 0), 0) / rows.length)
-  }, [data])
-
-  const totalCalls = useMemo(() => data.reduce((sum, r) => sum + r.calls, 0), [data])
-  const totalRowsRead = useMemo(() => data.reduce((sum, r) => sum + r.rows_read, 0), [data])
-  const cacheHitRate = useMemo(() => {
-    const hits = data.reduce((sum, r) => sum + (r._total_cache_hits ?? 0), 0)
-    const misses = data.reduce((sum, r) => sum + (r._total_cache_misses ?? 0), 0)
-    const total = hits + misses
-    return total > 0 ? ((hits / total) * 100).toFixed(2) + '%' : '–'
-  }, [data])
 
   return (
     <div className="w-full border-b flex items-center">
