@@ -1,21 +1,20 @@
-import { Component } from '@angular/core'
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core'
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { SupabaseService } from '../supabase.service'
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
-  standalone: false,
+  imports: [ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
   signInForm!: FormGroup
-  constructor(
-    private readonly supabase: SupabaseService,
-    private readonly formBuilder: FormBuilder
-  ) {}
+  private readonly supabase = inject(SupabaseService)
+  private readonly formBuilder = inject(FormBuilder)
 
-  loading = false
+  loading = signal(false)
   ngOnInit() {
     this.signInForm = this.formBuilder.group({
       email: '',
@@ -24,7 +23,7 @@ export class AuthComponent {
 
   async onSubmit(): Promise<void> {
     try {
-      this.loading = true
+      this.loading.set(true)
       const email = this.signInForm.value.email as string
       const { error } = await this.supabase.signIn(email)
       if (error) throw error
@@ -35,7 +34,7 @@ export class AuthComponent {
       }
     } finally {
       this.signInForm.reset()
-      this.loading = false
+      this.loading.set(false)
     }
   }
 }

@@ -1,17 +1,20 @@
-import { Component, Input, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { Component, inject, OnInit, input, signal, ChangeDetectionStrategy } from '@angular/core'
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { User } from '@supabase/supabase-js'
 import { Profile, SupabaseService } from '../supabase.service'
+
+import { AvatarComponent } from '../avatar/avatar.component'
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.css'],
-  standalone: false,
+  imports: [AvatarComponent, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountComponent implements OnInit {
-  loading = false
-  profile!: Profile
+  loading = signal(false)
+  profile = signal<Profile | null>(null)
   updateProfileForm!: FormGroup
 
   get avatarUrl() {
@@ -25,13 +28,12 @@ export class AccountComponent implements OnInit {
     await this.updateProfile()
   }
 
-  @Input()
-  user!: User
+  readonly user = input.required<User>()
 
-  constructor(
-    private readonly supabase: SupabaseService,
-    private formBuilder: FormBuilder
-  ) {
+  private readonly supabase = inject(SupabaseService)
+  private readonly formBuilder = inject(FormBuilder)
+
+  constructor() {
     this.updateProfileForm = this.formBuilder.group({
       username: '',
       website: '',
@@ -42,7 +44,7 @@ export class AccountComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.getProfile()
 
-    const { username, website, avatar_url } = this.profile
+    const { username, website, avatar_url } = this.profile() || {}
     this.updateProfileForm.patchValue({
       username,
       website,
@@ -52,35 +54,35 @@ export class AccountComponent implements OnInit {
 
   async getProfile() {
     try {
-      this.loading = true
-      const { data: profile, error, status } = await this.supabase.profile(this.user)
+      this.loading.set(true)
+      const { data: profile, error, status } = await this.supabase.profile(this.user())
 
       if (error && status !== 406) {
         throw error
       }
 
       if (profile) {
-        this.profile = profile
+        this.profile.set(profile)
       }
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message)
       }
     } finally {
-      this.loading = false
+      this.loading.set(false)
     }
   }
 
   async updateProfile(): Promise<void> {
     try {
-      this.loading = true
+      this.loading.set(true)
 
       const username = this.updateProfileForm.value.username as string
       const website = this.updateProfileForm.value.website as string
       const avatar_url = this.updateProfileForm.value.avatar_url as string
 
       const { error } = await this.supabase.updateProfile({
-        id: this.user.id,
+        id: this.user().id,
         username,
         website,
         avatar_url,
@@ -91,7 +93,7 @@ export class AccountComponent implements OnInit {
         alert(error.message)
       }
     } finally {
-      this.loading = false
+      this.loading.set(false)
     }
   }
 

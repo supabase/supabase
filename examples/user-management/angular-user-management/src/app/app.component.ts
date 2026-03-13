@@ -1,23 +1,27 @@
-import { Component, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core'
 import { User } from '@supabase/supabase-js'
 import { SupabaseService } from './supabase.service'
+
+import { AccountComponent } from './account/account.component'
+import { AuthComponent } from './auth/auth.component'
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  standalone: false,
+  imports: [AccountComponent, AuthComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
-  constructor(private readonly supabase: SupabaseService) {}
-
-  title = 'angular-user-management'
-  user: User | null = null
+  private readonly supabase = inject(SupabaseService)
+  user = signal<User | null>(null)
 
   async ngOnInit() {
-    this.user = await this.supabase.getUser()
+    const user = await this.supabase.getUser()
+    this.user.set(user)
     this.supabase.authChanges(async () => {
-      this.user = await this.supabase.getUser()
+      const currentUser = await this.supabase.getUser()
+      this.user.set(currentUser)
     })
   }
 }

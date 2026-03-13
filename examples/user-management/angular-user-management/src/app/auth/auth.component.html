@@ -13,9 +13,10 @@
           placeholder="Your email"
         />
       </div>
+      @let isLoading = loading();
       <div>
-        <button type="submit" class="button block" [disabled]="loading">
-          {{ loading ? "Loading" : "Send magic link" }}
+        <button type="submit" class="button block" [disabled]="isLoading">
+          {{ isLoading ? "Loading" : "Send magic link" }}
         </button>
       </div>
     </form>
