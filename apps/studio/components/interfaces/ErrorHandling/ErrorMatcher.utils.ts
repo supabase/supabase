@@ -1,13 +1,12 @@
-import type { KnownErrorType } from 'types/api-errors'
+import { ResponseError } from 'types/base'
 
 import { ERROR_MAPPINGS, type ErrorMapping } from './error-mappings'
 
-function isKnownErrorType(type: unknown): type is KnownErrorType {
-  return typeof type === 'string' && type in ERROR_MAPPINGS
-}
-
 export function getMappingForError(error: unknown): ErrorMapping | null {
-  if (typeof error !== 'object' || error === null) return null
-  const errorType = 'errorType' in error ? (error as { errorType: unknown }).errorType : undefined
-  return isKnownErrorType(errorType) ? ERROR_MAPPINGS[errorType] : null
+  const isResponseError = error instanceof ResponseError
+  if (!isResponseError) return null
+  for (const [ErrorClass, mapping] of ERROR_MAPPINGS) {
+    if (error instanceof ErrorClass) return mapping
+  }
+  return null
 }

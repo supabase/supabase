@@ -1,5 +1,6 @@
 import { ComponentType } from 'react'
-import type { KnownErrorType } from 'types/api-errors'
+import { ConnectionTimeoutError } from 'types/api-errors'
+import type { ClassifiedError, KnownErrorType } from 'types/api-errors'
 
 import { ConnectionTimeoutTroubleshooting } from './errorMappings/ConnectionTimeout'
 
@@ -8,9 +9,8 @@ export interface ErrorMapping {
   Troubleshooting: ComponentType
 }
 
-export const ERROR_MAPPINGS: Record<KnownErrorType, ErrorMapping> = {
-  'connection-timeout': {
-    id: 'connection-timeout',
-    Troubleshooting: ConnectionTimeoutTroubleshooting,
-  },
-}
+type ErrorConstructor = new (...args: any[]) => ClassifiedError
+
+export const ERROR_MAPPINGS = new Map<ErrorConstructor, ErrorMapping>([
+  [ConnectionTimeoutError, { id: 'connection-timeout', Troubleshooting: ConnectionTimeoutTroubleshooting }],
+])

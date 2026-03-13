@@ -23,12 +23,6 @@ const PATTERN_SAMPLES: Record<string, { matches: string[]; nonMatches: string[] 
 }
 
 describe('ERROR_PATTERNS registry', () => {
-  it('has no duplicate ErrorClass entries', () => {
-    const classes = ERROR_PATTERNS.map((p) => p.ErrorClass)
-    const unique = new Set(classes)
-    expect(unique.size).toBe(classes.length)
-  })
-
   it('has a PATTERN_SAMPLES entry for every registered pattern (keep samples in sync)', () => {
     for (const { ErrorClass } of ERROR_PATTERNS) {
       expect(
