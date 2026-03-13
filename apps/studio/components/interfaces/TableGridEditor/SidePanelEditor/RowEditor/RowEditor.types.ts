@@ -18,4 +18,5 @@ export interface RowField {
   isNullable: boolean
   isIdentity: boolean
   isPrimaryKey: boolean
+  isUserModified?: boolean
 }

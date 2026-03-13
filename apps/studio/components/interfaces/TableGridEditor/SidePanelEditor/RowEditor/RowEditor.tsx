@@ -95,7 +95,7 @@ export const RowEditor = ({
     const updatedProperties = Object.keys(changes)
     const updatedFields = rowFields.map((field) => {
       if (updatedProperties.includes(field.name)) {
-        return { ...field, value: changes[field.name] }
+        return { ...field, value: changes[field.name], isUserModified: true }
       } else {
         return field
       }

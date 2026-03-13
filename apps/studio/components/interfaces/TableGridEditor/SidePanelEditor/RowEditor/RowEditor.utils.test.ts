@@ -713,4 +713,80 @@ describe('generateRowObjectFromFields - additional cases', () => {
     const result = generateRowObjectFromFields(fields)
     expect(result).toEqual({})
   })
+
+  it('should include null values for user-modified fields when includeNullProperties is false', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'optional_field',
+        format: 'text',
+        value: null,
+        isUserModified: true,
+      }),
+      createField({
+        name: 'untouched_field',
+        format: 'text',
+        value: null,
+        isUserModified: false,
+      }),
+      createField({
+        name: 'active_field',
+        format: 'text',
+        value: 'value',
+      }),
+    ]
+    const result = generateRowObjectFromFields(fields, false)
+    expect(result).toEqual({ optional_field: null, active_field: 'value' })
+  })
+
+  it('should omit null values for non-user-modified fields', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'count',
+        format: 'int4',
+        value: '',
+        isUserModified: false,
+      }),
+    ]
+    const result = generateRowObjectFromFields(fields)
+    expect(result).toEqual({})
+  })
+
+  it('should include null for user-modified boolean set to null', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'active',
+        format: 'bool',
+        value: 'null',
+        isUserModified: true,
+      }),
+    ]
+    const result = generateRowObjectFromFields(fields)
+    expect(result).toEqual({ active: null })
+  })
+
+  it('should omit null for non-user-modified boolean set to null', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'active',
+        format: 'bool',
+        value: 'null',
+        isUserModified: false,
+      }),
+    ]
+    const result = generateRowObjectFromFields(fields)
+    expect(result).toEqual({})
+  })
+
+  it('should include null for user-modified non-text field with empty value', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'count',
+        format: 'int4',
+        value: '',
+        isUserModified: true,
+      }),
+    ]
+    const result = generateRowObjectFromFields(fields)
+    expect(result).toEqual({ count: null })
+  })
 })

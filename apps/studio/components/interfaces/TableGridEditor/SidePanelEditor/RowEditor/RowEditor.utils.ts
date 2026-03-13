@@ -80,6 +80,7 @@ export const generateRowFields = (
       isNullable: column.is_nullable,
       isIdentity: column.is_identity,
       isPrimaryKey: primaryKeyColumns.includes(column.name),
+      isUserModified: row !== undefined,
     }
   })
 }
@@ -182,11 +183,6 @@ const convertInputDatetimeToPostgresDatetime = (format: string, value: string | 
   }
 }
 
-// [Joshen] JFYI this presents a small problem in particular when creating a new row
-// given that we don't include null properties. Because of that if the column has a default
-// value, the column value will then always be the default value, instead of null
-// which may be considered a bug if e.g for a boolean column the user specifically selects "NULL" option
-// This would probably also apply to other column types like numbers (e.g user specifically wants a null value)
 export const generateRowObjectFromFields = (
   fields: RowField[],
   includeNullProperties = false
@@ -224,7 +220,16 @@ export const generateRowObjectFromFields = (
       rowObject[field.name] = value
     }
   })
-  return includeNullProperties ? rowObject : omitBy(rowObject, isNull)
+
+  if (includeNullProperties) return rowObject
+
+  // For new rows, keep null values for fields the user explicitly modified
+  // so that we distinguish between "use DB default" (untouched) and "insert NULL" (user set to null)
+  return omitBy(rowObject, (value, key) => {
+    if (!isNull(value)) return false
+    const field = fields.find((f) => f.name === key)
+    return field ? !field.isUserModified : true
+  })
 }
 
 export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) => {
