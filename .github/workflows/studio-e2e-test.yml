@@ -89,7 +89,7 @@ jobs:
 
       - name: Build studio
         if: steps.filter.outputs.studio == 'true'
-        run: NODE_ENV=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
+        run: SKIP_ASSET_UPLOAD=1 NODE_ENV=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
 
       - name: 🚀 Run Playwright tests against Vercel Preview
         if: steps.filter.outputs.studio == 'true'
