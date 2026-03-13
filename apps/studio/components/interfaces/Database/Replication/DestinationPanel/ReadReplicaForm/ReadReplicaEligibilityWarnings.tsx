@@ -1,8 +1,4 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -13,8 +9,12 @@ import { MAX_REPLICAS_ABOVE_XL, MAX_REPLICAS_BELOW_XL } from 'data/read-replicas
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployReplica'
 
 export const ReadReplicaEligibilityWarnings = () => {
@@ -138,9 +138,7 @@ export const ReadReplicaEligibilityWarnings = () => {
             addon="computeSize"
             source="read-replicas"
             featureProposition="deploy Read Replicas"
-          >
-            Change compute size
-          </UpgradePlanButton>
+          />
           <DocsButton href={`${DOCS_URL}/guides/platform/read-replicas#prerequisites`} />
         </div>
       </Admonition>

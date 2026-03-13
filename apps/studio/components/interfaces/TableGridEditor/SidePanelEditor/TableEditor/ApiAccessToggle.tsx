@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
@@ -20,6 +21,7 @@ import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import {
@@ -110,6 +112,18 @@ const useTableApiAccessHandler = (
     : isDuplicate
       ? params.templateTableName
       : params.tableName
+  const isNewTableQuery = isNewTable && enabled
+  const defaultPrivilegesQuery = useQuery(
+    defaultPrivilegesQueryOptions(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString ?? undefined,
+        schema: currentTableSchema,
+      },
+      { enabled: isNewTableQuery }
+    )
+  )
+
   const canResolvePrivilegeParams = Boolean(
     shouldReadExistingGrants &&
       project?.ref &&
@@ -131,19 +145,33 @@ const useTableApiAccessHandler = (
     ? apiAccessStatus.data?.[permissionsTemplateTable]
     : undefined
 
+  const defaultPrivilegesEnabled = defaultPrivilegesQuery.data ?? true
+  const defaultPrivilegesForNewTable = defaultPrivilegesEnabled
+    ? DEFAULT_DATA_API_PRIVILEGES
+    : EMPTY_DATA_API_PRIVILEGES
+
   const [privileges, setPrivileges] = useState<DeepReadonly<ApiPrivilegesByRole>>(
-    DEFAULT_DATA_API_PRIVILEGES
+    defaultPrivilegesForNewTable
   )
 
   const hasLoadedInitialData = useRef(false)
 
   const resetState = useStaticEffectEvent(() => {
     hasLoadedInitialData.current = !shouldReadExistingGrants
-    setPrivileges(DEFAULT_DATA_API_PRIVILEGES)
+    setPrivileges(defaultPrivilegesForNewTable)
   })
   useEffect(() => {
     resetState()
   }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable, resetState])
+
+  const syncDefaultPrivileges = useStaticEffectEvent(() => {
+    if (!isNewTable) return
+    if (!defaultPrivilegesQuery.isSuccess) return
+    setPrivileges(defaultPrivilegesForNewTable)
+  })
+  useEffect(() => {
+    syncDefaultPrivileges()
+  }, [defaultPrivilegesQuery.status, syncDefaultPrivileges])
 
   const syncApiPrivileges = useStaticEffectEvent(() => {
     if (hasLoadedInitialData.current) return
@@ -168,6 +196,7 @@ const useTableApiAccessHandler = (
   const isPending =
     !enabled ||
     schemaExposure.status === 'pending' ||
+    (isNewTable && defaultPrivilegesQuery.isPending) ||
     (shouldReadExistingGrants && apiAccessStatus.isPending)
   if (isPending) {
     return { isError: false, isPending: true, isSuccess: false, data: undefined }
