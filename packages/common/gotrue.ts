@@ -38,10 +38,6 @@ const shouldDetectSessionInUrl = process.env.NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_
 
 const navigatorLockEnabled = !!(shouldEnableNavigatorLock && globalThis?.navigator?.locks)
 
-if (shouldEnableNavigatorLock && !globalThis?.navigator?.locks) {
-  console.warn('This browser does not support the Navigator Locks API. Please update it.')
-}
-
 const tabId = Math.random().toString(16).substring(2)
 
 let dbHandle = new Promise<IDBDatabase | null>((accept, _) => {
