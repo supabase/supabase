@@ -1,4 +1,5 @@
 import { IS_PLATFORM } from 'common'
+import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { InternalServerError } from '@/lib/api/apiHelpers'
@@ -8,7 +9,6 @@ import {
   type IncidentInfo,
 } from '@/lib/api/incident-status'
 import { createAdminClient } from '@/lib/api/supabase-admin'
-import apiWrapper from 'lib/api/apiWrapper'
 
 /**
  * Cache on browser for 5 minutes
@@ -85,7 +85,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json(enrichedIncidents)
   } catch (error) {
+    let errorCode = 500
+
     if (error instanceof InternalServerError) {
+      if (typeof error.details?.status === 'number') errorCode = error.details.status
       console.error('Failed to fetch active StatusPage incidents: %O', {
         message: error.message,
         details: error.details,
@@ -94,7 +97,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       console.error('Unexpected error fetching active StatusPage incidents: %O', error)
     }
 
-    return res.status(500).json({ error: 'Unable to fetch incidents at this time' })
+    return res.status(errorCode).json({ error: 'Unable to fetch incidents at this time' })
   }
 }
 
