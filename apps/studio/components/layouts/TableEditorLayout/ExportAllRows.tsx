@@ -1,8 +1,4 @@
 import { useQueryClient, type QueryClient } from '@tanstack/react-query'
-import saveAs from 'file-saver'
-import Papa from 'papaparse'
-import { useCallback, useState, type ReactNode } from 'react'
-
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, Sort, SupaTable } from 'components/grid/types'
@@ -14,10 +10,14 @@ import { tableEditorKeys } from 'data/table-editor/keys'
 import { getTableEditor, type TableEditorData } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows, fetchSelectedTableRows } from 'data/table-rows/table-rows-query'
+import saveAs from 'file-saver'
 import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
 import { DOCS_URL } from 'lib/constants'
 import type { RoleImpersonationState } from 'lib/role-impersonation'
+import Papa from 'papaparse'
+import { useCallback, useState, type ReactNode } from 'react'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import {
   BlobCreationError,
   DownloadSaveError,

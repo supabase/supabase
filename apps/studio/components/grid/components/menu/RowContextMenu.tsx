@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { DialogSectionSeparator, copyToClipboard } from 'ui'
+import { copyToClipboard, DialogSectionSeparator } from 'ui'
 
 import { formatClipboardValue } from '../../utils/common'
 
