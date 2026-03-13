@@ -2,7 +2,14 @@ import { mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import {
+  forwardRef,
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  type PropsWithChildren,
+  type ReactNode,
+} from 'react'
 import {
   cn,
   LogoLoader,
@@ -12,13 +19,16 @@ import {
   useIsMobile,
   usePanelRef,
 } from 'ui'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useSetMainScrollContainer } from '../MainScrollContainerContext'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
+import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
+
+import { getSectionKeyFromPathname, MobileMenuContent } from './LayoutHeader/MobileMenuContent'
 import { LoadingState } from './LoadingState'
+import { useMobileSheet } from './NavigationBar/MobileSheetContext'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
 import { PausingState } from './PausingState'
@@ -35,8 +45,8 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { usePHFlag } from '@/hooks/ui/useFlag'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { buildStudioPageTitle } from '@/lib/page-title'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -67,11 +77,19 @@ const routesToIgnorePostgrestConnection = [
 ]
 
 export interface ProjectLayoutProps {
+  /** @deprecated Use browserTitle.section instead. */
   title?: string
   isLoading?: boolean
   isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
+  browserTitle?: {
+    entity?: string
+    section?: string
+    surface?: string
+    override?: string
+  }
+  // Deprecated: use browserTitle.entity instead. Kept for backwards compatibility.
   selectedTable?: string
   resizableSidebar?: boolean
   productMenuClassName?: string
@@ -85,6 +103,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       isBlocking = true,
       product = '',
       productMenu,
+      browserTitle,
       children,
       selectedTable,
       resizableSidebar = false,
@@ -96,13 +115,17 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const router = useRouter()
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
-    const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
+    const { showSidebar } = useAppStateSnapshot()
+    const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
+
+    const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
+    const currentSectionKey = getSectionKeyFromPathname(pathname)
 
     const setMainScrollContainer = useSetMainScrollContainer()
     const combinedRef = mergeRefs(ref, setMainScrollContainer)
 
     const { appTitle } = useCustomContent(['app:title'])
-    const titleSuffix = appTitle || 'Supabase'
+    const brandTitle = appTitle || 'Supabase'
 
     const isMobile = useIsMobile()
 
@@ -114,6 +137,17 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
+    const pageTitle =
+      browserTitle?.override ||
+      buildStudioPageTitle({
+        entity: browserTitle?.entity ?? selectedTable,
+        section: browserTitle?.section ?? title,
+        surface: browserTitle?.surface ?? product,
+        project: projectName,
+        org: organizationName,
+        brand: brandTitle,
+      }) ||
+      brandTitle
 
     const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
@@ -124,20 +158,24 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname.includes('/project/[ref]/logs')
     const showPausedState = isPaused && !ignorePausedState
 
+    useLayoutEffect(() => {
+      const unregister = registerOpenMenu(() => {
+        setMobileSheetContent(
+          <MobileMenuContent
+            currentProductMenu={productMenu ?? null}
+            currentProduct={product}
+            currentSectionKey={currentSectionKey}
+            onCloseSheet={() => setMobileSheetContent(null)}
+          />
+        )
+      })
+      return unregister
+    }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
+
     return (
       <>
         <Head>
-          <title>
-            {title
-              ? `${title} | ${titleSuffix}`
-              : selectedTable
-                ? `${selectedTable} | ${projectName} | ${organizationName} | ${titleSuffix}`
-                : projectName
-                  ? `${projectName} | ${organizationName} | ${titleSuffix}`
-                  : organizationName
-                    ? `${organizationName} | ${titleSuffix}`
-                    : titleSuffix}
-          </title>
+          <title>{pageTitle}</title>
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
@@ -205,9 +243,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         </div>
         <CreateBranchModal />
         <ProjectAPIDocs />
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          {productMenu}
-        </MobileSheetNav>
       </>
     )
   }
@@ -267,8 +302,6 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const isHomeNew = usePHFlag('homeNew') === 'new-home'
-
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
   const isHomePage = router.pathname === '/project/[ref]'
 
@@ -288,13 +321,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
-  // handle redirect to home for building state
-  const shouldRedirectToHomeForBuilding =
-    isProjectBuilding && requiresDbConnection && isHomeNew && !isHomePage
+  const shouldRedirectToHomeForBuilding = isProjectBuilding && requiresDbConnection && !isHomePage
 
-  // We won't be showing the building state with the new home page
-  const shouldShowBuildingState =
-    isProjectBuilding && requiresDbConnection && !(isHomeNew && isHomePage)
+  // Don't show building state on the home page — it handles building state inline
+  const shouldShowBuildingState = isProjectBuilding && requiresDbConnection && !isHomePage
 
   useEffect(() => {
     if (shouldRedirectToHomeForBuilding && ref) {

@@ -1,5 +1,5 @@
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
-import { generateSettingsMenu } from 'components/layouts/ProjectSettingsLayout/SettingsMenu.utils'
+import { useGenerateSettingsMenu } from 'components/layouts/ProjectSettingsLayout/SettingsMenu.utils'
 import type { Route } from 'components/ui/ui.types'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
@@ -182,8 +182,7 @@ export const generateOtherRoutes = (
   ]
 }
 
-export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
-  const settingsMenu = generateSettingsMenu(ref as string)
+export const generateSettingsRoutes = (ref?: string): Route[] => {
   return [
     {
       key: 'settings',
@@ -192,7 +191,6 @@ export const generateSettingsRoutes = (ref?: string, project?: Project): Route[]
       link:
         ref &&
         (IS_PLATFORM ? `/project/${ref}/settings/general` : `/project/${ref}/settings/log-drains`),
-      items: settingsMenu,
       disabled: false,
     },
   ]

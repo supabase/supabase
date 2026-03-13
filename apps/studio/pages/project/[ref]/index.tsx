@@ -1,25 +1,12 @@
 import { IS_PLATFORM } from 'common'
 import { Home } from 'components/interfaces/Home/Home'
-import { HomeV2 } from 'components/interfaces/HomeNew/Home'
+import { ProjectHome } from 'components/interfaces/ProjectHome/Home'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
-import { useTrackExperimentExposure } from 'hooks/misc/useTrackExperimentExposure'
-import { usePHFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
 
 const HomePage: NextPageWithLayout = () => {
-  const homeNewVariant = usePHFlag<string>('homeNew')
-  const isHomeNew = homeNewVariant === 'new-home'
-
-  useTrackExperimentExposure(
-    'home_new',
-    IS_PLATFORM && typeof homeNewVariant !== 'boolean' ? homeNewVariant : undefined
-  )
-
-  if (isHomeNew) {
-    return <HomeV2 />
-  }
-  return <Home />
+  return IS_PLATFORM ? <ProjectHome /> : <Home />
 }
 
 HomePage.getLayout = (page) => (

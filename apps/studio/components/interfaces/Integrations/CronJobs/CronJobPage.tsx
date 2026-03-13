@@ -3,7 +3,6 @@ import { toString as CronToString } from 'cronstrue'
 import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { type ConfirmOnCloseModalProps, useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Edit3, List } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -15,15 +14,12 @@ import {
   BreadcrumbPage_Shadcn_ as BreadcrumbPage,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
+  cn,
   CodeBlock,
-  Sheet,
-  SheetContent,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageHeader,
   PageHeaderAside,
@@ -63,15 +59,6 @@ export const CronJobPage = () => {
     cronJobValues.type === 'edge_function' ? cronJobValues.edgeFunctionName : undefined
   const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()
   const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
-
-  const [isDirty, setIsDirty] = useState(false)
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
-    onClose: () => {
-      setIsDirty(false)
-      setIsEditSheetOpen(false)
-    },
-  })
 
   const pageTitle = childLabel || childId || 'Cron Job'
 
@@ -192,40 +179,13 @@ export const CronJobPage = () => {
 
       <PreviousRunsTab />
 
-      <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
-        <SheetContent size="lg">
-          {job && (
-            <CreateCronJobSheet
-              selectedCronJob={{
-                jobname: job.jobname,
-                schedule: job.schedule,
-                active: job.active,
-                command: job.command,
-              }}
-              supportsSeconds={true}
-              onDirty={setIsDirty}
-              onClose={() => setIsEditSheetOpen(false)}
-              onCloseWithConfirmation={confirmOnClose}
-            />
-          )}
-        </SheetContent>
-      </Sheet>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      {job && (
+        <CreateCronJobSheet
+          open={isEditSheetOpen}
+          selectedCronJob={job}
+          onClose={() => setIsEditSheetOpen(false)}
+        />
+      )}
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

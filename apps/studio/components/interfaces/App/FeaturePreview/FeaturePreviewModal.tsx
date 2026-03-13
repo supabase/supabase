@@ -20,10 +20,10 @@ import {
 } from 'ui'
 
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
-import { APISidePanelPreview } from './APISidePanelPreview'
 import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
+import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { QueueOperationsPreview } from './QueueOperationsPreview'
 import { TableFilterBarPreview } from './TableFilterBarPreview'
@@ -37,11 +37,11 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]: <Branching2Preview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]: <PgDeltaDiffPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]: <AdvisorRulesPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]: <QueueOperationsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]: <TableFilterBarPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
 }
 
 export const FeaturePreviewModal = () => {
@@ -63,15 +63,17 @@ export const FeaturePreviewModal = () => {
   )
 
   const { flags, onUpdateFlag } = featurePreviewContext
-  const selectedFeature =
-    featurePreviews.find((preview) => preview.key === selectedFeatureKey) ?? featurePreviews[0]
-  const isSelectedFeatureEnabled = flags[selectedFeatureKey]
+  const allFeaturePreviews = (
+    IS_PLATFORM ? featurePreviews : featurePreviews.filter((x) => !x.isPlatformOnly)
+  ).filter((x) => x.enabled)
 
-  const allFeaturePreviews = IS_PLATFORM
-    ? featurePreviews
-    : featurePreviews.filter((x) => !x.isPlatformOnly)
+  const selectedFeature =
+    allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
+    allFeaturePreviews[0]
+  const isSelectedFeatureEnabled = flags[selectedFeature?.key]
 
   const toggleFeature = () => {
+    if (!selectedFeature) return
     onUpdateFlag(selectedFeature.key, !isSelectedFeatureEnabled)
     sendEvent({
       action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',
@@ -98,7 +100,7 @@ export const FeaturePreviewModal = () => {
         <DialogSectionSeparator />
 
         <DialogSection className="!p-0">
-          {featurePreviews.length > 0 ? (
+          {allFeaturePreviews.length > 0 ? (
             <div className="flex">
               <div>
                 <ScrollArea className="h-[550px] w-[280px] border-r">
@@ -111,7 +113,7 @@ export const FeaturePreviewModal = () => {
                         onClick={() => selectFeaturePreview(feature.key)}
                         className={cn(
                           'flex items-center justify-between p-4 border-b cursor-pointer bg transition',
-                          selectedFeature.key === feature.key ? 'bg-surface-300' : 'bg-surface-100'
+                          selectedFeature?.key === feature.key ? 'bg-surface-300' : 'bg-surface-100'
                         )}
                       >
                         <div className="flex items-center gap-x-3">
@@ -150,7 +152,7 @@ export const FeaturePreviewModal = () => {
                     </Button>
                   </div>
                 </div>
-                {FEATURE_PREVIEW_KEY_TO_CONTENT[selectedFeature.key]}
+                {FEATURE_PREVIEW_KEY_TO_CONTENT[selectedFeature?.key ?? '']}
               </div>
             </div>
           ) : (

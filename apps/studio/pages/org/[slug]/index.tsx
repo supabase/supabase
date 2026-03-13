@@ -19,7 +19,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <ScaffoldContainer className="flex-grow flex">
-      <ScaffoldSection isFullWidth className="flex-grow pb-0">
+      <ScaffoldSection isFullWidth className="pb-0">
         {disableAccessMfa ? (
           <Admonition
             type="note"
@@ -50,7 +50,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
 ProjectsPage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
+    <OrganizationLayout title="Projects">
       <PageLayout title="Projects">{page}</PageLayout>
     </OrganizationLayout>
   </DefaultLayout>

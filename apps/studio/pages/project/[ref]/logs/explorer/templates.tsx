@@ -43,7 +43,7 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
 
 LogsTemplatesPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Templates">{page}</LogsLayout>
   </DefaultLayout>
 )
 

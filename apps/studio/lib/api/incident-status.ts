@@ -6,6 +6,8 @@ import { InternalServerError } from 'lib/api/apiHelpers'
 export type IncidentCache = {
   affected_regions: Array<string> | null
   affects_project_creation: boolean
+  /** When true, the banner is shown unconditionally regardless of regions or project state. */
+  force?: boolean
 }
 
 export type IncidentMetadata = {
