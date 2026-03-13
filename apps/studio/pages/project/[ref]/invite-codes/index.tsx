@@ -8,8 +8,8 @@ import { useState } from 'react'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { NextPageWithLayout } from 'types'
-import { CreateInviteCodeDialog } from './CreateInviteCodeDialog'
-import { InviteCodeList } from './InviteCodeList'
+import { CreateInviteCodeDialog } from 'components/invite-codes/CreateInviteCodeDialog'
+import { InviteCodeList } from 'components/invite-codes/InviteCodeList'
 
 const InviteCodesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
