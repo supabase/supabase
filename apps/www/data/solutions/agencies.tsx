@@ -143,7 +143,7 @@ const data: {
       },
       {
         icon: '/images/logos/publicity/brthrs.svg',
-        avatar: '/images/avatars/zimo-holdijk.jpeg',
+        avatar: '/images/avatars/zimo-holdijk.png',
         author: 'Zimo Holdijk',
         authorTitle: 'Lead Product Manager, Brthrs',
         quote: (

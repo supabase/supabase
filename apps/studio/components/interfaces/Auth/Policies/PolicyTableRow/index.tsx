@@ -66,11 +66,12 @@ const PolicyTableRowComponent = ({
     [exposedSchemas, table.schema]
   )
 
-  const { data: tablesWithAnonAuthAccess = new Set() } = useTablesRolesAccessQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: table.schema,
-  })
+  const { data: tablesWithAnonAuthAccess = new Set(), isLoading: isLoadingRolesAccess } =
+    useTablesRolesAccessQuery({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: table.schema,
+    })
 
   const hasAnonAuthenticatedRolesAccess = tablesWithAnonAuthAccess.has(table.name)
   const hasApiAccess = isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
@@ -81,7 +82,7 @@ const PolicyTableRowComponent = ({
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
 
-  const showPolicies = !isPoliciesLoading && !isPoliciesError
+  const showPolicies = !isPoliciesLoading && !isPoliciesError && !isLoadingRolesAccess
 
   const shouldHideHeaderBorder =
     isPubliclyReadableWritable ||
@@ -106,12 +107,13 @@ const PolicyTableRowComponent = ({
           table={table}
           isLocked={isLocked}
           hasApiAccess={hasApiAccess}
+          isLoadingApiAccess={isLoadingRolesAccess}
           onSelectToggleRLS={onSelectToggleRLS}
           onSelectCreatePolicy={onSelectCreatePolicy}
         />
       </CardHeader>
 
-      {!isTableExposedThroughAPI && (
+      {!isLoadingRolesAccess && !isTableExposedThroughAPI && (
         <Admonition
           showIcon={false}
           type="warning"
@@ -128,7 +130,8 @@ const PolicyTableRowComponent = ({
         </Admonition>
       )}
 
-      {(isPubliclyReadableWritable || rlsEnabledNoPolicies || isApiDisabledDueToRoles) &&
+      {!isLoadingRolesAccess &&
+        (isPubliclyReadableWritable || rlsEnabledNoPolicies || isApiDisabledDueToRoles) &&
         isTableExposedThroughAPI && (
           <Admonition
             showIcon={false}
@@ -139,7 +142,7 @@ const PolicyTableRowComponent = ({
           </Admonition>
         )}
 
-      {isPoliciesLoading && (
+      {(isPoliciesLoading || isLoadingRolesAccess) && (
         <CardContent>
           <ShimmeringLoader />
         </CardContent>

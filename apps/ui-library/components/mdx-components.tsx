@@ -18,6 +18,7 @@ import { DualRealtimeMonaco } from './dual-realtime-monaco'
 import { RegistryBlock } from './registry-block'
 import { StyleWrapper } from './style-wrapper'
 import TanStackBeta from './tanstack-beta'
+import { TanstackDBGenerator } from './tanstack-db-generator'
 import type { Style } from '@/registry/styles'
 
 const components = {
@@ -183,6 +184,7 @@ const components = {
   BlockPreview,
   DualRealtimeChat,
   DualRealtimeMonaco,
+  TanstackDBGenerator,
 }
 
 interface MdxProps {

@@ -8,6 +8,7 @@ import {
   type IncidentInfo,
 } from '@/lib/api/incident-status'
 import { createAdminClient } from '@/lib/api/supabase-admin'
+import apiWrapper from 'lib/api/apiWrapper'
 
 /**
  * Cache on browser for 5 minutes
@@ -47,11 +48,7 @@ async function fetchIncidentCache(incidentIds: Array<string>): Promise<Map<strin
   return cacheMap
 }
 
-// Default export needed by Next.js convention
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Array<IncidentInfo> | { error: string }>
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!IS_PLATFORM) {
     return res.status(404).end()
   }
@@ -100,3 +97,8 @@ export default async function handler(
     return res.status(500).json({ error: 'Unable to fetch incidents at this time' })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper

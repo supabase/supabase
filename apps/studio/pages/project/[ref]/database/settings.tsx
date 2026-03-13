@@ -76,7 +76,7 @@ const ProjectSettings: NextPageWithLayout = () => {
 
 ProjectSettings.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Settings">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 
