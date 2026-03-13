@@ -49,7 +49,7 @@ export function RestartDatabaseTroubleshootingSection({
   const handleClick = () => {
     track('inline_error_troubleshooter_action_clicked', {
       errorType,
-      action: 'restart_db',
+      ctaType: 'restart_db',
     })
     if (onRestartProject) {
       onRestartProject()
@@ -119,7 +119,7 @@ export function TroubleshootingGuideSection({
             onClick={() =>
               track('inline_error_troubleshooter_action_clicked', {
                 errorType,
-                action: 'troubleshooting_guide',
+                ctaType: 'troubleshooting_guide',
               })
             }
             iconRight={<ExternalLink />}
@@ -166,7 +166,7 @@ export function FixWithAITroubleshootingSection({
             onOpenAssistant={() => {
               track('inline_error_troubleshooter_action_clicked', {
                 errorType,
-                action: 'ask_ai',
+                ctaType: 'ask_ai',
               })
               onDebugWithAI?.(buildPrompt())
             }}

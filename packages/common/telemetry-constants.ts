@@ -2627,8 +2627,8 @@ export interface InlineErrorTroubleshooterActionClickedEvent {
   properties: {
     /** ID of the matched error mapping */
     errorType: string
-    /** Which action was clicked */
-    action: 'restart_db' | 'troubleshooting_guide' | 'ask_ai' | 'contact_support'
+    /** Which CTA was clicked */
+    ctaType: 'restart_db' | 'troubleshooting_guide' | 'ask_ai' | 'contact_support'
   }
   groups: TelemetryGroups
 }

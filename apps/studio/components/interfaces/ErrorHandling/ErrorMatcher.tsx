@@ -35,7 +35,7 @@ export function ErrorMatcher({ title, error, supportFormParams, className }: Err
           ? () =>
               track('inline_error_troubleshooter_action_clicked', {
                 errorType: mapping.id,
-                action: 'contact_support',
+                ctaType: 'contact_support',
               })
           : undefined
       }
