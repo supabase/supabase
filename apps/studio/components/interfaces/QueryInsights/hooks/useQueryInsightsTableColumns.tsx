@@ -585,7 +585,14 @@ export function useQueryInsightsTableColumns({
         },
       },
     ],
-    [triageQueryColWidth, timeConsumedWidth, handleGoToLogs, handleAiSuggestedFix, setSelectedTriageRow, setSheetView]
+    [
+      triageQueryColWidth,
+      timeConsumedWidth,
+      handleGoToLogs,
+      handleAiSuggestedFix,
+      setSelectedTriageRow,
+      setSheetView,
+    ]
   )
 
   return { columns, triageColumns }
