@@ -12,5 +12,8 @@ export interface ErrorMapping {
 type ErrorConstructor = new (...args: any[]) => ClassifiedError
 
 export const ERROR_MAPPINGS = new Map<ErrorConstructor, ErrorMapping>([
-  [ConnectionTimeoutError, { id: 'connection-timeout', Troubleshooting: ConnectionTimeoutTroubleshooting }],
+  [
+    ConnectionTimeoutError,
+    { id: 'connection-timeout', Troubleshooting: ConnectionTimeoutTroubleshooting },
+  ],
 ])
