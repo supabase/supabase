@@ -22,7 +22,11 @@ const InviteCodesPage: NextPageWithLayout = () => {
     error: projectsError,
   } = useAdminProjectsQuery({ projectRef })
 
-  const activeProjectId = selectedProjectId ?? adminProjects?.[0]?.id ?? null
+  const activeProjectId =
+    selectedProjectId ??
+    adminProjects?.find((p) => p.name === projectRef)?.id ??
+    adminProjects?.[0]?.id ??
+    null
 
   const {
     data: inviteCodes,

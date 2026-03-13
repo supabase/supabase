@@ -58,7 +58,7 @@ export const useInviteCodesQuery = <TData = InviteCodesData>(
   const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
 
   return useQuery<InviteCodesData, InviteCodesError, TData>({
-    queryKey: inviteCodeKeys.list(projectRef, clientEndpoint),
+    queryKey: inviteCodeKeys.list(projectRef, clientEndpoint, projectId),
     queryFn: () => getInviteCodes({ projectRef, clientEndpoint, projectId }),
     enabled:
       enabled &&
