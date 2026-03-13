@@ -277,7 +277,7 @@ export const getStaticEvents = async (): Promise<{
   )
 
   const onDemandEvents = allEvents.filter(
-    (event: SupabaseEvent) => new Date(event.date) < new Date() && event.onDemand === true
+    (event: SupabaseEvent) => event.onDemand === true
   )
 
   const categories = upcomingEvents.reduce(
