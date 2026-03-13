@@ -61,6 +61,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
         <Link
           href={`${DOCS_URL}/guides/telemetry/metrics`}
           target="_blank"
+          rel="noreferrer"
           onClick={() =>
             sendEvent({
               action: 'reports_database_grafana_banner_clicked',
@@ -75,6 +76,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
         <Link
           href="https://github.com/supabase/supabase-grafana"
           target="_blank"
+          rel="noreferrer"
           onClick={() =>
             sendEvent({
               action: 'reports_database_grafana_banner_clicked',
