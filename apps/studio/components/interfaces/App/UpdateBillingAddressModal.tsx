@@ -45,15 +45,16 @@ export function UpdateBillingAddressModal() {
     'stripe.customer'
   )
 
-  const shouldShow =
+  const shouldShow = Boolean(
     IS_PLATFORM &&
-    showMissingAddressModal &&
-    !!org &&
-    org.plan.id !== 'free' &&
-    org.organization_missing_address &&
-    !org.billing_partner &&
-    permissionsLoaded &&
-    canBillingWrite
+      showMissingAddressModal &&
+      org &&
+      org.plan.id !== 'free' &&
+      org.organization_missing_address &&
+      !org.billing_partner &&
+      permissionsLoaded &&
+      canBillingWrite
+  )
 
   const {
     data: customerProfile,
