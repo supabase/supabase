@@ -228,11 +228,11 @@ The code adds a [matcher](https://nextjs.org/docs/app/api-reference/file-convent
 
 Be careful when protecting pages. The server gets the user session from the cookies, which can be spoofed by anyone.
 
-Always use `supabase.auth.getClaims()` to protect pages and user data.
+Always use `supabase.auth.getUser()` to protect pages and user data. This method is the more secure option because it sends a request to the Auth server to verify the user's session and identity.
 
-_Never_ trust `supabase.auth.getSession()` inside server code such as Proxy. It isn't guaranteed to revalidate the Auth token.
+`supabase.auth.getClaims()` can be used to validate the JWT signature locally, but it does not check with the Auth server if the session is still valid or has been revoked.
 
-It's safe to trust `getClaims()` because it validates the JWT signature against the project's published public keys every time.
+_Never_ trust `supabase.auth.getSession()` inside server code such as Middleware. It isn't guaranteed to revalidate the Auth token.
 
 </Admonition>
 
