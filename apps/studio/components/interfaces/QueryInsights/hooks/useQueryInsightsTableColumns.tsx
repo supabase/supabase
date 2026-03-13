@@ -309,7 +309,7 @@ export function useQueryInsightsTableColumns({
       }
       return result
     })
-  }, [sort, setSort, timeConsumedWidth])
+  }, [sort, setSort, timeConsumedWidth, gridRef, setSelectedRow, setSheetView])
 
   const triageColumns = useMemo(
     (): Column<ClassifiedQuery>[] => [
@@ -585,7 +585,7 @@ export function useQueryInsightsTableColumns({
         },
       },
     ],
-    [triageQueryColWidth, timeConsumedWidth, handleGoToLogs, handleAiSuggestedFix]
+    [triageQueryColWidth, timeConsumedWidth, handleGoToLogs, handleAiSuggestedFix, setSelectedTriageRow, setSheetView]
   )
 
   return { columns, triageColumns }

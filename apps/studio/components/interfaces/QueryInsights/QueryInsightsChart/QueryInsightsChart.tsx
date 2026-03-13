@@ -170,13 +170,7 @@ export const QueryInsightsChart = ({
                         </linearGradient>
                       ))}
                       {hasSelection && (
-                        <linearGradient
-                          id={`gradient-${selDataKey}`}
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
+                        <linearGradient id={`gradient-${selDataKey}`} x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor={SEL_COLOR} stopOpacity={0.35} />
                           <stop offset="100%" stopColor={SEL_COLOR} stopOpacity={0} />
                         </linearGradient>
@@ -229,9 +223,7 @@ export const QueryInsightsChart = ({
                         strokeOpacity={
                           !hiddenSeries.has(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0
                         }
-                        fillOpacity={
-                          !hiddenSeries.has(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0
-                        }
+                        fillOpacity={!hiddenSeries.has(item.dataKey) ? (hasSelection ? 0.2 : 1) : 0}
                       />
                     ))}
                     {hasSelection && (
