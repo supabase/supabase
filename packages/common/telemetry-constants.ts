@@ -766,9 +766,6 @@ export interface CopyAsMarkdownEvent {
 export interface AskAIEvent {
   action: 'ask_ai_clicked'
   properties: {
-    /**
-     * 'yes' means clicking on the tick button, 'no' means clicking on the cross button.
-     */
     agent: 'chatgpt' | 'claude'
   }
 }

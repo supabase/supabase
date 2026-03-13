@@ -27,19 +27,20 @@ function AiTools({ className }: { className?: string }) {
 
   async function copyMarkdown() {
     const mdUrl = `/docs/${path}.md`
-
+    
     try {
       const res = await fetch(mdUrl)
       const text = await res.text()
       await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-      sendTelemetryEvent({
-        action: 'copy_as_markdown_clicked',
-      })
     } catch (error) {
       console.error('Failed to copy markdown', error)
     }
+
+    sendTelemetryEvent({
+      action: 'copy_as_markdown_clicked',
+    })
   }
 
   return (
