@@ -4,6 +4,11 @@ import { cn } from 'ui'
 
 import { Admonition } from 'ui-patterns'
 
+/**
+ * @deprecated Use Admonition from ui-patterns instead
+ * Pass actions as a prop to the Admonition component
+ */
+
 interface NoticeBarProps extends Omit<ComponentProps<typeof Admonition>, 'description'> {
   title?: string
   description?: string

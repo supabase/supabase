@@ -1,28 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { BarChart2 } from 'lucide-react'
+import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   WarningIcon,
 } from 'ui'
@@ -31,24 +25,18 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import PauseProjectButton from './Infrastructure/PauseProjectButton'
-import RestartServerButton from './Infrastructure/RestartServerButton'
+import * as z from 'zod'
+
+import { ProjectAccessSection } from './ProjectAccessSection'
 
 export const General = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-
   const isBranch = Boolean(project?.parent_project_ref)
-
-  const { projectSettingsRestartProject } = useIsFeatureEnabled([
-    'project_settings:restart_project',
-  ])
 
   const { can: canUpdateProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
@@ -115,7 +103,11 @@ export const General = () => {
           )}
 
           {project === undefined ? (
-            <GenericSkeletonLoader />
+            <Card>
+              <CardContent>
+                <GenericSkeletonLoader />
+              </CardContent>
+            </Card>
           ) : (
             <Form_Shadcn_ {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -138,7 +130,6 @@ export const General = () => {
                               autoComplete="off"
                             />
                           </FormControl_Shadcn_>
-                          <FormMessage_Shadcn_ />
                         </FormItemLayout>
                       )}
                     />
@@ -184,89 +175,7 @@ export const General = () => {
         </PageSectionContent>
       </PageSection>
 
-      <PageSection id="restart-project">
-        <PageSectionMeta>
-          <PageSectionSummary>
-            <PageSectionTitle>Project availability</PageSectionTitle>
-            <PageSectionDescription>
-              Restart or pause your project when performing maintenance.
-            </PageSectionDescription>
-          </PageSectionSummary>
-        </PageSectionMeta>
-        <PageSectionContent>
-          <Card>
-            <CardContent>
-              <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
-                <div>
-                  <p className="text-sm">
-                    {projectSettingsRestartProject ? 'Restart project' : 'Restart database'}
-                  </p>
-                  <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">
-                      Your project will not be available for a few minutes.
-                    </p>
-                  </div>
-                </div>
-                <RestartServerButton />
-              </div>
-            </CardContent>
-            <CardContent>
-              <div
-                className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4"
-                id="pause-project"
-              >
-                <div>
-                  <p className="text-sm">Pause project</p>
-                  <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">
-                      Your project will not be accessible while it is paused.
-                    </p>
-                  </div>
-                </div>
-                <PauseProjectButton />
-              </div>
-            </CardContent>
-          </Card>
-        </PageSectionContent>
-      </PageSection>
-
-      {!isBranch && (
-        <PageSection>
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Project usage</PageSectionTitle>
-              <PageSectionDescription>
-                Usage statistics now live under your organization settings.
-              </PageSectionDescription>
-            </PageSectionSummary>
-          </PageSectionMeta>
-          <PageSectionContent>
-            <Card>
-              <CardContent>
-                <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
-                  <div className="flex space-x-4">
-                    <BarChart2 strokeWidth={2} />
-                    <div>
-                      <p className="text-sm">Project usage statistics have been moved</p>
-                      <p className="text-foreground-light text-sm">
-                        You may view your project's usage under your organization's settings
-                      </p>
-                    </div>
-                  </div>
-
-                  {!!organization && !!project && (
-                    <Button asChild type="default">
-                      <Link href={`/org/${organization.slug}/usage?projectRef=${project.ref}`}>
-                        View project usage
-                      </Link>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </PageSectionContent>
-        </PageSection>
-      )}
+      <ProjectAccessSection />
     </>
   )
 }

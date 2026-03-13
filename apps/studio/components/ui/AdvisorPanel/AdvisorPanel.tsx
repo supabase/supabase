@@ -1,6 +1,3 @@
-import dayjs from 'dayjs'
-import { useMemo, useRef } from 'react'
-
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import {
@@ -9,12 +6,14 @@ import {
   useNotificationsV2Query,
 } from 'data/notifications/notifications-v2-query'
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { useMemo, useRef } from 'react'
 import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+
 import { AdvisorDetail } from './AdvisorDetail'
 import { AdvisorFilters } from './AdvisorFilters'
 import type { AdvisorItem } from './AdvisorPanel.types'
@@ -66,7 +65,6 @@ export const AdvisorPanel = () => {
     resetNotificationFilters,
   } = useAdvisorStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
   const isSidebarOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
@@ -98,12 +96,8 @@ export const AdvisorPanel = () => {
   // Memoize filters to prevent query key changes on every render
   // Use selected organization and project if they exist
   const notificationFilters = useMemo(
-    () => ({
-      priority: notificationFilterPriorities,
-      organizations: selectedOrganization?.slug ? [selectedOrganization.slug] : [],
-      projects: project?.ref ? [project.ref] : [],
-    }),
-    [notificationFilterPriorities, selectedOrganization?.slug, project?.ref]
+    () => ({ priority: notificationFilterPriorities }),
+    [notificationFilterPriorities]
   )
 
   const {

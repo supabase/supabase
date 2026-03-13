@@ -81,7 +81,8 @@ export const AWSPrivateLinkSection = () => {
                 {promptPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
-                      primaryText="Upgrade to Team or Enterprise to use AWS PrivateLink"
+                      layout="vertical"
+                      primaryText="Only available on Team or Enterprise Plan and above"
                       secondaryText="Connect your AWS VPC privately to your Supabase project using AWS PrivateLink."
                       buttonText="Upgrade to Team"
                       source="aws-privatelink-integration"
@@ -92,7 +93,9 @@ export const AWSPrivateLinkSection = () => {
               <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-foreground text-sm">AWS Accounts</h3>
-                  <Button onClick={onAddAccount}>Add Account</Button>
+                  <Button type={promptPlanUpgrade ? 'default' : 'primary'} onClick={onAddAccount}>
+                    Add Account
+                  </Button>
                 </div>
                 {(accounts?.length ?? 0) > 0 ? (
                   <ResourceList>

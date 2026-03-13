@@ -1,28 +1,24 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import type { ConnectionVars } from 'data/common.types'
+import { getLiveTupleEstimate, getLiveTupleEstimateKey } from 'data/database/database.sql'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { useCallback } from 'react'
 
-import type { ConnectionVars } from 'data/common.types'
-import { executeSql } from 'data/sql/execute-sql-query'
 import {
   getLargestSizeLimitBucketsKey,
   getLargestSizeLimitBucketsSqlUnoptimized,
-} from 'data/sql/queries/get-largest-size-limit-buckets'
-import {
-  getLiveTupleEstimate,
-  getLiveTupleEstimateKey,
-} from 'data/sql/queries/get-live-tuple-stats'
+} from './storage.sql'
 
 export const THRESHOLD_FOR_AUTO_QUERYING_BUCKET_LIMITS = 10_000
 
-const getBucketNumberEstimateKey = (projectRef: string | undefined) =>
+export const getBucketNumberEstimateKey = (projectRef: string | undefined) =>
   getLiveTupleEstimateKey(projectRef, 'buckets', 'storage')
 
-const getBucketNumberEstimate = async ({
+export const getBucketNumberEstimate = async ({
   projectRef,
   connectionString,
 }: ConnectionVars): Promise<number | undefined> => {
   if (!projectRef) throw new Error('Project reference is required')
-  if (!connectionString) throw new Error('Connection string is required')
 
   const queryKey = getBucketNumberEstimateKey(projectRef)
 

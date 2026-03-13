@@ -31,6 +31,19 @@ Setting up OAuth with Azure consists of four broad steps:
 
 ## Obtain a client ID and secret
 
+### Local development with Azure OAuth
+
+Azure does not allow `127.0.0.1` as a redirect URI hostname and requires
+the use of `localhost`.
+
+To enable Azure OAuth during local Supabase development, configure the
+Supabase API external URL in your `config.toml`:
+
+```toml
+[api]
+external_url = "http://localhost:54321"
+```
+
 - Once your app has been registered, the client ID can be found under the [list of app registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) under the column titled _Application (client) ID_.
 - You can also find it in the app overview screen.
 - Place the Client ID in the Azure configuration screen in the Supabase Auth dashboard.

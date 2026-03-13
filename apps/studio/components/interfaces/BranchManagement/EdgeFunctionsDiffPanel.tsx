@@ -1,8 +1,9 @@
 import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
 import Link from 'next/link'
+import { basename } from 'path'
 import { useEffect, useMemo, useState } from 'react'
 
-import DiffViewer from 'components/ui/DiffViewer'
+import { DiffEditor } from '@/components/ui/DiffEditor'
 import type { EdgeFunctionBodyData } from 'data/edge-functions/edge-function-body-query'
 import type {
   EdgeFunctionsDiffResult,
@@ -10,7 +11,6 @@ import type {
   FileStatus,
 } from 'hooks/branches/useEdgeFunctionsDiff'
 import { EMPTY_ARR } from 'lib/void'
-import { basename } from 'path'
 import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
 const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
@@ -20,7 +20,6 @@ const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
 interface EdgeFunctionsDiffPanelProps {
   diffResults: EdgeFunctionsDiffResult
   currentBranchRef?: string
-  mainBranchRef?: string
 }
 
 interface FunctionDiffProps {
@@ -152,10 +151,11 @@ const FunctionDiff = ({
             </ul>
           </div>
           <div className="flex-1 min-h-0">
-            <DiffViewer
+            <DiffEditor
               language={language}
               original={mainFile?.content || ''}
               modified={currentFile?.content || ''}
+              options={{ readOnly: true }}
             />
           </div>
         </div>
@@ -164,10 +164,9 @@ const FunctionDiff = ({
   )
 }
 
-const EdgeFunctionsDiffPanel = ({
+export const EdgeFunctionsDiffPanel = ({
   diffResults,
   currentBranchRef,
-  mainBranchRef,
 }: EdgeFunctionsDiffPanelProps) => {
   if (diffResults.isLoading) {
     return <Skeleton className="h-64" />
@@ -240,5 +239,3 @@ const EdgeFunctionsDiffPanel = ({
     </div>
   )
 }
-
-export default EdgeFunctionsDiffPanel

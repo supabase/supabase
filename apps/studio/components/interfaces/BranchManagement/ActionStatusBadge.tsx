@@ -1,6 +1,5 @@
-import type { PropsWithChildren } from 'react'
-
 import { ActionName, ActionStatus, type ActionRunStep } from 'data/actions/action-runs-query'
+import type { PropsWithChildren } from 'react'
 import { Badge, StatusIcon, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export interface ActionStatusBadgeProps {
@@ -44,15 +43,12 @@ export const ActionStatusBadgeCondensed = ({
   }
 
   const isUnhealthy = UNHEALTHY_STATUES.includes(status)
-  const isWaiting = WAITING_STATUSES.includes(status)
 
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger asChild>
         <Badge variant={isUnhealthy ? 'destructive' : 'default'} className="gap-1.5">
-          {(isUnhealthy || isWaiting) && (
-            <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
-          )}
+          {isUnhealthy && <StatusIcon variant="destructive" hideBackground />}
           {children}
         </Badge>
       </TooltipTrigger>

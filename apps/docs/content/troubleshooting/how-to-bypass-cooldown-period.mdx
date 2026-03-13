@@ -1,9 +1,8 @@
 ---
-title = "How to bypass cooldown period"
-topics = [
-"platform"
-]
-keywords = ["cooldown", "disk resize"]
+title = "How to bypass modification limits"
+topics = [ "platform" ]
+keywords = [ "modification limits", "disk resize" ]
+database_id = "6f6a34a6-ac3f-4fba-9c70-4f4b8c7aeda7"
 ---
 
 This cooldown period isn't a Supabase limitation. It's rooted in how Amazon EBS (the underlying storage instance for our databases) manages volume modifications. After modifying a volume (e.g. increasing size, changing type, or IOPS), AWS enforces a mandatory 6-hour cooldown before allowing another modification on the same volume. This is to ensure data integrity and stability of the volume under load.

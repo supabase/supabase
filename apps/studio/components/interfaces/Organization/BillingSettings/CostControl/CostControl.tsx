@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
-import Link from 'next/link'
-
 import { useFlag, useParams } from 'common'
 import {
   ScaffoldSection,
@@ -19,11 +14,17 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { ExternalLink } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert, Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
+
+import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import SpendCapSidePanel from './SpendCapSidePanel'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 export interface CostControlProps {}
 
@@ -64,13 +65,7 @@ const CostControl = ({}: CostControlProps) => {
               <p className="text-foreground text-base m-0">Cost Control</p>
               <p className="text-sm text-foreground-light m-0">
                 Allow scaling beyond your plan's{' '}
-                <Link
-                  href={`/org/${slug}/usage`}
-                  className="text-green-900 transition hover:text-green-1000"
-                >
-                  included quota
-                </Link>
-                .
+                <InlineLink href={`/org/${slug}/usage`}>included quota</InlineLink>.
               </p>
             </div>
             <div className="space-y-2">

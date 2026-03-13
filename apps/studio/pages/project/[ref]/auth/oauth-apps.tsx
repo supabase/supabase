@@ -38,7 +38,7 @@ const OAuthApps: NextPageWithLayout = () => (
 
 OAuthApps.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="OAuth Apps">{page}</AuthLayout>
   </DefaultLayout>
 )
 

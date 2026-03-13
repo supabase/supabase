@@ -1,7 +1,4 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { useCallback, useMemo, useState } from 'react'
-
 import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
@@ -22,6 +19,9 @@ import {
   genDefaultQuery,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
+import dayjs from 'dayjs'
+import { useCallback, useMemo, useState } from 'react'
+
 import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import { useLogsUrlState } from './useLogsUrlState'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
@@ -248,14 +248,14 @@ function useLogsPreview({
     'timestamp'
   )
 
-  const { data: eventChartData, error: eventChartError } = useFillTimeseriesSorted(
-    normalizedEventChartData,
-    'timestamp',
-    'count',
-    0,
-    timestampStart,
-    timestampEnd || new Date().toISOString()
-  )
+  const { data: eventChartData, error: eventChartError } = useFillTimeseriesSorted({
+    data: normalizedEventChartData,
+    timestampKey: 'timestamp',
+    valueKey: 'count',
+    defaultValue: 0,
+    startDate: timestampStart,
+    endDate: timestampEnd ?? new Date().toISOString(),
+  })
 
   return {
     newCount,

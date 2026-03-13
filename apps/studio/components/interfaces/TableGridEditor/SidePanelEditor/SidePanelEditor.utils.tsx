@@ -1,10 +1,7 @@
 import pgMeta from '@supabase/pg-meta'
-import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
-import { chunk, find, isEmpty, isEqual } from 'lodash'
-import Papa from 'papaparse'
-import { toast } from 'sonner'
-
 import { Query } from '@supabase/pg-meta/src/query'
+import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
+import type { SupaRow } from 'components/grid/types'
 import { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import SparkBar from 'components/ui/SparkBar'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
@@ -26,10 +23,10 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { executeWithRetry } from 'data/table-rows/table-rows-query'
 import { tableKeys } from 'data/tables/keys'
 import {
+  RetrieveTableResult,
+  RetrievedTableColumn,
   getTable,
   getTableQuery,
-  RetrievedTableColumn,
-  RetrieveTableResult,
 } from 'data/tables/table-retrieve-query'
 import {
   UpdateTableBody,
@@ -38,6 +35,11 @@ import {
 import { getTables } from 'data/tables/tables-query'
 import { sendEvent } from 'data/telemetry/send-event-mutation'
 import { timeout, tryParseJson } from 'lib/helpers'
+import { chunk, find, isEmpty, isEqual } from 'lodash'
+import Papa from 'papaparse'
+import { toast } from 'sonner'
+import type { SidePanel } from 'state/table-editor'
+
 import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
@@ -46,9 +48,37 @@ import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import type { DeepReadonly } from '@/lib/type-helpers'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
+
+/**
+ * Extracts the row data from the current side panel state.
+ * Used when queuing cell edit operations to get the row being edited.
+ * Accepts both mutable and readonly (valtio snapshot) versions of SidePanel.
+ *
+ * @param sidePanel - The current side panel state (can be readonly from valtio snapshot)
+ * @returns The row data if available, undefined otherwise
+ */
+export function getRowFromSidePanel(
+  sidePanel: SidePanel | DeepReadonly<SidePanel> | undefined
+): SupaRow | undefined {
+  if (!sidePanel) return undefined
+
+  switch (sidePanel.type) {
+    case 'json':
+      return sidePanel.jsonValue.row as SupaRow | undefined
+    case 'cell':
+      return sidePanel.value?.row as SupaRow | undefined
+    case 'row':
+      return sidePanel.row as SupaRow | undefined
+    case 'foreign-row-selector':
+      return sidePanel.foreignKey.row as SupaRow | undefined
+    default:
+      return undefined
+  }
+}
 
 /**
  * The functions below are basically just queries but may be supported directly
