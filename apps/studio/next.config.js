@@ -605,11 +605,7 @@ const nextConfig = {
     // Typechecking is run via GitHub Action only for efficiency
     // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
     ignoreBuildErrors: true,
-  },
-  experimental: {
-    workerThreads: process.env.CI !== 'true',
-    cpus: 2,
-  },
+  }
 }
 
 // Make sure adding Sentry options is the last code to run before exporting, to
