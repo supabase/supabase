@@ -1,4 +1,5 @@
 import useDbQuery from 'hooks/analytics/useDbQuery'
+
 import { PRESET_CONFIG } from './Reports.constants'
 import { Presets } from './Reports.types'
 
@@ -16,6 +17,8 @@ export type QueryPerformanceSort = {
   order: 'asc' | 'desc'
 }
 
+export type QuerySource = 'dashboard' | 'non-dashboard'
+
 export type QueryPerformanceQueryOpts = {
   preset:
     | 'mostFrequentlyInvoked'
@@ -28,6 +31,7 @@ export type QueryPerformanceQueryOpts = {
   searchQuery?: string
   orderBy?: QueryPerformanceSort
   roles?: string[]
+  sources?: QuerySource[]
   runIndexAdvisor?: boolean
   minCalls?: number
   minTotalTime?: number
@@ -39,6 +43,7 @@ export const useQueryPerformanceQuery = ({
   orderBy,
   searchQuery = '',
   roles,
+  sources = [],
   runIndexAdvisor = false,
   minCalls,
   minTotalTime,
@@ -52,6 +57,12 @@ export const useQueryPerformanceQuery = ({
       ? `auth.rolname in (${roles.map((r) => `'${r}'`).join(', ')})`
       : '',
     searchQuery.length > 0 ? `statements.query ~* '${searchQuery}'` : '',
+    sources.includes('dashboard') && !sources.includes('non-dashboard')
+      ? `statements.query ~* 'source: dashboard'`
+      : '',
+    sources.includes('non-dashboard') && !sources.includes('dashboard')
+      ? `statements.query !~* 'source: dashboard'`
+      : '',
     typeof minCalls === 'number' && minCalls > 0 ? `statements.calls >= ${minCalls}` : '',
     typeof minTotalTime === 'number' && minTotalTime > 0
       ? `(statements.total_exec_time + statements.total_plan_time) >= ${minTotalTime}`
