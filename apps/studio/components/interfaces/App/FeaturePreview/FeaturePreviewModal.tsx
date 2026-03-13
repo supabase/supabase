@@ -29,10 +29,7 @@ import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
-<<<<<<< feat/floating-mobile-navbar
 import { FloatingMobileToolbarPreview } from './FloatingMobileToolbarPreview'
-=======
->>>>>>> master
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { QueueOperationsPreview } from './QueueOperationsPreview'
