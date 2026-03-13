@@ -1,4 +1,21 @@
+/* Focus styles for keyboard navigation on buttons */
+.button-focus {
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-600 transition-all;
+}
+/* Focus styles for keyboard navigation on text links and buttons that look like text links */
+.text-focus {
+  @apply ease-out duration-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-600 focus-visible:rounded-sm transition-all;
+}
+
 /* Focus styles for keyboard navigation on interactive table rows */
 .inset-focus {
-  @apply ease-out duration-100 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-600 focus-visible:rounded-md transition-all;
+  @apply ease-out duration-100 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-600 focus-visible:rounded-md transition-all;
+}
+
+/* Global focus styles for navigation menu items */
+/* Apply focus styles to all focusable children within NavMenu (ul[role="menu"]) */
+ul[role="menu"] a:focus-visible,
+ul[role="menu"] button:focus-visible,
+ul[role="menu"] [role="menuitem"]:focus-visible {
+  @apply outline-none outline-2 outline-offset-1 outline-brand-500 dark:outline-brand-600 rounded-sm transition-all;
 }

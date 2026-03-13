@@ -77,7 +77,6 @@ module.exports = config({
           dark: 'hsl(var(--border-muted))',
         },
       },
-
       animation: {
         shimmer: 'shimmer 2s infinite linear',
         sway: 'sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
