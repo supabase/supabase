@@ -21,6 +21,7 @@ async function getIncidentBanner(signal?: AbortSignal): Promise<IncidentBannerDa
   const response = await fetch(`${BASE_PATH}/api/incident-banner`, {
     signal,
     method: 'GET',
+    credentials: 'omit',
     headers: { 'Content-Type': 'application/json' },
   })
   if (!response.ok) throw new Error(`Failed to fetch incident banner: ${response.statusText}`)
