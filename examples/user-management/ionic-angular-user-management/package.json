@@ -14,7 +14,7 @@
   "private": true,
   "dependencies": {
     "@angular/common": "~21.2.0",
-    "@angular/core": "~21.2.0",
+    "@angular/core": "~21.2.4",
     "@angular/forms": "~21.2.0",
     "@angular/platform-browser": "~21.2.0",
     "@angular/platform-browser-dynamic": "~21.2.0",
@@ -39,7 +39,7 @@
     "@angular-eslint/eslint-plugin-template": "~21.2.0",
     "@angular-eslint/template-parser": "~21.2.0",
     "@angular/cli": "~21.2.0",
-    "@angular/compiler": "~21.2.0",
+    "@angular/compiler": "~21.2.4",
     "@angular/compiler-cli": "~21.2.0",
     "@angular/language-service": "~21.2.0",
     "@capacitor/cli": "8.1.0",
