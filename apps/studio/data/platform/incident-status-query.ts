@@ -49,7 +49,6 @@ export const useIncidentStatusQuery = <TData = IncidentStatusData>(
     ...options,
     // temporarily disable incident status queries until we have the capacity to handle potential increased load
     // from retries.
-    enabled: false,
     // Enable in platform mode, or in test environment for E2E testing
-    // enabled: (IS_PLATFORM || IS_TEST_ENV) && (options.enabled ?? true),
+    enabled: (IS_PLATFORM || IS_TEST_ENV) && (options.enabled ?? true),
   })
