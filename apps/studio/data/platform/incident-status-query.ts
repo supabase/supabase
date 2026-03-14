@@ -47,8 +47,6 @@ export const useIncidentStatusQuery = <TData = IncidentStatusData>(
     retryDelay: (attemptIndex) => Math.min(1000 * 4 ** attemptIndex, 1000 * 60 * 5),
     staleTime: 1000 * 60 * 5, // 5 minutes to match API cache
     ...options,
-    // temporarily disable incident status queries until we have the capacity to handle potential increased load
-    // from retries.
     // Enable in platform mode, or in test environment for E2E testing
     enabled: (IS_PLATFORM || IS_TEST_ENV) && (options.enabled ?? true),
   })
