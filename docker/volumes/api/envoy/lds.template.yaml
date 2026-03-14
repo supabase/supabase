@@ -508,10 +508,6 @@ resources:
                                 name: apikey
                                 string_match:
                                   exact: '${SERVICE_ROLE_KEY_ASYMMETRIC}'
-                            - header:
-                                name: authorization
-                                string_match:
-                                  exact: 'Bearer ${SERVICE_ROLE_KEY_ASYMMETRIC}'
                         apikey:
                           permissions:
                             - url_path:
@@ -546,15 +542,6 @@ resources:
                                 name: apikey
                                 string_match:
                                   exact: '${ANON_KEY_ASYMMETRIC}'
-                            - header:
-                                name: authorization
-                                string_match:
-                                  exact: 'Bearer ${SERVICE_ROLE_KEY_ASYMMETRIC}'
-                            - header:
-                                name: authorization
-                                string_match:
-                                  exact: 'Bearer ${ANON_KEY_ASYMMETRIC}'
-                                  
                 - name: envoy.filters.http.router
                   typed_config:
                     '@type': >-
