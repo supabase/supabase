@@ -56,8 +56,7 @@ const page: GoPageInput = {
         },
         {
           title: 'Visual AI builders vs code-first tools',
-          description:
-            'When to use visual AI builders for speed vs code-first tools for control.',
+          description: 'When to use visual AI builders for speed vs code-first tools for control.',
         },
         {
           title: 'Preventing breaking changes',
@@ -66,13 +65,11 @@ const page: GoPageInput = {
         },
         {
           title: 'Lightweight validation practices',
-          description:
-            'Validation practices that preserve velocity without sacrificing safety.',
+          description: 'Validation practices that preserve velocity without sacrificing safety.',
         },
         {
           title: 'Client handoff without risk',
-          description:
-            'How to hand projects off to clients without handing over production risk.',
+          description: 'How to hand projects off to clients without handing over production risk.',
         },
         {
           title: 'Velocity with control',

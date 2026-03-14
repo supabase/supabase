@@ -7,14 +7,14 @@ const page: GoPageInput = {
   metadata: {
     title: 'Fully Operational: Learn More | Supabase + Figma Make Webinar',
     description:
-      "You watched the webinar. Want to go deeper? Get resources, talk to our team, or learn how to build production-ready apps with Figma Make and Supabase.",
+      'You watched the webinar. Want to go deeper? Get resources, talk to our team, or learn how to build production-ready apps with Figma Make and Supabase.',
     ogImage: '/images/landing-pages/figma-webinar-may2026/og.png',
   },
   hero: {
     subtitle: 'Thanks for watching',
     title: 'Fully Operational: Building Production-Ready Apps with Figma Make + Supabase',
     description:
-      "You saw how to go from a working prototype to a production-ready application with Figma Make and Supabase. Want to learn more, get hands-on, or talk to our team? Share your details below.",
+      'You saw how to go from a working prototype to a production-ready application with Figma Make and Supabase. Want to learn more, get hands-on, or talk to our team? Share your details below.',
     image: {
       src: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=platform&layout=icon-only&copy=%5B2.5x+faster%5D%0A%5BPostgres+parser%5D%0Awith+Claude+Code&icon=supabase.svg&icon2=figma.svg',
       alt: 'Fully Operational: Building Production-Ready Apps with Figma Make + Supabase',
@@ -39,7 +39,7 @@ const page: GoPageInput = {
       type: 'single-column',
       title: 'Watch the recording',
       description:
-        "Join engineers from Supabase and Figma as they walk through what it takes to go from a working prototype to a production-ready application.",
+        'Join engineers from Supabase and Figma as they walk through what it takes to go from a working prototype to a production-ready application.',
       // TODO: Add YouTube URL when recording is available
       children: <MediaBlock />,
     },
@@ -51,8 +51,7 @@ const page: GoPageInput = {
       items: [
         {
           title: 'Where vibe-coded apps break',
-          description:
-            'Where vibe-coded apps typically break on the way to production.',
+          description: 'Where vibe-coded apps typically break on the way to production.',
         },
         {
           title: 'Auth and RLS without rewriting',
@@ -61,23 +60,19 @@ const page: GoPageInput = {
         },
         {
           title: 'Figma Make and Supabase together',
-          description:
-            'How Figma Make and Supabase work together end to end.',
+          description: 'How Figma Make and Supabase work together end to end.',
         },
         {
           title: 'Live build',
-          description:
-            'From design to deployed, production-grade app in one session.',
+          description: 'From design to deployed, production-grade app in one session.',
         },
         {
           title: 'Secure and scalable',
-          description:
-            "Ship apps that are secure, scalable, and ready for real traffic.",
+          description: 'Ship apps that are secure, scalable, and ready for real traffic.',
         },
         {
           title: 'Design-to-code workflow',
-          description:
-            "Pair Figma Make's design-to-code workflow with Supabase's backend.",
+          description: "Pair Figma Make's design-to-code workflow with Supabase's backend.",
         },
       ],
     },
