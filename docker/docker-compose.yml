@@ -74,6 +74,10 @@ services:
     container_name: supabase-kong
     image: kong/kong:3.9.1
     restart: unless-stopped
+    networks:
+      default:
+        aliases:
+          - api-gw
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 5s
@@ -93,7 +97,7 @@ services:
       KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
-      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,request-termination,ip-restriction
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,request-termination,ip-restriction,post-function
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
       #KONG_SSL_CERT: /home/kong/server.crt

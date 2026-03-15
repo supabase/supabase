@@ -226,14 +226,14 @@ services:
             - anon
 
   ## Storage API endpoint (with Authorization header transformation).
-  ## No key-auth.
+  ## No key-auth — S3 protocol requests don't carry an apikey header.
   ##
-  ## supabase-js and AWS SDK normal operations always send an Authorization
-  ## header, so the Lua expression passes it through unchanged.
-  ##
-  ## AWS S3 presigned URLs (aws cli, boto3, etc. - not Supabase signed URLs)
-  ## carry credentials in query parameters without an Authorization header.
-  ## The Lua expression evaluates to nil, which Kong renders as empty string.
+  ## The request-transformer translates opaque API keys to asymmetric JWTs
+  ## and passes through existing Authorization headers (user JWTs, AWS SigV4).
+  ## When no Authorization or apikey header is present (S3 presigned URLs),
+  ## the Lua expression evaluates to nil which Kong renders as empty string.
+  ## The post-function strips this empty header so Storage's S3 signature
+  ## verification falls through to query-parameter parsing.
   - name: storage-v1
     _comment: 'Storage: /storage/v1/* -> http://storage:5000/*'
     url: http://storage:5000/
@@ -252,6 +252,13 @@ services:
           replace:
             headers:
               - "Authorization: $LUA_AUTH_EXPR"
+      - name: post-function
+        config:
+          access:
+            - |
+              if kong.request.get_header("authorization") == "" then
+                kong.service.request.clear_header("authorization")
+              end
 
   ## Edge Functions routes
   - name: functions-v1
