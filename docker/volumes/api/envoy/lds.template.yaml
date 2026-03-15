@@ -234,6 +234,7 @@ resources:
                           prefix: /api/mcp
                         route:
                           cluster: studio
+                          prefix_rewrite: /api/mcp
                           timeout: 30s
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
@@ -245,6 +246,7 @@ resources:
                           prefix: /mcp
                         route:
                           cluster: studio
+                          prefix_rewrite: /api/mcp
                           timeout: 30s
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
