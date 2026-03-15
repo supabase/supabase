@@ -1,5 +1,12 @@
 // Constants specific to self-hosted environments
 
+// Schemas exposed via PostgREST Data API.
+// In hosted Supabase, PostgREST sets the `pgrst.db_schemas` GUC on its own connections.
+// In self-hosted/local environments this GUC isn't available to other services (e.g. Studio),
+// so we hardcode the default here until a dynamic config source is wired up.
+// See: https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml#L183
+export const DEFAULT_EXPOSED_SCHEMAS = 'public, storage'
+
 export const ENCRYPTION_KEY = process.env.PG_META_CRYPTO_KEY || 'SAMPLE_KEY'
 export const POSTGRES_PORT = parseInt(process.env.POSTGRES_PORT || '5432', 10)
 export const POSTGRES_HOST = process.env.POSTGRES_HOST || 'db'
