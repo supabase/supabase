@@ -1,4 +1,30 @@
-import { QueryPerformanceRow, ChartDataPoint, ParsedLogEntry } from '../QueryPerformance.types'
+import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
+import type { ChartDataPoint, ParsedLogEntry } from '../QueryInsights.types'
+import {
+  SUPAMONITOR_EXCLUDED_ROLES,
+  SUPAMONITOR_EXCLUDED_APP_NAMES,
+  TRANSACTION_CONTROL_REGEX,
+  SCHEMA_INTROSPECTION_REGEX,
+} from '../QueryInsights.constants'
+
+export function filterSystemLogs(
+  logs: ParsedLogEntry[],
+  { includeIntrospection = false }: { includeIntrospection?: boolean } = {}
+): ParsedLogEntry[] {
+  return logs.filter((log) => {
+    if (log.user_name && (SUPAMONITOR_EXCLUDED_ROLES as readonly string[]).includes(log.user_name))
+      return false
+    if (
+      log.application_name &&
+      (SUPAMONITOR_EXCLUDED_APP_NAMES as readonly string[]).includes(log.application_name)
+    )
+      return false
+    if (log.query && TRANSACTION_CONTROL_REGEX.test(log.query)) return false
+    if (!includeIntrospection && log.query && SCHEMA_INTROSPECTION_REGEX.test(log.query))
+      return false
+    return true
+  })
+}
 
 export function parseSupamonitorLogs(logData: any[]): ParsedLogEntry[] {
   if (!logData || logData.length === 0) return []
@@ -87,22 +113,39 @@ export function aggregateLogsByQuery(parsedLogs: ParsedLogEntry[]): QueryPerform
     let totalCalls = 0
     let totalExecTime = 0
     let totalPlanTime = 0
+    let p95Sum = 0
+    let p95Count = 0
     let minTime = Infinity
     let maxTime = -Infinity
     const rolname = logs[0]?.user_name || ''
     const applicationName = logs[0]?.application_name || ''
+    let firstSeen = logs[0]?.timestamp ?? ''
 
     logs.forEach((log) => {
+      if (log.timestamp && (!firstSeen || log.timestamp < firstSeen)) firstSeen = log.timestamp
       const logCalls = parseInt(String(log.calls ?? 0), 10)
       totalCalls += logCalls
       totalExecTime += parseFloat(String(log.total_exec_time ?? 0))
       totalPlanTime += parseFloat(String(log.total_plan_time ?? 0))
-      minTime = Math.min(minTime, (log.min_exec_time ?? 0) + (log.min_plan_time ?? 0))
-      maxTime = Math.max(maxTime, (log.max_exec_time ?? 0) + (log.max_plan_time ?? 0))
+      const logP95 =
+        parseFloat(String(log.p95_exec_time ?? 0)) + parseFloat(String(log.p95_plan_time ?? 0))
+      if (logP95 > 0) {
+        p95Sum += logP95
+        p95Count++
+      }
+      minTime = Math.min(
+        minTime,
+        parseFloat(String(log.min_exec_time ?? 0)) + parseFloat(String(log.min_plan_time ?? 0))
+      )
+      maxTime = Math.max(
+        maxTime,
+        parseFloat(String(log.max_exec_time ?? 0)) + parseFloat(String(log.max_plan_time ?? 0))
+      )
     })
 
     const totalTime = totalExecTime + totalPlanTime
     const avgMeanTime = totalCalls > 0 ? totalTime / totalCalls : 0
+    const avgP95Time = p95Count > 0 ? p95Sum / p95Count : 0
     const finalMinTime = minTime === Infinity ? 0 : minTime
     const finalMaxTime = maxTime === -Infinity ? 0 : maxTime
 
@@ -112,8 +155,10 @@ export function aggregateLogsByQuery(parsedLogs: ParsedLogEntry[]): QueryPerform
       query,
       rolname,
       applicationName,
+      firstSeen,
       count,
       avgMeanTime,
+      avgP95Time,
       minTime: finalMinTime,
       maxTime: finalMaxTime,
       totalCalls,
@@ -130,6 +175,7 @@ export function aggregateLogsByQuery(parsedLogs: ParsedLogEntry[]): QueryPerform
       application_name: stats.applicationName,
       calls: stats.totalCalls,
       mean_time: stats.avgMeanTime,
+      p95_time: stats.avgP95Time,
       min_time: stats.minTime,
       max_time: stats.maxTime,
       total_time: stats.totalTime,
@@ -140,6 +186,7 @@ export function aggregateLogsByQuery(parsedLogs: ParsedLogEntry[]): QueryPerform
       _total_cache_hits: 0,
       _total_cache_misses: 0,
       _count: stats.count,
+      first_seen: stats.firstSeen,
     })
   })
 

@@ -3,8 +3,8 @@ import {
   parseSupamonitorLogs,
   transformLogsToChartData,
   aggregateLogsByQuery,
-} from './WithSupamonitor.utils'
-import { ParsedLogEntry } from '../QueryPerformance.types'
+} from './supamonitor.utils'
+import type { ParsedLogEntry } from '../QueryInsights.types'
 
 const makeSampleLog = (overrides: Partial<ParsedLogEntry> = {}): any => ({
   timestamp: '2025-01-01T00:00:00Z',

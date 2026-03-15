@@ -12,7 +12,7 @@ import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 
-import { useMobileSheet } from '../ProjectLayout/NavigationBar/MobileSheetContext'
+import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
 

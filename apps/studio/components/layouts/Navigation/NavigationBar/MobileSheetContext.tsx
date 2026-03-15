@@ -1,7 +1,7 @@
 import type { PropsWithChildren, ReactNode } from 'react'
 import { createContext, useCallback, useContext, useRef, useState } from 'react'
 
-import type { TYPEOF_SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
+import type { TYPEOF_SIDEBAR_KEYS } from '../../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 /**
  * Sheet content: null = closed; sidebar id = one of SIDEBAR_KEYS; ReactNode = custom content (menu, search, etc.).

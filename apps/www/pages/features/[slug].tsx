@@ -222,10 +222,19 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               <div className="prose prose-docs">
                 <ReactMarkdown>{feature.description}</ReactMarkdown>
               </div>
-              {feature.docsUrl && (
-                <Button type="default" iconRight={<ChevronRight />} asChild>
-                  <Link href={feature.docsUrl}>Read Documentation</Link>
-                </Button>
+              {(feature.docsUrl || feature.blogUrl) && (
+                <div className="flex flex-wrap gap-2">
+                  {feature.docsUrl && (
+                    <Button type="default" iconRight={<ChevronRight />} asChild>
+                      <Link href={feature.docsUrl}>Read Documentation</Link>
+                    </Button>
+                  )}
+                  {feature.blogUrl && (
+                    <Button type="default" iconRight={<ChevronRight />} asChild>
+                      <Link href={feature.blogUrl}>Read Blog Post</Link>
+                    </Button>
+                  )}
+                </div>
               )}
               <div className="w-full flex items-center justify-between text-foreground-lighter text-sm border-y py-4">
                 <span>Share</span>

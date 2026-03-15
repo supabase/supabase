@@ -7,6 +7,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
+  Input_Shadcn_,
   LogoLoader,
   WarningIcon,
 } from 'ui'
@@ -32,6 +33,8 @@ const StripeFabricLoginPage = () => {
 
   const [selectedOrg, setSelectedOrg] = useState<OrgSummary | null>(null)
   const [orgConfirmed, setOrgConfirmed] = useState(false)
+  const [creatingNewOrg, setCreatingNewOrg] = useState(false)
+  const [newOrgName, setNewOrgName] = useState('')
 
   const {
     data: accountRequest,
@@ -57,9 +60,9 @@ const StripeFabricLoginPage = () => {
     }
   }, [router.isReady, ar_id, router])
 
-  const handleApprove = async (organizationId?: number) => {
+  const handleApprove = async (organizationId?: number, organizationName?: string) => {
     if (!ar_id || isConfirming) return
-    confirmAccountRequest({ arId: ar_id, organizationId })
+    confirmAccountRequest({ arId: ar_id, organizationId, organizationName })
   }
 
   // linked_organization is set when an org is already linked to this Stripe account+org pair
@@ -76,19 +79,19 @@ const StripeFabricLoginPage = () => {
 
   const loadingText = isReauth
     ? 'Completing authorization...'
-    : isLinking
-      ? 'Linking your organization...'
-      : 'Setting up your organization...'
+    : creatingNewOrg || orgCount === 0
+      ? 'Creating your organization...'
+      : 'Linking your organization...'
   const successTitle = isReauth
     ? 'Authorization Complete'
-    : isLinking
-      ? 'Organization Linked'
-      : 'Organization Created'
+    : creatingNewOrg || orgCount === 0
+      ? 'Organization Created'
+      : 'Organization Linked'
   const successDescription = isReauth
-    ? `Your Stripe account is connected to ${linkedOrg?.name}.`
-    : isLinking
-      ? 'Your Supabase organization has been linked to your Stripe account.'
-      : 'Your Supabase organization has been created and linked to your Stripe account.'
+    ? null
+    : creatingNewOrg || orgCount === 0
+      ? 'Your Supabase organization has been created and linked to your Stripe account.'
+      : 'Your Supabase organization has been linked to your Stripe account.'
 
   return (
     <APIAuthorizationLayout>
@@ -101,7 +104,7 @@ const StripeFabricLoginPage = () => {
         ) : isConfirmed ? (
           <>
             <h2 className="py-2 text-lg font-medium">{successTitle}</h2>
-            <p className="text-foreground-light">{successDescription}</p>
+            {successDescription && <p className="text-foreground-light">{successDescription}</p>}
             <p className="pt-4 text-sm text-foreground-lighter">You can close this window.</p>
           </>
         ) : isPending ? (
@@ -136,7 +139,7 @@ const StripeFabricLoginPage = () => {
               <>
                 <p className="mt-4 text-sm text-foreground-light text-center">
                   Your organization <strong>{linkedOrg.name}</strong> is already linked to your
-                  Stripe account. Approve to continue.
+                  Stripe account.
                 </p>
                 <div className="py-6">
                   <Button
@@ -145,7 +148,7 @@ const StripeFabricLoginPage = () => {
                     disabled={isConfirming}
                     onClick={() => handleApprove()}
                   >
-                    Approve
+                    Continue
                   </Button>
                 </div>
               </>
@@ -166,14 +169,52 @@ const StripeFabricLoginPage = () => {
                   </Button>
                 </div>
               </>
+            ) : creatingNewOrg ? (
+              // User chose to create a new org — show name input
+              <>
+                <p className="mt-4 text-sm text-foreground-light text-center">
+                  A new <strong>Free</strong> organization will be created and linked to your Stripe
+                  account for provisioning Supabase resources.
+                </p>
+                <div className="mt-4 w-80 flex flex-col gap-3">
+                  <Input_Shadcn_
+                    type="text"
+                    placeholder="Organization name"
+                    value={newOrgName}
+                    onChange={(e) => setNewOrgName(e.target.value)}
+                    maxLength={64}
+                    autoFocus
+                  />
+                </div>
+                <div className="py-6 flex flex-col items-center gap-3">
+                  <Button
+                    size="large"
+                    type="primary"
+                    disabled={isConfirming || newOrgName.trim().length === 0}
+                    onClick={() => handleApprove(undefined, newOrgName.trim())}
+                  >
+                    Create and Approve
+                  </Button>
+                  <button
+                    className="text-sm text-foreground-lighter underline hover:text-foreground-light"
+                    onClick={() => {
+                      setCreatingNewOrg(false)
+                      setNewOrgName('')
+                    }}
+                  >
+                    Back
+                  </button>
+                </div>
+              </>
             ) : orgCount === 1 ? (
-              // Exactly one org — show its name and approve directly
+              // Exactly one org — show its name and option to create new
               <>
                 <p className="mt-4 text-sm text-foreground-light text-center">
                   Your organization <strong>{userOrgs[0].name}</strong> will be linked to your
-                  Stripe account.
+                  Stripe account. Supabase resources from Stripe will be provisioned into this
+                  organization.
                 </p>
-                <div className="py-6">
+                <div className="py-6 flex flex-col items-center gap-3">
                   <Button
                     size="large"
                     type="primary"
@@ -182,13 +223,20 @@ const StripeFabricLoginPage = () => {
                   >
                     Approve
                   </Button>
+                  <button
+                    className="text-sm text-foreground-lighter underline hover:text-foreground-light"
+                    onClick={() => setCreatingNewOrg(true)}
+                  >
+                    or create a new free organization
+                  </button>
                 </div>
               </>
             ) : !orgConfirmed ? (
               // 2+ orgs — show picker
               <>
                 <p className="mt-4 text-sm text-foreground-light text-center">
-                  Select the organization you'd like to link to your Stripe account.
+                  Select the organization you'd like to link to your Stripe account. Supabase
+                  resources from Stripe will be provisioned into this organization.
                 </p>
                 <div className="mt-4 w-96">
                   <OrganizationSelector
@@ -202,6 +250,12 @@ const StripeFabricLoginPage = () => {
                     maxOrgsToShow={3}
                     canCreateNewOrg={false}
                   />
+                  <button
+                    className="mt-3 w-full text-sm text-foreground-lighter underline hover:text-foreground-light"
+                    onClick={() => setCreatingNewOrg(true)}
+                  >
+                    or create a new free organization
+                  </button>
                 </div>
               </>
             ) : (

@@ -1,5 +1,8 @@
 import { IS_PLATFORM } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ASSISTANT_SUGGESTIONS } from 'components/ui/HelpPanel/HelpPanel.constants'
+import { getSupportLinkQueryParams } from 'components/ui/HelpPanel/HelpPanel.utils'
+import { HelpSection } from 'components/ui/HelpPanel/HelpSection'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Lightbulb, TriangleAlert } from 'lucide-react'
@@ -15,9 +18,6 @@ import {
   PopoverTrigger_Shadcn_,
 } from 'ui'
 
-import { ASSISTANT_SUGGESTIONS } from '../HelpPanel/HelpPanel.constants'
-import { getSupportLinkQueryParams } from '../HelpPanel/HelpPanel.utils'
-import { HelpSection } from '../HelpPanel/HelpSection'
 import { FeedbackWidget } from './FeedbackWidget'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
