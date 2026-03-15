@@ -16,6 +16,14 @@ resources:
               stat_prefix: ingress_http
               upgrade_configs:
                 - upgrade_type: websocket
+              access_log:
+                - name: envoy.access_loggers.stdout
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
+                    log_format:
+                      text_format_source:
+                        inline_string: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT% - - [%START_TIME(%d/%b/%Y:%H:%M:%S %z)%] \"%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%\" %RESPONSE_CODE% %BYTES_SENT% \"%REQ(REFERER)%\" \"%REQ(USER-AGENT)%\"\n"
                 
               route_config:
                 name: supabase_route
