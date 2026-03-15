@@ -256,7 +256,8 @@ services:
         config:
           access:
             - |
-              if kong.request.get_header("authorization") == "" then
+              local auth = kong.request.get_header("authorization")
+              if auth == nil or auth == "" or auth:find("^%s*$") then
                 kong.service.request.clear_header("authorization")
               end
 
