@@ -141,7 +141,7 @@ export const ProjectDropdown = ({
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
-    if (!embedded) return <ShimmeringLoader className="p-2 md:p-0 md:w-[90px]" />
+    if (!embedded) return <ShimmeringLoader className="p-2 md:mr-2 md:w-[90px]" />
   }
 
   const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen

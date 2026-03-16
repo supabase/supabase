@@ -75,7 +75,7 @@ export const BranchDropdown = ({
     />
   )
 
-  if (isLoading) return <ShimmeringLoader className="p-2 md:p-0md:w-[90px]" />
+  if (isLoading) return <ShimmeringLoader className="p-2 md:w-[90px]" />
 
   if (isError) return <AppLayoutDropdownError message="Failed to load branches" />
 

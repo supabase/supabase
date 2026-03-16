@@ -40,7 +40,8 @@ export const OrganizationDropdown = ({
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
 
-  if (isLoadingOrganizations && !embedded) return <ShimmeringLoader className="w-[90px]" />
+  if (isLoadingOrganizations && !embedded)
+    return <ShimmeringLoader className="p-2 md:mr-2 w-[90px]" />
 
   if (isError) return <AppLayoutDropdownError message="Failed to load organizations" />
 
