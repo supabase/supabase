@@ -13,7 +13,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   return (
     <ProjectLayout
       product="Storage"
-      browserTitle={{ section: title || 'Storage' }}
+      browserTitle={{ section: title }}
       productMenu={<StorageMenuV2 />}
     >
       {children}

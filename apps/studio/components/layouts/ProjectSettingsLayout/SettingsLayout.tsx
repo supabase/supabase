@@ -24,7 +24,7 @@ export const SettingsProductMenu = () => {
 }
 
 interface SettingsLayoutProps {
-  title?: string
+  title: string
 }
 
 export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
@@ -32,7 +32,7 @@ export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLa
     <ProjectLayout
       isBlocking={false}
       product="Settings"
-      browserTitle={{ section: title || 'Settings' }}
+      browserTitle={{ section: title }}
       productMenu={<SettingsProductMenu />}
     >
       {children}

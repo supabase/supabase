@@ -26,12 +26,7 @@ const BranchProductMenu = () => {
 
 const BranchLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
-    <ProjectLayout
-      product="Branching"
-      browserTitle={{ section: 'Branching' }}
-      productMenu={<BranchProductMenu />}
-      isBlocking={false}
-    >
+    <ProjectLayout product="Branching" productMenu={<BranchProductMenu />} isBlocking={false}>
       {children}
     </ProjectLayout>
   )
