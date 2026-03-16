@@ -58,9 +58,6 @@ Check updates for each service to learn more.
 - ⚠️ Added an option for a "hybrid" JWT verification following the addition of the new API keys and the new asymmetric authentication (requires `volumes/functions/main/index.ts` update) - PR [#42130](https://github.com/supabase/supabase/pull/42130)
 - ⚠️ Added optional rate limiter - PR [edge-runtime#670](https://github.com/supabase/edge-runtime/pull/670)
 
-### Supavisor
-- Updated to `v2.8.0` - [Release](https://github.com/supabase/supavisor/releases/tag/v2.8.0)
-
 ---
 
 ## [2026-02-18]
