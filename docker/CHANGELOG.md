@@ -32,7 +32,8 @@ Check updates for each service to learn more.
 
 ### Studio
 - Updated to `2026.03.xx-xxx-xxxxxxx`
-- Added the link to Data API page in Integrations - PR [#43268](https://github.com/supabase/supabase/pull/43268)
+- ⚠️ Added the link to Data API page in Integrations - PR [#43268](https://github.com/supabase/supabase/pull/43268)
+- ⚠️ Added `PGRST_DB_SCHEMAS`, `PGRST_DB_EXTRA_SEARCH_PATH`, and `PGRST_DB_MAX_ROWS` environment variables (requires `docker-compose.yml` update) - PR [#43268](https://github.com/supabase/supabase/pull/43268)
 
 ### MCP Server
 - Updated to `v0.7.0` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.7.0)
@@ -47,6 +48,13 @@ Check updates for each service to learn more.
 - ⚠️ Added `STORAGE_PUBLIC_URL` environment variable to simplify proxy configuration (requires `docker-compose.s3.yml` update) - PR [storage#900](https://github.com/supabase/storage/pull/900)
 - ⚠️ Added RustFS as an optional S3 backend - PR [#42935](https://github.com/supabase/supabase/pull/42935)
 - ⚠️ Changed Docker Compose configuration for S3 backends to use named volumes - PR [#43815](https://github.com/supabase/supabase/pull/43815)
+
+### Edge Runtime
+
+- Updated to `v1.71.2` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.71.2)
+- ⚠️ Added `SUPABASE_PUBLISHABLE_KEYS`, SUPABASE_SECRET_KEYS`, and `SUPABASE_PUBLIC_URL` environment variables (requires `docker-compose.yml` update)
+- ⚠️ Added an option for "hybrid" JWT verification following the addition of the new API keys and the new asymmetric authentication (requires `volumes/functions/main/index.ts` update) - PR [#42130](https://github.com/supabase/supabase/pull/42130)
+- ⚠️ Added optional rate limiter - PR [edge-runtime#670](https://github.com/supabase/edge-runtime/pull/670)
 
 ---
 
