@@ -8,6 +8,7 @@ import type {
   WebhookEndpoint,
   WebhookScope,
 } from './PlatformWebhooks.types'
+import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
 
 interface CreateEndpointOptions {
   now?: string
@@ -96,11 +97,10 @@ export const createWebhookEndpoint = (
   options?: CreateEndpointOptions
 ): { state: PlatformWebhooksState; endpoint: WebhookEndpoint; signingSecret: string } => {
   const endpointId = options?.endpointId ?? randomId('endpoint')
-  const internalName = input.name.trim().length > 0 ? input.name.trim() : endpointId
   const signingSecret = options?.signingSecret ?? generateSigningSecret()
   const endpoint: WebhookEndpoint = {
     id: endpointId,
-    name: internalName,
+    name: input.name.trim(),
     url: input.url.trim(),
     description: input.description.trim(),
     enabled: input.enabled,
@@ -132,7 +132,7 @@ export const updateWebhookEndpoint = (
       endpoint.id === endpointId
         ? {
             ...endpoint,
-            name: input.name.trim().length > 0 ? input.name.trim() : endpoint.name,
+            name: input.name.trim(),
             url: input.url.trim(),
             description: input.description.trim(),
             enabled: input.enabled,
@@ -185,7 +185,8 @@ export const filterWebhookEndpoints = (endpoints: WebhookEndpoint[], search: str
   if (normalizedSearch.length === 0) return endpoints
 
   return endpoints.filter((endpoint) => {
-    const haystack = `${endpoint.name} ${endpoint.url} ${endpoint.description}`.toLowerCase()
+    const haystack =
+      `${getWebhookEndpointDisplayName(endpoint)} ${endpoint.url} ${endpoint.description}`.toLowerCase()
     return haystack.includes(normalizedSearch)
   })
 }

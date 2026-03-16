@@ -1,7 +1,6 @@
-import { Search } from 'lucide-react'
-
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { Search } from 'lucide-react'
 import {
   Badge,
   Card,
@@ -15,6 +14,7 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 
@@ -47,6 +47,8 @@ export const PlatformWebhooksEndpointDetails = ({
   onOpenDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
+  const hasName = selectedEndpoint.name.trim().length > 0
+  const hasDescription = selectedEndpoint.description.trim().length > 0
 
   return (
     <div className="space-y-16">
@@ -55,11 +57,15 @@ export const PlatformWebhooksEndpointDetails = ({
         <Card className="overflow-hidden">
           <CardContent className="pb-5">
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
+              {hasName && <DetailItem label="Name">{selectedEndpoint.name}</DetailItem>}
+
               <DetailItem label="URL" ddClassName="text-sm break-all">
                 {selectedEndpoint.url}
               </DetailItem>
 
-              <DetailItem label="Description">{selectedEndpoint.description || '-'}</DetailItem>
+              {hasDescription && (
+                <DetailItem label="Description">{selectedEndpoint.description}</DetailItem>
+              )}
 
               <DetailItem label="Event types" ddClassName="flex flex-wrap gap-2">
                 {(selectedEndpoint.eventTypes.includes('*')

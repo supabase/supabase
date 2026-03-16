@@ -1,7 +1,6 @@
+import { DocsButton } from 'components/ui/DocsButton'
 import Link from 'next/link'
 import { ReactNode } from 'react'
-
-import { DocsButton } from 'components/ui/DocsButton'
 import {
   Badge,
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
