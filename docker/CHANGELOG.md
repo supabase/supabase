@@ -20,16 +20,15 @@ Check updates for each service to learn more.
 ⚠️ **Note:** This update includes several important changes. Please check the details below. The following configuration files have been added/updated: `utils/add-new-auth-keys.sh`, `utils/rotate-new-api-keys.sh`, `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `docker-compose.rustfs.yml`, `volumes/api/kong.yml`, `volumes/api/kong-entrypoint.sh`, `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, and `volumes/proxy`.
 
 ### Configuration
-- ⚠️ Added scripts and templates to support the new API key format (`sb_` API keys) and the new asymmetric authentication - PR [#43554](https://github.com/supabase/supabase/pull/43554); see the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) for detailed instructions.
-- Added optional configuration options for Caddy or nginx - PR [#43291](https://github.com/supabase/supabase/pull/43291); read the [how-to guide](https://github.com/supabase/supabase/pull/43293) to learn more
+- ⚠️ Added scripts and templates to support the new API key format (`sb_` API keys) and the new asymmetric authentication - PR [#43554](https://github.com/supabase/supabase/pull/43554); see the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) for detailed instructions
+- Added optional configuration for Caddy or nginx - PR [#43291](https://github.com/supabase/supabase/pull/43291); read the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) to learn more
 
 ### Documentation
 - Added several new how-to guides to the self-hosted Supabase [documentation](https://supabase.com/docs/guides/self-hosting) - PR [#42745](https://github.com/supabase/supabase/pull/42745), PR [#42953](https://github.com/supabase/supabase/pull/42953), PR [#43177](https://github.com/supabase/supabase/pull/43177), PR [#43286](https://github.com/supabase/supabase/pull/43286), PR [#43293](https://github.com/supabase/supabase/pull/43293)
-- Updated self-hosting installation and configuration guide - PR [#40901](https://github.com/supabase/supabase/pull/40901), PR [#41438](https://github.com/supabase/supabase/pull/41438)
 
 ### Utils and tests
 - Added `add-new-auth-keys.sh` and `rotate-new-api-keys.sh` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
-- Added `./tests` with 100+ test cases
+- Added `./tests` with 100+ test cases - PR [#43573](https://github.com/supabase/supabase/pull/43573)
 
 ### Studio
 - Updated to `2026.03.xx-xxx-xxxxxxx`
@@ -40,14 +39,14 @@ Check updates for each service to learn more.
 
 ### Realtime
 
-- Updated to `v2.76.5` - [Release](https://github.com/supabase/realtime/releases/tag/v2.76.5)
+- Updated to `v2.78.15` - [Release](https://github.com/supabase/realtime/releases/tag/v2.78.15)
 - ⚠️ Added `METRICS_JWT_SECRET` environment variable (requires `docker-compose.s3.yml` update) - PR [realtime#1729](https://github.com/supabase/realtime/pull/1729)
 
 ### Storage
 - Updated `supabase/storage-api` to `v1.44.2`
-- Added `STORAGE_PUBLIC_URL` environment variable to simplify proxy configuration (requires requires `docker-compose.s3.yml` update) - PR [storage#900](https://github.com/supabase/storage/pull/900)
-- Added RustFS as an optional S3 backend - PR [#42935](https://github.com/supabase/supabase/pull/42935)
-- MinIO, RustFS
+- ⚠️ Added `STORAGE_PUBLIC_URL` environment variable to simplify proxy configuration (requires requires `docker-compose.s3.yml` update) - PR [storage#900](https://github.com/supabase/storage/pull/900)
+- ⚠️ Added RustFS as an optional S3 backend - PR [#42935](https://github.com/supabase/supabase/pull/42935)
+- ⚠️ Changed Docker Compose configuration for S3 backends to use named volumes - PR [#43815](https://github.com/supabase/supabase/pull/43815)
 
 ---
 
