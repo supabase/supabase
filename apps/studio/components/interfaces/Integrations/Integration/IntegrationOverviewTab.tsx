@@ -49,9 +49,13 @@ export const IntegrationOverviewTab = ({
   return (
     <div className="flex flex-col gap-8 py-10">
       <BuiltBySection integration={integration} status={status} />
-      {alert && <div className="px-10 max-w-4xl">{alert}</div>}
+
+      {!!alert && <div className="px-10 max-w-4xl">{alert}</div>}
+
       <MarkdownContent key={integration.id} integrationId={integration.id} />
+
       <Separator />
+
       {dependsOnExtension && (
         <div className="px-4 md:px-10 max-w-4xl flex flex-col gap-y-4">
           <h4>Required extensions</h4>
@@ -66,16 +70,12 @@ export const IntegrationOverviewTab = ({
                   return (
                     <li
                       key={requiredExtension}
-                      className={[
+                      className={cn(
                         'flex items-center justify-between gap-3 py-2 px-3',
-                        !isLastRow ? 'border-b' : '',
-                      ].join(' ')}
+                        !isLastRow ? 'border-b' : ''
+                      )}
                     >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="truncate">
-                          <code>{requiredExtension}</code>
-                        </span>
-                      </div>
+                      <code className="text-xs">{requiredExtension}</code>
 
                       <div className="shrink-0">
                         {extension ? (
@@ -100,6 +100,7 @@ export const IntegrationOverviewTab = ({
           </Card>
         </div>
       )}
+
       {!!actions && (
         <div
           aria-disabled={hasToInstallExtensions}

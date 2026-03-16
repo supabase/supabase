@@ -124,7 +124,7 @@ export function useKeyboardNavigation({
 
   const handleBackspace = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
-      if (activeInput?.type === 'operator') return
+      if (activeInput?.type === 'operator' || activeInput?.type === 'property') return
 
       const inputElement = e.target as HTMLInputElement
       const isEmpty = inputElement.value === ''
@@ -172,6 +172,8 @@ export function useKeyboardNavigation({
 
   const handleArrowLeft = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
+      if (activeInput?.type === 'property') return
+
       const inputElement = e.target as HTMLInputElement
       const isEmpty = inputElement.value === ''
 
@@ -201,6 +203,8 @@ export function useKeyboardNavigation({
 
   const handleArrowRight = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
+      if (activeInput?.type === 'property') return
+
       const inputElement = e.target as HTMLInputElement
       const isEmpty = inputElement.value === ''
 
@@ -255,7 +259,10 @@ export function useKeyboardNavigation({
       } else if (e.key === 'ArrowRight') {
         handleArrowRight(e)
       } else if (e.key === 'Escape') {
-        if (highlightedConditionPath) {
+        if (activeInput?.type === 'property') {
+          e.preventDefault()
+          setActiveInput({ type: 'value', path: activeInput.path })
+        } else if (highlightedConditionPath) {
           e.preventDefault()
           setHighlightedConditionPath(null)
         } else {

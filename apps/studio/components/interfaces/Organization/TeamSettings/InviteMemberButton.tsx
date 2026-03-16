@@ -1,57 +1,54 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
+import { useParams } from 'common'
+import { UserPlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
-import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
-import { useProfile } from 'lib/profile'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
   Button,
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
   ExpandingTextArea,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  DialogFooter,
-  Form_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Select_Shadcn_,
+  SelectValue_Shadcn_,
   Switch,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-import { UserPlus } from 'lucide-react'
-import { Admonition } from 'ui-patterns'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
+import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { doPermissionsCheck, useGetPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { DOCS_URL } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
 
 function parseEmails(value: string): string[] {
   return value
@@ -71,15 +68,24 @@ export const InviteMemberButton = () => {
   ])
 
   const [isOpen, setIsOpen] = useState(false)
-  const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState(false)
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
 
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
 
-  const currentPlan = organization?.plan
-  const isFreeOrProPlan = currentPlan?.id === 'free' || currentPlan?.id === 'pro'
+  const { data: ssoConfig } = useOrgSSOConfigQuery({ orgSlug: slug })
+  const hasSsoProvider = !!ssoConfig && ssoConfig !== null
+
+  const defaultValues = {
+    email: '',
+    role: orgScopedRoles.find((role) => role.name === 'Developer')?.id.toString() ?? '',
+    applyToOrg: true,
+    projectRef: '',
+    requireSso: 'auto' as const,
+  }
+
+  const { hasAccess: hasAccessToSso } = useCheckEntitlements('auth.platform.sso')
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
@@ -134,13 +140,14 @@ export const InviteMemberButton = () => {
     role: z.string().min(1, 'Role is required'),
     applyToOrg: z.boolean(),
     projectRef: z.string(),
+    requireSso: z.enum(['auto', 'sso', 'non-sso']),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
-    defaultValues: { email: '', role: '', applyToOrg: true, projectRef: '' },
+    defaultValues,
   })
 
   const { applyToOrg, projectRef, email } = form.watch()
@@ -150,8 +157,6 @@ export const InviteMemberButton = () => {
   const onInviteMember = async (values: z.infer<typeof FormSchema>) => {
     if (!slug) return console.error('Slug is required')
     if (profile?.id === undefined) return console.error('Profile ID required')
-
-    const developerRole = orgScopedRoles.find((role) => role.name === 'Developer')
     const emails = parseEmails(values.email).map((e) => e.toLowerCase())
 
     const alreadyInvited: string[] = []
@@ -191,6 +196,15 @@ export const InviteMemberButton = () => {
 
     const projectPayload =
       !values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}
+
+    // Transform SSO preference to backend format
+    const ssoPayload =
+      values.requireSso === 'sso'
+        ? { requireSso: true }
+        : values.requireSso === 'non-sso'
+          ? { requireSso: false }
+          : {} // 'auto' - let backend use automatic behavior
+
     const results = await Promise.allSettled(
       toInvite.map((emailAddress) =>
         inviteMemberAsync({
@@ -198,6 +212,7 @@ export const InviteMemberButton = () => {
           email: emailAddress,
           roleId: Number(values.role),
           ...projectPayload,
+          ...ssoPayload,
         })
       )
     )
@@ -211,13 +226,7 @@ export const InviteMemberButton = () => {
           ? 'Successfully sent invitation to new member'
           : `Successfully sent invitations to ${successCount} new members`
       )
-      setIsOpen(false)
-      form.reset({
-        email: '',
-        role: developerRole?.id.toString() ?? '',
-        applyToOrg: true,
-        projectRef: '',
-      })
+      closeInviteDialog()
     }
     if (failedEmails.length > 0) {
       toast.error(
@@ -230,12 +239,12 @@ export const InviteMemberButton = () => {
 
   useEffect(() => {
     if (isSuccess && isOpen) {
-      const developerRole = orgScopedRoles.find((role) => role.name === 'Developer')
-      if (developerRole !== undefined) {
-        form.reset({
-          ...form.getValues(),
-          role: developerRole.id.toString(),
-        })
+      const developerRoleId = orgScopedRoles
+        .find((role) => role.name === 'Developer')
+        ?.id.toString()
+
+      if (developerRoleId !== undefined && form.getValues('role') === '') {
+        form.setValue('role', developerRoleId, { shouldDirty: false })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -243,38 +252,20 @@ export const InviteMemberButton = () => {
 
   const hasUnsavedChanges = form.formState.isDirty
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open && hasUnsavedChanges) {
-      setIsDiscardConfirmOpen(true)
-    } else {
-      setIsOpen(open)
-    }
-  }
-
-  const handleCancel = () => {
-    if (hasUnsavedChanges) {
-      setIsDiscardConfirmOpen(true)
-    } else {
-      form.reset({
-        email: '',
-        role: '',
-        applyToOrg: true,
-        projectRef: '',
-      })
-      setIsOpen(false)
-    }
-  }
-
-  const handleDiscardConfirm = () => {
-    form.reset({
-      email: '',
-      role: '',
-      applyToOrg: true,
-      projectRef: '',
-    })
-    setIsDiscardConfirmOpen(false)
+  const closeInviteDialog = () => {
+    setProjectDropdownOpen(false)
     setIsOpen(false)
+    form.reset(defaultValues)
   }
+
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: discardChangesModalProps,
+  } = useConfirmOnClose({
+    checkIsDirty: () => hasUnsavedChanges,
+    onClose: closeInviteDialog,
+  })
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -308,23 +299,19 @@ export const InviteMemberButton = () => {
           type="note"
           showIcon={false}
           title="Single Sign-On (SSO) available"
-          layout={isFreeOrProPlan ? 'vertical' : 'horizontal'}
+          layout={!hasAccessToSso ? 'vertical' : 'horizontal'}
           className="rounded-none border-t-0 border-x-0 px-5"
           description="Enforce login via your company identity provider for added security and access control. Available on Team plan and above."
           actions={
             <>
-              <Button asChild type="default">
-                <Link href={`${DOCS_URL}/guides/platform/sso`} target="_blank" rel="noreferrer">
-                  Learn more
-                </Link>
-              </Button>
-              {isFreeOrProPlan ? (
+              <DocsButton href={`${DOCS_URL}/guides/platform/sso`} />
+              {!hasAccessToSso && (
                 <UpgradePlanButton
                   plan="Team"
                   source="inviteMemberSSO"
                   featureProposition="enable Single Sign-on (SSO)"
                 />
-              ) : null}
+              )}
             </>
           }
         />
@@ -341,10 +328,7 @@ export const InviteMemberButton = () => {
                 render={({ field }) => (
                   <FormItemLayout label="Role">
                     <FormControl_Shadcn_>
-                      <Select_Shadcn_
-                        value={field.value}
-                        onValueChange={(value) => form.setValue('role', value)}
-                      >
+                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_ className="text-sm capitalize">
                           {orgScopedRoles.find((role) => role.id === Number(field.value))?.name ??
                             'Unknown'}
@@ -375,6 +359,39 @@ export const InviteMemberButton = () => {
                   </FormItemLayout>
                 )}
               />
+              {hasSsoProvider && (
+                <FormField_Shadcn_
+                  name="requireSso"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Invitation type"
+                      description="Choose how the invitee should authenticate"
+                    >
+                      <FormControl_Shadcn_>
+                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger_Shadcn_>
+                            <SelectValue_Shadcn_ placeholder="Automatic (based on your account)" />
+                          </SelectTrigger_Shadcn_>
+                          <SelectContent_Shadcn_>
+                            <SelectGroup_Shadcn_>
+                              <SelectItem_Shadcn_ value="auto">
+                                Automatic (based on your account)
+                              </SelectItem_Shadcn_>
+                              <SelectItem_Shadcn_ value="sso">
+                                Require SSO authentication
+                              </SelectItem_Shadcn_>
+                              <SelectItem_Shadcn_ value="non-sso">
+                                Email/password authentication
+                              </SelectItem_Shadcn_>
+                            </SelectGroup_Shadcn_>
+                          </SelectContent_Shadcn_>
+                        </Select_Shadcn_>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
               {hasAccessToProjectLevelPermissions && (
                 <FormField_Shadcn_
                   name="applyToOrg"
@@ -382,10 +399,7 @@ export const InviteMemberButton = () => {
                   render={({ field }) => (
                     <FormItemLayout layout="flex" label="Grant this role on all projects">
                       <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(value) => form.setValue('applyToOrg', value)}
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -441,7 +455,7 @@ export const InviteMemberButton = () => {
               />
             </DialogSection>
             <DialogFooter className="!justify-between">
-              <Button type="default" onClick={handleCancel}>
+              <Button type="default" onClick={confirmOnClose}>
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit" loading={isInviting}>
@@ -451,22 +465,10 @@ export const InviteMemberButton = () => {
           </form>
         </Form_Shadcn_>
       </DialogContent>
-      <AlertDialog open={isDiscardConfirmOpen} onOpenChange={setIsDiscardConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Discard changes?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to discard your changes? Your invitation will not be sent.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Keep editing</AlertDialogCancel>
-            <AlertDialogAction variant="danger" onClick={handleDiscardConfirm}>
-              Discard changes
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DiscardChangesConfirmationDialog
+        {...discardChangesModalProps}
+        description="Are you sure you want to discard your changes? Your invitation will not be sent."
+      />
     </Dialog>
   )
 }

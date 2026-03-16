@@ -17,8 +17,39 @@ import types from './pg-meta-types'
 import version from './pg-meta-version'
 import views from './pg-meta-views'
 import * as query from './query/index'
-import { getIndexStatusesSQL, USER_SEARCH_INDEXES } from './sql/studio/get-index-statuses'
-import { getIndexWorkerStatusSQL } from './sql/studio/get-index-worker-status'
+
+// Studio SQL queries
+export { getUserSQL } from './sql/studio/auth/get-user'
+export { getIndexStatusesSQL, USER_SEARCH_INDEXES } from './sql/studio/auth/get-index-statuses'
+export { getIndexWorkerStatusSQL } from './sql/studio/auth/get-index-worker-status'
+export { type OptimizedSearchColumns } from './sql/studio/auth/get-users-types'
+export { getPaginatedUsersSQL, type UsersCursor } from './sql/studio/auth/get-users-paginated'
+export { getUsersCountSQL } from './sql/studio/auth/get-users-count'
+export {
+  getLargestSizeLimitBucketsSqlUnoptimized,
+  LARGEST_SIZE_LIMIT_BUCKETS_COUNT,
+} from './sql/studio/storage/get-largest-size-limit-buckets'
+export {
+  getExposedTablesSql,
+  getExposedTableCountsSql,
+  getExposedFunctionsSql,
+  getExposedFunctionCountsSql,
+  buildTablePrivilegesSql,
+  buildFunctionPrivilegesSql,
+  buildDefaultPrivilegesSql,
+  getDefaultPrivilegesStateSql,
+} from './sql/studio/privileges'
+export { getIndexesSQL } from './sql/studio/database/indexes'
+export { getDatabaseExtensionDefaultSchemaSQL } from './sql/studio/database/extensions'
+export {
+  getCronJobsMinimalSql,
+  getCronJobsSql,
+  getJobRunDetailsPageCountSql,
+  getDeleteOldCronJobRunDetailsByCtidSql,
+  getScheduleDeleteCronJobRunDetailsSql,
+} from './sql/studio/database/cron-jobs'
+export { getTableRowsCountSql } from './sql/studio/database/rows'
+export { getLiveTupleEstimate } from './sql/studio/get-live-tuple-estimate'
 
 export default {
   roles,
@@ -40,7 +71,4 @@ export default {
   indexes,
   columnPrivileges,
   query,
-  getIndexWorkerStatusSQL,
-  getIndexStatusesSQL,
-  USER_SEARCH_INDEXES,
 }

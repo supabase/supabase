@@ -6,12 +6,16 @@ import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 interface RAMWarningsProps {
-  isFreePlan: boolean
+  hasAccessToComputeSizes: boolean
   upgradeUrl: string
   severity?: 'warning' | 'critical' | null
 }
 
-export const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => {
+export const RAMWarnings = ({
+  hasAccessToComputeSizes,
+  upgradeUrl,
+  severity,
+}: RAMWarningsProps) => {
   if (severity === 'warning') {
     return (
       <Alert_Shadcn_ variant="warning">
@@ -28,7 +32,7 @@ export const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsPro
           </Button>
           <Button asChild type="warning">
             <Link href={upgradeUrl}>
-              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+              {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>
           </Button>
         </div>
@@ -52,7 +56,7 @@ export const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsPro
           </Button>
           <Button asChild type="danger">
             <Link href={upgradeUrl}>
-              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+              {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>
           </Button>
         </div>

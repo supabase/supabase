@@ -1,7 +1,13 @@
 import { useCallback } from 'react'
 
 import { ActiveInputState, FilterGroup, FilterProperty, MenuItem } from './types'
-import { addFilterToGroup, addGroupToGroup, findGroupByPath, isCustomOptionObject } from './utils'
+import {
+  addFilterToGroup,
+  addGroupToGroup,
+  findGroupByPath,
+  updateNestedOperator,
+  updateNestedValue,
+} from './utils'
 
 export function useCommandHandling({
   activeInput,
@@ -95,15 +101,7 @@ export function useCommandHandling({
       const group = findGroupByPath(activeFilters, currentPath)
       if (!group) return
 
-      if (
-        selectedProperty.options &&
-        !Array.isArray(selectedProperty.options) &&
-        isCustomOptionObject(selectedProperty.options)
-      ) {
-        handlePropertySelection(selectedProperty, currentPath, group)
-      } else {
-        handlePropertySelection(selectedProperty, currentPath, group)
-      }
+      handlePropertySelection(selectedProperty, currentPath, group)
       onFreeformTextChange('')
     },
     [activeInput, filterProperties, activeFilters, onFreeformTextChange, handlePropertySelection]
@@ -136,7 +134,18 @@ export function useCommandHandling({
       if (activeInput?.type === 'value') {
         handleValueCommand(item)
       } else if (activeInput?.type === 'operator') {
-        handleOperatorCommand(selectedValue)
+        if (item.isDefaultOperator) {
+          const path = activeInput.path
+          const filtersWithOperator = updateNestedOperator(activeFilters, path, item.value)
+          onFilterChange(updateNestedValue(filtersWithOperator, path, item.defaultValue ?? ''))
+
+          // Added minor delay to ensure the filter is updated before navigating to the group
+          setTimeout(() => {
+            setActiveInput({ type: 'group', path: path.slice(0, -1) })
+          }, 0)
+        } else {
+          handleOperatorCommand(selectedValue)
+        }
       } else if (activeInput?.type === 'group') {
         handleGroupPropertyCommand(selectedValue)
       }
@@ -150,6 +159,7 @@ export function useCommandHandling({
       handleValueCommand,
       handleOperatorCommand,
       handleGroupPropertyCommand,
+      onFilterChange,
       setIsCommandMenuVisible,
     ]
   )

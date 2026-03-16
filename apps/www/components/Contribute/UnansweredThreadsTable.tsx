@@ -25,7 +25,7 @@ import {
 
 import type { ThreadRow } from '~/types/contribute'
 import { FilterPopover } from './FilterPopover'
-import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import { ChannelIcon, DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
 
 interface TabConfig {
   id: string
@@ -398,31 +398,8 @@ function ThreadRow({
       <TableCell className="w-auto max-w-[600px]">
         <div className="flex items-center gap-3 overflow-hidden">
           {/* Channel icon */}
-          <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md">
-            {thread.channel === 'discord' && (
-              <DiscordIcon
-                className={cn(
-                  'h-4 w-4',
-                  thread.channel === 'discord' ? 'text-[#5865F2]' : 'text-foreground-lighter'
-                )}
-              />
-            )}
-            {thread.channel === 'reddit' && (
-              <RedditIcon
-                className={cn(
-                  'h-4 w-4',
-                  thread.channel === 'reddit' ? 'text-[#FF4500]' : 'text-foreground-lighter'
-                )}
-              />
-            )}
-            {thread.channel === 'github' && (
-              <GitHubIcon
-                className={cn(
-                  'h-4 w-4',
-                  thread.channel === 'github' ? 'text-foreground' : 'text-foreground-lighter'
-                )}
-              />
-            )}
+          <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md shrink-0">
+            <ChannelIcon channel={thread.channel} />
           </div>
           <div className="min-w-0 flex-1 flex flex-col gap-y-0.5">
             {/* Thread title */}

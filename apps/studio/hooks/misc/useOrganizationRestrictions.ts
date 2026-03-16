@@ -43,14 +43,6 @@ export function useOrganizationRestrictions() {
     (invoice) => invoice.organization_id === org?.id
   )
 
-  if (org && org.organization_missing_address && !org.billing_partner) {
-    warnings.push({
-      variant: 'danger',
-      title: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.title,
-      description: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.description(org.slug),
-    })
-  }
-
   if (thisOrgHasOverdueInvoices?.length) {
     warnings.push({
       variant: 'danger',

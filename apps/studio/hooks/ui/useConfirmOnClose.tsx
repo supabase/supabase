@@ -27,6 +27,15 @@ export const useConfirmOnClose = ({ checkIsDirty, onClose }: UseConfirmOnClosePr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        confirmOnClose()
+      }
+    },
+    [confirmOnClose]
+  )
+
   const onConfirm = useCallback(() => {
     setVisible(false)
     onCloseRef.current()
@@ -49,8 +58,9 @@ export const useConfirmOnClose = ({ checkIsDirty, onClose }: UseConfirmOnClosePr
   return useMemo(
     () => ({
       confirmOnClose,
+      handleOpenChange,
       modalProps,
     }),
-    [confirmOnClose, modalProps]
+    [confirmOnClose, handleOpenChange, modalProps]
   )
 }
