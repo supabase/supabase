@@ -21,10 +21,7 @@ import {
   InfoIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
-const SERVICE_DOCS_URLS: Partial<Record<Service, string>> = {
-  [Service.Auth]: 'https://supabase.com/docs/guides/auth/debugging/error-codes',
-}
+import { getErrorCodeInfo } from './ErrorCodeTooltip.utils'
 
 interface ErrorCodeTooltipProps {
   errorCode: string
@@ -38,16 +35,19 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { data, isPending } = useErrorCodesQuery({ code: errorCode, service }, { enabled: isOpen })
+  const { definition, docsUrl: sharedDocsUrl } = getErrorCodeInfo(errorCode, service)
+
+  const { data, isPending } = useErrorCodesQuery(
+    { code: errorCode, service },
+    { enabled: isOpen && !definition }
+  )
 
   const errors = data?.errors?.nodes?.filter((e) => !!e.message) ?? []
 
-  const docsUrl =
-    errors.map((e) => SERVICE_DOCS_URLS[e.service]).find(Boolean) ??
-    (service ? SERVICE_DOCS_URLS[service] : undefined)
+  const description = definition?.description ?? errors[0]?.message
+  const docsUrl = sharedDocsUrl
 
   const buildPrompt = () => {
-    const description = errors[0]?.message
     const servicePart = service ? ` in Supabase ${service}` : ''
     const descriptionPart = description ? `\n\nError description: ${description}` : ''
     return `I'm encountering error code \`${errorCode}\`${servicePart}.${descriptionPart}\n\nCan you explain what this error means and suggest steps to fix it?`
@@ -78,18 +78,18 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
           </div>
 
           <div className="px-4 py-3 space-y-2">
-            {isPending ? (
+            {isPending && !definition ? (
               <div className="space-y-1.5">
                 <ShimmeringLoader className="w-full" />
                 <ShimmeringLoader className="w-4/5" />
                 <ShimmeringLoader className="w-3/5" />
               </div>
-            ) : errors.length === 0 ? (
+            ) : !description ? (
               <p className="text-sm text-foreground-lighter">
                 No description available for this error code.
               </p>
             ) : (
-              <p className="text-sm text-foreground leading-relaxed">{errors[0].message}</p>
+              <p className="text-sm text-foreground leading-relaxed">{description}</p>
             )}
           </div>
 

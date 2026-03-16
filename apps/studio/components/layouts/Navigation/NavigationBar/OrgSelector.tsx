@@ -52,13 +52,7 @@ export function OrgSelector() {
 
   const isMobile = useBreakpoint('md')
 
-  if (isLoadingOrganizations) {
-    return (
-      <div className="px-2 py-2">
-        <ShimmeringLoader className="w-full py-3" />
-      </div>
-    )
-  }
+  if (isLoadingOrganizations) return <ShimmeringLoader className="ml-1 w-[120px]" />
 
   const triggerButton = (
     <SidebarMenuButton
@@ -91,7 +85,9 @@ export function OrgSelector() {
     return (
       <>
         <SidebarMenu className="flex-shrink">
-          <SidebarMenuItem>{triggerButton}</SidebarMenuItem>
+          <SidebarMenuItem>
+            {isLoadingOrganizations ? <ShimmeringLoader className="p-2 w-[90px]" /> : triggerButton}
+          </SidebarMenuItem>
         </SidebarMenu>
         <OrgSelectorSheet
           open={open}
