@@ -39,6 +39,18 @@ const secureRandomHex = (length: number) => {
 }
 
 const randomId = (prefix: string) => `${prefix}-${secureRandomHex(8)}`
+const randomUuid = () => {
+  const cryptoApi = globalThis.crypto
+  if (cryptoApi?.randomUUID) return cryptoApi.randomUUID()
+
+  return [
+    secureRandomHex(8),
+    secureRandomHex(4),
+    `4${secureRandomHex(3)}`,
+    `${((parseInt(secureRandomHex(2), 16) & 0x3f) | 0x80).toString(16)}${secureRandomHex(2)}`,
+    secureRandomHex(12),
+  ].join('-')
+}
 
 const generateSigningSecret = () => `whsec_${secureRandomHex(16)}`
 
@@ -96,7 +108,7 @@ export const createWebhookEndpoint = (
   input: UpsertWebhookEndpointInput,
   options?: CreateEndpointOptions
 ): { state: PlatformWebhooksState; endpoint: WebhookEndpoint; signingSecret: string } => {
-  const endpointId = options?.endpointId ?? randomId('endpoint')
+  const endpointId = options?.endpointId ?? randomUuid()
   const signingSecret = options?.signingSecret ?? generateSigningSecret()
   const endpoint: WebhookEndpoint = {
     id: endpointId,
@@ -230,7 +242,7 @@ export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
   return {
     ...state,
     createEndpoint: (input: UpsertWebhookEndpointInput) => {
-      const endpointId = randomId('endpoint')
+      const endpointId = randomUuid()
       const now = new Date().toISOString()
       const signingSecret = generateSigningSecret()
       const createdBy = 'mock-user@supabase.io'

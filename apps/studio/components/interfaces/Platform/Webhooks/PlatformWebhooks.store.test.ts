@@ -13,7 +13,7 @@ const EMPTY_STATE: PlatformWebhooksState = {
 }
 
 const createEndpoint = (overrides?: Partial<WebhookEndpoint>): WebhookEndpoint => ({
-  id: 'endpoint-1',
+  id: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
   name: 'Billing events',
   url: 'https://hooks.example.com/billing',
   description: 'Invoices and receipts',
@@ -38,7 +38,7 @@ describe('PlatformWebhooks.store', () => {
         customHeaders: [],
       },
       {
-        endpointId: 'endpoint-new',
+        endpointId: '9e4b1d62-7c35-4f18-a9d1-2b6e7f8c9012',
         signingSecret: 'whsec_example',
       }
     )
@@ -58,7 +58,7 @@ describe('PlatformWebhooks.store', () => {
         customHeaders: [],
       },
       {
-        endpointId: 'endpoint-new',
+        endpointId: '9e4b1d62-7c35-4f18-a9d1-2b6e7f8c9012',
         signingSecret: 'whsec_example',
       }
     )
@@ -72,7 +72,7 @@ describe('PlatformWebhooks.store', () => {
       deliveries: [],
     }
 
-    const result = updateWebhookEndpoint(state, 'endpoint-1', {
+    const result = updateWebhookEndpoint(state, '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12', {
       name: '   ',
       url: 'https://hooks.example.com/billing',
       description: 'Invoices and receipts',
@@ -88,7 +88,7 @@ describe('PlatformWebhooks.store', () => {
     const endpoints = [
       createEndpoint(),
       createEndpoint({
-        id: 'endpoint-2',
+        id: '1a4e8c73-5b29-44af-8c62-9f1d2b3c4d5e',
         name: '',
         url: 'https://hooks.example.com/slack',
         description: 'Operational alerts',

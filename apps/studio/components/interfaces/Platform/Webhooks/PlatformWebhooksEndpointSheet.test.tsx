@@ -22,7 +22,7 @@ vi.mock(import('./PlatformWebhooks.utils'), async (importOriginal) => {
 const PROJECT_EVENT_TYPES = ['project.updated', 'project.paused']
 
 const createEndpoint = (overrides?: Partial<WebhookEndpoint>): WebhookEndpoint => ({
-  id: 'endpoint-1',
+  id: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
   name: 'Billing events',
   url: 'https://hooks.example.com/billing',
   description: 'Invoices and receipts',
