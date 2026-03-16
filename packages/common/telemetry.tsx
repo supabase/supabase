@@ -22,10 +22,7 @@ import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useFirstTouchStore, useParams } from './hooks'
 import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
-import {
-  clearFirstTouchData,
-  getFirstTouchData,
-} from './telemetry-first-touch-store'
+import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
 import { getSharedTelemetryData, getTelemetryCookieOptions } from './telemetry-utils'
 
 export { posthogClient, type ClientTelemetryEvent }
