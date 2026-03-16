@@ -6,35 +6,46 @@ description: 'Things to do before making your app publicly available'
 
 After developing your project and deciding it's production ready, you should run through this checklist to ensure that your project:
 
-- is secure
-- won't falter under the expected load
-- remains available whilst in production
+- [Is secure](#security)
+- [Won't falter under the expected load](#performance)
+- [Remains available whilst in production](#availability)
 
 ## Security
 
-- Ensure RLS is enabled
+<Admonition type="tip">
+
+Check and review issues in your database using [Security Advisor](/dashboard/project/_/database/security-advisor).
+
+</Admonition>
+
+- [Ensure you have enabled row level security (RLS) on all tables](/dashboard/project/_/database/tables)
   - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is usually not what you want.
   - [Learn more about RLS](/docs/guides/database/postgres/row-level-security).
-- Enable replication on tables containing sensitive data by enabling Row Level Security (RLS) and setting row security policies:
-  - Go to the Authentication > Policies page in the Supabase Dashboard to enable RLS and create security policies.
-  - Go to the Database > Publications page in the Supabase Dashboard to manage replication tables.
-- Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement) (see: [dashboard](/dashboard/project/_/auth/policies))
-- Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for your database (see: [dashboard](/dashboard/project/_/database/settings#network-restrictions)).
+- Enable replication on tables containing sensitive data by enabling RLS and setting row security policies:
+  - Go to the [**Authentication > Policies**](/dashboard/project/_/auth/policies) page in the Supabase Dashboard to enable RLS and create security policies.
+  - Go to the [**Database > Publications**](/dashboard/project/_/database/publications) page in the Supabase Dashboard to manage replication tables.
+- Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement) from the [**Database > Settings > SSL Configuration**](/dashboard/project/_/database/settings#ssl-configuration) section of the dashboard.
+- Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for the database from the [**Database > Settings > Network Restrictions**](/dashboard/project/_/database/settings#network-restrictions) section of the dashboard.
 - Ensure that your Supabase Account is protected with multi-factor authentication (MFA).
   - If using a GitHub sign-in, [enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication). Since your GitHub account gives you administrative rights to your Supabase org, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
   - If using email+password sign-in, set up [MFA for your Supabase account](/docs/guides/platform/multi-factor-authentication#enable-mfa).
 - Enable [MFA enforcement on your organization](/docs/guides/platform/network-restrictions). This ensures all users must have a valid MFA backed session to interact with organization and project resources.
 - Consider [adding multiple owners on your Supabase org](/dashboard/org/_/team). This ensures that if one of the owners is unreachable or loses access to their account, you still have Owner access to your org.
-- Ensure email confirmations are [enabled](/dashboard/project/_/auth/providers) in the `Settings > Auth` page.
-- Ensure that you've [set the expiry](/dashboard/project/_/auth/providers) for one-time passwords (OTPs) to a reasonable value that you are comfortable with. We recommend setting this to 3600 seconds (1 hour) or lower.
+- Ensure you enable email confirmations in the [**Settings > Auth**](/dashboard/project/_/auth/providers) page of the dashboard.
+- Ensure that you've set the expiry in the [**Settings > Auth**](/dashboard/project/_/auth/providers) page of the dashboard for one-time passwords (OTPs) to a reasonable value that you are comfortable with. We recommend setting this to 3600 seconds (1 hour) or lower.
 - Increase the length of the OTP if you need a higher level of entropy.
 - If your application requires a higher level of security, consider setting up [multi-factor authentication](/docs/guides/auth/auth-mfa) (MFA) for your users.
 - Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). Grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
 - Consider how _you_ might abuse your service as an attacker, and take steps to mitigate it.
 - Review these [common cybersecurity threats](https://auth0.com/docs/security/prevent-threats).
-- Check and review issues in your database using [Security Advisor](/dashboard/project/_/database/security-advisor).
 
 ## Performance
+
+<Admonition type="tip">
+
+Check and review issues in your database using [Performance Advisor](/dashboard/project/_/database/performance-advisor).
+
+</Admonition>
 
 - Ensure that you have suitable indices to cater to your common query patterns
   - [Learn more about indexes in Postgres](https://www.enterprisedb.com/postgres-tutorials/overview-postgresql-indexes).
@@ -44,7 +55,6 @@ After developing your project and deciding it's production ready, you should run
 - Upgrade your database if you require more resources. If you need anything beyond what is listed, contact enterprise@supabase.io.
 - If you are expecting a surge in traffic (for a big launch) and are on a Team or Enterprise Plan, [contact support](/dashboard/support/new) with more details about your launch and we'll help keep an eye on your project.
 - If you expect your database size to be > 4 GB, [enable](/dashboard/project/_/settings/addons?panel=pitr) the Point in Time Recovery (PITR) add-on. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
-- Check and review issues in your database using [Performance Advisor](/dashboard/project/_/database/performance-advisor).
 
 ## Availability
 
@@ -99,29 +109,3 @@ After developing your project and deciding it's production ready, you should run
   consider altering the email template to replace the original magic link with a link to a domain you control. The domain can present the user with a "Sign-in" button which redirect the user to the original magic link URL when clicked.
 
 - When using a custom SMTP service, some services might have link tracking enabled which may overwrite or disform the email confirmation links sent by Supabase Auth. To prevent this from happening, we recommend that you disable link tracking when using a custom SMTP service.
-
-## Subscribe to Supabase status page
-
-Stay informed about Supabase service status by subscribing to the [Status Page](https://status.supabase.com/). We recommend setting up Slack notifications through an RSS feed to ensure your team receives timely updates about service status changes.
-
-### Setting up Slack notifications
-
-1. Install the RSS app in Slack:
-
-   - Visit the [RSS app page](https://slack.com/marketplace/A0F81R7U7-rss) in the Slack marketplace
-   - Click `Add to Slack` if not already installed
-   - Otherwise you will get straight to next step, no need to reinstall the app
-
-2. Configure the Supabase status feed:
-
-   - Create a channel (e.g., `#supabase-status-alerts`) for status updates
-   - On the [RSS app page](https://slack.com/marketplace/A0F81R7U7-rss) go to _Add a Feed_ section and set Feed URL to `https://status.supabase.com/history.rss`
-   - Select your designated channel and click "Subscribe to this feed"
-
-Once configured, your team will receive automatic notifications in Slack whenever the Supabase Status Page is updated.
-
-For detailed setup instructions, see the [Add RSS feeds to Slack](https://slack.com/intl/en-nz/help/articles/218688467-Add-RSS-feeds-to-Slack).
-
-## Next steps
-
-This checklist is always growing so be sure to check back frequently, and also feel free to suggest additions and amendments by making a PR on [GitHub](https://github.com/supabase/supabase).
