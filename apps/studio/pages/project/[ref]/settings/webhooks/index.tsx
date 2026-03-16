@@ -9,7 +9,7 @@ const ProjectWebhooksSettings: NextPageWithLayout = () => {
 
 ProjectWebhooksSettings.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout>{page}</SettingsLayout>
+    <SettingsLayout title="Webhooks">{page}</SettingsLayout>
   </DefaultLayout>
 )
 

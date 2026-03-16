@@ -12,6 +12,7 @@ export async function getIncidentStatus(
   const response = await fetch(`${BASE_PATH}/api/incident-status`, {
     signal,
     method: 'GET',
+    credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -40,6 +41,10 @@ export const useIncidentStatusQuery = <TData = IncidentStatusData>(
   useQuery<IncidentStatusData, IncidentStatusError, TData>({
     queryKey: platformKeys.incidentStatus(),
     queryFn: ({ signal }) => getIncidentStatus(signal),
+    refetchOnWindowFocus: false,
+    // exponential backoff retry starting at 4s, 16s, 64s, 256s etc. Hard capped at 5 minutes to prevent excessively
+    // long retry delays.
+    retryDelay: (attemptIndex) => Math.min(1000 * 4 ** attemptIndex, 1000 * 60 * 5),
     staleTime: 1000 * 60 * 5, // 5 minutes to match API cache
     ...options,
     // Enable in platform mode, or in test environment for E2E testing

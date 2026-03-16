@@ -29,7 +29,7 @@ const SecretsPage: NextPageWithLayout = () => {
 SecretsPage.getLayout = (page) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>
+      <EdgeFunctionsLayout title="Secrets">
         <div className="w-full min-h-full flex flex-col items-stretch">
           <PageHeader size="large">
             <PageHeaderMeta>

@@ -33,6 +33,7 @@ import {
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
@@ -41,6 +42,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { ProjectStorageConfigResponse } from '@/data/config/project-storage-config-query'
 import { getQueryClient } from '@/data/query-client'
 import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation'
+import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
 import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
@@ -795,8 +797,34 @@ function createStorageExplorerState({
           { id: toastId, closeButton: false, position: 'top-right' }
         )
 
+        // Pre-fetch all URLs in a single batch to avoid N management API calls
+        const filePaths = files.map((file) => `${file.prefix}/${file.name}`)
+        const urlByPath = new Map<string, string>()
+
+        if (state.selectedBucket.public) {
+          for (const filePath of filePaths) {
+            urlByPath.set(
+              filePath,
+              `${clientEndpoint}/storage/v1/object/public/${state.selectedBucket.id}/${filePath}`
+            )
+          }
+        } else {
+          const signedUrls = await signBucketObjects({
+            projectRef: state.projectRef,
+            bucketId: state.selectedBucket.id,
+            paths: filePaths,
+            expiresIn: 60 * 60, // 1 hour — enough for large folder downloads
+          })
+          for (const item of signedUrls) {
+            if (item.path && item.signedUrl) {
+              urlByPath.set(item.path, item.signedUrl)
+            }
+          }
+        }
+
         const promises = files.map((file) => {
           const fileMimeType = (file.metadata?.mimetype as string) ?? null
+          const filePath = `${file.prefix}/${file.name}`
           return () => {
             return new Promise<
               | {
@@ -807,26 +835,22 @@ function createStorageExplorerState({
               | boolean
             >(async (resolve) => {
               try {
-                // Get authenticated Supabase client for Storage API access
-                const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
+                const url = urlByPath.get(filePath)
+                if (!url) throw new Error(`Failed to retrieve file ${filePath}`)
 
-                // Use Storage API directly instead of Management API to avoid throttling
-                const { data, error } = await client.storage
-                  .from(state.selectedBucket.id)
-                  .download(`${file.prefix}/${file.name}`)
-
-                if (error) throw error
-                if (!data) throw new Error('No data returned from download')
+                const response = await fetch(url)
+                if (!response.ok) throw new Error(`Failed to retrieve file ${filePath}`)
+                const data = await response.blob()
 
                 progress = progress + 1 / files.length
 
                 resolve({
                   name: file.name,
                   prefix: file.prefix,
-                  blob: new Blob([data], { type: fileMimeType }),
+                  blob: new Blob([data], { type: fileMimeType ?? data.type }),
                 })
               } catch (error) {
-                console.error('Failed to download file', `${file.prefix}/${file.name}`)
+                console.error('Failed to download file', filePath)
                 resolve(false)
               }
             })
@@ -1530,17 +1554,17 @@ function createStorageExplorerState({
       const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
       try {
-        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
+        const url = await fetchFileUrl(
+          file.path,
+          state.projectRef,
+          state.selectedBucket.id,
+          state.selectedBucket.public
+        )
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`Failed to retrieve file ${file.path}`)
+        const data = await response.blob()
 
-        // Use Storage API directly instead of Management API to avoid throttling
-        const { data, error } = await client.storage
-          .from(state.selectedBucket.id)
-          .download(file.path)
-
-        if (error) throw error
-        if (!data) throw new Error('No data returned from download')
-
-        const newBlob = new Blob([data], { type: fileMimeType })
+        const newBlob = new Blob([data], { type: fileMimeType ?? data.type })
         const blobUrl = window.URL.createObjectURL(newBlob)
         const link = document.createElement('a')
         link.href = blobUrl
@@ -1574,17 +1598,18 @@ function createStorageExplorerState({
       if (!file.path) return false
 
       try {
-        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
-
-        const { data, error } = await client.storage
-          .from(state.selectedBucket.id)
-          .download(file.path)
-
-        if (error) throw error
-        if (!data) throw new Error('No data returned from download')
+        const url = await fetchFileUrl(
+          file.path,
+          state.projectRef,
+          state.selectedBucket.id,
+          state.selectedBucket.public
+        )
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`Failed to retrieve file ${file.path}`)
+        const data = await response.blob()
 
         const fileMimeType = file?.metadata?.mimetype ?? undefined
-        return { name: file.name, blob: new Blob([data], { type: fileMimeType }) }
+        return { name: file.name, blob: new Blob([data], { type: fileMimeType ?? data.type }) }
       } catch (err) {
         console.error('Failed to download file', file.path)
         return false

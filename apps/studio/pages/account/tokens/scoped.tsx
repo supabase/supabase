@@ -1,19 +1,17 @@
+import { NewScopedTokenButton } from 'components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenButton'
+import { ScopedTokenList } from 'components/interfaces/Account/AccessTokens/Scoped/ScopedTokenList'
+import { AccessTokensLayout } from 'components/layouts/AccessTokens/AccessTokensLayout'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
+import { NewScopedAccessToken } from 'data/scoped-access-tokens/scoped-access-token-create-mutation'
 import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
-
-import AccessTokensLayout from 'components/layouts/AccessTokens/AccessTokensLayout'
-import { NewScopedTokenButton } from 'components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenButton'
-import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
-
-import { ScopedTokenList } from 'components/interfaces/Account/AccessTokens/Scoped/ScopedTokenList'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { NewScopedAccessToken } from 'data/scoped-access-tokens/scoped-access-token-create-mutation'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
 
 const ScopedTokens: NextPageWithLayout = () => {
   const [searchString, setSearchString] = useState('')
@@ -36,7 +34,7 @@ const ScopedTokens: NextPageWithLayout = () => {
             autoComplete="off"
             icon={<Search size={12} />}
             value={searchString}
-            onChange={(e: any) => setSearchString(e.target.value)}
+            onChange={(e) => setSearchString(e.target.value)}
             name="search"
             id="search"
             placeholder="Filter by name"
@@ -78,9 +76,7 @@ const ScopedTokens: NextPageWithLayout = () => {
 ScopedTokens.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
-      <OrganizationLayout>
-        <AccountLayout title="Access Tokens">{page}</AccountLayout>
-      </OrganizationLayout>
+      <AccountLayout title="Access Tokens">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
 )

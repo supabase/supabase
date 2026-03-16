@@ -1,6 +1,3 @@
-import { useRouter } from 'next/router'
-import { ReactElement } from 'react'
-
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Error from 'components/ui/Error'
@@ -10,6 +7,9 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
+import { useRouter } from 'next/router'
+import { ReactElement } from 'react'
+
 import { ProjectLayout } from '../ProjectLayout'
 import { generateDocsMenu, getActivePage } from './DocsLayout.utils'
 
@@ -55,9 +55,9 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
 
   return (
     <ProjectLayout
-      title={title || 'API Docs'}
       isLoading={isLoading}
       product="API Docs"
+      browserTitle={{ section: title || 'API Docs' }}
       productMenu={
         !hideMenu && (
           <ProductMenu

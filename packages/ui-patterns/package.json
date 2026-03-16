@@ -222,6 +222,10 @@
       "import": "./src/CommandMenu/prepackaged/Support.tsx",
       "types": "./src/CommandMenu/prepackaged/Support.tsx"
     },
+    "./CommandMenu/prepackaged/ThemeSwitcher.test": {
+      "import": "./src/CommandMenu/prepackaged/ThemeSwitcher.test.tsx",
+      "types": "./src/CommandMenu/prepackaged/ThemeSwitcher.test.tsx"
+    },
     "./CommandMenu/prepackaged/ThemeSwitcher": {
       "import": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx",
       "types": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx"
@@ -302,9 +306,29 @@
       "import": "./src/EmptyStatePresentational/index.tsx",
       "types": "./src/EmptyStatePresentational/index.tsx"
     },
+    "./ErrorDisplay/ErrorDisplay": {
+      "import": "./src/ErrorDisplay/ErrorDisplay.tsx",
+      "types": "./src/ErrorDisplay/ErrorDisplay.tsx"
+    },
+    "./ErrorDisplay/ErrorDisplay.types": {
+      "import": "./src/ErrorDisplay/ErrorDisplay.types.ts",
+      "types": "./src/ErrorDisplay/ErrorDisplay.types.ts"
+    },
+    "./ErrorDisplay": {
+      "import": "./src/ErrorDisplay/ErrorDisplay.tsx",
+      "types": "./src/ErrorDisplay/ErrorDisplay.tsx"
+    },
     "./ExpandableVideo": {
       "import": "./src/ExpandableVideo/index.tsx",
       "types": "./src/ExpandableVideo/index.tsx"
+    },
+    "./FilterBar/CommandListItem": {
+      "import": "./src/FilterBar/CommandListItem.tsx",
+      "types": "./src/FilterBar/CommandListItem.tsx"
+    },
+    "./FilterBar/DefaultCommandList.helpers": {
+      "import": "./src/FilterBar/DefaultCommandList.helpers.tsx",
+      "types": "./src/FilterBar/DefaultCommandList.helpers.tsx"
     },
     "./FilterBar/DefaultCommandList": {
       "import": "./src/FilterBar/DefaultCommandList.tsx",
@@ -330,6 +354,10 @@
       "import": "./src/FilterBar/FilterGroup.tsx",
       "types": "./src/FilterBar/FilterGroup.tsx"
     },
+    "./FilterBar/OperatorSymbolBadge": {
+      "import": "./src/FilterBar/OperatorSymbolBadge.tsx",
+      "types": "./src/FilterBar/OperatorSymbolBadge.tsx"
+    },
     "./FilterBar/hooks.test": {
       "import": "./src/FilterBar/hooks.test.ts",
       "types": "./src/FilterBar/hooks.test.ts"
@@ -342,6 +370,10 @@
       "import": "./src/FilterBar/index.ts",
       "types": "./src/FilterBar/index.ts"
     },
+    "./FilterBar/menuItems.test": {
+      "import": "./src/FilterBar/menuItems.test.ts",
+      "types": "./src/FilterBar/menuItems.test.ts"
+    },
     "./FilterBar/menuItems": {
       "import": "./src/FilterBar/menuItems.ts",
       "types": "./src/FilterBar/menuItems.ts"
@@ -350,9 +382,17 @@
       "import": "./src/FilterBar/types.ts",
       "types": "./src/FilterBar/types.ts"
     },
+    "./FilterBar/useAIFilter": {
+      "import": "./src/FilterBar/useAIFilter.ts",
+      "types": "./src/FilterBar/useAIFilter.ts"
+    },
     "./FilterBar/useCommandHandling": {
       "import": "./src/FilterBar/useCommandHandling.ts",
       "types": "./src/FilterBar/useCommandHandling.ts"
+    },
+    "./FilterBar/useCommandMenu": {
+      "import": "./src/FilterBar/useCommandMenu.ts",
+      "types": "./src/FilterBar/useCommandMenu.ts"
     },
     "./FilterBar/useKeyboardNavigation": {
       "import": "./src/FilterBar/useKeyboardNavigation.ts",
@@ -422,6 +462,10 @@
       "import": "./src/McpUrlBuilder/utils/getMcpButtonData.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpButtonData.ts"
     },
+    "./McpUrlBuilder/utils/getMcpIconSrc": {
+      "import": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts",
+      "types": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts"
+    },
     "./McpUrlBuilder/utils/getMcpUrl": {
       "import": "./src/McpUrlBuilder/utils/getMcpUrl.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpUrl.ts"
@@ -429,6 +473,10 @@
     "./MetricCard": {
       "import": "./src/MetricCard/index.tsx",
       "types": "./src/MetricCard/index.tsx"
+    },
+    "./MobileSheetNav/MobileSheetNav.test": {
+      "import": "./src/MobileSheetNav/MobileSheetNav.test.tsx",
+      "types": "./src/MobileSheetNav/MobileSheetNav.test.tsx"
     },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
@@ -449,6 +497,10 @@
     "./MultiSelectDeprecated": {
       "import": "./src/MultiSelectDeprecated/index.tsx",
       "types": "./src/MultiSelectDeprecated/index.tsx"
+    },
+    "./MultipleCodeBlock": {
+      "import": "./src/MultipleCodeBlock/index.tsx",
+      "types": "./src/MultipleCodeBlock/index.tsx"
     },
     "./PageContainer": {
       "import": "./src/PageContainer/index.tsx",
@@ -582,10 +634,6 @@
       "import": "./src/admonition.tsx",
       "types": "./src/admonition.tsx"
     },
-    "./MultipleCodeBlock": {
-      "import": "./src/MultipleCodeBlock/index.tsx",
-      "types": "./src/MultipleCodeBlock/index.tsx"
-    },
     "./consent": {
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"
@@ -668,7 +716,6 @@
     "react-intersection-observer": "^9.8.2",
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.6.6",
-    "react-tooltip": "*",
     "react-use": "^17.5.0",
     "recharts": "catalog:",
     "remark": "^15.0.1",
