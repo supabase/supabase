@@ -9,7 +9,7 @@ export const isValidEdgeFunctionURL = (url: string, isPlatform: boolean) => {
 
   if (!isPlatform) {
     const regexValidLocalEdgeFunctionURL = new RegExp(
-      /^https?:\/\/[^\\s/?#]+\/functions\/v[0-9]{1}\/.*$/
+      /^https?:\/\/[^\s/?#]+\/functions\/v[0-9]{1}\/.*$/
     )
 
     return regexValidLocalEdgeFunctionURL.test(url)
