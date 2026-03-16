@@ -11,6 +11,12 @@ import sxswContest from './events/sxsw-2026/contest'
 import accentureContest from './events/accenture-reinvention-2026/contest'
 import postgresconfContest from './events/postgresconf-sjc-2026/contest'
 import postgresconfContestThankYou from './events/postgresconf-sjc-2026/contest-thank-you'
+import mcpDevSummitContest from './events/mcp-dev-nyc-2026/contest'
+import mcpDevSummitContestThankYou from './events/mcp-dev-nyc-2026/contest-thank-you'
+import pgconfDevContest from './events/pgconf-dev-2026/contest'
+import pgconfDevContestThankYou from './events/pgconf-dev-2026/contest-thank-you'
+import aiEngineerEuropeContest from './events/ai-engineer-europe-2026/contest'
+import aiEngineerEuropeContestThankYou from './events/ai-engineer-europe-2026/contest-thank-you'
 import startupGrindContest from './events/startup-grind-2026/contest'
 
 const pages: GoPageInput[] = [
@@ -25,6 +31,12 @@ const pages: GoPageInput[] = [
   accentureContest, // remove after May 31, 2026
   postgresconfContest, // remove after May 31, 2026
   postgresconfContestThankYou, // remove after May 31, 2026
+  mcpDevSummitContest,
+  mcpDevSummitContestThankYou,
+  pgconfDevContest,
+  pgconfDevContestThankYou,
+  aiEngineerEuropeContest,
+  aiEngineerEuropeContestThankYou,
   startupGrindContest, // remove after May 31, 2026
 ]
 

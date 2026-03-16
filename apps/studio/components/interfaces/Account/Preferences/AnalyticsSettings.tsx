@@ -1,10 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useConsentState } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Card, CardContent, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -15,6 +20,45 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+export const PrivacyUpdateBanner = () => {
+  const [privacyUpdateAcknowledged, setPrivacyUpdateAcknowledged] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.PRIVACY_NOTICE_ACKNOWLEDGED,
+    false
+  )
+
+  if (privacyUpdateAcknowledged) return null
+
+  return (
+    <Alert_Shadcn_ className="mb-4 relative">
+      <AlertTitle_Shadcn_>
+        <Badge variant="default" className="mr-2">
+          NOTICE
+        </Badge>
+        Privacy Policy Update – Effective March 16, 2026
+      </AlertTitle_Shadcn_>
+      <AlertDescription_Shadcn_>
+        We've updated our{' '}
+        <a href="https://supabase.com/privacy" target="_blank" className="text hover:text-brand">
+          Privacy Policy
+        </a>{' '}
+        to clarify our use of analytics, cookies, and advertising audience management tools. By
+        continuing to use Supabase after March 16, you agree to the new terms. Questions? Contact{' '}
+        <a href="mailto:privacy@supabase.com" target="_blank" className="text hover:text-brand">
+          our team
+        </a>
+        .
+      </AlertDescription_Shadcn_>
+      <ButtonTooltip
+        type="text"
+        icon={<X />}
+        className="absolute top-2 right-2 px-1"
+        onClick={() => setPrivacyUpdateAcknowledged(true)}
+        tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
+      />
+    </Alert_Shadcn_>
+  )
+}
 
 const AnalyticsSchema = z.object({
   telemetryEnabled: z.boolean(),

@@ -1,0 +1,162 @@
+---
+title = "Edge Function 401 error response"
+topics = [ "functions" ]
+keywords = [ "401", "error" ]
+database_id = "12e09c3f-a48b-4aea-9df3-90a25ef0021e"
+
+[[errors]]
+http_status_code = 401
+message = "Invalid JWT"
+---
+
+The function rejected the request for lacking the appropriate authorization headers.
+
+## Context for the error
+
+#### The JWT verification check
+
+By default, edge functions are configured to check requests for a valid [legacy key](/docs/guides/api/api-keys#overview).
+
+#### How the check causes 401 errors
+
+The check fails and return a 401 permission error if:
+
+- The request includes an invalid legacy key, or
+- The request uses the newer asymmetric keys instead of a legacy key.
+
+#### What this check actually does
+
+This validation provides limited security value. It only confirms that the request includes a legacy token associated with your project, such as the anon key.
+
+It does not validate the user's identity or permissions beyond that.
+
+Because the security check is weak, it was deprecated when used with the new asymmetric keys.
+
+## Solving the error
+
+### Step 1: Identifying the error
+
+<Admonition type="note">
+
+If the tests return a 401 but don't match the criteria below, the error is coming from your app logic, not the JWT check.
+
+</Admonition>
+
+### Inspecting the return message
+
+When an edge function fails due to a platform 401 error, it returns the error:
+
+```json
+{
+  "code": 401,
+  "message": "Invalid JWT"
+}
+```
+
+### Inspecting the logs
+
+Your code may return a 401 error due to its own logic
+
+```js
+return new Response(JSON.stringify(data), {
+  headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  status: 401, // app logic returning a 401
+})
+```
+
+A 401 status code alone doesn't confirm a JWT check failure by itself. The log must also lack an `execution_id`.
+
+![image](/docs/img/troubleshooting/401_in_the_logs.png)
+
+Instead of manually reviewing the logs, you can run the below query in the [log explorer](</dashboard/project/_/logs/explorer?q=SELECT+DISTINCT%0A++++req.pathname+AS+function_name,%0A++++res.status_code%0A++FROM+function_edge_logs%0A++CROSS+JOIN+UNNEST(metadata)+AS+metadata+%0A++CROSS+JOIN+UNNEST(metadata.request)+AS+req+%0A++CROSS+JOIN+UNNEST(metadata.response)+AS+res+%0AWHERE+status_code+=+401+AND+metadata.execution_id+IS+NULL%0ALIMIT+10;&its=&ite=%3E>) to get a list of functions that were impacted by the check:
+
+```sql
+select distinct
+  req.pathname as function_name,
+  res.status_code
+from
+  function_edge_logs
+  cross join UNNEST(metadata) as metadata
+  cross join UNNEST(metadata.request) as req
+  cross join UNNEST(metadata.response) as res
+where status_code = 401 and metadata.execution_id is null
+limit 10;
+```
+
+### Step 2: Disabling the JWT check
+
+The JWT check provides minimal security benefits, so we now recommend handling authentication through app logic instead. See the [Edge Function Auth Doc](/docs/guides/functions/auth) for details.
+
+If you've migrated to [asymmetric keys (publishable/secret)](/dashboard/project/_/settings/api-keys) or no longer need the JWT check, you can disable it using one of the three options below:
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="In the Dashboard"
+      id="item-1"
+    >
+        In the [Function Dashboard](/dashboard/project/_/functions/), under the offending function's detail tab, you can toggle off the check:
+
+        ![image](/docs/img/troubleshooting/401_edge_functions_toggle_off_JWT_check.png)
+
+
+    </AccordionItem>
+
+  </div>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="With the Management API"
+      id="item-2"
+    >
+
+    1. Generate a secret token in the [Account Preferences Dashboard](/dashboard/account/tokens)
+    2. Get your project ID from the [General Settings](/dashboard/project/_/settings/general)
+    3. Substitute in the `PROJECT_ID`, `FUNCTION_NAME`, and `SECRET_TOKEN` in below [management endpoint](/docs/reference/api/v1-update-a-function). Then execute the request from a terminal environment
+
+    ```sh
+    # remember to substitute in your PROJECT_ID, FUNCTION_NAME, and SECRET_TOKEN
+
+curl 'https://api.supabase.com/v1/projects/PROJECT_ID/functions/FUNCTION_NAME?verify_jwt=false' \
+--request PATCH \
+--header 'Content-Type: application/vnd.denoland.eszip' \
+--header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+--data '""'
+
+````
+</AccordionItem>
+
+  </div>
+
+      <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="With the Supabase CLI"
+      id="item-3"
+    >
+
+With the [Supabase CLI](/docs/guides/local-development/cli/getting-started), you can redeploy your edge function without the JWT check:
+
+```sh
+supabase functions deploy hello-world --no-verify-jwt
+```
+
+    </AccordionItem>
+
+  </div>
+</Accordion>
+
+If you would like to continue using the JWT check, make sure that your [Supabase Client](/docs/guides/api/rest/client-libs) only uses your [legacy keys](/dashboard/project/_/settings/api-keys/legacy).
+
+## Additional resources
+
+- [Securing Edge Functions](/docs/guides/functions/auth)
+- [Debugging Edge Functions](/docs/guides/functions/logging)
+- [Quickstart Deployment: Dashboard](/docs/guides/functions/quickstart-dashboard)
+- [Quickstart Deployment: CLI](/docs/guides/functions/quickstart)
+````

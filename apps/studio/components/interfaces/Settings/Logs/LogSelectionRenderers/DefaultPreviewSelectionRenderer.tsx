@@ -15,7 +15,7 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
-import { ErrorCodeTooltip } from '../ErrorCodeTooltip'
+import { ErrorCodeTooltip } from 'components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
 
@@ -26,7 +26,7 @@ const LogRowCodeBlock = ({ value, className }: { value: string; className?: stri
       className
     )}
   >
-    {JSON.stringify(value, null, 2)}
+    {typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
   </pre>
 )
 

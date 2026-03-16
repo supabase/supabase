@@ -36,7 +36,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
   const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
 
   const [urlDestinationType, setDestinationType] = useQueryState(
-    'type',
+    'destinationType',
     parseAsStringEnum<DestinationType>([
       'Read Replica',
       'BigQuery',
