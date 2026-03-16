@@ -101,7 +101,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-export default wrapper
+export default handler

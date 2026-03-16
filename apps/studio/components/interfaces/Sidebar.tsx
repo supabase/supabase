@@ -4,7 +4,7 @@ import {
   generateProductRoutes,
   generateSettingsRoutes,
   generateToolRoutes,
-} from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
+} from 'components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
