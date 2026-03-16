@@ -176,14 +176,16 @@ export function LogDrains({
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="max-w-[140px]" align="end">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            onUpdateDrainClick(drain)
-                          }}
-                        >
-                          <Pencil className="h-4 w-4 mr-2" />
-                          Update
-                        </DropdownMenuItem>
+                        {drain.type !== 'webhook' && (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              onUpdateDrainClick(drain)
+                            }}
+                          >
+                            <Pencil className="h-4 w-4 mr-2" />
+                            Update
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem
                           onClick={() => {
                             setSelectedLogDrain(drain)
