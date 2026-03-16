@@ -1,3 +1,5 @@
+import { ident } from "../../../pg-format"
+
 export const getDropConstraintSQL = ({
   schema,
   table,
@@ -6,4 +8,4 @@ export const getDropConstraintSQL = ({
   schema: string
   table: string
   name: string
-}) => `ALTER TABLE "${schema}"."${table}" DROP CONSTRAINT "${name}"`
+}) => `ALTER TABLE ${ident(schema)}.${ident(table)} DROP CONSTRAINT ${ident(name)}`

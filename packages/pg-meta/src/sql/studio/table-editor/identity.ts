@@ -1,3 +1,5 @@
+import { ident } from "../../../pg-format"
+
 export const getUpdateIdentitySequenceSQL = ({
   schema,
   table,
@@ -7,7 +9,7 @@ export const getUpdateIdentitySequenceSQL = ({
   table: string
   column: string
 }) => {
-  return `SELECT setval('"${schema}"."${table}_${column}_seq"', (SELECT COALESCE(MAX("${column}"), 1) FROM "${schema}"."${table}"))`
+  return `SELECT setval('${ident(schema)}.${ident(`${table}_${column}_seq`)}', (SELECT COALESCE(MAX(${ident(column)}), 1) FROM ${ident(schema)}.${ident(table)}))`
 }
 
 
@@ -22,5 +24,5 @@ export const getDuplicateIdentitySequenceSQL = ({
   sourceTableName: string
   sourceTableSchema: string
 }) => {
-  return `SELECT setval('"${sourceTableSchema}"."${duplicatedTableName}_${columnName}_seq"', (SELECT MAX("${columnName}") FROM "${sourceTableSchema}"."${sourceTableName}"));`
+  return `SELECT setval('${ident(sourceTableSchema)}.${ident(`${duplicatedTableName}_${columnName}_seq`)}', (SELECT MAX(${ident(columnName)}) FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)}));`
 }

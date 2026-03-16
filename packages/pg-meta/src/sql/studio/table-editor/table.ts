@@ -1,3 +1,5 @@
+import { ident } from '../../../pg-format'
+
 export const getDuplicateTableSQL = ({
   comment,
   duplicatedTableName,
@@ -10,9 +12,9 @@ export const getDuplicateTableSQL = ({
   sourceTableSchema: string
 }) => {
   return [
-    `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`,
+    `CREATE TABLE ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} (LIKE ${ident(sourceTableSchema)}.${ident(sourceTableName)} INCLUDING ALL);`,
     comment != undefined
-      ? `comment on table "${sourceTableSchema}"."${duplicatedTableName}" is '${comment}';`
+      ? `comment on table ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} is '${comment}';`
       : '',
   ].join('\n')
 }
@@ -26,5 +28,5 @@ export const getDuplicateRowsSQL = ({
   sourceTableName: string
   sourceTableSchema: string
 }) => {
-  return `INSERT INTO "${sourceTableSchema}"."${duplicatedTableName}" SELECT * FROM "${sourceTableSchema}"."${sourceTableName}";`
+  return `INSERT INTO ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} SELECT * FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)};`
 }
