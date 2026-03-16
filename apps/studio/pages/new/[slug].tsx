@@ -312,7 +312,7 @@ const Wizard: NextPageWithLayout = () => {
       ? smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
       : undefined
 
-    const data: ProjectCreateVariables & { highAvailability: boolean } = {
+    const data: ProjectCreateVariables = {
       dbPass,
       cloudProvider,
       organizationSlug: currentOrg.slug,
