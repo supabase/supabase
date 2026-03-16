@@ -1,8 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
-import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { entityTypeKeys } from 'data/entity-types/keys'
@@ -13,7 +10,11 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useChangedSync } from 'hooks/misc/useChanged'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { fixSqlBackslashEscapes } from 'lib/ai/util'
 import { useProfile } from 'lib/profile'
+import { useRouter } from 'next/router'
+import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
+
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '../QueryBlock/QueryBlock'
 import { identifyQueryType } from './AIAssistant.utils'
 import { ConfirmFooter } from './ConfirmFooter'
@@ -95,7 +96,7 @@ export const DisplayBlockRenderer = ({
   const isDraggableToReports = canCreateSQLSnippet && (isReportsPage || isHomePage)
   const label = initialArgs.label || 'SQL Results'
   const [isWriteQuery, setIsWriteQuery] = useState<boolean>(initialArgs.isWriteQuery || false)
-  const sqlQuery = initialArgs.sql
+  const sqlQuery = fixSqlBackslashEscapes(initialArgs.sql)
 
   const { database: primaryDatabase } = usePrimaryDatabase({ projectRef: ref })
 

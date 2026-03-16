@@ -1,12 +1,11 @@
 import { tool } from 'ai'
 import { z } from 'zod'
-import { fixSqlBackslashEscapes } from 'lib/ai/util'
 
 export const getRenderingTools = () => ({
   execute_sql: tool({
     description: 'Asks the user to execute a SQL statement and return the results',
     inputSchema: z.object({
-      sql: z.string().describe('The SQL statement to execute.').transform(fixSqlBackslashEscapes),
+      sql: z.string().describe('The SQL statement to execute.'),
       label: z.string().describe('A short 2-4 word label for the SQL statement.'),
       chartConfig: z
         .object({
