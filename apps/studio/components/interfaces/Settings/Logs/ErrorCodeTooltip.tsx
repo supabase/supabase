@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useTheme } from 'next-themes'
 import { ExternalLink } from 'lucide-react'
+import { ERROR_CODES, ERROR_CODE_DOCS_URLS, HTTP_ERROR_CODES } from 'shared-data'
+import type { ErrorCodeService } from 'shared-data'
 
 import { useErrorCodesQuery } from 'data/content-api/docs-error-codes-query'
 import { Service } from 'data/graphql/graphql'
@@ -22,8 +24,9 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-const SERVICE_DOCS_URLS: Partial<Record<Service, string>> = {
-  [Service.Auth]: 'https://supabase.com/docs/guides/auth/debugging/error-codes',
+const SERVICE_MAP: Partial<Record<Service, ErrorCodeService>> = {
+  [Service.Auth]: 'auth',
+  [Service.Realtime]: 'realtime',
 }
 
 interface ErrorCodeTooltipProps {
@@ -38,16 +41,29 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { data, isPending } = useErrorCodesQuery({ code: errorCode, service }, { enabled: isOpen })
+  const mappedService = service ? SERVICE_MAP[service] : undefined
+  const sharedDataDef = mappedService
+    ? ERROR_CODES[mappedService]?.[errorCode] ??
+      HTTP_ERROR_CODES[mappedService]?.[Number(errorCode)]
+    : undefined
+
+  const { data, isPending } = useErrorCodesQuery(
+    { code: errorCode, service },
+    { enabled: isOpen && !sharedDataDef }
+  )
 
   const errors = data?.errors?.nodes?.filter((e) => !!e.message) ?? []
 
-  const docsUrl =
-    errors.map((e) => SERVICE_DOCS_URLS[e.service]).find(Boolean) ??
-    (service ? SERVICE_DOCS_URLS[service] : undefined)
+  const description = sharedDataDef?.description ?? errors[0]?.message
+  const docsUrl = mappedService
+    ? ERROR_CODE_DOCS_URLS[mappedService]
+    : errors
+        .map((e) =>
+          e.service ? ERROR_CODE_DOCS_URLS[e.service.toLowerCase() as ErrorCodeService] : undefined
+        )
+        .find(Boolean)
 
   const buildPrompt = () => {
-    const description = errors[0]?.message
     const servicePart = service ? ` in Supabase ${service}` : ''
     const descriptionPart = description ? `\n\nError description: ${description}` : ''
     return `I'm encountering error code \`${errorCode}\`${servicePart}.${descriptionPart}\n\nCan you explain what this error means and suggest steps to fix it?`
@@ -78,18 +94,18 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
           </div>
 
           <div className="px-4 py-3 space-y-2">
-            {isPending ? (
+            {isPending && !sharedDataDef ? (
               <div className="space-y-1.5">
                 <ShimmeringLoader className="w-full" />
                 <ShimmeringLoader className="w-4/5" />
                 <ShimmeringLoader className="w-3/5" />
               </div>
-            ) : errors.length === 0 ? (
+            ) : !description ? (
               <p className="text-sm text-foreground-lighter">
                 No description available for this error code.
               </p>
             ) : (
-              <p className="text-sm text-foreground leading-relaxed">{errors[0].message}</p>
+              <p className="text-sm text-foreground leading-relaxed">{description}</p>
             )}
           </div>
 
