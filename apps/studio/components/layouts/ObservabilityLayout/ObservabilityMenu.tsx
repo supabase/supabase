@@ -20,6 +20,7 @@ import { cn, Menu } from 'ui'
 import { InnerSideBarEmptyPanel } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
 
@@ -29,6 +30,7 @@ const ObservabilityMenu = () => {
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4] || 'observability') as string
   const showOverview = useFlag('observabilityOverview')
+  const { isSupamonitorEnabled } = useSupamonitorStatus()
 
   // b/c fly doesn't support storage
   const storageSupported = useIsFeatureEnabled('project_storage:all')
@@ -136,11 +138,21 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
-        },
+        ...(isSupamonitorEnabled
+          ? [
+              {
+                name: 'Query Insights',
+                key: 'query-insights',
+                url: `/project/${ref}/observability/query-insights${preservedQueryParams}`,
+              },
+            ]
+          : [
+              {
+                name: 'Query Performance',
+                key: 'query-performance',
+                url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
+              },
+            ]),
         ...(IS_PLATFORM
           ? [
               {

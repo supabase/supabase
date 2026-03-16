@@ -1,18 +1,19 @@
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
-
-import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { parseAsString, useQueryState } from 'nuqs'
-import type { Organization } from 'types'
+import { useMemo, useState } from 'react'
 import { Badge, Button, Card, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ButtonTooltip } from './ButtonTooltip'
+import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import type { Organization } from '@/types'
 
 export interface ProjectClaimChooseOrgProps {
   onSelect: (orgSlug: string) => void
   maxOrgsToShow?: number
+  canCreateNewOrg: boolean
 }
 
 const OrganizationCard = ({
@@ -84,7 +85,11 @@ const OrganizationCard = ({
   )
 }
 
-export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectClaimChooseOrgProps) {
+export function OrganizationSelector({
+  onSelect,
+  maxOrgsToShow = 5,
+  canCreateNewOrg,
+}: ProjectClaimChooseOrgProps) {
   const {
     data: organizations = [],
     isPending: isLoadingOrgs,
@@ -162,14 +167,16 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
           </div>
         </>
       )}
-      <Card className="flex items-center justify-between border-dashed pr-6">
-        <CardHeader className="border-none">
-          <CardTitle>Need a new organization?</CardTitle>
-        </CardHeader>
-        <Button size="small" className="" asChild type="default">
-          <Link href={`/new?${searchParams.toString()}`}>New Organization</Link>
-        </Button>
-      </Card>
+      {canCreateNewOrg && (
+        <Card className="flex items-center justify-between border-dashed pr-6">
+          <CardHeader className="border-none">
+            <CardTitle>Need a new organization?</CardTitle>
+          </CardHeader>
+          <Button size="small" className="" asChild type="default">
+            <Link href={`/new?${searchParams.toString()}`}>New Organization</Link>
+          </Button>
+        </Card>
+      )}
     </div>
   )
 }

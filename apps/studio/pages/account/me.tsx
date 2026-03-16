@@ -7,10 +7,9 @@ import { InlineEditorSettings } from 'components/interfaces/Account/Preferences/
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import AlertError from 'components/ui/AlertError'
+import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
+import { AlertError } from 'components/ui/AlertError'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
@@ -31,10 +30,8 @@ const User: NextPageWithLayout = () => {
 
 User.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout hideMobileMenu headerTitle="Account">
-      <OrganizationLayout>
-        <AccountLayout title="Account Settings">{page}</AccountLayout>
-      </OrganizationLayout>
+    <DefaultLayout headerTitle="Account">
+      <AccountLayout title="Preferences">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
 )

@@ -395,11 +395,14 @@ const OneTapComponent = () => {
     console.log('Nonce: ', nonce, hashedNonce)
 
     // check if there's already an existing session before initializing the one-tap UI
-    const { data, error } = await supabase.auth.getSession()
+    const {
+      data: { claims },
+      error,
+    } = await supabase.auth.getClaims()
     if (error) {
-      console.error('Error getting session', error)
+      console.error('Error getting claims', error)
     }
-    if (data.session) {
+    if (claims) {
       router.push('/')
       return
     }

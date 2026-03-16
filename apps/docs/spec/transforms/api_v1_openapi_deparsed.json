@@ -1078,6 +1078,7 @@
                   "region": {
                     "type": "string",
                     "description": "Region you want your server to reside in. Use region_selection instead.",
+                    "example": "us-east-1",
                     "deprecated": true,
                     "enum": [
                       "us-east-1",
@@ -1166,9 +1167,10 @@
                     "description": "This field is deprecated and is ignored in this request"
                   },
                   "desired_instance_size": {
+                    "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
+                    "example": "nano",
                     "type": "string",
                     "enum": [
-                      "pico",
                       "nano",
                       "micro",
                       "small",
@@ -1195,18 +1197,6 @@
                     "format": "uri",
                     "description": "Template URL used to create the project from the CLI.",
                     "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-                  },
-                  "release_channel": {
-                    "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
-                    "description": "Release channel. If not provided, GA will be used.",
-                    "deprecated": true
-                  },
-                  "postgres_engine": {
-                    "type": "string",
-                    "enum": ["15", "17", "17-oriole"],
-                    "description": "Postgres engine version. If not provided, the latest version will be used.",
-                    "deprecated": true
                   }
                 },
                 "required": ["db_pass", "name", "organization_slug"],
@@ -1344,12 +1334,11 @@
             "name": "desired_instance_size",
             "required": false,
             "in": "query",
-            "description": "Desired instance size",
+            "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
             "schema": {
               "example": "nano",
               "type": "string",
               "enum": [
-                "pico",
                 "nano",
                 "micro",
                 "small",
@@ -19223,7 +19212,11 @@
                     "suspend": {
                       "type": "boolean",
                       "nullable": true,
-                      "description": "Whether to suspend realtime"
+                      "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+                    },
+                    "presence_enabled": {
+                      "type": "boolean",
+                      "description": "Whether to enable presence"
                     }
                   },
                   "required": [
@@ -19236,7 +19229,8 @@
                     "max_joins_per_second",
                     "max_presence_events_per_second",
                     "max_payload_size_in_kb",
-                    "suspend"
+                    "suspend",
+                    "presence_enabled"
                   ]
                 }
               }
@@ -19338,7 +19332,11 @@
                   },
                   "suspend": {
                     "type": "boolean",
-                    "description": "Whether to suspend realtime"
+                    "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+                  },
+                  "presence_enabled": {
+                    "type": "boolean",
+                    "description": "Whether to enable presence"
                   }
                 },
                 "additionalProperties": false
@@ -21970,6 +21968,7 @@
           "region": {
             "type": "string",
             "description": "Region you want your server to reside in. Use region_selection instead.",
+            "example": "us-east-1",
             "deprecated": true,
             "enum": [
               "us-east-1",
@@ -22058,9 +22057,10 @@
             "description": "This field is deprecated and is ignored in this request"
           },
           "desired_instance_size": {
+            "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
+            "example": "nano",
             "type": "string",
             "enum": [
-              "pico",
               "nano",
               "micro",
               "small",
@@ -22087,18 +22087,6 @@
             "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-          },
-          "release_channel": {
-            "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
-            "description": "Release channel. If not provided, GA will be used.",
-            "deprecated": true
-          },
-          "postgres_engine": {
-            "type": "string",
-            "enum": ["15", "17", "17-oriole"],
-            "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "deprecated": true
           }
         },
         "required": ["db_pass", "name", "organization_slug"],
@@ -28725,7 +28713,11 @@
           "suspend": {
             "type": "boolean",
             "nullable": true,
-            "description": "Whether to suspend realtime"
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": {
+            "type": "boolean",
+            "description": "Whether to enable presence"
           }
         },
         "required": [
@@ -28738,7 +28730,8 @@
           "max_joins_per_second",
           "max_presence_events_per_second",
           "max_payload_size_in_kb",
-          "suspend"
+          "suspend",
+          "presence_enabled"
         ]
       },
       "UpdateRealtimeConfigBody": {
@@ -28798,7 +28791,11 @@
           },
           "suspend": {
             "type": "boolean",
-            "description": "Whether to suspend realtime"
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": {
+            "type": "boolean",
+            "description": "Whether to enable presence"
           }
         },
         "additionalProperties": false

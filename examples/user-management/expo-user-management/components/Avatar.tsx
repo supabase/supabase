@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert, Image, Button } from 'react-native'
-import DocumentPicker, { isCancel, isInProgress, types } from 'react-native-document-picker'
+import * as ImagePicker from 'expo-image-picker'
 
 interface Props {
   size: number
-	url: string | null
-	onUpload: (filePath: string) => void
+  url: string | null
+  onUpload: (filePath: string) => void
 }
 
 export default function Avatar({ url, size = 150, onUpload }: Props) {
@@ -20,10 +20,8 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
 
   async function downloadImage(path: string) {
     try {
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .download(path)
-      
+      const { data, error } = await supabase.storage.from('avatars').download(path)
+
       if (error) {
         throw error
       }
@@ -44,28 +42,28 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
     try {
       setUploading(true)
 
-      const file = await DocumentPicker.pickSingle({
-        presentationStyle: 'fullScreen',
-        copyTo: 'cachesDirectory',
-        type: types.images,
-        mode: 'open'
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 1,
       })
 
-      const photo = {
-        uri: file.fileCopyUri,
-        type: file.type,
-        name: file.name
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return
       }
 
-      const formData = new FormData()
-      formData.append("file", photo)
+      const image = result.assets[0]
+      if (!image.uri) {
+        throw new Error('No image uri!')
+      }
 
-      const fileExt = file.name.split('.').pop()
+      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
+      const fileExt = image.uri.split('.').pop()?.toLowerCase() ?? 'jpeg'
       const filePath = `${Math.random()}.${fileExt}`
 
-      let { error } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, formData)
+      const { error } = await supabase.storage.from('avatars').upload(filePath, arraybuffer, {
+        contentType: image.mimeType ?? 'image/jpeg',
+      })
 
       if (error) {
         throw error
@@ -73,15 +71,8 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
 
       onUpload(filePath)
     } catch (error) {
-      if (isCancel(error)) {
-        console.warn('cancelled')
-        // User cancelled the picker, exit any dialogs or menus and move on
-      } else if (isInProgress(error)) {
-        console.warn('multiple pickers were opened, only the last will be considered')
-      } else if (error instanceof Error) {
+      if (error instanceof Error) {
         Alert.alert(error.message)
-      } else {
-        throw error
       }
     } finally {
       setUploading(false)
@@ -91,7 +82,11 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
   return (
     <View>
       {avatarUrl ? (
-        <Image source={{ uri: avatarUrl }} accessibilityLabel="Avatar" style={[avatarSize, styles.avatar, styles.image]} />
+        <Image
+          source={{ uri: avatarUrl }}
+          accessibilityLabel="Avatar"
+          style={[avatarSize, styles.avatar, styles.image]}
+        />
       ) : (
         <View style={[avatarSize, styles.avatar, styles.noImage]} />
       )}
@@ -106,7 +101,7 @@ const styles = StyleSheet.create({
   avatar: {
     borderRadius: 5,
     overflow: 'hidden',
-    maxWidth: '100%'
+    maxWidth: '100%',
   },
   image: {
     objectFit: 'cover',
@@ -114,7 +109,6 @@ const styles = StyleSheet.create({
   },
   noImage: {
     backgroundColor: '#333',
-    border: '1px solid rgb(200, 200, 200)',
-    borderRadius: 5
+    borderRadius: 5,
   },
 })

@@ -1,7 +1,7 @@
 import { OAuthApps } from 'components/interfaces/Organization/OAuthApps/OAuthApps'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { OrganizationSettingsLayout } from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
 import type { NextPageWithLayout } from 'types'
 import {
   PageHeader,
@@ -31,8 +31,8 @@ const OrgOAuthApps: NextPageWithLayout = () => {
 
 OrgOAuthApps.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout pageTitle="OAuth Apps">{page}</OrganizationSettingsLayout>
+    <OrganizationLayout title="OAuth Apps">
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>
 )
