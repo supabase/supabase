@@ -395,7 +395,10 @@ function createStorageExplorerState({
     }) => {
       state.setColumnIsLoadingMore(index)
 
-      const prefix = state.openedFolders.map((folder) => folder.name).join('/')
+      const prefix = state.openedFolders
+        .slice(0, index + 1)
+        .map((folder) => folder.name)
+        .join('/')
       const options = {
         limit: LIMIT,
         offset: column.items.length,
