@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { AuthProvidersForm } from '@/components/interfaces/Auth/AuthProvidersForm'
@@ -11,12 +12,13 @@ import type { NextPageWithLayout } from '@/types'
 const ProvidersPage: NextPageWithLayout = () => {
   const showProviders = useIsFeatureEnabled('authentication:show_providers')
   const showCustomProviders = useIsFeatureEnabled('authentication:show_custom_providers')
+  const isOauthProvidersEnabled = useFlag('CustomOauthProviders')
 
   return (
     <PageContainer size="default">
       <BasicAuthSettingsForm />
       {showProviders && <AuthProvidersForm />}
-      {showCustomProviders && <CustomAuthProviders />}
+      {showCustomProviders && isOauthProvidersEnabled && <CustomAuthProviders />}
     </PageContainer>
   )
 }
