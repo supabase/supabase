@@ -14,11 +14,10 @@ import { ReactFlowProvider } from 'reactflow'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
-import { TopSectionSkeleton } from './TopSection.Skeleton'
 
 export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
-  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
 
@@ -40,10 +39,6 @@ export const TopSection = () => {
 
   if (isPaused) {
     return <ProjectPausedState />
-  }
-
-  if (isLoadingProject) {
-    return <TopSectionSkeleton />
   }
 
   return (
