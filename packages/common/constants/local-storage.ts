@@ -123,7 +123,6 @@ export const LOCAL_STORAGE_KEYS = {
    */
   /** @deprecated – we're using usercentrics instead to handle telemetry consent */
   TELEMETRY_CONSENT: 'supabase-consent-ph',
-  TELEMETRY_DATA: 'supabase-telemetry-data',
 
   /**
    * DOCS
