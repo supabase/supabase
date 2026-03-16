@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 import { IonApp, IonRouterOutlet, useIonRouter } from '@ionic/vue';
+import { onUnmounted } from 'vue';
 import { store } from './store';
 import { supabase } from './supabase';
 
@@ -15,10 +16,18 @@ supabase.auth.getUser().then(({ data: { user } }) => {
   store.user = user;
 });
 
-supabase.auth.onAuthStateChange((_event, session) => {
+const {
+  data: { subscription },
+} = supabase.auth.onAuthStateChange((_event, session) => {
   store.user = session?.user ?? null;
   if (session?.user) {
     router.replace('/account');
+  } else {
+    router.replace('/');
   }
+});
+
+onUnmounted(() => {
+  subscription.unsubscribe();
 });
 </script>

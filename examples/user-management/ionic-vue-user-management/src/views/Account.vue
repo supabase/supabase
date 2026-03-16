@@ -64,7 +64,10 @@ import {
   IonLabel,
 } from '@ionic/vue';
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Avatar from '../components/Avatar.vue';
+
+const router = useRouter();
 
 const profile = ref({
   username: '',
@@ -135,6 +138,7 @@ async function signOut() {
   try {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    await router.push('/');
   } catch (error: any) {
     toast.message = error.message;
     await toast.present();
