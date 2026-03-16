@@ -254,8 +254,8 @@ deleted_count=$(echo "$delete_objects_output" | jq -r '.Deleted | length' 2>/dev
 check "DeleteObjects removed 3 objects" "3" "$deleted_count"
 
 # Verify all gone
-batch_remaining=$(s3 s3api list-objects-v2 --bucket "$bucket_name" --prefix "batch-" --output json | \
-    jq -r '.KeyCount // 0' 2>/dev/null)
+batch_list=$(s3 s3api list-objects-v2 --bucket "$bucket_name" --prefix "batch-" --output json)
+batch_remaining=$(echo "$batch_list" | jq -r '[.Contents[]?] | length' 2>/dev/null)
 check "Batch-deleted objects gone" "0" "$batch_remaining"
 
 # ---------------------------------------------
@@ -279,21 +279,26 @@ check "Presigned URL returns correct content" "presigned content test" "$presign
 
 echo ""
 echo "--- Conditional request (IfNoneMatch) ---"
-cond_file=$(mktemp); cleanup_files="$cleanup_files $cond_file"
-echo "conditional test" > "$cond_file"
+# --if-none-match requires aws cli v2.22+ ; skip if not supported
+if aws s3api put-object help 2>&1 | grep -q 'if-none-match'; then
+    cond_file=$(mktemp); cleanup_files="$cleanup_files $cond_file"
+    echo "conditional test" > "$cond_file"
 
-# First put should succeed (key doesn't exist)
-s3 s3api put-object --bucket "$bucket_name" --key "cond-test.txt" \
-    --body "$cond_file" --if-none-match '*' --output json >/dev/null 2>&1
-first_put=$?
-check "IfNoneMatch put (new key) succeeds" "0" "$first_put"
+    # First put should succeed (key doesn't exist)
+    first_put_err=$(s3 s3api put-object --bucket "$bucket_name" --key "cond-test.txt" \
+        --body "$cond_file" --if-none-match '*' --output json 2>&1 || true)
+    first_put_ok=$(echo "$first_put_err" | grep -qi "error\|denied\|PreconditionFailed" && echo "false" || echo "true")
+    check "IfNoneMatch put (new key) succeeds" "true" "$first_put_ok"
 
-# Second put should fail with PreconditionFailed (key exists)
-cond_err=$(s3 s3api put-object --bucket "$bucket_name" --key "cond-test.txt" \
-    --body "$cond_file" --if-none-match '*' --output json 2>&1 || true)
-cond_rejected=$(echo "$cond_err" | grep -qi "PreconditionFailed" && echo "true" || echo "false")
-check "IfNoneMatch put (existing key) rejected" "true" "$cond_rejected"
-rm -f "$cond_file"
+    # Second put should fail with PreconditionFailed (key exists)
+    cond_err=$(s3 s3api put-object --bucket "$bucket_name" --key "cond-test.txt" \
+        --body "$cond_file" --if-none-match '*' --output json 2>&1 || true)
+    cond_rejected=$(echo "$cond_err" | grep -qi "PreconditionFailed" && echo "true" || echo "false")
+    check "IfNoneMatch put (existing key) rejected" "true" "$cond_rejected"
+    rm -f "$cond_file"
+else
+    echo "  SKIP: aws cli does not support --if-none-match (requires v2.22+)"
+fi
 
 # ---------------------------------------------
 # 14. Range request (partial GetObject)
