@@ -1,4 +1,4 @@
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import pgMeta from '@supabase/pg-meta'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { HelpCircle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -29,7 +29,7 @@ export const generateCascadeActionDescription = (
   const actionName = getForeignKeyCascadeAction(cascadeAction) ?? 'No action'
 
   switch (cascadeAction) {
-    case FOREIGN_KEY_CASCADE_ACTION.NO_ACTION:
+    case pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION:
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
@@ -38,7 +38,7 @@ export const generateCascadeActionDescription = (
           existing in this table that reference it
         </>
       )
-    case FOREIGN_KEY_CASCADE_ACTION.CASCADE:
+    case pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.CASCADE:
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
@@ -47,7 +47,7 @@ export const generateCascadeActionDescription = (
           reference it in this table
         </>
       )
-    case FOREIGN_KEY_CASCADE_ACTION.RESTRICT:
+    case pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.RESTRICT:
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>
@@ -65,7 +65,7 @@ export const generateCascadeActionDescription = (
           existing referencing rows from this table.
         </>
       )
-    case FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT:
+    case pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT:
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
@@ -74,7 +74,7 @@ export const generateCascadeActionDescription = (
           <span className="text-amber-900 opacity-75">default value</span>
         </>
       )
-    case FOREIGN_KEY_CASCADE_ACTION.SET_NULL:
+    case pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.SET_NULL:
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}

@@ -25,6 +25,8 @@ export { getIndexWorkerStatusSQL } from './sql/studio/auth/get-index-worker-stat
 export { type OptimizedSearchColumns } from './sql/studio/auth/get-users-types'
 export { getPaginatedUsersSQL, type UsersCursor } from './sql/studio/auth/get-users-paginated'
 export { getUsersCountSQL } from './sql/studio/auth/get-users-count'
+import * as tableEditor from './sql/studio/table-editor'
+export type { ForeignKey } from './sql/studio/table-editor'
 
 export default {
   roles,
@@ -46,4 +48,5 @@ export default {
   indexes,
   columnPrivileges,
   query,
+  tableEditor,
 }

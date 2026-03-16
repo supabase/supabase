@@ -1,4 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import pgMeta from '@supabase/pg-meta'
 import { sortBy } from 'lodash'
 import { ArrowRight, Database, HelpCircle, Loader2, Table, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
@@ -13,7 +14,6 @@ import {
 
 import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableQuery } from 'data/tables/table-retrieve-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -33,8 +33,8 @@ const EMPTY_STATE: ForeignKey = {
   schema: 'public',
   table: '',
   columns: [] as { source: string; target: string }[],
-  deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-  updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+  deletionAction: pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+  updateAction: pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
 }
 
 interface ForeignKeySelectorProps {
