@@ -44,7 +44,7 @@ Check updates for each service to learn more.
 
 ### Storage
 - Updated `supabase/storage-api` to `v1.44.2`
-- ⚠️ Added `STORAGE_PUBLIC_URL` environment variable to simplify proxy configuration (requires requires `docker-compose.s3.yml` update) - PR [storage#900](https://github.com/supabase/storage/pull/900)
+- ⚠️ Added `STORAGE_PUBLIC_URL` environment variable to simplify proxy configuration (requires `docker-compose.s3.yml` update) - PR [storage#900](https://github.com/supabase/storage/pull/900)
 - ⚠️ Added RustFS as an optional S3 backend - PR [#42935](https://github.com/supabase/supabase/pull/42935)
 - ⚠️ Changed Docker Compose configuration for S3 backends to use named volumes - PR [#43815](https://github.com/supabase/supabase/pull/43815)
 
