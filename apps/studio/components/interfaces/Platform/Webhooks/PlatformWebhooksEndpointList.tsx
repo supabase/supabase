@@ -171,9 +171,7 @@ export const PlatformWebhooksEndpointList = ({
                     <TableCell className="max-w-[420px]">
                       <p className="truncate">{displayName}</p>
                       {hasName && (
-                        <p className="text-xs text-foreground-lighter truncate mt-0.5">
-                          {endpoint.url}
-                        </p>
+                        <p className="text-xs text-foreground-lighter truncate">{endpoint.url}</p>
                       )}
                     </TableCell>
                     <TableCell className="max-w-[280px] truncate">
