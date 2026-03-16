@@ -25,8 +25,8 @@ export const ProjectIntegrationsLayout = withAuth(({ children }: PropsWithChildr
 
   return (
     <ProjectLayout
-      title={'Integrations'}
       product="Integrations"
+      browserTitle={{ section: 'Integrations' }}
       isBlocking={false}
       productMenu={
         <>

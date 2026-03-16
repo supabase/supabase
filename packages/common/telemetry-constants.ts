@@ -2791,7 +2791,7 @@ export interface RequestUpgradeSubmittedEvent {
 
 /**
  * Triggered when a Studio error UI element is displayed (mounted).
- * This includes error Admonitions and Toast notifications.
+ * This includes error Admonitions, Toast notifications, and ErrorDisplay components.
  *
  * @group Events
  * @source studio
@@ -2802,7 +2802,69 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Source of the error
      */
-    source?: 'admonition' | 'toast'
+    source?: 'admonition' | 'toast' | 'error_display'
+    /**
+     * Type of error matched (for error_display source)
+     */
+    errorType?: string
+    /**
+     * Whether troubleshooting steps are available (for error_display source)
+     */
+    hasTroubleshooting?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when the inline error troubleshooter is shown to the user.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterExposedEvent {
+  action: 'inline_error_troubleshooter_exposed'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user opens or closes a troubleshooting accordion step.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterStepClickedEvent {
+  action: 'inline_error_troubleshooter_step_clicked'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+    /** Step number that was clicked (1, 2, 3, ...) — null when a step is collapsed */
+    step: number | null
+    /** Title of the step that was clicked */
+    stepTitle?: string
+    /** Whether the step was opened (true) or closed (false) */
+    expanded: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks an action within the inline error troubleshooter.
+ * Covers all CTAs including the contact support link.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterActionClickedEvent {
+  action: 'inline_error_troubleshooter_action_clicked'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+    /** Which CTA was clicked */
+    ctaType: 'restart_db' | 'troubleshooting_guide' | 'ask_ai' | 'contact_support'
   }
   groups: TelemetryGroups
 }
@@ -3104,6 +3166,9 @@ export type TelemetryEvent =
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
+  | InlineErrorTroubleshooterExposedEvent
+  | InlineErrorTroubleshooterStepClickedEvent
+  | InlineErrorTroubleshooterActionClickedEvent
   | IntegrationInstallCompletedEvent
   | IntegrationInstallSubmittedEvent
   | IntegrationUninstallSubmittedEvent

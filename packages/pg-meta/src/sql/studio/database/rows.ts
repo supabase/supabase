@@ -1,11 +1,5 @@
-import { Query } from '@supabase/pg-meta/src/query'
-import {
-  COUNT_ESTIMATE_SQL,
-  THRESHOLD_COUNT,
-} from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
-
-import { GetTableRowsCountArgs } from './table-rows-count-query'
-import { formatFilterValue } from './utils'
+import { Filter, Query } from '../../../query'
+import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from '../get-count-estimate'
 
 /**
  * [Joshen] Initially check reltuples from pg_class for an estimate of row count on the table
@@ -18,7 +12,12 @@ export const getTableRowsCountSql = ({
   filters = [],
   enforceExactCount = false,
   isUsingReadReplica = false,
-}: GetTableRowsCountArgs & { isUsingReadReplica?: boolean }) => {
+}: {
+  table: any
+  filters?: Filter[]
+  enforceExactCount?: boolean
+  isUsingReadReplica?: boolean
+}) => {
   if (!table) return ``
 
   if (enforceExactCount) {
@@ -27,8 +26,7 @@ export const getTableRowsCountSql = ({
     filters
       .filter((x) => x.value && x.value !== '')
       .forEach((x) => {
-        const value = formatFilterValue(table, x)
-        queryChains = queryChains.filter(x.column, x.operator, value)
+        queryChains = queryChains.filter(x.column, x.operator, x.value)
       })
     return `select (${queryChains.toSql().slice(0, -1)}), false as is_estimate;`
   } else {
@@ -37,8 +35,7 @@ export const getTableRowsCountSql = ({
     filters
       .filter((x) => x.value && x.value != '')
       .forEach((x) => {
-        const value = formatFilterValue(table, x)
-        selectQueryChains = selectQueryChains.filter(x.column, x.operator, value)
+        selectQueryChains = selectQueryChains.filter(x.column, x.operator, x.value)
       })
     const selectBaseSql = selectQueryChains.toSql()
 
@@ -47,8 +44,7 @@ export const getTableRowsCountSql = ({
     filters
       .filter((x) => x.value && x.value != '')
       .forEach((x) => {
-        const value = formatFilterValue(table, x)
-        countQueryChains = countQueryChains.filter(x.column, x.operator, value)
+        countQueryChains = countQueryChains.filter(x.column, x.operator, x.value)
       })
     const countBaseSql = countQueryChains.toSql().slice(0, -1)
 

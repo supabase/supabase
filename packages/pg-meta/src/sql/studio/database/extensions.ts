@@ -1,4 +1,4 @@
-import { literal } from '@supabase/pg-meta/src/pg-format'
+import { literal } from '../../../pg-format'
 
 export const getDatabaseExtensionDefaultSchemaSQL = ({ extension }: { extension: string }) => {
   const sql = /* SQL */ `

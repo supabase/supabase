@@ -1,5 +1,3 @@
-import { sqlKeys } from '../sql/keys'
-
 export const LARGEST_SIZE_LIMIT_BUCKETS_COUNT = 50
 
 /**
@@ -15,6 +13,3 @@ WHERE file_size_limit IS NOT NULL
 ORDER BY file_size_limit DESC
 LIMIT ${LARGEST_SIZE_LIMIT_BUCKETS_COUNT + 1};
 `.trim()
-
-export const getLargestSizeLimitBucketsKey = (projectRef: string | undefined) =>
-  sqlKeys.query(projectRef, ['buckets-with-largest-size-limit'])

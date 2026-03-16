@@ -1,9 +1,3 @@
-import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
-
-export const IGNORED_SCHEMAS = [...INTERNAL_SCHEMAS, 'pg_catalog']
-
-const IGNORED_SCHEMAS_LIST = IGNORED_SCHEMAS.map((s) => `'${s}'`).join(', ')
-
 /**
  * Builds the shared `table_privileges` and `table_grants` CTEs used by
  * both the exposed-tables list query and the counts-only query.
@@ -11,7 +5,12 @@ const IGNORED_SCHEMAS_LIST = IGNORED_SCHEMAS.map((s) => `'${s}'`).join(', ')
  * Returns SQL text meant to follow `WITH` (no leading `WITH` keyword).
  * Callers that append additional CTEs should add a comma after interpolation.
  */
-function getTableGrantsCTEs({ search }: { search?: string } = {}) {
+function getTableGrantsCTEs({
+  search,
+  ignoredSchemas = [],
+}: { search?: string; ignoredSchemas?: string[] } = {}) {
+  const IGNORED_SCHEMAS_LIST = ignoredSchemas.map((s) => `'${s}'`).join(', ')
+
   return /* SQL */ `
     table_privileges as (
       select
@@ -83,13 +82,15 @@ export function getExposedTablesSql({
   search,
   offset,
   limit,
+  ignoredSchemas = [],
 }: {
   search?: string
   offset: number
   limit: number
+  ignoredSchemas?: string[]
 }) {
   return /* SQL */ `
-    with ${getTableGrantsCTEs({ search })}
+    with ${getTableGrantsCTEs({ search, ignoredSchemas })}
     select
       (select count(*)::int from table_grants) as total_count,
       coalesce(
@@ -135,7 +136,12 @@ export function getExposedTableCountsSql({ selectedSchemas }: { selectedSchemas:
  * Returns SQL text meant to follow `WITH` (no leading `WITH` keyword).
  * Callers that append additional CTEs should add a comma after interpolation.
  */
-function getFunctionGrantsCTEs({ search }: { search?: string } = {}) {
+function getFunctionGrantsCTEs({
+  search,
+  ignoredSchemas = [],
+}: { search?: string; ignoredSchemas?: string[] } = {}) {
+  const IGNORED_SCHEMAS_LIST = ignoredSchemas.map((s) => `'${s}'`).join(', ')
+
   return /* SQL */ `
     function_privileges as (
       select
@@ -177,13 +183,15 @@ export function getExposedFunctionsSql({
   search,
   offset,
   limit,
+  ignoredSchemas = [],
 }: {
   search?: string
   offset: number
   limit: number
+  ignoredSchemas?: string[]
 }) {
   return /* SQL */ `
-    with ${getFunctionGrantsCTEs({ search })}
+    with ${getFunctionGrantsCTEs({ search, ignoredSchemas })}
     select
       (select count(*)::int from function_grants) as total_count,
       coalesce(

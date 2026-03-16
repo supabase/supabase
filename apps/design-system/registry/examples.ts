@@ -1463,6 +1463,18 @@ export const examples: Registry = [
     files: ['example/expanding-textarea-demo.tsx'],
   },
   {
+    name: 'error-display-demo',
+    type: 'components:example',
+    registryDependencies: ['error-display'],
+    files: ['example/error-display-demo.tsx'],
+  },
+  {
+    name: 'error-display-with-children',
+    type: 'components:example',
+    registryDependencies: ['error-display'],
+    files: ['example/error-display-with-children.tsx'],
+  },
+  {
     name: 'logs-bar-chart',
     type: 'components:example',
     files: ['example/logs-bar-chart.tsx'],

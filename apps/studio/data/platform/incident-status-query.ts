@@ -12,6 +12,7 @@ export async function getIncidentStatus(
   const response = await fetch(`${BASE_PATH}/api/incident-status`, {
     signal,
     method: 'GET',
+    credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
     },
