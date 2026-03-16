@@ -57,12 +57,15 @@ export const PlatformWebhooksHeader = ({
         </PageHeaderBreadcrumb>
       )}
       <PageHeaderMeta>
-        <PageHeaderSummary>
-          <PageHeaderTitle>
-            <span className="inline-flex items-center gap-2">
-              <span>{headerTitle}</span>
+        <PageHeaderSummary className="min-w-0">
+          <PageHeaderTitle className="min-w-0 w-full">
+            <span className="flex w-full min-w-0 items-center gap-2">
+              <span className="block min-w-0 truncate leading-tight">{headerTitle}</span>
               {hasSelectedEndpoint && endpointStatus && (
-                <Badge variant={endpointStatus === 'enabled' ? 'success' : 'default'}>
+                <Badge
+                  className="shrink-0 self-center"
+                  variant={endpointStatus === 'enabled' ? 'success' : 'default'}
+                >
                   {endpointStatus === 'enabled' ? 'Enabled' : 'Disabled'}
                 </Badge>
               )}
