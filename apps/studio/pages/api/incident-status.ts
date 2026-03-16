@@ -89,6 +89,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (error instanceof InternalServerError) {
       if (typeof error.details?.status === 'number') errorCode = error.details.status
+      if (errorCode === 420 && typeof error.details?.retryAfter === 'string') {
+        res.setHeader('Retry-After', error.details.retryAfter)
+      }
       console.error('Failed to fetch active StatusPage incidents: %O', {
         message: error.message,
         details: error.details,
