@@ -232,7 +232,7 @@ const EdgeFunctionDetailsLayout = ({
   return (
     <EdgeFunctionsLayout title={title} browserTitle={browserTitle}>
       <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader size="full" className="sticky top-0 z-10 bg-background">
+        <PageHeader size="full" className="sticky top-0 z-10 bg-surface-75">
           {breadcrumbItems.length > 0 && (
             <PageHeaderBreadcrumb>
               <BreadcrumbList>
