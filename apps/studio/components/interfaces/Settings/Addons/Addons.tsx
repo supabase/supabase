@@ -42,6 +42,12 @@ import {
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection } from 'ui-patterns/PageSection'
 
+import {
+  getCustomDomainDisabledReason,
+  getIPv4DisabledReason,
+  getPitrAlertState,
+  getPitrDisabledReason,
+} from './Addons.utils'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
@@ -106,37 +112,85 @@ export const Addons = () => {
     !isOrioleDbInAws
   const canOpenCustomDomain = isProjectActive && !projectUpdateDisabled
 
-  const ipv4DisabledReason = !isAws
-    ? 'Dedicated IPv4 address is only available for AWS projects'
-    : !isProjectActive
-      ? 'Project must be active to update IPv4'
-      : projectUpdateDisabled
-        ? 'Project updates are currently disabled'
-        : !canUpdateIPv4 && !ipv4Enabled
-          ? 'You can only add IPv4 when your project network configuration is set to IPv6'
-          : undefined
+  const ipv4DisabledReason = getIPv4DisabledReason({
+    isAws,
+    isProjectActive,
+    projectUpdateDisabled,
+    canUpdateIPv4,
+    ipv4Enabled,
+  })
 
-  const pitrDisabledReason = !isProjectActive
-    ? 'Project must be active to update PITR'
-    : projectUpdateDisabled
-      ? 'Project updates are currently disabled'
-      : hasHipaaAddon
-        ? 'PITR cannot be changed with HIPAA enabled'
-        : !sufficientPgVersion
-          ? 'Your project is too old to enable PITR'
-          : isOrioleDbInAws
-            ? 'Point in time recovery is not supported with OrioleDB'
-            : undefined
+  const pitrDisabledReason = getPitrDisabledReason({
+    isProjectActive,
+    projectUpdateDisabled,
+    hasHipaaAddon,
+    sufficientPgVersion,
+    isOrioleDbInAws,
+  })
 
-  const customDomainDisabledReason = !isProjectActive
-    ? 'Project must be active to update custom domain'
-    : projectUpdateDisabled
-      ? 'Project updates are currently disabled'
-      : undefined
+  const customDomainDisabledReason = getCustomDomainDisabledReason({
+    isProjectActive,
+    projectUpdateDisabled,
+  })
+  const pitrAlertState = getPitrAlertState({
+    hasHipaaAddon,
+    sufficientPgVersion,
+    isOrioleDbInAws,
+  })
 
   const listTopSpacing = isBranch ? 'mt-6' : undefined
   const resourceItemClassName =
     'min-h-[128px] !border-b last:!border-b-0 [&>div:first-child]:hidden @lg:[&>div:first-child]:flex'
+
+  let pitrAlert = null
+
+  if (pitrAlertState === 'hipaa') {
+    pitrAlert = (
+      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
+        <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>
+          All projects should have PITR enabled by default and cannot be changed with HIPAA enabled.
+          Contact support for further assistance.
+        </AlertDescription_Shadcn_>
+        <div className="mt-4">
+          <Button type="default" asChild>
+            <SupportLink>Contact support</SupportLink>
+          </Button>
+        </div>
+      </Alert_Shadcn_>
+    )
+  } else if (pitrAlertState === 'legacy-project') {
+    pitrAlert = (
+      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
+        <AlertTitle_Shadcn_>Your project is too old to enable PITR</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>
+          <p className="text-sm leading-normal mb-2">
+            Reach out to us via support if you're interested
+          </p>
+          <Button asChild type="default">
+            <SupportLink
+              queryParams={{
+                projectRef,
+                category: SupportCategories.SALES_ENQUIRY,
+                subject: 'Project too old old for PITR',
+              }}
+            >
+              Contact support
+            </SupportLink>
+          </Button>
+        </AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
+  } else if (pitrAlertState === 'orioledb') {
+    pitrAlert = (
+      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
+        <AlertTitle_Shadcn_>PITR not supported</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>
+          Point in time recovery is not supported with OrioleDB
+        </AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
+  }
 
   return (
     <PageContainer size="default">
@@ -282,47 +336,7 @@ export const Addons = () => {
               </div>
             </ResourceItem>
 
-            {hasHipaaAddon ? (
-              <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-                <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  All projects should have PITR enabled by default and cannot be changed with HIPAA
-                  enabled. Contact support for further assistance.
-                </AlertDescription_Shadcn_>
-                <div className="mt-4">
-                  <Button type="default" asChild>
-                    <SupportLink>Contact support</SupportLink>
-                  </Button>
-                </div>
-              </Alert_Shadcn_>
-            ) : !sufficientPgVersion ? (
-              <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-                <AlertTitle_Shadcn_>Your project is too old to enable PITR</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p className="text-sm leading-normal mb-2">
-                    Reach out to us via support if you're interested
-                  </p>
-                  <Button asChild type="default">
-                    <SupportLink
-                      queryParams={{
-                        projectRef,
-                        category: SupportCategories.SALES_ENQUIRY,
-                        subject: 'Project too old old for PITR',
-                      }}
-                    >
-                      Contact support
-                    </SupportLink>
-                  </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            ) : isOrioleDbInAws ? (
-              <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-                <AlertTitle_Shadcn_>PITR not supported</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  Point in time recovery is not supported with OrioleDB
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            ) : null}
+            {pitrAlert}
 
             {projectSettingsCustomDomains && (
               <ResourceItem
