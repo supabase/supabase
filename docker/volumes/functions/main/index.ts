@@ -11,7 +11,7 @@ let SUPABASE_JWT_KEYS: ReturnType<typeof jose.createRemoteJWKSet> | null = null
 if (SUPABASE_URL) {
   try {
     SUPABASE_JWT_KEYS = jose.createRemoteJWKSet(
-      new URL(SUPABASE_URL + '/auth/v1/.well-known/jwks.json')
+      new URL('/auth/v1/.well-known/jwks.json', SUPABASE_URL)
     )
   } catch (e) {
     console.error('Failed to fetch JWKS from SUPABASE_URL:', e)
