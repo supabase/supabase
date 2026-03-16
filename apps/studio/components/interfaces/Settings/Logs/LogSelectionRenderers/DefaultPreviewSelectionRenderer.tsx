@@ -15,7 +15,7 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
-import { ErrorCodeTooltip } from '../ErrorCodeTooltip'
+import { ErrorCodeTooltip } from 'components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
 

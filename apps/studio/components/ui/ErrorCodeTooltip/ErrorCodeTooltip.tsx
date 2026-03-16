@@ -3,8 +3,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useTheme } from 'next-themes'
 import { ExternalLink } from 'lucide-react'
-import { ERROR_CODES, ERROR_CODE_DOCS_URLS, HTTP_ERROR_CODES } from 'shared-data'
-import type { ErrorCodeService } from 'shared-data'
 
 import { useErrorCodesQuery } from 'data/content-api/docs-error-codes-query'
 import { Service } from 'data/graphql/graphql'
@@ -23,11 +21,7 @@ import {
   InfoIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
-const SERVICE_MAP: Partial<Record<Service, ErrorCodeService>> = {
-  [Service.Auth]: 'auth',
-  [Service.Realtime]: 'realtime',
-}
+import { getErrorCodeInfo } from './ErrorCodeTooltip.utils'
 
 interface ErrorCodeTooltipProps {
   errorCode: string
@@ -41,27 +35,17 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const mappedService = service ? SERVICE_MAP[service] : undefined
-  const sharedDataDef = mappedService
-    ? ERROR_CODES[mappedService]?.[errorCode] ??
-      HTTP_ERROR_CODES[mappedService]?.[Number(errorCode)]
-    : undefined
+  const { definition, docsUrl: sharedDocsUrl } = getErrorCodeInfo(errorCode, service)
 
   const { data, isPending } = useErrorCodesQuery(
     { code: errorCode, service },
-    { enabled: isOpen && !sharedDataDef }
+    { enabled: isOpen && !definition }
   )
 
   const errors = data?.errors?.nodes?.filter((e) => !!e.message) ?? []
 
-  const description = sharedDataDef?.description ?? errors[0]?.message
-  const docsUrl = mappedService
-    ? ERROR_CODE_DOCS_URLS[mappedService]
-    : errors
-        .map((e) =>
-          e.service ? ERROR_CODE_DOCS_URLS[e.service.toLowerCase() as ErrorCodeService] : undefined
-        )
-        .find(Boolean)
+  const description = definition?.description ?? errors[0]?.message
+  const docsUrl = sharedDocsUrl
 
   const buildPrompt = () => {
     const servicePart = service ? ` in Supabase ${service}` : ''
@@ -94,7 +78,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
           </div>
 
           <div className="px-4 py-3 space-y-2">
-            {isPending && !sharedDataDef ? (
+            {isPending && !definition ? (
               <div className="space-y-1.5">
                 <ShimmeringLoader className="w-full" />
                 <ShimmeringLoader className="w-4/5" />
