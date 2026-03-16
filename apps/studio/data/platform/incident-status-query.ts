@@ -1,21 +1,10 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import type { IncidentInfo } from 'lib/api/incident-status'
 import { BASE_PATH, IS_PLATFORM, IS_TEST_ENV } from 'lib/constants'
 import { partition } from 'lodash'
-import { UseCustomQueryOptions } from 'types'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { platformKeys } from './keys'
-
-export class IncidentStatusFetchError extends Error {
-  constructor(
-    message: string,
-    public readonly status: number,
-    public readonly retryAfter: number | null
-  ) {
-    super(message)
-    this.name = 'IncidentStatusFetchError'
-  }
-}
 
 export async function getIncidentStatus(
   signal?: AbortSignal
@@ -33,16 +22,17 @@ export async function getIncidentStatus(
     const errorText = await response.text()
     console.error('[getIncidentStatus] Failed:', response.status, errorText)
 
-    let retryAfter: number | null = null
+    let retryAfter: number | undefined
     const retryAfterHeader = response.headers.get('Retry-After')
     if (retryAfterHeader !== null) {
       const parsed = Number(retryAfterHeader)
       if (Number.isFinite(parsed) && parsed > 0) retryAfter = parsed
     }
 
-    throw new IncidentStatusFetchError(
+    throw new ResponseError(
       `Failed to fetch incident status: ${response.statusText}`,
       response.status,
+      undefined,
       retryAfter
     )
   }
@@ -61,41 +51,18 @@ export type IncidentStatusError = unknown
 export const useIncidentStatusQuery = <TData = IncidentStatusData>(
   options: UseCustomQueryOptions<IncidentStatusData, IncidentStatusError, TData> = {}
 ) => {
-  const queryClient = useQueryClient()
-
   return useQuery<IncidentStatusData, IncidentStatusError, TData>({
     queryKey: platformKeys.incidentStatus(),
     queryFn: ({ signal }) => getIncidentStatus(signal),
     refetchOnWindowFocus: false,
-    // For 420 with Retry-After: retry exactly once after the specified delay.
-    // All other errors: defer to the QueryClient default (e.g. retry: false in tests,
-    // retry: 3 in production) with exponential backoff capped at 5 minutes.
-    retry: (failureCount, error) => {
-      if (
-        error instanceof IncidentStatusFetchError &&
-        error.status === 420 &&
-        error.retryAfter !== null
-      ) {
-        return failureCount < 1
-      }
-      const defaultRetry = queryClient.getDefaultOptions()?.queries?.retry ?? 3
-      if (defaultRetry === false) return false
-      if (defaultRetry === true) return true
-      if (typeof defaultRetry === 'number') return failureCount < defaultRetry
-      if (error instanceof Error) return defaultRetry(failureCount, error)
-      return false
-    },
+    // Use longer exponential backoff than the QueryClient default (base 4, cap 5 min vs base 2, cap 30s).
+    // The retryAfter header case is also handled here for consistency with query-client.ts.
     retryDelay: (attemptIndex, error) => {
-      if (
-        error instanceof IncidentStatusFetchError &&
-        error.status === 420 &&
-        error.retryAfter !== null
-      ) {
+      if (error instanceof ResponseError && error.retryAfter) {
         return error.retryAfter * 1000
       }
       return Math.min(1000 * 4 ** attemptIndex, 1000 * 60 * 5)
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes to match API cache
     ...options,
     // Enable in platform mode, or in test environment for E2E testing
     enabled: (IS_PLATFORM || IS_TEST_ENV) && (options.enabled ?? true),

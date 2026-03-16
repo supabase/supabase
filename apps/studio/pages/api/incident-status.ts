@@ -1,21 +1,15 @@
 import { IS_PLATFORM } from 'common'
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { InternalServerError } from '@/lib/api/apiHelpers'
-import {
-  getActiveIncidents,
-  type IncidentCache,
-  type IncidentInfo,
-} from '@/lib/api/incident-status'
+import { getActiveIncidents, type IncidentCache } from '@/lib/api/incident-status'
 import { createAdminClient } from '@/lib/api/supabase-admin'
 
 /**
- * Cache on browser for 5 minutes
  * Cache on CDN for 5 minutes
  * Allow serving stale content for 1 minute while revalidating
  */
-const CACHE_CONTROL_SETTINGS = 'public, max-age=300, s-maxage=300, stale-while-revalidate=60'
+const CACHE_CONTROL_SETTINGS = 'public, s-maxage=300, stale-while-revalidate=60'
 
 async function fetchIncidentCache(incidentIds: Array<string>): Promise<Map<string, IncidentCache>> {
   const cacheMap = new Map<string, IncidentCache>()
@@ -89,7 +83,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (error instanceof InternalServerError) {
       if (typeof error.details?.status === 'number') errorCode = error.details.status
-      if (errorCode === 420 && typeof error.details?.retryAfter === 'string') {
+      if (errorCode === 420) errorCode = 429
+      if (errorCode === 429 && typeof error.details?.retryAfter === 'string') {
         res.setHeader('Retry-After', error.details.retryAfter)
       }
       console.error('Failed to fetch active StatusPage incidents: %O', {
