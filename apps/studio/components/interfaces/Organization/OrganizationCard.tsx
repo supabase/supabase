@@ -37,11 +37,11 @@ export const OrganizationCard = ({
       onClick={onClick}
       description={
         <div className="flex items-center justify-between text-xs text-foreground-light font-sans">
-          <div className="flex items-center gap-x-1.5">
+          <div className="flex items-center gap-x-1">
             <span>{organization.plan.name} Plan</span>
             {numProjects > 0 && (
               <>
-                <span>•</span>
+                <span className="text-foreground-lighter">·</span>
                 <span>
                   {numProjects} project{numProjects > 1 ? 's' : ''}
                 </span>

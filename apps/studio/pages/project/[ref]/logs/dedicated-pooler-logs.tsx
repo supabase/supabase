@@ -3,7 +3,7 @@ import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constant
 import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
@@ -12,18 +12,18 @@ import { LogoLoader } from 'ui'
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+  const { hasAccess: hasDedicatedPooler, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('dedicated_pooler')
 
   useEffect(() => {
-    // Redirect to pooler logs if user is on free plan
-    if (!isOrgPlanLoading && isFreePlan) {
+    // Redirect to pooler logs if org is not entitled to dedicated pooler
+    if (!isLoadingEntitlement && !hasDedicatedPooler) {
       router.push(`/project/${ref}/logs/pooler-logs`)
     }
-  }, [isFreePlan, isOrgPlanLoading, ref, router])
+  }, [hasDedicatedPooler, isLoadingEntitlement, ref, router])
 
-  // Prevent showing logs while checking plan or loading config
-  if (isOrgPlanLoading || isFreePlan) {
+  // Prevent showing logs while checking entitlement
+  if (isLoadingEntitlement || !hasDedicatedPooler) {
     return <LogoLoader />
   }
 

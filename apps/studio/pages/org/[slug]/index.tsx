@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import { useIsMFAEnabled } from 'common'
 import { ProjectList } from 'components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from 'components/interfaces/HomePageActions'
@@ -8,6 +6,7 @@ import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import Link from 'next/link'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -20,7 +19,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <ScaffoldContainer className="flex-grow flex">
-      <ScaffoldSection isFullWidth className="flex-grow pb-0">
+      <ScaffoldSection isFullWidth className="pb-0">
         {disableAccessMfa ? (
           <Admonition
             type="note"
@@ -40,7 +39,7 @@ const ProjectsPage: NextPageWithLayout = () => {
           />
         ) : (
           <div className="flex flex-col gap-y-4">
-            <HomePageActions showViewToggle={true} />
+            <HomePageActions />
             <ProjectList />
           </div>
         )}
@@ -51,7 +50,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
 ProjectsPage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
+    <OrganizationLayout title="Projects">
       <PageLayout title="Projects">{page}</PageLayout>
     </OrganizationLayout>
   </DefaultLayout>

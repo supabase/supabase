@@ -1,23 +1,25 @@
+// End of third-party imports
+
+import {
+  DocsSearchResultType as PageType,
+  type DocsSearchResult as Page,
+  type DocsSearchResultSection as PageSection,
+} from 'common'
+import { getProjectDetail } from 'data/projects/project-detail-query'
+import dayjs from 'dayjs'
+import { DOCS_URL } from 'lib/constants'
+import { partition } from 'lodash'
 import { Book, Github, Hash, MessageSquare } from 'lucide-react'
 import {
   createLoader,
   createParser,
   createSerializer,
-  type inferParserType,
   parseAsString,
+  type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
-// End of third-party imports
-
-import {
-  type DocsSearchResult as Page,
-  type DocsSearchResultSection as PageSection,
-  DocsSearchResultType as PageType,
-} from 'common'
-import { getProjectDetail } from 'data/projects/project-detail-query'
-import dayjs from 'dayjs'
-import { DOCS_URL } from 'lib/constants'
 import type { Organization } from 'types'
+
 import { CATEGORY_OPTIONS } from './Support.constants'
 
 export const NO_PROJECT_MARKER = 'no-project'
@@ -32,10 +34,13 @@ export const formatMessage = ({
   attachments?: Array<string>
   error: string | null | undefined
 }) => {
+  const [harFiles, images] = partition(attachments, (x) => x.split('?token')[0].endsWith('.har'))
   const errorString = error != null ? `\n\nError: ${error}` : ''
-  const attachmentsString =
-    attachments.length > 0 ? `\n\nAttachments:\n${attachments.join('\n')}` : ''
-  return `${message}${errorString}${attachmentsString}`
+
+  const imagesString = images.length > 0 ? `\n\nImage Attachments:\n${images.join('\n\n')}` : ''
+  const harFilesString = harFiles.length > 0 ? `\n\nHAR Files:\n${harFiles.join('\n\n')}` : ''
+
+  return `${message}${errorString}${imagesString}${harFilesString}`
 }
 
 export const formatStudioVersion = (commit: { commitSha: string; commitTime: string }): string => {

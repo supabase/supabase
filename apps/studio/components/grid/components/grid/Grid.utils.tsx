@@ -38,20 +38,21 @@ export function useOnRowsChange(rows: SupaRow[]) {
       const previousRowsQueries = queryClient.getQueriesData<TableRowsData>({ queryKey })
 
       queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
-        return {
-          rows:
-            old?.rows.map((row) => {
-              // match primary keys
-              if (
-                Object.entries(row)
-                  .filter(([key]) => primaryKeyColumns.has(key))
-                  .every(([key, value]) => value === configuration.identifiers[key])
-              ) {
-                return { ...row, ...payload }
-              }
+        if (!old) return old
 
-              return row
-            }) ?? [],
+        return {
+          rows: old.rows.map((row) => {
+            // match primary keys
+            if (
+              Object.entries(row)
+                .filter(([key]) => primaryKeyColumns.has(key))
+                .every(([key, value]) => value === configuration.identifiers[key])
+            ) {
+              return { ...row, ...payload }
+            }
+
+            return row
+          }),
         }
       })
 

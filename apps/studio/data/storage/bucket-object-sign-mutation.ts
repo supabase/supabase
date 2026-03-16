@@ -35,6 +35,33 @@ export const signBucketObject = async (
 
 type SignBucketObjectData = Awaited<ReturnType<typeof signBucketObject>>
 
+type SignBucketObjectsParams = {
+  projectRef: string
+  bucketId?: string
+  paths: Array<string>
+  expiresIn: number
+}
+export const signBucketObjects = async (
+  { projectRef, bucketId, paths, expiresIn }: SignBucketObjectsParams,
+  signal?: AbortSignal
+) => {
+  if (!bucketId) throw new Error('bucketId is required')
+
+  const { data, error } = await post('/platform/storage/{ref}/buckets/{id}/objects/sign-multi', {
+    params: {
+      path: {
+        ref: projectRef,
+        id: bucketId,
+      },
+    },
+    body: { path: paths, expiresIn },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data ?? []
+}
+
 export const useGetSignBucketObjectMutation = ({
   onSuccess,
   onError,

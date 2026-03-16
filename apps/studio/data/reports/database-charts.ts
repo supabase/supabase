@@ -1,29 +1,32 @@
-import { numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { compactNumberFormatter, numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import type { Organization } from 'types'
+
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
 import { Project } from '../projects/project-detail-query'
 
 export const getReportAttributesV2: (
-  org: Organization,
+  entitledFeatures: string[],
   project: Project,
   diskConfig?: DiskAttributesData,
   maxConnections?: MaxConnectionsData,
-  pgBouncerMaxConnections?: number
-) => ReportAttributes[] = (org, project, diskConfig, maxConnections, pgBouncerMaxConnections) => {
-  const isFreePlan = org?.plan?.id === 'free'
-  const isSpendCapEnabled =
-    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
-
+  pgBouncerMaxConnections?: number,
+  isSpendCapEnabled?: boolean
+) => ReportAttributes[] = (
+  entitledFeatures,
+  project,
+  diskConfig,
+  maxConnections,
+  pgBouncerMaxConnections,
+  isSpendCapEnabled
+) => {
   return [
     {
       id: 'ram-usage',
       label: 'Memory usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -68,7 +71,6 @@ export const getReportAttributesV2: (
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -139,7 +141,6 @@ export const getReportAttributesV2: (
       label: 'Disk Input/Output operations per second (IOPS)',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
       syncId: 'database-reports',
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       valuePrecision: 0,
@@ -148,8 +149,8 @@ export const getReportAttributesV2: (
       showGrid: true,
       showMaxValue: true,
       YAxisProps: {
-        width: 35,
-        tickFormatter: (value: any) => numberFormatter(value, 0),
+        width: 55,
+        tickFormatter: (value: any) => compactNumberFormatter(value),
       },
       defaultChartStyle: 'bar',
       attributes: [
@@ -183,7 +184,8 @@ export const getReportAttributesV2: (
       label: 'Disk throughput',
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
-      availableIn: ['team', 'enterprise', 'platform'],
+      entitlement: 'disk_throughput',
+      requiredPlan: 'Team',
       hide: false,
       showTooltip: true,
       format: 'bytes-per-second',
@@ -230,8 +232,7 @@ export const getReportAttributesV2: (
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['free'],
-      hide: !isFreePlan,
+      hide: entitledFeatures.includes('database'),
       showTooltip: false,
       showLegend: false,
       showMaxValue: true,
@@ -263,8 +264,9 @@ export const getReportAttributesV2: (
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
@@ -327,8 +329,9 @@ export const getReportAttributesV2: (
       label: 'Dedicated Pooler Client Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
@@ -359,8 +362,9 @@ export const getReportAttributesV2: (
       label: 'Shared Pooler (Supavisor) client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: false,
       showLegend: false,
       showMaxValue: false,
@@ -382,7 +386,6 @@ export const getReportAttributesV2: (
       label: 'Disk Usage',
       syncId: 'database-reports',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -426,7 +429,7 @@ export const getReportAttributesV2: (
           label: 'Disk Size',
           tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
-        !isFreePlan &&
+        entitledFeatures.includes('database') &&
           (isSpendCapEnabled
             ? {
                 attribute: 'pg_database_size_percent_paid_spendCap',

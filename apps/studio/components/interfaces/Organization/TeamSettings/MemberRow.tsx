@@ -1,4 +1,4 @@
-import { ArrowRight, Check, User, X } from 'lucide-react'
+import { ArrowRight, Check, User, X, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
@@ -72,40 +72,44 @@ export const MemberRow = ({ member }: MemberRowProps) => {
               </div>
             }
           />
-          <div className="flex item-center gap-x-2">
+          <div className="flex item-center gap-x-3">
             <p className="text-foreground-light truncate">{member.primary_email}</p>
-            {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
+            <div className="flex items-center gap-x-2">
+              {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
+              {isInvitedUser && member.invited_at && (
+                <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
+                  {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
+                </Badge>
+              )}
+              {member.is_sso_user && <Badge variant="default">SSO</Badge>}
+              {(member.metadata as any)?.origin && (
+                <PartnerIcon
+                  organization={{
+                    managed_by:
+                      MEMBER_ORIGIN_TO_MANAGED_BY[
+                        (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
+                      ] ?? 'supabase',
+                  }}
+                  tooltipText="Managed by Vercel Marketplace."
+                />
+              )}
+            </div>
           </div>
-
-          {(member.metadata as any)?.origin && (
-            <PartnerIcon
-              organization={{
-                managed_by:
-                  MEMBER_ORIGIN_TO_MANAGED_BY[
-                    (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
-                  ] ?? 'supabase',
-              }}
-              tooltipText="This user is managed by Vercel Marketplace."
-            />
-          )}
         </div>
       </TableCell>
 
       <TableCell>
-        {isInvitedUser && member.invited_at && (
-          <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
-            {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
-          </Badge>
-        )}
-        {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-      </TableCell>
-
-      <TableCell>
-        <div className="flex items-center justify-center">
+        <div className="flex items-center gap-x-1.5">
           {member.mfa_enabled ? (
-            <Check className="text-brand" strokeWidth={2} size={20} />
+            <>
+              <span className="text-foreground-lighter">Enabled</span>
+              <Check className="text-brand" strokeWidth={2} size={16} />
+            </>
           ) : (
-            <X className="text-foreground-light" strokeWidth={1.5} size={20} />
+            <>
+              <span className="text-foreground-lighter">Disabled</span>
+              <X className="text-foreground-muted" strokeWidth={1.5} size={16} />
+            </>
           )}
         </div>
       </TableCell>
@@ -130,18 +134,18 @@ export const MemberRow = ({ member }: MemberRowProps) => {
 
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
-                <p>{roleName}</p>
+                <p className="text-foreground-light">{roleName}</p>
                 {hasProjectScopedRoles && (
                   <>
-                    <span>•</span>
+                    <ChevronRight className="text-foreground-muted/50" size={14} />
                     {projectsApplied.length === 1 ? (
-                      <span className="text-foreground truncate" title={projectsApplied[0]}>
+                      <span className="text-foreground-light truncate" title={projectsApplied[0]}>
                         {projectsApplied[0]}
                       </span>
                     ) : (
                       <HoverCard_Shadcn_ openDelay={200}>
                         <HoverCardTrigger_Shadcn_ asChild>
-                          <span className="text-foreground">
+                          <span className="text-foreground-light">
                             {role?.projects.length === 0
                               ? 'Organization'
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}

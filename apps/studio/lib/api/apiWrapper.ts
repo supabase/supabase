@@ -24,16 +24,16 @@ export function isResponseOk<T>(response: T | ResponseFailure | undefined): resp
 // Purpose of this apiWrapper is to function like a global catchall for ANY errors
 // It's a safety net as the API service should never drop, nor fail
 
-export default async function apiWrapper(
+async function apiWrapper(
   req: NextApiRequest,
   res: NextApiResponse,
   handler: (
     req: NextApiRequest,
     res: NextApiResponse,
     claims?: JwtPayload
-  ) => Promise<Response | void>,
+  ) => Promise<NextApiResponse | Response | void>,
   options?: { withAuth: boolean }
-): Promise<Response | void> {
+): Promise<NextApiResponse | Response | void> {
   try {
     const { withAuth } = options || {}
     let claims: JwtPayload | undefined
@@ -55,3 +55,6 @@ export default async function apiWrapper(
     return res.status(500).json({ error })
   }
 }
+
+export { apiWrapper }
+export default apiWrapper

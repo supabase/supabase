@@ -96,10 +96,10 @@ const UserImpersonationSelector = () => {
     setPreviousSearches((prev) => {
       // Remove if already present
       const filtered = prev.filter((u) => u.id !== user.id)
-      // Add new user to the end
-      const updated = [...filtered, user]
+      // Add new user to the start of the list (last used first)
+      const updated = [user, ...filtered]
       // Keep only the last 6
-      return updated.slice(-6)
+      return updated.slice(0, 5)
     })
 
     if (customAccessTokenHookDetails?.type === 'https') {

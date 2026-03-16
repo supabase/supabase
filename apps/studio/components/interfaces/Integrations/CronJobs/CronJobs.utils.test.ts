@@ -41,8 +41,42 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should return a sql function command when the function name contains an underscore', () => {
+    const command = 'SELECT random_schema.function_1()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'random_schema',
+      functionName: 'function_1',
+      snippet: command,
+    })
+  })
+
   it('should return a sql snippet command when the command is SELECT public.test_fn(1, 2)', () => {
     const command = 'SELECT public.test_fn(1, 2)'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql snippet command when the command is using a SQL function from the search path', () => {
+    const command = 'SELECT test_cron_function()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql snippet command when the command is SELECT .()', () => {
+    const command = 'SELECT .()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql snippet command when the command is SELECT schema.()', () => {
+    const command = 'SELECT schema.()'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       type: 'sql_snippet',
       snippet: command,

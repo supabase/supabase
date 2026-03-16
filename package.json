@@ -9,6 +9,7 @@
     "preinstall": "npx only-allow pnpm",
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
+    "build:studio:docker": "docker build . -f apps/studio/Dockerfile --target production -t supabase-studio:local --build-arg NEXT_PUBLIC_STUDIO_AUTH_MODE=supabase --no-cache",
     "build:design-system": "turbo run build --filter=design-system",
     "build:docs": "turbo run build --filter=docs",
     "clean": "turbo run clean --parallel && rimraf -G node_modules/{*,.bin,.modules.yaml}",
@@ -27,7 +28,7 @@
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
-    "e2e:setup:cli": "supabase stop --all --no-backup ; supabase start --exclude studio && supabase db reset && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
+    "e2e:setup:cli": "supabase stop --all --no-backup ; supabase start --exclude studio && if [ -z \"${CI}\" ]; then supabase db reset; fi && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "e2e:setup:selfhosted": "SKIP_ASSET_UPLOAD=1 pnpm e2e:setup:cli && NODE_ENV=test NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:studio && NODE_ENV=test pnpm --prefix ./apps/studio start",
     "e2e:setup:platform": "SKIP_ASSET_UPLOAD=1 NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:studio && pnpm --prefix ./apps/studio start",
     "e2e": "pnpm --prefix e2e/studio run e2e",
@@ -45,11 +46,12 @@
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
+    "jsdom": "^28.1.0",
     "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
-    "supabase": "^2.65.6",
+    "supabase": "^2.76.10",
     "supports-color": "^8.0.0",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",
@@ -65,6 +67,13 @@
     "pnpm": "10.24",
     "node": ">=22"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "packageManager": "pnpm@10.24.0"
 }

@@ -9,7 +9,7 @@ const OrgIntegrationSettings: NextPageWithLayout = () => {
 
 OrgIntegrationSettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>{page}</OrganizationLayout>
+    <OrganizationLayout title="Integrations">{page}</OrganizationLayout>
   </DefaultLayout>
 )
 

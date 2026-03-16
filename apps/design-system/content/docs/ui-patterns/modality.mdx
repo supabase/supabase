@@ -74,3 +74,53 @@ Sheets are dialogs presented as side panels. Use them for content that is larger
 [Sheet](../components/sheet) is modal by default, blocking interaction with the underlying page.
 
 <ComponentPreview name="sheet-demo" />
+
+## Best practices
+
+### Dirty form dismissal
+
+When a dialog or sheet contains a form, keep all normal dismissal affordances enabled (backdrop click, Escape key, close icon, and footer `Cancel` button).
+
+Decision flow:
+
+1. User attempts to close the dialog/sheet.
+2. If the form is clean, close immediately.
+3. If the form is dirty, show a discard-confirmation dialog.
+4. `Keep editing` returns to the form.
+5. `Discard changes` closes and resets the form.
+
+Implementation checklist:
+
+- Intercept close attempts from `onOpenChange`.
+- Route footer `Cancel` through the same close guard.
+- Render a separate discard confirmation dialog when dirty.
+- Keep `Cancel` non-destructive; use `Discard`/`Discard changes` for one-click destructive exits.
+- Guard controlled close attempts only; do not try to block route changes or arbitrary unmounts.
+
+Studio implementation (preferred in Studio code):
+
+```tsx
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
+
+const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+  checkIsDirty: () => form.formState.isDirty,
+  onClose,
+})
+
+<Sheet open={visible} onOpenChange={handleOpenChange}>
+  ...
+  <Button type="default" onClick={confirmOnClose}>
+    Cancel
+  </Button>
+  ...
+  <DiscardChangesConfirmationDialog {...modalProps} />
+</Sheet>
+```
+
+Generic implementation (outside Studio):
+
+- If Studio-only helpers are unavailable, recreate the same behavior with `AlertDialog`.
+- The demo below shows the same flow and API shape (`confirmOnClose`, `handleOpenChange`, `modalProps`).
+
+<ComponentPreview name="sheet-confirm-on-close-demo" />

@@ -96,7 +96,7 @@ export const UserReportPage: NextPageWithLayout = () => {
 
 UserReportPage.getLayout = (page) => (
   <DefaultLayout>
-    <ObservabilityLayout>{page}</ObservabilityLayout>
+    <ObservabilityLayout title="Overview">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
