@@ -43,7 +43,6 @@ Check updates for each service to learn more.
 
 ### Realtime
 
-- Updated to `v2.78.15` - [Release](https://github.com/supabase/realtime/releases/tag/v2.78.15)
 - ⚠️ Added **mandatory** `METRICS_JWT_SECRET` environment variable (requires `docker-compose.s3.yml` update) - PR [realtime#1729](https://github.com/supabase/realtime/pull/1729)
 
 ### Storage
