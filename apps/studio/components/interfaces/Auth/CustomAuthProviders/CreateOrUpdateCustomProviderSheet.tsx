@@ -126,7 +126,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
             identifier: providerToEdit.identifier.replace('custom:', ''),
             provider_type: providerToEdit.provider_type,
             client_id: providerToEdit.client_id,
-            client_secret: '********',
+            client_secret: 'placeholder',
             email_optional: providerToEdit.email_optional,
             issuer: providerToEdit.issuer,
             discovery_url: providerToEdit.discovery_url,
@@ -138,7 +138,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
             identifier: providerToEdit.identifier.replace('custom:', ''),
             provider_type: providerToEdit.provider_type,
             client_id: providerToEdit.client_id,
-            client_secret: '********',
+            client_secret: 'placeholder',
             email_optional: providerToEdit.email_optional,
             issuer: providerToEdit.issuer,
             authorization_url: providerToEdit.authorization_url,
@@ -193,6 +193,10 @@ export const CreateOrUpdateCustomProviderSheet = ({
     }
 
     if (isEditMode) {
+      // only include the client secret if it was changed, otherwise keep existing secret
+      if (values.client_secret !== 'placeholder') {
+        payload.client_secret = values.client_secret
+      }
       updateCustomProvider({
         identifier,
         projectRef,
