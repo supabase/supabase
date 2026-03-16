@@ -2,9 +2,6 @@ services:
 
   rustfs:
     image: rustfs/rustfs
-    ports:
-      - '9000:9000'
-      - '9001:9001'
     environment:
       RUSTFS_ACCESS_KEY: ${MINIO_ROOT_USER}
       RUSTFS_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
