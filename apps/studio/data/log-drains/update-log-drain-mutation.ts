@@ -20,13 +20,21 @@ export async function updateLogDrain(payload: LogDrainUpdateVariables) {
     throw new Error('Token is required')
   }
 
+  const config = payload.config as any
+  if (config?.headers && typeof config.headers === 'object') {
+    const filteredHeaders = Object.fromEntries(
+      Object.entries(config.headers).filter(([, value]) => value !== 'REDACTED')
+    )
+    config.headers = filteredHeaders
+  }
+
   const { data, error } = await put('/platform/projects/{ref}/analytics/log-drains/{token}', {
     params: { path: { ref: payload.projectRef, token: payload.token } },
     body: {
       name: payload.name,
       description: payload.description,
       type: payload.type,
-      config: payload.config as any,
+      config: config,
     },
   })
 
