@@ -38,6 +38,8 @@ Check updates for each service to learn more.
 ### MCP Server
 - Updated to `v0.7.0` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.7.0)
 
+- Updated to `v14.6` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.6)
+
 ### Realtime
 
 - Updated to `v2.78.15` - [Release](https://github.com/supabase/realtime/releases/tag/v2.78.15)
@@ -55,6 +57,9 @@ Check updates for each service to learn more.
 - ⚠️ Added `SUPABASE_PUBLISHABLE_KEYS`, `SUPABASE_SECRET_KEYS`, and `SUPABASE_PUBLIC_URL` environment variables (requires `docker-compose.yml` update)
 - ⚠️ Added an option for a "hybrid" JWT verification following the addition of the new API keys and the new asymmetric authentication (requires `volumes/functions/main/index.ts` update) - PR [#42130](https://github.com/supabase/supabase/pull/42130)
 - ⚠️ Added optional rate limiter - PR [edge-runtime#670](https://github.com/supabase/edge-runtime/pull/670)
+
+### Supavisor
+- Updated to `v2.8.0` - [Release](https://github.com/supabase/supavisor/releases/tag/v2.8.0)
 
 ---
 
